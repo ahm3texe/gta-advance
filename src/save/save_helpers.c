@@ -1,8 +1,7 @@
 /* Kayit serilestirme yardimcilari — 0x080010F8-0x0800114B
  *
- * Bu dosya assembly'den C'ye tasima calismasinin ilkidir. Sekiz fonksiyonun
- * besi C'den byte-matching; ucu acik. Blok tamamlanana kadar
- * src/save/save_helpers.s gecerli build kaynagidir.
+ * Sekiz fonksiyonun yedisi C'den byte-matching; WriteU16LE acik. Blok
+ * tamamlanana kadar src/save/save_helpers.s gecerli build kaynagidir.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/save/save_helpers.c
@@ -18,9 +17,10 @@ typedef struct {
     u8 data[11];
 } SaveSlotHeader;
 
-#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)
 #define SAVE_SLOT_COUNT  3
 #define SAVE_SLOT_STRIDE 160
+
+extern SaveSlotHeader gSaveSlotHeaders[SAVE_SLOT_COUNT];
 
 extern void *Memset(void *dest, int value, u32 count);
 extern u32 WriteEepromRange(u32 offset, const void *src, u32 size);
@@ -59,16 +59,12 @@ u32 EraseSaveSlot(u32 slot)
  * bir bayrak; C'yi kurcalayarak cozulecek gibi gorunmuyor. */
 SaveSlotHeader *GetSaveSlotHeader(u32 slot)
 {
-    SaveSlotHeader *header;
-
     if (slot >= SAVE_SLOT_COUNT)
         return 0;
-
-    header = &gSaveSlotHeaders[slot];
-    if (header->marker == 0)
+    if (gSaveSlotHeaders[slot].marker == 0)
         return 0;
 
-    return header;
+    return &gSaveSlotHeaders[slot];
 }
 
 /* 0x080010F8 — byte-matching */
@@ -95,18 +91,14 @@ void WriteU8(u8 *p, u8 v)
     p[0] = v;
 }
 
-/* 0x08001124 — HENUZ ESLESMIYOR (8 byte'in 6'si farkli)
+/* 0x08001124 — HENUZ ESLESMIYOR (ROM 12 byte, bizimki 8)
  *
- * ROM giriste degeri 16 bite kirpiyor:
+ * ROM giriste degeri 16 bite normalize ediyor:
  *     lsls r1, r1, #16 ; lsrs r1, r1, #16
- * Bu kirpma anlamsal olarak gereksiz (strb zaten alt bayti alir), bu yuzden
- * old_agbcc onu eliyor. Denenip TUTMAYANLAR:
- *   u32/int parametre + u16 yerel; 0xffff maskesi; (u16) cast; (u8) castlar;
- *   v >>= 8 yerinde kaydirma; v / 256; v & 255; i<2 dongusu; *p++ yazimi.
- * TEK IPUCU: p[1] once yazilinca old_agbcc kirpmayi uretiyor, ama sirayi
- * bozdugu icin tutmuyor. Muhtemelen deger ayri bir u16 nesneden geliyor.
- * Bu fonksiyon cozulene kadar src/save/save_helpers.s icindeki assembly
- * gecerli kaynaktir. */
+ * Kalan sekiz bayt birebir ayni. En yakin gelen bicim `int` yerel degisken:
+ * kirpmayi uretiyor ama kaydirmayi isaretli yapiyor (asrs, oysa lsrs gerek);
+ * isaretsiz cast eklenince kirpma tamamen kayboluyor.
+ * Denenip tutmayanlarin tam listesi docs/COMPILER.md icinde. */
 void WriteU16LE(u8 *p, u16 v)
 {
     p[0] = v;

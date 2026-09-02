@@ -15,3 +15,5 @@ address,size,name,source,status,notes
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
 
+0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
+0x02000460,36,gSaveSlotHeaders,decomp,verified,"Three 12-byte save slot headers; byte 0 of each is the validity marker"

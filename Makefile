@@ -205,15 +205,10 @@ build/save/save_slots.bin: build/save/save_slots.elf
 save-slots-match: verify-rom build/save/save_slots.bin
 	@python3 tools/compare_slice.py baserom.gba 0xb00 build/save/save_slots.bin
 
-build/save/save_wrappers.o: src/save/save_wrappers.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/save_wrappers.bin: src/save/save_wrappers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/save_wrappers.elf: build/save/save_wrappers.o config/save_wrappers.ld
-	@arm-none-eabi-ld -T config/save_wrappers.ld -o $@ $<
-
-build/save/save_wrappers.bin: build/save/save_wrappers.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.save_wrappers $< $@
+	@python3 tools/build_c.py $< $@
 
 save-wrappers-match: verify-rom build/save/save_wrappers.bin
 	@python3 tools/compare_slice.py baserom.gba 0xbe4 build/save/save_wrappers.bin

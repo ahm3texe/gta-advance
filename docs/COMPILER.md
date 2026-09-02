@@ -66,39 +66,81 @@ old_agbcc -mthumb-interwork -O2 -fhex-asm
 Bazı çeviri birimleri farklı derleyici veya seviye kullanıyor olabilir;
 `make c-match FILE=... --cc=agbcc` ile diğer varyant denenebilir.
 
-## Kapatılan yol: derleyici varyantı ve bayraklar
+## RAM adresleri extern sembol olmalı — en önemli kural
 
-`EraseSaveSlot`, `GetSaveSlotHeader` ve `WriteU16LE` aynı sistematik farkı
-gösteriyor (ROM taban adresi indeks hesabından önce yüklüyor). Bu hipotez
-sonuna kadar test edildi ve **tükendi**:
+`EraseSaveSlot` ve `GetSaveSlotHeader` uzun süre eşleşmedi. Sebebin derleyici
+sürümü olduğu sanıldı; **değildi.** Gerçek sebep C tarafındaydı:
 
-**Bayrak taraması** — 15 aday bayrak, iki derleyici üzerinde:
-`-fforce-addr`, `-fforce-mem`, `-fno-force-mem`, `-fno-strength-reduce`,
-`-fomit-frame-pointer`, `-fno-peephole`, `-fcaller-saves`, `-fno-cse-follow-jumps`,
-`-fno-expensive-optimizations`, `-fno-defer-pop`, `-fno-function-cse`
-(`-f*schedule-insns*` ve `-mlong-calls` desteklenmiyor).
+```c
+#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* YANLIS */
+extern SaveSlotHeader gSaveSlotHeaders[3];                /* DOGRU  */
+```
 
-Sonuç tamamen düz: `old_agbcc` her bayrakta 5/8, `agbcc` her bayrakta 3/8.
-Hiçbir bayrak tek bir byte değiştirmedi.
+Adres bir derleme-zamanı sabiti olduğunda agbcc onu katlıyor: `base + 16`
+ifadesini ayrı bir literal (`0x02000EE0`) hâline getiriyor ve tabanı register'da
+tutmuyor. ROM ise tabanı bir kez yükleyip register'da saklıyor. Adres extern
+sembol olunca derleyici katlayamıyor ve ROM'un ürettiği kodu üretiyor.
+
+Bu tek değişiklikle `EraseSaveSlot` anında eşleşti; `GetSaveSlotHeader` ise
+doğrudan üye erişimine geçirilince eşleşti:
+
+```c
+if (gSaveSlotHeaders[slot].marker == 0)   /* ara isaretci degiskeni degil */
+    return 0;
+return &gSaveSlotHeaders[slot];
+```
+
+**Kural: her RAM adresi `data/ram_map.csv`'ye yazılır ve C'de `extern` olarak
+bildirilir.** `tools/agbcc_build.py` sembolü oradan çözer.
+
+## Ölçülen ama etkisiz çıkanlar
+
+Yukarıdaki sebep bulunmadan önce iki hipotez sonuna kadar test edildi. İkisi de
+etkisiz çıktı; kayıt olarak duruyorlar ki tekrar denenmesin:
+
+**Bayrak taraması** — 15 aday bayrak, iki derleyici üzerinde (`-fforce-addr`,
+`-fforce-mem`, `-fno-strength-reduce`, `-fomit-frame-pointer`, `-fno-peephole`,
+`-fcaller-saves`, `-fno-cse-follow-jumps`, `-fno-expensive-optimizations`,
+`-fno-defer-pop`, `-fno-function-cse` ve diğerleri). Hiçbiri tek bayt
+değiştirmedi.
 
 **Derleyici sürümü** — pret/agbcc'nin `release` etiketi ayrıca derlendi.
-İkili dosyalar `master`'dan farklı (SHA-1 farklı) ama **çıktı birebir aynı**:
-`release old_agbcc` 5/8, `release agbcc` 3/8, eşleşmeyenler aynı üç fonksiyon.
+İkilileri `master`'dan farklı ama çıktısı birebir aynı.
 
-Depoda başka dal/etiket yok. Yani bu fark, kamuya açık agbcc ile
-kapatılamıyor. Kalan olasılık orijinal SDK derleyicisinin pret'in yeniden
-kurduğundan farklı olması; bu da elde edilebilir bir şey değil.
+Yani sorun hiçbir zaman derleyicide değildi. Bu, negatif sonuçların "yol
+kapalı" diye okunmasının nasıl yanıltabileceğinin örneğidir: asıl değişken
+başka yerdeydi.
 
-**Sonuç:** bu üç fonksiyon için C'yi kurcalamak ya da derleyici değiştirmek
-işe yaramıyor. Assembly kaynakları geçerli kalır; ilerleme başka fonksiyonlardan
-devam eder.
+## Diğer iki tuzak
+
+**Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
+değilse (`0x08001094` gibi) linker bölümü ileri itiyor ve *önceden eşleşen
+fonksiyonlar dahil* her ölçüm kayıyor. Link betiğinde bölüm adresi açıkça
+sabitlenir (`SUBALIGN(1)`).
+
+**Bölüm sonu dolgusu.** `as` Thumb bölümlerini NOP (`0x46C0`) ile doldurur,
+ROM ise sıfırla. Üretilen assembly'nin sonuna `.align 2, 0` eklenir.
+
+**Dış semboller `.equ` ile verilir, linker'a bırakılmaz.** Linker mutlak
+sembolü Thumb fonksiyonu olarak tanımadığı için araya interworking veneer'i
+sokar ve `bl` hedefi yanlış çıkar.
 
 ## Açık kalan
 
-`WriteU16LE` (0x08001124, 8 byte): ROM girişte anlamsal olarak gereksiz bir
-16-bit kırpma yapıyor, `old_agbcc` bunu eliyor. Denenen ve tutmayan C
-biçimleri `src/save/save_helpers.c` içinde listeli. Çözülene kadar
-`src/save/save_helpers.s` geçerli kaynaktır.
+`WriteU16LE` (`0x08001124`, 12 byte): ROM girişte değeri 16 bite normalize
+ediyor (`lsls #16` / `lsrs #16`), ürettiğimiz kod bu dört baytı atlıyor ve
+kalan sekiz bayt birebir aynı çıkıyor.
+
+En yakın gelen biçim `int` yerel değişken: kırpmayı üretiyor ama kaydırmayı
+işaretli yapıyor (`asrs` yerine `lsrs` gerekiyor) — tek yarım-sözcük fark.
+İşaretsiz cast eklenince kırpma tamamen kayboluyor.
+
+Denenip tutmayanlar: `u32`/`int` parametre ve yerel değişken kombinasyonları,
+`0xffff` maskesi, `(u16)`/`(u8)`/`(u32)` cast'ları, `v >>= 8`, `v / 256`,
+`v & 255`, `i < 2` döngüsü, `*p++` yazımı, K&R parametre bildirimi,
+`-traditional`, `-W`, `-funsigned-bitfields`, `-fshort-enums`,
+`-mno-thumb-interwork`.
+
 
 ## Kurulum
 

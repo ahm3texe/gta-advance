@@ -152,3 +152,57 @@ bu araçla korunuyor, bakım gerektirmeyen ve eskiyemeyen biçimde.
 
 `make matching` 21/21 bozulmadı. `save_helpers.s` hâlâ geçerli build kaynağı;
 blok 8/8 olana kadar öyle kalacak.
+
+## 2026-09-03 (devam 2) — İlk assembly dosyası emekli oldu
+
+### Asıl bulgu: RAM adresleri extern sembol olmalı
+
+`EraseSaveSlot` ve `GetSaveSlotHeader`'ın eşleşmemesinin sebebinin derleyici
+sürümü olduğunu düşünmüştüm. **Yanlıştı.** Sebep C tarafındaydı:
+
+```c
+#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* katlaniyor */
+extern SaveSlotHeader gSaveSlotHeaders[3];                /* dogru      */
+```
+
+Adres derleme-zamanı sabiti olunca agbcc `base + 16`'yı ayrı bir literal
+hâline getiriyor ve tabanı register'da tutmuyor; ROM ise tabanı bir kez
+yükleyip saklıyor. Extern sembole çevrilince `EraseSaveSlot` anında eşleşti,
+`GetSaveSlotHeader` da doğrudan üye erişimine geçirilince eşleşti.
+
+Önceki oturumda "derleyici hipotezi tükendi, bu üç fonksiyon kapanmıyor"
+diye kaydedilen sonuç bu yüzden hatalıydı; `docs/COMPILER.md` düzeltildi.
+Bayrak taraması ve `release` sürümü ölçümleri kayıt olarak duruyor — ikisi de
+gerçekten etkisizdi, ama asıl değişken başka yerdeydi.
+
+### save_wrappers: ilk tam blok
+
+`IsSaveSlotValid`, `ReadSaveMetadata`, `WriteSaveMetadata` — 3/3 byte-matching,
+ve 68 byte'lık bölgenin tamamı birebir. `src/save/save_wrappers.s` ve
+`config/save_wrappers.ld` silindi; bölge artık C'den üretiliyor.
+`make matching` 21/21 bozulmadan geçiyor.
+
+save_helpers 7/8: yalnızca `WriteU16LE` açık.
+
+### Yol boyunca düzeltilen üç tuzak
+
+1. **Dış semboller `.equ` ile verilir.** Linker'a bırakılınca mutlak sembolü
+   Thumb fonksiyonu saymıyor ve araya interworking veneer'i sokuyor;
+   `bl` hedefi yanlış çıkıyor.
+2. **Bölüm sonu dolgusu.** `as` Thumb bölümlerini NOP (`0x46C0`) ile
+   dolduruyor, ROM sıfırla. Üretilen assembly'nin sonuna `.align 2, 0` eklendi.
+3. **Bölüm hizalaması** (önceki oturumdan): agbcc `.text`'i 8'e hizalıyor,
+   taban 8'in katı değilse her ölçüm kayıyor.
+
+### Eklenenler
+
+- `tools/build_c.py` — C kaynağından ROM adresine linklenmiş `.bin` üretir;
+  Makefile bölge kuralları artık bunu kullanabiliyor.
+- `data/ram_map.csv` artık `agbcc_build` tarafından okunuyor; `gSaveMetadata`
+  (`0x02000ED0`) ve `gSaveSlotHeaders` (`0x02000460`) doğrulanmış olarak eklendi.
+
+### Sıradaki
+
+`WriteU16LE`; ardından `menu_helpers` (112 byte) ve
+`reset_display_interrupts` (63 satır) gibi küçük blokları C'ye taşımak.
+`agb_main.s` ve `intr_main.s` kalıcı olarak assembly kalır.

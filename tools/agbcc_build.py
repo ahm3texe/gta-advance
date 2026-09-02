@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 AGBCC_DIR = ROOT / "tools/agbcc/bin"
 ROM_PATH = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
+RAM_MAP = ROOT / "data/ram_map.csv"
 BUILD = ROOT / "build/cmatch"
 
 DEFAULT_CC = "old_agbcc"
@@ -32,6 +33,14 @@ def run(cmd: list[str], stdout: Path | None = None) -> str:
 
 def function_rows() -> dict[str, dict[str, str]]:
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
+        return {row["name"]: row for row in csv.DictReader(handle)}
+
+
+def ram_rows() -> dict[str, dict[str, str]]:
+    """RAM sembolleri: kod adresi olmayan dis semboller buradan cozulur."""
+    if not RAM_MAP.exists():
+        return {}
+    with RAM_MAP.open(newline="", encoding="utf-8") as handle:
         return {row["name"]: row for row in csv.DictReader(handle)}
 
 
@@ -70,9 +79,30 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     run(["cpp", "-nostdinc", "-undef", str(source)], Path(f"{stem}.i"))
     run([str(agbcc), *CC1FLAGS, "-o", f"{stem}.s", f"{stem}.i"])
     run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
-         "-o", f"{stem}.o", f"{stem}.s"])
+         "-o", f"{stem}.probe.o", f"{stem}.s"])
 
     rows = function_rows()
+    # Dis semboller assembler'a .equ ile verilir: `bl` boylece dogrudan
+    # kodlanir ve linker'a hic gitmez. Linker'a birakilirsa, mutlak sembolu
+    # Thumb fonksiyonu olarak tanimadigi icin araya interworking veneer'i
+    # sokar ve `bl` hedefi yanlis cikar.
+    ram = ram_rows()
+    externs = []
+    for name in _undefined(Path(f"{stem}.probe.o")):
+        row = rows.get(name) or ram.get(name)
+        if row is None:
+            sys.exit(f"'{name}' data/functions.csv veya data/ram_map.csv'de yok; "
+                     f"adresi cozulemiyor")
+        externs.append(f"    .equ {name}, {int(row['address'], 16):#x}\n")
+    source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
+    # Bolum sonu dolgusu: `as` Thumb bolumlerini varsayilan olarak NOP (0x46C0)
+    # ile doldurur, ROM ise sifirla dolduruyor. Acik hizalama bunu duzeltir.
+    Path(f"{stem}.s").write_text(
+        "".join(externs) + source_text + "\n    .align 2, 0\n", encoding="utf-8"
+    )
+    run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
+         "-o", f"{stem}.o", f"{stem}.s"])
+
     obj = Path(f"{stem}.o")
     defined = _symbols(obj)
 
@@ -81,16 +111,6 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
         sys.exit(f"{source} icindeki hicbir fonksiyon data/functions.csv'de yok")
     base = min(int(row["address"], 16) for row in known)
 
-    # Dis semboller ROM adreslerine sabitlenir; Thumb hedefleri icin +1.
-    provides = []
-    for name in _undefined(obj):
-        row = rows.get(name)
-        if row is None:
-            sys.exit(f"'{name}' data/functions.csv'de yok; adresi cozulemiyor")
-        address = int(row["address"], 16)
-        thumb = "ARM" not in row["notes"].upper().split()
-        provides.append(f"    PROVIDE({name} = {address + (1 if thumb else 0):#x});")
-
     # Bolum adresi acikca verilir: agbcc .text'i 8'e hizaliyor ve taban adres
     # 8'in kati degilse linker bolumu ileri iterek tum olcumleri kaydiriyor.
     script = Path(f"{stem}.ld")
@@ -98,7 +118,6 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
         "SECTIONS\n{\n"
         f"    . = {base:#x};\n"
         f"    .text {base:#x} : SUBALIGN(1) {{ *(.text) }}\n"
-        + ("\n".join(provides) + "\n" if provides else "")
         + "    /DISCARD/ : { *(.comment) *(.note*) }\n}\n",
         encoding="utf-8",
     )
