@@ -286,15 +286,10 @@ build/ui/draw_menu_items.bin: build/ui/draw_menu_items.elf
 draw-menu-match: verify-rom build/ui/draw_menu_items.bin
 	@python3 tools/compare_slice.py baserom.gba 0x11ec build/ui/draw_menu_items.bin
 
-build/ui/init_menu_screen.o: src/ui/init_menu_screen.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/ui/init_menu_screen.bin: src/ui/init_menu_screen.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/ui/init_menu_screen.elf: build/ui/init_menu_screen.o config/init_menu_screen.ld
-	@arm-none-eabi-ld -T config/init_menu_screen.ld -o $@ $<
-
-build/ui/init_menu_screen.bin: build/ui/init_menu_screen.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.init_menu_screen $< $@
+	@python3 tools/build_c.py $< $@
 
 init-menu-screen-match: verify-rom build/ui/init_menu_screen.bin
 	@python3 tools/compare_slice.py baserom.gba 0x13ac build/ui/init_menu_screen.bin

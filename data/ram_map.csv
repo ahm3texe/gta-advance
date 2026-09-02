@@ -30,3 +30,4 @@ address,size,name,source,status,notes
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
 0x03000004,4,gIwramFrameCounter,decomp,provisional,"IWRAM frame counter copied into gFrameDelay then cleared"
 0x04000202,2,gRegIf,decomp,verified,"REG_IF interrupt acknowledge register"
+0x02001210,4,gMenuPaletteSource,decomp,provisional,"Palette data DMA-ed into palette RAM by InitMenuScreen"

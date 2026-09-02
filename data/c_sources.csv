@@ -16,6 +16,7 @@ address,name,source,matching
 0x08001120,WriteU8,src/save/save_helpers.c,yes
 0x08001124,WriteU16LE,src/save/save_helpers.c,no
 0x08001130,WriteU32LE,src/save/save_helpers.c,yes
+0x080013AC,InitMenuScreen,src/ui/init_menu_screen.c,yes
 0x08001DC0,ResetMenuState,src/ui/menu_helpers.c,yes
 0x08001E00,IsMenuFlagSet,src/ui/menu_helpers.c,yes
 0x08001E1C,FinalizeMenuLayout,src/ui/menu_helpers.c,yes

@@ -81,6 +81,9 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 7 | Üretilen assembly'nin sonuna `.align 2, 0` eklenir | `as` Thumb bölümünü NOP ile dolduruyor, ROM sıfırla |
 | 8 | Dizi temizleme döngüsü **ileriye** yazılır (`i = 0; i < N; i++`) | agbcc bunu geriye giden işaretçi yürüyüşüne çeviriyor; ROM'daki biçim odur. Elle geriye yazmak farklı kod üretir |
 | 9 | Döngü indeksi **işaretli** (`int`) olmalı | İşaretçi karşılaştırması işaretsiz dal (`bcs`) üretir; ROM işaretli (`bge`) kullanıyor |
+| 10 | Zincirleme atama (`a = b = c`) ayrı satırlardan farklı kod üretir | ROM'daki biçim zincirleme; ayrı yazınca adres hesabı ters sıraya geçiyor |
+| 11 | Çağrılar boyunca yaşayan adres **başta yerel değişkene** alınır | ROM onu callee-saved register'da tutuyor; kullanıldığı yerde okunursa derleyici hoist etmiyor |
+| 12 | Kaydet/geri-yükle çifti olan register (`REG_IME`) `volatile` olmalı | Değilse derleyici iki kritik bölümün kaydetmelerini birleştiriyor |
 
 `volatile` agbcc'de bir **komut sıralama düğmesidir**, semantik bir işaret
 değil. Aynı `x |= sabit` deyimi için `gBiosIrqFlags`'te kaldırmak,

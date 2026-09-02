@@ -303,3 +303,40 @@ zincirleme yazınca tam eşleşme.
 
 `FUN_08012b9c`, `FUN_080133a8`, `FUN_080130f4`, `FUN_08013900`,
 `FUN_080101d8`, `FUN_080327c8` adlandırılmadı.
+
+## 2026-09-03 (devam 6) — init_menu_screen C'ye taşındı
+
+Beşinci emekli assembly dosyası. 172 baytlık bölgenin tamamı byte-matching.
+Şimdiye kadarki en karmaşık blok: iki DMA aktarımı, iki IME kritik bölümü,
+altı ardışık çağrı ve koşullu kuyruk.
+
+### Üç yeni kural
+
+**Kaydet/geri-yükle çifti olan register `volatile` olmalı.** `REG_IME`
+`volatile` değilken agbcc iki kritik bölümün kaydetmelerini birleştirip
+sıralamayı tamamen bozuyordu (136 bayt sapma). DMA3 ile birlikte `volatile`
+yapılınca 46'ya düştü.
+
+**Çağrılar boyunca yaşayan adres başta yerel değişkene alınır.** ROM palette
+kaynağını fonksiyonun ilk komutunda `r5`'e yükleyip altı çağrı boyunca orada
+tutuyor. Kullanıldığı yerde okununca derleyici hoist etmiyor:
+
+```c
+const u8 *palette = gMenuPaletteSource;   /* basta */
+...
+REG_DMA3.src = palette;                   /* sonra */
+```
+
+Bu tek değişiklik 46 bayt sapmayı sıfıra indirdi.
+
+**Zincirleme atama** (önceki bloktan): `a = b = c` ayrı satırlardan farklı
+kod üretiyor.
+
+Kural sayısı 12'ye çıktı.
+
+### Durum
+
+- `make matching` 21/21; beş bölge C'den üretiliyor
+- C kaynağı: 21 fonksiyon, 20'si byte-matching
+- Matching byte'ların **%13.69**'u C'den (638/4660)
+- Kalan assembly dosyası 16, ikisi kalıcı
