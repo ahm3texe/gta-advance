@@ -135,6 +135,19 @@ Fonksiyon başına eşleşme yüzdesi, fonksiyon aralığının [matching_region
 make dashboard-dev
 ```
 
+### Çalışırken canlı izleme
+
+İkinci bir terminalde izleyiciyi başlat:
+
+```sh
+make dashboard-watch
+```
+
+`data/*.csv` veya veri üreteci her değiştiğinde JSON yeniden üretilir. Sayfa
+JSON'u statik olarak import ettiği için Vite HMR haritayı **sayfa yenilenmeden**
+günceller: bir fonksiyon eşleştiğinde veya adlandırıldığında dikdörtgen anında
+rengini değiştirir.
+
 Dağıtım derlemesini doğrulamak için:
 
 ```sh

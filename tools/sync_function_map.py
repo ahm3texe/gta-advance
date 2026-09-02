@@ -25,13 +25,33 @@ def main() -> None:
         row = {
             "address": address,
             "name": override["name"] if override else detected["name"],
-            "size": detected["size"],
+            # Override boyutu Ghidra'nin gecici sinirini ezer.
+            "size": (override or {}).get("size") or detected["size"],
             "status": override["status"] if override else "candidate",
             "module": override["module"] if override else "unknown",
             "notes": override["notes"] if override else
                 "Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional",
         }
         merged.append(row)
+        overrides.pop(address.lower(), None)
+
+    # Ghidra'nin kacirdigi ama baska yolla dogrulanan fonksiyonlar
+    # (ornegin libc taramasi) yalnizca override dosyasinda bulunur.
+    added = 0
+    for override in overrides.values():
+        if not override.get("size", "").strip():
+            print(f"UYARI: {override['address']} Ghidra haritasinda yok ve "
+                  f"override'da size verilmemis; atlaniyor.")
+            continue
+        merged.append({
+            "address": f"0x{int(override['address'], 16):08X}",
+            "name": override["name"],
+            "size": override["size"],
+            "status": override["status"],
+            "module": override["module"],
+            "notes": override["notes"],
+        })
+        added += 1
 
     fieldnames = ["address", "name", "size", "status", "module", "notes"]
     with TRACKED.open("w", newline="", encoding="utf-8") as handle:
@@ -39,7 +59,8 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(sorted(merged, key=lambda row: int(row["address"], 16)))
 
-    print(f"Synchronized {len(merged)} Ghidra candidates into {TRACKED}")
+    print(f"Synchronized {len(merged)} functions into {TRACKED} "
+          f"({added} added from overrides beyond the Ghidra map)")
 
 
 if __name__ == "__main__":

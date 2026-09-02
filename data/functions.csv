@@ -1464,6 +1464,8 @@ address,name,size,status,module,notes
 0x08071520,FUN_08071520,216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0807160C,FUN_0807160c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071660,FUN_08071660,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080716A4,isinf,36,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was ?)
+0x080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was ?)
 0x080716E8,FUN_080716e8,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071718,FUN_08071718,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071750,FUN_08071750,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

@@ -91,6 +91,7 @@ const MODULE_LABELS: Record<string, string> = {
   sdk: 'GBA SDK',
   serialization: 'Serileştirme',
   ui: 'Arayüz',
+  libc: 'C kitaplığı',
   unknown: 'Sınıflandırılmamış',
 };
 
