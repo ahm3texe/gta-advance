@@ -132,15 +132,10 @@ build/interrupt/vblank_intr.bin: build/interrupt/vblank_intr.elf
 vblank-match: verify-rom build/interrupt/vblank_intr.bin
 	@python3 tools/compare_slice.py baserom.gba 0x220 build/interrupt/vblank_intr.bin
 
-build/interrupt/irq_helpers.o: src/interrupt/irq_helpers.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/interrupt/irq_helpers.bin: src/interrupt/irq_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/interrupt
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/interrupt/irq_helpers.elf: build/interrupt/irq_helpers.o config/irq_helpers.ld
-	@arm-none-eabi-ld -T config/irq_helpers.ld -o $@ $<
-
-build/interrupt/irq_helpers.bin: build/interrupt/irq_helpers.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.irq_helpers $< $@
+	@python3 tools/build_c.py $< $@
 
 irq-helpers-match: verify-rom build/interrupt/irq_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x730 build/interrupt/irq_helpers.bin

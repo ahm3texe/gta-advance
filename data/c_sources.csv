@@ -1,4 +1,9 @@
 address,name,source,matching
+0x08000730,NoOpVBlankFinalize,src/interrupt/irq_helpers.c,yes
+0x08000734,DummyIntr,src/interrupt/irq_helpers.c,yes
+0x08000738,RunVBlankTransfers,src/interrupt/irq_helpers.c,yes
+0x08000798,NoOpInterruptHelper,src/interrupt/irq_helpers.c,yes
+0x0800079C,VCountIntr,src/interrupt/irq_helpers.c,yes
 0x080007B4,ResetDisplayAndInterrupts,src/bootstrap/reset_display_interrupts.c,yes
 0x08000BE4,IsSaveSlotValid,src/save/save_wrappers.c,yes
 0x08000C00,ReadSaveMetadata,src/save/save_wrappers.c,yes

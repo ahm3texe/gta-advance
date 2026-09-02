@@ -268,3 +268,38 @@ işaretsiz dal üretiyor, ROM işaretli kullanıyor).
 - RAM haritası: menü sembolleri eklendi
 
 `FUN_080512b0` ve `FUN_08004280` adlandırılmadı; doğrulanmadan isim verilmiyor.
+
+## 2026-09-03 (devam 5) — irq_helpers C'ye taşındı
+
+Dördüncü emekli assembly dosyası. `NoOpVBlankFinalize`, `DummyIntr`,
+`RunVBlankTransfers`, `NoOpInterruptHelper`, `VCountIntr` — 5/5, 132 baytlık
+bölgenin tamamı.
+
+### İki kural düzeltildi
+
+**Kural 1 evrensel değil.** RAM sembolleri `extern` olmalı, ama agbcc'nin
+kaydırmayla üretebildiği adresler ROM'da sabit cast olarak yazılmış:
+`0x03000000` ROM'da `movs #0xc0` + `lsls #18` ile hesaplanıyor, literal
+havuzdan okunmuyor. Extern sembol yapınca 55 bayt sapma; sabit cast yapınca
+8'e düştü. Diff hangi biçimin doğru olduğunu söylüyor.
+
+**Kural 4 fazla genellenmişti.** Önceki oturumda "donanım değişkeni volatile
+olmamalı" diye yazmıştım — tek örnekten. `REG_IF` (`0x04000202`) tam tersini
+istiyor: `volatile` olmadan 7 bayt sapma, `volatile` ile tam eşleşme. Aynı
+`x |= sabit` deyimi, zıt gereksinimler. Kural "her erişim için ayrı denenir"
+olarak düzeltildi.
+
+### Üçüncü bulgu
+
+`gFrameDelay = counter = gIwramFrameCounter;` — zincirleme atama. Ayrı iki
+satır yazınca agbcc adres hesabını ters sıraya koyuyordu (8 bayt fark);
+zincirleme yazınca tam eşleşme.
+
+### Durum
+
+- `make matching` 21/21; dört bölge C'den üretiliyor
+- C kaynağı: 20 fonksiyon, 19'u byte-matching
+- Matching byte'ların **%10.73**'ü C'den (500/4660)
+
+`FUN_08012b9c`, `FUN_080133a8`, `FUN_080130f4`, `FUN_08013900`,
+`FUN_080101d8`, `FUN_080327c8` adlandırılmadı.

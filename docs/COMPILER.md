@@ -75,16 +75,21 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 1 | **RAM adresleri `extern` sembol olmalı**, `#define ((T*)0xADDR)` değil | Sabit olunca agbcc `taban+ofset`'i ayrı literale katlıyor; ROM tabanı register'da tutuyor |
 | 2 | **Ara işaretçi değişkeni kullanma**, doğrudan `dizi[i].alan` yaz | `p = &dizi[i]; p->alan` farklı register dağıtımı üretiyor |
 | 3 | **Yığındaki geçici tampon `volatile` olmalı** | Değilse agbcc adres alma ile sabit yüklemeyi yeniden sıralıyor |
-| 4 | **Donanım/BIOS değişkeni `volatile` OLMAMALI** | `volatile` yükleme sırasını değiştirip ROM'dan saptırıyor |
+| 4 | **`volatile` her erişim için ayrı denenir** | Sıralama düğmesidir, semantik değil: `gBiosIrqFlags` için kaldırmak, `REG_IF` için eklemek gerekti — aynı `x \|= sabit` biçiminde |
 | 5 | Dış semboller `.equ` ile assembler'a verilir | Linker'a bırakılınca interworking veneer'i sokuluyor |
 | 6 | Bölüm adresi link betiğinde sabitlenir (`SUBALIGN(1)`) | agbcc `.text`'i 8'e hizalıyor, taban 8'in katı değilse her ölçüm kayıyor |
 | 7 | Üretilen assembly'nin sonuna `.align 2, 0` eklenir | `as` Thumb bölümünü NOP ile dolduruyor, ROM sıfırla |
 | 8 | Dizi temizleme döngüsü **ileriye** yazılır (`i = 0; i < N; i++`) | agbcc bunu geriye giden işaretçi yürüyüşüne çeviriyor; ROM'daki biçim odur. Elle geriye yazmak farklı kod üretir |
 | 9 | Döngü indeksi **işaretli** (`int`) olmalı | İşaretçi karşılaştırması işaretsiz dal (`bcs`) üretir; ROM işaretli (`bge`) kullanıyor |
 
-3 ve 4 birbirinin zıddı gibi görünüyor ama değil: `volatile` agbcc'de komut
-sıralamasını değiştiren bir düğme. Yığın tamponunda ROM'un sırasını veriyor,
-donanım değişkeninde bozuyor. Kural ezberlenmez, denenir.
+`volatile` agbcc'de bir **komut sıralama düğmesidir**, semantik bir işaret
+değil. Aynı `x |= sabit` deyimi için `gBiosIrqFlags`'te kaldırmak,
+`REG_IF`'te eklemek gerekti. Ezberlenmez — her erişim için iki yönü de dene.
+
+Aynı şey adres biçimi için de geçerli: **kural 1 evrensel değildir.** RAM
+sembolleri `extern` olmalı, ama agbcc'nin kaydırmayla üretebildiği adresler
+(`0x03000000` = `0xc0 << 18` gibi) ROM'da sabit cast olarak yazılmış. Adres
+ROM'da literal havuzdan mı okunuyor yoksa hesaplanıyor mu — diff bunu söyler.
 
 ## RAM adresleri extern sembol olmalı — en önemli kural
 

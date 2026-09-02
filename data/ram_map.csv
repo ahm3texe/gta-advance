@@ -25,3 +25,8 @@ address,size,name,source,status,notes
 0x02001410,4,gMenuFlags,decomp,verified,"Menu flag bitfield tested by IsMenuFlagSet"
 0x02001414,1,gMenuPositionX,decomp,verified,"Menu horizontal position computed by BuildActiveMenuItems"
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,"Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed"
+0x02000E74,4,gAsyncState,decomp,provisional,"Nonzero suppresses the fifth VBlank transfer step; role unconfirmed"
+0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour"
+0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
+0x03000004,4,gIwramFrameCounter,decomp,provisional,"IWRAM frame counter copied into gFrameDelay then cleared"
+0x04000202,2,gRegIf,decomp,verified,"REG_IF interrupt acknowledge register"
