@@ -21,8 +21,10 @@ from agbcc_build import (  # noqa: E402
 GREEN, RED, DIM, RESET = "\033[32m", "\033[31m", "\033[2m", "\033[0m"
 
 
-def disassemble(blob: bytes, base: int, thumb: bool = True) -> list[str]:
-    raw = BUILD / "dis.bin"
+def disassemble(blob: bytes, base: int, thumb: bool = True,
+                tag: str = "dis") -> list[str]:
+    # Dosya adi cagriya ozel: paralel calisan araclar birbirini ezmesin.
+    raw = BUILD / f"{tag}.bin"
     raw.write_bytes(blob)
     out = run([
         "arm-none-eabi-objdump", "-b", "binary", "-m", "arm7tdmi",
@@ -63,8 +65,8 @@ def main() -> None:
     start = address - ROM_BASE
     theirs = rom_bytes()[start:start + (rom_size or size)]
 
-    rom_asm = disassemble(theirs, address, thumb)
-    our_asm = disassemble(mine, address, thumb)
+    rom_asm = disassemble(theirs, address, thumb, f"{source.stem}.rom")
+    our_asm = disassemble(mine, address, thumb, f"{source.stem}.mine")
 
     print(f"{target}  @ 0x{address:08X}  "
           f"ROM {len(theirs)} byte / seninki {len(mine)} byte  [{compiler}]")
