@@ -340,3 +340,38 @@ Kural sayısı 12'ye çıktı.
 - C kaynağı: 21 fonksiyon, 20'si byte-matching
 - Matching byte'ların **%13.69**'u C'den (638/4660)
 - Kalan assembly dosyası 16, ikisi kalıcı
+
+## 2026-09-03 (devam 7) — Dört blok denendi, üçü bitti
+
+`make matching` 21/21 bozulmadan duruyor.
+
+### Biten üç blok
+
+**menu_graphics** (212 B, 4 fonksiyon) — **ilk denemede 4/4**. Birikmiş
+kurallar (IME `volatile`, DMA3 `volatile`, sabit cast) doğrudan işe yaradı.
+
+**save_slots** (228 B, 2 fonksiyon) — ilk denemede 120/120 baytın 119'u
+tuttu. Tek fark `ble` ↔ `bls`: `length` parametresi `u32` olunca eşleşti.
+
+**read_eeprom_bytes** (208 B) — ROM'un açılmış sekizli byte kopyası
+`-funroll-loops` ile üretilemedi (136B/127 fark → 256B/239, daha kötü).
+Sekiz kopya `COPY_EEPROM_BYTE` makrosuyla açık yazılınca tam eşleşme.
+
+### Yarım kalan: init_save_system
+
+240 baytın 197'si tutuyor, yapı doğru. İki küme fark direniyor:
+
+1. Slot bayrağı temizleme döngüsünde ROM işaretçiyi +31'den aşağı yürütüyor,
+   bizimki +16'dan yukarı. Sayaç aynı. Altı farklı döngü biçimi denendi;
+   en iyisi 41 bayt fark.
+2. ROM `&gSavePayloadSize`'ı bölme çağrısından önce callee-saved register'a
+   alıyor. Yerel işaretçi denendi: fonksiyon başında 220, kullanım yerinde 80.
+
+Denenenler kaynak dosyanın başındaki yoruma yazıldı. `init_save_system.s`
+geçerli build kaynağı olarak kalıyor.
+
+### Durum
+
+- Emekli assembly dosyası: 8
+- C kaynağı: 28 fonksiyon, 27'si byte-matching
+- Matching byte'ların **%29.06**'sı C'den

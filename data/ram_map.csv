@@ -31,3 +31,5 @@ address,size,name,source,status,notes
 0x03000004,4,gIwramFrameCounter,decomp,provisional,"IWRAM frame counter copied into gFrameDelay then cleared"
 0x04000202,2,gRegIf,decomp,verified,"REG_IF interrupt acknowledge register"
 0x02001210,4,gMenuPaletteSource,decomp,provisional,"Palette data DMA-ed into palette RAM by InitMenuScreen"
+0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
+0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"

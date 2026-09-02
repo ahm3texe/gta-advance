@@ -5,6 +5,10 @@ address,name,source,matching
 0x08000798,NoOpInterruptHelper,src/interrupt/irq_helpers.c,yes
 0x0800079C,VCountIntr,src/interrupt/irq_helpers.c,yes
 0x080007B4,ResetDisplayAndInterrupts,src/bootstrap/reset_display_interrupts.c,yes
+0x0800082C,InitSaveSystem,src/save/init_save_system.c,no
+0x0800091C,ReadEepromBytes,src/save/read_eeprom_bytes.c,yes
+0x08000B00,WriteSaveSlot,src/save/save_slots.c,yes
+0x08000B78,ReadSaveSlot,src/save/save_slots.c,yes
 0x08000BE4,IsSaveSlotValid,src/save/save_wrappers.c,yes
 0x08000C00,ReadSaveMetadata,src/save/save_wrappers.c,yes
 0x08000C14,WriteSaveMetadata,src/save/save_wrappers.c,yes
@@ -20,3 +24,7 @@ address,name,source,matching
 0x08001DC0,ResetMenuState,src/ui/menu_helpers.c,yes
 0x08001E00,IsMenuFlagSet,src/ui/menu_helpers.c,yes
 0x08001E1C,FinalizeMenuLayout,src/ui/menu_helpers.c,yes
+0x08001E30,LoadMenuGraphics,src/ui/menu_graphics.c,yes
+0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,yes
+0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,yes
+0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,yes

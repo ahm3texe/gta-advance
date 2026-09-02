@@ -84,6 +84,8 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 10 | Zincirleme atama (`a = b = c`) ayrı satırlardan farklı kod üretir | ROM'daki biçim zincirleme; ayrı yazınca adres hesabı ters sıraya geçiyor |
 | 11 | Çağrılar boyunca yaşayan adres **başta yerel değişkene** alınır | ROM onu callee-saved register'da tutuyor; kullanıldığı yerde okunursa derleyici hoist etmiyor |
 | 12 | Kaydet/geri-yükle çifti olan register (`REG_IME`) `volatile` olmalı | Değilse derleyici iki kritik bölümün kaydetmelerini birleştiriyor |
+| 13 | Uzunluk/boyut parametreleri **işaretsiz** olabilir | `save_slots`'ta tek fark `ble` ↔ `bls` idi: `length` `u32` olunca eşleşti |
+| 14 | Tekrar eden byte kopyaları **açık yazılır**, döngüye sarılmaz | `-funroll-loops` ROM'unkinden farklı kod üretiyor (136B/127 fark → 256B/239); sekiz kopya elle yazılınca tam eşleşme |
 
 `volatile` agbcc'de bir **komut sıralama düğmesidir**, semantik bir işaret
 değil. Aynı `x |= sabit` deyimi için `gBiosIrqFlags`'te kaldırmak,
