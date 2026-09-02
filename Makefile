@@ -1,4 +1,4 @@
-.PHONY: agbcc c-match diff disasm scan-libc dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: agbcc c-match diff disasm scan-libc libc-align dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -36,6 +36,11 @@ disasm: verify-rom
 # agbcc libc.a fonksiyonlarini ROM icinde arar (--csv override satiri uretir).
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
+
+# Bir libc nesnesini bilinen capadan hizalayip fonksiyon fonksiyon karsilastirir.
+# Ornek: make libc-align FUNC=remap_handle ADDR=0x0807180C
+libc-align: verify-rom
+	@python3 tools/locate_libc_objects.py $(FUNC) $(ADDR)
 
 # Veri dosyalarini izler, degisince dashboard JSON'unu yeniler.
 # dashboard-dev ile birlikte calistir: harita anlik guncellenir.

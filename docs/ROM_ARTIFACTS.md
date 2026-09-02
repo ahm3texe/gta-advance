@@ -64,6 +64,34 @@ olarak kaydediliyor ve alternatif isim nota yazılıyor.
 `isinf` ve `isnan` Ghidra'nın fonksiyon haritasında hiç yok — yani bu yöntem
 yalnızca isim vermiyor, **kaçırılmış fonksiyonları da keşfediyor.**
 
+### Nesne düzeyinde yerleştirme denendi — çalışmıyor
+
+Bir fonksiyonun yerini bilince nesnesinin tabanı hesaplanabilir, oradan da
+nesnedeki bütün fonksiyonlar tek seferde çıkabilirdi. Denendi, olmadı.
+
+`make libc-align FUNC=remap_handle ADDR=0x0807180C` bunu gösteriyor:
+
+```
+findslot                     0x080717EC     30  26/26 TAM
+remap_handle                 0x0807180C     76  60/60 TAM
+initialise_monitor_handles   0x08071858    112  86/92
+get_errno                    0x080718C8     18  1/18
+wrap                         0x080718F0     24  0/24
+...
+```
+
+İlk iki fonksiyon birebir, üçüncüsü kısmen, sonrası tamamen kayıyor. Sebep:
+**ROM'un newlib'i aynı kaynaktan ama farklı yapılandırmayla derlenmiş.**
+`findslot`/`remap_handle` gibi yapılandırmadan bağımsız yardımcılar birebir
+aynı çıkıyor; sistem çağrısı saplamaları (`_read`, `_write`, `_open`, `_sbrk`)
+ise GBA'da işletim sistemi olmadığı için oyuna özel yazılmış ve boyutları
+farklı. Bir fonksiyonun boyutu değişince sonraki her şey öteleniyor.
+
+Dolayısıyla **fonksiyon düzeyinde maskeli arama tavandır**; nesne düzeyi
+yerleştirme bu ROM için mümkün değil. `make libc-align` tanı aracı olarak
+kaldı: bir nesnenin hangi kısmının ortak, hangi kısmının oyuna özel olduğunu
+gösterir.
+
 Kod kuyruğu (`0x08070000` sonrası) 69 fonksiyon / 6870 byte, toplam kod
 gövdesinin %2.4'ü. `0x0806F000-0x08071E00` bandında 74 fonksiyon / 10478 byte.
 
