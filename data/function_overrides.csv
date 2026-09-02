@@ -1,0 +1,47 @@
+address,name,status,module,notes
+0x080000C0,AgbMain,matching,bootstrap,52-byte body and 16-byte literal pool reproduce ROM bytes 0xC0-0x103 exactly
+0x08000104,IntrMain,matching,bootstrap,276-byte body and 8-byte literal pool reproduce ROM bytes 0x104-0x21F exactly
+0x08000220,VBlankIntr,matching,interrupt,312-byte body with interleaved literal pools reproduces ROM bytes 0x220-0x38B exactly
+0x0800038C,InitInterrupts,matching,bootstrap,102-byte body and 62-byte padding/literal pool reproduce ROM bytes 0x38C-0x42F exactly
+0x08000430,GameInit,matching,bootstrap,Main initialization/game loop plus literal pools reproduce ROM bytes 0x430-0x72F exactly
+0x08000730,NoOpVBlankFinalize,matching,interrupt,Two-byte no-op called by VBlankIntr; included in 0x730-0x7B3 matching block
+0x08000734,DummyIntr,matching,interrupt,Default two-byte IRQ handler; included in 0x730-0x7B3 matching block
+0x08000738,RunVBlankTransfers,matching,interrupt,80-byte shared graphics transfer path; surrounding literals match
+0x08000798,NoOpInterruptHelper,matching,interrupt,Two-byte no-op helper; included in 0x730-0x7B3 matching block
+0x0800079C,VCountIntr,matching,interrupt,20-byte VCount handler and literal reproduce ROM exactly
+0x080007B4,ResetDisplayAndInterrupts,matching,bootstrap,90-byte body and 30-byte padding/literals reproduce ROM bytes 0x7B4-0x82B exactly
+0x0800082C,InitSaveSystem,matching,save,Initializes EEPROM and CRAWSAVE metadata; entire 0x82C-0x91B region reproduces ROM
+0x0800091C,ReadEepromBytes,matching,save,Reads EEPROM in 8-byte units while masking interrupts; entire 0x91C-0x9EB region reproduces ROM
+0x080009EC,WriteEepromBytes,matching,save,Writes/verifies EEPROM with retries; entire 0x9EC-0xAFF region reproduces ROM
+0x08000B00,WriteSaveSlot,matching,save,Clamps slot/length and marks validity; included in exact 0xB00-0xBE3 block
+0x08000B78,ReadSaveSlot,matching,save,Checks validity and reads a clamped slot; included in exact 0xB00-0xBE3 block
+0x08000BE4,IsSaveSlotValid,matching,save,Reads metadata and returns slot-valid byte; exact in 0xBE4-0xBFF block
+0x08000C00,ReadSaveMetadata,matching,save,Reads the fixed 32-byte metadata block; exact in save-wrapper block
+0x08000C14,WriteSaveMetadata,matching,save,Writes the fixed 32-byte metadata block; exact in save-wrapper block
+0x08000C28,InitSaveManager,matching,save,Initializes three game-save headers and validates their checksum; exact through literal pools
+0x08000D20,LoadSaveSlot,matching,save,Loads a 160-byte slot and validates marker/complement checksum
+0x08000D80,WriteGameSaveSlot,matching,save,Creates a nonzero marker/complement checksum and writes a 160-byte slot
+0x08000DDC,ReadEepromRange,matching,save,Reads an arbitrary unaligned EEPROM byte range; exact 0xDDC-0xF1B region
+0x08000F1C,WriteEepromRange,matching,save,Writes arbitrary unaligned EEPROM byte ranges with bounded retries
+0x08001094,EraseSaveSlot,matching,save,Clears a slot header and its first EEPROM block
+0x080010D4,GetSaveSlotHeader,matching,save,Returns a valid slot header pointer or null
+0x080010F8,ReadU8,matching,serialization,Reads one byte from a serialized buffer
+0x080010FC,ReadU16LE,matching,serialization,Reads an unaligned little-endian 16-bit value
+0x08001108,ReadU32LE,matching,serialization,Reads an unaligned little-endian 32-bit value
+0x08001120,WriteU8,matching,serialization,Writes one byte to a serialized buffer
+0x08001124,WriteU16LE,matching,serialization,Writes an unaligned little-endian 16-bit value
+0x08001130,WriteU32LE,matching,serialization,Writes an unaligned little-endian 32-bit value
+0x0800114C,BuildActiveMenuItems,matching,ui,Filters active menu items and calculates horizontal layout; exact 0x114C-0x11EB region
+0x080011EC,DrawMenuItems,matching,ui,Draws active menu labels and formats numeric values; exact 0x11EC-0x13AB region
+0x080013AC,InitMenuScreen,matching,ui,Initializes menu display state and uploads palette/clears VRAM; exact 0x13AC-0x1457 region
+0x08001458,RunMenuScreen,documented,ui,Provisional name; builds/draws menu hierarchy and handles navigation/actions until exit
+0x08001DC0,ResetMenuState,matching,ui,Clears menu globals and active-item pointer table; exact in menu-helper block
+0x08001E00,IsMenuFlagSet,matching,ui,Tests a bit in the menu flag word; exact in menu-helper block
+0x08001E1C,FinalizeMenuLayout,matching,ui,Updates the menu layout-dependent rendering state; exact in menu-helper block
+0x08001E30,LoadMenuGraphics,matching,ui,Loads menu graphics and uploads two palette ranges; exact in menu-graphics block
+0x08001EA4,ClearMenuVram,matching,ui,Fills the menu VRAM range through DMA3; exact in menu-graphics block
+0x08001EE4,EnableMenuDisplay,matching,ui,Writes display control value 0x0101; exact in menu-graphics block
+0x08001EF4,EnableMenuDisplayAlt,matching,ui,Duplicate display-control wrapper; exact in menu-graphics block
+0x0806BCD0,LibraryAssertWrapper0,discovered,sdk,Provisional Thumb boundary; calls shared handler
+0x0806BCE0,LibraryAssertWrapper1,discovered,sdk,Provisional Thumb boundary; calls shared handler
+0x0806BCF0,LibraryAssertHandler,discovered,sdk,References assertion format at 0x08BD3470

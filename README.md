@@ -1,0 +1,93 @@
+# GTA Advance (Europe) decompilation workspace
+
+Bu depo, kullanıcının kendi sağladığı **Grand Theft Auto Advance Avrupa GBA ROM'u** üzerinde temiz ve ölçülebilir bir tersine mühendislik çalışması için hazırlanmıştır.
+
+> Bu depo orijinal ROM'u, oyundan çıkarılmış telifli varlıkları veya Rockstar/Digital Eclipse kaynak kodunu dağıtmaz. `baserom.gba` yalnızca yerel doğrulama girdisidir ve Git tarafından yok sayılır.
+
+## Şu anki durum
+
+- ROM doğrulandı: 16 MiB, başlık `GTA ADVANCE`, oyun kodu `BGTP`, sürüm `0`.
+- Avrupa ROM SHA-1: `06230842626da504f92396074f7c655e100f5d44`
+- GBA giriş dalı hedefi: `0x080000C0`.
+- Güncel Ghidra haritası: 1.497 fonksiyon adayı, yaklaşık 290 KiB aday fonksiyon gövdesi.
+- Byte-matching başlangıç/IRQ kaynakları: `AgbMain`, `IntrMain`, `VBlankIntr`, `InitInterrupts`, dört IRQ yardımcısı, `VCountIntr` ve `ResetDisplayAndInterrupts`.
+- EEPROM/save modülü ve serileştirme yardımcıları `0x0800082C–0x0800114B` boyunca kesintisiz 2336/2336 byte matching'dir; ayrıntı [SAVE_SYSTEM.md](docs/SAVE_SYSTEM.md) içindedir.
+- ROM girişinden ilk UI başlatma fonksiyonunun sonuna kadar `0x080000C0–0x08001457` aralığı kesintisiz 5016/5016 byte yeniden üretilmektedir.
+- Uzak menü yardımcılarıyla birlikte toplam 5340 benzersiz ROM byte ve 42 fonksiyon byte-matching'dir.
+- Mevcut matching kaynaklar okunabilir ARM/Thumb assembly'dir. Ghidra'nın C çıktıları analiz yardımcısıdır; compiler parmak izi netleştikçe uygun parçalar gerçek C'ye taşınacaktır.
+- **Derleyici kimliği çözüldü: agbcc.** ROM'un Nintendo'nun GBA SDK'sıyla gelen GCC 2.8.1 türevi ile derlendiği byte düzeyinde doğrulandı — `ReadU8`, `WriteU8` ve 28 byte'lık `WriteU32LE` doğrudan C'den birebir üretiliyor. Ayrıntı ve kanıt [COMPILER.md](docs/COMPILER.md) içinde. Bu, projenin C'den byte-matching hedefleyebileceği anlamına gelir.
+- Makinede Git, Make, Python 3, Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, ARM GNU araç zinciri 16.2 ve agbcc var.
+
+## İlk adım
+
+ROM'u yerel ve Git-dışı `baserom.gba` dosyasına hazırlayın:
+
+```sh
+make prepare-rom ROM_ZIP="/Users/muhammetyildirim/Downloads/Grand Theft Auto Advance (Europe) (En,Fr,De,Es,It).zip"
+```
+
+Ardından ortam raporunu ve ilerlemeyi görün:
+
+```sh
+make doctor
+make progress
+make matching
+```
+
+Sonraki teknik odak, belgelenmiş büyük `RunMenuScreen` fonksiyonunun sınırlarını ve girdi/eylem tablosunu kesinleştirmek; ardından grafik, giriş ve dünya alt sistemlerine geçmektir. Ayrıntılı sıra [ROADMAP.md](docs/ROADMAP.md) dosyasındadır.
+
+Başlangıç analizi [BOOT_SEQUENCE.md](docs/BOOT_SEQUENCE.md), mevcut açık çalışma ve ROM içi iz araştırması [PRIOR_ART.md](docs/PRIOR_ART.md), geçici RAM sembolleri ise [ram_map.csv](data/ram_map.csv) içindedir.
+
+## “Kaynak kodunu çıkarmak” ne demek?
+
+ROM'un içinde orijinal C kaynak dosyaları, değişken adları ve yorumlar bulunmaz. Hedefimiz makine kodunu analiz ederek eşdeğer C/ARM assembly yazmak ve üretilen ROM'u orijinalle karşılaştırmaktır. Orijinal kaynak kodun birebir isimleri ve yorumları geri getirilemez; davranış ve mümkünse byte eşleşmesi yeniden kurulabilir.
+
+## İlerleme kaydı
+
+Ghidra adayları [functions.csv](data/functions.csv) dosyasına otomatik yazılır; doğrulanmış isim ve durumlar [function_overrides.csv](data/function_overrides.csv) içinde tutulur. Durumlar:
+
+- `candidate`: Ghidra otomatik olarak buldu, henüz insan/araç çapraz kontrolü yok.
+- `discovered`: adres, mod ve sınır yeterli güvenle doğrulandı.
+- `documented`: davranış ve çağrılar belgelendi.
+- `decompiled`: C karşılığı yazıldı ama byte eşleşmesi yok.
+- `matching`: derlenen çıktı hedef assembly ile eşleşiyor.
+
+`make progress` güncel özeti üretir. Literal havuzları dahil doğrulanmış gerçek ROM parçaları [matching_regions.csv](data/matching_regions.csv) içinde tutulur; `make matching` hepsini yeniden derleyip ROM'a karşı denetler. Oturum günlüğü [WORKLOG.md](docs/WORKLOG.md) içindedir.
+
+## Etkileşimli decomp haritası
+
+`dashboard/`, decomp.dev benzeri yerel bir treemap sunar. Her dikdörtgen bir fonksiyondur; alanı fonksiyonun byte büyüklüğünü, rengi ise çalışma durumunu gösterir.
+
+Renk anlamları decomp.dev ile hizalıdır:
+
+| Renk | Anlam |
+|---|---|
+| Yeşil | Byte eşleşiyor |
+| Mavi | Kaynak yazıldı, henüz eşleşmiyor (`decompiled`) |
+| Turuncu | Belgelendi |
+| Mor | Keşfedildi |
+| Koyu gri | Henüz dokunulmadı (`candidate`) |
+
+Gruplama üç şekilde yapılabilir:
+
+- **Bitişik blok (varsayılan):** ROM'da art arda gelen fonksiyonlar aynı çeviri biriminden derlenmiş kabul edilerek kümelenir (`CLUSTER_GAP = 512` byte). Sembolü olmayan bir ROM'da decomp.dev'in dosya bazlı hiyerarşisinin en yakın dürüst karşılığıdır; sınıflandırılmamış 1451 fonksiyon 65 bloğa ayrılır.
+- **Modül:** doğrulanmış `module` sütununa göre.
+- **ROM bankı:** 64 KiB'lık adres blokları.
+
+Sınıflandırılmış fonksiyonlar her zaman kendi modül grubunda kalır; kümeleme yalnızca yapısı henüz bilinmeyen bölgeye sınır getirir.
+
+Fonksiyon başına eşleşme yüzdesi, fonksiyon aralığının [matching_regions.csv](data/matching_regions.csv) ile kesişen byte oranından hesaplanır — durum etiketinden türetilmez. Bugün her fonksiyon ya tamamen bir doğrulanmış bölgenin içinde ya da tamamen dışında olduğu için değerler %0 veya %100'dür; kısmi eşleşme çıktığında ara değerler kendiliğinden görünür.
+
+İlk kurulumdan sonra haritayı güncel veriyle açmak için:
+
+```sh
+make dashboard-dev
+```
+
+Dağıtım derlemesini doğrulamak için:
+
+```sh
+make dashboard-build
+```
+
+Harita verisi [functions.csv](data/functions.csv) ve [matching_regions.csv](data/matching_regions.csv) dosyalarından otomatik üretilir. Decomp durumu değiştikçe `make dashboard-data` JSON anlık görüntüsünü yeniler; `dashboard-dev` ve `dashboard-build` bunu zaten otomatik yapar.

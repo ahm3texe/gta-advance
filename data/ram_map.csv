@@ -1,0 +1,17 @@
+address,size,name,source,status,notes
+0x02000F22,1,player_health,libretro_cheat,provisional,Cheat value 100
+0x0200108C,2,weapon_slot_0,libretro_cheat,provisional,Start of strided weapon records
+0x0200108E,1,weapon_ammo_0,libretro_cheat,provisional,Records appear to use stride 8
+0x020010E4,2,car_weapon_id,libretro_cheat,provisional,
+0x020010E6,1,car_weapon_ammo,libretro_cheat,provisional,
+0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
+0x02025818,2,mission_timer,libretro_cheat,provisional,
+0x0202581A,1,wanted_level_display,libretro_cheat,provisional,
+0x0202581C,4,money_display_or_copy_0,libretro_cheat,provisional,Exact representation to verify dynamically
+0x02025824,4,money_display_or_copy_1,libretro_cheat,provisional,Exact representation to verify dynamically
+0x02025828,1,player_armor_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
+0x0202582A,1,player_health_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
+0x02030340,1,wanted_level_true,libretro_cheat,provisional,
+0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
+0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
+

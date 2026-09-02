@@ -1,0 +1,30 @@
+# Copyrighted inputs and generated ROMs must stay local.
+*.gba
+*.sav
+*.ss[0-9]
+*.state
+
+# Reverse-engineering databases and generated output.
+*.gpr
+*.rep/
+build/
+out/
+
+# macOS / editor noise.
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+.venv/
+analysis/ghidra-project/
+
+# agbcc ikilileri yerelde uretilir (tools/setup_agbcc.sh).
+tools/agbcc/
+
+# Ghidra decompiler ciktisi ROM'dan turetilmis materyaldir; yerelde kalir.
+analysis/decompiler/
+
+# Dashboard verisi CSV'lerden uretilir ve Ghidra ciktisi gomer.
+# Yeniden uretmek icin: make dashboard-data
+dashboard/app/decomp-data.json

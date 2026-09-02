@@ -1,0 +1,22 @@
+start,end,binary,module,notes
+0x080000C0,0x08000104,build/bootstrap/agb_main.bin,bootstrap,ARM entry and literal pool
+0x08000104,0x08000220,build/bootstrap/intr_main.bin,interrupt,ARM IRQ dispatcher and literal pool
+0x08000220,0x0800038C,build/interrupt/vblank_intr.bin,interrupt,VBlank handler and literal pools
+0x0800038C,0x08000430,build/bootstrap/init_interrupts.bin,bootstrap,IRQ table initialization and literals
+0x08000430,0x08000730,build/bootstrap/game_init.bin,bootstrap,Main initialization and game loop
+0x08000730,0x080007B4,build/interrupt/irq_helpers.bin,interrupt,IRQ helper block
+0x080007B4,0x0800082C,build/bootstrap/reset_display_interrupts.bin,bootstrap,Display/interrupt reset
+0x0800082C,0x0800091C,build/save/init_save_system.bin,save,CRAWSAVE metadata initialization
+0x0800091C,0x080009EC,build/save/read_eeprom_bytes.bin,save,Aligned EEPROM reads
+0x080009EC,0x08000B00,build/save/write_eeprom_bytes.bin,save,Aligned EEPROM writes
+0x08000B00,0x08000BE4,build/save/save_slots.bin,save,Generic save slot wrappers
+0x08000BE4,0x08000C28,build/save/save_wrappers.bin,save,Metadata wrappers
+0x08000C28,0x08000DDC,build/save/save_manager.bin,save,Three-slot game save manager
+0x08000DDC,0x08000F1C,build/save/read_eeprom_range.bin,save,Unaligned EEPROM reads
+0x08000F1C,0x08001094,build/save/write_eeprom_range.bin,save,Unaligned EEPROM writes
+0x08001094,0x0800114C,build/save/save_helpers.bin,serialization,Erase/header/little-endian helpers
+0x0800114C,0x080011EC,build/ui/build_active_menu_items.bin,ui,Active menu filtering and layout
+0x080011EC,0x080013AC,build/ui/draw_menu_items.bin,ui,Menu rendering and numeric formatting
+0x080013AC,0x08001458,build/ui/init_menu_screen.bin,ui,Menu display initialization
+0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
+0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers

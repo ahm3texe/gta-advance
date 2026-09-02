@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+import csv
+import json
+import re
+from collections import Counter
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent.parent
+FUNCTIONS = ROOT / "data/functions.csv"
+REGIONS = ROOT / "data/matching_regions.csv"
+OUTPUT = ROOT / "dashboard/app/decomp-data.json"
+DECOMPILER = ROOT / "analysis/decompiler"
+
+# Ard arda gelen fonksiyonlar büyük olasılıkla aynı çeviri biriminden derlendi.
+# Bu eşikten büyük boşluklar yeni bir küme başlatır.
+CLUSTER_GAP = 512
+
+MODULE_LABELS = {
+    "bootstrap": "Başlangıç",
+    "interrupt": "Kesme sistemi",
+    "save": "Kayıt sistemi",
+    "sdk": "GBA SDK",
+    "serialization": "Serileştirme",
+    "ui": "Arayüz",
+    "unknown": "Sınıflandırılmamış",
+}
+
+
+def read_decompiler_exports() -> dict[int, tuple[str, str]]:
+    exports: dict[int, tuple[str, str]] = {}
+    for path in DECOMPILER.glob("*.c"):
+        code = path.read_text(encoding="utf-8")
+        match = re.search(r"Function: .*? @ (?:0x)?([0-9A-Fa-f]{8})", code)
+        if match:
+            exports[int(match.group(1), 16)] = (
+                str(path.relative_to(ROOT)),
+                code,
+            )
+    return exports
+
+
+def read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def matched_bytes(start: int, size: int, regions: list[tuple[int, int]]) -> int:
+    """Fonksiyon aralığının doğrulanmış ROM bölgeleriyle kesişen byte sayısı."""
+    end = start + size
+    total = 0
+    for region_start, region_end in regions:
+        overlap = min(end, region_end) - max(start, region_start)
+        if overlap > 0:
+            total += overlap
+    return total
+
+
+def build_clusters(rows: list[dict]) -> None:
+    """Sınıflandırılmamış fonksiyonları bitişiklik kümelerine ayır.
+
+    Sınıflandırılmış fonksiyonlar kendi modül grubunda kalır; kümeleme yalnızca
+    yapısı henüz bilinmeyen bölgeye sanal çeviri birimi sınırları getirir.
+    """
+    for row in rows:
+        if row["module"] != "unknown":
+            row["cluster"] = row["module"]
+            row["clusterLabel"] = MODULE_LABELS.get(row["module"], row["module"])
+
+    unknown = sorted(
+        (row for row in rows if row["module"] == "unknown"),
+        key=lambda row: row["_start"],
+    )
+    clusters: list[list[dict]] = []
+    current: list[dict] = []
+    previous_end = None
+    for row in unknown:
+        if previous_end is not None and row["_start"] - previous_end > CLUSTER_GAP:
+            clusters.append(current)
+            current = []
+        current.append(row)
+        previous_end = max(previous_end or 0, row["_start"] + row["size"])
+    if current:
+        clusters.append(current)
+
+    for cluster in clusters:
+        key = f"0x{cluster[0]['_start']:08X}"
+        for row in cluster:
+            row["cluster"] = key
+            row["clusterLabel"] = key
+
+
+def main() -> None:
+    function_rows = read_csv(FUNCTIONS)
+    region_rows = read_csv(REGIONS)
+    status_counts = Counter(row["status"] for row in function_rows)
+    decompiler_exports = read_decompiler_exports()
+
+    verified_regions = [
+        (int(row["start"], 0), int(row["end"], 0)) for row in region_rows
+    ]
+
+    functions = []
+    total_code_bytes = 0
+    matching_code_bytes = 0
+    for row in function_rows:
+        size = int(row["size"], 0) if row["size"].strip() else 1
+        start = int(row["address"], 0)
+        total_code_bytes += size
+        if row["status"] == "matching":
+            matching_code_bytes += size
+        verified = matched_bytes(start, size, verified_regions)
+        function = {
+            "address": row["address"],
+            "name": row["name"],
+            "size": size,
+            "status": row["status"],
+            "module": row["module"],
+            "notes": row["notes"],
+            "matchedBytes": verified,
+            "matchPercent": round(100 * verified / size, 2) if size else 0.0,
+            "_start": start,
+        }
+        export = decompiler_exports.get(start)
+        if export:
+            function["analysisPath"], function["analysisCode"] = export
+        functions.append(function)
+
+    build_clusters(functions)
+    for function in functions:
+        del function["_start"]
+
+    regions = []
+    matching_region_bytes = 0
+    for row in region_rows:
+        start = int(row["start"], 0)
+        end = int(row["end"], 0)
+        size = end - start
+        matching_region_bytes += size
+        regions.append(
+            {
+                "start": row["start"],
+                "end": row["end"],
+                "size": size,
+                "module": row["module"],
+                "notes": row["notes"],
+            }
+        )
+
+    cluster_count = len({function["cluster"] for function in functions})
+    payload = {
+        "summary": {
+            "functionCount": len(functions),
+            "verifiedCount": len(functions) - status_counts["candidate"],
+            "matchingCount": status_counts["matching"],
+            "totalCodeBytes": total_code_bytes,
+            "matchingCodeBytes": matching_code_bytes,
+            "matchingCodePercent": round(100 * matching_code_bytes / total_code_bytes, 2),
+            "matchingRegionBytes": matching_region_bytes,
+            "clusterCount": cluster_count,
+        },
+        "functions": functions,
+        "regions": regions,
+    }
+
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"Dashboard verisi: {len(functions)} fonksiyon, {cluster_count} küme, {OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()
