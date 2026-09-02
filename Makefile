@@ -304,15 +304,10 @@ build/ui/init_menu_screen.bin: build/ui/init_menu_screen.elf
 init-menu-screen-match: verify-rom build/ui/init_menu_screen.bin
 	@python3 tools/compare_slice.py baserom.gba 0x13ac build/ui/init_menu_screen.bin
 
-build/ui/menu_helpers.o: src/ui/menu_helpers.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/ui/menu_helpers.bin: src/ui/menu_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/ui/menu_helpers.elf: build/ui/menu_helpers.o config/menu_helpers.ld
-	@arm-none-eabi-ld -T config/menu_helpers.ld -o $@ $<
-
-build/ui/menu_helpers.bin: build/ui/menu_helpers.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.menu_helpers $< $@
+	@python3 tools/build_c.py $< $@
 
 menu-helpers-match: verify-rom build/ui/menu_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1dc0 build/ui/menu_helpers.bin

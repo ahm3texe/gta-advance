@@ -237,3 +237,34 @@ Ghidra adları kullanıldı ve gerekçe yorumda yazıldı.
 
 `gVBlankState` (0x02000130), `gDisplayState` (0x020004BC, provisional),
 `gBiosIrqFlags` (0x03007FF8) eklendi.
+
+## 2026-09-03 (devam 4) — C metriği ve üçüncü blok
+
+### Ölçüm ayrıldı
+
+Assembly transkripsiyonu ile C'den byte-matching aynı metrikte görünüyordu.
+`make c-status` (`tools/scan_c_sources.py`) artık `src/` altındaki C
+kaynaklarını derleyip ROM ile karşılaştırıyor ve `data/c_sources.csv`
+üretiyor. `make progress` iki yeni satır veriyor; dashboard'da ayrı bir
+gösterim durumu (**C'den eşleşiyor**, daha parlak yeşil), özet kartında sayaç,
+durum filtresinde seçenek ve detay panelinde kaynak dosya yolu var.
+
+### menu_helpers C'ye taşındı
+
+`ResetMenuState`, `IsMenuFlagSet`, `FinalizeMenuLayout` — 3/3, 112 baytlık
+bölgenin tamamı. `src/ui/menu_helpers.s` ve link betiği silindi.
+Üçüncü emekli assembly dosyası.
+
+**İki yeni kural:** dizi temizleme döngüsü *ileriye* yazılmalı (agbcc onu
+geriye giden işaretçi yürüyüşüne çeviriyor; elle geriye yazmak farklı kod
+üretiyor) ve döngü indeksi *işaretli* olmalı (işaretçi karşılaştırması
+işaretsiz dal üretiyor, ROM işaretli kullanıyor).
+
+### Durum
+
+- `make matching` 21/21; üç bölge C'den üretiliyor
+- C kaynağı: 15 fonksiyon, 14'ü byte-matching
+- Matching byte'ların %8.45'i artık C'den geliyor (394/4660)
+- RAM haritası: menü sembolleri eklendi
+
+`FUN_080512b0` ve `FUN_08004280` adlandırılmadı; doğrulanmadan isim verilmiyor.

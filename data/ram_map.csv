@@ -20,3 +20,8 @@ address,size,name,source,status,notes
 0x02000130,1,gVBlankState,decomp,verified,"Set to 1 before waiting for VBlank; cleared by the VBlank handler"
 0x020004BC,4,gDisplayState,decomp,provisional,"Zeroed during display reset and in GameInit; exact role unconfirmed"
 0x03007FF8,2,gBiosIrqFlags,decomp,verified,"BIOS interrupt check flags (IntrWait); handlers OR their bit here"
+0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems"
+0x020011B0,80,gActiveMenuItems,decomp,verified,"Twenty pointers to the currently visible menu entries"
+0x02001410,4,gMenuFlags,decomp,verified,"Menu flag bitfield tested by IsMenuFlagSet"
+0x02001414,1,gMenuPositionX,decomp,verified,"Menu horizontal position computed by BuildActiveMenuItems"
+0x02010F44,4,gMenuRuntimeState,decomp,provisional,"Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed"
