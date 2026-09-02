@@ -1,0 +1,13 @@
+address,name,source,matching
+0x080007B4,ResetDisplayAndInterrupts,src/bootstrap/reset_display_interrupts.c,yes
+0x08000BE4,IsSaveSlotValid,src/save/save_wrappers.c,yes
+0x08000C00,ReadSaveMetadata,src/save/save_wrappers.c,yes
+0x08000C14,WriteSaveMetadata,src/save/save_wrappers.c,yes
+0x08001094,EraseSaveSlot,src/save/save_helpers.c,yes
+0x080010D4,GetSaveSlotHeader,src/save/save_helpers.c,yes
+0x080010F8,ReadU8,src/save/save_helpers.c,yes
+0x080010FC,ReadU16LE,src/save/save_helpers.c,yes
+0x08001108,ReadU32LE,src/save/save_helpers.c,yes
+0x08001120,WriteU8,src/save/save_helpers.c,yes
+0x08001124,WriteU16LE,src/save/save_helpers.c,no
+0x08001130,WriteU32LE,src/save/save_helpers.c,yes

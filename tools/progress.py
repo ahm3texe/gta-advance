@@ -28,6 +28,16 @@ def matching_region_summary(csv_path: Path) -> tuple[int, list[tuple[int, int]]]
     return sum(end - start for start, end in result), result
 
 
+def c_source_summary(csv_path: Path) -> tuple[int, int, set[str]]:
+    """(C kaynagi olan fonksiyon, C'den byte-matching olan, adresleri)."""
+    if not csv_path.exists():
+        return 0, 0, set()
+    with csv_path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    matched = {r["address"].upper() for r in rows if r["matching"] == "yes"}
+    return len(rows), len(matched), matched
+
+
 def main() -> int:
     csv_path = Path(sys.argv[1] if len(sys.argv) > 1 else "data/functions.csv")
     with csv_path.open(newline="", encoding="utf-8") as handle:
@@ -68,6 +78,17 @@ def main() -> int:
         print(f"Matching kod byte:    {matching_bytes}/{known_bytes} ({100 * matching_bytes / known_bytes:.2f}%)")
     else:
         print("Matching kod byte:    n/a (fonksiyon boyutları henüz bilinmiyor)")
+
+    c_total, c_matched, c_addresses = c_source_summary(csv_path.parent / "c_sources.csv")
+    if c_total:
+        c_bytes = sum(
+            int(row["size"], 0)
+            for row in rows
+            if row["address"].upper() in c_addresses and row["size"].strip()
+        )
+        print(f"C kaynagi olan:       {c_total} fonksiyon, {c_matched} tanesi byte-matching")
+        print(f"C'den matching byte:  {c_bytes}/{matching_bytes} "
+              f"({100 * c_bytes / matching_bytes:.2f}% of matching)")
 
     region_bytes, regions = matching_region_summary(csv_path.parent / "matching_regions.csv")
     if regions:

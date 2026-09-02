@@ -19,6 +19,7 @@ WATCHED = [
     ROOT / "data/functions.csv",
     ROOT / "data/function_overrides.csv",
     ROOT / "data/matching_regions.csv",
+    ROOT / "data/c_sources.csv",
     ROOT / "data/ram_map.csv",
 ]
 WATCHED_DIRS = [ROOT / "analysis/decompiler"]

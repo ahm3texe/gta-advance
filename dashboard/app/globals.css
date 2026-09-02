@@ -124,6 +124,7 @@ button, input, select { font: inherit; }
 .detail-card h2 { overflow-wrap: anywhere; margin: 17px 0 10px; font: 700 23px/1.08 var(--font-geist-mono); letter-spacing: -.045em; }
 .detail-card [data-slot='badge'] { border: 1px solid currentColor; background: transparent; }
 .status-matching { color: #33ed7e; }
+.status-cMatching { color: #7dffab; }
 .status-candidate { color: #7d92a3; }
 .status-decompiled { color: #4fb4ea; }
 .status-documented { color: #f1b34b; }

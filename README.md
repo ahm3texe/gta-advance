@@ -127,6 +127,12 @@ Gruplama üç şekilde yapılabilir:
 
 Sınıflandırılmış fonksiyonlar her zaman kendi modül grubunda kalır; kümeleme yalnızca yapısı henüz bilinmeyen bölgeye sınır getirir.
 
+Renk ayrımı önemli: **"C'den eşleşiyor"** ile **"Assembly eşleşiyor"** farklı
+tonlardadır. İkisi de ROM'u birebir üretir, ama yalnızca ilki okunabilir kaynak
+üretir. Assembly transkripsiyonu ölçüyü yeşile boyar, projeyi ilerletmez;
+gerçek hedef C'den eşleşmedir. `make c-status` bu ayrımı ölçer ve
+[c_sources.csv](data/c_sources.csv) dosyasını üretir.
+
 Fonksiyon başına eşleşme yüzdesi, fonksiyon aralığının [matching_regions.csv](data/matching_regions.csv) ile kesişen byte oranından hesaplanır — durum etiketinden türetilmez. Bugün her fonksiyon ya tamamen bir doğrulanmış bölgenin içinde ya da tamamen dışında olduğu için değerler %0 veya %100'dür; kısmi eşleşme çıktığında ara değerler kendiliğinden görünür.
 
 İlk kurulumdan sonra haritayı güncel veriyle açmak için:

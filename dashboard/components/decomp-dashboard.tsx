@@ -36,6 +36,15 @@ type FunctionStatus =
   | 'decompiled'
   | 'matching';
 
+/* Haritada gosterilen durum. C'den byte-matching olan fonksiyonlar
+   assembly transkripsiyonundan ayrilir: ikisi de ROM'u uretir ama yalnizca
+   ilki okunabilir kaynak uretir. */
+type DisplayStatus = FunctionStatus | 'cMatching';
+
+function displayStatus(fn: FunctionRecord): DisplayStatus {
+  return fn.status === 'matching' && fn.source === 'c' ? 'cMatching' : fn.status;
+}
+
 export type FunctionRecord = {
   address: string;
   name: string;
@@ -45,6 +54,8 @@ export type FunctionRecord = {
   notes: string;
   matchedBytes: number;
   matchPercent: number;
+  source: 'c' | 'asm';
+  sourcePath: string;
   cluster: string;
   clusterLabel: string;
   analysisPath?: string;
@@ -61,6 +72,8 @@ export type DashboardData = {
     matchingCodePercent: number;
     matchingRegionBytes: number;
     clusterCount: number;
+    cSourceCount: number;
+    cSourceBytes: number;
   };
   functions: FunctionRecord[];
   regions: Array<{ start: string; end: string; size: number; label: string }>;
@@ -74,10 +87,11 @@ type TreeDatum = {
 };
 
 const STATUS_META: Record<
-  FunctionStatus,
+  DisplayStatus,
   { label: string; color: string; glow: string }
 > = {
-  matching: { label: 'Byte eşleşiyor', color: '#19e66f', glow: '#0a7c3d' },
+  cMatching: { label: "C'den eşleşiyor", color: '#6cff9e', glow: '#1aa757' },
+  matching: { label: 'Assembly eşleşiyor', color: '#19e66f', glow: '#0a7c3d' },
   decompiled: { label: 'Yazıldı, eşleşmedi', color: '#2f9bd6', glow: '#124a6b' },
   documented: { label: 'Belgeli', color: '#f0ae3c', glow: '#7f4d0d' },
   discovered: { label: 'Keşfedildi', color: '#a777ff', glow: '#4c288e' },
@@ -182,7 +196,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
       return (
         matchesQuery &&
         (moduleFilter === 'all' || fn.module === moduleFilter) &&
-        (statusFilter === 'all' || fn.status === statusFilter)
+        (statusFilter === 'all' || displayStatus(fn) === statusFilter)
       );
     });
   }, [data.functions, moduleFilter, query, statusFilter]);
@@ -254,6 +268,10 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         <article className="stat-card">
           <CheckCircle2 aria-hidden="true" />
           <div><strong>{data.summary.matchingCount}</strong><span>Byte-eşleşen fonksiyon</span></div>
+        </article>
+        <article className="stat-card">
+          <FolderOpen aria-hidden="true" />
+          <div><strong>{data.summary.cSourceCount}</strong><span>Kaynağı C olan</span></div>
         </article>
         <article className="stat-card stat-card-accent">
           <Crosshair aria-hidden="true" />
@@ -346,14 +364,14 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                       key={fn.address}
                       role="button"
                       tabIndex={0}
-                      aria-label={`${fn.name}, ${formatBytes(fn.size)}, ${STATUS_META[fn.status].label}`}
+                      aria-label={`${fn.name}, ${formatBytes(fn.size)}, ${STATUS_META[displayStatus(fn)].label}`}
                       onClick={() => setSelected(fn)}
                       onDoubleClick={() => { setSelected(fn); setInspectorOpen(true); }}
                       onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setSelected(fn); }}
                       onPointerMove={(event) => setTooltip({ fn, x: event.clientX, y: event.clientY })}
                       onPointerLeave={() => setTooltip(null)}
                     >
-                      <rect className={active ? 'leaf-rect leaf-selected' : 'leaf-rect'} x={node.x0} y={node.y0} width={cellWidth} height={cellHeight} fill={`url(#fill-${fn.status})`} />
+                      <rect className={active ? 'leaf-rect leaf-selected' : 'leaf-rect'} x={node.x0} y={node.y0} width={cellWidth} height={cellHeight} fill={`url(#fill-${displayStatus(fn)})`} />
                       {cellWidth > 76 && cellHeight > 38 && <>
                         <text className="leaf-label" x={node.x0 + 7} y={node.y0 + 17}>{fn.name.length > 22 ? `${fn.name.slice(0, 20)}…` : fn.name}</text>
                         {cellHeight > 57 && <text className="leaf-meta" x={node.x0 + 7} y={node.y0 + 34}>{formatBytes(fn.size)} · %{fn.matchPercent.toFixed(0)}</text>}
@@ -374,13 +392,14 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         <aside className="detail-card" aria-live="polite">
           <div className="detail-kicker"><Binary aria-hidden="true" /> Seçili fonksiyon</div>
           <h2>{selected.name}</h2>
-          <Badge className={`status-${selected.status}`}>{STATUS_META[selected.status].label}</Badge>
+          <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
           <div className="detail-progress"><div><span>Byte eşleşmesi</span><strong>%{selected.matchPercent.toFixed(2)}</strong></div><div className="progress-track"><i style={{ width: `${selected.matchPercent}%` }} /></div></div>
           <dl>
             <div><dt>ROM adresi</dt><dd>{selected.address}</dd></div>
             <div><dt>Boyut</dt><dd>{formatBytes(selected.size)} ({selected.size} byte)</dd></div>
+            <div><dt>Kaynak</dt><dd>{selected.sourcePath || 'assembly'}</dd></div>
             <div><dt>Modül</dt><dd>{MODULE_LABELS[selected.module] ?? selected.module}</dd></div>
-            <div><dt>Durum</dt><dd>{STATUS_META[selected.status].label}</dd></div>
+            <div><dt>Durum</dt><dd>{STATUS_META[displayStatus(selected)].label}</dd></div>
           </dl>
           <div className="detail-note"><span>Analiz notu</span><p>{selected.notes || 'Henüz açıklama eklenmedi.'}</p></div>
           <Button className="inspect-button" onClick={() => setInspectorOpen(true)}><FolderOpen aria-hidden="true" /> Fonksiyonun içine gir</Button>
@@ -401,7 +420,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
               <Button variant="ghost" size="icon" onClick={() => setInspectorOpen(false)} aria-label="Fonksiyon görünümünü kapat"><X aria-hidden="true" /></Button>
             </header>
             <div className="inspector-toolbar">
-              <Badge className={`status-${selected.status}`}>{STATUS_META[selected.status].label}</Badge>
+              <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
               <span>{selected.analysisPath ?? 'Ghidra C çıktısı henüz dışa aktarılmadı'}</span>
             </div>
             {selected.analysisCode ? (

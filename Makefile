@@ -1,4 +1,4 @@
-.PHONY: agbcc c-match diff disasm scan-libc libc-align dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: agbcc c-match c-status diff disasm scan-libc libc-align dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -22,6 +22,11 @@ agbcc:
 # Ornek: make c-match FILE=src/save/save_helpers.c
 c-match: verify-rom
 	@python3 tools/verify_c_function.py $(FILE)
+
+# src/ altindaki tum C kaynaklarini derleyip ROM ile karsilastirir ve
+# data/c_sources.csv'yi uretir. progress ve dashboard bunu okur.
+c-status: verify-rom
+	@python3 tools/scan_c_sources.py
 
 # Tek fonksiyonun ROM halini derlenmis haliyle yan yana gosterir.
 # Ornek: make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE

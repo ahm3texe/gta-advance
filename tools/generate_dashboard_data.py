@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 FUNCTIONS = ROOT / "data/functions.csv"
 REGIONS = ROOT / "data/matching_regions.csv"
+C_SOURCES = ROOT / "data/c_sources.csv"
 OUTPUT = ROOT / "dashboard/app/decomp-data.json"
 DECOMPILER = ROOT / "analysis/decompiler"
 
@@ -94,6 +95,13 @@ def build_clusters(rows: list[dict]) -> None:
 def main() -> None:
     function_rows = read_csv(FUNCTIONS)
     region_rows = read_csv(REGIONS)
+    # C'den byte-matching olan fonksiyonlar: assembly transkripsiyonundan
+    # ayirt edilir, cunku projenin hedefi okunabilir kaynaktir.
+    c_matched = {
+        row["address"].upper(): row["source"]
+        for row in (read_csv(C_SOURCES) if C_SOURCES.exists() else [])
+        if row["matching"] == "yes"
+    }
     status_counts = Counter(row["status"] for row in function_rows)
     decompiler_exports = read_decompiler_exports()
 
@@ -120,6 +128,8 @@ def main() -> None:
             "notes": row["notes"],
             "matchedBytes": verified,
             "matchPercent": round(100 * verified / size, 2) if size else 0.0,
+            "source": "c" if row["address"].upper() in c_matched else "asm",
+            "sourcePath": c_matched.get(row["address"].upper(), ""),
             "_start": start,
         }
         export = decompiler_exports.get(start)
@@ -159,6 +169,10 @@ def main() -> None:
             "matchingCodePercent": round(100 * matching_code_bytes / total_code_bytes, 2),
             "matchingRegionBytes": matching_region_bytes,
             "clusterCount": cluster_count,
+            "cSourceCount": len(c_matched),
+            "cSourceBytes": sum(
+                f["size"] for f in functions if f["source"] == "c"
+            ),
         },
         "functions": functions,
         "regions": regions,
