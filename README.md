@@ -54,6 +54,37 @@ Ghidra adayları [functions.csv](data/functions.csv) dosyasına otomatik yazıl�
 
 `make progress` güncel özeti üretir. Literal havuzları dahil doğrulanmış gerçek ROM parçaları [matching_regions.csv](data/matching_regions.csv) içinde tutulur; `make matching` hepsini yeniden derleyip ROM'a karşı denetler. Oturum günlüğü [WORKLOG.md](docs/WORKLOG.md) içindedir.
 
+## C'ye taşıma iş akışı
+
+Derleyici `old_agbcc` olarak doğrulandığı için yeni fonksiyonlar doğrudan C
+ile yazılır; assembly yalnızca henüz eşleşmeyenler için geçerli kaynaktır.
+
+Bir C dosyasındaki her fonksiyonu ROM ile karşılaştır:
+
+```sh
+make c-match FILE=src/save/save_helpers.c
+```
+
+Eşleşmeyen bir fonksiyonun nerede saptığını gör:
+
+```sh
+make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE
+```
+
+Sol sütun ROM'daki gerçek kod, sağ sütun senin C'nden üretilen kod; farklı ve
+eksik komutlar işaretlenir. Eşleşmeyen fonksiyonlarda **assembly'yi değil C'yi**
+değiştirirsin — hangi C biçiminin hangi assembly'yi ürettiğini öğrenmek işin
+kendisidir.
+
+Derleyiciyi kurmak için (ikililer depoya girmez):
+
+```sh
+make agbcc
+```
+
+Bir blok tamamen C'den eşleşene kadar `data/matching_regions.csv` assembly
+kaynağını kullanmaya devam eder; böylece build hiçbir aşamada bozulmaz.
+
 ## Etkileşimli decomp haritası
 
 `dashboard/`, decomp.dev benzeri yerel bir treemap sunar. Her dikdörtgen bir fonksiyondur; alanı fonksiyonun byte büyüklüğünü, rengi ise çalışma durumunu gösterir.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bir C dosyasini agbcc ile derler ve her fonksiyonu ROM ile karsilastirir.
 
-Kullanim:  python3 tools/verify_c_function.py src/save/save_helpers.c
+Kullanim:  python3 tools/verify_c_function.py src/save/save_helpers.c [--cc=agbcc]
 
 Fonksiyon adresleri data/functions.csv'den okunur. Bir fonksiyon C'den
 byte-matching oldugunda, esdeger assembly kaynagi artik gereksizdir.
@@ -12,12 +12,14 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-AGBCC = ROOT / "tools/agbcc/bin/agbcc"
+AGBCC_DIR = ROOT / "tools/agbcc/bin"
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 BUILD = ROOT / "build/cmatch"
 
-# pokeemerald ile ayni bayraklar; ROM uzerinde dogrulandi.
+# ROM uzerinde dogrulanan derleyici ve bayraklar (docs/COMPILER.md).
+# old_agbcc, agbcc'nin eski varyanti; save_helpers'da 5/6 fonksiyonu tutturan bu.
+DEFAULT_CC = "old_agbcc"
 CC1FLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
 ROM_BASE = 0x08000000
 
@@ -52,18 +54,25 @@ def compiled_symbols(obj: Path) -> dict[str, tuple[int, int]]:
 
 
 def main() -> None:
-    if len(sys.argv) != 2:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = [a for a in sys.argv[1:] if a.startswith("--")]
+    if len(args) != 1:
         sys.exit(__doc__)
-    source = Path(sys.argv[1])
-    if not AGBCC.exists():
-        sys.exit("agbcc kurulu degil. Once: make agbcc")
+    source = Path(args[0])
+    compiler = DEFAULT_CC
+    for flag in flags:
+        if flag.startswith("--cc="):
+            compiler = flag.split("=", 1)[1]
+    agbcc = AGBCC_DIR / compiler
+    if not agbcc.exists():
+        sys.exit(f"{compiler} kurulu degil. Once: make agbcc")
     if not ROM.exists():
         sys.exit("baserom.gba yok. Once: make prepare-rom ROM_ZIP=...")
 
     BUILD.mkdir(parents=True, exist_ok=True)
     stem = BUILD / source.stem
     run(["cpp", "-nostdinc", "-undef", str(source)], Path(f"{stem}.i"))
-    run([str(AGBCC), *CC1FLAGS, "-o", f"{stem}.s", f"{stem}.i"])
+    run([str(agbcc), *CC1FLAGS, "-o", f"{stem}.s", f"{stem}.i"])
     run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
          "-o", f"{stem}.o", f"{stem}.s"])
     run(["arm-none-eabi-objcopy", "-O", "binary", f"{stem}.o", f"{stem}.bin"])
@@ -73,7 +82,7 @@ def main() -> None:
     addresses = function_addresses()
     symbols = compiled_symbols(Path(f"{stem}.o"))
 
-    print(f"{source}  ({len(symbols)} fonksiyon)")
+    print(f"{source}  [{compiler} {' '.join(CC1FLAGS)}]  {len(symbols)} fonksiyon")
     print(f"{'fonksiyon':22} {'boyut':>6}  sonuc")
     print("-" * 58)
     matched = []

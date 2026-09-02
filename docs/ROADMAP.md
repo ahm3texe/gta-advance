@@ -12,7 +12,7 @@ Uzun vadeli teknik hedef, kullanıcının yerel `baserom.gba` girdisinden çalı
 | 1. Haritalama | ARM/Thumb fonksiyon ve veri sınırları | Keşfedilen fonksiyon sayısı | Devam ediyor |
 | 2. İskelet | Linker script, assembly kaynakları, yeniden derleme | ROM boyutu/yerleşimi | Tamamlandı |
 | 3. Modül analizi | Grafik, giriş, dünya, görev, ses, kayıt alt sistemleri | Belgelenen fonksiyonlar | Devam ediyor; IRQ ve save haritalandı |
-| 4. Matching decomp | C/assembly kaynak ve compiler bayrakları | Matching/toplam fonksiyon ve byte | Devam ediyor |
+| 4. Matching decomp | C/assembly kaynak ve compiler bayrakları | Matching/toplam fonksiyon ve byte | Devam ediyor; derleyici `old_agbcc` doğrulandı, C'den byte-matching çalışıyor |
 | 5. Doğrulama | Otomatik ROM diff + mGBA testleri | Hash/davranış testleri | ROM diff etkin; dinamik test bekliyor |
 
 ## İlk çalışma oturumu
@@ -41,7 +41,7 @@ Tahmini yüzdeleri kesin ilerleme gibi göstermemek için boyutu bilinmeyen fonk
 - **Ghidra:** statik analiz, ARM/Thumb disassembly, decompiler, sembol ve çağrı grafiği.
 - **mGBA:** oyunu çalıştırma, breakpoint/watchpoint, GDB remote ve davranış testi.
 - **devkitARM (`gba-dev`):** ARM assembler/linker/objdump ve modern GBA derleme araç zinciri.
-- **agbcc:** compiler parmak izi uyarsa byte-matching C derlemesi. Başta varsaymayacağız; üretilen assembly kalıplarıyla doğrulayacağız.
+- **agbcc / old_agbcc:** byte-matching C derlemesi. Parmak izi doğrulandı ve `src/save/save_helpers.c` üzerinde 6 fonksiyonun 5'i C'den birebir üretildi; ayrıntı [COMPILER.md](COMPILER.md).
 - **Git:** her keşfi, sembol adını ve matching dönüşümü geri alınabilir biçimde izleme.
 - **Python araçları:** ROM ayrıştırma, varlık çıkarma, tablo üretimi ve otomatik diff.
 
