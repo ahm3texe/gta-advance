@@ -17,3 +17,6 @@ address,size,name,source,status,notes
 
 0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
 0x02000460,36,gSaveSlotHeaders,decomp,verified,"Three 12-byte save slot headers; byte 0 of each is the validity marker"
+0x02000130,1,gVBlankState,decomp,verified,"Set to 1 before waiting for VBlank; cleared by the VBlank handler"
+0x020004BC,4,gDisplayState,decomp,provisional,"Zeroed during display reset and in GameInit; exact role unconfirmed"
+0x03007FF8,2,gBiosIrqFlags,decomp,verified,"BIOS interrupt check flags (IntrWait); handlers OR their bit here"

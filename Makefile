@@ -140,15 +140,10 @@ build/interrupt/irq_helpers.bin: build/interrupt/irq_helpers.elf
 irq-helpers-match: verify-rom build/interrupt/irq_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x730 build/interrupt/irq_helpers.bin
 
-build/bootstrap/reset_display_interrupts.o: src/bootstrap/reset_display_interrupts.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/bootstrap/reset_display_interrupts.bin: src/bootstrap/reset_display_interrupts.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/bootstrap/reset_display_interrupts.elf: build/bootstrap/reset_display_interrupts.o config/reset_display_interrupts.ld
-	@arm-none-eabi-ld -T config/reset_display_interrupts.ld -o $@ $<
-
-build/bootstrap/reset_display_interrupts.bin: build/bootstrap/reset_display_interrupts.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.reset_display_interrupts $< $@
+	@python3 tools/build_c.py $< $@
 
 reset-display-match: verify-rom build/bootstrap/reset_display_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x7b4 build/bootstrap/reset_display_interrupts.bin

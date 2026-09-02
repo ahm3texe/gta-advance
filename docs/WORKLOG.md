@@ -206,3 +206,34 @@ save_helpers 7/8: yalnızca `WriteU16LE` açık.
 `WriteU16LE`; ardından `menu_helpers` (112 byte) ve
 `reset_display_interrupts` (63 satır) gibi küçük blokları C'ye taşımak.
 `agb_main.s` ve `intr_main.s` kalıcı olarak assembly kalır.
+
+## 2026-09-03 (devam 3) — İkinci blok C'ye taşındı
+
+`ResetDisplayAndInterrupts` (`0x080007B4`, 120 byte bölge) C'den byte-matching.
+`src/bootstrap/reset_display_interrupts.s` ve link betiği silindi.
+`make matching` 21/21; iki bölge artık C'den üretiliyor.
+
+### İki yeni kural
+
+**Yığındaki geçici tampon `volatile` olmalı.** DMA kaynağı olarak kullanılan
+yığın değişkeni `volatile` yapılmadan agbcc `mov r0, sp` ile `movs r2, #0`'ı
+ters sırada üretiyordu. Fark 57 bayttan 7 bayta düştü.
+
+**Donanım/BIOS değişkeni `volatile` OLMAMALI.** Kalan 7 bayt `gBiosIrqFlags`
+erişimindeydi; `volatile` kaldırılınca tam eşleşti. İkisi zıt görünüyor ama
+`volatile` burada semantik değil, sıralama düğmesi.
+
+Tüm kurallar `docs/COMPILER.md` içinde tablo hâlinde.
+
+### Doğrulanmamış isimler benimsenmedi
+
+Assembly kaynağı üç dış fonksiyonu `WaitForDma3`, `InitSubsystem`,
+`WaitForVBlank` diye etiketlemişti. Disassembly bunları desteklemiyor:
+`FUN_08063b74` DMA döngüsü değil, dört donanım register'ına sabit yazıyor;
+`FUN_0800cae4` VBlank beklemiyor, iki fonksiyon çağırıyor. C dosyasında
+Ghidra adları kullanıldı ve gerekçe yorumda yazıldı.
+
+### RAM haritası
+
+`gVBlankState` (0x02000130), `gDisplayState` (0x020004BC, provisional),
+`gBiosIrqFlags` (0x03007FF8) eklendi.

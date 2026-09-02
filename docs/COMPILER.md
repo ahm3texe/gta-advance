@@ -66,6 +66,24 @@ old_agbcc -mthumb-interwork -O2 -fhex-asm
 Bazı çeviri birimleri farklı derleyici veya seviye kullanıyor olabilir;
 `make c-match FILE=... --cc=agbcc` ile diğer varyant denenebilir.
 
+## C yazım kuralları (ölçülerek bulundu)
+
+Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
+
+| # | Kural | Neden |
+|---|---|---|
+| 1 | **RAM adresleri `extern` sembol olmalı**, `#define ((T*)0xADDR)` değil | Sabit olunca agbcc `taban+ofset`'i ayrı literale katlıyor; ROM tabanı register'da tutuyor |
+| 2 | **Ara işaretçi değişkeni kullanma**, doğrudan `dizi[i].alan` yaz | `p = &dizi[i]; p->alan` farklı register dağıtımı üretiyor |
+| 3 | **Yığındaki geçici tampon `volatile` olmalı** | Değilse agbcc adres alma ile sabit yüklemeyi yeniden sıralıyor |
+| 4 | **Donanım/BIOS değişkeni `volatile` OLMAMALI** | `volatile` yükleme sırasını değiştirip ROM'dan saptırıyor |
+| 5 | Dış semboller `.equ` ile assembler'a verilir | Linker'a bırakılınca interworking veneer'i sokuluyor |
+| 6 | Bölüm adresi link betiğinde sabitlenir (`SUBALIGN(1)`) | agbcc `.text`'i 8'e hizalıyor, taban 8'in katı değilse her ölçüm kayıyor |
+| 7 | Üretilen assembly'nin sonuna `.align 2, 0` eklenir | `as` Thumb bölümünü NOP ile dolduruyor, ROM sıfırla |
+
+3 ve 4 birbirinin zıddı gibi görünüyor ama değil: `volatile` agbcc'de komut
+sıralamasını değiştiren bir düğme. Yığın tamponunda ROM'un sırasını veriyor,
+donanım değişkeninde bozuyor. Kural ezberlenmez, denenir.
+
 ## RAM adresleri extern sembol olmalı — en önemli kural
 
 `EraseSaveSlot` ve `GetSaveSlotHeader` uzun süre eşleşmedi. Sebebin derleyici
