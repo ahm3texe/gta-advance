@@ -1402,7 +1402,7 @@ address,name,size,status,module,notes
 0x0806DBB4,FUN_0806dbb4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DBD0,FUN_0806dbd0,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DC34,FUN_0806dc34,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806DCC0,FUN_0806dcc0,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806DCC0,Memset,86,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
 0x0806DD18,FUN_0806dd18,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DD78,FUN_0806dd78,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DDC8,FUN_0806ddc8,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

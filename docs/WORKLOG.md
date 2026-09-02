@@ -102,3 +102,53 @@ deponun kendi yayın politikasına uygun biçimde yerelde bırakıldı.
 3. mGBA yamalama/çalıştırma döngüsü — byte-matching olmayan fonksiyonlar için
    davranışsal doğrulama.
 4. `RunMenuScreen` kontrol akışı.
+
+## 2026-09-03 (devam) — Linkleme boru hatti ve save_helpers bloğu
+
+### Kritik altyapı: linkleme
+
+Yaprak olmayan hiçbir fonksiyon linklenmeden doğrulanamaz — `bl` komutları
+hedef adres çözülmeden doğru byte üretmez. `tools/agbcc_build.py` eklendi:
+C kaynağını derler, blokun ROM taban adresine linkler, dış sembolleri
+`data/functions.csv`'den çözer. `verify_c_function.py` ve `diff_function.py`
+artık bu ortak katmanı kullanıyor.
+
+**Yakalanan tuzak:** agbcc `.text` bölümünü 8'e hizalıyor. Taban adres 8'in
+katı değilse (0x08001094 gibi) linker bölümü 4 byte ileri itiyor ve *önceden
+eşleşen fonksiyonlar dahil her ölçüm kayıyor*. Link betiğinde bölüm adresi
+artık açıkça sabitleniyor (`SUBALIGN(1)`). Bu hata sessiz: her şey "eşleşmiyor"
+görünür ve sebep kodda sanılır.
+
+### save_helpers bloğu: 8 fonksiyonun 5'i C'den byte-matching
+
+Eklenenler: `EraseSaveSlot`, `GetSaveSlotHeader`. İkisi de eşleşmedi ama
+yapıları doğru — tüm komutlar var, fark sıralamada.
+
+Her ikisinde de **aynı sistematik fark**: ROM taban adresini indeks
+hesabından önce yüklüyor, agbcc sonra. `GetSaveSlotHeader` için beş farklı
+yerel değişken dizilimi, işaretçi aritmetiği, ters koşul, `void*` dönüş,
+extern dizi sembolü ve iki derleyici varyantı denendi — **beşi de byte-byte
+aynı çıktıyı verdi.** agbcc bu fonksiyonda C biçimine duyarsız, dolayısıyla
+C'yi kurcalayarak çözülecek bir sorun değil. Kalan olasılıklar: pret/agbcc'nin
+yeniden kurulmuş sürümü ile orijinal SDK sürümü arasındaki fark, veya henüz
+bulunmamış bir derleyici bayrağı.
+
+`WriteU16LE` de açık (dokuz C biçimi denendi, kayıtlı).
+
+### Memset adlandırıldı
+
+`FUN_0806dcc0` incelendi ve `Memset` olarak doğrulandı: (dest, value, count)
+alıyor, baytı 4 byte'lık desene yayıp `stmia` ile 16'şar byte yazıyor, kalanı
+bayt bayt bitiriyor, `dest` döndürüyor. `function_overrides.csv`'ye
+`documented`/`sdk` olarak işlendi.
+
+### Eklenen: make disasm
+
+`make disasm FUNC=...` bir fonksiyonun disassembly'sini doğrudan ROM'dan
+üretir. Assembly kaynakları C'ye taşındıkça silinecek; orijinal koda erişim
+bu araçla korunuyor, bakım gerektirmeyen ve eskiyemeyen biçimde.
+
+### Durum
+
+`make matching` 21/21 bozulmadı. `save_helpers.s` hâlâ geçerli build kaynağı;
+blok 8/8 olana kadar öyle kalacak.

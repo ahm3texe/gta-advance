@@ -45,3 +45,4 @@ address,name,status,module,notes
 0x0806BCD0,LibraryAssertWrapper0,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCE0,LibraryAssertWrapper1,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,discovered,sdk,References assertion format at 0x08BD3470
+0x0806DCC0,Memset,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
