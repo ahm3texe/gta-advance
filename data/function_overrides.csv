@@ -46,3 +46,7 @@ address,name,status,module,notes
 0x0806BCE0,LibraryAssertWrapper1,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,discovered,sdk,References assertion format at 0x08BD3470
 0x0806DCC0,Memset,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
+0X08070CE4,_mbtowc_r,documented,libc,"newlib routine; body byte-identical to agbcc libc.a build (was FUN_08070ce4)"
+0X080716A4,isinf,documented,libc,"newlib routine; body byte-identical to agbcc libc.a build (was ?)"
+0X080716C8,isnan,documented,libc,"newlib routine; body byte-identical to agbcc libc.a build (was ?)"
+0X08071D8C,abort,documented,libc,"newlib routine; body byte-identical to agbcc libc.a build (was FUN_08071d8c)"

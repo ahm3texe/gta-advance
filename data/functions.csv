@@ -1443,7 +1443,7 @@ address,name,size,status,module,notes
 0x080706E0,FUN_080706e0,212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080707C0,FUN_080707c0,306,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08070920,FUN_08070920,910,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08070CE4,FUN_08070ce4,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08070CE4,_mbtowc_r,42,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was FUN_08070ce4)
 0x08070D10,FUN_08070d10,122,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08070D94,FUN_08070d94,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08070D98,FUN_08070d98,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1492,7 +1492,7 @@ address,name,size,status,module,notes
 0x08071D20,FUN_08071d20,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071D50,FUN_08071d50,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071D5C,FUN_08071d5c,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071D8C,FUN_08071d8c,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08071D8C,abort,26,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was FUN_08071d8c)
 0x08071DAC,FUN_08071dac,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071DB4,FUN_08071db4,46,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071DE8,FUN_08071de8,46,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
