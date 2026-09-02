@@ -1,4 +1,4 @@
-.PHONY: agbcc c-match c-status diff disasm scan-libc libc-align dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: agbcc c-match c-status diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -41,6 +41,10 @@ disasm: verify-rom
 # agbcc libc.a fonksiyonlarini ROM icinde arar (--csv override satiri uretir).
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
+
+# ROM'daki standart kutuphane bolgelerini agbcc libc.a'sina karsi dogrular.
+libc-verify: verify-rom
+	@python3 tools/verify_libc_regions.py
 
 # Bir libc nesnesini bilinen capadan hizalayip fonksiyon fonksiyon karsilastirir.
 # Ornek: make libc-align FUNC=remap_handle ADDR=0x0807180C
@@ -300,5 +304,5 @@ build/ui/menu_graphics.bin: src/ui/menu_graphics.c data/functions.csv data/ram_m
 menu-graphics-match: verify-rom build/ui/menu_graphics.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1e30 build/ui/menu_graphics.bin
 
-matching: bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match
 	@python3 tools/verify_matching_regions.py

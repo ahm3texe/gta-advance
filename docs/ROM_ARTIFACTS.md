@@ -45,6 +45,35 @@ libc.a'daki fonksiyon gövdelerini ROM içinde arar:
 | `0x08071B9C` | `_exit` | 32 B | **Ghidra kaçırmış**; `_kill` ile belirsiz |
 | `0x08071D8C` | `abort` | 32 B | |
 
+### Doğrulanmış libc bölgeleri
+
+Yer değiştirmesiz eşleşen fonksiyonlar artık build'e bağlı:
+
+```sh
+make libc-verify
+```
+
+`data/libc_regions.csv`'deki her giriş için `tools/agbcc/lib/libc.a` içinden
+fonksiyon gövdesi çıkarılır ve ROM ile karşılaştırılır. `make matching` bunu
+otomatik çalıştırır.
+
+| Adres | Fonksiyon | Boyut |
+|---|---|---|
+| `0x08070CE4` | `_mbtowc_r` | 42 B |
+| `0x08070DF8` | `_Bfree` | 24 B |
+| `0x08070F34` | `_hi0bits` | 88 B |
+| `0x08070F8C` | `_lo0bits` | 130 B |
+| `0x080716A4` | `isinf` | 36 B |
+| `0x080716C8` | `isnan` | 32 B |
+| `0x08071D8C` | `abort` | 32 B |
+
+Toplam **384 byte**. Bunlar tersine mühendislik ürünü değil: kaynağı zaten
+elimizde olan standart kütüphane kodunun ROM'daki byte'larla birebir aynı
+olduğunun kanıtı. Doğrulanmış toplam ROM alanı 5340 → **5724 byte**.
+
+`_exit` (`0x08071B9C`) dahil edilmedi: gövdesi `_kill` ile birebir aynı ve
+hangisinin o adreste durduğu byte'lardan anlaşılamıyor.
+
 ### Maskeli arama
 
 Dış çağrı içeren fonksiyonlar linklenmeden ROM byte'larıyla eşleşmez: `bl`

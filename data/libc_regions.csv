@@ -1,0 +1,8 @@
+address,end,object,symbol,notes
+0x08070CE4,0x08070D0E,mbtowc_r.o,_mbtowc_r,newlib multibyte conversion helper
+0x08070DF8,0x08070E10,mprec.o,_Bfree,newlib bignum free helper used by strtod/dtoa
+0x08070F34,0x08070F8C,mprec.o,_hi0bits,newlib bignum leading-zero count
+0x08070F8C,0x0807100E,mprec.o,_lo0bits,newlib bignum trailing-zero count
+0x080716A4,0x080716C8,s_isinf.o,isinf,newlib float classification
+0x080716C8,0x080716E8,s_isnan.o,isnan,newlib float classification
+0x08071D8C,0x08071DAC,libcfunc.o,abort,newlib abort

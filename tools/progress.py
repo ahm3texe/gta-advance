@@ -90,6 +90,15 @@ def main() -> int:
         print(f"C'den matching byte:  {c_bytes}/{matching_bytes} "
               f"({100 * c_bytes / matching_bytes:.2f}% of matching)")
 
+    libc_path = csv_path.parent / "libc_regions.csv"
+    if libc_path.exists():
+        with libc_path.open(newline="", encoding="utf-8") as handle:
+            libc_bytes = sum(
+                int(r["end"], 16) - int(r["address"], 16) for r in csv.DictReader(handle)
+            )
+        print(f"libc bolgesi:         {libc_bytes} byte "
+              f"(agbcc libc.a'ya karsi dogrulandi)")
+
     region_bytes, regions = matching_region_summary(csv_path.parent / "matching_regions.csv")
     if regions:
         print(f"Matching ROM bölgesi: {region_bytes} benzersiz byte")
