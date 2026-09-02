@@ -33,15 +33,33 @@ libc.a'daki fonksiyon gövdelerini ROM içinde arar:
 
 | Adres | Fonksiyon | Boyut | Not |
 |---|---|---|---|
+| `0x0806DE84` | `_toupper` | 28 B | maskeli; `toupper` ile belirsiz |
 | `0x08070CE4` | `_mbtowc_r` | 42 B | |
+| `0x08070DF8` | `_Bfree` | 24 B | |
+| `0x08070F34` | `_hi0bits` | 88 B | |
+| `0x08070F8C` | `_lo0bits` | 130 B | |
 | `0x080716A4` | `isinf` | 36 B | **Ghidra kaçırmış** |
 | `0x080716C8` | `isnan` | 32 B | **Ghidra kaçırmış** |
+| `0x080717EC` | `findslot` | 30 B | maskeli |
+| `0x0807180C` | `remap_handle` | 76 B | maskeli |
+| `0x08071B9C` | `_exit` | 32 B | **Ghidra kaçırmış**; `_kill` ile belirsiz |
 | `0x08071D8C` | `abort` | 32 B | |
 
-Tarama şu an yalnızca yer değiştirmesiz fonksiyonları bulabiliyor: 362
-fonksiyonun 324'ü dış çağrı içeriyor ve hedef adrese linklenmeden ROM
-byte'larıyla eşleşmiyor. Bunlar için adres tahmini + `tools/agbcc_build.py`
-linkleme katmanı gerekiyor.
+### Maskeli arama
+
+Dış çağrı içeren fonksiyonlar linklenmeden ROM byte'larıyla eşleşmez: `bl`
+hedefi ve literal havuzdaki adresler bağlamaya göre değişir. Tarama bu yüzden
+**maskeli** yapılıyor — yer değiştirmenin dokunduğu byte'lar joker sayılıp
+geri kalan gövde birebir aranıyor. Böylece adres bilinmeden fonksiyon bulunur.
+
+Yöntem `remap_handle` (`0x0807180C`, 76 B) üzerinde gözle doğrulandı: 37
+komutun tamamı birebir aynı, farklı görünen tek şey literal havuz sözcükleri —
+yani tam olarak maskelenen byte'lar.
+
+Belirsizlik dürüstçe işaretleniyor: `toupper`/`_toupper` ve `_exit`/`_kill`
+çiftlerinin gövdeleri birbirinin aynısı olduğu için hangisinin o adreste
+durduğu byte'lardan anlaşılamıyor. Bunlar `documented` değil `discovered`
+olarak kaydediliyor ve alternatif isim nota yazılıyor.
 
 `isinf` ve `isnan` Ghidra'nın fonksiyon haritasında hiç yok — yani bu yöntem
 yalnızca isim vermiyor, **kaçırılmış fonksiyonları da keşfediyor.**

@@ -46,7 +46,14 @@ address,name,size,status,module,notes
 0x0806BCE0,LibraryAssertWrapper1,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,,discovered,sdk,References assertion format at 0x08BD3470
 0x0806DCC0,Memset,,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
-0X08070CE4,_mbtowc_r,,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was FUN_08070ce4)
-0X080716A4,isinf,36,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was ?)
-0X080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was ?)
-0X08071D8C,abort,,documented,libc,newlib routine; body byte-identical to agbcc libc.a build (was FUN_08071d8c)
+0x0806DE84,_toupper,28,discovered,libc,newlib routine; matched against agbcc libc.a build; identical body to toupper - which symbol occupies this address is undetermined
+0x08070CE4,_mbtowc_r,42,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x08070DF8,_Bfree,24,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x08070F34,_hi0bits,88,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x08070F8C,_lo0bits,130,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x080716A4,isinf,36,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
+0x080717EC,findslot,30,documented,libc,newlib routine; matched against agbcc libc.a build
+0x0807180C,remap_handle,76,documented,libc,newlib routine; matched against agbcc libc.a build
+0x08071B9C,_exit,32,discovered,libc,newlib routine; body byte-identical to agbcc libc.a build; identical body to _kill - which symbol occupies this address is undetermined; missed by Ghidra auto-analysis
+0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build

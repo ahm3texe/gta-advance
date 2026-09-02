@@ -66,6 +66,33 @@ old_agbcc -mthumb-interwork -O2 -fhex-asm
 Bazı çeviri birimleri farklı derleyici veya seviye kullanıyor olabilir;
 `make c-match FILE=... --cc=agbcc` ile diğer varyant denenebilir.
 
+## Kapatılan yol: derleyici varyantı ve bayraklar
+
+`EraseSaveSlot`, `GetSaveSlotHeader` ve `WriteU16LE` aynı sistematik farkı
+gösteriyor (ROM taban adresi indeks hesabından önce yüklüyor). Bu hipotez
+sonuna kadar test edildi ve **tükendi**:
+
+**Bayrak taraması** — 15 aday bayrak, iki derleyici üzerinde:
+`-fforce-addr`, `-fforce-mem`, `-fno-force-mem`, `-fno-strength-reduce`,
+`-fomit-frame-pointer`, `-fno-peephole`, `-fcaller-saves`, `-fno-cse-follow-jumps`,
+`-fno-expensive-optimizations`, `-fno-defer-pop`, `-fno-function-cse`
+(`-f*schedule-insns*` ve `-mlong-calls` desteklenmiyor).
+
+Sonuç tamamen düz: `old_agbcc` her bayrakta 5/8, `agbcc` her bayrakta 3/8.
+Hiçbir bayrak tek bir byte değiştirmedi.
+
+**Derleyici sürümü** — pret/agbcc'nin `release` etiketi ayrıca derlendi.
+İkili dosyalar `master`'dan farklı (SHA-1 farklı) ama **çıktı birebir aynı**:
+`release old_agbcc` 5/8, `release agbcc` 3/8, eşleşmeyenler aynı üç fonksiyon.
+
+Depoda başka dal/etiket yok. Yani bu fark, kamuya açık agbcc ile
+kapatılamıyor. Kalan olasılık orijinal SDK derleyicisinin pret'in yeniden
+kurduğundan farklı olması; bu da elde edilebilir bir şey değil.
+
+**Sonuç:** bu üç fonksiyon için C'yi kurcalamak ya da derleyici değiştirmek
+işe yaramıyor. Assembly kaynakları geçerli kalır; ilerleme başka fonksiyonlardan
+devam eder.
+
 ## Açık kalan
 
 `WriteU16LE` (0x08001124, 8 byte): ROM girişte anlamsal olarak gereksiz bir
