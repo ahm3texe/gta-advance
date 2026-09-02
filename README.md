@@ -85,6 +85,26 @@ make agbcc
 Bir blok tamamen C'den eşleşene kadar `data/matching_regions.csv` assembly
 kaynağını kullanmaya devam eder; böylece build hiçbir aşamada bozulmaz.
 
+### Assembly kaynakları neden siliniyor
+
+Bir fonksiyon C'den byte-matching olduğunda assembly karşılığı **build kaynağı
+olmaktan çıkar**. İkisini birden tutmak build'de çift sembol üretir, dolayısıyla
+biri devre dışı kalır — ve devre dışı kalan dosya artık hiçbir şey tarafından
+doğrulanmadığı için sessizce eskir. Doğrulanmayan bir referans, referans değildir.
+
+Orijinal kodu kaybetmezsin: kaynak zaten ROM'un kendisidir.
+
+```sh
+make disasm FUNC=WriteU32LE
+```
+
+Bu çıktı doğrudan `baserom.gba`'dan üretilir, bakım gerektirmez ve her zaman
+doğrudur. Silinen assembly dosyaları ayrıca git geçmişinde durur.
+
+**İstisna:** orijinalinde de elle assembly yazılmış olan kod — ARM modundaki
+başlangıç ve IRQ dağıtıcısı (`src/bootstrap/agb_main.s`, `src/bootstrap/intr_main.s`)
+— kalıcı olarak assembly kalır. Bunlar C'ye taşınmaz.
+
 ## Etkileşimli decomp haritası
 
 `dashboard/`, decomp.dev benzeri yerel bir treemap sunar. Her dikdörtgen bir fonksiyondur; alanı fonksiyonun byte büyüklüğünü, rengi ise çalışma durumunu gösterir.

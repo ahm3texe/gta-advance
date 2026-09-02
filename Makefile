@@ -1,4 +1,4 @@
-.PHONY: agbcc c-match diff prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: agbcc c-match diff disasm prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -27,6 +27,11 @@ c-match: verify-rom
 # Ornek: make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE
 diff: verify-rom
 	@python3 tools/diff_function.py $(FILE) $(FUNC)
+
+# ROM'daki bir fonksiyonun disassembly'sini uretir (kaynak: ROM, depo degil).
+# Ornek: make disasm FUNC=EraseSaveSlot
+disasm: verify-rom
+	@python3 tools/disasm_function.py $(FUNC)
 
 dashboard-data:
 	@python3 tools/generate_dashboard_data.py
