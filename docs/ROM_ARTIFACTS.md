@@ -65,12 +65,59 @@ e_wantedlevel_last3    l_vehicletest3_rn1    grptrafficpolicelevel2
 Bu tablo görev/varlık arama sistemini adlandırmaya ve ona başvuran kod
 tablolarını tanımaya yarar.
 
+## Crawfish soy bağı — retail ROM devralınmış bir kod tabanı
+
+Retail oyunu **Digital Eclipse** yaptı, ama ROM iki ayrı **Crawfish Interactive**
+izi taşıyor:
+
+1. **`CRAWSAVE` imzası.** `InitSaveSystem` (`0x0800082C`) EEPROM metadata'sının
+   ilk 8 byte'ını karakter karakter `'C' 'R' 'A' 'W' 'S' 'A' 'V' 'E'` ile
+   karşılaştırıyor. Dize ROM'da bitişik olarak *saklanmıyor* — karşılaştırma
+   komutlarında gömülü sabitler hâlinde. (Bu yüzden düz metin araması bulamaz.)
+2. **Araç fizik debug menüsü.** TCRF'in Crawfish prototipi için belgelediği
+   "Press A and B to toggle car physics test" özelliği retail ROM'da hâlâ
+   duruyor (aşağıdaki tablo).
+
+TCRF'e göre proje Crawfish'ten devralındı; Crawfish Kasım 2002'de kapandı.
+Bu iki iz, Digital Eclipse'in sıfırdan başlamak yerine **Crawfish'in kod
+tabanını devraldığını** gösteriyor. Yani 16 Nisan 2002 tarihli prototip,
+"farklı bir oyun" olsa da aynı motor soyundan geliyor olabilir.
+
 ## Debug izleri
 
-`0x03E3554`: `!!! ASSERT cam(0x%x 0x%x 0x%x) %s : %d` — eski bir sürümden
-kalan kamera debug menüsünün parçası. TCRF `0x03E31A8`'den itibaren `CUSTOM 0-10`,
-`CAR PHYSICS TEST`, `SPEED/ACCEL/FACE/DIR/ROTSP/RADIUS/FCOLL/ACOLL/ROLL/TILT/VEL/POS/HBRAKE/HORN`
-alanlarını belgeliyor.
+`0x03E3554`: `!!! ASSERT cam(0x%x 0x%x 0x%x) %s : %d` — kamera debug'ı.
+
+**TCRF'in adresleri ABD sürümüne ait; Avrupa ROM'unda kaymış hâlde.**
+Avrupa karşılıkları:
+
+| İçerik | TCRF (ABD) | Avrupa (bizim) |
+|---|---|---|
+| Debug menü başlangıcı | `0x3E31A8` | `0x3E40BC` |
+| `CAR PHYSICS TEST` | — | `0x3E4184` |
+| `PLACEHOLDER` | `0x7C9624` | `0x7C99D4` |
+| `FLAKEY CHECK ON` | `0x7C76DC` | `0x7C7A8C` |
+| `SAY HELLO TO MR PAGER` | `0x3BC6B5` | `0x7C909C` |
+| `KILL FRENZY` | `0x7C7CA4` | `0x7C8054` |
+| `MULTI PLAYER` | `0x7C93AC` | `0x7C975C` |
+
+### Araç fizik alan adları — struct için hazır isimler
+
+`0x03E4198`'den itibaren **8 byte aralıklı sabit dizi**. Bunlar geliştiricinin
+araç yapısı için kullandığı kendi alan adları; araç alt sistemine gelindiğinde
+`unk_14` yerine gerçek isimler kullanılabilir:
+
+| Adres | Etiket | Adres | Etiket |
+|---|---|---|---|
+| `0x03E4198` | `SPEED` | `0x03E41D8` | `ROLL` |
+| `0x03E41A0` | `ACCEL` | `0x03E41E0` | `TILT` |
+| `0x03E41A8` | `FACE` | `0x03E41E8` | `VEL` |
+| `0x03E41B0` | `DIR` | `0x03E41F0` | `POS` |
+| `0x03E41B8` | `ROTSP` | `0x03E41F8` | `HBRAKE` |
+| `0x03E41C0` | `RADIUS` | `0x03E4200` | *(boş)* |
+| `0x03E41C8` | `FCOLL` | `0x03E4208` | `HORN` |
+| `0x03E41D0` | `ACOLL` | | |
+
+`0x03E40BC`'de ayrıca `CUSTOM 0` – `CUSTOM 10`, 15 byte aralıklı.
 
 Oyunda erişilebilir debug özellikleri de var (TCRF):
 
@@ -98,8 +145,16 @@ yoldan kurtarılamıyor.
 | `0x7C88E4` | Çok oyunculu görev adları |
 | `0x7C949C` | Acil durum araç adları |
 
-## Prototip
+## Prototip — sınırlı değer
 
-TCRF'te GTA Advance için ayrı bir **prototip sayfası** var. Prototip
-derlemeler bazen sembol tablosu veya debug bilgisi taşır; taşıyorsa çeviri
-birimi yapısı doğrudan kurtarılabilir. Henüz incelenmedi.
+TCRF'in belgelediği prototip **16 Nisan 2002 tarihli, Crawfish Interactive'in
+teknoloji demosu**: tek küçük alan, tek taksi, tuning ekranı ve araç fizik testi.
+GTA III portu olarak planlanan ilk aşamadan geliyor; retail oyunu Digital Eclipse
+yaptı ve oyun içeriği tamamen farklı.
+
+Yine de yukarıdaki soy bağı nedeniyle motor kodu ortak olabilir. Prototipin
+sembol tablosu taşıyıp taşımadığı bilinmiyor — Hidden Palace'ta dump'lanmış
+durumda. İncelenirse öncelik sırası: sembol/debug bölümü var mı, `CRAWSAVE`
+imzası ve araç fizik menüsü aynı mı, ortak fonksiyon gövdeleri var mı.
+
+Not: prototip ROM'u bu depoya girmez ve yasal edinim kullanıcının sorumluluğundadır.
