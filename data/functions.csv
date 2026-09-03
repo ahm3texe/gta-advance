@@ -412,10 +412,10 @@ address,name,size,status,module,notes
 0x0802392C,FUN_0802392c,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08023938,FUN_08023938,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08023974,FUN_08023974,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08023A0C,FUN_08023a0c,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08023A40,FUN_08023a40,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08023A4C,FUN_08023a4c,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08023A58,FUN_08023a58,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08023A0C,ApplyThreshold,48,matching,world,"Bant hesaplayici; src/world/threshold.c"
+0x08023A40,ResetMeter,10,matching,world,"Bant hesaplayici; src/world/threshold.c"
+0x08023A4C,SetToMax,10,matching,world,"Bant hesaplayici; src/world/threshold.c"
+0x08023A58,ReloadMeter,16,matching,world,"Bant hesaplayici; src/world/threshold.c"
 0x08023A80,FUN_08023a80,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08023AA0,FUN_08023aa0,130,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08023CC4,FUN_08023cc4,230,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

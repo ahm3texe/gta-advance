@@ -150,3 +150,7 @@ address,name,source,matching
 0x08067244,BumpCountA,src/world/stat_counters.c,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
 0x08067274,AddDistance,src/world/distance_accum.c,no
+0x08023A0C,ApplyThreshold,src/world/threshold.c,yes
+0x08023A40,ResetMeter,src/world/threshold.c,yes
+0x08023A4C,SetToMax,src/world/threshold.c,yes
+0x08023A58,ReloadMeter,src/world/threshold.c,yes
