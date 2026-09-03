@@ -37,4 +37,5 @@ start,end,binary,module,notes
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
+0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"

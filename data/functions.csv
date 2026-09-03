@@ -1281,10 +1281,10 @@ address,name,size,status,module,notes
 0x080671B8,FUN_080671b8,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080671D4,FUN_080671d4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080671F0,FUN_080671f0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067228,FUN_08067228,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067244,FUN_08067244,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067260,FUN_08067260,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067274,FUN_08067274,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08067228,BumpCountB,22,matching,world,"Istatistik sayaci; src/world/stat_counters.c"
+0x08067244,BumpCountA,22,matching,world,"Istatistik sayaci; src/world/stat_counters.c"
+0x08067260,ResetDistanceAccum,16,matching,world,"Istatistik sayaci; src/world/stat_counters.c"
+0x08067274,AddDistance,56,candidate,world,"Istatistik sayaci; src/world/stat_counters.c"
 0x080672B8,FUN_080672b8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080672FC,FUN_080672fc,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08067370,FUN_08067370,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
