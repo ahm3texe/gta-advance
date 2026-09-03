@@ -564,10 +564,10 @@ address,name,size,status,module,notes
 0x08030B40,FUN_08030b40,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08030C0C,FUN_08030c0c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08030C28,FUN_08030c28,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030C4C,FUN_08030c4c,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030C80,FUN_08030c80,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030CB0,FUN_08030cb0,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030CB4,FUN_08030cb4,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08030C4C,IsAreaFlagSet,52,matching,world,"Alan bayraklari; src/world/area_flags.c"
+0x08030C80,SetAreaFlag,48,matching,world,"Alan bayraklari; src/world/area_flags.c"
+0x08030CB0,AreaFlagsNoop,2,matching,world,"Alan bayraklari; src/world/area_flags.c"
+0x08030CB4,CleanupAreaTiles,62,candidate,world,"Alan bayraklari; src/world/area_flags.c"
 0x08030D0C,FUN_08030d0c,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08030D4C,FUN_08030d4c,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08030D84,FUN_08030d84,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

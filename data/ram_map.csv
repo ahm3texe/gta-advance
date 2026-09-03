@@ -83,7 +83,7 @@ address,size,name,source,status,notes
 0x0300009C,4,gRam0300009C,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
 0x02000498,4,gRam02000498,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
 0x030000A0,4,gRam030000A0,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
-0x02025810,24,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para"
+0x02025810,4991,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para"
 0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat ciftini tutan blok, +72 ayri bir kelime"
 0x020110AC,4,gRam020110AC,decomp,provisional,"Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor"
 0x02030C10,320,gSlotIds,decomp,provisional,"160 adet u16 yuva kimligi; 0x7FEF bos demek"
@@ -92,3 +92,4 @@ address,size,name,source,status,notes
 0x02035A70,4,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik"
 0x020272C8,4,gRam020272C8,decomp,provisional,"Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor"
 0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
+0x02026E80,4,gRam02026E80,decomp,provisional,"0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok"
