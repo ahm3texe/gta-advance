@@ -77,7 +77,7 @@ address,size,name,source,status,notes
 0x0202F3D0,4,gRam0202F3D0,decomp,provisional,"Referenced by a block queued for matching; role unknown"
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,"Referenced by a block queued for matching; role unknown"
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x0202F3E0,4,gRam0202F3E0,decomp,provisional,"Referenced by a block queued for matching; role unknown"
+0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi"
 0x03000078,4,gRam03000078,decomp,provisional,"Referenced by a block queued for matching; role unknown"
 0x03000098,4,gRam03000098,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
 0x0300009C,4,gRam0300009C,decomp,provisional,"Referenced by FUN_08001A00; role unknown"

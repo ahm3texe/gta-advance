@@ -934,7 +934,7 @@ address,name,size,status,module,notes
 0x08042088,FUN_08042088,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080420F8,FUN_080420f8,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08042144,FUN_08042144,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08042434,FUN_08042434,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08042434,IsTileTypeInRange,60,matching,world,"Karo turu sorgusu; Ghidra 56 bayt saymisti, havuz kelimesi govdenin icinde"
 0x08042470,FUN_08042470,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080424A8,FUN_080424a8,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080424D8,FUN_080424d8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

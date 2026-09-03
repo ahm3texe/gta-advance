@@ -26,6 +26,7 @@ start,end,binary,module,notes
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
+0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
