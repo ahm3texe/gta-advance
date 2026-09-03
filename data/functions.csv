@@ -762,10 +762,10 @@ address,name,size,status,module,notes
 0x080380B4,FUN_080380b4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038108,FUN_08038108,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080381A4,FUN_080381a4,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080381F8,FUN_080381f8,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038234,FUN_08038234,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803824C,FUN_0803824c,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038260,FUN_08038260,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080381F8,ProbeObject,58,candidate,world,"Nesne sorgusu; src/world/object_query.c"
+0x08038234,SubmitObject,22,candidate,world,"Nesne sorgusu; src/world/object_query.c"
+0x0803824C,GetInnerId,20,candidate,world,"Nesne sorgusu; src/world/object_query.c"
+0x08038260,ResolveObjectValue,54,matching,world,"Nesne sorgusu; src/world/object_query.c"
 0x08038358,ForwardToSub,12,matching,world,Nesne yardimcisi; src/world/object_helpers.c
 0x08038364,IsObjectActive,28,matching,world,Nesne yardimcisi; src/world/object_helpers.c
 0x08038380,UpdateObject,32,matching,world,Nesne yardimcisi; src/world/object_helpers.c

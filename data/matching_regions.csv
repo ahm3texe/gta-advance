@@ -29,6 +29,7 @@ start,end,binary,module,notes
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
+0x08038260,0x08038298,build/world/object_value.bin,world,"Nesne deger cozumu: sinama, dolayli yuva, dogrudan ayrinti"
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Bes yuva sorgusu: sabit, aktif yuva, olcek adimi, hedef isaretleme"
