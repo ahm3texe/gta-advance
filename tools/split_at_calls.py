@@ -72,8 +72,9 @@ def main() -> None:
         print("\n(yalnizca rapor; bolmek icin --apply)")
         return
 
-    by_address = {int(r["address"], 16): r for r in rows}
     out = []
+    added: set[int] = set()      # ayni cagri hedefi iki ebeveynin icinde
+                                 # kalabilir; cocugu yalnizca BIR kez ekle
     for row in rows:
         address = int(row["address"], 16)
         if address not in splits:
@@ -88,6 +89,9 @@ def main() -> None:
                         "split_at_calls.py ayirdi").lstrip("; ")
         out.append(row)
         for i, start in enumerate(splits[address]):
+            if start in added:
+                continue
+            added.add(start)
             out.append({
                 "address": f"0x{start:08X}", "name": f"FUN_{start:08x}",
                 "size": str(points[i + 1] - start), "status": "discovered",

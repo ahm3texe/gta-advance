@@ -121,7 +121,7 @@ address,name,source,matching
 0x08037FD0,GetPoolD,src/world/pool_gets.c,yes
 0x08037FDC,MarkAndClear,src/world/pool_gets.c,yes
 0x080381F8,ProbeObject,src/world/object_query.c,no
-0x08038234,SubmitObject,src/world/object_query.c,yes
+0x08038234,SubmitObject,src/world/submit_object.c,yes
 0x0803824C,GetInnerId,src/world/object_query.c,no
 0x08038260,ResolveObjectValue,src/world/object_value.c,yes
 0x08038358,ForwardToSub,src/world/object_helpers.c,yes

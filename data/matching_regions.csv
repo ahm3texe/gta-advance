@@ -46,6 +46,7 @@ start,end,binary,module,notes
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
+0x08038234,0x0803824C,build/world/submit_object.bin,world,Nesne gonderme sarmalayicisi
 0x08038260,0x08038298,build/world/object_value.bin,world,"Nesne deger cozumu: sinama, dolayli yuva, dogrudan ayrinti"
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu

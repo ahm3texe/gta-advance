@@ -1,6 +1,6 @@
 /* Nesne sorgulari — 0x080381F8-0x0803825F
  *
- * Dort fonksiyon. Ilki ROM'daki sabit bir dort sozcuklu yapiyi yerele
+ * Iki fonksiyon. Ilki ROM'daki sabit bir dort sozcuklu yapiyi yerele
  * kopyalayip (ldmia/stmia cifti struct atamasindan geliyor) sinama
  * fonksiyonuna veriyor.
  *
@@ -16,6 +16,9 @@
  *
  * Bu kumeden esleşen ResolveObjectValue ayri dosyada:
  * src/world/object_value.c
+ *
+ * Ayni kumeden eslesen ikisi ayri dosyada: SubmitObject ->
+ * src/world/submit_object.c, ResolveObjectValue -> object_value.c
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/object_query.c
@@ -52,8 +55,6 @@ typedef struct Object {
 } Object;
 
 extern u32    FUN_0804293c(u32 *target, const Params *params);
-extern u32    FUN_08038608(Object *object);
-extern u32    FUN_08036cac(u32 handle, int one, u32 arg);
 
 /* 0x080381F8 */
 u32 ProbeObject(Object *object)
@@ -70,12 +71,6 @@ u32 ProbeObject(Object *object)
     }
 
     return 0;
-}
-
-/* 0x08038234 */
-u32 SubmitObject(Object *object, u32 arg)
-{
-    return FUN_08036cac(FUN_08038608(object), 1, arg);
 }
 
 /* 0x0803824C */
