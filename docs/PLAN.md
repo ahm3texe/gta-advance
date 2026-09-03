@@ -32,38 +32,55 @@ gerektirir.
 
 ---
 
-## Faz 0 — Sınır denetimi ✅ TAMAMLANDI
+## Faz 0 — Fonksiyon haritasını doğru kur
 
-`tools/audit_boundaries.py` yazıldı ve uygulandı: **647 sınır düzeltildi,
-43 sahte kayıt silindi.** 1505 → 1462 kayıt, 291.535 → 333.317 bayt.
+Bu faz iki iş içeriyordu; başta yalnızca birincisini görmüştüm.
 
-Düzeltmelerin dağılımı: 467'si ≤32 bayt (boyut özensizliği — bazı bildirilen
-boyutlar tek sayıydı, Thumb'da imkânsız), 71'i >128 bayt (gerçek Ghidra
-atlama tablosu kesikleri).
+### 0a. Sınır denetimi ✅
 
-Yan bulgu: ~8.4 KB'lik dört **ARM kod aralığı** (muhtemelen ses sürücüsü).
-`functions.csv` ARM/Thumb kipini kaydetmiyor; bu aralıklar şimdilik denetim
-dışı.
+`tools/audit_boundaries.py`: **647 sınır düzeltildi, 43 sahte kayıt
+silindi.** 1505 → 1462 kayıt, 291.535 → 333.317 bayt.
 
-Kalan iş: 6 fonksiyon "akıl dışı büyüme" diye elle bakılmak üzere ayrıldı.
+### 0b. Eksik fonksiyon keşfi ✅ (kısmen)
 
-Bu şimdiye kadar üç kez ölçüldü: `RunMenuScreen` 956 yerine 1414,
-`IsTileTypeInRange` 56 yerine 60, ayrıca iki sahte "küçük fonksiyon kümesi"
-aslında büyük fonksiyonların kuyruğuydu.
+**Bunu baştan planlamamıştım — hata buydu.** Sınırları düzeltmek yetmez;
+Ghidra fonksiyonların bir kısmını *hiç görmemiş*.
 
-**Neden önce:** yanlış sınır her aşamada boşa emek demek. Ucuz, otomatikleşir
-ve tüm sonraki fazları hızlandırır.
+`tools/discover_functions.py` iki yöntem kullanıyor:
 
-**İş:** `tools/audit_boundaries.py`
-- gövde dışına dallanan adayı işaretle
-- gerçek sonu bul: epilog (`pop`/`bx lr`) + sonraki prolog (`push`)
-- gövde içi literal havuzlarını sınıra dahil et
-- bitişik parçaları tek fonksiyonda birleştir
-- `functions.csv`'yi düzelt, değişiklikleri raporla
+- **Çağrı hedefi (kesin):** bilinen kodun içindeki her `bl` hedefi tanım
+  gereği bir fonksiyon girişidir. Yanlış pozitif olamaz, yaprak
+  fonksiyonları da bulur. → **49 fonksiyon**
+- **Prolog deseni (olası):** boşluklarda `push {..,lr}` araması, dört
+  sıkı filtreyle. → **358 fonksiyon**
 
-**Çıktı:** güvenilir fonksiyon haritası. Kapsama artışı yok, ama her şeyin ön koşulu.
+Sonuç: 1466 → **1873 fonksiyon**, 338.163 → **419.717 bayt**.
 
----
+### Yüzdenin üç kez düşmesinin nedeni
+
+| Ne zaman | Payda | Oran |
+|---|---|---|
+| Başlangıç | 291.535 | %2.34 |
+| Sınır denetimi sonrası | 338.163 | %2.05 |
+| Prolog keşfi sonrası | 413.699 | %2.38 |
+| Çağrı hedefi keşfi sonrası | 419.717 | %2.35 |
+
+Kapsama hiç kaybedilmedi; her seferinde **payda gerçeğe yaklaştı**.
+Ders: payda güvenilir değilse yüzde de değil. Harita işi kapsama işinden
+**önce** bitmeliydi.
+
+### Faz 0'da kalan iş
+
+1. **51 sınır hatası.** `bl` hedefi bilinen bir fonksiyonun *içine*
+   düşüyor — ya iki fonksiyon tek kayıtta birleşmiş ya sınır yanlış.
+   Örnek: `0x080026F8`, `0x080031EA`, `0x08005532`.
+2. **48.816 bayt boşluk** (%10,5) — 27 tanesi 256 bayttan büyük
+   (28.228 bayt). Veri mi kod mu ayrılmalı.
+3. **ARM bölgeleri** kabaca ölçüldü (~8,4 KB, dört aralık); gerçek
+   sınırları çıkarılmalı.
+4. **Dolaylı çağrılar.** Yalnızca fonksiyon işaretçisiyle çağrılan
+   fonksiyonlar `bl` taramasında görünmez; atlama tabloları ve
+   işleyici dizileri ayrıca taranmalı.
 
 ## Faz 1 — Küçük fonksiyon hasadı
 
