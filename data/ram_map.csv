@@ -105,3 +105,7 @@ address,size,name,source,status,notes
 0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
 0x02022E50,512,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi"
 0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"
+0x0202F310,4,gRam0202F310,decomp,provisional,"+8'de u32 alan"
+0x0202F300,4,gRam0202F300,decomp,provisional,"+8'de u32 alan"
+0x02028280,4,gRam02028280,decomp,provisional,"+8'de u32 alan"
+0x0202F2C0,4,gRam0202F2C0,decomp,provisional,"+8'de u32 alan"

@@ -751,11 +751,11 @@ address,name,size,status,module,notes
 0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
 0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
 0x08037F70,FUN_08037f70,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037FAC,FUN_08037fac,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037FB8,FUN_08037fb8,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037FC4,FUN_08037fc4,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037FD0,FUN_08037fd0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037FDC,FUN_08037fdc,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08037FAC,GetPoolA,6,matching,world,"Havuz getirici / isaretleme; src/world/pool_gets.c"
+0x08037FB8,GetPoolB,6,matching,world,"Havuz getirici / isaretleme; src/world/pool_gets.c"
+0x08037FC4,GetPoolC,6,matching,world,"Havuz getirici / isaretleme; src/world/pool_gets.c"
+0x08037FD0,GetPoolD,6,matching,world,"Havuz getirici / isaretleme; src/world/pool_gets.c"
+0x08037FDC,MarkAndClear,34,matching,world,"Havuz getirici / isaretleme; src/world/pool_gets.c"
 0x08038020,FUN_08038020,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038044,FUN_08038044,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038084,FUN_08038084,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

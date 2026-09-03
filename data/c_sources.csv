@@ -85,6 +85,11 @@ address,name,source,matching
 0x08037F4C,GetUnk0202F2D0,src/misc/state_getters.c,yes
 0x08037F58,GetUnk02028290,src/misc/state_getters.c,yes
 0x08037F64,GetUnk02028280,src/misc/state_getters.c,yes
+0x08037FAC,GetPoolA,src/world/pool_gets.c,yes
+0x08037FB8,GetPoolB,src/world/pool_gets.c,yes
+0x08037FC4,GetPoolC,src/world/pool_gets.c,yes
+0x08037FD0,GetPoolD,src/world/pool_gets.c,yes
+0x08037FDC,MarkAndClear,src/world/pool_gets.c,yes
 0x080381F8,ProbeObject,src/world/object_query.c,no
 0x08038234,SubmitObject,src/world/object_query.c,yes
 0x0803824C,GetInnerId,src/world/object_query.c,no
