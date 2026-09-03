@@ -51,6 +51,7 @@ check: rom
 	@python3 tools/scan_c_sources.py
 	@python3 tools/review_c_source.py
 	@python3 tools/progress.py
+	@python3 tools/generate_dashboard_data.py
 
 # Tam ROM'u yeniden uretir: dogrulanmis bolgeler kendi kaynagimizdan,
 # kalani baserom.gba'dan. Sonucun SHA-1'i orijinalle ayni olmali.
