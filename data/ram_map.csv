@@ -109,3 +109,4 @@ address,size,name,source,status,notes
 0x0202F300,4,gRam0202F300,decomp,provisional,"+8'de u32 alan"
 0x02028280,4,gRam02028280,decomp,provisional,"+8'de u32 alan"
 0x0202F2C0,4,gRam0202F2C0,decomp,provisional,"+8'de u32 alan"
+0x02030330,64,gRam02030330,decomp,provisional,"+0x10'da bir offset, +0x2C'de yaz alani"

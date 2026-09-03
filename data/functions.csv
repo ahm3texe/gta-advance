@@ -969,9 +969,9 @@ address,name,size,status,module,notes
 0x08050918,FUN_08050918,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08050934,FUN_08050934,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08050994,FUN_08050994,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080509C4,FUN_080509c4,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080509DC,FUN_080509dc,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080509E8,FUN_080509e8,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080509C4,CallWithOffset,18,candidate,world,"Ofset yardimcisi; src/world/offset_helpers.c"
+0x080509DC,GetBase,6,matching,world,"Ofset yardimcisi; src/world/offset_helpers.c"
+0x080509E8,SetSlot,6,matching,world,"Ofset yardimcisi; src/world/offset_helpers.c"
 0x08050A00,FUN_08050a00,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08050A0C,FUN_08050a0c,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08050A8C,FUN_08050a8c,754,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

@@ -43,6 +43,7 @@ start,end,binary,module,notes
 0x0803F630,0x0803F67C,build/world/state_init.bin,world,"Durum kurulum, bos, cagirici, degistirici"
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
+0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"

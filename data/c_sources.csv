@@ -126,6 +126,9 @@ address,name,source,matching
 0x0803F74C,SetActorIdle,src/world/actor_states.c,yes
 0x0803F764,ReleaseActor,src/world/actor_states.c,yes
 0x08042434,IsTileTypeInRange,src/world/map_tiles.c,yes
+0x080509C4,CallWithOffset,src/world/offset_helpers.c,no
+0x080509DC,GetBase,src/world/gRam02030330_gets.c,yes
+0x080509E8,SetSlot,src/world/gRam02030330_gets.c,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,yes
 0x08051500,GetRecord,src/misc/record_table.c,yes
