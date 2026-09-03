@@ -403,7 +403,7 @@ address,name,size,status,module,notes
 0x0802016C,FUN_0802016c,878,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08020560,FUN_08020560,798,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080208A8,FUN_080208a8,490,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08020A9C,FUN_08020a9c,210,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08020A9C,FUN_08020a9c,210,candidate,entity,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08020B70,FUN_08020b70,480,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08020D5A,FUN_08020d5a,1974,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08021588,FUN_08021588,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
