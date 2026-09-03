@@ -100,6 +100,47 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 26 | Dar **struct alanının** işaretliliği maskenin genişliğini belirler | `s8 flags` ile `flags &= ~4` maskeyi 32 bit tutuyor (`movs #5`/`negs`); `u8` ile bayta daraltıyor (`movs #251`). Kural 15'in alan hâli |
 | 27 | Ham değer ve türevi **tek değişkende** tutulabilir | `index = id; index = (u16)(index - 1);` ayrı iki değişkenden farklı register dağıtımı veriyor |
 
+## Register dağıtımının mekanizması
+
+Kuralların çoğu (11, 16, 17, 20, 23, 27) aynı tek mekanizmanın yüzleridir.
+agbcc'nin (GCC 2.8.1) global register dağıtıcısı sanal register'ları şu
+önceliğe göre sıralayıp sırayla ilk uygun donanım register'ını verir:
+
+```
+öncelik = floor_log2(referans_sayısı) × referans_sayısı / ömür_uzunluğu
+```
+
+Yani bir değişkene **referans eklemek veya çıkarmak**, onun hangi register'a
+düştüğünü ve dolayısıyla *tüm* dağıtımı çevirebilir. `ClearTextArea`'da
+ölçülen:
+
+| Değişken | referans / ömür | öncelik |
+|---|---|---|
+| `dma` | 9 / 52 | 5192 |
+| `control` | 5 / 21 | 4761 |
+
+Bu sırayla `dma` önce dağıtılıp `r3`'ü kapıyor, ROM'unkinin tersi. Blok 2'deki
+ölü okuma `control` değişkenine atanınca `control` 6 referansa çıkıyor
+(6/22 → 5454 > 5192), önce dağıtılıyor ve `r3`'ü alıyor — `dma` `r4`'e,
+`dest` `r5`'e, IME tabanı `r6`'ya, stride `r7`'ye oturuyor: **ROM'un tam
+dağılımı.** 13 bayt fark 1'e iniyor.
+
+Bu, kural 17'nin ("tek adres için iki ayrı yerel") *neden* çalıştığının da
+cevabıdır: ikinci yerel ömrü bölüp öncelikleri değiştirir.
+
+**Pratik sonuç:** register uyuşmazlığında C'yi rastgele kurcalamak yerine
+ilgili değişkenlerin referans sayısını ve ömrünü say; hangisinin önce
+dağıtılması gerektiğini hesapla; referans ekleyip çıkararak sırayı çevir.
+
+Bir uyarı: fonksiyonun tamamı tek bir genişletilmiş temel blokken **bedava
+referans eklenemez**. Her reg-reg kopyası CSE tarafından yayılıp combine
+tarafından siliniyor; `x = x`, ölü `x = 0`, `x |= 0`, `x + 0`, `x ^ x` hepsi
+eleniyor. Referans kazandıran tek şey `volatile` bir erişimdir — o da bir
+operand register'ını değiştirir.
+
+Ölçüm için `old_agbcc -dg` (global) ve `-dl` (yerel) dağıtım dökümü üretir;
+bu depodaki çağrımda dosyalar boş çıktı, formül dolaylı ölçümle doğrulandı.
+
 Kural 20'nin arkasındaki mekanizma genellenebilir: **yığın yerleşimini belirleyen
 şey bildirim sırası değil, tipin BLKmode olup olmadığıdır.** Bir agent 24
 bildirim sırası permütasyonu deneyip yerleşimin hiç değişmediğini ölçtü.
