@@ -12,7 +12,12 @@ A) CAGRI HEDEFI (kesin). Bilinen kodun icindeki her `bl` komutunun
    hedefi tanim geregi bir fonksiyon girisidir. Yanlis pozitif olamaz.
    Prolog desenine bakmaya gerek yok -- yaprak fonksiyonlar da bulunur.
 
-B) PROLOG DESENI (olasi). Bosluklarda Thumb prologu
+B) FONKSIYON ISARETCISI (guclu). ROM verisindeki atlama tablolari ve
+   isleyici dizileri Thumb isaretcisi tutar: 0x08xxxxxx, TEK sayi.
+   Ham tarama cok yanlis pozitif verir (grafik verisi icinde rastlanti),
+   bu yuzden hedefin GERCEK bir prologu olmasi sarti aranir.
+
+C) PROLOG DESENI (olasi). Bosluklarda Thumb prologu
    (`push {..., lr}`) arar, sonra audit_boundaries yurutucusuyle govdeyi
 cikarir. Dort siki kosul:
   1. govde 8-4096 bayt ve cozulemeyen dolayli atlama yok
@@ -97,7 +102,30 @@ def main() -> None:
         if MIN_SIZE <= size <= MAX_SIZE and not walker.unresolved:
             from_calls.append((target, size))
 
-    found = list(from_calls)
+    # B) Fonksiyon isaretcileri: yalnizca hedefte gercek prolog varsa.
+    limit = max(address + size for address, size in known)
+    from_pointers = []
+    seen_ptr = set()
+    for off in range(0, len(rom) - 4, 4):
+        word = int.from_bytes(rom[off:off + 4], "little")
+        if not (ROM_BASE <= word < limit and (word & 1)):
+            continue
+        target = word & ~1
+        if target in known_starts or target in covered or target in seen_ptr:
+            continue
+        if in_arm_range(target) or target in ARM_FUNCTIONS:
+            continue
+        head = int.from_bytes(rom[target - ROM_BASE:target - ROM_BASE + 2], "little")
+        if not ((head & 0xFF00) == 0xB500 or (head & 0xFE00) == 0xB400):
+            continue                     # gercek prolog yoksa rastlanti say
+        seen_ptr.add(target)
+        walker = Walker(rom, target)
+        walker.run()
+        size = walker.code_extent()
+        if MIN_SIZE <= size <= MAX_SIZE and not walker.unresolved:
+            from_pointers.append((target, size))
+
+    found = list(from_calls) + list(from_pointers)
     for gap_start, gap_end in gaps:
         addr = (gap_start + 1) & ~1
         while addr + 2 <= gap_end:
@@ -129,8 +157,10 @@ def main() -> None:
 
     total = sum(size for _, size in unique)
     print(f"Bosluk: {len(gaps)} adet")
-    print(f"A) Cagri hedefinden kesin: {len(from_calls)} fonksiyon")
-    print(f"B) Prolog deseninden olasi: {len(unique) - len(from_calls)} fonksiyon")
+    print(f"A) Cagri hedefinden kesin:   {len(from_calls)} fonksiyon")
+    print(f"B) Isaretciden (prologlu):   {len(from_pointers)} fonksiyon")
+    print(f"C) Prolog deseninden olasi:  "
+          f"{len(unique) - len(from_calls) - len(from_pointers)} fonksiyon")
     print(f"Toplam: {len(unique)} fonksiyon, {total} bayt")
     if inside_known:
         print(f"\nUYARI: {len(inside_known)} `bl` hedefi bilinen bir fonksiyonun "
@@ -152,6 +182,7 @@ def main() -> None:
             "size": str(size), "status": "discovered", "module": "unknown",
             "notes": ("Ghidra kacirmisti; tools/discover_functions.py "
                       + ("cagri hedefi (kesin)" if (addr, size) in from_calls
+                         else "fonksiyon isaretcisi" if (addr, size) in from_pointers
                          else "prolog deseni (olasi)")
                       + ", govdesi henuz incelenmedi"),
         })
