@@ -1,7 +1,7 @@
-/* Kayit serilestirme yardimcilari — 0x080010F8-0x0800114B
+/* Kayit serilestirme yardimcilari — 0x08001094-0x0800114B
  *
- * Sekiz fonksiyonun yedisi C'den byte-matching; WriteU16LE acik. Blok
- * tamamlanana kadar src/save/save_helpers.s gecerli build kaynagidir.
+ * Sekiz fonksiyonun TAMAMI C'den byte-matching. (WriteU16LE bir donem
+ * acikti; kural 15 -- dar parametrenin isaretliligi -- ile kapandi.)
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/save/save_helpers.c

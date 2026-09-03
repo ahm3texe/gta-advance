@@ -10,8 +10,13 @@
 #include "gba_types.h"
 
 typedef struct CoordBlock {
-    u32 unk00;                  /* +0 */
-    u32 unk04;                  /* +4 */
+    u32 unk00;              /* +0  */
+    u32 unk04;              /* +4  */
+    u32 unk08;              /* +8  */
+    s32 second;             /* +12 */
+    s32 first;              /* +16 */
+    u8  pad14[52];
+    u32 unk48;              /* +72 */
 } CoordBlock;
 
 extern CoordBlock gRam02011030;

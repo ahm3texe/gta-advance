@@ -31,11 +31,12 @@ ReadU8        4 byte   BYTE-MATCHING  (0x080010F8)
 ReadU16LE    12 byte   BYTE-MATCHING  (0x080010FC)
 ReadU32LE    24 byte   BYTE-MATCHING  (0x08001108)
 WriteU8       4 byte   BYTE-MATCHING  (0x08001120)
-WriteU16LE    8 byte   acik           (0x08001124)
+WriteU16LE   12 byte   BYTE-MATCHING  (0x08001124)
 WriteU32LE   28 byte   BYTE-MATCHING  (0x08001130)
 ```
 
-**5/6 fonksiyon, tek satır C değişikliği olmadan.**
+**Sekiz fonksiyonun tamamı byte-matching** (`WriteU16LE` sonradan
+çözüldü; aşağıdaki "Açık kalan" bölümü kaldırıldı).
 
 `WriteU32LE` belirleyici olan: 28 byte'ın tamamı birebir, üstelik maskeyi
 literal havuzdan okumak yerine iki kez `mov #0xff` + `lsl` ile yeniden kurma
@@ -73,7 +74,7 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | # | Kural | Neden |
 |---|---|---|
 | 1 | **RAM adresleri `extern` sembol olmalı**, `#define ((T*)0xADDR)` değil | Sabit olunca agbcc `taban+ofset`'i ayrı literale katlıyor; ROM tabanı register'da tutuyor |
-| 2 | **Ara işaretçi değişkeni kullanma**, doğrudan `dizi[i].alan` yaz | `p = &dizi[i]; p->alan` farklı register dağıtımı üretiyor |
+| 2 | Dizi elemanının üyesine erişimde **iki biçim de farklı kod üretir**; ROM'a bakıp seçilir | `dizi[i].alan` agbcc'ye alan ofsetini taban literaline katlatabilir (`.word taban+0x3c`); `p = &dizi[i]; p->alan` ofseti yükleme komutunda bırakır. Hangisinin doğru olduğu fonksiyona göre değişir — `entity_flags.c` ikinciyi, başka ölçümler birinciyi gerektirdi. Kural 23 bu kuralın ikinci yarısıydı, birleştirildi |
 | 3 | **Yığındaki geçici tampon `volatile` olmalı** | Değilse agbcc adres alma ile sabit yüklemeyi yeniden sıralıyor |
 | 4 | **`volatile` her erişim için ayrı denenir** | Sıralama düğmesidir, semantik değil: `gBiosIrqFlags` için kaldırmak, `REG_IF` için eklemek gerekti — aynı `x \|= sabit` biçiminde |
 | 5 | Dış semboller `.equ` ile assembler'a verilir | Linker'a bırakılınca interworking veneer'i sokuluyor |
@@ -94,13 +95,12 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 20 | 4 bayt hizalı ama halfword yazılan yığın yuvası için **`u16 x[2]` dizisi** | Dizi BLKmode olduğu için bildirim sırasında ve 4 bayta hizalı yerleşiyor; `x[0]=0` yine `strh` üretiyor, `(u32)x` adresi tek komutta veriyor. Skaler `u16` çerçeveyi 12 bayta düşürüyor, `u32` yazımı word yapıyor |
 | 21 | Döngü içinde kullanılan **sabit atamaları döngünün içine** yazılır | Döngü önüne yazılırsa agbcc onu kaynak deyimi olarak preheader kopyalarından *önce* yayıyor; içine alınınca döngü-değişmezi taşıyıcısı preheader'ın sonuna koyuyor ve sıra ROM'unkine oturuyor |
 | 22 | Aynı tabanın kopyası değil, **sabitten yeniden atama** yazılır | `b = a;` yazılırsa agbcc iki değişkeni birleştirip tek işaretçiye dönüyor; `b = (T *)ADRES;` ayrı ömür veriyor |
-| 23 | Dizi elemanının üyesine erişirken **yerel işaretçi** kullanılır | `dizi[i].alan` yazılırsa agbcc alan ofsetini taban literaline katlıyor; `p = &dizi[i]; p->alan` ofseti yükleme komutunda bırakıyor (ROM'daki biçim) |
 | 24 | Yedi bitlik alan için **bitfield** yazılır, maske değil | `x & 0x7F` yerine `u8 f : 7` — ROM `lsls #25`/`lsrs #25` çifti üretiyor |
 | 25 | Genel değişken okuması, kullanıldığı yerde değil **ayrı deyimde** yapılabilir | `if (g[26] != 0)` ile `v = g[26]; if (v != 0)` farklı sıralama üretiyor |
 | 26 | Dar **struct alanının** işaretliliği maskenin genişliğini belirler | `s8 flags` ile `flags &= ~4` maskeyi 32 bit tutuyor (`movs #5`/`negs`); `u8` ile bayta daraltıyor (`movs #251`). Kural 15'in alan hâli. İkinci ölçüm: `InitActor`'da 0x8A/0xA8 alanlarını `s8` yapmak farkı 40 → 14 bayta indirdi |
 | 27 | Ham değer ve türevi **tek değişkende** tutulabilir | `index = id; index = (u16)(index - 1);` ayrı iki değişkenden farklı register dağıtımı veriyor |
 | 30 | Seyrek `case` değerleri geniş bir aralığa yayılıyorsa **`||` karşılaştırma zinciri** yazılır, `switch` değil | `switch` (case 21..57 arasında 6 değer) agbcc'ye 37 girişli atlama tablosu ürettiriyor: 64 bayt yerine 212. ROM'un `cmp`/`beq` zinciri ancak `if (k == 57 \|\| k == 25 \|\| ...)` ile çıkıyor, **kaynak sırası ROM'un karşılaştırma sırasıyla aynı olmalı**. Kural 19'un (yoğun `switch` → atlama tablosu) tersi |
-| 32 | Ardışık kelime kopyası için **struct atama** yazılır, `*dest++ = *src++;` değil | agbcc `*p++ = *q++;` üçlüsünü üç ayrı `ldr/str` üretir (12 komut). `typedef struct { u32 a,b,c; } Triple;` bildirip `*(Triple*)dest = *(Triple*)src;` yazmak `ldmia/stmia {r0,r1,r2}` çiftini tetikler (2 komut). `stat_copy.c`'de 54 → 27 bayt fark. `memcpy` çağrısı yaptırmaz — struct atama gerekiyor |
+| 32 | Ardışık kelime kopyası için **struct atama** yazılır, `*dest++ = *src++;` değil | agbcc `*p++ = *q++;` üçlüsünü üç ayrı `ldr/str` üretir (12 komut). `typedef struct { u32 a,b,c; } Triple;` bildirip `*(Triple*)dest = *(Triple*)src;` yazmak `ldmia/stmia {r0,r1,r2}` çiftini tetikler (2 komut). `0x08031FB4`'te 54 → 27 bayt fark (ölçüm yapıldı; dosya sonradan parktan çıkarılıp silindi). `memcpy` çağrısı yaptırmaz — struct atama gerekiyor |
 | 31 | Döngü sayacının işaretliliği `bls` (unsigned) vs `ble` (signed) dallanma seçimini belirler | `for (u32 i = 0; i <= N; i++)` → `bls`; `for (s32 i = 0; i <= N; i++)` → `ble`. ROM her ikisini de kullanır — hangisinin çıktığını sayaç tipi belirler. `slot_scan.c`'de tek başına 1 bayt farkı 0'a indirdi. `MaybeAdvance`'in park nedeni buydu; oradaki `u16 counter` yerine `int counter` denenebilir |
 | 29 | İki dal aynı işi yapıyorsa **erken `return` + ortak kuyruk** yazılır, ortak değişkene atama değil | `if (k) { p->h = A; return; } ... p->h = B;` ROM'daki gibi iki ayrı kopya üretiyor; `handler = A else B; p->h = handler;` agbcc'ye dalları birleştirtiyor (cross-jumping) ve 39 bayt fark veriyor |
 | 28 | Ölçekli tabana iki terim eklenirken **işaretçi aritmetiği** ile **dizi indeksi** farklı kod üretir | `*(t + x + (y << s))` her terimi ayrı ölçekliyor (`lsl` + `lsl` + iki toplama); `t[x + (y << s)]` önce toplayıp bir kez ölçekliyor. `IsTileTypeInRange`'de dizi biçimi 33 bayt fark **ve** gereksiz bir `push {r4,lr}` veriyordu, işaretçi biçimi 3'e indirip fonksiyonu yaprak yaptı |
@@ -225,22 +225,13 @@ ROM ise sıfırla. Üretilen assembly'nin sonuna `.align 2, 0` eklenir.
 sembolü Thumb fonksiyonu olarak tanımadığı için araya interworking veneer'i
 sokar ve `bl` hedefi yanlış çıkar.
 
-## Açık kalan
+## Kapanan: WriteU16LE
 
-`WriteU16LE` (`0x08001124`, 12 byte): ROM girişte değeri 16 bite normalize
-ediyor (`lsls #16` / `lsrs #16`), ürettiğimiz kod bu dört baytı atlıyor ve
-kalan sekiz bayt birebir aynı çıkıyor.
-
-En yakın gelen biçim `int` yerel değişken: kırpmayı üretiyor ama kaydırmayı
-işaretli yapıyor (`asrs` yerine `lsrs` gerekiyor) — tek yarım-sözcük fark.
-İşaretsiz cast eklenince kırpma tamamen kayboluyor.
-
-Denenip tutmayanlar: `u32`/`int` parametre ve yerel değişken kombinasyonları,
-`0xffff` maskesi, `(u16)`/`(u8)`/`(u32)` cast'ları, `v >>= 8`, `v / 256`,
-`v & 255`, `i < 2` döngüsü, `*p++` yazımı, K&R parametre bildirimi,
-`-traditional`, `-W`, `-funsigned-bitfields`, `-fshort-enums`,
-`-mno-thumb-interwork`.
-
+Bir dönem açık kalmıştı: ROM girişte değeri 16 bite normalize ediyordu
+(`lsls #16` / `lsrs #16`) ve ürettiğimiz kod bu dört baytı atlıyordu.
+Kural 15 (dar parametrenin işaretliliği giriş normalizasyonunu belirler)
+bulunduktan sonra kapandı; `src/save/save_helpers.c` şimdi 8/8
+byte-matching.
 
 ## Kurulum
 

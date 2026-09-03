@@ -12,8 +12,10 @@ make check
 ```
 
 Şunları çalıştırır: `make rom` (tam ROM'u yeniden üretir ve SHA-1 doğrular),
-`make c-status` (C kaynaklarını ROM ile karşılaştırır), `make c-review`
-(okunabilirlik denetimi), `make progress`.
+`check_consistency.py` (veri dosyalarının kendi içinde, birbiriyle ve
+kaynakla tutarlılığı), `make c-status` (C kaynaklarını ROM ile
+karşılaştırır), `make c-review` (okunabilirlik denetimi), `make progress`
+ve dashboard verisinin yenilenmesi.
 
 **Kural:** `make check` geçmeden commit atılmaz. Hash tutmuyorsa iş bitmemiştir.
 
@@ -59,7 +61,23 @@ adayların oluşturduğu blok*tur.
 yazmaç gerekiyorsa `gba_io.h`'ye eklenir.
 
 `data/*.csv` dosyaları elle değil araçlarla değiştirilir:
-`sync_function_map.py`, `add_c_region.py`, `retire_asm.py`.
+`add_c_region.py`, `retire_asm.py`, `audit_boundaries.py`,
+`discover_functions.py`, `split_at_calls.py`.
+
+**Birincil kaynak `data/functions.csv`'nin kendisidir.**
+`sync_function_map.py` haritayı bayat Ghidra dökümünden *yeniden kurar* —
+bu oturumda kazara çalıştı ve 479 kaydı, 148 adı, 133 `matching` durumunu
+sildi. Artık kayıp kapısı var ve reddediyor; yine de yalnızca sıfırdan
+yeniden kurmak istendiğinde kullanılır.
+
+### Yeniden adlandırma
+
+Bir fonksiyonu `functions.csv`'de yeniden adlandırmak, o adı `extern` ile
+kullanan **her kaynağı kırar**. Bu projede yedi kez oldu ve her seferinde
+ancak `make rom` zincirinin sonunda fark edildi.
+
+**Kural:** yeniden adlandırdıktan sonra `make consistency` çalıştır — hangi
+dosyanın kırıldığını anında söyler. Referansları güncellemeden commit atma.
 
 ## 5. Dürüstlük kuralları
 

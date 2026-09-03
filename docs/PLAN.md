@@ -8,12 +8,13 @@ bu dosya *güncel durumu* ve *sıradaki işi* tutar. Çalışma kuralları
 ## Şu an neredeyiz (ölçülmüş)
 
 ```
-Fonksiyon haritası:   1.978 fonksiyon / 433.403 bayt kod
-Byte-matching:        205 fonksiyon / 9.864 bayt   (%2,28)
-Doğrulanmış ROM:      11.264 bayt (96 bölge) + 448 bayt libc = 11.712
-Harita boşluğu:       35.146 bayt (%7,5) — sınıflandırılmamış
+Fonksiyon haritası:   1.974 fonksiyon / 431.116 bayt kod
+Byte-matching:        206 fonksiyon / 9.886 bayt   (%2,29)
+Doğrulanmış ROM:      11.288 bayt (80 bölge) + 448 bayt libc = 11.736
+Harita boşluğu:       ~35 KB (%7,5) — sınıflandırılmamış
 Park (yazıldı,
-eşleşmedi):           16 fonksiyon — Faz 2 test korpusu
+eşleşmedi):           17 fonksiyon — Faz 2 test korpusu
+Tutarlılık:           `make consistency` TEMİZ
 make rom:             SHA-1 birebir, her commit'te doğrulanıyor
 ```
 
@@ -25,6 +26,7 @@ make rom:             SHA-1 birebir, her commit'te doğrulanıyor
 | Sınır denetimi sonrası | 338.163 | %2,05 |
 | Keşif sonrası | 413.699 | %2,38 |
 | Kuyruk-çağrısı bölmesi sonrası | 433.403 | %2,28 |
+| Hayalet/yinelenen temizliği sonrası | 431.116 | %2,29 |
 
 Kapsama hiç düşmedi; **payda gerçeğe yaklaştı**. Ghidra kodun ~%33'ünü ya
 hiç görmemiş ya yanlış sınırlamıştı. Ders: harita işi kapsama işinden önce
@@ -39,6 +41,12 @@ Yapılan: sınır denetimi (647 düzeltme, 43 silme) → üç yöntemli keşif
 +460 fonksiyon) → kuyruk-çağrısı bölmesi (32 kayıt → 54 fonksiyon).
 Keşif artık **0 yeni** veriyor, "gövde içine düşen çağrı hedefi" uyarısı
 **0**.
+
+**Veri bütünlüğü ayrıca onarıldı** (denetim bulguları): 2 yinelenen kayıt,
+2 hayalet kayıt (ROM'da çağıranı yok + gövde ortası), 2 fazla uzamış sınır,
+`ram_map`'te EWRAM'ı 9,2 MB aşan boyut ve aynı adrese iki isim veren 3
+sembol. `tools/check_consistency.py` bu sınıfların hepsini artık `make
+check`'te yakalıyor.
 
 ### Kalan üç iş (kapanış ölçütü: boşlukların tamamı kod/veri etiketli)
 
