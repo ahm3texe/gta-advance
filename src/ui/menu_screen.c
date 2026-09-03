@@ -133,7 +133,7 @@ extern void  FUN_08063ca4(void);
 extern void  FUN_0800ab60(void);
 extern void  FUN_08005fc4(int id);
 extern u32   FUN_080512b0(void);
-extern void  FUN_0806b884(void);
+extern void  VBlankIntrWait(void);
 extern void  FUN_08007fdc(void);
 extern void  FUN_08063d3c(void);
 extern void  FUN_080353bc(void);
@@ -413,7 +413,7 @@ void RunMenuScreen(int mode)
             redraw = 0;
         }
 
-        FUN_0806b884();
+        VBlankIntrWait();
     }
 
     REG_DISPCNT = MENU_DISPCNT;

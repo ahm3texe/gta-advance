@@ -94,7 +94,7 @@ extern u32 gFrameReset;
 extern u32 gPostFrameState;
 extern u8  gGameState[16];
 
-extern void FUN_0806b864(s32 mode);      /* kartus kitapligini baslatir  */
+extern void RegisterRamReset(s32 flags);     /* BIOS swi 1: RAM/IO sifirlama */
 extern void FUN_08005f5c(void);          /* bellek alt sistemi           */
 extern void FUN_08063b74(void);          /* DMA3'un bitmesini bekler     */
 extern void FUN_0803251c(s32 arg);       /* alt sistem baslatma          */
@@ -180,7 +180,7 @@ void GameInit(void)
     dma[2] = DMA_CLEAR_VRAM;
     dma[2];
 
-    FUN_0806b864(1);
+    RegisterRamReset(1);
 
     /* Bellegi tanitici desenle doldur (bozuk okuma yakalamak icin) */
     *(u32 *)fillSlot = EWRAM_FILL;

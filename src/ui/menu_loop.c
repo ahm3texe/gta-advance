@@ -97,7 +97,7 @@ extern void  FUN_08063ca4(void);
 extern void  FUN_0800ab60(void);
 extern void  FUN_08005fc4(int id);
 extern u32   FUN_080512b0(void);
-extern void  FUN_0806b884(void);
+extern void  VBlankIntrWait(void);
 extern void  FUN_08063cf0(void);
 
 /* 0x08001A00 */
@@ -309,7 +309,7 @@ void RunMenuLoop(void)
             redraw = 0;
         }
 
-        FUN_0806b884();
+        VBlankIntrWait();
     } while (running != 0);
 
     REG_DISPCNT = MENU_DISPCNT;

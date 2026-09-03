@@ -44,7 +44,7 @@ extern u32  GetRecordWord(u32 textId);           /* 0x0805E6E0 metin kimligini c
 extern void DrawTextCentred(u32 text, int x, int y); /* 0x080643D8 metni cizer */
 extern void DrawText(u32 text, int x, int y); /* 0x0806435C metni stiliyle cizer */
 extern void DrawTextRightAligned(const char *text, int x, int y); /* 0x08064460 hazir dizi cizer */
-extern int  FUN_0806b858(int numerator, int denominator); /* 0x0806B858 BIOS Div (svc 6) */
+extern int  Div(int numerator, int denominator); /* 0x0806B858 BIOS Div (svc 6) */
 
 /* 0x080011EC */
 void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
@@ -86,17 +86,17 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
             /* Deger hanelerine ayrilir; ustteki cagrilar araya girdigi
              * icin ogeyi ve degerini yeniden okuyoruz (ROM da oyle yapiyor). */
             value = gActiveMenuItems[item]->value;
-            digits[6] = FUN_0806b858(value, 1000000);
+            digits[6] = Div(value, 1000000);
             value -= digits[6] * 1000000;
-            digits[5] = FUN_0806b858(value, 100000);
+            digits[5] = Div(value, 100000);
             value -= digits[5] * 100000;
-            digits[4] = FUN_0806b858(value, 10000);
+            digits[4] = Div(value, 10000);
             value -= digits[4] * 10000;
-            digits[3] = FUN_0806b858(value, 1000);
+            digits[3] = Div(value, 1000);
             value -= digits[3] * 1000;
-            digits[2] = FUN_0806b858(value, 100);
+            digits[2] = Div(value, 100);
             value -= digits[2] * 100;
-            digits[1] = FUN_0806b858(value, 10);
+            digits[1] = Div(value, 10);
             value -= digits[1] * 10;
             digits[0] = value;
 
