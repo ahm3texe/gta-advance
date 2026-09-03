@@ -1254,12 +1254,12 @@ address,name,size,status,module,notes
 0x08064020,FUN_08064020,322,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08064180,FUN_08064180,374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806430C,FUN_0806430c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806434C,SetFontIndex,10,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
-0x0806435C,DrawText,120,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
-0x080643D8,DrawTextCentred,128,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
-0x08064460,DrawTextRightAligned,126,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
-0x080644E4,GetGlyphWidth,58,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
-0x08064524,GetTextWidth,104,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x0806434C,SetFontIndex,10,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x0806435C,DrawText,120,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x080643D8,DrawTextCentred,128,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x08064460,DrawTextRightAligned,126,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x080644E4,GetGlyphWidth,58,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x08064524,GetTextWidth,104,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
 0x08064590,ClearTextArea,110,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
 0x08064614,FUN_08064614,102,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080646AC,FUN_080646ac,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

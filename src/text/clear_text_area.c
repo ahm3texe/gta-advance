@@ -1,17 +1,18 @@
-/* Metin cizme — 0x0806434C-0x0806458F
+/* Metin alani temizleme — 0x08064590-0x08064613
  *
- * Uc cizim varyanti (sol, ortali, saga hizali) ile glif ve dize genislik
- * hesabi. Metinde '@' + '0'/'8'/'9' bir RENK KACISI olarak atlanir; oyun
- * metnindeki "@8AMMU-NATION@0" kalibi budur.
+ * Verilen hucreden baslayarak metin katmanini DMA3 ile sifirlar. Ikinci
+ * blok yalnizca gHalfLineSpacing sifirken calisir (tam satir yuksekligi).
  *
- * Cizimden once her karakter newlib _toupper'dan geciriliyor; ROM'daki tum
- * oyun metninin buyuk harf olmasinin sebebi budur.
- *
- * GetTextWidth, GetGlyphWidth'i cagirmaz; ayni hesabi kendi icinde
- * tekrarlar. ROM'da da iki ayri kod kopyasi var.
+ * HENUZ ESLESMIYOR: 110 byte'lik ROM fonksiyonuna karsi 10 bayt farkli.
+ * Otuz komutun yirmi dokuzu birebir tutuyor; TEK fark DMA taban adresinin
+ * yuklendigi yer. ROM `ldr r4` komutunu `fill = 0` yaziminin ARDINDAN
+ * yayiyor, bizimki IME okumasindan once.
+ * Denenenler: atamayi fill sonrasina almak (13 fark), ime oncesine (17),
+ * control'u one cekmek (34), REG_DMA3 makrosu (19), iki ayri yerel (13),
+ * blok kapsaminda tanimlama (64). Hicbiri 10'un altina inmedi.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/draw_text.c
+ * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
  */
 
 #include "gba_io.h"
@@ -95,61 +96,47 @@ static __inline__ s32 DrawTextAt(const u8 *text, s32 x, s32 y)
     return x;
 }
 
-/* 0x0806434C */
-void SetFontIndex(u32 index)
+/* 0x08064590 */
+void ClearTextArea(s32 x, s32 y, s32 height)
 {
-    u32 value;
+    volatile u16 fill;
+    u16 ime;
+    u8 *dest;
+    s32 row;
+    s32 col;
+    u32 control;
+    volatile DmaChannel *dma;
 
-    value = (u8)index;
-    gFontIndex = value;
-}
+    if ((u32)x > SCREEN_RIGHT)
+        return;
+    if ((u32)y > SCREEN_BOTTOM)
+        return;
 
-/* 0x0806435C */
-s32 DrawText(const u8 *text, s32 x, s32 y)
-{
-    return DrawTextAt(text, x, y);
-}
+    row = y >> TILE_SHIFT;
+    col = x >> TILE_SHIFT;
+    dest = gTextVramBase + (col << 6) + (row * gTextRowStride << 6);
 
-/* 0x080643D8 */
-void DrawTextCentred(const u8 *text, s32 x, s32 y)
-{
-    s32 width;
+    ime = REG_IME;
+    dma = (volatile DmaChannel *)REG_DMA3_ADDR;
+    REG_IME = 0;
+    fill = 0;
+    dma->src = &fill;
+    dma->dst = dest;
+    control = ((height << 6) >> 1) | 0x81000000;
+    dma->control = control;
+    dma->control;
+    REG_IME = ime;
 
-    width = GetTextWidth(text) >> 1;
-    DrawTextAt(text, x - width, y);
-}
+    if (gHalfLineSpacing == 0) {
+        dest += gTextRowStride << 6;
 
-/* 0x08064460 */
-void DrawTextRightAligned(const u8 *text, s32 x, s32 y)
-{
-    s32 width;
-
-    width = GetTextWidth(text);
-    DrawTextAt(text, x - width, y);
-}
-
-/* 0x080644E4 */
-s32 GetGlyphWidth(u32 ch)
-{
-    return GlyphAdvance(ch);
-}
-
-/* 0x08064524 */
-s32 GetTextWidth(const u8 *text)
-{
-    s32 total;
-    u8 ch;
-
-    total = 0;
-
-    while ((ch = *text++) != 0) {
-        if (ch == COLOUR_ESCAPE && IS_COLOUR_DIGIT(*text)) {
-            text++;
-            continue;
-        }
-
-        total += GlyphAdvance(ch);
+        ime = REG_IME;
+        REG_IME = 0;
+        fill = 0;
+        dma->src = &fill;
+        dma->dst = dest;
+        dma->control = control;
+        dma->control;
+        REG_IME = ime;
     }
-
-    return total;
 }
