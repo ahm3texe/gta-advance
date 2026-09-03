@@ -150,6 +150,8 @@ address,name,size,status,module,notes
 0x0800AAD0,GetCoordSecond,6,matching,misc,Koordinat erisimi; src/misc/coord_more.c
 0x0800AADC,SetCoordFlag,8,matching,misc,Koordinat erisimi; src/misc/coord_more.c
 0x0800AAF4,FUN_0800aaf4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800AB30,FUN_0800ab30,10,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x0800AB40,FUN_0800ab40,8,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x0800AB4C,FUN_0800ab4c,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800AB60,FUN_0800ab60,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800AB6C,FUN_0800ab6c,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1535,6 +1537,7 @@ address,name,size,status,module,notes
 0x0805D338,FUN_0805d338,76,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0805D39C,FUN_0805d39c,72,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
 0x0805D3E8,FUN_0805d3e8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0805D464,FUN_0805d464,312,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x0805D808,FUN_0805d808,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805D82C,FUN_0805d82c,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805D84C,FUN_0805d84c,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
