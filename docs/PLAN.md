@@ -34,7 +34,7 @@ bitmeli — bu yüzden Faz 0 aşağıdaki gibi genişletildi.
 
 ---
 
-## Faz 0 — Fonksiyon haritası (BÜYÜK ÖLÇÜDE TAMAM)
+## Faz 0 — Fonksiyon haritası (ANALİZLER TAMAM, UYGULAMA KISMİ)
 
 Yapılan: sınır denetimi (647 düzeltme, 43 silme) → üç yöntemli keşif
 (`bl` hedefi kesin, fonksiyon işaretçisi güçlü, prolog deseni olası;
@@ -48,18 +48,68 @@ Keşif artık **0 yeni** veriyor, "gövde içine düşen çağrı hedefi" uyarı
 sembol. `tools/check_consistency.py` bu sınıfların hepsini artık `make
 check`'te yakalıyor.
 
-### Kalan üç iş (kapanış ölçütü: boşlukların tamamı kod/veri etiketli)
+### Faz 0 analizleri — üçü de ölçüldü
 
-1. **Atlama tablosu taraması.** `mov pc, rN` tablolarının girdileri ayrı
-   fonksiyonlara işaret edebilir; sadece dolaylı çağrıyla ulaşılanlar üç
-   yöntemin hiçbirinde görünmez.
-2. **ARM bölgeleri.** ~8,4 KB dört aralık kabaca ölçüldü
-   (`audit_boundaries.py ARM_RANGES`); gerçek sınırlar ve fonksiyon
-   girişleri çıkarılmalı. Muhtemelen ses sürücüsü.
-3. **35 KB boşluk sınıflandırması.** 7 boşluk 512 B'den büyük (12,3 KB) —
-   önce bunlar. Veri mi (grafik/tablo/metin) ölü kod mu etiketlenmeli.
+**1. Atlama tablosu taraması — TAMAM.** Kod bölgesinde 101 `mov pc, rN`,
+bunların 93'ü gerçek switch tablosu (2.393 girdi, 734 benzersiz hedef).
+93 tablonun 89'unun dağıtım komutu bilinen bir fonksiyonun içinde; 4'ü
+sahipsiz. Hiçbir bilinen fonksiyona düşmeyen tablo girdisi: 20.
+**5 yeni fonksiyon adayı** çıktı; üçü de aynı profilde: `push` prologu
+yok (yaprak), ROM'un tamamında tek çağıranı yok — üç keşif yöntemimiz
+de tam bu üç şarta dayandığı için yapısal olarak görünmezdiler.
+*Not: kod oldukları kesin, ama girişin TAM yeri ±2 bayt belirsiz;
+eklemeden önce tek tek disassemble edilmeli.*
 
-Tahmini gerçek toplam: **~2.000–2.050 fonksiyon**. 1.978 bir alt sınır.
+**2. ARM bölgesi — ÖLÇÜLDÜ VE DÜZELTİLDİ.** `ARM_RANGES` sabiti yanlıştı:
+dört ayrı aralık değil **tek bitişik bölge**, `[0x08067E04, 0x0806B84C)`
+= **14.920 bayt**, belgelenen 8.384'ün 1,78 katı. Eski sabit yanlış
+pozitif içermiyordu ama 6.524 baytı (%44) kaçırıyordu.
+
+Kanıt (kendim ölçtüm): bölgedeki 3.730 kelimenin **tamamında** koşul
+alanı `!= 0xF`; rastgele veri ya da Thumb'da ~1/16 kelimede `0xF`
+beklenir. Hemen öncesi 0,9533 — sonrası 0,9747 oranında kalıyor, yani
+sınırlar keskin. Üst sınır BIOS `swi` thunk'larının başı.
+
+`0x08CA4514`'te bir **IWRAM bindirme tablosu** var; yapısı üçlüler
+halinde *(IWRAM hedefi, ARM başı, ARM sonu)* ve ardışık girdiler
+zincirleniyor (birinin sonu diğerinin başı). Bu, bölgenin gerçekten
+çalıştırılan kod olduğunun bağımsız kanıtı.
+
+`stmfd sp!` prologuyla **14 ARM fonksiyonu** ölçüldü ve haritaya eklendi
+(6.792 B). Kalan ~8,1 KB kaydedici saklamayan ARM yaprakları — Thumb'daki
+yaprak sorununun aynısı.
+
+**İçerik ses sürücüsü DEĞİL** (ipucundaki hipotez yanlıştı): ROM'da
+m4a/sappy imzası yok, bölgede tek bir ses yazmacı erişimi yok. Kod bir
+**rasterleştirici**: afin doku eşleme, Cohen-Sutherland kırpma, 8bpp
+döşeli çerçeve arabelleği adresleme.
+
+**3. 35 KB boşluk sınıflandırması — TAMAM.** 35.146 baytın:
+- **%55,1 (19.352 B) kod** — 200 yeni fonksiyon girişi (14.702 B) +
+  4.650 B "kod kuyruğu", yani boyutu kısa yazılmış 29 fonksiyonun taşan
+  gövdesi.
+- **%42,3 (14.902 B)** kodun yapısal eklentisi: literal havuz, atlama
+  tablosu, hizalama dolgusu.
+- **yalnızca %2,5 (892 B)** sınıflandırılamayan veri.
+
+512 B'den büyük 7 boşluğun (12.354 B) tamamı çözüldü. **Grafik/metin/veri
+tablosu YOK** — `0x080000C0-0x08071E16` aralığındaki boşluklarda tek bir
+yazdırılabilir metin bloğu ya da grafik verisi yok; ROM'un veri kısmı bu
+aralığın dışında. Bu, asset'lerin ayrı bir bölgede toplandığını doğruluyor.
+
+### Faz 0'dan çıkan iş listesi (uygulanmayı bekliyor)
+
+Aşağıdakiler **ölçüldü ama haritaya işlenmedi** — her biri tek tek
+doğrulama istiyor, toplu ekleme bu projede iki kez veri kaybettirdi:
+
+- 200 boşluk fonksiyonu (61'i agbcc prologlu Thumb = düşük risk;
+  123'ü prologsuz yaprak = orta risk; 16 ARM = risk yok sayılır)
+- 29 fonksiyonun kısa yazılmış boyutu (4.650 B kuyruk)
+- 5 atlama tablosu fonksiyonu (giriş yeri ±2 bayt doğrulanmalı)
+- ~8,1 KB prologsuz ARM yaprağı
+
+Bunlar işlenirse harita **~2.190 fonksiyona** çıkar. Şu anki 1.988 bir
+**alt sınır**; kod paydası da (431.116 B) buna göre yeniden ölçülmeli.
 
 ---
 

@@ -32,14 +32,20 @@ MAX_EXTENT = 8192
 # Kalici ARM fonksiyonlari: yurutucu Thumb cozumluyor, bunlar atlanir.
 ARM_FUNCTIONS = {0x080000C0, 0x08000104}
 
-# ARM kodu bolgeleri. Bu depoda olculdu: 0x08067FEC gibi adresler Thumb
-# olarak sacma, ARM olarak tutarli cozuluyor (muhtemelen ses surucusu).
-# Yurutucu Thumb varsaydigi icin bu araliklar denetim disi birakilir.
+# ARM kodu bolgesi. Olculdu: TEK bitisik aralik, dort ayri parca DEGIL.
+# [0x08067E04, 0x0806B84C) = 14920 bayt. Kanit: aralikta 3730 kelimenin
+# TAMAMINDA kosul alani != 0xF (rastgele veri/Thumb'da ~1/16 kelimede
+# 0xF beklenir); hemen oncesi 0.9533, sonrasi 0.9747 oraninda kaliyor.
+# Ust sinir 0x0806B84C = BIOS swi thunk'larinin (Thumb) basi.
+#
+# Onceki dort-aralikli sabit yanlis pozitif icermiyordu ama 6524 bayti
+# (%44) kaciriyordu; kacirilan dort parcanin dordu de 1.0000 oran veriyor.
+#
+# Icerik: ses surucusu DEGIL (ROM'da m4a/sappy imzasi ve bu bolgede tek
+# bir ses yazmaci erisimi yok) -- afin doku esleme, Cohen-Sutherland
+# kirpma ve 8bpp doseli cerceve arabellegi adresleme, yani rasterlestirici.
 ARM_RANGES = [
-    (0x08068B00, 0x08069800),
-    (0x08069940, 0x0806A500),
-    (0x0806A540, 0x0806A940),
-    (0x0806B440, 0x0806B840),
+    (0x08067E04, 0x0806B84C),
 ]
 
 # Bir fonksiyonun bu boyutu asmasi analiz hatasi sayilir; otomatik

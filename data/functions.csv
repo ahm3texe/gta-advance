@@ -1785,10 +1785,24 @@ address,name,size,status,module,notes
 0x08067CB8,FUN_08067cb8,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08067D80,FUN_08067d80,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08067DB4,FUN_08067db4,66,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08067E04,FUN_08067e04,488,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
 0x08067FEC,FUN_08067fec,240,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080681E0,FUN_080681e0,240,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080683D8,FUN_080683d8,1348,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
 0x0806891C,FUN_0806891c,3500,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080697BC,FUN_080697bc,224,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
 0x0806989C,FUN_0806989c,360,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806A5C0,FUN_0806a5c0,216,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806A698,FUN_0806a698,228,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806A77C,FUN_0806a77c,196,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806A840,FUN_0806a840,240,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806A930,FUN_0806a930,228,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806AA14,FUN_0806aa14,288,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806AB34,FUN_0806ab34,1788,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806B230,FUN_0806b230,280,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806B348,FUN_0806b348,248,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806B440,FUN_0806b440,520,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
+0x0806B648,FUN_0806b648,516,discovered,arm,ARM modu (bolge 0x08067E04-0x0806B84C); stmfd prologuyla olculdu; 0x08CA4514 bindirme tablosu bu bolgeyi IWRAM'a kopyaliyor
 0x0806B84C,ArcTan2,4,matching,bios,BIOS swi thunk; src/bios/syscalls.s (kalici assembly)
 0x0806B850,CpuFastSet,4,matching,bios,BIOS swi thunk; src/bios/syscalls.s (kalici assembly)
 0x0806B854,CpuSet,4,matching,bios,BIOS swi thunk; src/bios/syscalls.s (kalici assembly)
