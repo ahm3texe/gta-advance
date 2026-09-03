@@ -96,3 +96,7 @@ address,size,name,source,status,notes
 0x020251EC,2960,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri"
 0x02025280,2960,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime"
 0x020246F0,2960,gRam020246F0,decomp,provisional,"20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor"
+0x02035EA0,24,gRam02035EA0,decomp,provisional,"+0x16 u16 kimlik"
+0x02030328,4,gRam02030328,decomp,provisional,"0x0806262C icinde sifir kontrolu"
+0x02036328,4,gRam02036328,decomp,provisional,"Ek bayrak; 0x080664C4 kontrolu"
+0x0200048C,4,gRam0200048C,decomp,provisional,"u16 sayac; 0x080664F0 kontrolu"
