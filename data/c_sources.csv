@@ -73,6 +73,9 @@ address,name,source,matching
 0x08038364,IsObjectActive,src/world/object_helpers.c,yes
 0x08038380,UpdateObject,src/world/object_helpers.c,yes
 0x080383A0,GetObjectLinkId,src/world/object_helpers.c,yes
+0x0803C050,ConfigureSlot,src/world/slot_config.c,yes
+0x0803C090,GetActiveSlotValue,src/world/slot_config.c,yes
+0x0803C0B4,GetSlotField,src/world/slot_config.c,yes
 0x0803C77C,GetScaleFactor,src/misc/session_reset.c,yes
 0x0803C790,ReturnOne,src/misc/session_reset.c,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,yes
