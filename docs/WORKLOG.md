@@ -525,3 +525,63 @@ her şey taşındı: geriye yalnızca ARM modundaki başlangıç kodu ve IRQ dis
 kaldı, ki bunlar özgün kaynakta da assembly'ydi ve öyle kalacak.
 
 19/19 C dosyası okunabilirlik denetiminden geçiyor.
+
+---
+
+## 2026-09-03 — Harita revizyonu, hasat, 32 kural
+
+### Harita: 1.466 → 1.978 fonksiyon (+%35)
+
+Uc is birlikte fonksiyon haritasini bastan kurdu:
+
+1. **Sinir denetimi** (`audit_boundaries.py`): ozyinelemeli inisle 647
+   sinir duzeltildi, 43 sahte kayit silindi. Ilk yaklasim (dogrusal
+   disassembly) 998 fonksiyonu 8 KB'a "buyutuyordu" — yalniz-rapor
+   kipinde yakalandi.
+2. **Eksik fonksiyon kesfi** (`discover_functions.py`, uc yontem):
+   `bl` cagri hedefi (kesin, 51+49+3), ROM verisindeki fonksiyon
+   isaretcileri (prolog sartiyla 46; ham tarama 1.538 aday veriyordu,
+   cogu grafik verisinde rastlanti), prolog deseni (358). Yakinsayana
+   kadar tekrarlandi.
+3. **Kuyruk cagrisi bolmesi** (`split_at_calls.py`): yurutucu kosulsuz
+   `b`yi fonksiyon ici akis sayiyordu; GCC bunu kuyruk cagrisi icin de
+   kullaniyor. 52 `bl` hedefi bilinen kayitlarin ICINE dusuyordu —
+   32 kayit bolundu, 54 fonksiyon ayrildi. Sonrasinda kesif 0 veriyor.
+
+**Olcut uc kez asagi duzeltildi** (payda 291K → 338K → 414K → 433K;
+oran %2.34 → %2.28 gorunumu). Kapsama hic dusmedi; payda gercege
+yaklasti. Ders: harita isi kapsama isinden ONCE bitmeliydi.
+
+### Hasat: 7.268 → 11.264 dogrulanmis ROM bayti
+
+~30 yeni bolge, cogu 2-6 fonksiyonluk yaprak kumeleri. Kanitlanmis
+deyimlerin (tasma korumali sayac, cift bagli liste, DMA blogu, karo
+isaretci aritmetigi, 148/180 baytlik tablo girisleri) tekrar kullanimi
+cogu kumede ILK denemede tam eslesme verdi.
+
+### Kurallar: 27 → 32
+
+- 28: isaretci aritmetigi != dizi indeksi (olcekleme sirasi)
+- 29: iki ayni dal → erken return + ortak kuyruk (cross-jump engeli)
+- 30: seyrek case → `||` zinciri (atlama tablosu felaketi: 64 B yerine 212)
+- 31: dongu sayacinin isaretliligi `bls`/`ble` secimini belirler
+- 32: ardisik kelime kopyasi struct atamayla (`ldmia/stmia` tetigi)
+- Register dagitim onceligi mekanizma bolumu olarak belgelendi
+  (`oncelik = floor_log2(ref) × ref / omur`).
+
+### Park korpusu: 16 dosya
+
+Yedisi ≤5 bayt uzaklikta (ClearTextArea 1, MaybeAdvance 1, QueryEntity 2,
+ScanAllEntries 2, GetInnerId 4, IsRamModeWanted 4, ProbeObject 5).
+Engel siniflari tanimlandi: register dagitim sirasi, dal yonu
+normalizasyonu, taban kopyalama/iki-taban, havuz yerlesimi, -O0 sinifi,
+carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
+
+### Diger
+
+- BIOS yuzeyi kapandi: oyunun tum `swi` temasi 10 thunk, hepsi eslesti.
+- libc: `findslot`/`remap_handle` maskeli eslesme ile kimliklendirildi
+  (bayt-birebir olmadigi icin bolge sayilmadi); `identify_libc_at.py`.
+- Dashboard: bayat JSON (make check artik yeniliyor), palet ton ayrimi,
+  panel artik Ghidra yerine bizim kaynagi gosteriyor.
+- Yeniden adlandirma YEDI kez baska dosyayi kirdi → rename araci gerek.

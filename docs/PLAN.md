@@ -1,178 +1,200 @@
 # Yol haritası
 
-Bu belge *ne yapılacağını* ve *neden o sırayla* yapılacağını tutar.
-[ROADMAP.md](ROADMAP.md) aşamaların tanımını, bu dosya güncel planı verir.
+Güncelleme: 2026-09-03. Uzun vadeli hedef tanımı [ROADMAP.md](ROADMAP.md)'de;
+bu dosya *güncel durumu* ve *sıradaki işi* tutar. Çalışma kuralları
+[WORKFLOW.md](WORKFLOW.md)'de, ölçülmüş derleyici davranışı (32 kural)
+[COMPILER.md](COMPILER.md)'de.
 
-## Nerede duruyoruz
+## Şu an neredeyiz (ölçülmüş)
 
 ```
-Doğrulanmış ROM:   7.872 bayt, 36 bölge
-Matching kod:      6.830 / 333.317 bayt  (%2.05)
-Byte-matching:     100 / 1462 fonksiyon
+Fonksiyon haritası:   1.978 fonksiyon / 433.403 bayt kod
+Byte-matching:        205 fonksiyon / 9.864 bayt   (%2,28)
+Doğrulanmış ROM:      11.264 bayt (96 bölge) + 448 bayt libc = 11.712
+Harita boşluğu:       35.146 bayt (%7,5) — sınıflandırılmamış
+Park (yazıldı,
+eşleşmedi):           16 fonksiyon — Faz 2 test korpusu
+make rom:             SHA-1 birebir, her commit'te doğrulanıyor
 ```
 
-> **Faz 0 tamamlandı.** Yüzde %2.34'ten %2.05'e *düştü* çünkü payda
-> düzeldi: Ghidra fonksiyonları kesik saydığı için toplam kod boyutu
-> 41.782 bayt eksik ölçülüyordu. Kapsama kaybedilmedi, ölçüt dürüstleşti.
+### Yüzde neden üç kez düştü
 
-## Kalanın dağılımı — planın dayanağı
+| Aşama | Payda | Görünen oran |
+|---|---|---|
+| Başlangıç | 291.535 | %2,34 |
+| Sınır denetimi sonrası | 338.163 | %2,05 |
+| Keşif sonrası | 413.699 | %2,38 |
+| Kuyruk-çağrısı bölmesi sonrası | 433.403 | %2,28 |
 
-1362 fonksiyon, 326.487 bayt (Faz 0 sonrası, düzeltilmiş sınırlarla):
+Kapsama hiç düşmedi; **payda gerçeğe yaklaştı**. Ghidra kodun ~%33'ünü ya
+hiç görmemiş ya yanlış sınırlamıştı. Ders: harita işi kapsama işinden önce
+bitmeli — bu yüzden Faz 0 aşağıdaki gibi genişletildi.
+
+---
+
+## Faz 0 — Fonksiyon haritası (BÜYÜK ÖLÇÜDE TAMAM)
+
+Yapılan: sınır denetimi (647 düzeltme, 43 silme) → üç yöntemli keşif
+(`bl` hedefi kesin, fonksiyon işaretçisi güçlü, prolog deseni olası;
++460 fonksiyon) → kuyruk-çağrısı bölmesi (32 kayıt → 54 fonksiyon).
+Keşif artık **0 yeni** veriyor, "gövde içine düşen çağrı hedefi" uyarısı
+**0**.
+
+### Kalan üç iş (kapanış ölçütü: boşlukların tamamı kod/veri etiketli)
+
+1. **Atlama tablosu taraması.** `mov pc, rN` tablolarının girdileri ayrı
+   fonksiyonlara işaret edebilir; sadece dolaylı çağrıyla ulaşılanlar üç
+   yöntemin hiçbirinde görünmez.
+2. **ARM bölgeleri.** ~8,4 KB dört aralık kabaca ölçüldü
+   (`audit_boundaries.py ARM_RANGES`); gerçek sınırlar ve fonksiyon
+   girişleri çıkarılmalı. Muhtemelen ses sürücüsü.
+3. **35 KB boşluk sınıflandırması.** 7 boşluk 512 B'den büyük (12,3 KB) —
+   önce bunlar. Veri mi (grafik/tablo/metin) ölü kod mu etiketlenmeli.
+
+Tahmini gerçek toplam: **~2.000–2.050 fonksiyon**. 1.978 bir alt sınır.
+
+---
+
+## Faz 1 — Küçük fonksiyon hasadı (SÜRÜYOR, verimli)
+
+Havuz (eşleşmemiş, oyun kodu):
 
 | Boyut | Adet | Bayt | Kalanın payı |
 |---|---|---|---|
-| ≤64 | 462 | 15.518 | %4.8 |
-| 65–256 | 549 | 73.478 | %22.5 |
-| 257–512 | 163 | 58.321 | %17.9 |
-| 513+ | 148 | 179.090 | **%54.9** |
+| ≤64 | 625 | 19.552 | %4,6 |
+| 65–256 | 716 | 94.284 | %22,3 |
+| 257–512 | 223 | 79.931 | %18,9 |
+| 513–1024 | 142 | 99.758 | %23,6 |
+| 1025+ | 67 | 130.014 | %30,7 |
 
-Tek cümleyle: **kalanın yarısı 513 bayttan büyük fonksiyonlarda.** Küçük
-fonksiyonları toplamak bizi ancak ~%5-6'ya taşır; ötesi büyükleri çözmeyi
-gerektirir.
+Yöntem kanıtlandı: bitişik yaprak kümeleri + **kanıtlanmış deyim
+kütüphanesi**. Bu oturumda ~30 bölgenin çoğu ilk denemede tam eşleşti.
+Tekrar kullanılan deyimler: taşma korumalı sayaç, çift bağlı liste, DMA
+IME-sarmalı blok, karo işaretçi aritmetiği, 148/180-baytlık tablo girişi,
+`ldmia` struct ataması.
+
+Beklenti: ≤64 havuzunun %60–70'i mevcut yöntemle düşer (~12–14 KB, yani
+toplam ~%5,5–6). Sonrası Faz 2'ye bağlı.
 
 ---
 
-## Faz 0 — Fonksiyon haritasını doğru kur
+## Faz 2 — Sistemik engeller (ASIL BAHİS)
 
-Bu faz iki iş içeriyordu; başta yalnızca birincisini görmüştüm.
+Orta/büyük fonksiyonlar %85–95 komut hizalamasına gelip hep aynı birkaç
+engelde takılıyor. 16 dosyalık park korpusu tam bunun için — **doğru çözüm
+tek dosyayı değil, sınıfın tamamını açar.**
 
-### 0a. Sınır denetimi ✅
+### Test korpusu (güncel farklar, 2026-09-03)
 
-`tools/audit_boundaries.py`: **647 sınır düzeltildi, 43 sahte kayıt
-silindi.** 1505 → 1462 kayıt, 291.535 → 333.317 bayt.
-
-### 0b. Eksik fonksiyon keşfi ✅ (kısmen)
-
-**Bunu baştan planlamamıştım — hata buydu.** Sınırları düzeltmek yetmez;
-Ghidra fonksiyonların bir kısmını *hiç görmemiş*.
-
-`tools/discover_functions.py` iki yöntem kullanıyor:
-
-- **Çağrı hedefi (kesin):** bilinen kodun içindeki her `bl` hedefi tanım
-  gereği bir fonksiyon girişidir. Yanlış pozitif olamaz, yaprak
-  fonksiyonları da bulur. → **49 fonksiyon**
-- **Prolog deseni (olası):** boşluklarda `push {..,lr}` araması, dört
-  sıkı filtreyle. → **358 fonksiyon**
-
-Sonuç: 1466 → **1873 fonksiyon**, 338.163 → **419.717 bayt**.
-
-### Yüzdenin üç kez düşmesinin nedeni
-
-| Ne zaman | Payda | Oran |
+| Dosya | Fark | Engel sınıfı |
 |---|---|---|
-| Başlangıç | 291.535 | %2.34 |
-| Sınır denetimi sonrası | 338.163 | %2.05 |
-| Prolog keşfi sonrası | 413.699 | %2.38 |
-| Çağrı hedefi keşfi sonrası | 419.717 | %2.35 |
+| clear_text_area | 1/132 | B1 register dağıtımı |
+| maybe_advance | 1/42 | B2 dal yönü (`bls`/`bhi`) |
+| entity_query | 2/60 | B2 |
+| scan_all | 2/62 | B2 (+operand sırası) |
+| is_ram_mode | 4/28 | B2 normalizasyon |
+| object_query:GetInnerId | 4/20 | B2 |
+| object_query:ProbeObject | 5/58 | B2 |
+| offset_helpers | 10/24 | B1 epilog register |
+| actor_init | 14/192 | B1 |
+| kind_scan | 25/48 | B4 havuz yerleşimi |
+| history_push | 31/48 | B3 taban kopyalama |
+| distance_accum | 38/72 | B3/B4 |
+| bump_or_reset | 41/60 | B3 paylaşılan store |
+| release_slot | 47/48 | B3 iki-taban |
+| area_cleanup | 56/84 | B1/B4 |
+| entity_action | 140/210 | B5 blok yerleşimi |
+| menu_screen | 946/1456 | B1 (tüm atama kaymış) |
 
-Kapsama hiç kaybedilmedi; her seferinde **payda gerçeğe yaklaştı**.
-Ders: payda güvenilir değilse yüzde de değil. Harita işi kapsama işinden
-**önce** bitmeliydi.
+### Engel sınıfları
 
-### Faz 0'da kalan iş
+- **B1 Register dağıtım sırası.** Mekanizma belgeli
+  (`öncelik = floor_log2(ref) × ref / ömür`) ama elle uygulamak deneme
+  yanılma. → `alloc_advisor.py`: diff verildiğinde hangi değişkenin
+  referans/ömür dengesinin değişmesi gerektiğini hesaplasın.
+- **B2 Dal yönü / karşılaştırma normalizasyonu.** agbcc bazı dalların
+  yönünü C ifadesinden bağımsız seçiyor. Beş biçim aynı çıktıyı verdi
+  (maybe_advance). Sistematik varyant taraması gerekiyor; ölçüt bayt
+  DEĞİL **komut hizalaması** (bayt sayısı dal ofsetleriyle yanıltıyor).
+- **B3 Taban kopyalama / iki-taban.** ROM bir tabanı yükleyip kopyalıyor
+  ya da `index*N`'i bir kez hesaplayıp iki ayrı sabit tabana ekliyor.
+  Kural 17/22 yetmedi; yeni bir C biçimi keşfedilmeli.
+- **B4 Havuz yerleşimi.** Literal havuzunun gövde içine gömülme noktası
+  komut akışını değiştiriyor; C'den doğrudan denetlenemiyor.
+- **B5 Blok yerleşimi.** `return 0` bloğunun erken/geç konması
+  (entity_action). Cross-jump ve dal maliyeti etkileşimi.
+- **B6 Ayrık sınıflar.** `-O0` derlenen LibraryAssert kümesi (dosya
+  başına bayrak desteği gerekir — `agbcc_build.py`'ye küçük ekleme);
+  çarpım faktörizasyonu (`x*28`, tune_adjust).
 
-1. **51 sınır hatası.** `bl` hedefi bilinen bir fonksiyonun *içine*
-   düşüyor — ya iki fonksiyon tek kayıtta birleşmiş ya sınır yanlış.
-   Örnek: `0x080026F8`, `0x080031EA`, `0x08005532`.
-2. **48.816 bayt boşluk** (%10,5) — 27 tanesi 256 bayttan büyük
-   (28.228 bayt). Veri mi kod mu ayrılmalı.
-3. **ARM bölgeleri** kabaca ölçüldü (~8,4 KB, dört aralık); gerçek
-   sınırları çıkarılmalı.
-4. **Dolaylı çağrılar.** Yalnızca fonksiyon işaretçisiyle çağrılan
-   fonksiyonlar `bl` taramasında görünmez; atlama tabloları ve
-   işleyici dizileri ayrıca taranmalı.
+### İş listesi (sırayla)
 
-## Faz 1 — Küçük fonksiyon hasadı
+1. `tools/sweep_variants.py` — mekanik dönüşümleri (dal çevir, erken
+   return ayır, u8↔s8, yerel↔satıriçi, işaretçi↔dizi, bildirim sırası)
+   otomatik uygula, **komut hizalamasıyla** puanla, korpus üzerinde koş.
+   Bugüne kadar elle yazdığım tarama betiklerinin genelleştirilmişi.
+2. `agbcc_build.py`'ye dosya başına bayrak → LibraryAssert (-O0) kümesini
+   aç. Ucuz, bağımsız, ~200 B.
+3. `tools/alloc_advisor.py` — B1 için referans/ömür hesabı. Riskli
+   (`-dl/-dg` dökümleri bu depoda boş çıkıyor; dolaylı ölçümle).
+4. B3 için hedefli araştırma: release_slot (47/48!) en net örnek — tek
+   fonksiyon, tek desen.
 
-**Havuz:** ≤64 bayt, 519 fonksiyon, 16.816 bayt.
-Bunların 32 tanesi ≥3 fonksiyonluk bitişik küme (~3.354 bayt); gerisi dağınık.
-
-**Yöntem:** bu oturumda kanıtlandı — altı bölgenin dördü *ilk denemede* tam
-eşleşti. Bitişik kümeler tek bölgede toplanıyor, dağınık olanlar kendi
-bölgesini alıyor.
-
-**Gerçekçi beklenti:** havuzun %60–70'i → **~10.000–12.000 bayt.**
-Toplam ~18.000 bayt (%6–7).
-
-**Risk:** düşük. Yöntem çalışıyor.
-
----
-
-## Faz 2 — Sistemik engeli kır (asıl kaldıraç)
-
-**Sorun:** orta ve büyük fonksiyonlarda %85–95 komut hizalamasına gelip
-register dağıtımı veya blok sıralamasında takılıyoruz. Dört fonksiyon
-tam olarak burada park halinde:
-
-| Dosya | Kalan | Engel |
-|---|---|---|
-| `clear_text_area.c` | 1/132 bayt | ölü okumanın hedef register'ı |
-| `actor_init.c` | 14/192 bayt | 0xA8 tabanı r2 yerine r3 |
-| `entity_action.c` | 85/98 komut | `return 0` bloğunun yeri |
-| `menu_screen.c` | 503/694 komut | tüm atama bir register kaymış |
-
-Bu dördü **test korpusu**: doğru çözüm dördünü birden ilerletmeli.
-
-**İş A — otomatik varyant tarayıcı (`tools/sweep_variants.py`)**
-Şimdiye kadar her fonksiyon için elle tarama betiği yazdım. Mekanik
-dönüşümleri otomatikleştir:
-- dal yönünü çevir (`if (x) A else B` ↔ `if (!x) B else A`)
-- erken `return`'ü ayır / gövdeyi `if` içine al
-- alan işaretliliği (`u8` ↔ `s8`)
-- yerel değişken ↔ satır içi ifade
-- deyim sırası permütasyonları
-- işaretçi aritmetiği ↔ dizi indeksi
-
-Ölçüt **bayt değil komut hizalaması** olmalı — bu oturumda bir varyant
-baytı 140→133 indirirken hizalamayı 85/98'den 76/98'e düşürdü.
-
-**İş B — dağıtım danışmanı**
-`docs/COMPILER.md`'deki formül belgeli:
-`öncelik = floor_log2(ref) × ref / ömür`. Bir diff verildiğinde hangi
-değişkenin referans sayısının değişmesi gerektiğini hesaplayan araç.
-Riskli: `old_agbcc -dl/-dg` dökümü bu depoda boş çıkıyor, formül dolaylı
-ölçümle doğrulandı.
-
-**Beklenti:** belirsiz ama getirisi en yüksek iş. Başarılı olursa Faz 3 ve 4
-açılır; olmazsa proje ~%7'de tavan yapar.
+**Karar kapısı:** bu dört işten sonra korpustan en az 8/16 dosya
+kapanmazsa, Faz 3-4 beklentisi aşağı çekilir ve ağırlık davranışsal
+doğrulamaya kayar (aşağıda).
 
 ---
 
-## Faz 3 — Orta fonksiyonlar (65–512 bayt)
+## Faz 3 — Orta fonksiyonlar (65–512 B, 174 KB)
 
-716 fonksiyon, 127.533 bayt (kalanın %45'i). Faz 2'nin çıktısına bağlı.
-Faz 2 çalışırsa buradan **%15–20 toplam kapsama** ulaşılabilir.
+Faz 2 çıktısına bağlı. Sweep aracı + deyim kütüphanesiyle buradan
+**toplam %15–20 kapsama** hedeflenebilir.
 
----
+## Faz 4 — Büyük fonksiyonlar (513+ B, 230 KB, kalanın %54'ü)
 
-## Faz 4 — Büyük fonksiyonlar (513+)
-
-125 fonksiyon, 140.267 bayt (kalanın %49'u). En büyük 43 fonksiyon tek
-başına 82.889 bayt. Bunlar ancak Faz 2 tamamen çözülünce gerçekçi.
-
-`menu_screen.c` bu sınıfın ilk örneği ve zaten %72 hizalamada — iyi bir
-göstergesi.
+Ancak Faz 2 tamamen çözülürse gerçekçi. `menu_screen.c` (503/694 komut)
+sınıfın göstergesi: yapı doğru, tüm register ataması bir kaymış.
 
 ---
 
-## Yatay işler (paralel yürür)
+## Yatay işler (fazlara paralel)
 
-**Davranışsal doğrulama (mGBA).** Şu an tek ölçütümüz byte-matching. mGBA +
-GDB ile fonksiyon düzeyinde davranış testi, byte-matching olmayan ama
-semantik olarak doğru kodu da doğrulanabilir kılar. `ROADMAP.md` Aşama 5.
-
-**Adlandırma kapsaması.** 1405 fonksiyonun çoğu hâlâ `FUN_xxxxxxxx`.
-Byte-matching'i etkilemez ama okunabilirliği ve çağrı grafiğini etkiler.
-Kullanıcı bunu daha önce erteledi.
-
-**RAM haritası.** `data/ram_map.csv` büyüyor ama çoğu `provisional`.
+- **Davranışsal doğrulama (mGBA).** ROADMAP Aşama 5. İlk somut adım:
+  headless mGBA ile `out/gtaadvance.gba`'yı N kare koşturup kare hash'i
+  karşılaştıran bir betik. Bugün bayt-birebir olduğumuz için önemsiz
+  görünür ama Faz 2 başarısız olursa *semantik-doğru-ama-eşleşmeyen* C
+  için tek doğrulama yolu bu olacak.
+- **Varlık boru hattı.** ROM'un %97,2'si veri (15,5 MB). Decompile
+  edilmez, çıkarılır: betikler depoda, çıkarılan varlıklar `.gitignore`'da
+  yerel kalır (ROADMAP hukuki sınırı). Kod ilerledikçe formatlar zaten
+  koddan çözülüyor; öncelik düşük.
+- **Adlandırma kapsaması + çağrı grafiği.** 1.773 fonksiyon hâlâ
+  `FUN_xxxxxxxx`. Byte-matching'i etkilemez; okunabilirlik işi.
+  (Kullanıcı ertelemişti.)
+- **`tools/rename_symbol.py`.** Yeniden adlandırma bu oturumda YEDİ kez
+  başka dosyayı kırdı. Tek komutla tüm referansları güncelleyen araç.
+- **Veri hijyeni.** `make check` artık dashboard JSON'unu da yeniliyor;
+  park dosyaları `decompiled` statüsünde; bölge kayıtları `make matching`
+  ile her commit'te denetleniyor.
 
 ---
+
+## Dürüst zaman tahmini
+
+Oturum başına ~2.500–3.000 bayt hasat hızıyla (bu oturum ölçümü):
+
+| Senaryo | Sonuç |
+|---|---|
+| Faz 2 başarılı (≥8/16 korpus kapanır) | Orta fonksiyonlar açılır; %15–20 birkaç ayda, sonrası büyüklere bağlı. Tam byte-matching: **12–18+ ay**, düzenli çalışmayla |
+| Faz 2 kısmen (3–7/16) | ~%8–10'da yavaşlama; büyükler kapalı kalır |
+| Faz 2 başarısız (<3/16) | ~%6–8 tavan; proje "tam byte-matching"ten "byte-matching çekirdek + davranışsal-doğru gövde" hedefine döner |
+
+Belirsizliğin kaynağı süre değil, **B1–B5'in çözülüp çözülemeyeceği**.
+Karar kapısı bunu erken (birkaç oturum içinde) netleştirecek.
 
 ## Sıradaki somut adım
 
-**Faz 0'ı yaz ve çalıştır.** `tools/audit_boundaries.py` bir günlük iş değil,
-birkaç saatlik; getirisi %25'lik veri hatasını temizlemek ve sonraki her
-fazın boşa emeğini önlemek.
-
-Ardından Faz 1'i sırayla hasat et — 32 küme hazır bekliyor.
+1. Faz 0 kalanları (atlama tablosu taraması en ucuzu) — yarım oturum
+2. `sweep_variants.py` + korpus koşusu — Faz 2'nin ilk gerçek testi
+3. Karar kapısına göre devam
