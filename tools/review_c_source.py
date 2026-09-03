@@ -8,6 +8,7 @@ ciktisindan kalan degisken adlari, cikplak adres sabitleri, eksik baslik.
 Kullanim:  python3 tools/review_c_source.py [dosya.c ...]
            (argumansiz calisirsa src/ altindaki tum .c dosyalarina bakar)
 """
+import csv
 import re
 import sys
 from pathlib import Path
@@ -28,6 +29,21 @@ BARE_ADDRESS = re.compile(r"0x0[2-8][0-9A-Fa-f]{6}")
 def strip_comments(text: str) -> str:
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
     return re.sub(r"//[^\n]*", "", text)
+
+
+def renamed_symbols() -> dict[str, str]:
+    """Artik FUN_ olmayan adresler: eski adi kaynakta kalirsa build sessizce bozulur."""
+    path = ROOT / "data/functions.csv"
+    if not path.exists():
+        return {}
+    with path.open(newline="", encoding="utf-8") as handle:
+        out = {}
+        for row in csv.DictReader(handle):
+            address = int(row["address"], 16)
+            legacy = f"FUN_{address:08x}"
+            if row["name"] != legacy:
+                out[legacy] = row["name"]
+        return out
 
 
 def review(path: Path) -> list[str]:
@@ -52,6 +68,10 @@ def review(path: Path) -> list[str]:
             continue
         for addr in BARE_ADDRESS.findall(line):
             problems.append(f"#define disinda ciplak adres {addr}: {line.strip()[:60]}")
+
+    for legacy, current in renamed_symbols().items():
+        if legacy in code:
+            problems.append(f"bayat sembol adi {legacy}; artik {current}")
 
     comment_chars = len(text) - len(code)
     if len(code) and comment_chars / len(text) < 0.05:

@@ -48,6 +48,16 @@ address,name,size,status,module,notes
 0x080320A8,GetEntityFlags,8,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320B0,GetEntityKind,6,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320B8,GetEntityUnk10,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
+0x08037F1C,GetUnk0202F2C0,12,matching,misc,Reads one global u32
+0x08037F28,GetUnk0202F310,12,matching,misc,Reads one global u32
+0x08037F34,GetUnk02028270,12,matching,misc,Reads one global u32
+0x08037F40,GetUnk020282A0,12,matching,misc,Reads one global u32
+0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
+0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
+0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
+0x0805E6C4,SetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
+0x0805E6D4,GetTableIndex,6,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
+0x0805E6E0,GetRecordWord,20,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0806BCD0,LibraryAssertWrapper0,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCE0,LibraryAssertWrapper1,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,,discovered,sdk,References assertion format at 0x08BD3470

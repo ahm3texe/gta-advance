@@ -260,5 +260,19 @@ build/world/entity_accessors.bin: src/world/entity_accessors.c data/functions.cs
 world-entity-accessors-match: verify-rom build/world/entity_accessors.bin
 	@python3 tools/compare_slice.py baserom.gba 0x32090 build/world/entity_accessors.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match
+build/misc/state_getters.bin: src/misc/state_getters.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-state-getters-match: verify-rom build/misc/state_getters.bin
+	@python3 tools/compare_slice.py baserom.gba 0x37f1c build/misc/state_getters.bin
+
+build/misc/table_lookup.bin: src/misc/table_lookup.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-table-lookup-match: verify-rom build/misc/table_lookup.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5e6c4 build/misc/table_lookup.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match
 	@python3 tools/verify_matching_regions.py

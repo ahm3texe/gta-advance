@@ -763,12 +763,13 @@ address,name,size,status,module,notes
 0x08037D98,FUN_08037d98,222,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08037E7C,FUN_08037e7c,82,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08037EE8,FUN_08037ee8,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F1C,FUN_08037f1c,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F28,FUN_08037f28,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F34,FUN_08037f34,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F40,FUN_08037f40,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F58,FUN_08037f58,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08037F64,FUN_08037f64,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08037F1C,GetUnk0202F2C0,12,matching,misc,Reads one global u32
+0x08037F28,GetUnk0202F310,12,matching,misc,Reads one global u32
+0x08037F34,GetUnk02028270,12,matching,misc,Reads one global u32
+0x08037F40,GetUnk020282A0,12,matching,misc,Reads one global u32
+0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
+0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
+0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
 0x08037F70,FUN_08037f70,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08037FAC,FUN_08037fac,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08037FB8,FUN_08037fb8,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1163,9 +1164,9 @@ address,name,size,status,module,notes
 0x0805E168,FUN_0805e168,236,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805E28C,FUN_0805e28c,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805E61C,FUN_0805e61c,66,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805E6C4,FUN_0805e6c4,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805E6D4,FUN_0805e6d4,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805E6E0,FUN_0805e6e0,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0805E6C4,SetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
+0x0805E6D4,GetTableIndex,6,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
+0x0805E6E0,GetRecordWord,20,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E700,FUN_0805e700,178,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805E7C8,FUN_0805e7c8,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805E9E4,FUN_0805e9e4,82,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
