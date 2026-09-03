@@ -243,11 +243,11 @@ address,name,size,status,module,notes
 0x080127FC,FUN_080127fc,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08012808,FUN_08012808,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801282C,FUN_0801282c,106,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08012898,FUN_08012898,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080128C0,FUN_080128c0,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080128FC,FUN_080128fc,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08012908,FUN_08012908,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08012924,FUN_08012924,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08012898,ListAppend,40,matching,core,"Cift bagli liste; src/core/linked_list.c"
+0x080128C0,ListRemove,60,matching,core,"Cift bagli liste; src/core/linked_list.c"
+0x080128FC,ListInit,10,matching,core,"Cift bagli liste; src/core/linked_list.c"
+0x08012908,ListForEach,28,matching,core,"Cift bagli liste; src/core/linked_list.c"
+0x08012924,ListForEachArg,32,matching,core,"Cift bagli liste; src/core/linked_list.c"
 0x08012968,FUN_08012968,114,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08012A00,FUN_08012a00,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08012A98,FUN_08012a98,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

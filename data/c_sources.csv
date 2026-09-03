@@ -45,6 +45,11 @@ address,name,source,matching
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,yes
+0x08012898,ListAppend,src/core/linked_list.c,yes
+0x080128C0,ListRemove,src/core/linked_list.c,yes
+0x080128FC,ListInit,src/core/linked_list.c,yes
+0x08012908,ListForEach,src/core/linked_list.c,yes
+0x08012924,ListForEachArg,src/core/linked_list.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,yes

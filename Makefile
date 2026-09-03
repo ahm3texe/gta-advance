@@ -362,5 +362,12 @@ build/world/object_helpers.bin: src/world/object_helpers.c data/functions.csv da
 world-object-helpers-match: verify-rom build/world/object_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x38358 build/world/object_helpers.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match
+build/core/linked_list.bin: src/core/linked_list.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/core
+	@python3 tools/build_c.py $< $@
+
+core-linked-list-match: verify-rom build/core/linked_list.bin
+	@python3 tools/compare_slice.py baserom.gba 0x12898 build/core/linked_list.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match
 	@python3 tools/verify_matching_regions.py
