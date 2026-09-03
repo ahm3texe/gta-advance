@@ -426,3 +426,60 @@ kapatıldı: `diff_function.py`'nin paylaşılan geçici dosyası çağrıya öz
 yapıldı, kalan assembly'de geçen 20 RAM adresi `ram_map.csv`'ye tek seferde
 eklendi (ajanlar o dosyaya yazmıyor), ve ajanlara `make` tamamen yasaklandı.
 Emeklilik kararı ve son doğrulama ana süreçte kalıyor.
+
+## 2026-09-03 (gece, workflow) — On blok birden C'ye taşındı
+
+12 ajanlık paralel workflow tamamlandı (0 hata, ~33 dakika). Her sonuç ana
+süreçte bağımsız olarak ROM'a karşı yeniden doğrulandı; ajan raporuna
+güvenilmedi.
+
+### Sonuç
+
+**Kalan taşınabilir assembly bitti.** `src/` altında yalnızca üç `.s` kaldı:
+`agb_main.s` ve `intr_main.s` (ARM modunda, kalıcı olarak assembly) ve
+`game_init.s` (henüz eşleşmeyen taslağın yedeği).
+
+- `make matching` 21/21 + libc 9/9
+- C kaynağı: 40 fonksiyon, **39'u byte-matching**
+- Matching byte'ların **%78.97**'si artık okunabilir C'den (oturum başı: %0)
+- 19/19 C dosyası okunabilirlik denetiminden geçiyor
+
+### İki direnen fonksiyon da çözüldü
+
+**`WriteU16LE`** — cevap parametrenin **işaretli dar tip** olmasıydı (`s16`).
+Bütün oturum boyunca daha *geniş* tipler denemiştim; yön tersmiş. ROM'daki
+`lsls #16`/`lsrs #16` çifti semantik olarak gereksiz, bu yüzden `u16` ile hiç
+üretilmiyor: işaretsiz HImode parametre çağırandan zaten sıfır-genişletilmiş
+gelir. `s16` yazılınca değer işaret-genişletilmiş kabul edilir ve agbcc üst
+yarıyı temizlemek zorunda kalır. **Yani o dört bayt, özgün kaynakta
+parametrenin işaretli olduğunun kanıtıdır.**
+
+**`InitSaveSystem`** — iki ajan bağımsız olarak 240/240 buldu. Kuyruk bölümü
+üç yazım tercihinin *birlikte* uygulanmasıyla tuttu; hiçbiri tek başına
+yetmiyor (kurallar 16, 17, 18).
+
+Ayrıca ajanlardan biri kaynak dosyadaki yorumumun bayat olduğunu bayt kanıtıyla
+gösterdi: "çözülemeyen döngü" olarak işaretlediğim birinci küme aslında zaten
+eşleşiyordu — ilk farklı bayt döngünün *sonrasındaydı*. Kural 8 böylece
+ölçülerek teyit edildi.
+
+### Araç hatası düzeltildi
+
+`diff_function.py` ROM tarafını `functions.csv`'deki boyutla kırpıyordu. O
+boyut Ghidra'nın gövde tahmini ve literal havuzu dışarıda bırakabiliyor;
+sonuç olarak **tam eşleşen bir fonksiyonda bile** sahte "ROM da YOK" satırları
+çıkıyordu. Bu beni de yanıltmıştı. Artık iki taraftan büyüğü alınıyor.
+
+### Kural seti 19'a çıktı
+
+Beş yeni kural (15-19) ve önemli bir üst-kural: **kurallar birbirine bağlı.**
+18. kural tek başına etkisizdi ama 16 ve 17 uygulandıktan sonra belirleyici
+oldu. "Denendi, tutmadı" kaydı tek başına değerlendirilmemeli.
+
+### Süreç notu
+
+Ajanlar çalışırken `rm -rf build` çalıştırdım ve `build/variants/` altındaki
+dört varyant dosyası silindi. Bir ajan bunu fark edip yedek bırakmıştı;
+`InitSaveSystem` çözümü oradan kurtarıldı, `WriteU16LE` çözümü ise ajanın
+rapor metninden geri yazıldı. Paralel çalışmada ortak dizinlere dokunmamak
+gerekiyor.

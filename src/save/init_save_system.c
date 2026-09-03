@@ -5,7 +5,7 @@
  * boyutunu sekiz byte'a hizalar.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/init_save_system.c
+ * Dogrulama:  python3 tools/verify_c_function.py src/save/init_save_system.c
  */
 
 typedef unsigned char  u8;
@@ -18,7 +18,6 @@ typedef signed int     s32;
 #define SAVE_SLOT_MIN     1
 #define SAVE_SLOT_MAX     16
 #define SAVE_SLOT_FLAGS   16
-#define SAVE_METADATA_END 31
 #define EEPROM_TOTAL      480
 #define EEPROM_BLOCK_MASK 7
 
@@ -31,25 +30,39 @@ extern s32  FUN_0806c0f4(s32 dividend, s32 divisor);
 extern u32  ReadSaveMetadata(u8 *dest);
 extern u32  WriteSaveMetadata(const u8 *src);
 
-/* 0x0800082C — HENUZ ESLESMIYOR (240 byte'in 197'si tutuyor)
+/* 0x0800082C — 240/240 byte BYTE-MATCHING
  *
- * Yapi dogru; iki kume fark kaldi:
- *   1. Slot bayraklarini temizleyen dongude ROM isaretciyi +31'den asagi
- *      yuruturken bizimki +16'dan yukari yuruyor. Sayac (15..0) ayni.
- *      Denenen bicimler: [31-i] artan, [16+i] artan, [16+i] azalan,
- *      [31-i] azalan, acik isaretci yuruyusu, i=16..31 ileri. En iyisi
- *      [16+i] artan (41 bayt fark).
- *   2. ROM &gSavePayloadSize'i bolme cagrisindan ONCE callee-saved bir
- *      register'a aliyor ve ucunu de oradan yaziyor; bizimki her seferinde
- *      literal havuzdan okuyor. Yerel isaretci denendi: fonksiyon basinda
- *      tanimlaninca 220 bayta cikiyor, kullanim yerinde tanimlaninca 80.
+ * Uc yazim ayrintisi olculerek bulundu; ucu de gerekli:
  *
- * Blok tamamlanana kadar src/save/init_save_system.s gecerli build
- * kaynagidir. */
+ *  1. Bayrak temizleme dongusu ILERIYE yazilir (COMPILER.md kural 8).
+ *     agbcc bunu kendisi ters cevirip ROM'daki asagi yuruyen isaretciye
+ *     (adds r2,#31 / subs r2,#1, sayac 15..0) donusturuyor. Elle geriye
+ *     yazmak farkli kod uretiyor — olculen ilk-fark ofsetleri:
+ *       i=0..15,  [16+i] ileri  -> @176  (dongu TAM eslesiyor)
+ *       i=15..0,  [16+i] geri   -> @152
+ *       i=16..31, [i]    ileri  -> @112
+ *       i=0..15,  [31-i]        -> @160
+ *
+ *  2. Bolme cagrisinin bolen argumani ONCE yerel degiskene alinir
+ *     (COMPILER.md kural 11). ROM once arguman 2'yi kuruyor
+ *     (ldr r0,=&gSaveSlotCount / ldr r1,[r0]), sonra sabit olan arguman
+ *     1'i (movs r0,#240 / lsls r0,#1). Cagriya dogrudan gSaveSlotCount
+ *     yazilirsa agbcc sabiti once kuruyor ve sira ters cikiyor (fark 23).
+ *
+ *  3. &gSavePayloadSize icin IKI AYRI isaretci degiskeni gerekiyor; her
+ *     biri yalnizca BIR kez kullanilir. ROM adresi callee-saved r4'te
+ *     tutuyor ve if blogunun icinde r3'e kopyaliyor (adds r3,r4,#0).
+ *     Tek isaretciyi iki yerde kullanmak agbcc'nin &gSavePayloadSize
+ *     hesabini fonksiyon basina kaldirmasina yol aciyor: fonksiyon 236
+ *     byte'a dusuyor ve ilk fark 48. ofsete geri kayiyor. Ayni adres icin
+ *     ikinci bir yerel degisken kullanmak kopyayi geri getiriyor.
+ *     Isaretcisiz tum bicimler (global dogrudan) 41 bayt farkta kaliyor. */
 s32 InitSaveSystem(s32 slotCount)
 {
     s32 size;
     s32 i;
+    s32 slots;
+    s32 *payloadSize;
 
     REG_IME = 0;
     FUN_0806bd34(4);
@@ -78,21 +91,30 @@ s32 InitSaveSystem(s32 slotCount)
         gSaveMetadata[7] = 'E';
         gSaveMetadata[8] = gSaveSlotCount;
 
+        /* Slot bayraklarini temizle — ileriye yaz, bkz. yukarida (1) */
         for (i = 0; i < SAVE_SLOT_MAX; i++)
             gSaveMetadata[SAVE_SLOT_FLAGS + i] = 0;
 
         WriteSaveMetadata(gSaveMetadata);
     }
 
-    size = FUN_0806c0f4(EEPROM_TOTAL, gSaveSlotCount);
+    /* Geri donuste okunacak adres; cagrilar boyunca register'da yasar */
+    payloadSize = &gSavePayloadSize;
+
+    slots = gSaveSlotCount;
+    size = FUN_0806c0f4(EEPROM_TOTAL, slots);
     gSavePayloadSize = size;
 
+    /* Slot basina boyutu sekiz byte'in altina hizala */
     if (size & EEPROM_BLOCK_MASK) {
+        s32 *alignedSize = &gSavePayloadSize;
+
         do {
             size--;
         } while (size & EEPROM_BLOCK_MASK);
-        gSavePayloadSize = size;
+
+        *alignedSize = size;
     }
 
-    return gSavePayloadSize;
+    return *payloadSize;
 }

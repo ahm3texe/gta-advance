@@ -101,15 +101,10 @@ build/bootstrap/intr_main.bin: build/bootstrap/intr_main.elf
 intr-match: verify-rom build/bootstrap/intr_main.bin
 	@python3 tools/compare_slice.py baserom.gba 0x104 build/bootstrap/intr_main.bin
 
-build/bootstrap/init_interrupts.o: src/bootstrap/init_interrupts.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/bootstrap/init_interrupts.bin: src/bootstrap/init_interrupts.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/bootstrap/init_interrupts.elf: build/bootstrap/init_interrupts.o config/init_interrupts.ld
-	@arm-none-eabi-ld -T config/init_interrupts.ld -o $@ $<
-
-build/bootstrap/init_interrupts.bin: build/bootstrap/init_interrupts.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.init_interrupts $< $@
+	@python3 tools/build_c.py $< $@
 
 init-interrupts-match: verify-rom build/bootstrap/init_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x38c build/bootstrap/init_interrupts.bin
@@ -127,15 +122,10 @@ build/bootstrap/game_init.bin: build/bootstrap/game_init.elf
 game-init-match: verify-rom build/bootstrap/game_init.bin
 	@python3 tools/compare_slice.py baserom.gba 0x430 build/bootstrap/game_init.bin
 
-build/interrupt/vblank_intr.o: src/interrupt/vblank_intr.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/interrupt/vblank_intr.bin: src/interrupt/vblank_intr.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/interrupt
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/interrupt/vblank_intr.elf: build/interrupt/vblank_intr.o config/vblank_intr.ld
-	@arm-none-eabi-ld -T config/vblank_intr.ld -o $@ $<
-
-build/interrupt/vblank_intr.bin: build/interrupt/vblank_intr.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.vblank_intr $< $@
+	@python3 tools/build_c.py $< $@
 
 vblank-match: verify-rom build/interrupt/vblank_intr.bin
 	@python3 tools/compare_slice.py baserom.gba 0x220 build/interrupt/vblank_intr.bin
@@ -156,15 +146,10 @@ build/bootstrap/reset_display_interrupts.bin: src/bootstrap/reset_display_interr
 reset-display-match: verify-rom build/bootstrap/reset_display_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x7b4 build/bootstrap/reset_display_interrupts.bin
 
-build/save/init_save_system.o: src/save/init_save_system.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/init_save_system.bin: src/save/init_save_system.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/init_save_system.elf: build/save/init_save_system.o config/init_save_system.ld
-	@arm-none-eabi-ld -T config/init_save_system.ld -o $@ $<
-
-build/save/init_save_system.bin: build/save/init_save_system.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.init_save_system $< $@
+	@python3 tools/build_c.py $< $@
 
 init-save-system-match: verify-rom build/save/init_save_system.bin
 	@python3 tools/compare_slice.py baserom.gba 0x82c build/save/init_save_system.bin
@@ -177,15 +162,10 @@ build/save/read_eeprom_bytes.bin: src/save/read_eeprom_bytes.c data/functions.cs
 read-eeprom-match: verify-rom build/save/read_eeprom_bytes.bin
 	@python3 tools/compare_slice.py baserom.gba 0x91c build/save/read_eeprom_bytes.bin
 
-build/save/write_eeprom_bytes.o: src/save/write_eeprom_bytes.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/write_eeprom_bytes.bin: src/save/write_eeprom_bytes.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/write_eeprom_bytes.elf: build/save/write_eeprom_bytes.o config/write_eeprom_bytes.ld
-	@arm-none-eabi-ld -T config/write_eeprom_bytes.ld -o $@ $<
-
-build/save/write_eeprom_bytes.bin: build/save/write_eeprom_bytes.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.write_eeprom_bytes $< $@
+	@python3 tools/build_c.py $< $@
 
 write-eeprom-match: verify-rom build/save/write_eeprom_bytes.bin
 	@python3 tools/compare_slice.py baserom.gba 0x9ec build/save/write_eeprom_bytes.bin
@@ -206,80 +186,50 @@ build/save/save_wrappers.bin: src/save/save_wrappers.c data/functions.csv data/r
 save-wrappers-match: verify-rom build/save/save_wrappers.bin
 	@python3 tools/compare_slice.py baserom.gba 0xbe4 build/save/save_wrappers.bin
 
-build/save/save_manager.o: src/save/save_manager.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/save_manager.bin: src/save/save_manager.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/save_manager.elf: build/save/save_manager.o config/save_manager.ld
-	@arm-none-eabi-ld -T config/save_manager.ld -o $@ $<
-
-build/save/save_manager.bin: build/save/save_manager.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.save_manager $< $@
+	@python3 tools/build_c.py $< $@
 
 save-manager-match: verify-rom build/save/save_manager.bin
 	@python3 tools/compare_slice.py baserom.gba 0xc28 build/save/save_manager.bin
 
-build/save/read_eeprom_range.o: src/save/read_eeprom_range.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/read_eeprom_range.bin: src/save/read_eeprom_range.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/read_eeprom_range.elf: build/save/read_eeprom_range.o config/read_eeprom_range.ld
-	@arm-none-eabi-ld -T config/read_eeprom_range.ld -o $@ $<
-
-build/save/read_eeprom_range.bin: build/save/read_eeprom_range.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.read_eeprom_range $< $@
+	@python3 tools/build_c.py $< $@
 
 read-eeprom-range-match: verify-rom build/save/read_eeprom_range.bin
 	@python3 tools/compare_slice.py baserom.gba 0xddc build/save/read_eeprom_range.bin
 
-build/save/write_eeprom_range.o: src/save/write_eeprom_range.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/write_eeprom_range.bin: src/save/write_eeprom_range.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/write_eeprom_range.elf: build/save/write_eeprom_range.o config/write_eeprom_range.ld
-	@arm-none-eabi-ld -T config/write_eeprom_range.ld -o $@ $<
-
-build/save/write_eeprom_range.bin: build/save/write_eeprom_range.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.write_eeprom_range $< $@
+	@python3 tools/build_c.py $< $@
 
 write-eeprom-range-match: verify-rom build/save/write_eeprom_range.bin
 	@python3 tools/compare_slice.py baserom.gba 0xf1c build/save/write_eeprom_range.bin
 
-build/save/save_helpers.o: src/save/save_helpers.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/save/save_helpers.bin: src/save/save_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/save/save_helpers.elf: build/save/save_helpers.o config/save_helpers.ld
-	@arm-none-eabi-ld -T config/save_helpers.ld -o $@ $<
-
-build/save/save_helpers.bin: build/save/save_helpers.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.save_helpers $< $@
+	@python3 tools/build_c.py $< $@
 
 save-helpers-match: verify-rom build/save/save_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1094 build/save/save_helpers.bin
 
-build/ui/build_active_menu_items.o: src/ui/build_active_menu_items.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/ui/build_active_menu_items.bin: src/ui/build_active_menu_items.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/ui/build_active_menu_items.elf: build/ui/build_active_menu_items.o config/build_active_menu_items.ld
-	@arm-none-eabi-ld -T config/build_active_menu_items.ld -o $@ $<
-
-build/ui/build_active_menu_items.bin: build/ui/build_active_menu_items.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.build_active_menu_items $< $@
+	@python3 tools/build_c.py $< $@
 
 menu-layout-match: verify-rom build/ui/build_active_menu_items.bin
 	@python3 tools/compare_slice.py baserom.gba 0x114c build/ui/build_active_menu_items.bin
 
-build/ui/draw_menu_items.o: src/ui/draw_menu_items.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/ui/draw_menu_items.bin: src/ui/draw_menu_items.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/ui/draw_menu_items.elf: build/ui/draw_menu_items.o config/draw_menu_items.ld
-	@arm-none-eabi-ld -T config/draw_menu_items.ld -o $@ $<
-
-build/ui/draw_menu_items.bin: build/ui/draw_menu_items.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.draw_menu_items $< $@
+	@python3 tools/build_c.py $< $@
 
 draw-menu-match: verify-rom build/ui/draw_menu_items.bin
 	@python3 tools/compare_slice.py baserom.gba 0x11ec build/ui/draw_menu_items.bin

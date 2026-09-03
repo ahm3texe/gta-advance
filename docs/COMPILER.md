@@ -86,6 +86,18 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 12 | Kaydet/geri-yükle çifti olan register (`REG_IME`) `volatile` olmalı | Değilse derleyici iki kritik bölümün kaydetmelerini birleştiriyor |
 | 13 | Uzunluk/boyut parametreleri **işaretsiz** olabilir | `save_slots`'ta tek fark `ble` ↔ `bls` idi: `length` `u32` olunca eşleşti |
 | 14 | Tekrar eden byte kopyaları **açık yazılır**, döngüye sarılmaz | `-funroll-loops` ROM'unkinden farklı kod üretiyor (136B/127 fark → 256B/239); sekiz kopya elle yazılınca tam eşleşme |
+| 15 | Dar parametrenin **işaretliliği** giriş normalizasyonunu belirler | `s16` parametre `lsls #16`/`lsrs #16` çifti üretir, `u16` üretmez. `WriteU16LE` bunun kanıtı |
+| 16 | Kural 11'de **atama yeri** önemli, bildirim yeri değil | `payload = &g...` başta ilklendirilirse ömür fazla uzuyor ve dağıtım kayıyor (220/240 fark); atama kullanımın hemen önüne alınınca eşleşiyor |
+| 17 | Tek adres için **her biri tek kullanımlı iki ayrı yerel** gerekebilir | Tek işaretçiyi iki yerde kullanmak agbcc'ye hesabı fonksiyon başına kaldırtıyor; ROM'daki `adds r3, r4, #0` ancak iki değişkenle çıkıyor |
+| 18 | Argümanı **ayrı deyimde** yerele okumak argüman kurma sırasını çevirir | `f(480, gSlotCount)` sabiti önce kuruyor; `count = gSlotCount;` ara satırı ROM'un sırasını veriyor |
+| 19 | Döngü öncesi atamaların **kaynak sırası** korunur | agbcc kaynak atamalarını kaynak sırasında, kendi ürettiği sayaç ilklendirmelerini döngü başına bitişik yayıyor; sırayı değiştirmek 13-14 bayt fark bırakıyor |
+
+**Kuralların birbirine bağlı olduğunu unutma.** 18. kural tek başına
+denendiğinde hiçbir şeyi değiştirmiyordu; ancak 16 ve 17 uygulandıktan sonra
+belirleyici oldu — çünkü sıra farkı bağımsız bir düğme değil, register
+baskısının sonucuydu. Bu yüzden "denendi, tutmadı" kaydı tek başına
+değerlendirilmemeli: etkisiz çıkan bir değişiklik, başka bir değişiklikle
+birleştiğinde işe yarayabilir.
 
 `volatile` agbcc'de bir **komut sıralama düğmesidir**, semantik bir işaret
 değil. Aynı `x |= sabit` deyimi için `gBiosIrqFlags`'te kaldırmak,

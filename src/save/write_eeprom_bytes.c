@@ -3,7 +3,7 @@
  * Kaynak tamponu 8 byte'lik EEPROM bloklarina ters byte sirasiyla paketler,
  * her blogu yazar ve geri okuyarak dogrular. Dogrulama basarisiz olursa blok
  * yeniden yazilir; deneme sayaci butun cagri boyunca ortaktir, blok basina
- * sifirlanmaz.
+ * sifirlanmaz (ROM'da 'mov sl, r0' dis dongunun disinda).
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/save/write_eeprom_bytes.c
@@ -20,23 +20,28 @@ typedef struct {
     u32 control;
 } DmaChannel;
 
+/* IO register'lari sabit cast: ROM bunlari literal havuzdan tek taban olarak
+ * okuyup ofsetliyor (ldr r0, [r2, #8]), extern sembol degil. */
 #define REG_DMA3     (*(volatile DmaChannel *)0x040000D4)
 #define REG_IME      (*(volatile u16 *)0x04000208)
 #define DMA_ENABLE   0x80000000
 #define EEPROM_BLOCK 8
 
-/* Bir blok icin izin verilen en fazla yeniden yazma denemesi. ROM'daki
- * karsilastirma "sayac <= 19" seklinde isaretli. */
+/* Bir blok icin izin verilen yeniden yazma denemesi. ROM'daki karsilastirma
+ * isaretli: cmp #19 / ble. */
 #define MAX_RETRIES  20
 
-/* Nintendo EEPROM rutinleri; henuz adlandirilmadi (data/functions.csv). */
+/* Nintendo EEPROM rutinleri; data/functions.csv'de henuz adlandirilmadi.
+ * FUN_0806beac bir sozcuk programlar, FUN_0806c020 geri okuyup karsilastirir
+ * ve sifirdan farkli bir u16 ile hatayi bildirir. */
 extern void FUN_0806beac(u16 block, const void *buffer);
 extern u16  FUN_0806c020(u16 block, const void *buffer);
 
-/* EEPROM sozcugu big-endian yazilir: kaynagin ilk byte'i blogun son
- * byte'ina gider. Kaynak bitince (size < 0) kalan byte'lar dokunulmadan
- * birakilir -- bu yuzden 'break', paketleme do/while(0) icine sarili.
- * Sekiz kopya acik yazilir; dongu hali farkli kod uretiyor (kural 14). */
+/* EEPROM sozcugu big-endian yazilir: kaynagin ilk byte'i blogun son byte'ina
+ * gider. Kaynak bitince (size < 0) blogun kalani dokunulmaz -- bu yuzden
+ * paketleme do/while(0) icine sarilip 'break' ile terk edilir; 'continue'
+ * olsaydi programlama adimi da atlanirdi. Sekiz kopya acik yazilir, dongu
+ * hali farkli kod uretiyor (COMPILER.md kural 14). */
 #define COPY_EEPROM_BYTE(index) \
     if (size < 0)               \
         break;                  \
@@ -50,7 +55,6 @@ u32 WriteEepromBytes(u32 block, s32 size, const u8 *src)
     s32 blocks;
     s32 retries;
     s32 i;
-    u32 word;
 
     blocks = size / EEPROM_BLOCK;
 
@@ -72,11 +76,18 @@ u32 WriteEepromBytes(u32 block, s32 size, const u8 *src)
             COPY_EEPROM_BYTE(0);
         } while (0);
 
-        word = block + i;
-        FUN_0806beac((u16)word, buffer);
+        /* 'block + i' bir yerel degiskene ALINMAZ. Yerel degiskenle
+         * (u32 word = block + i) uretilen kod baska turlu her yerde ayni,
+         * ama register dagitimi kayiyor: derleyici degiskeni r8'e koyup
+         * dongu sayacini r6'da tutuyor. ROM ise 'block + i' CSE gecicisini
+         * callee-saved r4'te tutup sayaci sp+16'ya tasiyor (bu yuzden
+         * 'sub sp, #20', #16 degil). Ifade uc yerde de acik yazilinca
+         * agbcc ROM'un dagitimini uretiyor. */
+        FUN_0806beac((u16)(block + i), buffer);
 
-        while (FUN_0806c020((u16)word, buffer) != 0 && retries < MAX_RETRIES) {
-            FUN_0806beac((u16)word, buffer);
+        while (FUN_0806c020((u16)(block + i), buffer) != 0
+               && retries < MAX_RETRIES) {
+            FUN_0806beac((u16)(block + i), buffer);
             retries++;
         }
     }

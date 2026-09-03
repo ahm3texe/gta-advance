@@ -63,7 +63,11 @@ def main() -> None:
 
     mine = blob[offset:offset + size]
     start = address - ROM_BASE
-    theirs = rom_bytes()[start:start + (rom_size or size)]
+    # data/functions.csv boyutu Ghidra'nin govde tahminidir ve literal havuzu
+    # ile hizalama dolgusunu disarida birakabilir. ROM tarafini onunla kirpmak,
+    # TAM eslesen bir fonksiyonda bile sahte "ROM da YOK" satirlari uretir.
+    # Iki taraftan buyugunu al.
+    theirs = rom_bytes()[start:start + max(rom_size, size)]
 
     rom_asm = disassemble(theirs, address, thumb, f"{source.stem}.rom")
     our_asm = disassemble(mine, address, thumb, f"{source.stem}.mine")

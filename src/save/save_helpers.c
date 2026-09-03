@@ -10,6 +10,7 @@
 typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned int   u32;
+typedef signed short   s16;
 
 /* Uc kayit slotunun EWRAM'daki basligi; 12 byte'lik girisler. */
 typedef struct {
@@ -91,15 +92,18 @@ void WriteU8(u8 *p, u8 v)
     p[0] = v;
 }
 
-/* 0x08001124 — HENUZ ESLESMIYOR (ROM 12 byte, bizimki 8)
+/* 0x08001124 — byte-matching
  *
- * ROM giriste degeri 16 bite normalize ediyor:
- *     lsls r1, r1, #16 ; lsrs r1, r1, #16
- * Kalan sekiz bayt birebir ayni. En yakin gelen bicim `int` yerel degisken:
- * kirpmayi uretiyor ama kaydirmayi isaretli yapiyor (asrs, oysa lsrs gerek);
- * isaretsiz cast eklenince kirpma tamamen kayboluyor.
- * Denenip tutmayanlarin tam listesi docs/COMPILER.md icinde. */
-void WriteU16LE(u8 *p, u16 v)
+ * Parametre ISARETLI dar tip: ROM giriste degeri 16 bite normalize ediyor
+ * (lsls #16 / lsrs #16). Bu cift, `u16` parametrede hic uretilmez -- cunku
+ * isaretsiz HImode parametre cagirandan zaten sifir-genisletilmis gelir.
+ * `s16` yazilinca deger isaret-genisletilmis kabul edilir ve agbcc kullanmadan
+ * once ust yariyi temizlemek zorunda kalir; ROM'daki cift tam olarak budur.
+ * Yani bu dort bayt, ozgun kaynakta parametrenin isaretli oldugunun kanitidir.
+ * Kardes fonksiyonlar isaretsiz kalir (WriteU8 -> u8, WriteU32LE -> u32);
+ * WriteU8'in ROM'da 4 byte olmasi, yani normalizasyon icermemesi bunu
+ * dogruluyor. */
+void WriteU16LE(u8 *p, s16 v)
 {
     p[0] = v;
     p[1] = v >> 8;
