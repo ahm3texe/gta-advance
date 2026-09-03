@@ -6,3 +6,5 @@ address,end,object,symbol,notes
 0x080716A4,0x080716C8,s_isinf.o,isinf,newlib float classification
 0x080716C8,0x080716E8,s_isnan.o,isnan,newlib float classification
 0x08071D8C,0x08071DAC,libcfunc.o,abort,newlib abort
+0x08071B9C,0x08071BBC,syscalls.o,_exit,newlib exit stub; order confirmed by the twin-body spacing argument
+0x08071BBC,0x08071BDC,syscalls.o,_kill,newlib kill stub; identical body to _exit, 32 bytes later

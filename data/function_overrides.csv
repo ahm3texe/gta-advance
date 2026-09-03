@@ -55,5 +55,6 @@ address,name,size,status,module,notes
 0x080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x080717EC,findslot,30,documented,libc,newlib routine; matched against agbcc libc.a build
 0x0807180C,remap_handle,76,documented,libc,newlib routine; matched against agbcc libc.a build
-0x08071B9C,_exit,32,discovered,libc,newlib routine; body byte-identical to agbcc libc.a build; identical body to _kill - which symbol occupies this address is undetermined; missed by Ghidra auto-analysis
+0x08071B9C,_exit,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
+0x08071BBC,_kill,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
 0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build

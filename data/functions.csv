@@ -1485,7 +1485,8 @@ address,name,size,status,module,notes
 0x08071A9C,FUN_08071a9c,156,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071B54,FUN_08071b54,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071B8C,FUN_08071b8c,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071B9C,_exit,32,discovered,libc,newlib routine; body byte-identical to agbcc libc.a build; identical body to _kill - which symbol occupies this address is undetermined; missed by Ghidra auto-analysis
+0x08071B9C,_exit,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
+0x08071BBC,_kill,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
 0x08071BE0,FUN_08071be0,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071C20,FUN_08071c20,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071C38,FUN_08071c38,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

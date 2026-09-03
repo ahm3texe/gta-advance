@@ -65,14 +65,23 @@ otomatik çalıştırır.
 | `0x08070F8C` | `_lo0bits` | 130 B |
 | `0x080716A4` | `isinf` | 36 B |
 | `0x080716C8` | `isnan` | 32 B |
+| `0x08071B9C` | `_exit` | 32 B |
+| `0x08071BBC` | `_kill` | 32 B |
 | `0x08071D8C` | `abort` | 32 B |
 
-Toplam **384 byte**. Bunlar tersine mühendislik ürünü değil: kaynağı zaten
+Toplam **448 byte**. Bunlar tersine mühendislik ürünü değil: kaynağı zaten
 elimizde olan standart kütüphane kodunun ROM'daki byte'larla birebir aynı
-olduğunun kanıtı. Doğrulanmış toplam ROM alanı 5340 → **5724 byte**.
+olduğunun kanıtı. Doğrulanmış toplam ROM alanı 5340 → **5788 byte**.
 
-`_exit` (`0x08071B9C`) dahil edilmedi: gövdesi `_kill` ile birebir aynı ve
-hangisinin o adreste durduğu byte'lardan anlaşılamıyor.
+`_exit` / `_kill` belirsizliği çözüldü. Gövdeleri birebir aynı, ama bu gövdeden
+ROM'da **tam iki adet** var ve aralarındaki mesafe 32 byte — `syscalls.o`
+içindeki yerleşimin aynısı (`_exit` nesne ofseti 892, `_kill` 924). İkili
+ancak bu sırayla yerleşebilir, dolayısıyla `_exit = 0x08071B9C` ve
+`_kill = 0x08071BBC` kesindir.
+
+Bu, tek başına byte karşılaştırmasının çözemediği bir belirsizliğin *yerleşim
+argümanıyla* çözülebileceğini gösteriyor: aynı gövdeli sembol çiftleri için
+kullanılabilir bir yöntem.
 
 ### Maskeli arama
 
