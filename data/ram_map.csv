@@ -65,3 +65,8 @@ address,size,name,source,status,notes
 0x02000F04,4,gSessionPtr,decomp,provisional,Pointer used by 0x0803C798; target layout partially known
 0x020303D0,4,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
+0x0203630C,4,gTextRowStride,decomp,provisional,"Row stride in tiles used when clearing a text area"
+0x02036310,4,gTextVramBase,decomp,provisional,"Base VRAM address of the text layer"
+0x02036314,4,gGlyphWidths,decomp,provisional,"Pointer to the per-glyph width table, indexed from space (0x20)"
+0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C"
+0x0203631C,4,gHalfLineSpacing,decomp,provisional,"Nonzero halves the line height used by the text drawing helpers"

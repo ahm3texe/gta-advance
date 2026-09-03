@@ -39,11 +39,11 @@ extern u8 gActiveMenuItemCount;
 extern MenuItem *gActiveMenuItems[20];
 
 /* Isimleri henuz cozulmedi; data/functions.csv'deki adlar kullanildi. */
-extern void FUN_0806434c(int style);            /* 0x0806434C metin stilini ayarlar */
+extern void SetFontIndex(int style);            /* 0x0806434C metin stilini ayarlar */
 extern u32  GetRecordWord(u32 textId);           /* 0x0805E6E0 metin kimligini cozer */
-extern void FUN_080643d8(u32 text, int x, int y); /* 0x080643D8 metni cizer */
-extern void FUN_0806435c(u32 text, int x, int y); /* 0x0806435C metni stiliyle cizer */
-extern void FUN_08064460(const char *text, int x, int y); /* 0x08064460 hazir dizi cizer */
+extern void DrawTextCentred(u32 text, int x, int y); /* 0x080643D8 metni cizer */
+extern void DrawText(u32 text, int x, int y); /* 0x0806435C metni stiliyle cizer */
+extern void DrawTextRightAligned(const char *text, int x, int y); /* 0x08064460 hazir dizi cizer */
 extern int  FUN_0806b858(int numerator, int denominator); /* 0x0806B858 BIOS Div (svc 6) */
 
 /* 0x080011EC */
@@ -58,9 +58,9 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
     /* Secili satir ekranda hep ayni yerde kalsin diye arka plan kaydirilir. */
     REG_BG1VOFS = -(gMenuPositionX + (selectedItem - firstItem) * MENU_ROW_HEIGHT);
 
-    FUN_0806434c(STYLE_SELECTED);
+    SetFontIndex(STYLE_SELECTED);
     if (*titleText != 0)
-        FUN_080643d8(GetRecordWord(*titleText), TITLE_X,
+        DrawTextCentred(GetRecordWord(*titleText), TITLE_X,
                      gMenuPositionX - TITLE_Y_OFFSET);
 
     count = gActiveMenuItemCount;
@@ -70,16 +70,16 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
     item = firstItem;
     for (row = 0; row < count; row++) {
         if (item == selectedItem)
-            FUN_0806434c(STYLE_SELECTED);
+            SetFontIndex(STYLE_SELECTED);
         else
-            FUN_0806434c(STYLE_NORMAL);
+            SetFontIndex(STYLE_NORMAL);
 
         if (gActiveMenuItems[item]->value < 0) {
             /* Sadece etiket: satirda gosterilecek sayi yok. */
-            FUN_080643d8(GetRecordWord(gActiveMenuItems[item]->label), LABEL_X,
+            DrawTextCentred(GetRecordWord(gActiveMenuItems[item]->label), LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
         } else {
-            FUN_0806435c(GetRecordWord(gActiveMenuItems[item]->label),
+            DrawText(GetRecordWord(gActiveMenuItems[item]->label),
                          VALUE_LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
 
@@ -126,7 +126,7 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
                 }
             }
 
-            FUN_08064460(text, VALUE_X,
+            DrawTextRightAligned(text, VALUE_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
         }
         item++;

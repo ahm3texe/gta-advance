@@ -65,6 +65,13 @@ address,name,size,status,module,notes
 0x0805E6C4,SetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6D4,GetTableIndex,6,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6E0,GetRecordWord,20,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
+0x0806434C,SetFontIndex,10,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x0806435C,DrawText,120,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x080643D8,DrawTextCentred,128,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x08064460,DrawTextRightAligned,126,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x080644E4,GetGlyphWidth,58,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x08064524,GetTextWidth,104,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
+0x08064590,ClearTextArea,110,decompiled,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
 0x0806BCD0,LibraryAssertWrapper0,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCE0,LibraryAssertWrapper1,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,,discovered,sdk,References assertion format at 0x08BD3470
