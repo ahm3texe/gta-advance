@@ -71,6 +71,8 @@ export type DashboardData = {
     matchingCodeBytes: number;
     matchingCodePercent: number;
     matchingRegionBytes: number;
+    libcRegionBytes: number;
+    verifiedRomBytes: number;
     clusterCount: number;
     cSourceCount: number;
     cSourceBytes: number;
@@ -279,7 +281,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         </article>
         <article className="stat-card">
           <Database aria-hidden="true" />
-          <div><strong>{formatBytes(data.summary.matchingRegionBytes)}</strong><span>Doğrulanmış ROM bölgesi</span></div>
+          <div><strong>{formatBytes(data.summary.verifiedRomBytes)}</strong><span>Doğrulanmış ROM bölgesi</span></div>
         </article>
       </section>
 
@@ -404,6 +406,10 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
           <div className="detail-note"><span>Analiz notu</span><p>{selected.notes || 'Henüz açıklama eklenmedi.'}</p></div>
           <Button className="inspect-button" onClick={() => setInspectorOpen(true)}><FolderOpen aria-hidden="true" /> Fonksiyonun içine gir</Button>
           <div className="project-progress">
+            <div className="project-note">
+              {formatBytes(data.summary.matchingRegionBytes)} kaynaktan yeniden üretiliyor,
+              {' '}{formatBytes(data.summary.libcRegionBytes)} standart kütüphaneye karşı doğrulandı
+            </div>
             <div><span>Toplam kaynak ilerlemesi</span><strong>%{data.summary.matchingCodePercent.toFixed(2)}</strong></div>
             <div className="project-track"><i style={{ width: `${data.summary.matchingCodePercent}%` }} /></div>
             <small>{formatBytes(data.summary.matchingCodeBytes)} / {formatBytes(data.summary.totalCodeBytes)} fonksiyon gövdesi</small>

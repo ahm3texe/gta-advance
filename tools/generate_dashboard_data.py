@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FUNCTIONS = ROOT / "data/functions.csv"
 REGIONS = ROOT / "data/matching_regions.csv"
 C_SOURCES = ROOT / "data/c_sources.csv"
+LIBC_REGIONS = ROOT / "data/libc_regions.csv"
 OUTPUT = ROOT / "dashboard/app/decomp-data.json"
 DECOMPILER = ROOT / "analysis/decompiler"
 
@@ -158,6 +159,11 @@ def main() -> None:
             }
         )
 
+    # agbcc libc.a'ya karsi dogrulanmis standart kutuphane bolgeleri.
+    libc_region_bytes = sum(
+        int(row["end"], 16) - int(row["address"], 16)
+        for row in (read_csv(LIBC_REGIONS) if LIBC_REGIONS.exists() else [])
+    )
     cluster_count = len({function["cluster"] for function in functions})
     payload = {
         "summary": {
@@ -168,6 +174,8 @@ def main() -> None:
             "matchingCodeBytes": matching_code_bytes,
             "matchingCodePercent": round(100 * matching_code_bytes / total_code_bytes, 2),
             "matchingRegionBytes": matching_region_bytes,
+            "libcRegionBytes": libc_region_bytes,
+            "verifiedRomBytes": matching_region_bytes + libc_region_bytes,
             "clusterCount": cluster_count,
             "cSourceCount": len(c_matched),
             "cSourceBytes": sum(

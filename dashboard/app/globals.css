@@ -184,3 +184,5 @@ button, input, select { font: inherit; }
   .control-panel [data-slot='native-select-wrapper'], .control-panel select, .control-panel button { width: 100%; }
   .legend small { width: 100%; margin-left: 0; }
 }
+
+.project-note { color: #7d92a3; font: 400 11px/1.5 var(--font-geist-sans, sans-serif); margin: 6px 0 10px; }
