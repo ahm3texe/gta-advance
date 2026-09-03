@@ -24,24 +24,24 @@ typedef struct Obj {
     void *sub;                  /* +0x1C */
 } Obj;
 
-extern Pool gRam0202F310;
+extern Pool gUnk0202F310;
 extern Pool gRam0202F300;
-extern Pool gRam02028280;
-extern Pool gRam0202F2C0;
+extern Pool gUnk02028280;
+extern Pool gUnk0202F2C0;
 
 extern void FUN_08016808(void *sub);
 
 /* 0x08037FAC */
-u32 GetPoolA(void) { return gRam0202F310.value; }
+u32 GetPoolA(void) { return gUnk0202F310.value; }
 
 /* 0x08037FB8 */
 u32 GetPoolB(void) { return gRam0202F300.value; }
 
 /* 0x08037FC4 */
-u32 GetPoolC(void) { return gRam02028280.value; }
+u32 GetPoolC(void) { return gUnk02028280.value; }
 
 /* 0x08037FD0 */
-u32 GetPoolD(void) { return gRam0202F2C0.value; }
+u32 GetPoolD(void) { return gUnk0202F2C0.value; }
 
 /* 0x08037FDC */
 void MarkAndClear(Obj *obj)

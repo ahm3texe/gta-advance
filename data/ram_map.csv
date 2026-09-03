@@ -1,134 +1,131 @@
 address,size,name,source,status,notes
+0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
+0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
+0x02000224,4,gRam02000224,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
+0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
+0x020003E4,1,gCartFlag,decomp,provisional,0x080336EC/2C tarafindan test edilen bayrak (=1 iken islem yapiliyor)
+0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
+0x0200048C,4,gRam0200048C,decomp,provisional,u16 sayac; 0x080664F0 kontrolu
+0x02000494,4,gLoopState,decomp,provisional,Main loop state word
+0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
+0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
+0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
+0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
+0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour
+0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
+0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
+0x02000D18,4,gRam02000D18,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
+0x02000D50,4,gSaveBuffer,decomp,provisional,Working buffer used by the save manager
+0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
+0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
+0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
+0x02000EBC,4,gPostFrameState,decomp,provisional,State written after the frame completes
+0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
+0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
+0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
+0x02000F04,4,gSessionPtr,decomp,provisional,Pointer used by 0x0803C798; target layout partially known
+0x02000F0C,4,gState1,decomp,provisional,Unidentified state word
+0x02000F10,18,gRam02000F10,decomp,provisional,Referenced by a block queued for matching; role unknown; boyut 36->18 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
 0x02000F22,1,player_health,libretro_cheat,provisional,Cheat value 100
+0x02000F70,4,gState0,decomp,provisional,Unidentified state word
+0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"
+0x02001050,4,gState2,decomp,provisional,Unidentified state word
+0x02001060,4,gRam02001060,decomp,provisional,Ikincil bir yuva isaretcisi; slot_query.c'nin bagimli sembolu
 0x0200108C,2,weapon_slot_0,libretro_cheat,provisional,Start of strided weapon records
 0x0200108E,1,weapon_ammo_0,libretro_cheat,provisional,Records appear to use stride 8
 0x020010E4,2,car_weapon_id,libretro_cheat,provisional,
 0x020010E6,1,car_weapon_ammo,libretro_cheat,provisional,
+0x02001130,4,gState3,decomp,provisional,Unidentified state word
+0x02001140,36,gRam02001140,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x020011A0,1,gActiveMenuItemCount,decomp,verified,Number of visible menu entries written by BuildActiveMenuItems
+0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
+0x02001210,4,gMenuPaletteSource,decomp,provisional,Palette data DMA-ed into palette RAM by InitMenuScreen
+0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
+0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
 0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
+0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
+0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
+0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
+0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat ciftini tutan blok, +72 ayri bir kelime"
+0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
+0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev"
+0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor
+0x0201AEE8,4,gRam0201AEE8,decomp,provisional,0x0801D7FC ile yazilan isaretci
+0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
+0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
+0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"
+0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) sabit; +12/+16 (arg << 16 | 0xFF000000)
+0x0202370C,4,gRam0202370C,decomp,provisional,0x0802392C tarafindan sifirlanan degisken
+0x02023A00,2088,gEntriesA,decomp,provisional,148 baytlik giris tablosu; 0x8028E3C 14 girisi tariyor
+0x02024650,160,gRam02024650,decomp,provisional,65536 girisli 148 bayt dizi (u16 index sarilir); boyut 9748664->160 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
+0x020246F0,2812,gRam020246F0,decomp,provisional,20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor; boyut 2960->2812 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
+0x020251EC,148,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri; boyut 2960->148 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
+0x02025280,1424,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime; boyut 2960->1424 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
+0x02025810,8,gRam02025810,decomp,provisional,Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para; boyut 4991->8 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
 0x02025818,2,mission_timer,libretro_cheat,provisional,
 0x0202581A,1,wanted_level_display,libretro_cheat,provisional,
 0x0202581C,4,money_display_or_copy_0,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025824,4,money_display_or_copy_1,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025828,1,player_armor_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
 0x0202582A,1,player_health_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
+0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
+0x02026E80,4,gRam02026E80,decomp,provisional,0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok
+0x02026EF0,8,gFlagsB,decomp,provisional,8 girisli bayrak dizisi
+0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
+0x02026F38,8,gFlagsA,decomp,provisional,8 girisli bayrak dizisi
+0x02026FE0,576,gBlockTable,decomp,provisional,8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik
+0x020272C8,4,gRam020272C8,decomp,provisional,Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor
+0x02027344,264,gAddrTable,decomp,provisional,6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi
+0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
+0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown
+0x02028290,4,gUnk02028290,decomp,provisional,Read by a small getter at 0x08037F58; role unknown
+0x020282A0,4,gUnk020282A0,decomp,provisional,Read by a small getter at 0x08037F40; role unknown
+0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,Read by a small getter at 0x08037F1C; role unknown
+0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
+0x0202F300,4,gRam0202F300,decomp,provisional,+8'de u32 alan
+0x0202F310,4,gUnk0202F310,decomp,provisional,Read by a small getter at 0x08037F28; role unknown
+0x0202F3D0,4,gRam0202F3D0,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi"
+0x020302E0,4,gRam020302E0,decomp,provisional,0x08050190 karsilastirmasi
+0x02030304,4,gRam02030304,decomp,provisional,0x080501AC karsilastirmasi
+0x02030308,4,gRam02030308,decomp,provisional,0x08050190 karsilastirmasi
+0x02030324,4,gRam02030324,decomp,provisional,0x080501AC karsilastirmasi
+0x02030328,4,gRam02030328,decomp,provisional,0x0806262C icinde sifir kontrolu
+0x02030330,16,gRam02030330,decomp,provisional,"+0x10'da bir offset, +0x2C'de yaz alani; boyut 64->16 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02030340,1,wanted_level_true,libretro_cheat,provisional,
+0x020303D0,4,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
+0x02030C10,320,gSlotIds,decomp,provisional,160 adet u16 yuva kimligi; 0x7FEF bos demek
+0x02030D50,7680,gSlotArray,decomp,provisional,128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi
+0x02035A70,4,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik"
+0x02035A9C,1,gRam02035A9C,decomp,provisional,254'te doyan u8 sayac
+0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
+0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
+0x02035CC0,4,gTableIndex,decomp,provisional,Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record
+0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 kimlik
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
-0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
-0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
-0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
-0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
-0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
-0x020011A0,1,gActiveMenuItemCount,decomp,verified,Number of visible menu entries written by BuildActiveMenuItems
-0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
-0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
-0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
-0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
-0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
-0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour
-0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
-0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
-0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
-0x02001210,4,gMenuPaletteSource,decomp,provisional,Palette data DMA-ed into palette RAM by InitMenuScreen
-0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
-0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
-0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
-0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
-0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
-0x02000494,4,gLoopState,decomp,provisional,Main loop state word
-0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
-0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
-0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
-0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
-0x02000D50,4,gSaveBuffer,decomp,provisional,Working buffer used by the save manager
-0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
-0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
-0x02000EBC,4,gPostFrameState,decomp,provisional,State written after the frame completes
-0x02000F0C,4,gState1,decomp,provisional,Unidentified state word
-0x02000F70,4,gState0,decomp,provisional,Unidentified state word
-0x02001050,4,gState2,decomp,provisional,Unidentified state word
-0x02001130,4,gState3,decomp,provisional,Unidentified state word
-0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
-0x03007E00,4,gSystemStack,decomp,verified,BIOS system stack pointer area
-0x03007FA0,4,gIrqStack,decomp,verified,BIOS IRQ stack pointer area
-0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
-0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,Read by a small getter at 0x08037F1C; role unknown
-0x0202F310,4,gUnk0202F310,decomp,provisional,Read by a small getter at 0x08037F28; role unknown
-0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
-0x020282A0,4,gUnk020282A0,decomp,provisional,Read by a small getter at 0x08037F40; role unknown
-0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
-0x02028290,4,gUnk02028290,decomp,provisional,Read by a small getter at 0x08037F58; role unknown
-0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown
-0x02035CC0,4,gTableIndex,decomp,provisional,Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record
-0x08EC46D4,0,gRecordTable,decomp,provisional,ROM table of 0x9A8-byte records selected by gTableIndex
-0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
-0x02000F04,4,gSessionPtr,decomp,provisional,Pointer used by 0x0803C798; target layout partially known
-0x020303D0,4,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
-0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
-0x0203630C,4,gTextRowStride,decomp,provisional,"Row stride in tiles used when clearing a text area"
-0x02036310,4,gTextVramBase,decomp,provisional,"Base VRAM address of the text layer"
+0x0203630C,4,gTextRowStride,decomp,provisional,Row stride in tiles used when clearing a text area
+0x02036310,4,gTextVramBase,decomp,provisional,Base VRAM address of the text layer
 0x02036314,4,gGlyphWidths,decomp,provisional,"Pointer to the per-glyph width table, indexed from space (0x20)"
 0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C"
-0x0203631C,4,gHalfLineSpacing,decomp,provisional,"Nonzero halves the line height used by the text drawing helpers"
-0x02000224,4,gRam02000224,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x02000D18,4,gRam02000D18,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x02000F10,36,gRam02000F10,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x02001140,36,gRam02001140,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x0202F3D0,4,gRam0202F3D0,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x0202F3D8,4,gRam0202F3D8,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x0202F3DC,4,gRam0202F3DC,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi"
-0x03000078,4,gRam03000078,decomp,provisional,"Referenced by a block queued for matching; role unknown"
-0x03000098,4,gRam03000098,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
-0x0300009C,4,gRam0300009C,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
-0x02000498,4,gRam02000498,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
-0x030000A0,4,gRam030000A0,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
-0x02025810,4991,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para"
-0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat ciftini tutan blok, +72 ayri bir kelime"
-0x020110AC,4,gRam020110AC,decomp,provisional,"Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor"
-0x02030C10,320,gSlotIds,decomp,provisional,"160 adet u16 yuva kimligi; 0x7FEF bos demek"
-0x02036340,8,gDistanceAccum,decomp,provisional,"Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor"
-0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
-0x02035A70,4,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik"
-0x020272C8,4,gRam020272C8,decomp,provisional,"Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor"
-0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
-0x02026E80,4,gRam02026E80,decomp,provisional,"0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok"
-0x020251EC,2960,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri"
-0x02025280,2960,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime"
-0x020246F0,2960,gRam020246F0,decomp,provisional,"20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor"
-0x02035EA0,24,gRam02035EA0,decomp,provisional,"+0x16 u16 kimlik"
-0x02030328,4,gRam02030328,decomp,provisional,"0x0806262C icinde sifir kontrolu"
-0x02036328,4,gRam02036328,decomp,provisional,"Ek bayrak; 0x080664C4 kontrolu"
-0x0200048C,4,gRam0200048C,decomp,provisional,"u16 sayac; 0x080664F0 kontrolu"
-0x02001060,4,gRam02001060,decomp,provisional,"Ikincil bir yuva isaretcisi; slot_query.c'nin bagimli sembolu"
-0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"
-0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
-0x02022E50,512,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi"
-0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"
-0x0202F310,4,gRam0202F310,decomp,provisional,"+8'de u32 alan"
-0x0202F300,4,gRam0202F300,decomp,provisional,"+8'de u32 alan"
-0x02028280,4,gRam02028280,decomp,provisional,"+8'de u32 alan"
-0x0202F2C0,4,gRam0202F2C0,decomp,provisional,"+8'de u32 alan"
-0x02030330,64,gRam02030330,decomp,provisional,"+0x10'da bir offset, +0x2C'de yaz alani"
-0x0201AA90,1,gRam0201AA90,decomp,provisional,"Melodi bayragi; 0x08063B98'de 6 yaziliyor"
-0x02030D50,7680,gSlotArray,decomp,provisional,"128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi"
-0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev"
-0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
+0x0203631C,4,gHalfLineSpacing,decomp,provisional,Nonzero halves the line height used by the text drawing helpers
+0x02036328,4,gRam02036328,decomp,provisional,Ek bayrak; 0x080664C4 kontrolu
 0x02036338,4,gRam02036338,decomp,provisional,"Iletisim blogu isaretcisi; hedef +0 bayrak, +6 yaz"
-0x0202370C,4,gRam0202370C,decomp,provisional,"0x0802392C tarafindan sifirlanan degisken"
-0x020302E0,4,gRam020302E0,decomp,provisional,"0x08050190 karsilastirmasi"
-0x02030308,4,gRam02030308,decomp,provisional,"0x08050190 karsilastirmasi"
-0x02030304,4,gRam02030304,decomp,provisional,"0x080501AC karsilastirmasi"
-0x02030324,4,gRam02030324,decomp,provisional,"0x080501AC karsilastirmasi"
-0x020230D0,20,gRam020230D0,decomp,provisional,"+0/+4 (=0x01000000) sabit; +12/+16 (arg << 16 | 0xFF000000)"
-0x0201AEE8,4,gRam0201AEE8,decomp,provisional,"0x0801D7FC ile yazilan isaretci"
-0x020003E4,1,gCartFlag,decomp,provisional,"0x080336EC/2C tarafindan test edilen bayrak (=1 iken islem yapiliyor)"
-0x02027344,264,gAddrTable,decomp,provisional,"6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi"
-0x02026F38,8,gFlagsA,decomp,provisional,"8 girisli bayrak dizisi"
-0x02026EF0,8,gFlagsB,decomp,provisional,"8 girisli bayrak dizisi"
-0x02026FE0,576,gBlockTable,decomp,provisional,"8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik"
-0x02024650,9748664,gRam02024650,decomp,provisional,"65536 girisli 148 bayt dizi (u16 index sarilir)"
-0x02023A00,2088,gEntriesA,decomp,provisional,"148 baytlik giris tablosu; 0x8028E3C 14 girisi tariyor"
-0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
-0x02035A9C,1,gRam02035A9C,decomp,provisional,"254'te doyan u8 sayac"
-0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
+0x02036340,8,gDistanceAccum,decomp,provisional,Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor
+0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
+0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
+0x03000078,4,gRam03000078,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x03000098,4,gRam03000098,decomp,provisional,Referenced by FUN_08001A00; role unknown
+0x0300009C,4,gRam0300009C,decomp,provisional,Referenced by FUN_08001A00; role unknown
+0x030000A0,4,gRam030000A0,decomp,provisional,Referenced by FUN_08001A00; role unknown
+0x03007E00,4,gSystemStack,decomp,verified,BIOS system stack pointer area
+0x03007FA0,4,gIrqStack,decomp,verified,BIOS IRQ stack pointer area
+0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
+0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
+0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
+0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
+0x08EC46D4,0,gRecordTable,decomp,provisional,ROM table of 0x9A8-byte records selected by gTableIndex
