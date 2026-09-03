@@ -5,6 +5,16 @@
 @ `swi` uretilemez. Bu yuzden agb_main.s ve intr_main.s gibi KALICI
 @ assembly kaynagi.
 @
+@ TAM KAPSAMA: ROM tarandi, `swi` + `bx lr` bicimindeki gercek thunk'lar
+@ yalnizca bunlar. Oyunun BIOS'a tum temas yuzeyi bu on fonksiyon; baska
+@ hicbir yerde swi kullanilmiyor.
+@
+@ Ozellikle: `swi 6` ardindan `adds r0, r1, #0` gelen bir thunk YOK, yani
+@ oyun BIOS Div'in kalanini (r1) hic kullanmiyor ve C tarafinda
+@ `int Div(int, int)` bildirimi eksiksiz. BIOS uc deger dondurur
+@ (r0 bolum, r1 kalan, r3 mutlak bolum); C cagrisi yalnizca r0'i alabilir,
+@ ama burada gerekli degil.
+@
 @ Dogrulama:  make bios-match
 
 	.text
