@@ -22,4 +22,6 @@ start,end,binary,module,notes
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
+0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
+0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader

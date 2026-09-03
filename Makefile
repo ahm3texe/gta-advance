@@ -274,5 +274,19 @@ build/misc/table_lookup.bin: src/misc/table_lookup.c data/functions.csv data/ram
 misc-table-lookup-match: verify-rom build/misc/table_lookup.bin
 	@python3 tools/compare_slice.py baserom.gba 0x5e6c4 build/misc/table_lookup.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match
+build/misc/record_table.bin: src/misc/record_table.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-record-table-match: verify-rom build/misc/record_table.bin
+	@python3 tools/compare_slice.py baserom.gba 0x514c8 build/misc/record_table.bin
+
+build/misc/session_reset.bin: src/misc/session_reset.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-session-reset-match: verify-rom build/misc/session_reset.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c77c build/misc/session_reset.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match
 	@python3 tools/verify_matching_regions.py

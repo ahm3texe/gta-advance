@@ -63,3 +63,7 @@ address,size,name,source,status,notes
 0x02028280,4,gUnk02028280,decomp,provisional,"Read by a small getter at 0x08037F64; role unknown"
 0x02035CC0,4,gTableIndex,decomp,provisional,"Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record"
 0x08EC46D4,0,gRecordTable,decomp,provisional,"ROM table of 0x9A8-byte records selected by gTableIndex"
+0x02010C60,32,gUnk02010C60,decomp,provisional,"Byte 26 selects between the two return values of 0x0803C77C"
+0x02000F04,4,gSessionPtr,decomp,provisional,"Pointer used by 0x0803C798; target layout partially known"
+0x020303D0,4,gRecordIndex,decomp,provisional,"Selects a 60-byte record in the table at 0x08CAC248"
+0x08CAC248,0,gRecords,decomp,provisional,"ROM table of 60-byte records indexed by gRecordIndex"

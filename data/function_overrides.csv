@@ -55,6 +55,13 @@ address,name,size,status,module,notes
 0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
 0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
 0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
+0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
+0x0803C790,ReturnOne,4,matching,misc,Returns the constant 1; missed by Ghidra auto-analysis
+0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
+0x0803C798,ResetSessionNode,34,decompiled,misc,Clears two node fields and two session flag bits
+0x080514C8,GetRecordUnk04,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
+0x080514E4,GetRecordUnk08,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
+0x08051500,GetRecord,14,matching,misc,Returns the address of a 60-byte record
 0x0805E6C4,SetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6D4,GetTableIndex,6,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6E0,GetRecordWord,20,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified

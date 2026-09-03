@@ -851,9 +851,10 @@ address,name,size,status,module,notes
 0x0803C698,FUN_0803c698,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C6B8,FUN_0803c6b8,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C708,FUN_0803c708,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C77C,FUN_0803c77c,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C794,FUN_0803c794,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C798,FUN_0803c798,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
+0x0803C790,ReturnOne,4,matching,misc,Returns the constant 1; missed by Ghidra auto-analysis
+0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
+0x0803C798,ResetSessionNode,34,decompiled,misc,Clears two node fields and two session flag bits
 0x0803C7D4,FUN_0803c7d4,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C7EC,FUN_0803c7ec,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C840,FUN_0803c840,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1008,9 +1009,9 @@ address,name,size,status,module,notes
 0x08051300,FUN_08051300,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805135C,FUN_0805135c,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080513E0,FUN_080513e0,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080514C8,FUN_080514c8,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080514E4,FUN_080514e4,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08051500,FUN_08051500,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080514C8,GetRecordUnk04,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
+0x080514E4,GetRecordUnk08,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
+0x08051500,GetRecord,14,matching,misc,Returns the address of a 60-byte record
 0x08051540,FUN_08051540,122,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080515D0,FUN_080515d0,156,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08051674,FUN_08051674,672,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
