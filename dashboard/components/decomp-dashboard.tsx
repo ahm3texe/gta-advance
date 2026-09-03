@@ -93,9 +93,12 @@ const STATUS_META: Record<
   DisplayStatus,
   { label: string; color: string; glow: string }
 > = {
+  // Alti durum ayri TON almali: yesil -> turkuaz -> mavi -> kehribar ->
+  // mor -> gri. Daha once iki yesil, sonra iki mavi cakisti; ayrimin
+  // parlaklikta degil TONDA olmasi gerekiyor.
   cMatching: { label: "C'den eşleşiyor", color: '#6cff9e', glow: '#1aa757' },
-  matching: { label: 'Assembly eşleşiyor', color: '#4aa8ff', glow: '#1560a8' },
-  decompiled: { label: 'Yazıldı, eşleşmedi', color: '#2f9bd6', glow: '#124a6b' },
+  matching: { label: 'Assembly eşleşiyor', color: '#2ee6c8', glow: '#0d7d6b' },
+  decompiled: { label: 'Yazıldı, eşleşmedi', color: '#4aa8ff', glow: '#1560a8' },
   documented: { label: 'Belgeli', color: '#f0ae3c', glow: '#7f4d0d' },
   discovered: { label: 'Keşfedildi', color: '#a777ff', glow: '#4c288e' },
   candidate: { label: 'Dokunulmadı', color: '#243441', glow: '#161f28' },
