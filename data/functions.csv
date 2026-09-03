@@ -807,8 +807,8 @@ address,name,size,status,module,notes
 0x0803C090,GetActiveSlotValue,30,matching,world,Yuva yapilandirmasi; src/world/slot_config.c
 0x0803C0B4,GetSlotField,48,matching,world,Yuva yapilandirmasi; src/world/slot_config.c
 0x0803C0E4,FUN_0803c0e4,130,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C178,FUN_0803c178,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C1AC,FUN_0803c1ac,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803C178,GetSlotRange,50,matching,world,"Yuva menzili; src/world/slot_range.c"
+0x0803C1AC,GetDefaultRange,6,matching,world,"Yuva menzili; src/world/slot_range.c"
 0x0803C1B4,FUN_0803c1b4,66,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C20C,FUN_0803c20c,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803C268,FUN_0803c268,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -958,16 +958,16 @@ address,name,size,status,module,notes
 0x0804FDDC,FUN_0804fddc,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0804FFD8,FUN_0804ffd8,78,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08050130,FUN_08050130,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08050190,FUN_08050190,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080501AC,FUN_080501ac,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08050190,CompareA,28,matching,world,"Kelime karsilastirici; src/world/word_compare.c"
+0x080501AC,CompareB,28,matching,world,"Kelime karsilastirici; src/world/word_compare.c"
 0x080501C8,FUN_080501c8,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08050288,FUN_08050288,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080502F8,FUN_080502f8,290,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080504B4,FUN_080504b4,388,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805063C,FUN_0805063c,436,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080507F4,FUN_080507f4,290,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08050918,FUN_08050918,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08050934,FUN_08050934,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08050918,ResetAnchorSmall,24,matching,world,"Anchor sifirlama; src/world/anchor_reset.c"
+0x08050934,ResetAnchorFull,32,matching,world,"Anchor sifirlama; src/world/anchor_reset.c"
 0x08050994,FUN_08050994,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080509C4,CallWithOffset,18,candidate,world,"Ofset yardimcisi; src/world/offset_helpers.c"
 0x080509DC,GetBase,6,matching,world,"Ofset yardimcisi; src/world/offset_helpers.c"
@@ -1188,8 +1188,8 @@ address,name,size,status,module,notes
 0x080622B4,FUN_080622b4,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08062370,FUN_08062370,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080623E4,FUN_080623e4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08062514,FUN_08062514,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062530,FUN_08062530,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08062514,GetRamType,28,matching,world,"gRam02035EA0 sorgusu; src/world/ram_flags.c"
+0x08062530,IsRamModeWanted,28,candidate,world,"gRam02035EA0 sorgusu; src/world/ram_flags.c"
 0x0806254C,FUN_0806254c,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080625A0,FUN_080625a0,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080625D0,FUN_080625d0,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1288,8 +1288,8 @@ address,name,size,status,module,notes
 0x080672B8,FUN_080672b8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080672FC,FUN_080672fc,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08067370,FUN_08067370,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067374,FUN_08067374,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08067390,FUN_08067390,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08067374,BumpCount7A,22,matching,world,"Ek sayac; src/world/more_counters_2.c"
+0x08067390,BumpCount84,22,matching,world,"Ek sayac; src/world/more_counters_2.c"
 0x080673C4,FUN_080673c4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080673E0,FUN_080673e0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08067404,FUN_08067404,172,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

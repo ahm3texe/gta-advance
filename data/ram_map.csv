@@ -116,3 +116,7 @@ address,size,name,source,status,notes
 0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
 0x02036338,4,gRam02036338,decomp,provisional,"Iletisim blogu isaretcisi; hedef +0 bayrak, +6 yaz"
 0x0202370C,4,gRam0202370C,decomp,provisional,"0x0802392C tarafindan sifirlanan degisken"
+0x020302E0,4,gRam020302E0,decomp,provisional,"0x08050190 karsilastirmasi"
+0x02030308,4,gRam02030308,decomp,provisional,"0x08050190 karsilastirmasi"
+0x02030304,4,gRam02030304,decomp,provisional,"0x080501AC karsilastirmasi"
+0x02030324,4,gRam02030324,decomp,provisional,"0x080501AC karsilastirmasi"

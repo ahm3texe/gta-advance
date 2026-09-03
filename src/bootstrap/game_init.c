@@ -125,7 +125,7 @@ extern void FUN_08014fa0(void);
 extern void FUN_08008e68(void);
 extern void FUN_08037e7c(void);
 extern void FUN_08042784(void);
-extern void FUN_08050918(void);
+extern void ResetAnchorSmall(void);
 extern void FUN_08051300(void);
 extern void FUN_08051960(void);
 extern void FUN_08019c04(void);
@@ -289,7 +289,7 @@ void GameInit(void)
             FUN_08008e68();
             FUN_08037e7c();
             FUN_08042784();
-            FUN_08050918();
+            ResetAnchorSmall();
             FUN_08051300();
             FUN_08051960();
             FUN_08019c04();

@@ -109,6 +109,8 @@ address,name,source,matching
 0x0803C050,ConfigureSlot,src/world/slot_config.c,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,yes
 0x0803C0B4,GetSlotField,src/world/slot_config.c,yes
+0x0803C178,GetSlotRange,src/world/slot_range.c,yes
+0x0803C1AC,GetDefaultRange,src/world/slot_range.c,yes
 0x0803C49C,SelectSlotAB,src/world/slot_selectors.c,yes
 0x0803C4B8,SelectSlotCD,src/world/slot_selectors.c,yes
 0x0803C4D4,GetSubValue,src/world/slot_selectors.c,yes
@@ -134,6 +136,10 @@ address,name,source,matching
 0x08042434,IsTileTypeInRange,src/world/map_tiles.c,yes
 0x080424A8,GetTileFieldA2,src/world/tile_and_map.c,yes
 0x080424D8,GetMapSize,src/world/tile_and_map.c,yes
+0x08050190,CompareA,src/world/word_compare.c,yes
+0x080501AC,CompareB,src/world/word_compare.c,yes
+0x08050918,ResetAnchorSmall,src/world/anchor_reset.c,yes
+0x08050934,ResetAnchorFull,src/world/anchor_reset.c,yes
 0x080509C4,CallWithOffset,src/world/offset_helpers.c,no
 0x080509DC,GetBase,src/world/gRam02030330_gets.c,yes
 0x080509E8,SetSlot,src/world/gRam02030330_gets.c,yes
@@ -153,6 +159,8 @@ address,name,source,matching
 0x0805E6C4,SetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6D4,GetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6E0,GetRecordWord,src/misc/table_lookup.c,yes
+0x08062514,GetRamType,src/world/ram_flags.c,yes
+0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,no
 0x0806434C,SetFontIndex,src/text/draw_text.c,yes
 0x0806435C,DrawText,src/text/draw_text.c,yes
 0x080643D8,DrawTextCentred,src/text/draw_text.c,yes
@@ -172,3 +180,5 @@ address,name,source,matching
 0x08067244,BumpCountA,src/world/stat_counters.c,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
 0x08067274,AddDistance,src/world/distance_accum.c,no
+0x08067374,BumpCount7A,src/world/more_counters_2.c,yes
+0x08067390,BumpCount84,src/world/more_counters_2.c,yes

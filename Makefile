@@ -545,5 +545,40 @@ build/world/tile_and_map.bin: src/world/tile_and_map.c data/functions.csv data/r
 world-tile-and-map-match: verify-rom build/world/tile_and_map.bin
 	@python3 tools/compare_slice.py baserom.gba 0x424a8 build/world/tile_and_map.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match
+build/world/anchor_reset.bin: src/world/anchor_reset.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-anchor-reset-match: verify-rom build/world/anchor_reset.bin
+	@python3 tools/compare_slice.py baserom.gba 0x50918 build/world/anchor_reset.bin
+
+build/world/slot_range.bin: src/world/slot_range.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-slot-range-match: verify-rom build/world/slot_range.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c178 build/world/slot_range.bin
+
+build/world/word_compare.bin: src/world/word_compare.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-word-compare-match: verify-rom build/world/word_compare.bin
+	@python3 tools/compare_slice.py baserom.gba 0x50190 build/world/word_compare.bin
+
+build/world/ram_flags.bin: src/world/ram_flags.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-ram-flags-match: verify-rom build/world/ram_flags.bin
+	@python3 tools/compare_slice.py baserom.gba 0x62514 build/world/ram_flags.bin
+
+build/world/more_counters_2.bin: src/world/more_counters_2.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-more-counters-2-match: verify-rom build/world/more_counters_2.bin
+	@python3 tools/compare_slice.py baserom.gba 0x67374 build/world/more_counters_2.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match
 	@python3 tools/verify_matching_regions.py

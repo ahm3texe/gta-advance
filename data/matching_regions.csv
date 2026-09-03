@@ -38,6 +38,7 @@ start,end,binary,module,notes
 0x08038260,0x08038298,build/world/object_value.bin,world,"Nesne deger cozumu: sinama, dolayli yuva, dogrudan ayrinti"
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu
+0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Yuva menzili + varsayilan sabit
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Uc yuva secici; SlotCD ve GetSubValue ortak kuyrukta birlesiyor
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Bes yuva sorgusu: sabit, aktif yuva, olcek adimi, hedef isaretleme"
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
@@ -47,15 +48,19 @@ start,end,binary,module,notes
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
+0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
+0x08050918,0x08050958,build/world/anchor_reset.bin,world,Anchor sifirlama
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
+0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type sorgusu
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"
 0x08066A40,0x08066A54,build/world/comm_flag.bin,world,Iletisim bayragi
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
 0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
+0x08067374,0x080673AC,build/world/more_counters_2.bin,world,u16 ve u8 tasma korumali sayaclar
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"
