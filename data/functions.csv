@@ -335,8 +335,8 @@ address,name,size,status,module,notes
 0x080199BC,FUN_080199bc,134,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019A64,FUN_08019a64,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019A80,FUN_08019a80,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019B08,FUN_08019b08,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019B3C,FUN_08019b3c,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08019B08,IsActorUsable,52,matching,world,"Aktor durum; src/world/actor_check.c"
+0x08019B3C,GetAngleField,30,matching,world,"Aktor durum; src/world/actor_check.c"
 0x08019B5C,FUN_08019b5c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019BCC,FUN_08019bcc,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019C04,FUN_08019c04,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -470,15 +470,15 @@ address,name,size,status,module,notes
 0x08028D44,FUN_08028d44,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08028DC4,FUN_08028dc4,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08028DF4,FUN_08028df4,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028E3C,FUN_08028e3c,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028E6C,FUN_08028e6c,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08028E3C,HasWantedEntry,48,candidate,world,"Giris tarayici + kare zinciri; src/world/kind_scan.c"
+0x08028E6C,FrameChain,26,matching,world,"Giris tarayici + kare zinciri; src/world/kind_scan.c"
 0x08028EC0,FUN_08028ec0,46,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08028EF4,FUN_08028ef4,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08028F4C,FUN_08028f4c,66,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08028F98,FUN_08028f98,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08028FB8,FUN_08028fb8,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08028FFC,FUN_08028ffc,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08029014,FUN_08029014,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08028FFC,GetNegatedNested,24,matching,world,"Zincir + tarama; src/world/scan_active.c"
+0x08029014,ScanAllEntries,62,candidate,world,"Zincir + tarama; src/world/scan_active.c"
 0x08029088,FUN_08029088,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080290F4,FUN_080290f4,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08029130,FUN_08029130,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -595,8 +595,8 @@ address,name,size,status,module,notes
 0x080315F8,FUN_080315f8,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031618,FUN_08031618,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031658,FUN_08031658,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08031D24,FUN_08031d24,46,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031D54,FUN_08031d54,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08031D24,AnyPairSet,46,matching,world,"Bayrak dizisi; src/world/flag_arrays.c"
+0x08031D54,ClearAllBlocks,42,matching,world,"Bayrak dizisi; src/world/flag_arrays.c"
 0x08031DB8,FUN_08031db8,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031E18,FUN_08031e18,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031E44,FUN_08031e44,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -646,8 +646,8 @@ address,name,size,status,module,notes
 0x08033264,FUN_08033264,314,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080333AC,FUN_080333ac,572,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08033674,FUN_08033674,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080336EC,FUN_080336ec,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803372C,FUN_0803372c,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080336EC,VerifyId,64,matching,world,"Kimlik dogrulama; src/world/id_verify.c"
+0x0803372C,TriggerIfMatched,52,matching,world,"Kimlik dogrulama; src/world/id_verify.c"
 0x0803376C,FUN_0803376c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803378C,FUN_0803378c,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803379C,FUN_0803379c,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
