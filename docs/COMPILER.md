@@ -97,8 +97,9 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 23 | Dizi elemanının üyesine erişirken **yerel işaretçi** kullanılır | `dizi[i].alan` yazılırsa agbcc alan ofsetini taban literaline katlıyor; `p = &dizi[i]; p->alan` ofseti yükleme komutunda bırakıyor (ROM'daki biçim) |
 | 24 | Yedi bitlik alan için **bitfield** yazılır, maske değil | `x & 0x7F` yerine `u8 f : 7` — ROM `lsls #25`/`lsrs #25` çifti üretiyor |
 | 25 | Genel değişken okuması, kullanıldığı yerde değil **ayrı deyimde** yapılabilir | `if (g[26] != 0)` ile `v = g[26]; if (v != 0)` farklı sıralama üretiyor |
-| 26 | Dar **struct alanının** işaretliliği maskenin genişliğini belirler | `s8 flags` ile `flags &= ~4` maskeyi 32 bit tutuyor (`movs #5`/`negs`); `u8` ile bayta daraltıyor (`movs #251`). Kural 15'in alan hâli |
+| 26 | Dar **struct alanının** işaretliliği maskenin genişliğini belirler | `s8 flags` ile `flags &= ~4` maskeyi 32 bit tutuyor (`movs #5`/`negs`); `u8` ile bayta daraltıyor (`movs #251`). Kural 15'in alan hâli. İkinci ölçüm: `InitActor`'da 0x8A/0xA8 alanlarını `s8` yapmak farkı 40 → 14 bayta indirdi |
 | 27 | Ham değer ve türevi **tek değişkende** tutulabilir | `index = id; index = (u16)(index - 1);` ayrı iki değişkenden farklı register dağıtımı veriyor |
+| 28 | Ölçekli tabana iki terim eklenirken **işaretçi aritmetiği** ile **dizi indeksi** farklı kod üretir | `*(t + x + (y << s))` her terimi ayrı ölçekliyor (`lsl` + `lsl` + iki toplama); `t[x + (y << s)]` önce toplayıp bir kez ölçekliyor. `IsTileTypeInRange`'de dizi biçimi 33 bayt fark **ve** gereksiz bir `push {r4,lr}` veriyordu, işaretçi biçimi 3'e indirip fonksiyonu yaprak yaptı |
 
 ## Register dağıtımının mekanizması
 
