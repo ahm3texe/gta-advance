@@ -165,8 +165,8 @@ address,name,size,status,module,notes
 0x0800DB60,FUN_0800db60,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800DB7C,FUN_0800db7c,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800DB80,FUN_0800db80,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800DBE8,FUN_0800dbe8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800DC0C,FUN_0800dc0c,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800DBE8,ListPushFront,36,matching,world,"Liste islemleri; src/world/list_ops.c"
+0x0800DC0C,ListRemove2,52,matching,world,"Liste islemleri; src/world/list_ops.c"
 0x0800DC44,FUN_0800dc44,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800DCB4,FUN_0800dcb4,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800DD50,FUN_0800dd50,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

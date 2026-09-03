@@ -22,6 +22,7 @@ start,end,binary,module,notes
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
+0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
 0x08012898,0x08012944,build/core/linked_list.bin,core,"Cift bagli liste: ekle, cikar, ilklendir, iki dolasim"
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu

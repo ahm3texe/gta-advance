@@ -112,3 +112,4 @@ address,size,name,source,status,notes
 0x02030330,64,gRam02030330,decomp,provisional,"+0x10'da bir offset, +0x2C'de yaz alani"
 0x0201AA90,1,gRam0201AA90,decomp,provisional,"Melodi bayragi; 0x08063B98'de 6 yaziliyor"
 0x02030D50,7680,gSlotArray,decomp,provisional,"128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi"
+0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev"
