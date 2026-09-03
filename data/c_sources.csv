@@ -41,6 +41,8 @@ address,name,source,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,yes
+0x08008064,PushHistory,src/world/history_push.c,no
+0x08008094,SetIndexReturnOne,src/world/set_index.c,yes
 0x0800A94C,SetCoordUnk48,src/misc/coord_accessors.c,yes
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,yes
@@ -59,6 +61,8 @@ address,name,source,matching
 0x08013974,GetEntryOrDefault,src/world/list_head.c,yes
 0x0801398C,CountChain,src/world/list_head.c,yes
 0x080139B0,MarkChain,src/world/list_head.c,yes
+0x08013A28,SubmitFixed,src/world/dma_flush.c,yes
+0x08013A48,FlushBlock,src/world/dma_flush.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
 0x08019450,IsActorMarked,src/world/actor_control.c,yes
 0x08019464,NotifyActor,src/world/actor_control.c,yes
@@ -88,6 +92,8 @@ address,name,source,matching
 0x08028E6C,FrameChain,src/world/frame_chain.c,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,yes
 0x08029014,ScanAllEntries,src/world/scan_all.c,no
+0x080308A0,ReleaseAllSlots,src/world/slot_release.c,yes
+0x080308AC,ReleaseSlot,src/world/release_slot.c,no
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,yes
 0x08030C80,SetAreaFlag,src/world/area_flags.c,yes
 0x08030CB0,AreaFlagsNoop,src/world/area_flags.c,yes
@@ -172,6 +178,8 @@ address,name,source,matching
 0x08055D08,GetEntrySlot,src/world/slot_table.c,yes
 0x08055D18,FindFreeSlotRun,src/world/slot_table.c,yes
 0x08055D54,FillSlotsWithNone,src/world/slot_table.c,yes
+0x0805AC44,CopySrcToDest,src/world/counter_saturate.c,yes
+0x0805AC50,BumpOrReset,src/world/bump_or_reset.c,no
 0x0805E6C4,SetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6D4,GetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6E0,GetRecordWord,src/misc/table_lookup.c,yes

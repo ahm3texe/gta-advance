@@ -1,0 +1,26 @@
+/* Kopyalama — 0x0805AC44-0x0805AC4F
+ *
+ * gRam02025810 blogunda +20'yi +12'ye kopyaliyor.
+ * Kardesi BumpOrReset ayri dosyada: src/world/bump_or_reset.c
+ *
+ * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Dogrulama:  make c-match FILE=src/world/counter_saturate.c
+ */
+
+#include "gba_types.h"
+
+
+typedef struct Pack {
+    u8  pad0000[12];
+    u32 dest;                   /* +0x0C */
+    u8  pad10[4];
+    u32 src;                    /* +0x14 */
+} Pack;
+
+extern Pack gRam02025810;
+
+/* 0x0805AC44 */
+void CopySrcToDest(void)
+{
+    gRam02025810.dest = gRam02025810.src;
+}

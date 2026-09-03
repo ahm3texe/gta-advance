@@ -21,12 +21,14 @@ start,end,binary,module,notes
 0x08001A00,0x08001DC0,build/ui/menu_loop.bin,ui,"Menu loop: hierarchy, input and redraw"
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
+0x08008094,0x080080A4,build/world/set_index.bin,world,SetTableIndex sarmalayicisi
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
 0x080127FC,0x0801282C,build/core/list_ops2.bin,core,List init + push front (varyant)
 0x08012898,0x08012944,build/core/linked_list.bin,core,"Cift bagli liste: ekle, cikar, ilklendir, iki dolasim"
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
+0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Sabit cagri + DMA bosaltma
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
@@ -36,6 +38,7 @@ start,end,binary,module,notes
 0x08028C48,0x08028CE8,build/world/table_entries.bin,world,"Uc tablo girdisi yardimcisi: aktiflik testi, iki serbest birakma"
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
+0x080308A0,0x080308AC,build/world/slot_release.bin,world,Yuva serbest birakma cagricisi
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
@@ -63,6 +66,7 @@ start,end,binary,module,notes
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
+0x0805AC44,0x0805AC50,build/world/counter_saturate.bin,world,Kopyalama
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode kategorisi + iki alan yazici
 0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type sorgusu

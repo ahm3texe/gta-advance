@@ -129,3 +129,6 @@ address,size,name,source,status,notes
 0x02026FE0,576,gBlockTable,decomp,provisional,"8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik"
 0x02024650,9748664,gRam02024650,decomp,provisional,"65536 girisli 148 bayt dizi (u16 index sarilir)"
 0x02023A00,2088,gEntriesA,decomp,provisional,"148 baytlik giris tablosu; 0x8028E3C 14 girisi tariyor"
+0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
+0x02035A9C,1,gRam02035A9C,decomp,provisional,"254'te doyan u8 sayac"
+0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
