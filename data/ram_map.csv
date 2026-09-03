@@ -88,3 +88,4 @@ address,size,name,source,status,notes
 0x020110AC,4,gRam020110AC,decomp,provisional,"Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor"
 0x02030C10,320,gSlotIds,decomp,provisional,"160 adet u16 yuva kimligi; 0x7FEF bos demek"
 0x02036340,8,gDistanceAccum,decomp,provisional,"Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor"
+0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"

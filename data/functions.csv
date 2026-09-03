@@ -820,11 +820,11 @@ address,name,size,status,module,notes
 0x0803C49C,FUN_0803c49c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C4B8,FUN_0803c4b8,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C4D4,FUN_0803c4d4,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C53C,FUN_0803c53c,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C544,FUN_0803c544,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C564,FUN_0803c564,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C578,FUN_0803c578,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803C594,FUN_0803c594,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803C53C,GetUnitSize,6,matching,world,"Yuva sorgusu; src/world/slot_query.c"
+0x0803C544,GetActiveSlot,26,matching,world,"Yuva sorgusu; src/world/slot_query.c"
+0x0803C564,GetScaleStep,16,matching,world,"Yuva sorgusu; src/world/slot_query.c"
+0x0803C578,MarkTarget,26,matching,world,"Yuva sorgusu; src/world/slot_query.c"
+0x0803C594,IsTargetMarked,32,matching,world,"Yuva sorgusu; src/world/slot_query.c"
 0x0803C5B4,FUN_0803c5b4,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C62C,FUN_0803c62c,106,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C698,FUN_0803c698,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
