@@ -25,9 +25,9 @@ address,size,name,source,status,notes
 0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
 0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
 0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
-0x02000F04,4,gSessionPtr,decomp,provisional,Pointer used by 0x0803C798; target layout partially known
+0x02000F04,4,gSessionPtr,decomp,provisional,"Pointer used by 0x0803C798; target layout partially known; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan"
 0x02000F0C,4,gState1,decomp,provisional,Unidentified state word
-0x02000F10,18,gRam02000F10,decomp,provisional,Referenced by a block queued for matching; role unknown; boyut 36->18 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
+0x02000F10,18,gRam02000F10,decomp,provisional,"Referenced by a block queued for matching; role unknown; boyut 36->18 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor); +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan"
 0x02000F22,1,player_health,libretro_cheat,provisional,Cheat value 100
 0x02000F70,4,gState0,decomp,provisional,Unidentified state word
 0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"
@@ -38,7 +38,7 @@ address,size,name,source,status,notes
 0x020010E4,2,car_weapon_id,libretro_cheat,provisional,
 0x020010E6,1,car_weapon_ammo,libretro_cheat,provisional,
 0x02001130,4,gState3,decomp,provisional,Unidentified state word
-0x02001140,36,gRam02001140,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x02001140,36,gRam02001140,decomp,provisional,"Referenced by a block queued for matching; role unknown; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan"
 0x020011A0,1,gActiveMenuItemCount,decomp,verified,Number of visible menu entries written by BuildActiveMenuItems
 0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
 0x02001210,4,gMenuPaletteSource,decomp,provisional,Palette data DMA-ed into palette RAM by InitMenuScreen

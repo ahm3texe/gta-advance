@@ -24,7 +24,10 @@ typedef void (*SlotHandler)(void);
 #define SLOT_SECONDARY   2
 
 struct Slot {
-    u32         value;          /* +0x00 */
+    /* +0x00 bir ISARETCIDIR: src/ui/menu_screen.c ayni sozcugu yukleyip
+     * dereference ediyor (`ldr r1,[r0]` + `ldrb r2,[r1,#8]`). u32 olarak
+     * yazmak ayni baytlari uretir ama anlami gizler. */
+    void       *entry;          /* +0x00 */
     u32         kind;           /* +0x04 */
     u8          pad08[4];
     u32         unk0C;          /* +0x0C */
@@ -38,13 +41,13 @@ extern Slot *gSessionPtr;       /* 0x02000F04 */
 extern u8    gGameState[];
 
 /* 0x0803C050 */
-void ConfigureSlot(u32 value, u32 kind, int which)
+void ConfigureSlot(void *entry, u32 kind, int which)
 {
     Slot *slot;
 
     if (which == 0) {
         slot = &gRam02000F10;
-        slot->value = value;
+        slot->entry = entry;
         slot->kind = kind;
         if (kind == SLOT_KIND_LINKED) {
             slot->handler = HANDLER_LINKED;
@@ -52,7 +55,7 @@ void ConfigureSlot(u32 value, u32 kind, int which)
         }
     } else {
         slot = &gRam02001140;
-        slot->value = value;
+        slot->entry = entry;
         slot->kind = kind;
         if (kind == SLOT_KIND_LINKED) {
             slot->handler = HANDLER_LINKED;
@@ -67,9 +70,9 @@ void ConfigureSlot(u32 value, u32 kind, int which)
 u32 GetActiveSlotValue(void)
 {
     if (gGameState[12] == 0)
-        return gRam02000F10.value;
+        return (u32)gRam02000F10.entry;
 
-    return gSessionPtr->value;
+    return (u32)gSessionPtr->entry;
 }
 
 /* 0x0803C0B4 */

@@ -19,8 +19,11 @@
 #define UNIT_SIZE           0x10000
 #define MARK_VALUE          16
 
+/* +0x00 bir ISARETCIDIR (bkz. src/ui/menu_screen.c: ayni sozcugu yukleyip
+ * dereference ediyor; src/misc/session_node.c ayni hedefi `Context *`
+ * olarak tipliyor). u32 yazmak ayni baytlari uretir ama anlami gizler. */
 typedef struct SlotValue {
-    u32 value;                  /* +0x00 */
+    void *entry;                /* +0x00 */
 } SlotValue;
 
 typedef struct Target {
@@ -46,9 +49,9 @@ u32 GetUnitSize(void)
 u32 GetActiveSlot(void)
 {
     if (gSlotSelector == SELECTOR_SECONDARY)
-        return gRam02001140.value;
+        return (u32)gRam02001140.entry;
 
-    return gRam02000F10.value;
+    return (u32)gRam02000F10.entry;
 }
 
 /* 0x0803C564 */
