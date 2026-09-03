@@ -102,3 +102,6 @@ address,size,name,source,status,notes
 0x0200048C,4,gRam0200048C,decomp,provisional,"u16 sayac; 0x080664F0 kontrolu"
 0x02001060,4,gRam02001060,decomp,provisional,"Ikincil bir yuva isaretcisi; slot_query.c'nin bagimli sembolu"
 0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"
+0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
+0x02022E50,512,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi"
+0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"

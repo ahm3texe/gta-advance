@@ -50,6 +50,9 @@ address,name,source,matching
 0x080128FC,ListInit,src/core/linked_list.c,yes
 0x08012908,ListForEach,src/core/linked_list.c,yes
 0x08012924,ListForEachArg,src/core/linked_list.c,yes
+0x08013974,GetEntryOrDefault,src/world/list_head.c,yes
+0x0801398C,CountChain,src/world/list_head.c,yes
+0x080139B0,MarkChain,src/world/list_head.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
 0x08019450,IsActorMarked,src/world/actor_control.c,yes
 0x08019464,NotifyActor,src/world/actor_control.c,yes
