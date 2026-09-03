@@ -60,6 +60,10 @@ address,name,source,matching
 0x08037F4C,GetUnk0202F2D0,src/misc/state_getters.c,yes
 0x08037F58,GetUnk02028290,src/misc/state_getters.c,yes
 0x08037F64,GetUnk02028280,src/misc/state_getters.c,yes
+0x08038358,ForwardToSub,src/world/object_helpers.c,yes
+0x08038364,IsObjectActive,src/world/object_helpers.c,yes
+0x08038380,UpdateObject,src/world/object_helpers.c,yes
+0x080383A0,GetObjectLinkId,src/world/object_helpers.c,yes
 0x0803C77C,GetScaleFactor,src/misc/session_reset.c,yes
 0x0803C790,ReturnOne,src/misc/session_reset.c,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,yes

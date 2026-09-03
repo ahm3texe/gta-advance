@@ -786,10 +786,10 @@ address,name,size,status,module,notes
 0x08038234,FUN_08038234,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803824C,FUN_0803824c,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038260,FUN_08038260,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038358,FUN_08038358,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038364,FUN_08038364,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038380,FUN_08038380,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080383A0,FUN_080383a0,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08038358,ForwardToSub,12,matching,world,"Nesne yardimcisi; src/world/object_helpers.c"
+0x08038364,IsObjectActive,28,matching,world,"Nesne yardimcisi; src/world/object_helpers.c"
+0x08038380,UpdateObject,32,matching,world,"Nesne yardimcisi; src/world/object_helpers.c"
+0x080383A0,GetObjectLinkId,18,matching,world,"Nesne yardimcisi; src/world/object_helpers.c"
 0x080383B8,FUN_080383b8,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080383E8,FUN_080383e8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038440,FUN_08038440,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
