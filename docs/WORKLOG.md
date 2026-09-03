@@ -483,3 +483,45 @@ dört varyant dosyası silindi. Bir ajan bunu fark edip yedek bırakmıştı;
 `InitSaveSystem` çözümü oradan kurtarıldı, `WriteU16LE` çözümü ise ajanın
 rapor metninden geri yazıldı. Paralel çalışmada ortak dizinlere dokunmamak
 gerekiyor.
+
+## 2026-09-03 (gece, 2. workflow) — GameInit eşleşti: taşınabilir assembly bitti
+
+Son blok. Altı ajan, altı farklı açı. **Dokuzu bağımsız olarak 0 farka ulaştı**
+(bazı ajanlar birden fazla çözüm üretti) — güçlü çapraz doğrulama. En açıklamalı
+olanı seçildi: ROM'dan sıfırdan yazılmış, %39 yorum oranı, 768/768 byte.
+
+### Asıl düğümün çözümü
+
+Oturum boyunca takıldığım nokta şuydu: ROM 16 baytlık yığın çerçevesi kullanıyor,
+yuvalar 4 bayt aralıklı, ama sp+4 ve sp+8'e **halfword** yazıyor. `u16` skaler
+çerçeveyi 12 bayta düşürüyordu (673 fark), `u32` yazımı word yapıyordu (264).
+
+Cevap: yuvaları **`u16 x[2]` dizisi** yapmak. Dizi BLKmode olduğu için agbcc onu
+bildirim sırasında ve 4 bayta hizalı yerleştiriyor; `x[0] = 0` yine `strh`
+üretiyor ve `(u32)x` adresi tek komutta veriyor. Word yuvası da dizi olmalı —
+skaler bırakılırsa dizilerden sonra yerleşip `sp+0`'ı kaybediyor.
+
+Denenip tutmayanlar: `struct{u16 h; u16 pad;}` (agbcc SImode sayıp `ldr`/`and`/
+`str` üretiyor), tek büyük struct, union, cast'lar.
+
+### Üç yeni kural (20-22)
+
+Ayrıca ölçülmüş bir mekanizma açıklaması: **yığın yerleşimini belirleyen şey
+bildirim sırası değil, tipin BLKmode olup olmadığıdır.** Bir ajan 24 bildirim
+sırası permütasyonu deneyip yerleşimin hiç değişmediğini gösterdi — bu, daha
+önce "bildirim sırası etkisiz" diye kaydettiğim gözlemin *nedenini* veriyor.
+
+### Nihai durum
+
+```
+make matching        21/21 + libc 9/9
+C kaynağı            40 fonksiyon, 40'ı byte-matching
+C'den matching byte  4332/4660  (%92.96)
+kalan assembly       agb_main.s (52 B) + intr_main.s (276 B) = 328 B
+```
+
+**Kalan %7.04 tam olarak o iki dosyadır** (4660 - 4332 = 328). Yani taşınabilir
+her şey taşındı: geriye yalnızca ARM modundaki başlangıç kodu ve IRQ dispatcher
+kaldı, ki bunlar özgün kaynakta da assembly'ydi ve öyle kalacak.
+
+19/19 C dosyası okunabilirlik denetiminden geçiyor.

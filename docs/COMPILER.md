@@ -91,6 +91,13 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 17 | Tek adres için **her biri tek kullanımlı iki ayrı yerel** gerekebilir | Tek işaretçiyi iki yerde kullanmak agbcc'ye hesabı fonksiyon başına kaldırtıyor; ROM'daki `adds r3, r4, #0` ancak iki değişkenle çıkıyor |
 | 18 | Argümanı **ayrı deyimde** yerele okumak argüman kurma sırasını çevirir | `f(480, gSlotCount)` sabiti önce kuruyor; `count = gSlotCount;` ara satırı ROM'un sırasını veriyor |
 | 19 | Döngü öncesi atamaların **kaynak sırası** korunur | agbcc kaynak atamalarını kaynak sırasında, kendi ürettiği sayaç ilklendirmelerini döngü başına bitişik yayıyor; sırayı değiştirmek 13-14 bayt fark bırakıyor |
+| 20 | 4 bayt hizalı ama halfword yazılan yığın yuvası için **`u16 x[2]` dizisi** | Dizi BLKmode olduğu için bildirim sırasında ve 4 bayta hizalı yerleşiyor; `x[0]=0` yine `strh` üretiyor, `(u32)x` adresi tek komutta veriyor. Skaler `u16` çerçeveyi 12 bayta düşürüyor, `u32` yazımı word yapıyor |
+| 21 | Döngü içinde kullanılan **sabit atamaları döngünün içine** yazılır | Döngü önüne yazılırsa agbcc onu kaynak deyimi olarak preheader kopyalarından *önce* yayıyor; içine alınınca döngü-değişmezi taşıyıcısı preheader'ın sonuna koyuyor ve sıra ROM'unkine oturuyor |
+| 22 | Aynı tabanın kopyası değil, **sabitten yeniden atama** yazılır | `b = a;` yazılırsa agbcc iki değişkeni birleştirip tek işaretçiye dönüyor; `b = (T *)ADRES;` ayrı ömür veriyor |
+
+Kural 20'nin arkasındaki mekanizma genellenebilir: **yığın yerleşimini belirleyen
+şey bildirim sırası değil, tipin BLKmode olup olmadığıdır.** Bir agent 24
+bildirim sırası permütasyonu deneyip yerleşimin hiç değişmediğini ölçtü.
 
 **Kuralların birbirine bağlı olduğunu unutma.** 18. kural tek başına
 denendiğinde hiçbir şeyi değiştirmiyordu; ancak 16 ve 17 uygulandıktan sonra

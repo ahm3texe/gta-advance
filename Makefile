@@ -109,15 +109,10 @@ build/bootstrap/init_interrupts.bin: src/bootstrap/init_interrupts.c data/functi
 init-interrupts-match: verify-rom build/bootstrap/init_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x38c build/bootstrap/init_interrupts.bin
 
-build/bootstrap/game_init.o: src/bootstrap/game_init.s
+# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+build/bootstrap/game_init.bin: src/bootstrap/game_init.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
-	@arm-none-eabi-as -mcpu=arm7tdmi -mthumb -o $@ $<
-
-build/bootstrap/game_init.elf: build/bootstrap/game_init.o config/game_init.ld
-	@arm-none-eabi-ld -T config/game_init.ld -o $@ $<
-
-build/bootstrap/game_init.bin: build/bootstrap/game_init.elf
-	@arm-none-eabi-objcopy -O binary --only-section=.text.game_init $< $@
+	@python3 tools/build_c.py $< $@
 
 game-init-match: verify-rom build/bootstrap/game_init.bin
 	@python3 tools/compare_slice.py baserom.gba 0x430 build/bootstrap/game_init.bin

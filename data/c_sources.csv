@@ -1,7 +1,7 @@
 address,name,source,matching
 0x08000220,VBlankIntr,src/interrupt/vblank_intr.c,yes
 0x0800038C,InitInterrupts,src/bootstrap/init_interrupts.c,yes
-0x08000430,GameInit,src/bootstrap/game_init.c,no
+0x08000430,GameInit,src/bootstrap/game_init.c,yes
 0x08000730,NoOpVBlankFinalize,src/interrupt/irq_helpers.c,yes
 0x08000734,DummyIntr,src/interrupt/irq_helpers.c,yes
 0x08000738,RunVBlankTransfers,src/interrupt/irq_helpers.c,yes
