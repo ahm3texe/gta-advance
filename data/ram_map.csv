@@ -14,56 +14,54 @@ address,size,name,source,status,notes
 0x02030340,1,wanted_level_true,libretro_cheat,provisional,
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
-
 0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
-0x02000460,36,gSaveSlotHeaders,decomp,verified,"Three 12-byte save slot headers; byte 0 of each is the validity marker"
-0x02000130,1,gVBlankState,decomp,verified,"Set to 1 before waiting for VBlank; cleared by the VBlank handler"
-0x020004BC,4,gDisplayState,decomp,provisional,"Zeroed during display reset and in GameInit; exact role unconfirmed"
-0x03007FF8,2,gBiosIrqFlags,decomp,verified,"BIOS interrupt check flags (IntrWait); handlers OR their bit here"
-0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems"
-0x020011B0,80,gActiveMenuItems,decomp,verified,"Twenty pointers to the currently visible menu entries"
-0x02001410,4,gMenuFlags,decomp,verified,"Menu flag bitfield tested by IsMenuFlagSet"
-0x02001414,1,gMenuPositionX,decomp,verified,"Menu horizontal position computed by BuildActiveMenuItems"
-0x02010F44,4,gMenuRuntimeState,decomp,provisional,"Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed"
-0x02000E74,4,gAsyncState,decomp,provisional,"Nonzero suppresses the fifth VBlank transfer step; role unconfirmed"
-0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour"
+0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
+0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
+0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
+0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
+0x020011A0,1,gActiveMenuItemCount,decomp,verified,Number of visible menu entries written by BuildActiveMenuItems
+0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
+0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
+0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
+0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
+0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
+0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
-0x03000004,4,gIwramFrameCounter,decomp,provisional,"IWRAM frame counter copied into gFrameDelay then cleared"
-0x04000202,2,gRegIf,decomp,verified,"REG_IF interrupt acknowledge register"
-0x02001210,4,gMenuPaletteSource,decomp,provisional,"Palette data DMA-ed into palette RAM by InitMenuScreen"
+0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
+0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
+0x02001210,4,gMenuPaletteSource,decomp,provisional,Palette data DMA-ed into palette RAM by InitMenuScreen
 0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
 0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
-0x02000170,4,gIrqHandlerTable,decomp,provisional,"Interrupt handler table base used by InitInterrupts and IntrMain"
-0x02000284,4,gActiveIrqSlot,decomp,provisional,"Currently dispatched IRQ slot"
-0x020003E0,4,gFrameReset,decomp,provisional,"Cleared during frame reset"
-0x02000494,4,gLoopState,decomp,provisional,"Main loop state word"
-0x0200049C,4,gOuterState,decomp,provisional,"Outer loop state word"
-0x020004D0,4,gIntrMainEwram,decomp,provisional,"EWRAM copy target of the IRQ dispatcher"
-0x02000CF8,4,gFrameStateSource,decomp,provisional,"Source of the per-frame state copy"
-0x02000D08,4,gVBlankEnabled,decomp,provisional,"Nonzero while VBlank processing is enabled"
-0x02000D50,4,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager"
-0x02000EB4,4,gFrameCounterEwram,decomp,provisional,"EWRAM frame counter"
-0x02000EB8,4,gEepromAvailable,decomp,provisional,"Nonzero when EEPROM was identified; also used as IRQ depth"
-0x02000EBC,4,gPostFrameState,decomp,provisional,"State written after the frame completes"
-0x02000F0C,4,gState1,decomp,provisional,"Unidentified state word"
-0x02000F70,4,gState0,decomp,provisional,"Unidentified state word"
-0x02001050,4,gState2,decomp,provisional,"Unidentified state word"
-0x02001130,4,gState3,decomp,provisional,"Unidentified state word"
-0x02035CA8,4,gFrameCounterLate,decomp,provisional,"Second frame counter referenced by GameInit"
-0x03007E00,4,gSystemStack,decomp,verified,"BIOS system stack pointer area"
-0x03007FA0,4,gIrqStack,decomp,verified,"BIOS IRQ stack pointer area"
-0x03007FFC,4,gIrqVector,decomp,verified,"BIOS IRQ handler vector"
-0x02000D50,160,gSaveData,decomp,provisional,"Same address as gSaveBuffer, viewed as a structure; flag bits live at offset 60"
-0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,"Read by a small getter at 0x08037F1C; role unknown"
-0x0202F310,4,gUnk0202F310,decomp,provisional,"Read by a small getter at 0x08037F28; role unknown"
-0x02028270,4,gUnk02028270,decomp,provisional,"Read by a small getter at 0x08037F34; role unknown"
-0x020282A0,4,gUnk020282A0,decomp,provisional,"Read by a small getter at 0x08037F40; role unknown"
-0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,"Read by a small getter at 0x08037F4C; role unknown"
-0x02028290,4,gUnk02028290,decomp,provisional,"Read by a small getter at 0x08037F58; role unknown"
-0x02028280,4,gUnk02028280,decomp,provisional,"Read by a small getter at 0x08037F64; role unknown"
-0x02035CC0,4,gTableIndex,decomp,provisional,"Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record"
-0x08EC46D4,0,gRecordTable,decomp,provisional,"ROM table of 0x9A8-byte records selected by gTableIndex"
-0x02010C60,32,gUnk02010C60,decomp,provisional,"Byte 26 selects between the two return values of 0x0803C77C"
-0x02000F04,4,gSessionPtr,decomp,provisional,"Pointer used by 0x0803C798; target layout partially known"
-0x020303D0,4,gRecordIndex,decomp,provisional,"Selects a 60-byte record in the table at 0x08CAC248"
-0x08CAC248,0,gRecords,decomp,provisional,"ROM table of 60-byte records indexed by gRecordIndex"
+0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
+0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
+0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
+0x02000494,4,gLoopState,decomp,provisional,Main loop state word
+0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
+0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
+0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
+0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
+0x02000D50,4,gSaveBuffer,decomp,provisional,Working buffer used by the save manager
+0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
+0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
+0x02000EBC,4,gPostFrameState,decomp,provisional,State written after the frame completes
+0x02000F0C,4,gState1,decomp,provisional,Unidentified state word
+0x02000F70,4,gState0,decomp,provisional,Unidentified state word
+0x02001050,4,gState2,decomp,provisional,Unidentified state word
+0x02001130,4,gState3,decomp,provisional,Unidentified state word
+0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
+0x03007E00,4,gSystemStack,decomp,verified,BIOS system stack pointer area
+0x03007FA0,4,gIrqStack,decomp,verified,BIOS IRQ stack pointer area
+0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
+0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,Read by a small getter at 0x08037F1C; role unknown
+0x0202F310,4,gUnk0202F310,decomp,provisional,Read by a small getter at 0x08037F28; role unknown
+0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
+0x020282A0,4,gUnk020282A0,decomp,provisional,Read by a small getter at 0x08037F40; role unknown
+0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
+0x02028290,4,gUnk02028290,decomp,provisional,Read by a small getter at 0x08037F58; role unknown
+0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown
+0x02035CC0,4,gTableIndex,decomp,provisional,Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record
+0x08EC46D4,0,gRecordTable,decomp,provisional,ROM table of 0x9A8-byte records selected by gTableIndex
+0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
+0x02000F04,4,gSessionPtr,decomp,provisional,Pointer used by 0x0803C798; target layout partially known
+0x020303D0,4,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
+0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex

@@ -12,7 +12,7 @@ inşaya mecbur değil.
 ## Kanıt 1 — kod kalıpları
 
 Derleyiciler aynı işi yapmanın birden fazla yolundan hep aynısını seçer.
-Doğrulanmış 42 fonksiyonda (2874 satır assembly):
+İlk 42 doğrulanmış fonksiyonda (o aşamada 2874 satır assembly):
 
 | Kalıp | agbcc | modern GCC/Clang | ROM'da |
 |---|---|---|---|

@@ -13,7 +13,7 @@ Uzun vadeli teknik hedef, kullanıcının yerel `baserom.gba` girdisinden çalı
 | 2. İskelet | Linker script, assembly kaynakları, yeniden derleme | ROM boyutu/yerleşimi | Tamamlandı |
 | 3. Modül analizi | Grafik, giriş, dünya, görev, ses, kayıt alt sistemleri | Belgelenen fonksiyonlar | Devam ediyor; IRQ ve save haritalandı |
 | 4. Matching decomp | C/assembly kaynak ve compiler bayrakları | Matching/toplam fonksiyon ve byte | Devam ediyor; derleyici `old_agbcc` doğrulandı, C'den byte-matching çalışıyor |
-| 5. Doğrulama | Otomatik ROM diff + mGBA testleri | Hash/davranış testleri | ROM diff etkin; dinamik test bekliyor |
+| 5. Doğrulama | Otomatik ROM diff + mGBA testleri | Hash/davranış testleri | `make rom` tam ROM'u yeniden üretip SHA-1 doğruluyor; mGBA davranış testi hâlâ eksik |
 
 ## İlk çalışma oturumu
 

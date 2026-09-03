@@ -9,16 +9,29 @@ Bu depo, kullanıcının kendi sağladığı **Grand Theft Auto Advance Avrupa G
 - ROM doğrulandı: 16 MiB, başlık `GTA ADVANCE`, oyun kodu `BGTP`, sürüm `0`.
 - Avrupa ROM SHA-1: `06230842626da504f92396074f7c655e100f5d44`
 - GBA giriş dalı hedefi: `0x080000C0`.
-- Güncel Ghidra haritası: 1.497 fonksiyon adayı, yaklaşık 290 KiB aday fonksiyon gövdesi.
+- Güncel fonksiyon haritası: 1.503 kayıt (1.497 Ghidra adayı + 6 tanesi eşleştirme sırasında bulundu), yaklaşık 284 KiB aday fonksiyon gövdesi.
 - Byte-matching başlangıç/IRQ kaynakları: `AgbMain`, `IntrMain`, `VBlankIntr`, `InitInterrupts`, dört IRQ yardımcısı, `VCountIntr` ve `ResetDisplayAndInterrupts`.
 - EEPROM/save modülü ve serileştirme yardımcıları `0x0800082C–0x0800114B` boyunca kesintisiz 2336/2336 byte matching'dir; ayrıntı [SAVE_SYSTEM.md](docs/SAVE_SYSTEM.md) içindedir.
 - ROM girişinden ilk UI başlatma fonksiyonunun sonuna kadar `0x080000C0–0x08001457` aralığı kesintisiz 5016/5016 byte yeniden üretilmektedir.
-- Uzak menü yardımcılarıyla birlikte toplam 5340 benzersiz ROM byte ve 42 fonksiyon byte-matching'dir.
-- Ek olarak 448 byte standart kütüphane bölgesi agbcc `libc.a`'ya karşı doğrulanmıştır; toplam doğrulanmış ROM alanı **5788 byte**.
+- **63 fonksiyon byte-matching**; doğrulanmış ROM alanı 26 kaynak bölgesinde 5632 byte, dokuz libc bölgesinde 448 byte — toplam **6080 byte**.
 - **Taşınabilir assembly bitti.** Matching byte'ların **%92.96**'sı okunabilir C'den üretiliyor; kalan 328 byte ARM modundaki `agb_main` ve `intr_main`'dir ve kalıcı olarak assembly kalacaktır.
 - Derleyici `old_agbcc` olarak doğrulandı; yeni kaynaklar doğrudan C ile yazılıyor ve assembly karşılıkları blok tamamlandıkça emekli ediliyor. Ayrıntı [COMPILER.md](docs/COMPILER.md).
 - **Derleyici kimliği çözüldü: agbcc.** ROM'un Nintendo'nun GBA SDK'sıyla gelen GCC 2.8.1 türevi ile derlendiği byte düzeyinde doğrulandı — `ReadU8`, `WriteU8` ve 28 byte'lık `WriteU32LE` doğrudan C'den birebir üretiliyor. Ayrıntı ve kanıt [COMPILER.md](docs/COMPILER.md) içinde. Bu, projenin C'den byte-matching hedefleyebileceği anlamına gelir.
 - Makinede Git, Make, Python 3, Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, ARM GNU araç zinciri 16.2 ve agbcc var.
+
+## Tam ROM yeniden üretimi
+
+```sh
+make rom
+```
+
+Doğrulanmış her bölge kendi kaynağımızdan üretilir, kalan alanlar
+`baserom.gba`'dan kopyalanır ve sonucun SHA-1'i orijinalle karşılaştırılır.
+
+Bu, bölge bölge karşılaştırmadan daha güçlü bir iddiadır: dilim dilim
+kontroller bölge sınırları yanlış tanımlanmış ya da iki bölge çakışmış olsa
+bile geçebilir, tam ROM karşılaştırması geçemez. Üretilen ROM `out/` altına
+yazılır ve Git tarafından yok sayılır.
 
 ## İlk adım
 
