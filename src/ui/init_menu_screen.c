@@ -30,7 +30,7 @@ extern void FUN_0802f55c(void);
 extern void FUN_0800ab6c(void);
 extern void FUN_0803493c(void);
 extern void FUN_08063b98(void);
-extern u8 *FUN_0803c49c(void);
+extern u8 *SelectSlotAB(void);
 extern void FUN_080348b4(u32 resource);
 
 /* 0x080013AC */
@@ -76,7 +76,7 @@ void InitMenuScreen(void)
 
     gIwramFrameCounter = 1;
 
-    entry = FUN_0803c49c();
+    entry = SelectSlotAB();
     if (entry == 0)
         return;
     if (entry[55] == 0)

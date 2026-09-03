@@ -100,3 +100,5 @@ address,size,name,source,status,notes
 0x02030328,4,gRam02030328,decomp,provisional,"0x0806262C icinde sifir kontrolu"
 0x02036328,4,gRam02036328,decomp,provisional,"Ek bayrak; 0x080664C4 kontrolu"
 0x0200048C,4,gRam0200048C,decomp,provisional,"u16 sayac; 0x080664F0 kontrolu"
+0x02001060,4,gRam02001060,decomp,provisional,"Ikincil bir yuva isaretcisi; slot_query.c'nin bagimli sembolu"
+0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"

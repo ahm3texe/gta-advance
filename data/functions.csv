@@ -817,9 +817,9 @@ address,name,size,status,module,notes
 0x0803C37C,FUN_0803c37c,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C400,FUN_0803c400,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C45C,FUN_0803c45c,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C49C,FUN_0803c49c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C4B8,FUN_0803c4b8,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C4D4,FUN_0803c4d4,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C49C,SelectSlotAB,24,matching,world,"Yuva secici; src/world/slot_selectors.c"
+0x0803C4B8,SelectSlotCD,24,matching,world,"Yuva secici; src/world/slot_selectors.c"
+0x0803C4D4,GetSubValue,52,matching,world,"Yuva secici; src/world/slot_selectors.c"
 0x0803C53C,GetUnitSize,6,matching,world,Yuva sorgusu; src/world/slot_query.c
 0x0803C544,GetActiveSlot,26,matching,world,Yuva sorgusu; src/world/slot_query.c
 0x0803C564,GetScaleStep,16,matching,world,Yuva sorgusu; src/world/slot_query.c

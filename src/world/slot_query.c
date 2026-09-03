@@ -5,7 +5,7 @@
  * yapisinin tam hali src/world/slot_config.c'de.
  *
  * Son iki fonksiyon ayni zinciri kuruyor: FUN_0803c400 sonucu
- * FUN_0803c49c'ye veriliyor, donen isaretcinin +80 bayti okunuyor/yaziliyor.
+ * SelectSlotAB'ye veriliyor, donen isaretcinin +80 bayti okunuyor/yaziliyor.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/slot_query.c
@@ -34,7 +34,7 @@ extern SlotValue gRam02001140;      /* ikincil  */
 extern u8        gUnk02010C60[];
 
 extern u32     FUN_0803c400(u32 value);
-extern Target *FUN_0803c49c(u32 value);
+extern Target *SelectSlotAB(u32 value);
 
 /* 0x0803C53C */
 u32 GetUnitSize(void)
@@ -70,7 +70,7 @@ void MarkTarget(u32 value)
 {
     Target *target;
 
-    target = FUN_0803c49c(FUN_0803c400(value));
+    target = SelectSlotAB(FUN_0803c400(value));
     if (target != 0)
         target->mark = MARK_VALUE;
 }
@@ -80,7 +80,7 @@ u32 IsTargetMarked(u32 value)
 {
     Target *target;
 
-    target = FUN_0803c49c(FUN_0803c400(value));
+    target = SelectSlotAB(FUN_0803c400(value));
     if (target == 0)
         return 0;
     if (target->mark != 0)

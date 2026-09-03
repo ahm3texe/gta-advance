@@ -93,6 +93,9 @@ address,name,source,matching
 0x0803C050,ConfigureSlot,src/world/slot_config.c,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,yes
 0x0803C0B4,GetSlotField,src/world/slot_config.c,yes
+0x0803C49C,SelectSlotAB,src/world/slot_selectors.c,yes
+0x0803C4B8,SelectSlotCD,src/world/slot_selectors.c,yes
+0x0803C4D4,GetSubValue,src/world/slot_selectors.c,yes
 0x0803C53C,GetUnitSize,src/world/slot_query.c,yes
 0x0803C544,GetActiveSlot,src/world/slot_query.c,yes
 0x0803C564,GetScaleStep,src/world/slot_query.c,yes
