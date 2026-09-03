@@ -51,6 +51,10 @@ address,name,source,matching
 0x08012908,ListForEach,src/core/linked_list.c,yes
 0x08012924,ListForEachArg,src/core/linked_list.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
+0x08019670,ScaleByMode,src/world/object_state.c,yes
+0x0801969C,ReleaseObjectSlot,src/world/object_state.c,yes
+0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
+0x080196EC,IsObjectReadyB,src/world/object_state.c,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,yes

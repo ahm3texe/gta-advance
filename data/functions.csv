@@ -337,10 +337,10 @@ address,name,size,status,module,notes
 0x08019590,FUN_08019590,94,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080195F4,FUN_080195f4,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019620,FUN_08019620,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019670,FUN_08019670,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801969C,FUN_0801969c,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080196C8,FUN_080196c8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080196EC,FUN_080196ec,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08019670,ScaleByMode,42,matching,world,"Nesne durum sorgusu; src/world/object_state.c"
+0x0801969C,ReleaseObjectSlot,42,matching,world,"Nesne durum sorgusu; src/world/object_state.c"
+0x080196C8,IsObjectReadyA,36,matching,world,"Nesne durum sorgusu; src/world/object_state.c"
+0x080196EC,IsObjectReadyB,36,matching,world,"Nesne durum sorgusu; src/world/object_state.c"
 0x08019710,FUN_08019710,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080197FC,FUN_080197fc,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019800,FUN_08019800,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
