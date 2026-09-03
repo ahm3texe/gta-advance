@@ -45,8 +45,12 @@ address,name,source,matching
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,yes
+0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,yes
+0x0800AADC,SetCoordFlag,src/misc/coord_more.c,yes
 0x0800DBE8,ListPushFront,src/world/list_ops.c,yes
 0x0800DC0C,ListRemove2,src/world/list_ops.c,yes
+0x080127FC,List2Init,src/core/list_ops2.c,yes
+0x08012808,List2PushFront,src/core/list_ops2.c,yes
 0x08012898,ListAppend,src/core/linked_list.c,yes
 0x080128C0,ListRemove,src/core/linked_list.c,yes
 0x080128FC,ListInit,src/core/linked_list.c,yes
@@ -66,6 +70,8 @@ address,name,source,matching
 0x0801969C,ReleaseObjectSlot,src/world/object_state.c,yes
 0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,yes
+0x0801D7DC,SetWindow,src/world/window_config.c,yes
+0x0801D7FC,StoreRam0201AEE8,src/world/window_config.c,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
 0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,yes
 0x08023938,PairIndex,src/world/pair_lookup.c,yes
@@ -159,6 +165,8 @@ address,name,source,matching
 0x0805E6C4,SetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6D4,GetTableIndex,src/misc/table_lookup.c,yes
 0x0805E6E0,GetRecordWord,src/misc/table_lookup.c,yes
+0x08062294,GetModeCategory,src/world/ram_state.c,yes
+0x080622B4,SetRamState,src/world/ram_state.c,yes
 0x08062514,GetRamType,src/world/ram_flags.c,yes
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,no
 0x0806434C,SetFontIndex,src/text/draw_text.c,yes
@@ -182,3 +190,5 @@ address,name,source,matching
 0x08067274,AddDistance,src/world/distance_accum.c,no
 0x08067374,BumpCount7A,src/world/more_counters_2.c,yes
 0x08067390,BumpCount84,src/world/more_counters_2.c,yes
+0x080673C4,BumpCount70,src/world/more_counters_3.c,yes
+0x080673E0,BumpCount80,src/world/more_counters_3.c,yes
