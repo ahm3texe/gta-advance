@@ -1337,16 +1337,16 @@ address,name,size,status,module,notes
 0x080681E0,FUN_080681e0,240,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806891C,FUN_0806891c,3500,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806989C,FUN_0806989c,360,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B84C,FUN_0806b84c,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B850,FUN_0806b850,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B854,FUN_0806b854,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B858,FUN_0806b858,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B85C,FUN_0806b85c,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B860,FUN_0806b860,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B864,FUN_0806b864,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B868,FUN_0806b868,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B880,FUN_0806b880,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806B884,FUN_0806b884,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806B84C,ArcTan2,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B850,CpuFastSet,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B854,CpuSet,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B858,Div,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B85C,LZ77UnCompWram,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B860,RLUnCompVram,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B864,RegisterRamReset,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B868,SoftResetSystem,24,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B880,Sqrt,4,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
+0x0806B884,VBlankIntrWait,6,matching,bios,"BIOS swi thunk; src/bios/syscalls.s (kalici assembly)"
 0x0806B88C,FUN_0806b88c,370,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806BA18,FUN_0806ba18,226,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806BB04,FUN_0806bb04,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
