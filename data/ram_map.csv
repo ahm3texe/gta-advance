@@ -83,3 +83,4 @@ address,size,name,source,status,notes
 0x0300009C,4,gRam0300009C,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
 0x02000498,4,gRam02000498,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
 0x030000A0,4,gRam030000A0,decomp,provisional,"Referenced by FUN_08001A00; role unknown"
+0x02025810,24,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para"
