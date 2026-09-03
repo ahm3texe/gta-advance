@@ -60,6 +60,7 @@ export type FunctionRecord = {
   clusterLabel: string;
   analysisPath?: string;
   analysisCode?: string;
+  sourceCode?: string;
 };
 
 export type DashboardData = {
@@ -93,7 +94,7 @@ const STATUS_META: Record<
   { label: string; color: string; glow: string }
 > = {
   cMatching: { label: "C'den eşleşiyor", color: '#6cff9e', glow: '#1aa757' },
-  matching: { label: 'Assembly eşleşiyor', color: '#19e66f', glow: '#0a7c3d' },
+  matching: { label: 'Assembly eşleşiyor', color: '#4aa8ff', glow: '#1560a8' },
   decompiled: { label: 'Yazıldı, eşleşmedi', color: '#2f9bd6', glow: '#124a6b' },
   documented: { label: 'Belgeli', color: '#f0ae3c', glow: '#7f4d0d' },
   discovered: { label: 'Keşfedildi', color: '#a777ff', glow: '#4c288e' },
@@ -427,9 +428,11 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             </header>
             <div className="inspector-toolbar">
               <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
-              <span>{selected.analysisPath ?? 'Ghidra C çıktısı henüz dışa aktarılmadı'}</span>
+              <span>{selected.sourcePath || selected.analysisPath || 'Ghidra C çıktısı henüz dışa aktarılmadı'}</span>
             </div>
-            {selected.analysisCode ? (
+            {selected.sourceCode ? (
+              <pre><code>{selected.sourceCode}</code></pre>
+            ) : selected.analysisCode ? (
               <pre><code>{selected.analysisCode}</code></pre>
             ) : (
               <div className="no-analysis"><ExternalLink aria-hidden="true" /><h3>Bu fonksiyon henüz açılmadı</h3><p>GBA bir engel değil. Fonksiyon Ghidra’da analiz edilip C çıktısı dışa aktarıldığında kod burada görünecek. Şimdilik adresi ve sınırı otomatik analizden geliyor.</p></div>

@@ -111,6 +111,7 @@ def main() -> None:
     ]
 
     functions = []
+    source_texts: dict[str, str] = {}
     total_code_bytes = 0
     matching_code_bytes = 0
     for row in function_rows:
@@ -136,6 +137,12 @@ def main() -> None:
         export = decompiler_exports.get(start)
         if export:
             function["analysisPath"], function["analysisCode"] = export
+        # Kendi yazdigimiz kaynak: Ghidra ciktisindan farkli ve asil olan bu.
+        source_path = function["sourcePath"]
+        if source_path:
+            function["sourceCode"] = source_texts.setdefault(
+                source_path, (ROOT / source_path).read_text(encoding="utf-8")
+                if (ROOT / source_path).exists() else "")
         functions.append(function)
 
     build_clusters(functions)
