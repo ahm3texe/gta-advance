@@ -138,6 +138,9 @@ address,name,source,matching
 0x080664AC,MaybeReset,src/world/pause_helpers.c,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,no
+0x080671B8,BumpCount6A,src/world/more_counters.c,yes
+0x080671D4,BumpCount68,src/world/more_counters.c,yes
+0x080671F0,BumpCount64,src/world/more_counters.c,yes
 0x08067228,BumpCountB,src/world/stat_counters.c,yes
 0x08067244,BumpCountA,src/world/stat_counters.c,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes

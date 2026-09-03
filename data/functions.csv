@@ -1278,9 +1278,9 @@ address,name,size,status,module,notes
 0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08067014,FUN_08067014,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08067184,FUN_08067184,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080671B8,FUN_080671b8,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080671D4,FUN_080671d4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080671F0,FUN_080671f0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080671B8,BumpCount6A,22,matching,world,"Ek sayac; src/world/more_counters.c"
+0x080671D4,BumpCount68,22,matching,world,"Ek sayac; src/world/more_counters.c"
+0x080671F0,BumpCount64,22,matching,world,"Ek sayac; src/world/more_counters.c"
 0x08067228,BumpCountB,22,matching,world,Istatistik sayaci; src/world/stat_counters.c
 0x08067244,BumpCountA,22,matching,world,Istatistik sayaci; src/world/stat_counters.c
 0x08067260,ResetDistanceAccum,16,matching,world,Istatistik sayaci; src/world/stat_counters.c
