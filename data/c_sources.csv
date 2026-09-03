@@ -65,6 +65,10 @@ address,name,source,matching
 0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
+0x08023A0C,ApplyThreshold,src/world/threshold.c,yes
+0x08023A40,ResetMeter,src/world/threshold.c,yes
+0x08023A4C,SetToMax,src/world/threshold.c,yes
+0x08023A58,ReloadMeter,src/world/threshold.c,yes
 0x08028C48,IsEntryActive,src/world/table_entries.c,yes
 0x08028C68,ReleaseEntry,src/world/table_entries.c,yes
 0x08028CA8,ClearEntry,src/world/table_entries.c,yes
@@ -113,6 +117,10 @@ address,name,source,matching
 0x0803C790,ReturnOne,src/misc/session_reset.c,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,yes
 0x0803C798,ResetSessionNode,src/misc/session_node.c,yes
+0x0803F630,InitState,src/world/state_init.c,yes
+0x0803F64C,StateNoop,src/world/state_init.c,yes
+0x0803F650,RunState,src/world/state_init.c,yes
+0x0803F65C,UpdateState,src/world/state_init.c,yes
 0x0803F6F8,SetActorEngage,src/world/actor_states.c,yes
 0x0803F714,SetActorActive,src/world/actor_states.c,yes
 0x0803F74C,SetActorIdle,src/world/actor_states.c,yes
@@ -150,7 +158,3 @@ address,name,source,matching
 0x08067244,BumpCountA,src/world/stat_counters.c,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
 0x08067274,AddDistance,src/world/distance_accum.c,no
-0x08023A0C,ApplyThreshold,src/world/threshold.c,yes
-0x08023A40,ResetMeter,src/world/threshold.c,yes
-0x08023A4C,SetToMax,src/world/threshold.c,yes
-0x08023A58,ReloadMeter,src/world/threshold.c,yes

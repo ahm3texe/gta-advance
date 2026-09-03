@@ -865,10 +865,10 @@ address,name,size,status,module,notes
 0x0803F0E8,FUN_0803f0e8,624,candidate,world,Ghidra kacirmisti; 0x0803F6xx durum ayarlayicilarinin isleyici hedefi
 0x0803F35C,FUN_0803f35c,350,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803F4BC,FUN_0803f4bc,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803F630,FUN_0803f630,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803F64C,FUN_0803f64c,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803F650,FUN_0803f650,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803F65C,FUN_0803f65c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803F630,InitState,26,matching,world,"Durum kurulumu; src/world/state_init.c"
+0x0803F64C,StateNoop,2,matching,world,"Durum kurulumu; src/world/state_init.c"
+0x0803F650,RunState,12,matching,world,"Durum kurulumu; src/world/state_init.c"
+0x0803F65C,UpdateState,32,matching,world,"Durum kurulumu; src/world/state_init.c"
 0x0803F69C,FUN_0803f69c,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803F6F8,SetActorEngage,24,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c
 0x0803F714,SetActorActive,50,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c
