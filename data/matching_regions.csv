@@ -23,6 +23,7 @@ start,end,binary,module,notes
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
 0x08012898,0x08012944,build/core/linked_list.bin,core,"Cift bagli liste: ekle, cikar, ilklendir, iki dolasim"
+0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors

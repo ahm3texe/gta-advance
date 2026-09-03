@@ -312,12 +312,12 @@ address,name,size,status,module,notes
 0x08019090,FUN_08019090,450,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019320,FUN_08019320,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080193C4,FUN_080193c4,138,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019450,FUN_08019450,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019464,FUN_08019464,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019490,FUN_08019490,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080194B4,FUN_080194b4,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080194F4,FUN_080194f4,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019510,FUN_08019510,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08019450,IsActorMarked,20,matching,world,"Varlik denetimi; src/world/actor_control.c"
+0x08019464,NotifyActor,44,matching,world,"Varlik denetimi; src/world/actor_control.c"
+0x08019490,ReleaseActorRefs,34,matching,world,"Varlik denetimi; src/world/actor_control.c"
+0x080194B4,ResolveActorExtra,64,matching,world,"Varlik denetimi; src/world/actor_control.c"
+0x080194F4,ActivateActor,28,matching,world,"Varlik denetimi; src/world/actor_control.c"
+0x08019510,IsActorBusy,26,matching,world,"Varlik denetimi; src/world/actor_control.c"
 0x0801952C,FUN_0801952c,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019590,FUN_08019590,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080195F4,FUN_080195f4,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

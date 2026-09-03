@@ -51,6 +51,12 @@ address,name,source,matching
 0x08012908,ListForEach,src/core/linked_list.c,yes
 0x08012924,ListForEachArg,src/core/linked_list.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
+0x08019450,IsActorMarked,src/world/actor_control.c,yes
+0x08019464,NotifyActor,src/world/actor_control.c,yes
+0x08019490,ReleaseActorRefs,src/world/actor_control.c,yes
+0x080194B4,ResolveActorExtra,src/world/actor_control.c,yes
+0x080194F4,ActivateActor,src/world/actor_control.c,yes
+0x08019510,IsActorBusy,src/world/actor_control.c,yes
 0x08019670,ScaleByMode,src/world/object_state.c,yes
 0x0801969C,ReleaseObjectSlot,src/world/object_state.c,yes
 0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
