@@ -5,7 +5,7 @@
  *
  * Donanimi ayaga kaldirir (WAITCNT, EWRAM/IWRAM/VRAM/OAM temizleme, kesmeler),
  * sonra iki ic ice sonsuz dongu calistirir: dis dongu bir oturumu kurar, ic
- * dongu her kareyi isler. Ic dongu gLoopState 1 olunca ya da FUN_080664c4
+ * dongu her kareyi isler. Ic dongu gLoopState 1 olunca ya da IsSessionActive
  * sifirdan farkli donunce biter; ardindan ekran sifirlanip dis dongu bastan
  * baslar.
  *
@@ -110,7 +110,7 @@ extern void FUN_080337a8(void);
 extern void FUN_0803004c(void);
 extern void FUN_0805b1c0(s32 arg);
 extern void FUN_08008108(void);
-extern s32  FUN_080664c4(void);          /* sifirdan farkli ise dongu biter */
+extern s32  IsSessionActive(void);          /* sifirdan farkli ise dongu biter */
 extern void FUN_08013824(void);
 extern void FUN_08012248(void);
 extern void FUN_08012198(void);
@@ -306,9 +306,9 @@ void GameInit(void)
             *(vu16 *)REG_IME_ADDR = 0;
             FUN_080337a8();
             first = 0;
-        } while (gLoopState != 1 && FUN_080664c4() == 0);
+        } while (gLoopState != 1 && IsSessionActive() == 0);
 
-        if (FUN_080664c4() != 0)
+        if (IsSessionActive() != 0)
             pending = 1;
 
         /* gGameState[12] 1 veya 2 ise sifirlanir (u8 kirpmasi ROM'daki

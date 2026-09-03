@@ -128,11 +128,11 @@ address,name,source,matching
 0x080644E4,GetGlyphWidth,src/text/draw_text.c,yes
 0x08064524,GetTextWidth,src/text/draw_text.c,yes
 0x08064590,ClearTextArea,src/text/clear_text_area.c,no
-0x08067228,BumpCountB,src/world/stat_counters.c,yes
-0x08067244,BumpCountA,src/world/stat_counters.c,yes
-0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
-0x08067274,AddDistance,src/world/distance_accum.c,no
 0x080664A4,GetBaseValue,src/world/pause_helpers.c,yes
 0x080664AC,MaybeReset,src/world/pause_helpers.c,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,no
+0x08067228,BumpCountB,src/world/stat_counters.c,yes
+0x08067244,BumpCountA,src/world/stat_counters.c,yes
+0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
+0x08067274,AddDistance,src/world/distance_accum.c,no

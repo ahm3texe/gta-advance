@@ -141,7 +141,7 @@ extern void  FUN_08031e44(void);
 extern void  FUN_080081d4(int mode);
 extern void  FUN_08030b34(void);
 extern void  FUN_08030b1c(int amount);
-extern u32   FUN_080664c4(void);
+extern u32   IsSessionActive(void);
 extern void  FUN_08004f74(int which);
 
 /* 0x08001458 */
@@ -299,7 +299,7 @@ void RunMenuScreen(int mode)
     redraw = 0;
     savedSel = 0;
 
-    while (running != 0 && FUN_080664c4() == 0) {
+    while (running != 0 && IsSessionActive() == 0) {
         FUN_0800ab60();
         REG_DISPCNT = MENU_DISPCNT;
 
