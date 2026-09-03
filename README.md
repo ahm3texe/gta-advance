@@ -14,7 +14,9 @@ Bu depo, kullanıcının kendi sağladığı **Grand Theft Auto Advance Avrupa G
 - EEPROM/save modülü ve serileştirme yardımcıları `0x0800082C–0x0800114B` boyunca kesintisiz 2336/2336 byte matching'dir; ayrıntı [SAVE_SYSTEM.md](docs/SAVE_SYSTEM.md) içindedir.
 - ROM girişinden ilk UI başlatma fonksiyonunun sonuna kadar `0x080000C0–0x08001457` aralığı kesintisiz 5016/5016 byte yeniden üretilmektedir.
 - Uzak menü yardımcılarıyla birlikte toplam 5340 benzersiz ROM byte ve 42 fonksiyon byte-matching'dir.
-- Mevcut matching kaynaklar okunabilir ARM/Thumb assembly'dir. Ghidra'nın C çıktıları analiz yardımcısıdır; compiler parmak izi netleştikçe uygun parçalar gerçek C'ye taşınacaktır.
+- Ek olarak 448 byte standart kütüphane bölgesi agbcc `libc.a`'ya karşı doğrulanmıştır; toplam doğrulanmış ROM alanı **5788 byte**.
+- Kaynağın C'ye taşınması sürüyor: matching byte'ların **%25.5**'i artık okunabilir C'den üretiliyor, kalanı hâlâ assembly.
+- Derleyici `old_agbcc` olarak doğrulandı; yeni kaynaklar doğrudan C ile yazılıyor ve assembly karşılıkları blok tamamlandıkça emekli ediliyor. Ayrıntı [COMPILER.md](docs/COMPILER.md).
 - **Derleyici kimliği çözüldü: agbcc.** ROM'un Nintendo'nun GBA SDK'sıyla gelen GCC 2.8.1 türevi ile derlendiği byte düzeyinde doğrulandı — `ReadU8`, `WriteU8` ve 28 byte'lık `WriteU32LE` doğrudan C'den birebir üretiliyor. Ayrıntı ve kanıt [COMPILER.md](docs/COMPILER.md) içinde. Bu, projenin C'den byte-matching hedefleyebileceği anlamına gelir.
 - Makinede Git, Make, Python 3, Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, ARM GNU araç zinciri 16.2 ve agbcc var.
 

@@ -375,3 +375,54 @@ geçerli build kaynağı olarak kalıyor.
 - Emekli assembly dosyası: 8
 - C kaynağı: 28 fonksiyon, 27'si byte-matching
 - Matching byte'ların **%29.06**'sı C'den
+
+## 2026-09-03 (gece) — Doğrulanmış ROM alanı büyüdü
+
+Bu oturumda ilk kez **yeni ROM alanı doğrulandı** — şimdiye kadarki iş zaten
+eşleşen bölgeleri assembly'den C'ye taşımaktı; kapsam artmıyordu.
+
+### libc bölgeleri build'e bağlandı
+
+ROM'un agbcc newlib'ine linklendiği daha önce tespit edilmişti ama bu yalnızca
+bir tarama sonucuydu. Artık `data/libc_regions.csv` + `make libc-verify` ile
+her giriş `libc.a`'dan çıkarılıp ROM ile karşılaştırılıyor ve `make matching`
+bunu otomatik çalıştırıyor.
+
+**9/9 parça, 448 byte.** Doğrulanmış toplam ROM alanı 5340 → **5788 byte**.
+
+Bunlar tersine mühendislik ürünü değil; kaynağı elimizde olan kütüphane
+kodunun ROM'daki byte'larla aynı olduğunun kanıtı.
+
+### Yerleşim argümanı
+
+`_exit` ve `_kill` gövdeleri birebir aynı olduğu için byte karşılaştırması
+hangisinin nerede olduğunu söyleyemiyordu. Çözüm byte'larda değil yerleşimde:
+bu gövdeden ROM'da **tam iki adet** var ve araları 32 byte — `syscalls.o`
+içindeki mesafenin aynısı (`_exit` ofset 892, `_kill` 924). İkili ancak bu
+sırayla yerleşebilir.
+
+Aynı gövdeli sembol çiftleri için genellenebilir bir yöntem. `toupper` /
+`_toupper` çiftine uygulanamadı: ikisi de yer değiştirme içeriyor, bu yüzden
+ROM'da düz byte araması sıfır sonuç veriyor. O çift belirsiz kalıyor.
+
+### game_init taslağı
+
+En büyük blok (768 byte). Kontrol akışı tam çıkarıldı ve fonksiyonun baş kısmı
+birebir eşleşiyor; 772 baytın ~508'i tutuyor.
+
+Ölçülen: yığın değişkeni tipi büyük fark yaratıyor — `u16` kaynaklar 673 fark,
+`volatile u16` 590, **`u32` 264**, `u16` dizi 304, union `.half` 739,
+`u32` yuva + cast yazım 739. ROM'un 16 baytlık yığın çerçevesi `u32`'lerle
+yakalandı.
+
+Kalan bilinen sapma: ROM DMA kaynağına halfword yazıyor (`strh`), bizimki
+word (`str`). Yuva 4 byte aralıklı olmalı ama yazım 16 bit — denenen beş biçim
+bu ikisini aynı anda vermedi.
+
+### Paralel çalışma altyapısı
+
+Ultracode ile 12 ajanlık workflow başlatıldı. Öncesinde üç yarış koşulu
+kapatıldı: `diff_function.py`'nin paylaşılan geçici dosyası çağrıya özel
+yapıldı, kalan assembly'de geçen 20 RAM adresi `ram_map.csv`'ye tek seferde
+eklendi (ajanlar o dosyaya yazmıyor), ve ajanlara `make` tamamen yasaklandı.
+Emeklilik kararı ve son doğrulama ana süreçte kalıyor.
