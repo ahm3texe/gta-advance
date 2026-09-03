@@ -6,8 +6,14 @@ eksik oldugu kanitlandi: havuzdaki isleyici isaretcilerini cozerken elle
 bes fonksiyon bulundu (0x0803DEA8, 0x0803E280, 0x0803F0E8, 0x080397EC...).
 Bu arac ayni isi sistematik yapar.
 
-YONTEM: bilinen fonksiyonlarin arasindaki bosluklarda Thumb prologu
-(`push {..., lr}`) arar, sonra audit_boundaries yurutucusuyle govdeyi
+IKI YONTEM:
+
+A) CAGRI HEDEFI (kesin). Bilinen kodun icindeki her `bl` komutunun
+   hedefi tanim geregi bir fonksiyon girisidir. Yanlis pozitif olamaz.
+   Prolog desenine bakmaya gerek yok -- yaprak fonksiyonlar da bulunur.
+
+B) PROLOG DESENI (olasi). Bosluklarda Thumb prologu
+   (`push {..., lr}`) arar, sonra audit_boundaries yurutucusuyle govdeyi
 cikarir. Dort siki kosul:
   1. govde 8-4096 bayt ve cozulemeyen dolayli atlama yok
   2. govde bosluktan tasmiyor (bilinen fonksiyona girmiyor)
@@ -55,7 +61,43 @@ def main() -> None:
         off = addr - ROM_BASE
         return int.from_bytes(rom[off:off + 2], "little")
 
-    found = []
+    covered = set()
+    for address, size in known:
+        covered.update(range(address, address + size))
+    known_starts = {address for address, _ in known}
+
+    # A) Cagri hedefleri: kesin fonksiyon girisleri.
+    call_targets = set()
+    for address, size in known:
+        base = address - ROM_BASE
+        for i in range(0, max(0, size - 2), 2):
+            hw1 = int.from_bytes(rom[base + i:base + i + 2], "little")
+            hw2 = int.from_bytes(rom[base + i + 2:base + i + 4], "little")
+            if (hw1 & 0xF800) == 0xF000 and (hw2 & 0xF800) == 0xF800:
+                offset = hw1 & 0x7FF
+                if offset & 0x400:
+                    offset -= 0x800
+                dest = address + i + 4 + (offset << 12) + ((hw2 & 0x7FF) << 1)
+                if ROM_BASE <= dest < ROM_BASE + len(rom):
+                    call_targets.add(dest)
+
+    from_calls = []
+    inside_known = []
+    for target in sorted(call_targets):
+        if target in known_starts:
+            continue
+        if target in covered:
+            inside_known.append(target)      # sinir hatasi isareti
+            continue
+        if in_arm_range(target) or target in ARM_FUNCTIONS:
+            continue
+        walker = Walker(rom, target)
+        walker.run()
+        size = walker.code_extent()
+        if MIN_SIZE <= size <= MAX_SIZE and not walker.unresolved:
+            from_calls.append((target, size))
+
+    found = list(from_calls)
     for gap_start, gap_end in gaps:
         addr = (gap_start + 1) & ~1
         while addr + 2 <= gap_end:
@@ -87,7 +129,14 @@ def main() -> None:
 
     total = sum(size for _, size in unique)
     print(f"Bosluk: {len(gaps)} adet")
-    print(f"Bulunan fonksiyon: {len(unique)}, toplam {total} bayt\n")
+    print(f"A) Cagri hedefinden kesin: {len(from_calls)} fonksiyon")
+    print(f"B) Prolog deseninden olasi: {len(unique) - len(from_calls)} fonksiyon")
+    print(f"Toplam: {len(unique)} fonksiyon, {total} bayt")
+    if inside_known:
+        print(f"\nUYARI: {len(inside_known)} `bl` hedefi bilinen bir fonksiyonun "
+              f"ICINE dusuyor -- o fonksiyonlarin siniri yanlis olabilir.")
+        print("  Ornek: " + ", ".join(f"0x{t:08X}" for t in inside_known[:6]))
+    print()
     print(f"{'adres':12} {'bayt':>6}")
     print("-" * 20)
     for addr, size in sorted(unique, key=lambda f: -f[1])[:15]:
@@ -101,8 +150,10 @@ def main() -> None:
         rows.append({
             "address": f"0x{addr:08X}", "name": f"FUN_{addr:08x}",
             "size": str(size), "status": "discovered", "module": "unknown",
-            "notes": "Ghidra kacirmisti; tools/discover_functions.py ile "
-                     "bulundu, govdesi henuz incelenmedi",
+            "notes": ("Ghidra kacirmisti; tools/discover_functions.py "
+                      + ("cagri hedefi (kesin)" if (addr, size) in from_calls
+                         else "prolog deseni (olasi)")
+                      + ", govdesi henuz incelenmedi"),
         })
     rows.sort(key=lambda r: int(r["address"], 16))
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:
