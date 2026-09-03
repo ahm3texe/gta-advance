@@ -165,3 +165,5 @@ address,name,source,matching
 0x08067274,AddDistance,src/world/distance_accum.c,no
 0x0800DBE8,ListPushFront,src/world/list_ops.c,yes
 0x0800DC0C,ListRemove2,src/world/list_ops.c,yes
+0x08042058,GetTileFieldA,src/world/map_tile_fields.c,yes
+0x08042088,GetTileType,src/world/map_tile_fields.c,yes

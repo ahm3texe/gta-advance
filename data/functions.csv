@@ -906,8 +906,8 @@ address,name,size,status,module,notes
 0x08041EF8,FUN_08041ef8,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08041F30,FUN_08041f30,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08041F8C,FUN_08041f8c,126,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08042058,FUN_08042058,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08042088,FUN_08042088,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08042058,GetTileFieldA,44,matching,world,"Karo alan getirici; src/world/map_tile_fields.c"
+0x08042088,GetTileType,40,matching,world,"Karo alan getirici; src/world/map_tile_fields.c"
 0x080420F8,FUN_080420f8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08042144,FUN_08042144,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08042434,IsTileTypeInRange,60,matching,world,"Karo turu sorgusu; Ghidra 56 bayt saymisti, havuz kelimesi govdenin icinde"
