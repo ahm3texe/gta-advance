@@ -51,7 +51,11 @@ def main() -> int:
     counts = Counter(row["status"] for row in rows)
     total = len(rows)
     candidates = counts["candidate"]
-    verified = total - candidates
+    # `discovered` = yalnizca prolog deseniyle bulundu, GOVDESI INCELENMEDI.
+    # Bunu insan dogrulamasiyla ayni kefeye koymak sayiyi sisiriyordu
+    # (773/1988 gorunuyordu; gercek insan dogrulamasi 245).
+    discovered = counts["discovered"]
+    verified = total - candidates - discovered
     documented = counts["documented"] + counts["decompiled"] + counts["matching"]
     decompiled = counts["decompiled"] + counts["matching"]
 
@@ -69,8 +73,8 @@ def main() -> int:
         if row["status"] == "matching":
             matching_bytes += size
 
-    print(f"Ghidra fonksiyon adayı: {total}")
-    print(f"Doğrulanan fonksiyon:   {verified}/{total} ({percent(verified)})")
+    print(f"Fonksiyon haritası:       {total}")
+    print(f"İncelenmiş fonksiyon:   {verified}/{total} ({percent(verified)})")
     print(f"Belgelenen:           {documented}/{total} ({percent(documented)})")
     print(f"Kaynaklaştırılan:     {decompiled}/{total} ({percent(decompiled)})")
     print(f"Byte-matching:        {counts['matching']}/{total} ({percent(counts['matching'])})")

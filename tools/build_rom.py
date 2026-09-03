@@ -95,7 +95,7 @@ def main() -> None:
     print(f"beklenen SHA-1: {expected}")
     print(f"uretilen SHA-1: {built}")
     if built == expected:
-        print(f"{GREEN}ROM YENIDEN URETILDI: hash birebir ayni.{RESET}  -> {out}")
+        print(f"{GREEN}HASH BIREBIR AYNI{RESET} — dogrulanmis {covered} byte kendi\n  kaynagimizdan doğru yere oturuyor. Kalan {len(original) - covered} byte\n  baserom.gba'dan kopyalandi, yani bu TAM ROM'un kaynaktan uretildigi\n  anlamina GELMEZ; hibrit butunlestirme sinamasidir.  -> {out}")
         return
     diff = sum(1 for a, b in zip(image, original) if a != b)
     print(f"{RED}HASH TUTMUYOR: {diff} byte farkli.{RESET}")

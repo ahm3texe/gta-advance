@@ -49,6 +49,7 @@ scan-libc: verify-rom
 # Commit oncesi tek komut: her seyi dogrular.
 check: rom
 	@python3 tools/check_consistency.py
+	@python3 tools/audit_boundaries.py
 	@python3 tools/scan_c_sources.py
 	@python3 tools/review_c_source.py
 	@python3 tools/progress.py

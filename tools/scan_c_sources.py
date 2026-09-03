@@ -26,12 +26,18 @@ def main() -> None:
     rom = rom_bytes()
     rows = function_rows()
     records = []
+    failures = []
 
     for source in sorted(SOURCES.rglob("*.c")):
         try:
             blob, layout, _ = compile_and_link(source, DEFAULT_CC)
         except SystemExit as error:
-            print(f"{source}: {error}", file=sys.stderr)
+            # Derlenemeyen kaynagi ATLAMAK, o dosyanin fonksiyonlarini
+            # c_sources.csv'den sessizce silip komutu yine de basarili
+            # gostermek demekti: bozuk bir C dosyasi varken `make check`
+            # yesil kaliyordu. Artik toplayip sonunda basarisiz cikiyoruz
+            # ve CSV'nin USTUNE YAZMIYORUZ.
+            failures.append((source, error))
             continue
         relative = source.relative_to(ROOT)
         for name, (offset, size) in sorted(layout.items(), key=lambda kv: kv[1][0]):
@@ -44,6 +50,13 @@ def main() -> None:
                 "source": str(relative),
                 "matching": "yes" if matched else "no",
             })
+
+    if failures:
+        print(f"\nDURDU: {len(failures)} kaynak derlenemedi; "
+              f"{OUTPUT.relative_to(ROOT)} DEGISTIRILMEDI.", file=sys.stderr)
+        for source, error in failures:
+            print(f"  {source.relative_to(ROOT)}: {error}", file=sys.stderr)
+        sys.exit(1)
 
     records.sort(key=lambda r: int(r["address"], 16))
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
