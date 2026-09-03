@@ -9,11 +9,23 @@
  *     ROM  : ldr r0, [r4, #8]
  *     bizim: ldr r3, [r4, #8]
  * Deger atiliyor, yani semantik fark yok -- saf register dagitimi.
+ * NEDENI OLCULDU (docs/COMPILER.md, register dagitimi): iki okuma da ciplak
+ * birakilinca control r4'e, dma r3'e dusuyor -- ROM'un tersi, 13 bayt. Ciplak
+ * okuma dogru hedefi (r0) veriyor ama control'un 6. referansini goturuyor ve
+ * dagitim siralamasi ters donuyor. Ikisi ayni anda saglanamiyor.
+ *
  * Denenenler (hepsi daha kotu): ayri discard degiskeni 13, ciplak deyim 13,
  * ikisini de control'a atamak 24, olu okumayi row'a 13 / col'a 20 /
  * dest'e 13 / fill'e 57 / ime'ye 56, ilk bloktaki okumayi degistirmek 63-103.
  * Yedi yerel degiskenin 5040 bildirim permutasyonu tarandi: hicbiri 1'in
- * altina inmedi.
+ * altina inmedi. Ek olarak elenenler:
+ *   - height'i control olarak yeniden kullanmak (ROM'daki `add r3,r2,#0`
+ *     ipucundan): 15
+ *   - dma tanimini one almak, dagitici omrunu uzatip onceligini dusursun diye:
+ *     tanim noktasina gore 13 / 17 / 56 / 64 -- sabit yuklemesi yazildigi
+ *     yerde maddelestigi icin komut sirasi kayiyor, kazanc yok
+ *   - DMA kurulumunu iki kez cagrilan inline yardimciya almak: 55-59
+ * Bu bicim olculmus yerel optimum.
  *
  * NOT: bir ajan `register volatile DmaChannel *dma asm("r4");` ile 0 bayta
  * ulasti. Bu KABUL EDILMEDI (docs/WORKFLOW.md 6): acik register baglamasi
