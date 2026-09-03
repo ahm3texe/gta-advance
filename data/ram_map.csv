@@ -93,3 +93,6 @@ address,size,name,source,status,notes
 0x020272C8,4,gRam020272C8,decomp,provisional,"Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor"
 0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
 0x02026E80,4,gRam02026E80,decomp,provisional,"0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok"
+0x020251EC,2960,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri"
+0x02025280,2960,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime"
+0x020246F0,2960,gRam020246F0,decomp,provisional,"20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor"

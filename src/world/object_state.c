@@ -38,7 +38,7 @@ typedef struct Obj {
 
 extern s32  FUN_08038084(Obj *o);
 extern u32  FUN_08025fc0(Obj *o, int kind);
-extern void FUN_08028ca8(u8 slot);
+extern u32 ClearEntry(u32 idx);   /* 0x08028CA8 */
 extern u32  FUN_0805af48(Obj *o);
 extern u32  FUN_0805aefc(Obj *o);
 
@@ -68,7 +68,7 @@ void ReleaseObjectSlot(Obj *o)
     if (FUN_08025fc0(o, QUERY_KIND) == 0)
         return;
 
-    FUN_08028ca8(o->sub->slot);
+    ClearEntry(o->sub->slot);
     o->sub->slot = SLOT_UNSET;
 }
 

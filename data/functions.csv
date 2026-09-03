@@ -463,9 +463,9 @@ address,name,size,status,module,notes
 0x080289B8,FUN_080289b8,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080289BC,FUN_080289bc,204,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08028A88,FUN_08028a88,162,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028C48,FUN_08028c48,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028C68,FUN_08028c68,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028CA8,FUN_08028ca8,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08028C48,IsEntryActive,32,matching,world,"Tablo girdisi; src/world/table_entries.c"
+0x08028C68,ReleaseEntry,64,matching,world,"Tablo girdisi; src/world/table_entries.c"
+0x08028CA8,ClearEntry,64,matching,world,"Tablo girdisi; src/world/table_entries.c"
 0x08028CE8,FUN_08028ce8,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08028D44,FUN_08028d44,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08028DC4,FUN_08028dc4,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

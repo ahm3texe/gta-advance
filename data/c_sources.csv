@@ -62,6 +62,9 @@ address,name,source,matching
 0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
+0x08028C48,IsEntryActive,src/world/table_entries.c,yes
+0x08028C68,ReleaseEntry,src/world/table_entries.c,yes
+0x08028CA8,ClearEntry,src/world/table_entries.c,yes
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,yes
 0x08030C80,SetAreaFlag,src/world/area_flags.c,yes
 0x08030CB0,AreaFlagsNoop,src/world/area_flags.c,yes
