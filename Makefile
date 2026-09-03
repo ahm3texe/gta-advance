@@ -348,5 +348,12 @@ bios-match: verify-rom build/bios/syscalls.bin
 	@python3 tools/compare_slice.py baserom.gba 0x6b84c build/bios/syscalls.bin
 
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match
+build/misc/coord_accessors.bin: src/misc/coord_accessors.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-coord-accessors-match: verify-rom build/misc/coord_accessors.bin
+	@python3 tools/compare_slice.py baserom.gba 0xa94c build/misc/coord_accessors.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match
 	@python3 tools/verify_matching_regions.py

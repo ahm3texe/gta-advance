@@ -41,6 +41,10 @@ address,name,source,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,yes
+0x0800A94C,SetCoordUnk48,src/misc/coord_accessors.c,yes
+0x0800A958,GetCoordPair,src/misc/coord_accessors.c,yes
+0x0800A968,SetCoordPair,src/misc/coord_accessors.c,yes
+0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,yes
 0x080154D8,InitActor,src/world/actor_init.c,no
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,yes

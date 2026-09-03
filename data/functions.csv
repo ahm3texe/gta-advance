@@ -127,10 +127,10 @@ address,name,size,status,module,notes
 0x0800A4E0,FUN_0800a4e0,816,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800A8A8,FUN_0800a8a8,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800A930,FUN_0800a930,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800A94C,FUN_0800a94c,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800A958,FUN_0800a958,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800A968,FUN_0800a968,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800A974,FUN_0800a974,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0800A94C,SetCoordUnk48,6,matching,misc,"Koordinat erisimcisi; src/misc/coord_accessors.c"
+0x0800A958,GetCoordPair,12,matching,misc,"Koordinat erisimcisi; src/misc/coord_accessors.c"
+0x0800A968,SetCoordPair,8,matching,misc,"Koordinat erisimcisi; src/misc/coord_accessors.c"
+0x0800A974,ClearCoordFlag,8,matching,misc,"Koordinat erisimcisi; src/misc/coord_accessors.c"
 0x0800A980,FUN_0800a980,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800A9E4,FUN_0800a9e4,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800AAD0,FUN_0800aad0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
