@@ -41,6 +41,7 @@ address,name,source,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,yes
+0x080154D8,InitActor,src/world/actor_init.c,no
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,yes
 0x080320A4,GetEntityUnk0C,src/world/entity_accessors.c,yes

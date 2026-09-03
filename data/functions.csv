@@ -306,7 +306,7 @@ address,name,size,status,module,notes
 0x0801515C,FUN_0801515c,94,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080151C0,FUN_080151c0,114,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801528C,FUN_0801528c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080154D8,FUN_080154d8,184,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080154D8,InitActor,184,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08015598,FUN_08015598,506,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080157B8,FUN_080157b8,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08015834,FUN_08015834,336,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
