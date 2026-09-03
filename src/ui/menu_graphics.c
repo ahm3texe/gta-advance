@@ -7,21 +7,9 @@
  * Dogrulama:  make c-match FILE=src/ui/menu_graphics.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
 
-#define REG_IME     (*(volatile u16 *)0x04000208)
-#define REG_DMA3    (*(volatile DmaChannel *)0x040000D4)
-#define REG_DISPCNT (*(u16 *)0x04000000)
-
-#define VRAM_BASE   0x06000000
 
 #define MENU_TILES_A   ((const void *)0x08831880)
 #define MENU_TILES_B   ((const void *)0x0883F880)

@@ -4,8 +4,7 @@
  * Dogrulama:  make c-match FILE=src/ui/build_active_menu_items.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
+#include "gba_types.h"
 
 #define ACTIVE_MENU_ITEM_MAX 20
 

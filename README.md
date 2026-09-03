@@ -19,6 +19,22 @@ Bu depo, kullanıcının kendi sağladığı **Grand Theft Auto Advance Avrupa G
 - **Derleyici kimliği çözüldü: agbcc.** ROM'un Nintendo'nun GBA SDK'sıyla gelen GCC 2.8.1 türevi ile derlendiği byte düzeyinde doğrulandı — `ReadU8`, `WriteU8` ve 28 byte'lık `WriteU32LE` doğrudan C'den birebir üretiliyor. Ayrıntı ve kanıt [COMPILER.md](docs/COMPILER.md) içinde. Bu, projenin C'den byte-matching hedefleyebileceği anlamına gelir.
 - Makinede Git, Make, Python 3, Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, ARM GNU araç zinciri 16.2 ve agbcc var.
 
+## Çalışma kuralları
+
+Süreç ve kurallar [WORKFLOW.md](docs/WORKFLOW.md) içindedir: hedef seçimi,
+fonksiyon döngüsü, dosya/sembol düzeni ve dürüstlük kuralları. Commit öncesi
+tek komut:
+
+```sh
+make check
+```
+
+`make rom`, `make c-status`, `make c-review` ve `make progress` çalıştırır.
+Hash tutmuyorsa iş bitmemiştir.
+
+Ortak tipler `include/gba_types.h`, donanım yazmaçları `include/gba_io.h`
+içindedir; kaynak dosyalarında `typedef` veya `#define REG_...` tanımlanmaz.
+
 ## Tam ROM yeniden üretimi
 
 ```sh

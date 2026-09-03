@@ -13,10 +13,7 @@
  * Dogrulama:  make c-match FILE=src/world/entity_flags.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
+#include "gba_types.h"
 
 typedef struct {
     u8  unk00[22];

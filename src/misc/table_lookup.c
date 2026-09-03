@@ -8,7 +8,7 @@
  * Dogrulama:  make c-match FILE=src/misc/table_lookup.c
  */
 
-typedef unsigned int u32;
+#include "gba_types.h"
 
 #define TABLE_INDEX_MAX  4
 #define TABLE_RECORD_U32 (0x9A8 / 4)

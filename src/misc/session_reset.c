@@ -7,8 +7,7 @@
  * Dogrulama:  make c-match FILE=src/misc/session_reset.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
+#include "gba_types.h"
 
 extern u8       gUnk02010C60[32];
 

@@ -1,4 +1,4 @@
-.PHONY: rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: check rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -45,6 +45,12 @@ disasm: verify-rom
 # agbcc libc.a fonksiyonlarini ROM icinde arar (--csv override satiri uretir).
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
+
+# Commit oncesi tek komut: her seyi dogrular.
+check: rom
+	@python3 tools/scan_c_sources.py
+	@python3 tools/review_c_source.py
+	@python3 tools/progress.py
 
 # Tam ROM'u yeniden uretir: dogrulanmis bolgeler kendi kaynagimizdan,
 # kalani baserom.gba'dan. Sonucun SHA-1'i orijinalle ayni olmali.

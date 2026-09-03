@@ -7,19 +7,8 @@
  * Dogrulama:  make c-match FILE=src/save/read_eeprom_bytes.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
+#include "gba_io.h"
 
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
-
-#define REG_DMA3     (*(volatile DmaChannel *)0x040000D4)
-#define REG_IME      (*(volatile u16 *)0x04000208)
 #define DMA_ENABLE   0x80000000
 #define EEPROM_BLOCK 8
 

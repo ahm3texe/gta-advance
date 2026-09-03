@@ -11,13 +11,10 @@
  * kaydirma zincirlerine ceviriyor (ROM'daki bicim budur).
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
 /* BG1 dikey kaydirma yazmaci. Sabit cast olarak yazilir: agbcc bu adresi
  * kaydirmayla uretemez, ROM'daki gibi literal havuzdan okur. */
-#define REG_BG1VOFS (*(volatile u16 *)0x04000016)
 
 #define MENU_VISIBLE_MAX  8    /* ayni anda cizilen en fazla satir */
 #define MENU_ROW_HEIGHT   16   /* satir yuksekligi, piksel */

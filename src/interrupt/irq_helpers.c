@@ -4,17 +4,14 @@
  * Dogrulama:  make c-match FILE=src/interrupt/irq_helpers.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
 /* volatile SART: kaldirilinca agbcc sabiti bellekten once yukluyor ve
  * ROM'dan sapiyor. Ayni erisim bicimi gBiosIrqFlags'te tam tersini
  * gerektiriyordu; volatile burada semantik degil siralama dugmesi. */
-#define REG_IF          (*(volatile u16 *)0x04000202)
 #define FRAME_DELAY_MAX 5
 
-extern u8  gVBlankState;
+extern volatile u8 gVBlankState;
 extern u32 gAsyncState;
 extern u8  gGameState[16];
 /* IWRAM adresleri sabit cast olarak yazilir, extern sembol olarak degil:

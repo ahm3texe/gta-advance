@@ -4,21 +4,9 @@
  * Dogrulama:  make c-match FILE=src/bootstrap/init_interrupts.c
  */
 
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
 typedef void (*IrqHandler)(void);
-
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
-
-#define REG_DISPSTAT (*(volatile u16 *)0x04000004)
-#define REG_DMA3     (*(volatile DmaChannel *)0x040000D4)
-#define REG_IE       (*(volatile u16 *)0x04000200)
-#define REG_IME      (*(volatile u16 *)0x04000208)
 
 /* VBlank + VCount kesmeleri acik, VCount tetigi 50. tarama satirinda. */
 #define DISPSTAT_SETUP 0x3228

@@ -1,0 +1,102 @@
+# Çalışma kuralları
+
+Bu belge *nasıl çalıştığımızı* tanımlar. Derleyicinin nasıl davrandığı
+[COMPILER.md](COMPILER.md) içindedir; burası süreç.
+
+## 1. Tek doğruluk kaynağı: `make check`
+
+Commit öncesi tek komut:
+
+```sh
+make check
+```
+
+Şunları çalıştırır: `make rom` (tam ROM'u yeniden üretir ve SHA-1 doğrular),
+`make c-status` (C kaynaklarını ROM ile karşılaştırır), `make c-review`
+(okunabilirlik denetimi), `make progress`.
+
+**Kural:** `make check` geçmeden commit atılmaz. Hash tutmuyorsa iş bitmemiştir.
+
+## 2. Hedef seçimi
+
+```sh
+python3 tools/find_leaf_candidates.py --limit=20 --max-size=200
+```
+
+Yaprak (`bl` içermeyen) fonksiyonlar en ucuzudur. Ama **bir C dosyası bitişik
+bir ROM bölgesi üretir** — bu yüzden hedef tek fonksiyon değil, *bitişik
+adayların oluşturduğu blok*tur.
+
+Öncelik sırası:
+
+1. Bitişik yaprak blokları — en öngörülebilir
+2. Çağırdığı her şey artık bilinen fonksiyonlar — ağaç yukarı açılır
+3. Kesintisiz aralığı büyüten bloklar — kapsam yüzdesinden daha iyi bir
+   sağlık göstergesidir
+4. Büyük fonksiyonlar — bayt yüzdesini asıl hareket ettiren bunlar
+
+## 3. Fonksiyon döngüsü
+
+1. `tools/disasm_function.py <ad>` ile ROM'u oku, davranışı **anla**
+2. Temiz C yaz — Ghidra çıktısı kopyalanmaz
+3. `make c-match FILE=...` ile ölç
+4. Eşleşmiyorsa `make diff FILE=... FUNC=...` ile nerede saptığını gör
+5. **Assembly'yi değil C'yi** değiştir; [COMPILER.md](COMPILER.md) kurallarına bak
+6. Eşleşince bölgeyi kaydet, `make check` çalıştır, commit at
+
+## 4. Dosya ve sembol düzeni
+
+| Ne | Nereye |
+|---|---|
+| Tipler (`u8`, `s16`, `vu32`) | `include/gba_types.h` |
+| Donanım yazmaçları, `DmaChannel`, bellek tabanları | `include/gba_io.h` |
+| RAM/ROM veri sembolleri | `data/ram_map.csv` |
+| Fonksiyon adı, durum, modül | `data/function_overrides.csv` |
+| Doğrulanmış kaynak bölgeleri | `data/matching_regions.csv` (araçla) |
+| libc bölgeleri | `data/libc_regions.csv` |
+
+**Kaynak dosyalarında `typedef` veya `#define REG_...` tanımlanmaz.** Yeni bir
+yazmaç gerekiyorsa `gba_io.h`'ye eklenir.
+
+`data/*.csv` dosyaları elle değil araçlarla değiştirilir:
+`sync_function_map.py`, `add_c_region.py`, `retire_asm.py`.
+
+## 5. Dürüstlük kuralları
+
+Bunlar üslup değil, doğruluk meselesi. Her biri bu projede en az bir kez
+yanlış yola sapmamıza yol açtı.
+
+- **İsim uydurma.** Bir fonksiyonun ne yaptığını kanıtlayamıyorsan `FUN_...`
+  adında bırak. Assembly kaynaklarındaki `.equ` etiketleri önceki çalışmanın
+  *tahminleriydi* ve birçoğu yanlış çıktı.
+- **Belirsizliği belirsiz işaretle.** İki sembolün gövdesi aynıysa hangisinin
+  nerede olduğunu uydurma; `discovered` yaz ve alternatifi nota geç.
+- **Provisional olan provisional kalır.** `ram_map.csv`'de doğrulanmamış her
+  şey `provisional` statüsündedir.
+- **Eşleşmeyeni "eşleşti" sayma.** Kısmi sonuç değerlidir; uydurma değildir.
+- **Denenip tutmayanları yaz.** Kaynak dosyanın başına. Aynı yolu iki kez
+  yürümek pahalıdır.
+- **Bayat notu düzelt.** Bir yorum "çözülemedi" diyorsa ve artık çözüldüyse,
+  o yorum yanlış bilgidir.
+
+## 6. Yarım işi ayır
+
+Bir blokta bir fonksiyon direniyorsa, eşleşen kısmı ayrı dosyaya alıp bölge
+olarak kaydet. Yarım iş tamamı bekletmez. Direnen fonksiyon kendi dosyasında,
+denenenler yorumda.
+
+## 7. Negatif sonuçlar da kayıttır
+
+Bir hipotez tükendiğinde belgeye yazılır. Ama **tek başına etkisiz çıkan bir
+değişiklik, başkasıyla birleştiğinde belirleyici olabilir** — bu projede tam
+olarak böyle oldu. "Denendi, tutmadı" kaydını mutlak kabul etme.
+
+## 8. Paralel çalışma
+
+Birden fazla ajan çalışıyorsa:
+
+- Ortak dizinlere (`build/`) dokunulmaz; `rm -rf build` çalıştırılmaz
+- `data/*.csv` tek bir yerden yazılır
+- Her ajan yalnızca kendi kaynak dosyasına yazar
+- Emeklilik ve bölge kaydı kararı ana süreçte kalır
+- Ajan raporu doğrulama yerine geçmez; sonuç ROM'a karşı yeniden ölçülür

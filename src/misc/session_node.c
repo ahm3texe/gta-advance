@@ -11,8 +11,7 @@
  * Dogrulama:  make c-match FILE=src/misc/session_node.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
+#include "gba_types.h"
 
 typedef struct {
     u8  unk00[40];

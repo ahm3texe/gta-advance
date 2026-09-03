@@ -9,22 +9,11 @@
  * Dogrulama:  make c-match FILE=src/save/save_manager.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
-
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
+#include "gba_io.h"
 
 /* Kural 1'in tersi yonu (read/write_eeprom_range.c ile ayni): DMA3 sabit
  * cast olarak yazilir ama struct uyesi olarak, cunku ROM tabani (0x040000D4)
  * register'da tutup ofsetle (`ldr r0, [r2, #8]`) eriyor. */
-#define REG_DMA3   (*(volatile DmaChannel *)0x040000D4)
-#define REG_IME    (*(volatile u16 *)0x04000208)   /* kural 12: volatile */
 #define DMA_ENABLE 0x80000000
 
 /* Uc kayit slotunun EWRAM'daki basligi; 12 byte'lik girisler. */

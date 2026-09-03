@@ -4,9 +4,7 @@
  * Dogrulama:  make c-match FILE=src/save/save_slots.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
-typedef signed int    s32;
+#include "gba_types.h"
 
 #define SAVE_SLOT_FLAGS   16
 #define EEPROM_BLOCK_SIZE 8

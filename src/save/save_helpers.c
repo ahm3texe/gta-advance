@@ -7,10 +7,7 @@
  * Dogrulama:  make c-match FILE=src/save/save_helpers.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed short   s16;
+#include "gba_types.h"
 
 /* Uc kayit slotunun EWRAM'daki basligi; 12 byte'lik girisler. */
 typedef struct {

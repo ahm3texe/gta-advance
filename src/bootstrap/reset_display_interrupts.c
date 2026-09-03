@@ -7,30 +7,17 @@
  * Dogrulama:  make c-match FILE=src/bootstrap/reset_display_interrupts.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
-
-#define REG_DMA3      (*(volatile DmaChannel *)0x040000D4)
-
-#define VRAM_BASE     ((void *)0x06000000)
-#define OAM_BASE      ((void *)0x07000000)
 #define DMA_CLEAR_VRAM 0x8100C000   /* enable | fixed source | 0xC000 halfword */
 #define DMA_CLEAR_OAM  0x81000200   /* enable | fixed source | 0x200 halfword  */
 
 #define SUBSYSTEM_ARGUMENT 0x2FD
 
-extern u8  gVBlankState;
+extern volatile u8 gVBlankState;
 extern u32 gDisplayState;
 /* BIOS kesme denetim bayraklari (IntrWait). volatile DEGIL: volatile
  * isaretlenince agbcc yukleme sirasini degistiriyor ve ROM'dan sapiyor. */
-extern u16 gBiosIrqFlags;
 
 /* Asagidaki uc fonksiyon henuz adlandirilmadi. Assembly kaynaginda
  * WaitForDma3 / InitSubsystem / WaitForVBlank diye etiketlenmislerdi ama

@@ -7,9 +7,7 @@
  * Dogrulama:  make c-match FILE=src/save/save_wrappers.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
-typedef signed int    s32;
+#include "gba_types.h"
 
 extern u8 gSaveMetadata[32];
 #define SAVE_METADATA_SIZE 32

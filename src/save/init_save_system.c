@@ -8,12 +8,7 @@
  * Dogrulama:  python3 tools/verify_c_function.py src/save/init_save_system.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
-
-#define REG_IME (*(volatile u16 *)0x04000208)
+#include "gba_io.h"
 
 #define SAVE_SLOT_MIN     1
 #define SAVE_SLOT_MAX     16

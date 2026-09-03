@@ -20,23 +20,12 @@
  * Dogrulama:  make c-match FILE=src/save/write_eeprom_range.c
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
-
-typedef struct {
-    const void *src;
-    void *dst;
-    u32 control;
-} DmaChannel;
+#include "gba_io.h"
 
 /* Kural 1'in tersi yonu: DMA3 sabit cast olarak yazilir, ama tekil bir
  * `*(volatile u32 *)0x040000DC` degil struct uyesi olarak. Tekil biciminde
  * agbcc taban+ofseti tek literale katliyor (0x040000DC / [r2,#0]); ROM ise
  * tabani register'da tutup ofsetle eriyor (0x040000D4 / [r2,#8]). */
-#define REG_DMA3   (*(volatile DmaChannel *)0x040000D4)
-#define REG_IME    (*(volatile u16 *)0x04000208)   /* kural 12: volatile */
 #define DMA_ENABLE 0x80000000
 
 #define EEPROM_BLOCK       8    /* EEPROM erisim birimi (byte)          */

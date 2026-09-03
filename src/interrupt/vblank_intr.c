@@ -11,15 +11,12 @@
  * kucuk durum makinesidir.
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
+#include "gba_io.h"
 
 /* IWRAM adresi sabit cast olarak yazilir, extern sembol olarak degil:
  * ROM 0x03000000'i kaydirmayla uretiyor (movs #0xc0 / lsls #18), sembol
  * olsaydi literal havuzdan okunurdu. (docs/COMPILER.md, kural 1'in istisnasi) */
 #define gFrameDelay (*(u32 *)0x03000000)
-#define REG_VCOUNT  (*(volatile u16 *)0x04000006)
 
 /* VBlank 160. tarama satirinda baslar; VCOUNT - 160 gecen satir sayisidir. */
 #define VBLANK_FIRST_LINE 160
@@ -48,7 +45,6 @@ extern u16 gVBlankEnabled;
 extern volatile u8 gVBlankState;
 extern u32 gAsyncState;
 extern u8  gGameState[16];
-extern u16 gBiosIrqFlags;
 
 /* VBlank sirasinda calisan alt sistemler; henuz adlandirilmadi. */
 extern void FUN_08033264(void);

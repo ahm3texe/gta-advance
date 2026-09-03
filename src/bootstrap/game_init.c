@@ -56,19 +56,10 @@
  *    `ldr r0, [r4, #8]` komutlarinin karsiligidir; her blokta gerekli.
  */
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
-
-typedef volatile unsigned short vu16;
-typedef volatile unsigned int   vu32;
+#include "gba_io.h"
 
 /* Yazmac adresleri sabit cast olarak yazilir: agbcc hepsini literal havuzdan
  * okuyor, ROM da oyle. (COMPILER.md kural 1'in istisnasi.) */
-#define REG_WAITCNT_ADDR 0x04000204
-#define REG_DMA3_ADDR    0x040000D4
-#define REG_IME_ADDR     0x04000208
 
 #define WAITCNT_BITS 0x4014
 
@@ -93,9 +84,8 @@ typedef volatile unsigned int   vu32;
 
 #define SUBSYSTEM_ARG 0x2FD
 
-extern u8  gVBlankState;
+extern volatile u8 gVBlankState;
 extern u32 gDisplayState;
-extern u16 gBiosIrqFlags;
 extern u32 gOuterState;
 extern u8  gLoopState;
 extern u8  gFrameStateSource;

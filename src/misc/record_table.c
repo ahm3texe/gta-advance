@@ -9,8 +9,7 @@
  * Dogrulama:  make c-match FILE=src/misc/record_table.c
  */
 
-typedef unsigned char u8;
-typedef unsigned int  u32;
+#include "gba_types.h"
 
 typedef struct {
     u32 unk00;

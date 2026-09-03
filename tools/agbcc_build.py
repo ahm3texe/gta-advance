@@ -76,7 +76,8 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
 
     BUILD.mkdir(parents=True, exist_ok=True)
     stem = BUILD / source.stem
-    run(["cpp", "-nostdinc", "-undef", str(source)], Path(f"{stem}.i"))
+    run(["cpp", "-nostdinc", "-undef", f"-I{ROOT / 'include'}", str(source)],
+        Path(f"{stem}.i"))
     run([str(agbcc), *CC1FLAGS, "-o", f"{stem}.s", f"{stem}.i"])
     run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
          "-o", f"{stem}.probe.o", f"{stem}.s"])

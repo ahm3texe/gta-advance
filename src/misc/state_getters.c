@@ -10,7 +10,7 @@
  * Dogrulama:  make c-match FILE=src/misc/state_getters.c
  */
 
-typedef unsigned int u32;
+#include "gba_types.h"
 
 extern u32 gUnk0202F2C0;
 extern u32 gUnk0202F310;
