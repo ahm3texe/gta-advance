@@ -626,12 +626,12 @@ address,name,size,status,module,notes
 0x08031F48,FUN_08031f48,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031FB4,FUN_08031fb4,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08031FF0,FUN_08031ff0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08032058,FUN_08032058,50,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08032090,FUN_08032090,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080320A4,FUN_080320a4,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080320A8,FUN_080320a8,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080320B0,FUN_080320b0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080320B8,FUN_080320b8,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08032058,IsEntityFlagSet,50,decompiled,world,"Small entity accessor; names derived from behaviour, semantics unverified"
+0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
+0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
+0x080320A8,GetEntityFlags,8,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
+0x080320B0,GetEntityKind,6,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
+0x080320B8,GetEntityUnk10,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320E0,FUN_080320e0,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803214C,FUN_0803214c,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08032168,FUN_08032168,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

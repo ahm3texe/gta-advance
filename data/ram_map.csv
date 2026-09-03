@@ -53,3 +53,4 @@ address,size,name,source,status,notes
 0x03007E00,4,gSystemStack,decomp,verified,"BIOS system stack pointer area"
 0x03007FA0,4,gIrqStack,decomp,verified,"BIOS IRQ stack pointer area"
 0x03007FFC,4,gIrqVector,decomp,verified,"BIOS IRQ handler vector"
+0x02000D50,160,gSaveData,decomp,provisional,"Same address as gSaveBuffer, viewed as a structure; flag bits live at offset 60"

@@ -253,5 +253,12 @@ build/ui/menu_graphics.bin: src/ui/menu_graphics.c data/functions.csv data/ram_m
 menu-graphics-match: verify-rom build/ui/menu_graphics.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1e30 build/ui/menu_graphics.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match
+build/world/entity_accessors.bin: src/world/entity_accessors.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-entity-accessors-match: verify-rom build/world/entity_accessors.bin
+	@python3 tools/compare_slice.py baserom.gba 0x32090 build/world/entity_accessors.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match
 	@python3 tools/verify_matching_regions.py

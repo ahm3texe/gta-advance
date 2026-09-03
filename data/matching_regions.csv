@@ -20,3 +20,4 @@ start,end,binary,module,notes
 0x080013AC,0x08001458,build/ui/init_menu_screen.bin,ui,Menu display initialization
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
+0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
