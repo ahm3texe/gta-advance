@@ -86,3 +86,4 @@ address,size,name,source,status,notes
 0x02025810,24,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para"
 0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat ciftini tutan blok, +72 ayri bir kelime"
 0x020110AC,4,gRam020110AC,decomp,provisional,"Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor"
+0x02030C10,320,gSlotIds,decomp,provisional,"160 adet u16 yuva kimligi; 0x7FEF bos demek"

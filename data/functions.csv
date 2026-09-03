@@ -1066,9 +1066,9 @@ address,name,size,status,module,notes
 0x08055C04,FUN_08055c04,130,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055C8C,FUN_08055c8c,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055CC8,FUN_08055cc8,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055D08,FUN_08055d08,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055D18,FUN_08055d18,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08055D54,FUN_08055d54,46,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08055D08,GetEntrySlot,12,matching,world,"Yuva tablosu; src/world/slot_table.c"
+0x08055D18,FindFreeSlotRun,60,matching,world,"Yuva tablosu; src/world/slot_table.c"
+0x08055D54,FillSlotsWithNone,46,matching,world,"Yuva tablosu; src/world/slot_table.c"
 0x08055D90,FUN_08055d90,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08056048,FUN_08056048,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080560B4,FUN_080560b4,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
