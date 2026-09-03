@@ -100,7 +100,7 @@ extern void FUN_08063b74(void);          /* DMA3'un bitmesini bekler     */
 extern void FUN_0803251c(s32 arg);       /* alt sistem baslatma          */
 extern void FUN_0800cae4(void);          /* VBlank bekler                */
 extern void InitInterrupts(void);
-extern void FUN_08001a00(void);
+extern void RunMenuLoop(void);
 extern void FUN_080087f4(void);
 extern void InitSaveManager(void);
 extern void FUN_08005fa8(void);
@@ -223,7 +223,7 @@ void GameInit(void)
     FUN_0800cae4();
     gBiosIrqFlags |= 1;
     InitInterrupts();
-    FUN_08001a00();
+    RunMenuLoop();
     FUN_080087f4();
 
     pending = 0;

@@ -35,6 +35,7 @@ address,name,size,status,module,notes
 0x080011EC,DrawMenuItems,,matching,ui,Draws active menu labels and formats numeric values; exact 0x11EC-0x13AB region
 0x080013AC,InitMenuScreen,,matching,ui,Initializes menu display state and uploads palette/clears VRAM; exact 0x13AC-0x1457 region
 0x08001458,RunMenuScreen,,documented,ui,Provisional name; builds/draws menu hierarchy and handles navigation/actions until exit
+0x08001A00,RunMenuLoop,728,matching,ui,"Builds the menu hierarchy, handles input and redraws; five-case switch on the action return value compiles to a jump table"
 0x08001DC0,ResetMenuState,,matching,ui,Clears menu globals and active-item pointer table; exact in menu-helper block
 0x08001E00,IsMenuFlagSet,,matching,ui,Tests a bit in the menu flag word; exact in menu-helper block
 0x08001E1C,FinalizeMenuLayout,,matching,ui,Updates the menu layout-dependent rendering state; exact in menu-helper block
@@ -75,6 +76,16 @@ address,name,size,status,module,notes
 0x0806BCD0,LibraryAssertWrapper0,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCE0,LibraryAssertWrapper1,,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,,discovered,sdk,References assertion format at 0x08BD3470
+0x0806C0B8,_call_via_r0,2,documented,sdk,GCC call-via veneer: bx r0
+0x0806C0BC,_call_via_r1,2,documented,sdk,GCC call-via veneer: bx r1
+0x0806C0C0,_call_via_r2,2,documented,sdk,GCC call-via veneer: bx r2
+0x0806C0C4,_call_via_r3,2,documented,sdk,GCC call-via veneer: bx r3
+0x0806C0C8,_call_via_r4,2,documented,sdk,GCC call-via veneer: bx r4
+0x0806C0CC,_call_via_r5,2,documented,sdk,GCC call-via veneer: bx r5
+0x0806C0D0,_call_via_r6,2,documented,sdk,GCC call-via veneer: bx r6
+0x0806C0D4,_call_via_r7,2,documented,sdk,GCC call-via veneer: bx r7
+0x0806C0D8,_call_via_r8,2,documented,sdk,GCC call-via veneer: bx r8
+0x0806C0DC,_call_via_r9,2,documented,sdk,GCC call-via veneer: bx r9
 0x0806DCC0,Memset,,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
 0x0806DE84,_toupper,28,discovered,libc,newlib routine; matched against agbcc libc.a build; identical body to toupper - which symbol occupies this address is undetermined
 0x08070CE4,_mbtowc_r,42,documented,libc,newlib routine; body byte-identical to agbcc libc.a build

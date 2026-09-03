@@ -32,6 +32,7 @@ address,name,source,matching
 0x0800114C,BuildActiveMenuItems,src/ui/build_active_menu_items.c,yes
 0x080011EC,DrawMenuItems,src/ui/draw_menu_items.c,yes
 0x080013AC,InitMenuScreen,src/ui/init_menu_screen.c,yes
+0x08001A00,RunMenuLoop,src/ui/menu_loop.c,yes
 0x08001DC0,ResetMenuState,src/ui/menu_helpers.c,yes
 0x08001E00,IsMenuFlagSet,src/ui/menu_helpers.c,yes
 0x08001E1C,FinalizeMenuLayout,src/ui/menu_helpers.c,yes

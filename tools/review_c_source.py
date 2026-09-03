@@ -91,7 +91,10 @@ def main() -> None:
     worst = 0
     for path in targets:
         problems = review(path)
-        rel = path.relative_to(ROOT) if path.is_absolute() else path
+        try:
+            rel = path.relative_to(ROOT)
+        except ValueError:
+            rel = path
         if not problems:
             print(f"{GREEN}TEMIZ{RESET}  {rel}")
             continue

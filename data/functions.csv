@@ -35,7 +35,7 @@ address,name,size,status,module,notes
 0x080011EC,DrawMenuItems,408,matching,ui,Draws active menu labels and formats numeric values; exact 0x11EC-0x13AB region
 0x080013AC,InitMenuScreen,138,matching,ui,Initializes menu display state and uploads palette/clears VRAM; exact 0x13AC-0x1457 region
 0x08001458,RunMenuScreen,956,documented,ui,Provisional name; builds/draws menu hierarchy and handles navigation/actions until exit
-0x08001A00,FUN_08001a00,728,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08001A00,RunMenuLoop,728,matching,ui,"Builds the menu hierarchy, handles input and redraws; five-case switch on the action return value compiles to a jump table"
 0x08001DC0,ResetMenuState,44,matching,ui,Clears menu globals and active-item pointer table; exact in menu-helper block
 0x08001E00,IsMenuFlagSet,22,matching,ui,Tests a bit in the menu flag word; exact in menu-helper block
 0x08001E1C,FinalizeMenuLayout,18,matching,ui,Updates the menu layout-dependent rendering state; exact in menu-helper block
@@ -1363,14 +1363,16 @@ address,name,size,status,module,notes
 0x0806BEC0,FUN_0806bec0,328,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806C020,FUN_0806c020,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806C078,FUN_0806c078,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0B8,FUN_0806c0b8,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0BC,FUN_0806c0bc,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0C0,FUN_0806c0c0,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0C4,FUN_0806c0c4,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0C8,FUN_0806c0c8,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0CC,FUN_0806c0cc,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0D0,FUN_0806c0d0,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C0D8,FUN_0806c0d8,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806C0B8,_call_via_r0,2,documented,sdk,GCC call-via veneer: bx r0
+0x0806C0BC,_call_via_r1,2,documented,sdk,GCC call-via veneer: bx r1
+0x0806C0C0,_call_via_r2,2,documented,sdk,GCC call-via veneer: bx r2
+0x0806C0C4,_call_via_r3,2,documented,sdk,GCC call-via veneer: bx r3
+0x0806C0C8,_call_via_r4,2,documented,sdk,GCC call-via veneer: bx r4
+0x0806C0CC,_call_via_r5,2,documented,sdk,GCC call-via veneer: bx r5
+0x0806C0D0,_call_via_r6,2,documented,sdk,GCC call-via veneer: bx r6
+0x0806C0D4,_call_via_r7,2,documented,sdk,GCC call-via veneer: bx r7
+0x0806C0D8,_call_via_r8,2,documented,sdk,GCC call-via veneer: bx r8
+0x0806C0DC,_call_via_r9,2,documented,sdk,GCC call-via veneer: bx r9
 0x0806C0F4,FUN_0806c0f4,146,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806C188,FUN_0806c188,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806C18C,FUN_0806c18c,206,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

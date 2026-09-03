@@ -18,6 +18,7 @@ start,end,binary,module,notes
 0x0800114C,0x080011EC,build/ui/build_active_menu_items.bin,ui,Active menu filtering and layout
 0x080011EC,0x080013AC,build/ui/draw_menu_items.bin,ui,Menu rendering and numeric formatting
 0x080013AC,0x08001458,build/ui/init_menu_screen.bin,ui,Menu display initialization
+0x08001A00,0x08001DC0,build/ui/menu_loop.bin,ui,"Menu loop: hierarchy, input and redraw"
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
