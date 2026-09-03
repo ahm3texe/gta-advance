@@ -3,13 +3,17 @@
  * Verilen hucreden baslayarak metin katmanini DMA3 ile sifirlar. Ikinci
  * blok yalnizca gHalfLineSpacing sifirken calisir (tam satir yuksekligi).
  *
- * HENUZ ESLESMIYOR: 110 byte'lik ROM fonksiyonuna karsi 10 bayt farkli.
- * Otuz komutun yirmi dokuzu birebir tutuyor; TEK fark DMA taban adresinin
- * yuklendigi yer. ROM `ldr r4` komutunu `fill = 0` yaziminin ARDINDAN
- * yayiyor, bizimki IME okumasindan once.
- * Denenenler: atamayi fill sonrasina almak (13 fark), ime oncesine (17),
- * control'u one cekmek (34), REG_DMA3 makrosu (19), iki ayri yerel (13),
- * blok kapsaminda tanimlama (64). Hicbiri 10'un altina inmedi.
+ * HENUZ ESLESMIYOR: 66 komutun 65'i birebir tutuyor, TEK BAYT fark var
+ * (0x080645F2). Fark, DMA kontrol yazmacindan yapilan OLU OKUMANIN hedef
+ * register'i:
+ *     ROM  : ldr r0, [r4, #8]
+ *     bizim: ldr r3, [r4, #8]
+ * Deger atiliyor, yani semantik fark yok -- saf register dagitimi.
+ * Denenenler (hepsi daha kotu): ayri discard degiskeni 13, ciplak deyim 13,
+ * ikisini de control'a atamak 24, olu okumayi row'a 13 / col'a 20 /
+ * dest'e 13 / fill'e 57 / ime'ye 56, ilk bloktaki okumayi degistirmek 63-103.
+ * Yedi yerel degiskenin 5040 bildirim permutasyonu tarandi: hicbiri 1'in
+ * altina inmedi.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
@@ -104,7 +108,7 @@ void ClearTextArea(s32 x, s32 y, s32 height)
     u8 *dest;
     s32 row;
     s32 col;
-    u32 control;
+    s32 control;
     volatile DmaChannel *dma;
 
     if ((u32)x > SCREEN_RIGHT)
@@ -117,9 +121,9 @@ void ClearTextArea(s32 x, s32 y, s32 height)
     dest = gTextVramBase + (col << 6) + (row * gTextRowStride << 6);
 
     ime = REG_IME;
-    dma = (volatile DmaChannel *)REG_DMA3_ADDR;
     REG_IME = 0;
     fill = 0;
+    dma = (volatile DmaChannel *)REG_DMA3_ADDR;
     dma->src = &fill;
     dma->dst = dest;
     control = ((height << 6) >> 1) | 0x81000000;
@@ -136,7 +140,7 @@ void ClearTextArea(s32 x, s32 y, s32 height)
         dma->src = &fill;
         dma->dst = dest;
         dma->control = control;
-        dma->control;
+        control = dma->control;
         REG_IME = ime;
     }
 }

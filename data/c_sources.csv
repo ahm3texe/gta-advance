@@ -39,7 +39,7 @@ address,name,source,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,yes
-0x08032058,IsEntityFlagSet,src/world/entity_flags.c,no
+0x08032058,IsEntityFlagSet,src/world/entity_flags.c,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,yes
 0x080320A4,GetEntityUnk0C,src/world/entity_accessors.c,yes
 0x080320A8,GetEntityFlags,src/world/entity_accessors.c,yes
@@ -55,7 +55,7 @@ address,name,source,matching
 0x0803C77C,GetScaleFactor,src/misc/session_reset.c,yes
 0x0803C790,ReturnOne,src/misc/session_reset.c,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,yes
-0x0803C798,ResetSessionNode,src/misc/session_node.c,no
+0x0803C798,ResetSessionNode,src/misc/session_node.c,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,yes
 0x08051500,GetRecord,src/misc/record_table.c,yes
