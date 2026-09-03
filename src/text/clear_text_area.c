@@ -15,6 +15,12 @@
  * Yedi yerel degiskenin 5040 bildirim permutasyonu tarandi: hicbiri 1'in
  * altina inmedi.
  *
+ * NOT: bir ajan `register volatile DmaChannel *dma asm("r4");` ile 0 bayta
+ * ulasti. Bu KABUL EDILMEDI (docs/WORKFLOW.md 6): acik register baglamasi
+ * byte'lari tutturur ama nedenini gizler ve her register uyusmazligini
+ * "cozebilecek" bir cekictir. Yine de bir bilgi veriyor: ROM'un r4 secimi
+ * ulasilabilir, yani sorun dogal C'de o secimi tetikleyecek bicimi bulmak.
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
  */

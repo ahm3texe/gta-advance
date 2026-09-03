@@ -79,19 +79,34 @@ yanlış yola sapmamıza yol açtı.
 - **Bayat notu düzelt.** Bir yorum "çözülemedi" diyorsa ve artık çözüldüyse,
   o yorum yanlış bilgidir.
 
-## 6. Yarım işi ayır
+## 6. Register sabitleme yasak
+
+`register T *p asm("r4")` gibi acik register baglamalari, inline assembly ile
+ayni kategoridedir: byte'lari tutturur ama **neden** tuttugunu gizler.
+
+Bu bir cekic: her register uyusmazligi boyle "cozulebilir". Kabul edilirse
+kural setinin (docs/COMPILER.md) kesfi anlamsizlasir ve proje byte-matching
+tiyatrosuna doner. Ozgun 2004 kaynaginin register sabitledigine dair hicbir
+kanit da yok.
+
+Bir fonksiyon ancak DOGAL C ile eslesirse eslesmis sayilir.
+`tools/review_c_source.py` bunu yakalar ve `make check` basarisiz olur.
+
+Ayni sey inline assembly icin de gecerli.
+
+## 7. Yarım işi ayır
 
 Bir blokta bir fonksiyon direniyorsa, eşleşen kısmı ayrı dosyaya alıp bölge
 olarak kaydet. Yarım iş tamamı bekletmez. Direnen fonksiyon kendi dosyasında,
 denenenler yorumda.
 
-## 7. Negatif sonuçlar da kayıttır
+## 8. Negatif sonuçlar da kayıttır
 
 Bir hipotez tükendiğinde belgeye yazılır. Ama **tek başına etkisiz çıkan bir
 değişiklik, başkasıyla birleştiğinde belirleyici olabilir** — bu projede tam
 olarak böyle oldu. "Denendi, tutmadı" kaydını mutlak kabul etme.
 
-## 8. Paralel çalışma
+## 9. Paralel çalışma
 
 Birden fazla ajan çalışıyorsa:
 

@@ -22,6 +22,8 @@ GHIDRA_NAMES = re.compile(
     r"|param_\d+|local_[0-9a-f]+|DAT_[0-9a-f]+|unaff_\w+|in_\w+)\b"
 )
 INLINE_ASM = re.compile(r"\b(__asm__|asm\s*\(|__attribute__\s*\(\s*\(\s*naked)")
+# register T *p asm("r4") -- byte'lari tutturur ama nedenini gizler.
+REGISTER_PIN = re.compile(r"\bregister\b[^;\n]*\basm\s*\(")
 # Yorum veya #define disinda gecen ciplak donanim/RAM adresi
 BARE_ADDRESS = re.compile(r"0x0[2-8][0-9A-Fa-f]{6}")
 
@@ -57,7 +59,10 @@ def review(path: Path) -> list[str]:
     for match in sorted(set(GHIDRA_NAMES.findall(code))):
         problems.append(f"Ghidra kalintisi degisken adi: {match}")
 
-    if INLINE_ASM.search(code):
+    if REGISTER_PIN.search(code):
+        problems.append("acik register baglamasi (register ... asm(\"rN\")) -- "
+                        "eslesmeyi zorlar ama nedenini gizler; docs/WORKFLOW.md 6")
+    elif INLINE_ASM.search(code):
         problems.append("inline assembly iceriyor -- C'ye tasima amacini bozar")
 
     define_lines = {
