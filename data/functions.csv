@@ -1064,8 +1064,8 @@ address,name,size,status,module,notes
 0x08055BE8,FUN_08055be8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055BF8,FUN_08055bf8,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055C04,FUN_08055c04,130,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055C8C,FUN_08055c8c,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08055CC8,FUN_08055cc8,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08055C8C,FindNthFreeSlot,58,matching,world,"Yuva tarayici; src/world/slot_scan.c"
+0x08055CC8,ClearSlots,54,matching,world,"Yuva tarayici; src/world/slot_scan.c"
 0x08055D08,GetEntrySlot,12,matching,world,Yuva tablosu; src/world/slot_table.c
 0x08055D18,FindFreeSlotRun,60,matching,world,Yuva tablosu; src/world/slot_table.c
 0x08055D54,FillSlotsWithNone,46,matching,world,Yuva tablosu; src/world/slot_table.c
@@ -1211,7 +1211,7 @@ address,name,size,status,module,notes
 0x08063B38,FUN_08063b38,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08063B74,FUN_08063b74,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08063B98,FUN_08063b98,8,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08063BA4,FUN_08063ba4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08063BA4,FUN_08063ba4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08063BCC,FUN_08063bcc,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08063BD8,FUN_08063bd8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08063C88,FUN_08063c88,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

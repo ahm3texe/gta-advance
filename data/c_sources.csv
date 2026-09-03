@@ -137,6 +137,8 @@ address,name,source,matching
 0x08055AA8,FindNode,src/world/node_search.c,yes
 0x08055AC4,ClassifyId,src/world/node_search.c,yes
 0x08055AF8,QueryEntity,src/world/entity_query.c,no
+0x08055C8C,FindNthFreeSlot,src/world/slot_scan.c,yes
+0x08055CC8,ClearSlots,src/world/slot_scan.c,yes
 0x08055D08,GetEntrySlot,src/world/slot_table.c,yes
 0x08055D18,FindFreeSlotRun,src/world/slot_table.c,yes
 0x08055D54,FillSlotsWithNone,src/world/slot_table.c,yes
