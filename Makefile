@@ -306,5 +306,19 @@ build/text/draw_text.bin: src/text/draw_text.c data/functions.csv data/ram_map.c
 text-draw-text-match: verify-rom build/text/draw_text.bin
 	@python3 tools/compare_slice.py baserom.gba 0x6434c build/text/draw_text.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match
+build/world/entity_flags.bin: src/world/entity_flags.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-entity-flags-match: verify-rom build/world/entity_flags.bin
+	@python3 tools/compare_slice.py baserom.gba 0x32058 build/world/entity_flags.bin
+
+build/misc/session_node.bin: src/misc/session_node.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/misc
+	@python3 tools/build_c.py $< $@
+
+misc-session-node-match: verify-rom build/misc/session_node.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c798 build/misc/session_node.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match
 	@python3 tools/verify_matching_regions.py

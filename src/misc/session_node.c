@@ -1,11 +1,26 @@
-/* Oturum dugumu sifirlama — 0x0803C798-0x0803C7BF
+/* Oturum dugumu sifirlama — 0x0803C798-0x0803C7B9
  *
- * HENUZ ESLESMIYOR: 34 byte'lik ROM fonksiyonuna karsi 36 byte, 13 bayt
- * farkli. On alti komutun on besi birebir tutuyor; tek fark maskenin nasil
- * kuruldugu. ROM `movs r0,#5 / negs r0,r0` ile 32 bitlik -5 uretip u8 alanla
- * AND'liyor; bizimki maskeyi bayta daraltip `movs r0,#251` yaziyor.
- * Denenenler: ~4, -5, 0xFFFFFFFB, u32 yerel uzerinden, s32 yerel maske.
- * Hicbiri 32 bitlik bicimi vermedi.
+ * ESLESIYOR (byte-matching, 34 byte).
+ *
+ * Cozum: bayrak alani `u8` degil `s8`. ROM maskeyi 32 bit olarak kuruyor
+ * (`movs r0,#5 / negs r0,r0` = -5), bayta daraltmiyor (`movs r0,#251`
+ * degil). Sebep: agbcc/gcc `and`'in sabitini yalnizca AND'lanan degerin
+ * ust bitlerinin sifir oldugunu BILDIGINDE daraltiyor. Alan `u8` iken
+ * yukleme sifir-genisletme sayildigi icin nonzero_bits = 0xFF cikiyor ve
+ * -5 -> 0xFB'ye iniyor. Alan isaretli oldugunda ust bitler bilinmiyor,
+ * maske 32 bit kaliyor; deger geri `strb` ile yazildigi icin yukleme yine
+ * `ldrb` olarak kaliyor.
+ *
+ * Ayni ciktiyi veren esdeger yazim: alani bitfield yapmak
+ * (`u8 f0:2; u8 f2:1; u8 f3:5;` + `gSessionPtr->f2 = 0;`) — bitfield
+ * ekleme/cikarma da maskeyi kelime kipinde kuruyor. Diger bitlerin anlami
+ * bilinmedigi icin tek alanli isaretli bicim tercih edildi.
+ *
+ * Denenip TUTMAYANLAR (hepsi `movs r0,#251` uretti): `u8` alanda ~4, -5,
+ * 0xFFFFFFFB maskeleri; `(u8)((s32)flags & ~4)` cast'i; u32 yerel uzerinden
+ * okuma. `volatile u8` alan maskeyi daraltmakla kalmayip fazladan bir
+ * `ldrb` de ekliyor. `s32` yerel maske dogru sabiti uretiyor ama araya
+ * `add r0, r2, #0` kopyasi sokuyor.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/misc/session_node.c
@@ -27,7 +42,7 @@ typedef struct {
 typedef struct {
     Context *context;   /* 0x00 */
     u8       unk04[4];
-    u8       flags;     /* 0x08 */
+    s8       flags;     /* 0x08 */
 } Session;
 
 #define SESSION_FLAG_BIT  4

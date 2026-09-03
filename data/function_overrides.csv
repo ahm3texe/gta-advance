@@ -42,7 +42,7 @@ address,name,size,status,module,notes
 0x08001EA4,ClearMenuVram,,matching,ui,Fills the menu VRAM range through DMA3; exact in menu-graphics block
 0x08001EE4,EnableMenuDisplay,,matching,ui,Writes display control value 0x0101; exact in menu-graphics block
 0x08001EF4,EnableMenuDisplayAlt,,matching,ui,Duplicate display-control wrapper; exact in menu-graphics block
-0x08032058,IsEntityFlagSet,50,decompiled,world,"Small entity accessor; names derived from behaviour, semantics unverified"
+0x08032058,IsEntityFlagSet,50,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A8,GetEntityFlags,8,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
@@ -58,7 +58,7 @@ address,name,size,status,module,notes
 0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
 0x0803C790,ReturnOne,4,matching,misc,Returns the constant 1; missed by Ghidra auto-analysis
 0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
-0x0803C798,ResetSessionNode,34,decompiled,misc,Clears two node fields and two session flag bits
+0x0803C798,ResetSessionNode,34,matching,misc,Clears two node fields and two session flag bits
 0x080514C8,GetRecordUnk04,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
 0x080514E4,GetRecordUnk08,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
 0x08051500,GetRecord,14,matching,misc,Returns the address of a 60-byte record
