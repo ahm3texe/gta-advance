@@ -34,7 +34,7 @@ address,name,size,status,module,notes
 0x0800114C,BuildActiveMenuItems,146,matching,ui,Filters active menu items and calculates horizontal layout; exact 0x114C-0x11EB region
 0x080011EC,DrawMenuItems,408,matching,ui,Draws active menu labels and formats numeric values; exact 0x11EC-0x13AB region
 0x080013AC,InitMenuScreen,138,matching,ui,Initializes menu display state and uploads palette/clears VRAM; exact 0x13AC-0x1457 region
-0x08001458,RunMenuScreen,956,documented,ui,Provisional name; builds/draws menu hierarchy and handles navigation/actions until exit
+0x08001458,RunMenuScreen,1414,documented,ui,"Builds/draws menu hierarchy and handles navigation/actions until exit; gercek govde 0x1458-0x19DE, Ghidra atlama tablosunda durup 956 saymisti"
 0x08001A00,RunMenuLoop,728,matching,ui,"Builds the menu hierarchy, handles input and redraws; five-case switch on the action return value compiles to a jump table"
 0x08001DC0,ResetMenuState,44,matching,ui,Clears menu globals and active-item pointer table; exact in menu-helper block
 0x08001E00,IsMenuFlagSet,22,matching,ui,Tests a bit in the menu flag word; exact in menu-helper block
