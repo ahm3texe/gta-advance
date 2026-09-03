@@ -7,32 +7,45 @@ Bu belge *ne yapılacağını* ve *neden o sırayla* yapılacağını tutar.
 
 ```
 Doğrulanmış ROM:   7.872 bayt, 36 bölge
-Matching kod:      6.830 / 291.535 bayt  (%2.34)
-Byte-matching:     100 / 1505 fonksiyon
+Matching kod:      6.830 / 333.317 bayt  (%2.05)
+Byte-matching:     100 / 1462 fonksiyon
 ```
+
+> **Faz 0 tamamlandı.** Yüzde %2.34'ten %2.05'e *düştü* çünkü payda
+> düzeldi: Ghidra fonksiyonları kesik saydığı için toplam kod boyutu
+> 41.782 bayt eksik ölçülüyordu. Kapsama kaybedilmedi, ölçüt dürüstleşti.
 
 ## Kalanın dağılımı — planın dayanağı
 
-1405 fonksiyon, 284.705 bayt:
+1362 fonksiyon, 326.487 bayt (Faz 0 sonrası, düzeltilmiş sınırlarla):
 
 | Boyut | Adet | Bayt | Kalanın payı |
 |---|---|---|---|
-| ≤64 | 519 | 16.816 | %5.9 |
-| 65–256 | 567 | 75.100 | %26.4 |
-| 257–512 | 149 | 52.433 | %18.4 |
-| 513+ | 125 | 140.267 | **%49.3** |
+| ≤64 | 462 | 15.518 | %4.8 |
+| 65–256 | 549 | 73.478 | %22.5 |
+| 257–512 | 163 | 58.321 | %17.9 |
+| 513+ | 148 | 179.090 | **%54.9** |
 
 Tek cümleyle: **kalanın yarısı 513 bayttan büyük fonksiyonlarda.** Küçük
-fonksiyonları toplamak bizi ancak ~%7'ye taşır; ötesi büyükleri çözmeyi
+fonksiyonları toplamak bizi ancak ~%5-6'ya taşır; ötesi büyükleri çözmeyi
 gerektirir.
 
 ---
 
-## Faz 0 — Sınır denetimi (önce bu)
+## Faz 0 — Sınır denetimi ✅ TAMAMLANDI
 
-**Sorun:** `data/functions.csv`'deki sınırların **%25'i yanlış.** 401 aday
-tarandı, 99'u kendi gövdesinin dışına dallanıyor. Ghidra atlama tablolarında
-ve gövde içi literal havuzlarında duruyor.
+`tools/audit_boundaries.py` yazıldı ve uygulandı: **647 sınır düzeltildi,
+43 sahte kayıt silindi.** 1505 → 1462 kayıt, 291.535 → 333.317 bayt.
+
+Düzeltmelerin dağılımı: 467'si ≤32 bayt (boyut özensizliği — bazı bildirilen
+boyutlar tek sayıydı, Thumb'da imkânsız), 71'i >128 bayt (gerçek Ghidra
+atlama tablosu kesikleri).
+
+Yan bulgu: ~8.4 KB'lik dört **ARM kod aralığı** (muhtemelen ses sürücüsü).
+`functions.csv` ARM/Thumb kipini kaydetmiyor; bu aralıklar şimdilik denetim
+dışı.
+
+Kalan iş: 6 fonksiyon "akıl dışı büyüme" diye elle bakılmak üzere ayrıldı.
 
 Bu şimdiye kadar üç kez ölçüldü: `RunMenuScreen` 956 yerine 1414,
 `IsTileTypeInRange` 56 yerine 60, ayrıca iki sahte "küçük fonksiyon kümesi"
