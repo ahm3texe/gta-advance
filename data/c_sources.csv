@@ -93,6 +93,11 @@ address,name,source,matching
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,yes
 0x08051500,GetRecord,src/misc/record_table.c,yes
+0x08055A68,RandomizeCoords,src/world/node_search.c,yes
+0x08055A94,FindNodeAfter,src/world/node_search.c,yes
+0x08055AA8,FindNode,src/world/node_search.c,yes
+0x08055AC4,ClassifyId,src/world/node_search.c,yes
+0x08055AF8,QueryEntity,src/world/entity_query.c,no
 0x08055D08,GetEntrySlot,src/world/slot_table.c,yes
 0x08055D18,FindFreeSlotRun,src/world/slot_table.c,yes
 0x08055D54,FillSlotsWithNone,src/world/slot_table.c,yes

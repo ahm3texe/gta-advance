@@ -1054,11 +1054,11 @@ address,name,size,status,module,notes
 0x08055970,FUN_08055970,138,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055A00,FUN_08055a00,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055A24,FUN_08055a24,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08055A68,FUN_08055a68,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055A94,FUN_08055a94,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055AA8,FUN_08055aa8,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08055AC4,FUN_08055ac4,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08055AF8,FUN_08055af8,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08055A68,RandomizeCoords,40,matching,world,"Dugum arama / kimlik sorgusu; src/world/node_search.c"
+0x08055A94,FindNodeAfter,20,matching,world,"Dugum arama / kimlik sorgusu; src/world/node_search.c"
+0x08055AA8,FindNode,24,matching,world,"Dugum arama / kimlik sorgusu; src/world/node_search.c"
+0x08055AC4,ClassifyId,52,matching,world,"Dugum arama / kimlik sorgusu; src/world/node_search.c"
+0x08055AF8,QueryEntity,60,candidate,world,"Dugum arama / kimlik sorgusu; src/world/node_search.c"
 0x08055B34,FUN_08055b34,74,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055BBC,FUN_08055bbc,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055BE8,FUN_08055be8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
