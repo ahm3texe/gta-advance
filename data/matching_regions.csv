@@ -30,6 +30,7 @@ start,end,binary,module,notes
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
+0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader

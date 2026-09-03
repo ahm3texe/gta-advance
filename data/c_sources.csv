@@ -77,6 +77,10 @@ address,name,source,matching
 0x0803C790,ReturnOne,src/misc/session_reset.c,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,yes
 0x0803C798,ResetSessionNode,src/misc/session_node.c,yes
+0x0803F6F8,SetActorEngage,src/world/actor_states.c,yes
+0x0803F714,SetActorActive,src/world/actor_states.c,yes
+0x0803F74C,SetActorIdle,src/world/actor_states.c,yes
+0x0803F764,ReleaseActor,src/world/actor_states.c,yes
 0x08042434,IsTileTypeInRange,src/world/map_tiles.c,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,yes
