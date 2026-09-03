@@ -113,3 +113,6 @@ address,size,name,source,status,notes
 0x0201AA90,1,gRam0201AA90,decomp,provisional,"Melodi bayragi; 0x08063B98'de 6 yaziliyor"
 0x02030D50,7680,gSlotArray,decomp,provisional,"128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi"
 0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev"
+0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
+0x02036338,4,gRam02036338,decomp,provisional,"Iletisim blogu isaretcisi; hedef +0 bayrak, +6 yaz"
+0x0202370C,4,gRam0202370C,decomp,provisional,"0x0802392C tarafindan sifirlanan degisken"

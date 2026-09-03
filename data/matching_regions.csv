@@ -27,6 +27,7 @@ start,end,binary,module,notes
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
+0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
 0x08028C48,0x08028CE8,build/world/table_entries.bin,world,"Uc tablo girdisi yardimcisi: aktiflik testi, iki serbest birakma"
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
@@ -45,6 +46,7 @@ start,end,binary,module,notes
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
+0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
@@ -53,6 +55,7 @@ start,end,binary,module,notes
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"
+0x08066A40,0x08066A54,build/world/comm_flag.bin,world,Iletisim bayragi
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
 0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"

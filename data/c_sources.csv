@@ -45,6 +45,8 @@ address,name,source,matching
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,yes
 0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,yes
+0x0800DBE8,ListPushFront,src/world/list_ops.c,yes
+0x0800DC0C,ListRemove2,src/world/list_ops.c,yes
 0x08012898,ListAppend,src/core/linked_list.c,yes
 0x080128C0,ListRemove,src/core/linked_list.c,yes
 0x080128FC,ListInit,src/core/linked_list.c,yes
@@ -65,6 +67,8 @@ address,name,source,matching
 0x080196C8,IsObjectReadyA,src/world/object_state.c,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,no
+0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,yes
+0x08023938,PairIndex,src/world/pair_lookup.c,yes
 0x08023A0C,ApplyThreshold,src/world/threshold.c,yes
 0x08023A40,ResetMeter,src/world/threshold.c,yes
 0x08023A4C,SetToMax,src/world/threshold.c,yes
@@ -125,7 +129,11 @@ address,name,source,matching
 0x0803F714,SetActorActive,src/world/actor_states.c,yes
 0x0803F74C,SetActorIdle,src/world/actor_states.c,yes
 0x0803F764,ReleaseActor,src/world/actor_states.c,yes
+0x08042058,GetTileFieldA,src/world/map_tile_fields.c,yes
+0x08042088,GetTileType,src/world/map_tile_fields.c,yes
 0x08042434,IsTileTypeInRange,src/world/map_tiles.c,yes
+0x080424A8,GetTileFieldA2,src/world/tile_and_map.c,yes
+0x080424D8,GetMapSize,src/world/tile_and_map.c,yes
 0x080509C4,CallWithOffset,src/world/offset_helpers.c,no
 0x080509DC,GetBase,src/world/gRam02030330_gets.c,yes
 0x080509E8,SetSlot,src/world/gRam02030330_gets.c,yes
@@ -156,6 +164,7 @@ address,name,source,matching
 0x080664AC,MaybeReset,src/world/pause_helpers.c,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,no
+0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,yes
 0x080671B8,BumpCount6A,src/world/more_counters.c,yes
 0x080671D4,BumpCount68,src/world/more_counters.c,yes
 0x080671F0,BumpCount64,src/world/more_counters.c,yes
@@ -163,7 +172,3 @@ address,name,source,matching
 0x08067244,BumpCountA,src/world/stat_counters.c,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,yes
 0x08067274,AddDistance,src/world/distance_accum.c,no
-0x0800DBE8,ListPushFront,src/world/list_ops.c,yes
-0x0800DC0C,ListRemove2,src/world/list_ops.c,yes
-0x08042058,GetTileFieldA,src/world/map_tile_fields.c,yes
-0x08042088,GetTileType,src/world/map_tile_fields.c,yes
