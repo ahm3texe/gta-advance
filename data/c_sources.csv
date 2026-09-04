@@ -50,6 +50,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,16,16,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,12,12,yes
 0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,12,12,yes
+0x0800A980,ClipBounds,src/core/clip_bounds.c,96,100,no
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes

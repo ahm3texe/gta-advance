@@ -122,6 +122,7 @@ address,size,name,source,status,notes
 0x02036340,8,gDistanceAccum,decomp,provisional,Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
 0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
+0x03000014,12,gClipBounds,decomp,provisional,uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)
 0x03000078,4,gRam03000078,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x03000098,4,gRam03000098,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0300009C,4,gRam0300009C,decomp,provisional,Referenced by FUN_08001A00; role unknown
