@@ -238,6 +238,32 @@ class Walker:
         covered = self.code | self.data
         return (max(covered) + 4 - self.start) if covered else 0
 
+    def tail_pool_extent(self, limit: int) -> int:
+        """Kod govdesi + YALNIZCA govdenin hemen ardindaki kendi havuzu.
+
+        full_extent() fazla erisiyordu: yurutucu kuyruk cagrilarini izleyip
+        BASKA fonksiyonlarin havuzlarini da topluyor, bu yuzden 1651 kayit
+        isaretlenip 37'si dogrulanmis kaydin uzerine buyuyordu. Burada
+        yalnizca su kosulu saglayan kelimeler eklenir:
+          - kod govdesinin BITTIGI yerden itibaren KESINTISIZ,
+          - bu fonksiyonun kendi ldr'siyle basvurdugu (self.data),
+          - `limit` (bir sonraki kaydin basi) asilmadan.
+        Ilk bosluk zincirini kirar; havuzun otesindeki hicbir sey alinmaz.
+        """
+        if not self.code:
+            return 0
+        end = max(self.code) + 2
+        # Hizalama dolgusu ANCAK arkasindan gercek bir havuz kelimesi
+        # geliyorsa fonksiyona aittir. Kosulsuz yuvarlamak, havuzu olmayan
+        # 41 fonksiyonu tam +2 bayt fazla olcuyordu (NoOpVBlankFinalize
+        # gercekte 2 bayt, arac 4 diyordu).
+        aligned = (end + 3) & ~3
+        if aligned + 4 <= limit and aligned in self.data:
+            end = aligned
+            while end + 4 <= limit and end in self.data:
+                end += 4
+        return end - self.start
+
 
 def main() -> None:
     apply = "--apply" in sys.argv
@@ -310,7 +336,8 @@ def main() -> None:
             continue
         w = Walker(rom, start)
         w.run()
-        got = w.code_extent()
+        nxt = next((a for a in known if a > start), start + MAX_EXTENT)
+        got = w.tail_pool_extent(nxt)
         if got <= size:
             continue
         # Muhafazakar kapi: cozulemeyen dolayli atlama varsa yurutucu

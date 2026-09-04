@@ -32,7 +32,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800114C,BuildActiveMenuItems,src/ui/build_active_menu_items.c,160,160,yes
 0x080011EC,DrawMenuItems,src/ui/draw_menu_items.c,448,448,yes
 0x080013AC,InitMenuScreen,src/ui/init_menu_screen.c,172,172,yes
-0x08001458,RunMenuScreen,src/ui/menu_screen.c,1456,1414,no
+0x08001458,RunMenuScreen,src/ui/menu_screen.c,1456,1448,no
 0x08001A00,RunMenuLoop,src/ui/menu_loop.c,960,960,yes
 0x08001DC0,ResetMenuState,src/ui/menu_helpers.c,64,64,yes
 0x08001E00,IsMenuFlagSet,src/ui/menu_helpers.c,28,28,yes
@@ -193,7 +193,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08064460,DrawTextRightAligned,src/text/draw_text.c,130,130,yes
 0x080644E4,GetGlyphWidth,src/text/draw_text.c,64,64,yes
 0x08064524,GetTextWidth,src/text/draw_text.c,108,108,yes
-0x08064590,ClearTextArea,src/text/clear_text_area.c,132,110,no
+0x08064590,ClearTextArea,src/text/clear_text_area.c,132,132,no
 0x080664A4,GetBaseValue,src/world/pause_helpers.c,6,6,yes
 0x080664AC,MaybeReset,src/world/pause_helpers.c,24,24,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes
