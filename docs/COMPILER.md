@@ -265,3 +265,4 @@ make c-match FILE=src/save/save_helpers.c
 
 Her fonksiyonu ayrı ayrı derleyip `data/functions.csv`'deki adresinden ROM ile
 karşılaştırır. Eşleşen fonksiyonun assembly karşılığı artık gereksizdir.
+| 39 | Butun register'lar beklenenden **bir yukaridaysa**, kaynakta dokunulmadan **iletilen fazladan bir parametre** vardir | `SubmitPack`te ROM `{r4,r5,r6}` + r2/r3 kullanirken bizimki `{r3,r4,r5}` + r1/r2 uretiyordu; farkin tamami tek register kaymasiydi. r1'i KURAN komut yoktu, yani deger gelen parametreydi. Ikinci parametreyi imzaya ekleyip cagriya iletmek 8 bayt farki sifirladi. Once `FUN_08060db4(void)` -> arguman eklemek 16'dan 8'e indirmisti |

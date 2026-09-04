@@ -86,6 +86,7 @@ address,size,name,source,status,notes
 0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
 0x0202F300,4,gRam0202F300,decomp,provisional,+8'de u32 alan
 0x0202F310,4,gUnk0202F310,decomp,provisional,Read by a small getter at 0x08037F28; role unknown
+0x0202F360,12,gRam0202F360,decomp,provisional,SubmitPack 12 bayt kopyaliyor (byte-matching kanit)
 0x0202F3D0,4,gRam0202F3D0,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
@@ -106,6 +107,7 @@ address,size,name,source,status,notes
 0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
 0x02035CC0,4,gTableIndex,decomp,provisional,Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record
 0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 kimlik
+0x02036050,1,gRam02036050,decomp,provisional,kip bayti; IsModeReady okuyor (byte-matching kanit)
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
 0x0203630C,4,gTextRowStride,decomp,provisional,Row stride in tiles used when clearing a text area

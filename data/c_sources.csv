@@ -147,6 +147,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C790,ReturnOne,src/misc/session_reset.c,4,4,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,2,2,yes
 0x0803C798,ResetSessionNode,src/misc/session_node.c,40,40,yes
+0x0803C7D4,SubmitPack,src/world/submit_pack.c,24,24,yes
 0x0803F630,InitState,src/world/state_init.c,26,26,yes
 0x0803F64C,StateNoop,src/world/state_init.c,2,2,yes
 0x0803F650,RunState,src/world/state_init.c,12,12,yes
@@ -188,6 +189,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805E6E0,GetRecordWord,src/misc/table_lookup.c,32,32,yes
 0x08062294,GetModeCategory,src/world/ram_state.c,30,30,yes
 0x080622B4,SetRamState,src/world/ram_state.c,12,12,yes
+0x0806233C,IsModeReady,src/world/is_mode_two.c,20,20,yes
 0x08062514,GetRamType,src/world/ram_flags.c,28,28,yes
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,28,28,yes
 0x0806434C,SetFontIndex,src/text/draw_text.c,16,16,yes
