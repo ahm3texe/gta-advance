@@ -96,7 +96,7 @@ extern void  FUN_0806430c(void *dest, u32 tileCount, const void *tilesA,
 extern void  FUN_08063ca4(void);
 extern void  FUN_0800ab60(void);
 extern void  FUN_08005fc4(int id);
-extern u32   FUN_080512b0(void);
+extern u32   GetRecordIndex(void);
 extern void  VBlankIntrWait(void);
 extern void  FUN_08063cf0(void);
 
@@ -282,9 +282,9 @@ void RunMenuLoop(void)
                 SetTableIndex(sel);
                 if (sel < scrollTop) {
                     scrollTop--;
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 } else {
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 }
                 redraw = 1;
             }
@@ -295,9 +295,9 @@ void RunMenuLoop(void)
                 SetTableIndex(sel);
                 if (sel > scrollTop + (MENU_VISIBLE_MAX - 1)) {
                     scrollTop++;
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 } else {
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 }
                 redraw = 1;
             }

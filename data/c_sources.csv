@@ -209,6 +209,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080509E8,SetSlot,src/world/gRam02030330_gets.c,12,12,yes
 0x080509F4,GetAnchorUnk30,src/world/get_anchor_unk30.c,12,12,yes
 0x08050A00,GetAnchorUnk34,src/world/get_anchor_unk34.c,12,12,yes
+0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
 0x08051464,FUN_08051464,src/world/wrap_08051464.c,10,10,yes
 0x08051480,FUN_08051480,src/world/wrap_08051480.c,10,10,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,28,28,yes
@@ -239,6 +240,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08062350,IsModeDone,src/world/is_mode_two.c,20,20,yes
 0x08062514,GetRamType,src/world/ram_flags.c,28,28,yes
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,28,28,yes
+0x08062654,GetRamWord16,src/world/get_ram_word16.c,12,12,yes
 0x08063BCC,FUN_08063bcc,src/world/wrap_08063bcc.c,10,10,yes
 0x0806434C,SetFontIndex,src/text/draw_text.c,16,16,yes
 0x0806435C,DrawText,src/text/draw_text.c,124,124,yes

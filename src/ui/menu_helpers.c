@@ -16,7 +16,7 @@ extern u32 gActiveMenuItems[ACTIVE_MENU_ITEM_MAX];
 
 /* Henuz adlandirilmadi: 0x080512B0 alti byte'lik bir erisimci,
  * 0x08004280 ise 624 byte'lik bir islem. */
-extern u32 FUN_080512b0(void);
+extern u32 GetRecordIndex(void);
 extern void FUN_08004280(u32 target, u32 argument);
 
 /* 0x08001DC0 */
@@ -48,5 +48,5 @@ u32 IsMenuFlagSet(u32 bit)
 /* 0x08001E1C */
 void FinalizeMenuLayout(void)
 {
-    FUN_08004280(FUN_080512b0() + 108, 0);
+    FUN_08004280(GetRecordIndex() + 108, 0);
 }

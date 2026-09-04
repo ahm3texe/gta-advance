@@ -1231,7 +1231,7 @@ address,name,size,status,module,notes
 0x080510D8,FUN_080510d8,112,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08051148,FUN_08051148,12,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08051154,FUN_08051154,348,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080512B0,FUN_080512b0,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080512B0,GetRecordIndex,12,matching,world,"yaprak erisimci; tools/find_accessors.py ile bulundu, C'den byte-matching"
 0x080512BC,FUN_080512bc,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08051300,FUN_08051300,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805131C,FUN_0805131c,62,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -1615,7 +1615,7 @@ address,name,size,status,module,notes
 0x080625A0,FUN_080625a0,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080625D0,FUN_080625d0,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806262C,FUN_0806262c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062654,FUN_08062654,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08062654,GetRamWord16,12,matching,world,"yaprak erisimci; tools/find_accessors.py ile bulundu, C'den byte-matching"
 0x08062660,FUN_08062660,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806269C,FUN_0806269c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080626BC,FUN_080626bc,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

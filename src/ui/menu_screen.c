@@ -131,7 +131,7 @@ extern void  FUN_0806430c(void *dest, u32 tileCount, const void *tilesA,
 extern void  FUN_08063ca4(void);
 extern void  FUN_0800ab60(void);
 extern void  FUN_08005fc4(int id);
-extern u32   FUN_080512b0(void);
+extern u32   GetRecordIndex(void);
 extern void  VBlankIntrWait(void);
 extern void  FUN_08007fdc(void);
 extern void  FUN_08063d3c(void);
@@ -268,7 +268,7 @@ void RunMenuScreen(int mode)
     }
 
     menu = BuildActiveMenuItems(SCREEN_MENUS + mode);
-    FUN_08004280(FUN_080512b0() + 108, 0);
+    FUN_08004280(GetRecordIndex() + 108, 0);
 
     FUN_0806430c(VRAM, MENU_TILE_COUNT, MENU_TILES_A, MENU_TILES_B,
                  MENU_TILE_WIDTH, 0);
@@ -390,7 +390,7 @@ void RunMenuScreen(int mode)
                 sel--;
                 if (sel < scrollTop) {
                     scrollTop--;
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 }
                 redraw = 1;
             }
@@ -400,7 +400,7 @@ void RunMenuScreen(int mode)
                 sel++;
                 if (sel > scrollTop + (MENU_VISIBLE_MAX - 1)) {
                     scrollTop++;
-                    FUN_08004280(FUN_080512b0() + 108, 0);
+                    FUN_08004280(GetRecordIndex() + 108, 0);
                 }
                 redraw = 1;
             }
