@@ -59,6 +59,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
 0x080127FC,List2Init,src/core/list_ops2.c,10,10,yes
 0x08012808,List2PushFront,src/core/list_ops2.c,36,36,yes
+0x0801282C,InsertSorted,src/core/insert_sorted.c,106,106,yes
 0x08012898,ListAppend,src/core/linked_list.c,40,40,yes
 0x080128C0,ListRemove,src/core/linked_list.c,60,60,yes
 0x080128FC,ListInit,src/core/linked_list.c,10,10,yes

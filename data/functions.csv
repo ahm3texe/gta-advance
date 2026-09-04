@@ -262,7 +262,7 @@ address,name,size,status,module,notes
 0x080127A8,FUN_080127a8,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080127FC,List2Init,10,matching,core,Liste islemleri; src/core/list_ops2.c
 0x08012808,List2PushFront,36,matching,core,Liste islemleri; src/core/list_ops2.c
-0x0801282C,FUN_0801282c,106,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801282C,InsertSorted,106,matching,core,"C kaynagindan byte-matching; sirali cift bagli liste ekleme, uc yol + dondurulmus dongu"
 0x08012898,ListAppend,40,matching,core,Cift bagli liste; src/core/linked_list.c
 0x080128C0,ListRemove,60,matching,core,Cift bagli liste; src/core/linked_list.c
 0x080128FC,ListInit,10,matching,core,Cift bagli liste; src/core/linked_list.c
