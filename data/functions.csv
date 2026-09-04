@@ -946,7 +946,7 @@ address,name,size,status,module,notes
 0x0803C050,ConfigureSlot,64,matching,world,Yuva yapilandirmasi; src/world/slot_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C090,GetActiveSlotValue,36,matching,world,Yuva yapilandirmasi; src/world/slot_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C0B4,GetSlotField,48,matching,world,Yuva yapilandirmasi; src/world/slot_config.c
-0x0803C0E4,FUN_0803c0e4,148,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C0E4,ApplyTwoLevels,148,matching,world,"C kaynagindan byte-matching; 148 bayt, 128-256 bandinin ilk eslesmesi"
 0x0803C178,GetSlotRange,50,matching,world,Yuva menzili; src/world/slot_range.c
 0x0803C1AC,GetDefaultRange,6,matching,world,Yuva menzili; src/world/slot_range.c
 0x0803C1B4,FUN_0803c1b4,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

@@ -167,6 +167,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,36,36,yes
 0x0803C0B4,GetSlotField,src/world/slot_config.c,48,48,yes
+0x0803C0E4,ApplyTwoLevels,src/world/apply_two_levels.c,148,148,yes
 0x0803C178,GetSlotRange,src/world/slot_range.c,50,50,yes
 0x0803C1AC,GetDefaultRange,src/world/slot_range.c,6,6,yes
 0x0803C45C,SelectWordSource,src/world/select_word_source.c,32,32,yes

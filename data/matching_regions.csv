@@ -89,6 +89,7 @@ start,end,binary,module,notes
 0x08038260,0x08038298,build/world/object_value.bin,world,"Nesne deger cozumu: sinama, dolayli yuva, dogrudan ayrinti"
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu
+0x0803C0E4,0x0803C178,build/world/apply_two_levels.bin,world,iki seviyeyi kirpip uygulama
 0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Yuva menzili + varsayilan sabit
 0x0803C45C,0x0803C47C,build/world/select_word_source.bin,world,kaynak secip yarim soz okuma
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Uc yuva secici; SlotCD ve GetSubValue ortak kuyrukta birlesiyor
