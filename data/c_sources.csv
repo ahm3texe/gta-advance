@@ -212,6 +212,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080509E8,SetSlot,src/world/gRam02030330_gets.c,12,12,yes
 0x080509F4,GetAnchorUnk30,src/world/get_anchor_unk30.c,12,12,yes
 0x08050A00,GetAnchorUnk34,src/world/get_anchor_unk34.c,12,12,yes
+0x08050A0C,CheckCurrentEntity,src/world/check_current_entity.c,38,38,yes
 0x08050A34,IsAnchorSmall,src/world/is_anchor_small.c,20,20,yes
 0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
 0x08051464,FUN_08051464,src/world/wrap_08051464.c,10,10,yes
@@ -227,6 +228,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055AC4,ClassifyId,src/world/node_search.c,52,52,yes
 0x08055AF8,QueryEntity,src/world/entity_query.c,60,60,yes
 0x08055B34,EngageActor,src/world/engage_actor.c,74,74,yes
+0x08055BBC,RefreshThenNotify,src/world/refresh_then_notify.c,44,44,yes
 0x08055BF8,ForwardZeroArg2,src/world/forward_zero_arg2.c,12,12,yes
 0x08055C8C,FindNthFreeSlot,src/world/slot_scan.c,58,58,yes
 0x08055CC8,ClearSlots,src/world/slot_scan.c,64,64,yes

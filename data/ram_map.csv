@@ -103,6 +103,7 @@ address,size,name,source,status,notes
 0x020303D0,16,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
 0x02030C10,320,gSlotIds,decomp,provisional,160 adet u16 yuva kimligi; 0x7FEF bos demek
 0x02030D50,7680,gSlotArray,decomp,provisional,128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi
+0x02035780,4,gRam02035780,decomp,provisional,FUN_08055D90 cagrisinda ilk arguman (byte-matching kanit)
 0x02035A70,4,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik"
 0x02035A9C,1,gRam02035A9C,decomp,provisional,254'te doyan u8 sayac
 0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
