@@ -24,9 +24,11 @@
  *
  * Onceki elle-hesaplamali surum 2/128 veriyordu ama tur catismasi
  * nedeniyle `make check` kiriliyordu; bu surum tutarli ama 4 bayt kisa.
- * Ilk fark yalnizca HAVUZ INDISLERINDE (`17 48` vs `18 48`), yani
- * komutlar tutuyor, havuzda bir kelime eksik -- ROM bizim yuklemedigimiz
- * bir sabiti yukluyor. Sonraki tur o sabiti bulmali.
+ * TESHIS DUZELTILDI: havuz kelimesi EKSIK DEGIL. Iki havuz da ayni iki
+ * sabiti tasiyor (0x020246F0 ve 0x08BD3448), yalnizca 4 bayt kaymis
+ * duruyorlar. Yani eksik olan havuzdan ONCEKI dort baytlik KOD.
+ * Ilk yorumum ("bir sabit eksik") yanlisti; havuz tarayicim komut
+ * baytlarini kelime sanmisti.
  *
  * Elle-hesaplamali surumdeki iki fark (kayit icin):
  *     +0x4C  bizim `lsrs r0,r0,#2`   ROM `asrs r0,r0,#2`  (isaretli kaydirma)

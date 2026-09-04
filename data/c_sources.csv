@@ -98,6 +98,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
 0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,12,12,yes
 0x08023938,PairIndex,src/world/pair_lookup.c,60,60,yes
+0x08023974,StepDecay,src/world/step_decay.c,156,152,no
 0x08023A0C,ApplyThreshold,src/world/threshold.c,52,52,yes
 0x08023A40,ResetMeter,src/world/threshold.c,10,10,yes
 0x08023A4C,SetToMax,src/world/threshold.c,10,10,yes

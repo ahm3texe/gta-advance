@@ -487,7 +487,7 @@ address,name,size,status,module,notes
 0x08023868,FUN_08023868,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802392C,ClearRam0202370C,12,matching,world,Cift indeksleme; src/world/pair_lookup.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08023938,PairIndex,60,matching,world,Cift indeksleme; src/world/pair_lookup.c
-0x08023974,FUN_08023974,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08023974,StepDecay,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08023A0C,ApplyThreshold,52,matching,world,Bant hesaplayici; src/world/threshold.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08023A40,ResetMeter,10,matching,world,Bant hesaplayici; src/world/threshold.c
 0x08023A4C,SetToMax,10,matching,world,Bant hesaplayici; src/world/threshold.c
