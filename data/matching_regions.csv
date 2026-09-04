@@ -144,6 +144,7 @@ start,end,binary,module,notes
 0x0806720C,0x08067228,build/world/bump_save_counter.bin,world,gSaveBuffer +0x66 doyuran sayac
 0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
 0x08067274,0x080672B8,build/world/distance_accum.bin,world,AddDistance; mutlak delta mesafe ve taşma biriktiricisi
+0x080672B8,0x080672FC,build/world/accumulate_distance.bin,world,mesafe biriktirme ve tasma sayaci
 0x08067374,0x080673AC,build/world/more_counters_2.bin,world,u16 ve u8 tasma korumali sayaclar
 0x080673C4,0x080673FC,build/world/more_counters_3.bin,world,u8 tasma korumali sayaclar
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"

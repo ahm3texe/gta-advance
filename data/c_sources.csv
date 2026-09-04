@@ -266,6 +266,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08067244,BumpCountA,src/world/stat_counters.c,28,28,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,20,20,yes
 0x08067274,AddDistance,src/world/distance_accum.c,68,68,yes
+0x080672B8,AccumulateDistance,src/world/accumulate_distance.c,68,68,yes
 0x08067374,BumpCount7A,src/world/more_counters_2.c,28,28,yes
 0x08067390,BumpCount84,src/world/more_counters_2.c,28,28,yes
 0x080673C4,BumpCount70,src/world/more_counters_3.c,28,28,yes

@@ -19,6 +19,8 @@ typedef struct SaveBuffer {
     u8 byte9;                   /* +0x09 */
     u8 pad0A[92];
     u16 counter66;              /* +0x66 */
+    u8 pad68[14];
+    u16 counter76;              /* +0x76 */
 } SaveBuffer;
 
 extern SaveBuffer gSaveBuffer;
