@@ -27,6 +27,21 @@
  *   - DMA kurulumunu iki kez cagrilan inline yardimciya almak: 55-59
  * Bu bicim olculmus yerel optimum.
  *
+ * ENGEL DAHA KESIN TANIMLANDI (kural 35-38 turevleri denendi): sorun "olu
+ * okumanin register'i" DEGIL. Ciplak okuma + control'u UC DEYIMDE hesaplamak
+ * 0x62'yi TAM OLARAK duzeltiyor (olu okuma r0'a dusuyor) ama farki 0x38/0x3a'ya
+ * tasiyor:
+ *     ROM  : lsl r0, r3, #6  /  asr r3, r0, #1   <- ara deger r0'dan geciyor
+ *     bizim: lsl r3, r3, #6  /  asr r3, r3, #1   <- yerinde
+ * Yani gercek engel: agbcc kaydirmayi r0 uzerinden gecirirken control'un
+ * dagitimini ayni anda koruyamiyor. Iki bagimsiz yol da bu ayni iki bayta
+ * cikiyor (uc deyim = 2, dort deyim yerinde = 2).
+ *
+ * Bu turda ayrica elenenler: ikinci bloga ayri taban kopyasi (kural 37) 13 --
+ * `dma2 = dma` saf kopya oldugu icin agbcc birlestiriyor; ayri `shifted` ara
+ * yereli 13 (yeni bildirim referans dengesini bozuyor); olu yerelleri (row 58,
+ * col 20, height 13) ara deger yapmak; sabiti one alip |= ile birlestirmek 60.
+ *
  * NOT: bir ajan `register volatile DmaChannel *dma asm("r4");` ile 0 bayta
  * ulasti. Bu KABUL EDILMEDI (docs/WORKFLOW.md 6): acik register baglamasi
  * byte'lari tutturur ama nedenini gizler ve her register uyusmazligini

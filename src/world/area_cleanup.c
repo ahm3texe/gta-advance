@@ -3,12 +3,29 @@
  * Bekleyen temizlik bayragi kuruluysa iki VRAM konumuna ucer yarim soz
  * dolduruyor, bir blogu serbest birakiyor ve bayragi temizliyor.
  *
- * HENUZ ESLESMIYOR: 40 komutun 28'i tutuyor, 56 bayt fark. Fark havuz
- * yukleme sirasi ve ROM'un fazladan bir register kopyasi: ROM dolgu
- * degerini r1'e yukleyip `adds r0, r1, #0` ile r0'a kopyaliyor, bizimki
- * dogrudan hedefe yukluyor -- yani bizde bir `ldr` ve bir kopya eksik.
- * Denenenler: blogu dongu oncesi yuklemek (61), dolgudan sonra yuklemek
- * (56, secildi), dolguyu int yapmak (61), satir ici birakmak (63).
+ * HENUZ ESLESMIYOR: 7 bayt fark (onceki durum 56 idi).
+ *
+ * IKI ENGEL COZULDU:
+ *   1. Ayri yasam araligi (kural 37). ROM dolguyu r1'e yukleyip
+ *      `adds r0, r1, #0` ile r0'a kopyaliyordu; tek `fill` degiskeni bu
+ *      kopyayi uretemez. `fill2 = fill` ekleyip iki store'u ayirmak
+ *      56 -> 17 yaptı. Kopyanin yonu ve ikisini de sabitten kurmak
+ *      farketmiyor (uc bicim de 17): agbcc kopyayi ayni ele aliyor.
+ *   2. Havuz sirasi. ROM havuza once blok adresini, sonra dolguyu
+ *      koyuyor. `block` atamasini `fill`in ONUNE almak 17 -> 7 yaptı.
+ *      Havuz sirasi, sabitlerin KAYNAKTA ilk referans sirasini izliyor.
+ *
+ * KALAN 7 BAYT tek bir yapisal nedene iniyor: ROM bes register'a sigiyor
+ * (`push {r4,lr}`), biz alti istiyoruz (`push {r4,r5,lr}`). Farklarin
+ * tamami bunun turevi -- ROM block'u tek callee-saved r4'te tutup iki
+ * dolguyu scratch r0/r1'de birakiyor; bizde fill2 r4'u kapiyor ve block
+ * r5'e itiliyor. Yani ROM'da dongu boyunca yasayan bir deger daha az;
+ * muhtemelen `i` sayaci ayri bir register tutmuyor.
+ * Bildirim sirasi bu fonksiyonda ETKISIZ (uc permutasyon da 7 verdi) --
+ * ClearTextArea'nin aksine; oradaki hassasiyet genellenebilir degil.
+ *
+ * Onceki turda elenenler (fill2 YOKKEN olculmustu, artik gecersiz sayilmali):
+ * blogu dongu oncesi yuklemek 61, dolguyu int yapmak 61, satir ici 63.
  *
  * Ayni kumedeki eslesen uc fonksiyon: src/world/area_flags.c
  *
@@ -41,18 +58,20 @@ void CleanupAreaTiles(void)
     u32 *block;
     u32 i;
     u16 fill;
+    u16 fill2;
 
     if (((Progress *)gRam02025810)->pendingCleanup == 0)
         return;
 
     i = 0;
-    fill = TILE_FILL;
     block = &gRam02026E80;
+    fill = TILE_FILL;
+    fill2 = fill;
     right = TILE_ROW_RIGHT;
     left = TILE_ROW_LEFT;
     do {
         *left = fill;
-        *right = fill;
+        *right = fill2;
         right++;
         left++;
         i++;

@@ -97,7 +97,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,52,52,yes
 0x08030C80,SetAreaFlag,src/world/area_flags.c,48,48,yes
 0x08030CB0,AreaFlagsNoop,src/world/area_flags.c,2,2,yes
-0x08030CB4,CleanupAreaTiles,src/world/area_cleanup.c,84,62,no
+0x08030CB4,CleanupAreaTiles,src/world/area_cleanup.c,88,62,no
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,42,yes
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,56,50,yes
