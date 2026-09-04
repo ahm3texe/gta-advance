@@ -225,6 +225,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055AA8,FindNode,src/world/node_search.c,28,28,yes
 0x08055AC4,ClassifyId,src/world/node_search.c,52,52,yes
 0x08055AF8,QueryEntity,src/world/entity_query.c,60,60,yes
+0x08055B34,EngageActor,src/world/engage_actor.c,74,74,yes
 0x08055BF8,ForwardZeroArg2,src/world/forward_zero_arg2.c,12,12,yes
 0x08055C8C,FindNthFreeSlot,src/world/slot_scan.c,58,58,yes
 0x08055CC8,ClearSlots,src/world/slot_scan.c,64,64,yes

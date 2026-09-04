@@ -1322,7 +1322,7 @@ address,name,size,status,module,notes
 0x08055AA8,FindNode,28,matching,world,Dugum arama / kimlik sorgusu; src/world/node_search.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08055AC4,ClassifyId,52,matching,world,Dugum arama / kimlik sorgusu; src/world/node_search.c
 0x08055AF8,QueryEntity,60,matching,world,Varlık türü ve alt-hedef bayrak sorgusu; src/world/entity_query.c
-0x08055B34,FUN_08055b34,74,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08055B34,EngageActor,74,matching,world,"C kaynagindan byte-matching; iki kapili aktor devreye alma, etiketli kontrol akisi"
 0x08055BBC,FUN_08055bbc,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055BE8,FUN_08055be8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055BF8,ForwardZeroArg2,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)

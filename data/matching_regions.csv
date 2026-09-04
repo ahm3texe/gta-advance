@@ -122,6 +122,7 @@ start,end,binary,module,notes
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055AF8,0x08055B34,build/world/entity_query.bin,world,QueryEntity; varlık türü ve alt-hedef bayrak sorgusu
+0x08055B34,0x08055B80,build/world/engage_actor.bin,world,aktoru devreye alma
 0x08055BF8,0x08055C04,build/world/forward_zero_arg2.bin,world,ikinci argumani sifirlayarak iletme
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
