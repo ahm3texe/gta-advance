@@ -62,33 +62,37 @@ typedef struct DmaChannel {
 #define REG_IME (*(vu16 *)0x04000208)
 #define DMA3    ((volatile DmaChannel *)0x040000D4)
 
-typedef struct Slot {
-    u8           index;         /* +0x00 */
-    u8           pad01[2];
-    u8           pending;       /* +0x03 */
-    void        *src;           /* +0x04 */
-    struct Slot *next;          /* +0x08 */
-} Slot;
+/* list_head.c'deki mevcut Entry ile AYNI bayt duzeni; oradaki pad00[8]'in
+   ic alanlari burada adlandirildi (boyut ve ofsetler degismedi). */
+typedef struct Entry {
+    u8            index;        /* +0x00 */
+    u8            pad01[2];
+    u8            pending;      /* +0x03 */
+    void         *src;          /* +0x04 */
+    struct Entry *next;         /* +0x08 */
+} Entry;
 
 /* +0x104 ofseti `ldr rX,[rY,#imm]` kodlamasina sigmiyor (word yuklemede
    tavan 124), bu yuzden AGBCC 260'i ayri bir yazmaca kuruyor: kalip
-   bir dizi aritmetigi degil, YAPI UYESI erisimi. */
-typedef struct Root {
-    u8    pad000[0x104];
-    Slot *queue;                /* +0x104 */
-} Root;
+   bir dizi aritmetigi degil, YAPI UYESI erisimi.  Ayni sembolun ayni
+   yapisi zaten list_head.c'de (eslesmis) kullaniliyor. */
+typedef struct ListRoot {
+    u8     pad00[0x100];
+    Entry *listHead;            /* +0x100 */
+    Entry *chainHead;           /* +0x104 */
+} ListRoot;
 
-extern Root gRam02022E50;
+extern ListRoot gRam02022E50;
 
 /* 0x08013900 */
 void FlushPaletteQueue(void)
 {
-    Slot *slot;
-    Slot *next;
+    Entry *slot;
+    Entry *next;
     u16   ime;
     void *src;
 
-    slot = gRam02022E50.queue;
+    slot = gRam02022E50.chainHead;
     if (slot == 0)
         return;
 

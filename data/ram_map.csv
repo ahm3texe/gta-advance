@@ -134,8 +134,6 @@ address,size,name,source,status,notes
 0x03007FA0,4,gIrqStack,decomp,verified,BIOS IRQ stack pointer area
 0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
 0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
-0x040000D4,4,gDma3,,,
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
-0x04000208,4,REG_IME,,,
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
 0x08EC46D4,0,gRecordTable,decomp,provisional,ROM table of 0x9A8-byte records selected by gTableIndex

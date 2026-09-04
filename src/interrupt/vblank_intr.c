@@ -53,7 +53,7 @@ extern void FUN_0806686c(void);
 extern void FUN_08012b9c(void);
 extern void FUN_080133a8(void);
 extern void FUN_080130f4(void);
-extern void FUN_08013900(void);
+extern void FlushPaletteQueue(void);
 extern void FUN_080101d8(void);
 extern void FUN_080108f4(void);
 extern void NoOpVBlankFinalize(void);
@@ -82,7 +82,7 @@ void VBlankIntr(void)
                 FUN_08012b9c();
                 FUN_080133a8();
                 FUN_080130f4();
-                FUN_08013900();
+                FlushPaletteQueue();
                 if (gAsyncState == 0)
                     FUN_080101d8();
 
@@ -108,7 +108,7 @@ void VBlankIntr(void)
                     FUN_08012b9c();
                     FUN_080133a8();
                     FUN_080130f4();
-                    FUN_08013900();
+                    FlushPaletteQueue();
                     if (gAsyncState == 0)
                         FUN_080101d8();
 

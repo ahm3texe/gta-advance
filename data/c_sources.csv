@@ -71,6 +71,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012A98,FUN_08012a98,src/world/wrap_08012a98.c,10,10,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
 0x080138F4,FUN_080138f4,src/world/wrap_080138f4.c,10,10,yes
+0x08013900,FlushPaletteQueue,src/core/flush_palette_queue.c,120,116,no
 0x08013974,GetEntryOrDefault,src/world/list_head.c,24,24,yes
 0x0801398C,CountChain,src/world/list_head.c,36,36,yes
 0x080139B0,MarkChain,src/world/list_head.c,32,32,yes
