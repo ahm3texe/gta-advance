@@ -67,6 +67,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012908,ListForEach,src/core/linked_list.c,28,28,yes
 0x08012924,ListForEachArg,src/core/linked_list.c,32,32,yes
 0x08012944,ForEachNode,src/core/for_each_node.c,36,36,yes
+0x08012968,UnlinkToFree,src/core/unlink_to_free.c,150,150,no
 0x08012A98,FUN_08012a98,src/world/wrap_08012a98.c,10,10,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
 0x080138F4,FUN_080138f4,src/world/wrap_080138f4.c,10,10,yes
