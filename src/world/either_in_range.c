@@ -16,10 +16,24 @@
  * Anlamca ayni, bicimce farkli. agbcc `< 12`yi `<= 11`e ceviriyor ve
  * sabit bir eksik yaziliyor. Sekiz yerde birden.
  *
- * Denenenler: erken cikisli `goto` (8, en iyi); ic ice pozitif kosul
- * (15, DAHA KOTU -- ilk yarim zaten oyleydi ve ayni kanonikleştirme
- * cikiyordu). Sonraki fikir: kural 30 yonunde acik esitlik zinciri
- * (`x == 12 || x == 13 || ...`) denemek.
+ * ALTI VARYANT SISTEMATIK OLARAK DENENDI, HICBIRI 8'I GECEMEDI:
+ *     erken cikisli `goto`                  8  (en iyi, mevcut)
+ *     ters kosullu erken cikis              8  (esit)
+ *     ic ice pozitif kosul                 15
+ *     `> 11` bicimi (sabit 11 dogrudan)    15
+ *     kind yereli yok, alan dogrudan       10
+ *     kind u32                             10
+ *     kind int                              8  (esit)
+ *     acik esitlik zinciri (kural 30)      46 bayt, boyut bile tutmadi
+ *
+ * Yani `cmp #12 / blt` bicimini kaynaktan STEERING edemiyoruz; agbcc
+ * `< 12`yi `<= 11`e ceviriyor ve bu kanonikleştirme kaynak bicimine
+ * duyarli degil. Karsilastirma OPERATORU, operand TIPI ve blok YAPISI
+ * ayri ayri denendi.
+ *
+ * Kalan fikir: permuter (kurulu, tools/setup_permuter.sh) bu tur yerel
+ * bicim aramasi icin uygun -- ama ara skorlari bizim olcutumuz DEGIL,
+ * yalnizca skor 0 anlamli (bkz. ClearTextArea sonucu).
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/either_in_range.c
