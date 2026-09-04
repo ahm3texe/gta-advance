@@ -183,6 +183,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,2,2,yes
 0x0803C798,ResetSessionNode,src/misc/session_node.c,40,40,yes
 0x0803C7D4,SubmitPack,src/world/submit_pack.c,24,24,yes
+0x0803F4BC,TryEngageTarget,src/world/try_engage_target.c,372,372,no
 0x0803F630,InitState,src/world/state_init.c,26,26,yes
 0x0803F64C,StateNoop,src/world/state_init.c,2,2,yes
 0x0803F650,RunState,src/world/state_init.c,12,12,yes

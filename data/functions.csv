@@ -1011,7 +1011,7 @@ address,name,size,status,module,notes
 0x0803EF18,FUN_0803ef18,464,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0803F0E8,FUN_0803f0e8,628,candidate,world,Ghidra kacirmisti; 0x0803F6xx durum ayarlayicilarinin isleyici hedefi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803F35C,FUN_0803f35c,350,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803F4BC,FUN_0803f4bc,372,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803F4BC,TryEngageTarget,372,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803F630,InitState,26,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F64C,StateNoop,2,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F650,RunState,12,matching,world,Durum kurulumu; src/world/state_init.c
