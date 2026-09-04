@@ -143,6 +143,15 @@ const MODULE_LABELS: Record<string, string> = {
 const GROUP_LABEL_MIN_WIDTH = 108;
 const GROUP_LABEL_MIN_HEIGHT = 52;
 
+// Bir grup kutusu basligini tasiyabiliyor mu? Dolgu payi, baslik metni VE
+// yaprak etiketleri bu TEK kosula bagli. Ayri esikler kullanildiginda
+// aradaki bantta kalan gruplar basliksiz kaliyor ama icindeki en buyuk
+// fonksiyonun adi ciziliyordu; o ad baslik gibi okunuyordu.
+function hasGroupHeader(node: { x0: number; x1: number; y0: number; y1: number }) {
+  return node.x1 - node.x0 >= GROUP_LABEL_MIN_WIDTH
+    && node.y1 - node.y0 >= GROUP_LABEL_MIN_HEIGHT;
+}
+
 type Grouping = 'cluster' | 'module' | 'bank';
 
 function groupKey(fn: FunctionRecord, grouping: Grouping) {
@@ -263,13 +272,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
       .tile(treemapSquarify.ratio(1.12))
       .paddingOuter(5)
       .paddingInner(1.5)
-      .paddingTop((node) =>
-        node.depth === 1 &&
-        node.x1 - node.x0 >= GROUP_LABEL_MIN_WIDTH &&
-        node.y1 - node.y0 >= GROUP_LABEL_MIN_HEIGHT
-          ? 24
-          : 0,
-      )
+      .paddingTop((node) => (node.depth === 1 && hasGroupHeader(node) ? 24 : 0))
       .round(true)(root);
   }, [grouping, height, visibleFunctions, width]);
 
@@ -408,7 +411,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                     onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setFocusGroup(node.data.name); }}
                   >
                     <rect className="group-rect" x={node.x0} y={node.y0} width={node.x1 - node.x0} height={node.y1 - node.y0} />
-                    {node.x1 - node.x0 >= GROUP_LABEL_MIN_WIDTH && node.y1 - node.y0 >= GROUP_LABEL_MIN_HEIGHT && (
+                    {hasGroupHeader(node) && (
                       <text className="group-label" x={node.x0 + 8} y={node.y0 + 16}>
                         {truncateToWidth(
                           groupLabel(node.data.name, grouping, visibleFunctions),
@@ -424,6 +427,10 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                   const cellWidth = node.x1 - node.x0;
                   const cellHeight = node.y1 - node.y0;
                   const active = selected.address === fn.address;
+                  // Grubu basliksizsa fonksiyon adini da cizme: aksi halde
+                  // ad, grup basligi sanilir (kullanici bildirimi).
+                  const parent = node.parent as HierarchyRectangularNode<TreeDatum> | null;
+                  const labelAllowed = !parent || parent.depth !== 1 || hasGroupHeader(parent);
                   return (
                     <g
                       className="function-cell"
@@ -438,7 +445,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                       onPointerLeave={() => setTooltip(null)}
                     >
                       <rect className={active ? 'leaf-rect leaf-selected' : 'leaf-rect'} x={node.x0} y={node.y0} width={cellWidth} height={cellHeight} fill={`url(#fill-${displayStatus(fn)})`} />
-                      {cellWidth > 76 && cellHeight > 38 && <>
+                      {labelAllowed && cellWidth > 76 && cellHeight > 38 && <>
                         <text className="leaf-label" x={node.x0 + 7} y={node.y0 + 17}>{fn.name.length > 22 ? `${fn.name.slice(0, 20)}…` : fn.name}</text>
                         {cellHeight > 57 && <text className="leaf-meta" x={node.x0 + 7} y={node.y0 + 34}>{formatBytes(fn.size)} · %{fn.matchPercent.toFixed(0)}</text>}
                       </>}
