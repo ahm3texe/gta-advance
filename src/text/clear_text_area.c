@@ -36,6 +36,16 @@
  * bir yerde (orn. fonksiyonun ait oldugu gercek ceviri biriminin
  * bilinmesi, ya da henuz olcmedigimiz bir agbcc davranisi).
  *
+ * TERS YON DE DENENDI VE ELENDI. SetBg1Enable'i cozen "yerelleri KALDIR"
+ * yontemi burada dort varyantla sinandi, dordu de kotulesti:
+ *     control yerelini kaldirmak                 13
+ *     row/col kaldirip dest'i tek ifade         116
+ *     ikinci blokta da ciplak okuma              13
+ *     dest yerelini kaldirmak                   111
+ * Taban 1; hicbiri yaklasamadi bile. Boylece bu fonksiyon HER IKI YONDEN
+ * kapali: yerel ekleme (18 deneme), yerel kaldirma (4 deneme), rastgele
+ * arama (13.917 yineleme) ve 5040 bildirim permutasyonu.
+ *
  * ENGEL DAHA KESIN TANIMLANDI (kural 35-38 turevleri denendi): sorun "olu
  * okumanin register'i" DEGIL. Ciplak okuma + control'u UC DEYIMDE hesaplamak
  * 0x62'yi TAM OLARAK duzeltiyor (olu okuma r0'a dusuyor) ama farki 0x38/0x3a'ya
