@@ -333,5 +333,29 @@ icin `block` hicbir zaman dongu boyunca canli degildi.
 
 Yani kural izole deneyde olculebiliyor ama gercek bir fonksiyona
 uygulamak icin dagiticinin canli kumesini GORMEK gerekiyor; kaynaktaki
-yerelleri saymak yaniltiyor. Prolog kac register istedigini soyler, ama
-HANGI degerlerin sayildigini soylemez. Bu adim henuz cozulmedi.
+yerelleri saymak yaniltiyor.
+
+BU ADIM COZULDU: agbcc `-dg` bayragini kabul ediyor ve global dagitim
+dokumu (`.greg`) uretiyor. Dokumde dagiticinin KENDI oncelik listesi
+yazili -- her pseudo icin `refs` ve `live_length`. `tools/dump_alloc.py`
+bunu okuyup tabloyu basiyor.
+
+FORMUL DOKUME KARSI DOGRULANDI. Bir probe fonksiyonunda dokumun yazdigi
+sira:
+    R25 refs=7 omur=18 -> 0.778
+    R23 refs=7 omur=26 -> 0.538
+    R22 refs=7 omur=28 -> 0.500
+    R27 refs=4 omur=20 -> 0.400
+    R26 refs=3 omur=18 -> 0.167
+    R24 refs=2 omur=24 -> 0.083
+`floor_log2(refs) * refs / omur` ile hesaplanan sira BIREBIR ayni.
+
+ILK OLCUM SASIRTICI: CleanupAreaTiles'ta 12 pseudo-register ve 5 spill
+var; ben alti canli deger sayiyordum. Kaynaktaki her yerel birden fazla
+pseudo'ya aciliyor, bu yuzden elle saymak yaniltiyordu.
+
+KARSILASTIRMA OLCUTU SPILL SAYISI: eslesen EngageActor da 12 pseudo
+tasiyor ama 3 spill; CleanupAreaTiles 12 pseudo / 5 spill. Yani hedef
+pseudo sayisini degil SPILL sayisini dusurmek. Uc varyant denendi
+(fill2 kaldirmak 11/5, block satir ici 12/5, dongu acmak 8/8) -- hicbiri
+spill'i dusurmedi.
