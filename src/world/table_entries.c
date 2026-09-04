@@ -20,9 +20,14 @@ typedef struct Entry {
     u8  pad01;
     u16 unk02;                  /* +0x02 */
     u32 unk04;                  /* +0x04 (serbest birakilacak blok) */
-    u8  pad08[0x84];
+    u8  pad08[0x22];
+    u8  mark;                   /* +0x2A */
+    u8  state;                  /* +0x2B */
+    u8  pad2C[0x38];
+    u8  tableIndex;             /* +0x64 */
+    u8  pad65[0x27];
     u32 unk8C;                  /* +0x8C */
-    u8  pad90[4];
+    u32 phase;                  /* +0x90 */
 } Entry;
 
 typedef struct Owner {

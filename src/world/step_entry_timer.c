@@ -12,7 +12,23 @@
  * Zamanlayici sinamasi `lsls #16` + `cmp <= 0`, yani azaltilmis yarim soz
  * ISARETLI olarak sinaniyor.
  *
- * HENUZ ESLESMIYOR: 2/128. BOYUT DOGRU. Kalan iki fark:
+ * HENUZ ESLESMIYOR: 124/128 bayt (4 eksik).
+ *
+ * TIP BIRLESTIRILDI: gRam020246F0 zaten src/world/table_entries.c'de
+ * `Entry[20]` olarak tanimliymis ve o tanimda +0x02 (unk02) ile +0x04
+ * (unk04) DOGRU yerdeymis. Elle `base + index*148` hesaplamak yerine
+ * `&gRam020246F0[index]` kullanmak dogru olan; ayni sembole iki tur
+ * vermek TYPES-001 kapisini kiriyordu. Eksik alanlar (mark +0x2A,
+ * state +0x2B, tableIndex +0x64, phase +0x90) dolgudan oyuldu ve
+ * table_entries.c 3/3 KORUNDU.
+ *
+ * Onceki elle-hesaplamali surum 2/128 veriyordu ama tur catismasi
+ * nedeniyle `make check` kiriliyordu; bu surum tutarli ama 4 bayt kisa.
+ * Ilk fark yalnizca HAVUZ INDISLERINDE (`17 48` vs `18 48`), yani
+ * komutlar tutuyor, havuzda bir kelime eksik -- ROM bizim yuklemedigimiz
+ * bir sabiti yukluyor. Sonraki tur o sabiti bulmali.
+ *
+ * Elle-hesaplamali surumdeki iki fark (kayit icin):
  *     +0x4C  bizim `lsrs r0,r0,#2`   ROM `asrs r0,r0,#2`  (isaretli kaydirma)
  *     +0x56  bizim `adds r0,r4,#0`   ROM `adds r0,r4,#4`  (isaretci +4)
  *
@@ -21,7 +37,7 @@
  *   kaydirmada (s32) cast                -> 124 bayt
  *   ilk argumani (u8*)entry+4 yapmak     -> 124 bayt
  *   ilk argumani entry->pad04 yapmak     -> 124 bayt
- *   ilk argumani &entry->timer + 1       -> 124 bayt
+ *   ilk argumani &entry->unk02 + 1       -> 124 bayt
  * Yani bu iki noktaya dokunmak baska bir yerde iki komut goturuyor;
  * muhtemelen struct yerlesimi tam dogru degil ve "dogal" ifade ROM'unkiyle
  * ayni bicime gelmiyor. Sonraki tur once yerlesimi dogrulamali.
@@ -34,7 +50,6 @@
 
 #include "gba_types.h"
 
-#define ENTRY_SIZE   148
 #define STATE_READY  1
 #define PHASE_DONE   3
 #define TIMER_STEP   4
@@ -53,19 +68,21 @@ typedef struct TableA {
 } TableA;
 
 typedef struct Entry {
-    u8  pad00[2];
-    u16 timer;                  /* +0x02 */
-    u8  pad04[38];
+    u8  active;                 /* +0x00 */
+    u8  pad01;
+    u16 unk02;                  /* +0x02 */
+    u32 unk04;                  /* +0x04 (serbest birakilacak blok) */
+    u8  pad08[0x22];
     u8  mark;                   /* +0x2A */
     u8  state;                  /* +0x2B */
-    u8  pad2C[56];
+    u8  pad2C[0x38];
     u8  tableIndex;             /* +0x64 */
-    u8  pad65[39];
-    u32 offset;                 /* +0x8C */
+    u8  pad65[0x27];
+    u32 unk8C;                  /* +0x8C */
     u32 phase;                  /* +0x90 */
 } Entry;
 
-extern u8 gRam020246F0[];
+extern Entry gRam020246F0[20];
 
 extern void FUN_08013cfc(void *dest, u32 *src, u32 arg);
 
@@ -77,7 +94,7 @@ u32 StepEntryTimer(u32 unused, s16 index, u8 arg)
     u32 *target;
     u32 phase;
 
-    entry = (Entry *)(gRam020246F0 + index * ENTRY_SIZE);
+    entry = &gRam020246F0[index];
     b = ROM_TABLE->slots[entry->tableIndex];
     phase = entry->phase;
     target = (u32 *)b->slots[phase];
@@ -88,11 +105,11 @@ u32 StepEntryTimer(u32 unused, s16 index, u8 arg)
         return 1;
 
     entry->mark = MARK_VALUE;
-    FUN_08013cfc(&entry->timer - 1,
-                 (u32 *)((TableB *)target)->slots[entry->offset >> 2], arg);
+    FUN_08013cfc(&entry->unk04,
+                 (u32 *)((TableB *)target)->slots[entry->unk8C >> 2], arg);
 
-    entry->timer -= TIMER_STEP;
-    if ((s16)entry->timer <= 0)
+    entry->unk02 -= TIMER_STEP;
+    if ((s16)entry->unk02 <= 0)
         return 0;
     return 1;
 }
