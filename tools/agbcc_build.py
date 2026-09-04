@@ -90,11 +90,17 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     ram = ram_rows()
     externs = []
     for name in _undefined(Path(f"{stem}.probe.o")):
-        row = rows.get(name) or ram.get(name)
+        # `__thumb` soneki: sembol adresi | 1 olarak cozumlenir. Saklanan
+        # fonksiyon isaretcilerinde Thumb biti kurulu olmali; `bl` hedefinde
+        # ise bit eklemek dal ofsetini bozar, o yuzden AYRI bir ad kullanilir.
+        thumb = name.endswith("__thumb")
+        key = name[: -len("__thumb")] if thumb else name
+        row = rows.get(key) or ram.get(key)
         if row is None:
             sys.exit(f"'{name}' data/functions.csv veya data/ram_map.csv'de yok; "
                      f"adresi cozulemiyor")
-        externs.append(f"    .equ {name}, {int(row['address'], 16):#x}\n")
+        value = int(row["address"], 16) | (1 if thumb else 0)
+        externs.append(f"    .equ {name}, {value:#x}\n")
     source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
     # Bolum sonu dolgusu: `as` Thumb bolumlerini varsayilan olarak NOP (0x46C0)
     # ile doldurur, ROM ise sifirla dolduruyor. Acik hizalama bunu duzeltir.

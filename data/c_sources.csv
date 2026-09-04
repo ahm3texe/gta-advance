@@ -106,6 +106,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030CB4,CleanupAreaTiles,src/world/area_cleanup.c,88,88,no
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
+0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,56,56,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,20,20,yes
 0x080320A4,GetEntityUnk0C,src/world/entity_accessors.c,4,4,yes
@@ -162,6 +163,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803F64C,StateNoop,src/world/state_init.c,2,2,yes
 0x0803F650,RunState,src/world/state_init.c,12,12,yes
 0x0803F65C,UpdateState,src/world/state_init.c,32,32,yes
+0x0803F67C,InitHandlerPack,src/world/init_handler_pack.c,32,32,yes
+0x0803F6D8,RetargetIfKind4,src/world/retarget_if_kind4.c,32,32,yes
 0x0803F6F8,SetActorEngage,src/world/actor_states.c,28,28,yes
 0x0803F714,SetActorActive,src/world/actor_states.c,56,56,yes
 0x0803F74C,SetActorIdle,src/world/actor_states.c,24,24,yes
@@ -185,6 +188,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,28,28,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,28,28,yes
 0x08051500,GetRecord,src/misc/record_table.c,20,20,yes
+0x0805151C,DrainTwoChains,src/world/drain_two_chains.c,34,34,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
 0x08055A94,FindNodeAfter,src/world/node_search.c,20,20,yes
 0x08055AA8,FindNode,src/world/node_search.c,28,28,yes

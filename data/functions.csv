@@ -708,7 +708,7 @@ address,name,size,status,module,notes
 0x08031C98,FUN_08031c98,140,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08031D24,AnyPairSet,46,matching,world,Bayrak dizisi; src/world/flag_arrays.c
 0x08031D54,ClearAllBlocks,52,matching,world,Bayrak dizisi; src/world/flag_arrays.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08031DB8,FUN_08031db8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08031DB8,StepThenCheck,36,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
 0x08031DDC,FUN_08031ddc,60,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08031E18,FUN_08031e18,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08031E44,FUN_08031e44,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1016,9 +1016,9 @@ address,name,size,status,module,notes
 0x0803F64C,StateNoop,2,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F650,RunState,12,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F65C,UpdateState,32,matching,world,Durum kurulumu; src/world/state_init.c
-0x0803F67C,FUN_0803f67c,32,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x0803F67C,InitHandlerPack,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
 0x0803F69C,FUN_0803f69c,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803F6D8,FUN_0803f6d8,32,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x0803F6D8,RetargetIfKind4,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
 0x0803F6F8,SetActorEngage,28,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803F714,SetActorActive,56,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803F74C,SetActorIdle,24,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1242,7 +1242,7 @@ address,name,size,status,module,notes
 0x080514C8,GetRecordUnk04,28,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080514E4,GetRecordUnk08,28,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08051500,GetRecord,20,matching,misc,Returns the address of a 60-byte record boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0805151C,FUN_0805151c,34,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0805151C,DrainTwoChains,34,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
 0x08051540,FUN_08051540,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080515D0,FUN_080515d0,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08051674,FUN_08051674,748,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)

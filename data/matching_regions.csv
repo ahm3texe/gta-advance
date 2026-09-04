@@ -52,6 +52,7 @@ start,end,binary,module,notes
 0x08030C28,0x08030C4C,build/world/zero_two_blocks.bin,world,iki bayrak blogunu Memset ile sifirlama
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
+0x08031DB8,0x08031DDC,build/world/step_then_check.bin,world,adim atip bayrak sinama
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
@@ -75,6 +76,8 @@ start,end,binary,module,notes
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,12 baytlik paketi gRam0202F360'a kopyalayip iletir
 0x0803F630,0x0803F67C,build/world/state_init.bin,world,"Durum kurulum, bos, cagirici, degistirici"
+0x0803F67C,0x0803F69C,build/world/init_handler_pack.bin,world,isleyici ve 12 baytlik paket kurma
+0x0803F6D8,0x0803F6F8,build/world/retarget_if_kind4.bin,world,tur 4 ise isleyiciyi degistirme
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
@@ -86,6 +89,7 @@ start,end,binary,module,notes
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x08050A00,0x08050A0C,build/world/get_anchor_unk34.bin,world,Anchor +0x34 getirici
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
+0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055AF8,0x08055B34,build/world/entity_query.bin,world,QueryEntity; varlık türü ve alt-hedef bayrak sorgusu
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici

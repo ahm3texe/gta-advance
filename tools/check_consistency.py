@@ -188,6 +188,12 @@ def main() -> None:
     for source in sorted(ROOT.glob("src/**/*.c")):
         text = source.read_text(encoding="utf-8")
         for name in set(extern.findall(text)):
+            # `__thumb` soneki bir SEMBOL DEGIL, cozumleme talimati: aynı
+            # adresin Thumb biti kurulu hali demek (tools/agbcc_build.py).
+            # Aranirken sonek atilir, yoksa her saklanan fonksiyon isaretcisi
+            # sahte "yeniden adlandirma kirilmasi" olarak bildirilir.
+            if name.endswith("__thumb"):
+                name = name[: -len("__thumb")]
             if name not in symbols:
                 bad("kaynak", f"{source.relative_to(ROOT)}: extern '{name}' "
                               f"ne functions.csv ne ram_map.csv'de — "
