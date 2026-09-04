@@ -48,7 +48,7 @@ address,size,name,source,status,notes
 0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
 0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
-0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat ciftini tutan blok, +72 ayri bir kelime"
+0x02011030,76,gRam02011030,decomp,provisional,"+12/+16 ikili koordinat cifti, +72 ayri kelime; ayrica +0x30/+0x34/+0x38 ReadTriple tarafindan okunuyor (byte-matching kanit)"
 0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
 0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev"
 0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor

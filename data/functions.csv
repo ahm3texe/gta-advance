@@ -139,7 +139,7 @@ address,name,size,status,module,notes
 0x0800A484,FUN_0800a484,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800A4E0,FUN_0800a4e0,962,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800A8A8,FUN_0800a8a8,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800A930,FUN_0800a930,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800A930,ReadTriple,28,matching,core,C kaynagindan byte-matching (MATCH-014)
 0x0800A94C,SetCoordUnk48,12,matching,misc,Koordinat erisimcisi; src/misc/coord_accessors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800A958,GetCoordPair,16,matching,misc,Koordinat erisimcisi; src/misc/coord_accessors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800A968,SetCoordPair,12,matching,misc,Koordinat erisimcisi; src/misc/coord_accessors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -640,7 +640,7 @@ address,name,size,status,module,notes
 0x0803084C,FUN_0803084c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08030860,FUN_08030860,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08030874,FUN_08030874,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030884,FUN_08030884,28,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08030884,NotifyIfReady,28,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x080308A0,ReleaseAllSlots,10,matching,world,Yuva serbest; src/world/slot_release.c
 0x080308AC,ReleaseSlot,64,matching,world,İki tabanlı yuva serbest bırakma; src/world/release_slot.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080308EC,FUN_080308ec,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

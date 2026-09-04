@@ -23,6 +23,7 @@ start,end,binary,module,notes
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; 31 girdilik geçmiş kuyruğu kaydırması
 0x08008094,0x080080A4,build/world/set_index.bin,world,SetTableIndex sarmalayicisi
+0x0800A930,0x0800A94C,build/core/read_triple.bin,core,gRam02011030 +0x30/+0x34/+0x38 disari yazma
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
@@ -42,6 +43,7 @@ start,end,binary,module,notes
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
+0x08030884,0x080308A0,build/world/notify_if_ready.bin,world,nesne hazirsa FUN_0802B2B4 bildirimi
 0x080308A0,0x080308AC,build/world/slot_release.bin,world,Yuva serbest birakma cagricisi
 0x080308AC,0x080308EC,build/world/release_slot.bin,world,ReleaseSlot; iki tabanlı yuva serbest bırakma
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set

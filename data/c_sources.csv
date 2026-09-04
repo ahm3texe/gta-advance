@@ -43,6 +43,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,16,16,yes
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
+0x0800A930,ReadTriple,src/core/read_triple.c,28,28,yes
 0x0800A94C,SetCoordUnk48,src/misc/coord_accessors.c,12,12,yes
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,16,16,yes
 0x0800A968,SetCoordPair,src/misc/coord_accessors.c,12,12,yes
@@ -92,6 +93,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
+0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes
 0x080308A0,ReleaseAllSlots,src/world/slot_release.c,10,10,yes
 0x080308AC,ReleaseSlot,src/world/release_slot.c,64,64,yes
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,52,52,yes

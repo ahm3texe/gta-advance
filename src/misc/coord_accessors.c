@@ -19,7 +19,11 @@ typedef struct CoordBlock {
     u32 unk08;              /* +8  */
     s32 second;             /* +12 */
     s32 first;              /* +16 */
-    u8  pad14[52];
+    u8  pad14[28];
+    u32 a;                      /* +0x30 */
+    u32 b;                      /* +0x34 */
+    u32 c;                      /* +0x38 */
+    u8  pad3C[12];
     u32 unk48;              /* +72 */
 } CoordBlock;
 
