@@ -73,7 +73,7 @@ start,end,binary,module,notes
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
-0x08050918,0x08050958,build/world/anchor_reset.bin,world,Anchor sifirlama
+0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
 0x08050994,0x080509A0,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici
 0x080509C4,0x080509DC,build/world/offset_helpers.bin,world,CallWithOffset; void ofsetli çağrı sarmalayıcısı
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma

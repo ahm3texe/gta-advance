@@ -219,6 +219,44 @@ def main() -> None:
             )
             bad("ram-extern", f"{symbol} celiskili extern turlerinde: {detail}")
 
+    # Ayni SEMBOLU, ayni struct ADIYLA ama FARKLI GOVDEYLE gormek sessiz bir
+    # tehlike: extern turu ayni yazildigi icin yukaridaki kontrol yakalamiyor.
+    # `Anchor` dort dosyada ayni adla iki farkli govdeyle duruyordu (biri
+    # tamamen acilmis, otekiler dolgulu). Yerlesimler uyumlu oldugu icin hata
+    # vermiyordu ama birini degistirmek otekini sessizce yanlis yapardi.
+    #
+    # Kontrol BILEREK dar tutuldu: farkli sembolleri tarif eden ayni adli
+    # struct'lar bu projede NORMAL (her ceviri birimi kendi yerel gorunumunu
+    # kurar, bkz. include/ram_symbols.h). Yalnizca AYNI sembol uzerinde
+    # celisen govdeler bildirilir.
+    struct_def = re.compile(
+        r"typedef\s+struct\s*(?:\w+)?\s*\{(.*?)\}\s*(\w+)\s*;", re.S
+    )
+    bodies_by_file: dict[str, dict[str, str]] = {}
+    for source in declaration_files:
+        text = source.read_text(encoding="utf-8")
+        for match in struct_def.finditer(text):
+            body = " ".join(
+                re.sub(r"/\*.*?\*/", "", match.group(1), flags=re.S).split()
+            )
+            bodies_by_file.setdefault(str(source.relative_to(ROOT)), {})[
+                match.group(2)
+            ] = body
+
+    for symbol, declarations in sorted(ram_types.items()):
+        for type_text, paths in declarations.items():
+            name = type_text.replace("*", "").strip().split()[-1]
+            seen: dict[str, list[str]] = {}
+            for path in paths:
+                body = bodies_by_file.get(path, {}).get(name)
+                if body is not None:
+                    seen.setdefault(body, []).append(path)
+            if len(seen) > 1:
+                detail = "; ".join(f"({', '.join(v)})" for v in seen.values())
+                bad(
+                    "struct-govde",
+                    f"{symbol} icin {name} farkli govdelerle tanimli: {detail}",
+                )
     if problems:
         print(f"TUTARSIZLIK: {len(problems)} sorun\n")
         for problem in problems:

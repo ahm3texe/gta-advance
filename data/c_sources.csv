@@ -167,6 +167,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080501AC,CompareB,src/world/word_compare.c,28,28,yes
 0x08050918,ResetAnchorSmall,src/world/anchor_reset.c,28,28,yes
 0x08050934,ResetAnchorFull,src/world/anchor_reset.c,36,36,yes
+0x08050958,ResetAnchorPartial,src/world/anchor_reset.c,24,24,yes
 0x08050994,GetBaseAlt,src/world/get_slot_unk10.c,12,12,yes
 0x080509C4,CallWithOffset,src/world/offset_helpers.c,24,24,yes
 0x080509DC,GetBase,src/world/gRam02030330_gets.c,12,12,yes

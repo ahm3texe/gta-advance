@@ -16,6 +16,8 @@
 
 typedef struct Pool {
     u32 first;                  /* +0x00 */
+    u8  pad04[4];
+    u32 value;                  /* +0x08 */
 } Pool;
 
 extern Pool gRam0202F300;

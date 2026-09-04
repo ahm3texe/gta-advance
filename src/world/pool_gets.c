@@ -13,7 +13,8 @@
 #define STATE_FLAG      0x8000
 
 typedef struct Pool {
-    u8 pad00[8];
+    u32 first;                  /* +0x00 */
+    u8  pad04[4];
     u32 value;                  /* +0x08 */
 } Pool;
 

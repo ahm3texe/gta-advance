@@ -1210,7 +1210,7 @@ address,name,size,status,module,notes
 0x080507F4,FUN_080507f4,290,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08050918,ResetAnchorSmall,28,matching,world,Anchor sifirlama; src/world/anchor_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08050934,ResetAnchorFull,36,matching,world,Anchor sifirlama; src/world/anchor_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08050958,FUN_08050958,24,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x08050958,ResetAnchorPartial,24,matching,world,C kaynagindan byte-matching (MATCH-014); anchor_reset kumesinin ucuncusu
 0x08050994,GetBaseAlt,12,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x080509A0,FUN_080509a0,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x080509C4,CallWithOffset,24,matching,world,Void ofsetli çağrı sarmalayıcısı; src/world/offset_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

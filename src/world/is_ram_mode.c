@@ -14,10 +14,14 @@
 #define WANTED_MODE    8
 
 typedef struct RamBlock {
-    u32 unk00;
+    u32 unk00;                  /* +0x00 */
     u8  pad04[4];
-    u8  type;
+    u8  type;                   /* +0x08 */
     u8  mode;                   /* +0x09 */
+    u8  pad0A[10];
+    u8  byte14;                 /* +0x14 */
+    u8  pad15[1];
+    u16 word16;                 /* +0x16 */
 } RamBlock;
 
 extern RamBlock gRam02035EA0;

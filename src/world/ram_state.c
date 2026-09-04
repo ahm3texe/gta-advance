@@ -12,7 +12,7 @@
 #define MODE_SPECIAL   4
 
 typedef struct RamBlock {
-    u32 unk00;
+    u32 unk00;                  /* +0x00 */
     u8  pad04[4];
     u8  type;                   /* +0x08 */
     u8  mode;                   /* +0x09 */
