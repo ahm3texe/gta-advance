@@ -47,6 +47,7 @@ start,end,binary,module,notes
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
+0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,karmasik hasat
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,kucuk fonksiyon hasadi
 0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
@@ -81,6 +82,7 @@ start,end,binary,module,notes
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
 0x08038000,0x08038020,build/world/clear_flag_notify.bin,world,bayrak temizleyip bos ise bildirme
 0x08038020,0x0803802C,build/world/forward_zero_arg4.bin,world,dorduncu argumani sifirlayarak iletme
+0x08038044,0x08038060,build/world/slot_range_or_field.bin,world,karmasik hasat
 0x080381F8,0x08038234,build/world/object_query.bin,world,ProbeObject; varsayılan parametrelerle nesne sınaması
 0x08038234,0x0803824C,build/world/submit_object.bin,world,Nesne gonderme sarmalayicisi
 0x0803824C,0x08038260,build/world/get_inner_id.bin,world,GetInnerId; iki halkalı iç nesne kimliği
@@ -108,6 +110,7 @@ start,end,binary,module,notes
 0x0804FF98,0x0804FFA4,build/world/wrap_0804ff98.bin,world,iletme sarmalayicisi
 0x0804FFB4,0x0804FFC0,build/world/wrap_0804ffb4.bin,world,iletme sarmalayicisi
 0x080500D0,0x080500DC,build/world/wrap_080500d0.bin,world,iletme sarmalayicisi
+0x08050108,0x08050130,build/world/bump_or_trigger.bin,world,karmasik hasat
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
 0x08050988,0x08050994,build/world/get_anchor_unk04.bin,world,sarmalayici/erisimci hasadi

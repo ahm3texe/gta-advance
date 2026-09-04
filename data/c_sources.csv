@@ -83,6 +83,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080194B4,ResolveActorExtra,src/world/actor_control.c,64,64,yes
 0x080194F4,ActivateActor,src/world/actor_control.c,28,28,yes
 0x08019510,IsActorBusy,src/world/actor_control.c,26,26,yes
+0x080195F4,EitherInRange,src/world/either_in_range.c,44,44,no
 0x08019670,ScaleByMode,src/world/object_state.c,42,42,yes
 0x0801969C,ReleaseObjectSlot,src/world/object_state.c,42,42,yes
 0x080196C8,IsObjectReadyA,src/world/object_state.c,36,36,yes
@@ -91,6 +92,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08019B3C,GetAngleField,src/world/actor_check.c,30,30,yes
 0x0801D7DC,SetWindow,src/world/window_config.c,32,32,yes
 0x0801D7FC,StoreRam0201AEE8,src/world/window_config.c,12,12,yes
+0x0801D848,InitAndMirror,src/world/init_and_mirror.c,34,34,yes
 0x0801D8B0,FUN_0801d8b0,src/world/get_field_100.c,10,10,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
 0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,12,12,yes
@@ -113,6 +115,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes
 0x080308A0,ReleaseAllSlots,src/world/slot_release.c,10,10,yes
 0x080308AC,ReleaseSlot,src/world/release_slot.c,64,64,yes
+0x08030BE8,HalvesEqual,src/world/halves_equal.c,24,36,no
 0x08030C0C,LookupThenCall,src/world/lookup_then_call.c,24,24,yes
 0x08030C28,ZeroTwoBlocks,src/world/zero_two_blocks.c,36,36,yes
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,52,52,yes
@@ -152,6 +155,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08037FDC,MarkAndClear,src/world/pool_gets.c,34,34,yes
 0x08038000,ClearFlagNotify,src/world/clear_flag_notify.c,32,32,yes
 0x08038020,ForwardZeroArg4,src/world/forward_zero_arg4.c,12,12,yes
+0x08038044,SlotRangeOrField,src/world/slot_range_or_field.c,26,26,yes
 0x080381F8,ProbeObject,src/world/object_query.c,58,58,yes
 0x08038234,SubmitObject,src/world/submit_object.c,22,22,yes
 0x0803824C,GetInnerId,src/world/get_inner_id.c,20,20,yes
@@ -201,6 +205,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0804FF98,FUN_0804ff98,src/world/wrap_0804ff98.c,10,10,yes
 0x0804FFB4,FUN_0804ffb4,src/world/wrap_0804ffb4.c,10,10,yes
 0x080500D0,FUN_080500d0,src/world/wrap_080500d0.c,10,10,yes
+0x08050108,BumpOrTrigger,src/world/bump_or_trigger.c,40,40,yes
 0x08050190,CompareA,src/world/word_compare.c,28,28,yes
 0x080501AC,CompareB,src/world/word_compare.c,28,28,yes
 0x08050918,ResetAnchorSmall,src/world/anchor_reset.c,28,28,yes
