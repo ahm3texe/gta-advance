@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""ram_map.csv'den mGBA Lua izleme scripti uretir.
+
+mGBA 0.10.5'in Lua API'sinde kesme noktasi (setBreakpoint) YOK; elimizde
+read8/16/32 ve kare geri cagrisi var.  Bu yuzden yaklasim: her karede
+bilinen RAM sembollerini tarayip DEGISENLERI, o andaki tus durumuyla
+birlikte loglamak.
+
+Kullanim:
+    python3 tools/make_trace_script.py
+    -> tools/trace.lua
+
+Sonra mGBA'da:  Tools > Scripting... > Load script > tools/trace.lua
+Log dosyasi:    build/trace.log
+"""
+import csv
+import pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+RAM_MAP = ROOT / "data" / "ram_map.csv"
+OUT = ROOT / "tools" / "trace.lua"
+LOG = ROOT / "build" / "trace.log"
+
+# Sadece EWRAM (0x02......) ve IWRAM (0x03......).  MMIO (0x04......) her
+# karede degisiyor, logu bogar; ROM adresleri zaten sabit.
+WATCH_PREFIXES = (0x02, 0x03)
+
+
+def main() -> int:
+    rows = list(csv.DictReader(RAM_MAP.open()))
+    watched, skipped = [], []
+    for r in rows:
+        addr = int(r["address"], 16)
+        if (addr >> 24) not in WATCH_PREFIXES:
+            skipped.append(r["name"])
+            continue
+        try:
+            size = int(r["size"] or 1)
+        except ValueError:
+            size = 1
+        if size not in (1, 2, 4):
+            size = 1          # dizi/yapi: ilk baytini izle
+        watched.append((addr, size, r["name"]))
+
+    watched.sort()
+    entries = ",\n".join(
+        f'  {{0x{a:08X}, {s}, "{n}"}}' for a, s, n in watched
+    )
+
+    OUT.write_text(f"""-- OTOMATIK URETILDI: tools/make_trace_script.py
+-- Elle duzenleme; ram_map.csv'yi guncelleyip ureteci tekrar calistir.
+--
+-- mGBA 0.10.5 icin RAM degisim izleyicisi.
+-- Yukleme: Tools > Scripting... > Load script
+-- Log:     {LOG}
+
+local LOG_PATH = "{LOG}"
+local WATCH = {{
+{entries}
+}}
+
+local prev    = {{}}
+local nchg    = {{}}   -- sembol basina degisim sayisi
+local noisy   = {{}}   -- gurultulu diye susturulanlar
+local frame   = 0
+local fh      = nil
+local keys_ok = true
+
+-- Her karede degisen sayaclar/RNG logu bogar.  Bir sembol bu esigi
+-- gecerse susturulup bir kez rapor ediliyor.
+local NOISE_LIMIT = 30
+
+local KEY_NAMES = {{
+  [0]="A", [1]="B", [2]="Select", [3]="Start",
+  [4]="Right", [5]="Left", [6]="Up", [7]="Down", [8]="R", [9]="L",
+}}
+
+local function out(line)
+  console:log(line)
+  if fh then fh:write(line .. "\n"); fh:flush() end
+end
+
+local function readN(addr, size)
+  if size == 4 then return emu:read32(addr)
+  elseif size == 2 then return emu:read16(addr)
+  else return emu:read8(addr) end
+end
+
+-- Tus durumunu okumak surumden surume degisiyor; basarisiz olursa
+-- izlemeye tussuz devam et, cokme.
+local function keyString()
+  if not keys_ok then return "" end
+  local ok, mask = pcall(function() return emu:getKeys() end)
+  if not ok or type(mask) ~= "number" then
+    keys_ok = false
+    out("[uyari] emu:getKeys() yok; tus sutunu kapatildi")
+    return ""
+  end
+  local held = {{}}
+  for bit = 0, 9 do
+    if mask & (1 << bit) ~= 0 then held[#held + 1] = KEY_NAMES[bit] end
+  end
+  if #held == 0 then return "" end
+  return " [" .. table.concat(held, "+") .. "]"
+end
+
+local function onFrame()
+  frame = frame + 1
+  local keys = nil
+  for i = 1, #WATCH do
+    if not noisy[i] then
+      local e = WATCH[i]
+      -- pcall YOK: adresler acilista bir kez dogrulandi, sicak dongude
+      -- kare basina 135 pcall emulatoru gereksiz yavaslatiyordu.
+      local val = readN(e[1], e[2])
+      local old = prev[i]
+      if old ~= nil and old ~= val then
+        local c = (nchg[i] or 0) + 1
+        nchg[i] = c
+        if c > NOISE_LIMIT then
+          noisy[i] = true
+          out(string.format("f%-7d %-24s ... SUSTURULDU (%d degisim; sayac/RNG olabilir)",
+                frame, e[3], c))
+        else
+          if keys == nil then keys = keyString() end
+          out(string.format("f%-7d %-24s %s -> %s%s",
+                frame, e[3], tostring(old), tostring(val), keys))
+        end
+      end
+      prev[i] = val
+    end
+  end
+end
+
+fh = io.open(LOG_PATH, "a")
+if fh then
+  fh:write("\n==== yeni oturum ====\n")
+  fh:flush()
+else
+  console:log("[uyari] log dosyasi acilamadi: " .. LOG_PATH)
+end
+
+-- Acilista her adresi BIR KEZ dogrula; okunamayani listeden dus.
+do
+  local bad = 0
+  for i = #WATCH, 1, -1 do
+    local ok = pcall(readN, WATCH[i][1], WATCH[i][2])
+    if not ok then
+      out("[uyari] okunamadi, atlandi: " .. WATCH[i][3])
+      table.remove(WATCH, i)
+      bad = bad + 1
+    end
+  end
+  out(string.format("izleme basladi: %d sembol (%d atlandi), gurultu esigi %d",
+        #WATCH, bad, NOISE_LIMIT))
+end
+
+callbacks:add("frame", onFrame)
+""")
+
+    print(f"yazildi: {OUT.relative_to(ROOT)}")
+    print(f"  izlenen: {len(watched)} sembol")
+    print(f"  atlanan: {len(skipped)} (MMIO/ROM) -> {', '.join(skipped)}")
+    print(f"  log:     {LOG.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

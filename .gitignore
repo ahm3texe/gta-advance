@@ -35,3 +35,4 @@ dashboard/app/decomp-data.json
 # Permuter: dis kaynak ve izole ortam surumlenmez.
 tools/external/
 build/permuter/
+tools/trace.lua
