@@ -25,6 +25,8 @@ typedef struct CoordBlock {
     u32 c;                      /* +0x38 */
     u8  pad3C[12];
     u32 unk48;              /* +72 */
+    u8  pad4C[37];
+    u8  byte71;             /* +0x71 */
 } CoordBlock;
 
 extern CoordBlock gRam02011030;

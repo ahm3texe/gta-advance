@@ -43,6 +43,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,16,16,yes
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
+0x08008108,ZeroHistory,src/core/zero_history.c,20,20,yes
 0x0800A930,ReadTriple,src/core/read_triple.c,28,28,yes
 0x0800A94C,SetCoordUnk48,src/misc/coord_accessors.c,12,12,yes
 0x0800A958,GetCoordPair,src/misc/coord_accessors.c,16,16,yes
@@ -50,6 +51,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800A974,ClearCoordFlag,src/misc/coord_accessors.c,12,12,yes
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
+0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
 0x0800DBE8,ListPushFront,src/world/list_ops.c,36,36,yes
 0x0800DC0C,ListRemove2,src/world/list_ops.c,56,56,yes
 0x080127FC,List2Init,src/core/list_ops2.c,10,10,yes
@@ -94,11 +96,13 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
+0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,16,18,no
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
 0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes
 0x080308A0,ReleaseAllSlots,src/world/slot_release.c,10,10,yes
 0x080308AC,ReleaseSlot,src/world/release_slot.c,64,64,yes
+0x08030C0C,LookupThenCall,src/world/lookup_then_call.c,24,24,yes
 0x08030C28,ZeroTwoBlocks,src/world/zero_two_blocks.c,36,36,yes
 0x08030C4C,IsAreaFlagSet,src/world/area_flags.c,52,52,yes
 0x08030C80,SetAreaFlag,src/world/area_flags.c,48,48,yes
@@ -132,6 +136,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08037FD0,GetPoolD,src/world/pool_gets.c,12,12,yes
 0x08037FDC,MarkAndClear,src/world/pool_gets.c,34,34,yes
 0x08038000,ClearFlagNotify,src/world/clear_flag_notify.c,32,32,yes
+0x08038020,ForwardZeroArg4,src/world/forward_zero_arg4.c,12,12,yes
 0x080381F8,ProbeObject,src/world/object_query.c,58,58,yes
 0x08038234,SubmitObject,src/world/submit_object.c,22,22,yes
 0x0803824C,GetInnerId,src/world/get_inner_id.c,20,20,yes
@@ -194,6 +199,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055AA8,FindNode,src/world/node_search.c,28,28,yes
 0x08055AC4,ClassifyId,src/world/node_search.c,52,52,yes
 0x08055AF8,QueryEntity,src/world/entity_query.c,60,60,yes
+0x08055BF8,ForwardZeroArg2,src/world/forward_zero_arg2.c,12,12,yes
 0x08055C8C,FindNthFreeSlot,src/world/slot_scan.c,58,58,yes
 0x08055CC8,ClearSlots,src/world/slot_scan.c,64,64,yes
 0x08055D08,GetEntrySlot,src/world/slot_table.c,16,16,yes
@@ -221,6 +227,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080664AC,MaybeReset,src/world/pause_helpers.c,24,24,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,42,42,yes
+0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,20,20,yes
 0x080671B8,BumpCount6A,src/world/more_counters.c,28,28,yes
 0x080671D4,BumpCount68,src/world/more_counters.c,28,28,yes

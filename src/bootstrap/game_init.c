@@ -109,7 +109,7 @@ extern void FUN_08002600(u32 arg);
 extern void FUN_080337a8(void);
 extern void FUN_0803004c(void);
 extern void FUN_0805b1c0(s32 arg);
-extern void FUN_08008108(void);
+extern void ZeroHistory(void);
 extern s32  IsSessionActive(void);          /* sifirdan farkli ise dongu biter */
 extern void FUN_08013824(void);
 extern void FUN_08012248(void);
@@ -240,7 +240,7 @@ void GameInit(void)
         FUN_080337a8();
         FUN_0803004c();
         FUN_0805b1c0(0);
-        FUN_08008108();
+        ZeroHistory();
         gLoopState = pending;
 
         do {
