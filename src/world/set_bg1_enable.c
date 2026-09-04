@@ -22,6 +22,9 @@
  * eslesti; fark yalnizca oradaki islemin AND, buradakinin OR olmasi. Yani
  * engel adres kurulumunda degil, maske degerinin yasam araliginda.
  *
+ * KURAL 40 DENENDI, TUTMADI: blok kapsamli gecici cikti boyutunu degistirmedi
+ * (yine 16 bayt, ROM 18). ClipBounds'ta isleyen teknik buraya aktarilmiyor.
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/set_bg1_enable.c
  */

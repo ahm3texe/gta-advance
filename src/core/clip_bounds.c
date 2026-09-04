@@ -57,30 +57,21 @@ void ClipBounds(Vec3 *box, u32 margin)
 {
     Vec3 *bounds;
     s32 pad;
-    s32 cand;
-    s32 zlo;
 
     bounds = &gClipBounds;
     pad = margin << 16;
-    zlo = Z_LOWER;
 
-    cand = box->x - pad;
-    if (bounds->x < cand)
-        bounds->x = cand;
-    cand = box->y - pad;
-    if (bounds->y < cand)
-        bounds->y = cand;
-    cand = box->z + zlo;
-    if (bounds->z < cand)
-        bounds->z = cand;
+    { s32 cand = box->x - pad;
+      if (bounds->x < cand) bounds->x = cand; }
+    { s32 cand = box->y - pad;
+      if (bounds->y < cand) bounds->y = cand; }
+    { s32 cand = box->z + Z_LOWER;
+      if (bounds->z < cand) bounds->z = cand; }
 
-    cand = box->x + pad;
-    if (bounds->x > cand)
-        bounds->x = cand;
-    cand = box->y + pad;
-    if (bounds->y > cand)
-        bounds->y = cand;
-    cand = box->z + Z_UPPER;
-    if (bounds->z > cand)
-        bounds->z = cand;
+    { s32 cand = ((volatile Vec3 *)box)->x + pad;
+      if (bounds->x > cand) bounds->x = cand; }
+    { s32 cand = ((volatile Vec3 *)box)->y + pad;
+      if (bounds->y > cand) bounds->y = cand; }
+    { s32 cand = ((volatile Vec3 *)box)->z + Z_UPPER;
+      if (bounds->z > cand) bounds->z = cand; }
 }

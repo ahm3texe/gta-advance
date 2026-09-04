@@ -27,6 +27,7 @@ start,end,binary,module,notes
 0x08008108,0x0800811C,build/core/zero_history.bin,core,gecmis tamponunu Memset ile sifirlama
 0x0800A930,0x0800A94C,build/core/read_triple.bin,core,gRam02011030 +0x30/+0x34/+0x38 disari yazma
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
+0x0800A980,0x0800A9E4,build/core/clip_bounds.bin,core,sinir kutusu daraltma
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,CoordBlock +0x71 baytini sifirlama
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove

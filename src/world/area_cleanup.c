@@ -39,6 +39,9 @@
  *
  * Ayni kumedeki eslesen uc fonksiyon: src/world/area_flags.c
  *
+ * KURAL 40 DENENDI, TUTMADI: dar volatile ile fill2 okumasi 7 -> 85 bayt.
+ * ClipBounds'ta ayni teknik 26 -> 0 yapmisti; yani teknik yerel, genel degil.
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/area_cleanup.c
  */
