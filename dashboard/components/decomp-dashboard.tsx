@@ -410,6 +410,11 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                     onClick={() => setFocusGroup(node.data.name)}
                     onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setFocusGroup(node.data.name); }}
                   >
+                    {/* Kutuya sigmayacak kadar kucuk gruplar basliksiz kalir
+                        (olculdu: en buyugu 69x64, 24px baslik yuksekligin
+                        %37'sini yerdi). Adi yine de ogrenilebilsin diye her
+                        gruba yerel ipucu eklendi -- her boyutta calisir. */}
+                    <title>{groupLabel(node.data.name, grouping, visibleFunctions)}</title>
                     <rect className="group-rect" x={node.x0} y={node.y0} width={node.x1 - node.x0} height={node.y1 - node.y0} />
                     {hasGroupHeader(node) && (
                       <text className="group-label" x={node.x0 + 8} y={node.y0 + 16}>
