@@ -1017,7 +1017,7 @@ address,name,size,status,module,notes
 0x0803F650,RunState,12,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F65C,UpdateState,32,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F67C,InitHandlerPack,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
-0x0803F69C,FUN_0803f69c,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803F69C,RearmSlot,60,matching,world,C kaynagindan byte-matching; karmasik fonksiyon (dallanma + bayrak + isleyici karsilastirmasi)
 0x0803F6D8,RetargetIfKind4,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
 0x0803F6F8,SetActorEngage,28,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803F714,SetActorActive,56,matching,world,Varlik durum ayarlayicisi; src/world/actor_states.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

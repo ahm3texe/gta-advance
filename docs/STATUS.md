@@ -8,12 +8,12 @@ baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make sta
 | Ölçüm | Değer |
 |---|---:|
 | Fonksiyon haritası | 1933 fonksiyon / 454068 bayt |
-| İnsan incelemesi (`documented+`) | 321 / 1933 |
-| Byte-matching | 277 fonksiyon / 12984 bayt (%2.86) |
-| C kaynağı | 270 toplam / 265 matching |
-| Kaynaktan doğrulanan ROM | 13140 bayt |
+| İnsan incelemesi (`documented+`) | 322 / 1933 |
+| Byte-matching | 278 fonksiyon / 13044 bayt (%2.87) |
+| C kaynağı | 271 toplam / 266 matching |
+| Kaynaktan doğrulanan ROM | 13200 bayt |
 | libc doğrulaması | 448 bayt |
-| Toplam doğrulanmış ROM alanı | 13588 bayt |
+| Toplam doğrulanmış ROM alanı | 13648 bayt |
 | Açık sınır borcu | 0 kısa sınır + 0 ARM incelemesi + 0 aşırı büyüme |
 
 ## Şu anki tek aktif iş
@@ -27,7 +27,6 @@ Aktif iş yok.
 | BACKUP-001 | P1 | blocked | Özel uzak yedek oluştur | Bütün commit geçmişi kullanıcının seçtiği özel remote'a gönderildi |
 | TOOL-010 | P1 | todo | Yeni harita girisi icin yapisal kapi yaz | Bir aday ancak (a) push prologuyla basliyorsa VE (b) oncesinde fonksiyon bitiren komut (pop{..,pc} / bx lr / kosulsuz b) varsa haritaya eklenebilir; bu sinama split_at_calls'in urettigi 57 sahte girisin 57 sinide yakaladi |
 | MAP-010 | P2 | todo | Bosluk analizinin YALNIZ sifir-riskli 16 ARM girisini uygula | ARM bolgesi bagimsiz olculdu (cond!=0xF orani tam 1.0000); bu 16 giris TOOL-010 kapisindan gecirilerek eklenir. 123 prologsuz Thumb yapragi BILEREK DISARIDA birakilir |
-| MAP-011 | P2 | todo | 0x020303D0 blogunun gercek yapisini belgele | 0x0805148C ROM'da 0x020303D0'i TABAN alip +0x0C okuyor, yani orada bir struct var. Ama adres haritada gRecordIndex adiyla ve extern u32 olarak kayitli; record_table.c onu dizi indeksi olarak kullaniyor ve O DOSYA BYTE-MATCHING. Blogun yapisi belgelenmeden 0x0805148C yazilamaz: ikinci bir extern turu TYPES-001 kapisini kirar, literal adres makrosu EWRAM kullanimini RAM haritasindan gizler, 0x020303DC icin ayri sembol ise +12 ofsetini uretmez. |
 
 ## Araç zinciri kilidi
 

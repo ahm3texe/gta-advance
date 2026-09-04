@@ -23,12 +23,16 @@ typedef struct Pack12 {
 } Pack12;
 
 typedef struct Slot {
-    u8     pad00[8];
+    void  *first;               /* +0x00 */
+    u8     pad04[4];
     void  *handler;             /* +0x08 */
     u8     pad0C[16];
     u32    value;               /* +0x1C */
     Pack12 pack;                /* +0x20 */
-    u8     pad2C[85];
+    u32    unk2C;               /* +0x2C */
+    u8     pad30[2];
+    u16    unk32;               /* +0x32 */
+    u8     pad34[77];
     u8     ready;               /* +0x81 */
 } Slot;
 

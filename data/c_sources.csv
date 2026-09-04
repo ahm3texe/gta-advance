@@ -180,6 +180,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803F650,RunState,src/world/state_init.c,12,12,yes
 0x0803F65C,UpdateState,src/world/state_init.c,32,32,yes
 0x0803F67C,InitHandlerPack,src/world/init_handler_pack.c,32,32,yes
+0x0803F69C,RearmSlot,src/world/rearm_slot.c,60,60,yes
 0x0803F6D8,RetargetIfKind4,src/world/retarget_if_kind4.c,32,32,yes
 0x0803F6F8,SetActorEngage,src/world/actor_states.c,28,28,yes
 0x0803F714,SetActorActive,src/world/actor_states.c,56,56,yes

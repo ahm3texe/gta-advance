@@ -92,6 +92,7 @@ start,end,binary,module,notes
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,12 baytlik paketi gRam0202F360'a kopyalayip iletir
 0x0803F630,0x0803F67C,build/world/state_init.bin,world,"Durum kurulum, bos, cagirici, degistirici"
 0x0803F67C,0x0803F69C,build/world/init_handler_pack.bin,world,isleyici ve 12 baytlik paket kurma
+0x0803F69C,0x0803F6D8,build/world/rearm_slot.bin,world,yuvayi yeniden kurma
 0x0803F6D8,0x0803F6F8,build/world/retarget_if_kind4.bin,world,tur 4 ise isleyiciyi degistirme
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
