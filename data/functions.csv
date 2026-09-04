@@ -268,7 +268,7 @@ address,name,size,status,module,notes
 0x080128FC,ListInit,10,matching,core,Cift bagli liste; src/core/linked_list.c
 0x08012908,ListForEach,28,matching,core,Cift bagli liste; src/core/linked_list.c
 0x08012924,ListForEachArg,32,matching,core,Cift bagli liste; src/core/linked_list.c
-0x08012944,FUN_08012944,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08012944,ForEachNode,36,matching,core,C kaynagindan byte-matching; isaretci uzerinden geri cagirma dongusu
 0x08012968,FUN_08012968,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08012A00,FUN_08012a00,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08012A98,FUN_08012a98,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
