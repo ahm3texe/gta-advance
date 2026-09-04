@@ -10,6 +10,7 @@ address,size,name,source,status,notes
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
+0x020004B0,8,gFocusPoint,decomp,provisional,iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
 0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour

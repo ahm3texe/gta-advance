@@ -145,7 +145,7 @@ address,name,size,status,module,notes
 0x0800A968,SetCoordPair,12,matching,misc,Koordinat erisimcisi; src/misc/coord_accessors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800A974,ClearCoordFlag,12,matching,misc,Koordinat erisimcisi; src/misc/coord_accessors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800A980,ClipBounds,100,matching,core,C kaynagindan byte-matching; kisa omurlu blok kapsamli gecici + dar volatile yeniden okuma
-0x0800A9E4,FUN_0800a9e4,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800A9E4,UpdateFocusPoint,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800AAD0,GetCoordSecond,12,matching,misc,Koordinat erisimi; src/misc/coord_more.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800AADC,SetCoordFlag,12,matching,misc,Koordinat erisimi; src/misc/coord_more.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0800AAF4,FUN_0800aaf4,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
