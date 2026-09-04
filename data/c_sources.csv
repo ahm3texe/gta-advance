@@ -106,6 +106,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028C48,IsEntryActive,src/world/table_entries.c,32,32,yes
 0x08028C68,ReleaseEntry,src/world/table_entries.c,64,64,yes
 0x08028CA8,ClearEntry,src/world/table_entries.c,64,64,yes
+0x08028D44,StepEntryTimer,src/world/step_entry_timer.c,128,128,no
 0x08028E3C,HasWantedEntry,src/world/kind_scan.c,48,48,yes
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
