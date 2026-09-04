@@ -34,6 +34,12 @@
  * oynatiyor, yani sayacin yasam araligi dagitimi gercekten etkiliyor.
  * Kok neden (bir fazla canli deger) degismedi.
  *
+ * SADELESTIRME TARAMASI (SetBg1Enable'i cozen yontem) BURADA ISE YARAMADI:
+ * isaretci karsilastirmali dongu 7 (esit), fill/fill2 u32 7 (esit), blok
+ * yerelini kaldirmak 23, sayaci s32 yapmak 22. Yani "yerelleri azalt"
+ * yonu bu fonksiyonda kazandirmiyor; kalan 7 bayt hala "bir fazla canli
+ * deger" sinirinda.
+ *
  * Onceki turda elenenler (fill2 YOKKEN olculmustu, artik gecersiz sayilmali):
  * blogu dongu oncesi yuklemek 61, dolguyu int yapmak 61, satir ici 63.
  *

@@ -637,7 +637,7 @@ address,name,size,status,module,notes
 0x08030390,FUN_08030390,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08030458,FUN_08030458,624,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080306C8,FUN_080306c8,384,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803084C,SetBg1Enable,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803084C,SetBg1Enable,18,matching,world,C kaynagindan byte-matching; en sade ifade bicimi (yerel eklemek kopyayi bastiriyordu)
 0x08030860,ClearBg1Enable,20,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08030874,ForwardWithZero,14,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08030884,NotifyIfReady,28,matching,world,C kaynagindan byte-matching (MATCH-014)

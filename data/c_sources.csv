@@ -107,7 +107,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
-0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,16,18,no
+0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
 0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes

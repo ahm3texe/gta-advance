@@ -56,6 +56,7 @@ start,end,binary,module,notes
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
+0x0803084C,0x08030860,build/world/set_bg1_enable.bin,world,DISPCNT bit 9 kurma
 0x08030860,0x08030874,build/world/clear_bg1_enable.bin,world,DISPCNT bit 9 temizleme
 0x08030874,0x08030884,build/world/forward_with_zero.bin,world,sifir arguman ekleyerek iletme
 0x08030884,0x080308A0,build/world/notify_if_ready.bin,world,nesne hazirsa FUN_0802B2B4 bildirimi
