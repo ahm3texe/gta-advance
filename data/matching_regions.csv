@@ -100,12 +100,16 @@ start,end,binary,module,notes
 0x08042784,0x08042790,build/world/wrap_08042784.bin,world,kucuk fonksiyon hasadi
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,kucuk fonksiyon hasadi
 0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,kucuk fonksiyon hasadi
+0x0804FF98,0x0804FFA4,build/world/wrap_0804ff98.bin,world,iletme sarmalayicisi
+0x0804FFB4,0x0804FFC0,build/world/wrap_0804ffb4.bin,world,iletme sarmalayicisi
+0x080500D0,0x080500DC,build/world/wrap_080500d0.bin,world,iletme sarmalayicisi
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
 0x08050994,0x080509C4,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici
 0x080509C4,0x080509DC,build/world/offset_helpers.bin,world,CallWithOffset; void ofsetli çağrı sarmalayıcısı
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x08050A00,0x08050A0C,build/world/get_anchor_unk34.bin,world,Anchor +0x34 getirici
+0x08051464,0x08051470,build/world/wrap_08051464.bin,world,iletme sarmalayicisi
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
@@ -113,6 +117,7 @@ start,end,binary,module,notes
 0x08055BF8,0x08055C04,build/world/forward_zero_arg2.bin,world,ikinci argumani sifirlayarak iletme
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
+0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,iletme sarmalayicisi
 0x0805AC44,0x0805AC50,build/world/counter_saturate.bin,world,Kopyalama
 0x0805AC50,0x0805AC88,build/world/bump_or_reset.bin,world,BumpOrReset; koşullu sıfırlanan doygun sayaç
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
@@ -120,6 +125,7 @@ start,end,binary,module,notes
 0x0806233C,0x08062364,build/world/is_mode_two.bin,world,0x02036050 kip bayti == 2 sorgusu
 0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type sorgusu
 0x08062530,0x0806254C,build/world/is_ram_mode.bin,world,IsRamModeWanted; RAM etkinlik ve mod sorgusu
+0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"
 0x080664F0,0x0806651C,build/world/maybe_advance.bin,world,MaybeAdvance; 42 bayt fonksiyon + 2 bayt hizalama dolgusu
