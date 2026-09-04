@@ -23,8 +23,21 @@
  *   - 0x0063FFFF ve 0x0001FFFF havuzdan
  *   - son dongu 0x08342AC8'deki dort girisli ROM tablosunda donuyor ve
  *     `asrs r0, r1` ile REGISTER MIKTARLI kaydirma yapiyor
- * Sonraki tur once kontrol akisini yeniden cikarmali (dallarin hedefleri
- * tek tek izlenerek), sonra koda gecmeli.
+ * KONTROL AKISI ARACLA CIKARILDI (tools/dump_cfg.py) ve kaynak ona gore
+ * YENIDEN YAZILDI. Grafik 21 blok gosterdi; onemli olan BIRLESME
+ * NOKTALARIYDI: B7'ye uc yerden, B15'e DORT yerden geliniyor. Yani ic ice
+ * kosul degil, KORUMALI ERKEN CIKIS zinciri. Kaynak buna gore etiketli
+ * yazildi (goto no / apply / peers / scan).
+ *
+ * Yine de eslesmedi: 145/156 (ROM 152). Yeni teshis:
+ *     bizim `push {r4,r5,r6,r7,lr}`   ROM `push {r4,r5,r6,lr}`
+ * Bir fazla callee-saved register, yani bir fazla canli deger.
+ * `value` yerelini `span` ile paylastirmak DENENDI, hicbir sey degismedi.
+ *
+ * tools/dump_alloc.py: 22 pseudo-register / 5 spill. Karsilastirma icin
+ * eslesen EngageActor 12 pseudo / 3 spill. Basinc iki kati; bu, birkac
+ * baytlik bir duzeltmeyle kapanacak bir sey degil, kaynak yapisinin
+ * kendisi ROM'unkinden daha fazla ara deger uretiyor.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/step_decay.c
@@ -60,12 +73,12 @@ typedef struct Node {
 extern u32 gRam02000224;
 
 /* 0x08023974 */
+/* 0x08023974 */
 u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
 {
     Peer *peer;
     s32 limit;
     s32 span;
-    s32 value;
     u32 i;
 
     peer = 0;
@@ -90,25 +103,29 @@ no:
 apply:
     obj->stamp = gRam02000224;
     span = obj->value;
-    if (span != 0) {
-        obj->value = span - delta;
-        if (obj->value <= 0)
-            obj->value = 1;
-    }
+    if (span == 0)
+        goto peers;
+    obj->value = span - delta;
+    if (obj->value > 0)
+        goto peers;
+    obj->value = 1;
 
-    if (peer != 0) {
-        if (peer->flags & PEER_BIT) {
-            if (span > SPAN_LIMIT) {
-                if (obj->value <= SPAN_LIMIT)
-                    obj->value = SPAN_RESET;
-            }
-        }
-    }
+peers:
+    if (peer == 0)
+        goto scan;
+    if ((peer->flags & PEER_BIT) == 0)
+        goto scan;
+    if (span <= SPAN_LIMIT)
+        goto scan;
+    if (obj->value > SPAN_LIMIT)
+        goto scan;
+    obj->value = SPAN_RESET;
 
+scan:
     i = 0;
-    value = obj->value;
+    span = obj->value;
     do {
-        if (value <= (limit >> TABLE[i]))
+        if (span <= (limit >> TABLE[i]))
             obj->tag = i;
         i++;
     } while ((s32)i <= TABLE_LAST);
