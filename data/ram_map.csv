@@ -77,6 +77,8 @@ address,size,name,source,status,notes
 0x02026F38,8,gFlagsA,decomp,provisional,8 girisli bayrak dizisi
 0x02026FE0,576,gBlockTable,decomp,provisional,8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik
 0x020272C8,4,gRam020272C8,decomp,provisional,Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor
+0x02027310,4,gRam02027310,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
+0x02027320,4,gRam02027320,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
 0x02027344,264,gAddrTable,decomp,provisional,6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi
 0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
 0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown

@@ -86,6 +86,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08023A40,ResetMeter,src/world/threshold.c,10,10,yes
 0x08023A4C,SetToMax,src/world/threshold.c,10,10,yes
 0x08023A58,ReloadMeter,src/world/threshold.c,16,16,yes
+0x08023A80,MaskedDiffers,src/world/masked_compare.c,28,28,yes
 0x08028C48,IsEntryActive,src/world/table_entries.c,32,32,yes
 0x08028C68,ReleaseEntry,src/world/table_entries.c,64,64,yes
 0x08028CA8,ClearEntry,src/world/table_entries.c,64,64,yes
@@ -93,6 +94,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
+0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
 0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes
 0x080308A0,ReleaseAllSlots,src/world/slot_release.c,10,10,yes
 0x080308AC,ReleaseSlot,src/world/release_slot.c,64,64,yes
@@ -109,8 +111,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x080320B0,GetEntityKind,src/world/entity_accessors.c,6,6,yes
 0x080320B8,GetEntityUnk10,src/world/entity_accessors.c,4,4,yes
 0x080320C8,SaveBufferCopy8To9,src/world/copy_flag_byte.c,12,12,yes
+0x080320D4,SaveBufferCopy9To8,src/world/copy_flag_byte.c,12,12,yes
 0x080336EC,VerifyId,src/world/id_verify.c,64,64,yes
 0x0803372C,TriggerIfMatched,src/world/id_verify.c,64,64,yes
+0x0803376C,ZeroThreeFlags,src/world/zero_three_flags.c,32,32,yes
 0x08037F1C,GetUnk0202F2C0,src/misc/state_getters.c,12,12,yes
 0x08037F28,GetUnk0202F310,src/misc/state_getters.c,12,12,yes
 0x08037F34,GetUnk02028270,src/misc/state_getters.c,12,12,yes
@@ -169,9 +173,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050934,ResetAnchorFull,src/world/anchor_reset.c,36,36,yes
 0x08050958,ResetAnchorPartial,src/world/anchor_reset.c,24,24,yes
 0x08050994,GetBaseAlt,src/world/get_slot_unk10.c,12,12,yes
+0x080509A0,AdvanceAnchor,src/world/get_slot_unk10.c,36,36,yes
 0x080509C4,CallWithOffset,src/world/offset_helpers.c,24,24,yes
 0x080509DC,GetBase,src/world/gRam02030330_gets.c,12,12,yes
 0x080509E8,SetSlot,src/world/gRam02030330_gets.c,12,12,yes
+0x08050A00,GetAnchorUnk34,src/world/get_anchor_unk34.c,12,12,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,28,28,yes
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,28,28,yes
 0x08051500,GetRecord,src/misc/record_table.c,20,20,yes
@@ -193,6 +199,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08062294,GetModeCategory,src/world/ram_state.c,30,30,yes
 0x080622B4,SetRamState,src/world/ram_state.c,12,12,yes
 0x0806233C,IsModeReady,src/world/is_mode_two.c,20,20,yes
+0x08062350,IsModeDone,src/world/is_mode_two.c,20,20,yes
 0x08062514,GetRamType,src/world/ram_flags.c,28,28,yes
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,28,28,yes
 0x0806434C,SetFontIndex,src/text/draw_text.c,16,16,yes
@@ -210,6 +217,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080671B8,BumpCount6A,src/world/more_counters.c,28,28,yes
 0x080671D4,BumpCount68,src/world/more_counters.c,28,28,yes
 0x080671F0,BumpCount64,src/world/more_counters.c,28,28,yes
+0x0806720C,BumpSaveCounter,src/world/bump_save_counter.c,28,28,yes
 0x08067228,BumpCountB,src/world/stat_counters.c,28,28,yes
 0x08067244,BumpCountA,src/world/stat_counters.c,28,28,yes
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,20,20,yes

@@ -38,11 +38,13 @@ start,end,binary,module,notes
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
 0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
+0x08023A80,0x08023A9C,build/world/masked_compare.bin,world,maskeli karsilastirma
 0x08028C48,0x08028CE8,build/world/table_entries.bin,world,"Uc tablo girdisi yardimcisi: aktiflik testi, iki serbest birakma"
 0x08028E3C,0x08028E6C,build/world/kind_scan.bin,world,HasWantedEntry; 14 girdilik etkin tür taraması
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
+0x08030874,0x08030884,build/world/forward_with_zero.bin,world,sifir arguman ekleyerek iletme
 0x08030884,0x080308A0,build/world/notify_if_ready.bin,world,nesne hazirsa FUN_0802B2B4 bildirimi
 0x080308A0,0x080308AC,build/world/slot_release.bin,world,Yuva serbest birakma cagricisi
 0x080308AC,0x080308EC,build/world/release_slot.bin,world,ReleaseSlot; iki tabanlı yuva serbest bırakma
@@ -50,8 +52,9 @@ start,end,binary,module,notes
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
-0x080320C8,0x080320D4,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
+0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
+0x0803376C,0x0803378C,build/world/zero_three_flags.bin,world,uc bayragi sifirlama
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
@@ -74,9 +77,10 @@ start,end,binary,module,notes
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
-0x08050994,0x080509A0,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici
+0x08050994,0x080509C4,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici
 0x080509C4,0x080509DC,build/world/offset_helpers.bin,world,CallWithOffset; void ofsetli çağrı sarmalayıcısı
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
+0x08050A00,0x08050A0C,build/world/get_anchor_unk34.bin,world,Anchor +0x34 getirici
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055AF8,0x08055B34,build/world/entity_query.bin,world,QueryEntity; varlık türü ve alt-hedef bayrak sorgusu
@@ -86,7 +90,7 @@ start,end,binary,module,notes
 0x0805AC50,0x0805AC88,build/world/bump_or_reset.bin,world,BumpOrReset; koşullu sıfırlanan doygun sayaç
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode kategorisi + iki alan yazici
-0x0806233C,0x08062350,build/world/is_mode_two.bin,world,0x02036050 kip bayti == 2 sorgusu
+0x0806233C,0x08062364,build/world/is_mode_two.bin,world,0x02036050 kip bayti == 2 sorgusu
 0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type sorgusu
 0x08062530,0x0806254C,build/world/is_ram_mode.bin,world,IsRamModeWanted; RAM etkinlik ve mod sorgusu
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
@@ -94,6 +98,7 @@ start,end,binary,module,notes
 0x080664F0,0x0806651C,build/world/maybe_advance.bin,world,MaybeAdvance; 42 bayt fonksiyon + 2 bayt hizalama dolgusu
 0x08066A40,0x08066A54,build/world/comm_flag.bin,world,Iletisim bayragi
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
+0x0806720C,0x08067228,build/world/bump_save_counter.bin,world,gSaveBuffer +0x66 doyuran sayac
 0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
 0x08067274,0x080672B8,build/world/distance_accum.bin,world,AddDistance; mutlak delta mesafe ve taşma biriktiricisi
 0x08067374,0x080673AC,build/world/more_counters_2.bin,world,u16 ve u8 tasma korumali sayaclar

@@ -1,4 +1,4 @@
-/* Ikinci +0x10 getirici — 0x08050994-0x0805099F
+/* Anchor erisim ve ilerletme — 0x08050994-0x080509C3
  *
  * gRam02030330.base alanini dondurur; 0x080509DC'deki GetBase ile AYNI
  * alani okuyan ikinci bir erisimci (bu depoda GetPoolA..D gibi ozdes
@@ -37,3 +37,15 @@ extern Anchor gRam02030330;
 
 /* 0x08050994 */
 u32 GetBaseAlt(void) { return gRam02030330.base; }
+
+/* 0x080509A0 */
+void AdvanceAnchor(void)
+{
+    if (gRam02030330.unk08 != 1) {
+        gRam02030330.unk20 = 2400;
+        gRam02030330.unk08 = 3;
+        gRam02030330.unk04 = 0;
+    } else {
+        gRam02030330.unk20 += 120;
+    }
+}

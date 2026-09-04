@@ -492,7 +492,7 @@ address,name,size,status,module,notes
 0x08023A40,ResetMeter,10,matching,world,Bant hesaplayici; src/world/threshold.c
 0x08023A4C,SetToMax,10,matching,world,Bant hesaplayici; src/world/threshold.c
 0x08023A58,ReloadMeter,16,matching,world,Bant hesaplayici; src/world/threshold.c
-0x08023A80,FUN_08023a80,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08023A80,MaskedDiffers,28,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08023AA0,FUN_08023aa0,130,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08023B24,FUN_08023b24,148,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08023BB8,FUN_08023bb8,132,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -639,7 +639,7 @@ address,name,size,status,module,notes
 0x080306C8,FUN_080306c8,384,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803084C,FUN_0803084c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08030860,FUN_08030860,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030874,FUN_08030874,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08030874,ForwardWithZero,14,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08030884,NotifyIfReady,28,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x080308A0,ReleaseAllSlots,10,matching,world,Yuva serbest; src/world/slot_release.c
 0x080308AC,ReleaseSlot,64,matching,world,İki tabanlı yuva serbest bırakma; src/world/release_slot.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -726,7 +726,7 @@ address,name,size,status,module,notes
 0x080320B0,GetEntityKind,6,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320B8,GetEntityUnk10,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320C8,SaveBufferCopy8To9,12,matching,world,C kaynagindan byte-matching (MATCH-014)
-0x080320D4,FUN_080320d4,12,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x080320D4,SaveBufferCopy9To8,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x080320E0,FUN_080320e0,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803214C,FUN_0803214c,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08032168,FUN_08032168,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -764,7 +764,7 @@ address,name,size,status,module,notes
 0x08033674,FUN_08033674,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080336EC,VerifyId,64,matching,world,Kimlik dogrulama; src/world/id_verify.c
 0x0803372C,TriggerIfMatched,64,matching,world,Kimlik dogrulama; src/world/id_verify.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0803376C,FUN_0803376c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803376C,ZeroThreeFlags,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x0803378C,FUN_0803378c,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803379C,FUN_0803379c,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080337A8,FUN_080337a8,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1212,11 +1212,11 @@ address,name,size,status,module,notes
 0x08050934,ResetAnchorFull,36,matching,world,Anchor sifirlama; src/world/anchor_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08050958,ResetAnchorPartial,24,matching,world,C kaynagindan byte-matching (MATCH-014); anchor_reset kumesinin ucuncusu
 0x08050994,GetBaseAlt,12,matching,world,C kaynagindan byte-matching (MATCH-014)
-0x080509A0,FUN_080509a0,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x080509A0,AdvanceAnchor,36,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x080509C4,CallWithOffset,24,matching,world,Void ofsetli çağrı sarmalayıcısı; src/world/offset_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080509DC,GetBase,12,matching,world,Ofset yardimcisi; src/world/offset_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080509E8,SetSlot,12,matching,world,Ofset yardimcisi; src/world/offset_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08050A00,FUN_08050a00,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08050A00,GetAnchorUnk34,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08050A0C,FUN_08050a0c,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08050A34,FUN_08050a34,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x08050A48,FUN_08050a48,68,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
@@ -1600,7 +1600,7 @@ address,name,size,status,module,notes
 0x08062294,GetModeCategory,30,matching,world,gRam02035EA0 durum; src/world/ram_state.c
 0x080622B4,SetRamState,12,matching,world,gRam02035EA0 durum; src/world/ram_state.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0806233C,IsModeReady,20,matching,world,C kaynagindan byte-matching (MATCH-014)
-0x08062350,FUN_08062350,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x08062350,IsModeDone,20,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08062370,FUN_08062370,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080623AC,FUN_080623ac,56,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x080623E4,FUN_080623e4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1711,7 +1711,7 @@ address,name,size,status,module,notes
 0x080671B8,BumpCount6A,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671D4,BumpCount68,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671F0,BumpCount64,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0806720C,FUN_0806720c,28,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x0806720C,BumpSaveCounter,28,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08067228,BumpCountB,28,matching,world,Istatistik sayaci; src/world/stat_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067244,BumpCountA,28,matching,world,Istatistik sayaci; src/world/stat_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067260,ResetDistanceAccum,20,matching,world,Istatistik sayaci; src/world/stat_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
