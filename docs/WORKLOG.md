@@ -1,5 +1,35 @@
 # Çalışma günlüğü
 
+## 2026-09-04 — 53 sınır bulgusunun kapatılması
+
+- Her bulgu özyinelemeli Thumb akışı ve ROM disassembly'siyle incelendi;
+  karar kanıtları `data/boundary_review.csv` içine yazıldı.
+- 52 bulgu, `split_at_calls.py` aracının literal havuzları ve fonksiyon içi
+  ortak blokları doğrusal `bl` hedefi sanarak oluşturduğu sahte bölmelerdi.
+- `0x08053FF2`, `0x1C03FFFF` literalinin üst yarısındaki sahte başlangıçtı;
+  üç gerçek `bl` çağrısı ve `push {r4-r7,lr}` prologu bulunan
+  `0x08053FF4` ayrı fonksiyon olarak korundu.
+- Kısa sınır borcu 53'ten 0'a indi. ARM aralığındaki 18 kayıt ve 4096 bayt
+  eşiğini aşan 4 kayıt farklı inceleme sınıfları olarak açık tutuldu.
+- `ScanAllEntries`, ROM'un yalnız 0 numaralı girdiyi işleyen gerçek davranışını
+  yansıtacak biçimde `ProcessFirstEntry` olarak yeniden adlandırıldı.
+- `gRam02000F10`, `gRam02001140` ve `gRam02025810` için çelişkili extern
+  türleri ortak ham depolama bildirimlerinde birleştirildi. Dokuz matching
+  fonksiyonun bayt çıktısı değişmedi; tutarlılık kapısı yeni tür çelişkilerini
+  artık otomatik reddediyor.
+- Dashboard'daki kullanılmayan 57 UI scaffold/hook dosyası ve sekiz gereksiz
+  çalışma zamanı bağımlılığı kaldırıldı. Tam depo dashboard lint'i ve production
+  build artık geçiyor; kilometre taşı kapısı daraltılmış lint yerine tam lint
+  çalıştırıyor.
+- Dört aşırı büyüme kaydı ARM/Thumb disassembly ile kapatıldı. Üç büyük
+  fonksiyonun eksik kuyrukları uzatıldı; `0x0802BDF0`–`0x0802DE70` arası
+  8.320 baytın tek stack frame olduğu doğrulandı. Sahte girişlerin yeniden
+  keşfedilmesini önleyen 57 adreslik negatif bilgi tablosu eklendi.
+- ARM overlay'deki 18 kaydın tamamı incelendi: 14 stack-frame fonksiyonu ve
+  ebeveyn register/frame durumunu kullanan 4 yerel BL rutini. Dört eksik boyut
+  düzeltildi; `0x08067E04–0x0806B84C` aralığı boşluksuz doğrulandı. Sınır
+  baseline'ındaki açık/atlanan bütün sınıflar sıfıra indi.
+
 ## 2026-09-02 — İlk büyük tersine mühendislik geçişi
 
 ### Ortam ve koruma
@@ -572,7 +602,7 @@ cogu kumede ILK denemede tam eslesme verdi.
 ### Park korpusu: 16 dosya
 
 Yedisi ≤5 bayt uzaklikta (ClearTextArea 1, MaybeAdvance 1, QueryEntity 2,
-ScanAllEntries 2, GetInnerId 4, IsRamModeWanted 4, ProbeObject 5).
+ProcessFirstEntry 2, GetInnerId 4, IsRamModeWanted 4, ProbeObject 5).
 Engel siniflari tanimlandi: register dagitim sirasi, dal yonu
 normalizasyonu, taban kopyalama/iki-taban, havuz yerlesimi, -O0 sinifi,
 carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
@@ -585,3 +615,110 @@ carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
 - Dashboard: bayat JSON (make check artik yeniliyor), palet ton ayrimi,
   panel artik Ghidra yerine bizim kaynagi gosteriyor.
 - Yeniden adlandirma YEDI kez baska dosyayi kirdi → rename araci gerek.
+
+## 2026-09-04 — ProcessFirstEntry byte eşleşmesi
+
+- `src/world/scan_all.c` içindeki son iki baytlık fark kapatıldı. İşaretçi
+  hesabını `(u32)i * sizeof(Entry) + (u32)tbl` sırasıyla ifade etmek,
+  old_agbcc'nin ROM'daki `adds r1, r0, r5` kodlamasını üretmesini sağladı.
+- Fonksiyon 62/62 bayt eşleşiyor; iki baytlık hizalama dolgusu ile birlikte
+  `0x08029014–0x08029054` aralığı kalıcı matching zincirine eklendi.
+- Park korpusundaki `scan_all` engeli kapandı; bu ifade sırası benzer
+  register-dağıtımı farkları için yeniden kullanılabilir bir adaydır.
+
+## 2026-09-04 — MaybeAdvance semantik düzeltmesi
+
+- Tek baytlık `bls`/`bhi` farkının derleyici tercihi olmadığı kanıtlandı:
+  önceki C ve yorum ROM dal hedefini ters okuyordu.
+- Gerçek davranış: yalnız `gVBlankEnabled == 2` ve sayaç `> 1` iken 0;
+  diğer tüm durumlarda 1 döndürür.
+- Düzeltilen doğal C 42/42 bayt eşleşti. İki bayt hizalamayla
+  `0x080664F0–0x0806651C` bölgesi kalıcı matching zincirine eklendi.
+
+## 2026-09-04 — QueryEntity byte eşleşmesi
+
+- `flags & 3` ifadesindeki iki operand aynı değeri verse de agbcc sonucu
+  ROM'dan farklı register'da tutuyordu.
+- `mask = 3; mask &= flags` biçimi sonucu sabitin register'ında tuttu ve
+  kalan iki opcode baytını kapattı. Fonksiyon 60/60 bayt eşleşiyor.
+- `0x08055AF8–0x08055B34` kalıcı matching zincirine eklendi; derleyici
+  davranışı `COMPILER.md` kural 33 olarak kaydedildi.
+
+## 2026-09-04 — Object query ikilisi byte eşleşmesi
+
+- `ProbeObject` (58/58) ve `GetInnerId` (20/20), iç içe null kontrollerini
+  açık erken `return 0` kontrollerine çevirince ROM blok sırasına oturdu.
+- Aralarında başka bir doğrulanmış fonksiyon bulunduğundan dosya iki gerçek
+  ROM bölgesine ayrıldı: `object_query.c` ve `get_inner_id.c`.
+- `0x080381F8–0x08038234` ile `0x0803824C–0x08038260` kalıcı matching
+  zincirine eklendi; desen `COMPILER.md` kural 34 olarak kaydedildi.
+
+## 2026-09-04 — IsRamModeWanted byte eşleşmesi
+
+- İç içe ilk koşul açık `if (!active) return 0;` biçimine çevrildi.
+  Bu, ortak sıfır bloğunu literal havuzundan önce yerleştirerek kalan dört
+  baytlık kontrol-akışı farkını kapattı.
+- Fonksiyon 28/28 bayt eşleşti ve `0x08062530–0x0806254C` kalıcı matching
+  zincirine eklendi. Kural 34 böylece üçüncü fonksiyonda doğrulandı.
+
+## 2026-09-04 — CallWithOffset imza düzeltmesi
+
+- ROM epilogu çağrı sonucundaki r0'ı `pop {r0}` ile eziyordu; bu kanıt
+  sarmalayıcının önceki `u32` imzasının yanlış olduğunu gösterdi.
+- Dönüş tipi `void` yapılınca register dağıtımı ve epilog dahil fonksiyon
+  24/24 bayt eşleşti. `0x080509C4–0x080509DC` kalıcı matching zincirine
+  eklendi; çıkarım `COMPILER.md` kural 35 olarak kaydedildi.
+
+## 2026-09-04 — InitActor byte eşleşmesi
+
+- Döngü sayacını son kuyruk sıfır yazımlarında yeniden kullanmak farkı
+  14 bayttan tek taşınmış komuta indirdi.
+- `tail = &actor->unk90` adresini sıfır atamasından önce açıkça hesaplamak
+  ROM'un komut sırasını üretti; fonksiyon 192/192 bayt eşleşti.
+- `0x080154D8–0x08015598` kalıcı matching zincirine eklendi ve desen
+  `COMPILER.md` kural 36 olarak kaydedildi.
+
+## 2026-09-04 — HasWantedEntry byte eşleşmesi
+
+- `base`, `kind` ve `cur` işaretçilerini ayrı yaşam aralıkları olarak ifade
+  etmek ROM'daki r0/r1/r2 register dağıtımını geri getirdi.
+- Eksik kopya komutu geri gelince literal havuzu ve döngü hedefi de doğru
+  konuma oturdu; fonksiyon 48/48 bayt eşleşti.
+- `0x08028E3C–0x08028E6C` kalıcı matching zincirine eklendi; desen
+  `COMPILER.md` kural 37 olarak kaydedildi.
+
+## 2026-09-04 — PushHistory byte eşleşmesi
+
+- Genel taban, okunan `current` değeri ve yazım tabanı karşılaştırmadan önce
+  ayrı yaşam aralıklarına ayrıldı.
+- Bu biçim agbcc'nin eşitlik yolunu sondaki store ile birleştirmesini önledi;
+  register dağıtımı ve döngü hedefiyle birlikte fonksiyon 48/48 eşleşti.
+- `0x08008064–0x08008094` kalıcı matching zincirine eklendi; desen
+  `COMPILER.md` kural 38 olarak kaydedildi.
+
+## 2026-09-04 — AddDistance byte eşleşmesi
+
+- `gDistanceAccum` adresi ayrı işaretçiye alınarak ROM'daki erken r4 taban
+  yüklemesi ve tek taban kullanımı üretildi.
+- Yalnız son karşılaştırmadaki `distance` okumasına dar volatile görünümü
+  verilerek ROM'un store sonrası `ldrh` yeniden okuması korundu.
+- Fonksiyon 68/68 bayt eşleşti; `0x08067274–0x080672B8` kalıcı matching
+  zincirine eklendi ve desen `COMPILER.md` kural 39 olarak kaydedildi.
+
+## 2026-09-04 — BumpOrReset byte eşleşmesi
+
+- Yapısal `if/else` yerine ROM'un üç bloğu `reset`, `increment` ve ortak
+  `store` C etiketleriyle açıkça ifade edildi.
+- agbcc böylece iki dalda ayrı sayaç adresi yükleyip tek `strb` paylaştı;
+  fonksiyon 56/56 bayt eşleşti.
+- `0x0805AC50–0x0805AC88` kalıcı matching zincirine eklendi ve desen
+  `COMPILER.md` kural 40 olarak kaydedildi.
+
+## 2026-09-04 — ReleaseSlot byte eşleşmesi
+
+- Struct indekslemesi kaldırılıp bir kez hesaplanan `scaled` ofset ile
+  `heldBase` ve `extraBase` alan tabanları ayrı yerellerde kuruldu.
+- Çarpımı iki deyimden tek `scaled = index * 180` atamasına indirmek son
+  r3/r4 takasını düzeltti; fonksiyon 64/64 bayt eşleşti.
+- `0x080308AC–0x080308EC` kalıcı matching zincirine eklendi ve desen
+  `COMPILER.md` kural 41 olarak kaydedildi.

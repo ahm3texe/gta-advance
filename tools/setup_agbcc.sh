@@ -9,9 +9,12 @@ set -e
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 WORK=${AGBCC_WORK:-"$ROOT/build/agbcc-src"}
+AGBCC_REPO=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source"]["repository"])' "$ROOT/config/toolchain.lock.json")
+AGBCC_COMMIT=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source"]["compatibleRevision"])' "$ROOT/config/toolchain.lock.json")
 
 if [ -x "$ROOT/tools/agbcc/bin/agbcc" ] && [ "$1" != "--force" ]; then
     echo "agbcc zaten kurulu: tools/agbcc/bin/agbcc"
+    python3 "$ROOT/tools/verify_toolchain.py"
     echo "Yeniden kurmak icin: $0 --force"
     exit 0
 fi
@@ -23,21 +26,25 @@ if ! command -v arm-none-eabi-as >/dev/null 2>&1 || ! command -v arm-none-eabi-a
 fi
 
 # agbcc 1998 donemi C kaynagi; modern clang'in varsayilanlariyla derlenmez.
-CCWRAP="$WORK/../agbcc-cc"
-mkdir -p "$(dirname "$CCWRAP")"
-cat > "$CCWRAP" <<'WRAP'
-#!/bin/sh
-exec ${AGBCC_HOST_CC:-clang} -std=gnu89 -fcommon \
-  -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion \
-  -Wno-return-type -Wno-incompatible-pointer-types -Wno-deprecated-non-prototype \
-  -Wno-parentheses -Wno-shift-op-parentheses -Wno-dangling-else -Wno-format \
-  -Wno-error "$@"
-WRAP
-chmod +x "$CCWRAP"
+# Bayraklar ayri bir izlenen dosyada tutulur ki kurulum betigi ile yeniden
+# uretme deneyi birbirinden sapmasin.
+CCWRAP="$ROOT/tools/agbcc_host_cc.sh"
 
 if [ ! -d "$WORK" ]; then
     echo "agbcc kaynagi aliniyor..."
-    git clone --depth 1 https://github.com/pret/agbcc.git "$WORK"
+    git init "$WORK"
+    git -C "$WORK" remote add origin "$AGBCC_REPO"
+    git -C "$WORK" fetch --depth 1 origin "$AGBCC_COMMIT"
+    git -C "$WORK" checkout --detach FETCH_HEAD
+elif [ ! -d "$WORK/.git" ]; then
+    echo "HATA: $WORK var ama bir Git checkout'u degil." >&2
+    exit 1
+elif [ "$(git -C "$WORK" rev-parse HEAD)" != "$AGBCC_COMMIT" ]; then
+    echo "HATA: $WORK beklenen agbcc revizyonunda degil." >&2
+    echo "  beklenen: $AGBCC_COMMIT" >&2
+    echo "  bulunan:  $(git -C "$WORK" rev-parse HEAD)" >&2
+    echo "Farkli bos bir AGBCC_WORK dizini kullanin." >&2
+    exit 1
 fi
 
 echo "agbcc derleniyor (birkac dakika surebilir)..."
@@ -46,4 +53,5 @@ echo "agbcc derleniyor (birkac dakika surebilir)..."
 echo "Projeye kuruluyor..."
 ( cd "$WORK" && ./install.sh "$ROOT" )
 "$ROOT/tools/agbcc/bin/agbcc" --version 2>/dev/null || true
+python3 "$ROOT/tools/verify_toolchain.py" --corpus
 echo "Tamam: tools/agbcc/bin/{agbcc,old_agbcc,agbcc_arm}"

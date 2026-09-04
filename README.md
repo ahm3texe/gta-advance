@@ -9,45 +9,39 @@ Bu depo, kullanıcının kendi sağladığı **Grand Theft Auto Advance Avrupa G
 - ROM doğrulandı: 16 MiB, başlık `GTA ADVANCE`, oyun kodu `BGTP`, sürüm `0`.
 - Avrupa ROM SHA-1: `06230842626da504f92396074f7c655e100f5d44`
 - GBA giriş dalı hedefi: `0x080000C0`.
-- Güncel fonksiyon haritası: 1.503 kayıt (1.497 Ghidra adayı + 6 tanesi eşleştirme sırasında bulundu), yaklaşık 284 KiB aday fonksiyon gövdesi.
-- Byte-matching başlangıç/IRQ kaynakları: `AgbMain`, `IntrMain`, `VBlankIntr`, `InitInterrupts`, dört IRQ yardımcısı, `VCountIntr` ve `ResetDisplayAndInterrupts`.
-- EEPROM/save modülü ve serileştirme yardımcıları `0x0800082C–0x0800114B` boyunca kesintisiz 2336/2336 byte matching'dir; ayrıntı [SAVE_SYSTEM.md](docs/SAVE_SYSTEM.md) içindedir.
-- ROM girişinden ilk UI başlatma fonksiyonunun sonuna kadar `0x080000C0–0x08001457` aralığı kesintisiz 5016/5016 byte yeniden üretilmektedir.
-- **63 fonksiyon byte-matching**; doğrulanmış ROM alanı 26 kaynak bölgesinde 5632 byte, dokuz libc bölgesinde 448 byte — toplam **6080 byte**.
-- **Taşınabilir assembly bitti.** Matching byte'ların **%92.96**'sı okunabilir C'den üretiliyor; kalan 328 byte ARM modundaki `agb_main` ve `intr_main`'dir ve kalıcı olarak assembly kalacaktır.
-- Derleyici `old_agbcc` olarak doğrulandı; yeni kaynaklar doğrudan C ile yazılıyor ve assembly karşılıkları blok tamamlandıkça emekli ediliyor. Ayrıntı [COMPILER.md](docs/COMPILER.md).
-- **Derleyici kimliği çözüldü: agbcc.** ROM'un Nintendo'nun GBA SDK'sıyla gelen GCC 2.8.1 türevi ile derlendiği byte düzeyinde doğrulandı — `ReadU8`, `WriteU8` ve 28 byte'lık `WriteU32LE` doğrudan C'den birebir üretiliyor. Ayrıntı ve kanıt [COMPILER.md](docs/COMPILER.md) içinde. Bu, projenin C'den byte-matching hedefleyebileceği anlamına gelir.
-- Makinede Git, Make, Python 3, Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, ARM GNU araç zinciri 16.2 ve agbcc var.
+- Güncel sayaçlar, tek aktif iş ve açık borçlar otomatik üretilen
+  [STATUS.md](docs/STATUS.md) dosyasındadır. Terminalde aynı görünüm: `make status`.
+- Sürecin tek sözleşmesi [PROJECT_SYSTEM.md](docs/PROJECT_SYSTEM.md), fonksiyon
+  çalışma tekniği [WORKFLOW.md](docs/WORKFLOW.md) içindedir.
+- Derleyici revizyonu ve C-corpus parmak izi
+  [toolchain.lock.json](config/toolchain.lock.json) ile kilitlidir.
 
 ## Çalışma kuralları
 
-Süreç ve kurallar [WORKFLOW.md](docs/WORKFLOW.md) içindedir: hedef seçimi,
-fonksiyon döngüsü, dosya/sembol düzeni ve dürüstlük kuralları. Commit öncesi
-tek komut:
+Süreç ve kurallar [PROJECT_SYSTEM.md](docs/PROJECT_SYSTEM.md) içindedir.
+Commit öncesi günlük kapı:
 
 ```sh
 make check
 ```
 
-`make rom`, `make c-status`, `make c-review` ve `make progress` çalıştırır.
-Hash tutmuyorsa iş bitmemiştir.
+Kilometre taşı veya birleştirme öncesinde cache'siz derleme, C-corpus ve
+dashboard doğrulaması için `make check-full` kullanılır.
 
 Ortak tipler `include/gba_types.h`, donanım yazmaçları `include/gba_io.h`
 içindedir; kaynak dosyalarında `typedef` veya `#define REG_...` tanımlanmaz.
 
-## Tam ROM yeniden üretimi
+## Hibrit ROM bütünleştirme sınaması
 
 ```sh
 make rom
 ```
 
-Doğrulanmış her bölge kendi kaynağımızdan üretilir, kalan alanlar
-`baserom.gba`'dan kopyalanır ve sonucun SHA-1'i orijinalle karşılaştırılır.
-
-Bu, bölge bölge karşılaştırmadan daha güçlü bir iddiadır: dilim dilim
-kontroller bölge sınırları yanlış tanımlanmış ya da iki bölge çakışmış olsa
-bile geçebilir, tam ROM karşılaştırması geçemez. Üretilen ROM `out/` altına
-yazılır ve Git tarafından yok sayılır.
+Doğrulanmış bölgeler kendi kaynağımızdan üretilir, kalan alanlar
+`baserom.gba`dan kopyalanır ve hibrit görüntünün SHA-1'i orijinalle
+karşılaştırılır. Bu, kaynak bölgelerinin doğru konuma oturduğunu kanıtlayan
+bir bütünleştirme sınamasıdır; tam ROM'un kaynaktan üretildiği anlamına gelmez.
+Üretilen görüntü `out/` altına yazılır ve Git tarafından yok sayılır.
 
 ## İlk adım
 
@@ -65,7 +59,8 @@ make progress
 make matching
 ```
 
-Sonraki teknik odak, belgelenmiş büyük `RunMenuScreen` fonksiyonunun sınırlarını ve girdi/eylem tablosunu kesinleştirmek; ardından grafik, giriş ve dünya alt sistemlerine geçmektir. Ayrıntılı sıra [ROADMAP.md](docs/ROADMAP.md) dosyasındadır.
+Sıradaki teknik odak `data/work_queue.csv` içinde tek bir `in_progress` kayıtla
+tutulur; uzun vadeli sıra [ROADMAP.md](docs/ROADMAP.md) dosyasındadır.
 
 Başlangıç analizi [BOOT_SEQUENCE.md](docs/BOOT_SEQUENCE.md), mevcut açık çalışma ve ROM içi iz araştırması [PRIOR_ART.md](docs/PRIOR_ART.md), geçici RAM sembolleri ise [ram_map.csv](data/ram_map.csv) içindedir.
 

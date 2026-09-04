@@ -48,7 +48,7 @@ def main() -> None:
     })
     fields = ["start", "end", "binary", "module", "notes"]
     with REGIONS.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in sorted(rows, key=lambda r: int(r["start"], 16)):
             writer.writerow({k: row.get(k, "") for k in fields})

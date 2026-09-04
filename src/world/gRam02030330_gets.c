@@ -1,7 +1,7 @@
 /* gRam02030330 alan erisimi — 0x080509DC-0x080509ED
  *
  * `base` (+0x10) okuyucu ve `slot` (+0x2C) yazici.
- * Ayni kumedeki CallWithOffset ayri dosyada (henuz esleşmiyor).
+ * Ayni kumedeki CallWithOffset ayri dosyada ve byte-matching.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/gRam02030330_gets.c

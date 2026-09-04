@@ -3,9 +3,9 @@
  * Uc kucuk fonksiyon. Struct'in +0x10'undaki bir tabana offset ekleyip
  * FUN_080504B4 cagirici; +0x10 okuyucu; +0x2C yazici.
  *
- * HENUZ ESLESMIYOR: 11 komutun 5'i tuttu, 10 bayt fark. ROM r0'i
- * epilog icin tutuyor (`pop {r0}; bx r0`), bizimki `pop {r1}; bx r1`
- * -- register secimi C'den denetlenemedi. Ayri yerel de fark yaratmadi.
+ * BYTE-MATCHING. ROM `pop {r0}; bx r0` ile cagrilan fonksiyonun r0
+ * sonucunu eziyor; bu sarmalayicinin donus tipi u32 degil void. Dogru
+ * imza epilogu ve tum register dagitimini birebir uretiyor.
  *
  * Eslesen kardesler: src/world/gRam02030330_gets.c
  *
@@ -27,10 +27,10 @@ extern Anchor gRam02030330;
 extern u32 FUN_080504b4(u32 addr);
 
 /* 0x080509C4 */
-u32 CallWithOffset(u32 offset)
+void CallWithOffset(u32 offset)
 {
     u32 addr;
 
     addr = gRam02030330.base + offset;
-    return FUN_080504b4(addr);
+    FUN_080504b4(addr);
 }

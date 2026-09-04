@@ -12,6 +12,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 typedef struct Slot Slot;
 typedef void (*SlotHandler)(void);
@@ -35,8 +36,6 @@ struct Slot {
     SlotHandler handler;        /* +0x20 */
 };
 
-extern Slot  gRam02000F10;      /* birincil */
-extern Slot  gRam02001140;      /* ikincil  */
 extern Slot *gSessionPtr;       /* 0x02000F04 */
 extern u8    gGameState[];
 
@@ -46,7 +45,7 @@ void ConfigureSlot(void *entry, u32 kind, int which)
     Slot *slot;
 
     if (which == 0) {
-        slot = &gRam02000F10;
+        slot = (Slot *)gRam02000F10;
         slot->entry = entry;
         slot->kind = kind;
         if (kind == SLOT_KIND_LINKED) {
@@ -54,7 +53,7 @@ void ConfigureSlot(void *entry, u32 kind, int which)
             return;
         }
     } else {
-        slot = &gRam02001140;
+        slot = (Slot *)gRam02001140;
         slot->entry = entry;
         slot->kind = kind;
         if (kind == SLOT_KIND_LINKED) {
@@ -70,7 +69,7 @@ void ConfigureSlot(void *entry, u32 kind, int which)
 u32 GetActiveSlotValue(void)
 {
     if (gGameState[12] == 0)
-        return (u32)gRam02000F10.entry;
+        return (u32)((Slot *)gRam02000F10)->entry;
 
     return (u32)gSessionPtr->entry;
 }
@@ -79,11 +78,11 @@ u32 GetActiveSlotValue(void)
 u32 GetSlotField(int which)
 {
     if (which == SLOT_PRIMARY)
-        return gRam02000F10.unk0C;
+        return ((Slot *)gRam02000F10)->unk0C;
     if (which != SLOT_SECONDARY)
         return 0;
     if (gGameState[12] == 0)
         return 0;
 
-    return gRam02001140.unk0C;
+    return ((Slot *)gRam02001140)->unk0C;
 }

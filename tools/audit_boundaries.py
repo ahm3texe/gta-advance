@@ -16,9 +16,12 @@ yalnizca makul araliktayken izlenir.
 
 Kullanim:
     python3 tools/audit_boundaries.py            # rapor + kendi kendini sinama
+    python3 tools/audit_boundaries.py --check-baseline
+    python3 tools/audit_boundaries.py --write-baseline
     python3 tools/audit_boundaries.py --apply    # functions.csv'yi duzelt
 """
 import csv
+import json
 import sys
 from pathlib import Path
 
@@ -26,8 +29,12 @@ ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 REGIONS = ROOT / "data/matching_regions.csv"
+BASELINE = ROOT / "data/boundary_baseline.json"
+ARM_REVIEW = ROOT / "data/arm_boundary_review.csv"
 ROM_BASE = 0x08000000
-MAX_EXTENT = 8192
+# Oyunda 8 KiB'yi asan gercek Thumb fonksiyonu var (0x0802BDF0: 8320 B).
+# Yurutucunun tavani gercek bir govdeyi ortadan kesmeyecek kadar yuksek tutulur.
+MAX_EXTENT = 16384
 
 # Kalici ARM fonksiyonlari: yurutucu Thumb cozumluyor, bunlar atlanir.
 ARM_FUNCTIONS = {0x080000C0, 0x08000104}
@@ -48,9 +55,65 @@ ARM_RANGES = [
     (0x08067E04, 0x0806B84C),
 ]
 
-# Bir fonksiyonun bu boyutu asmasi analiz hatasi sayilir; otomatik
-# duzeltilmez, elle bakilmak uzere raporlanir.
-SANE_MAX = 4096
+# Kayitli sinira gore bu kadar fazla BUYUME analiz hatasi sayilir. Toplam
+# boyutu 4 KiB'den buyuk olan gercek fonksiyonlar tek basina supheli degildir.
+SANE_GROWTH = 4096
+
+
+def build_snapshot(grown, skipped_arm, skipped_jump, skipped_big, conflicts):
+    """Harita borcunun sirali, makinece karsilastirilabilir gorunumu."""
+
+    def measured(items):
+        return [
+            {
+                "address": row["address"],
+                "recordedSize": old,
+                "reachableSize": new,
+            }
+            for row, old, new in sorted(items, key=lambda item: int(item[0]["address"], 16))
+        ]
+
+    return {
+        "schemaVersion": 1,
+        "shortBoundaries": [
+            {
+                "address": row["address"],
+                "recordedSize": old,
+                "reachableSize": new,
+                "swallows": [f"0x{address:08X}" for address in eaten],
+            }
+            for row, old, new, eaten in sorted(
+                grown, key=lambda item: int(item[0]["address"], 16)
+            )
+        ],
+        "skippedArm": sorted(row["address"] for row in skipped_arm),
+        "skippedUnresolved": measured(skipped_jump),
+        "skippedOversized": measured(skipped_big),
+        "matchingConflicts": measured(conflicts),
+    }
+
+
+def compare_baseline(snapshot: dict) -> None:
+    if not BASELINE.exists():
+        sys.exit(f"HATA: {BASELINE.relative_to(ROOT)} yok; once --write-baseline")
+    expected = json.loads(BASELINE.read_text(encoding="utf-8"))
+    if snapshot == expected:
+        print(f"Sinir baseline: TEMIZ ({len(snapshot['shortBoundaries'])} bilinen bulgu)")
+        return
+
+    expected_addresses = {row["address"] for row in expected.get("shortBoundaries", [])}
+    actual_addresses = {row["address"] for row in snapshot["shortBoundaries"]}
+    added = sorted(actual_addresses - expected_addresses)
+    removed = sorted(expected_addresses - actual_addresses)
+    print("HATA: sinir denetimi baseline'dan saptı.", file=sys.stderr)
+    if added:
+        print(f"  yeni: {', '.join(added)}", file=sys.stderr)
+    if removed:
+        print(f"  kapanan: {', '.join(removed)}", file=sys.stderr)
+    if not added and not removed:
+        print("  adresler ayni; boyut/yutulan kayit veya atlanan grup degisti.", file=sys.stderr)
+    print("Degisiklik dogruysa inceleyip `make boundary-baseline` calistirin.", file=sys.stderr)
+    sys.exit(1)
 
 
 def in_arm_range(addr: int) -> bool:
@@ -178,10 +241,18 @@ class Walker:
 
 def main() -> None:
     apply = "--apply" in sys.argv
+    check_baseline = "--check-baseline" in sys.argv
+    write_baseline = "--write-baseline" in sys.argv
+    if sum((apply, check_baseline, write_baseline)) > 1:
+        sys.exit("--apply, --check-baseline ve --write-baseline birlikte kullanilamaz")
     rom = ROM.read_bytes()
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
         fields = list(rows[0].keys())
+    reviewed_arm = {
+        int(row["address"], 16)
+        for row in csv.DictReader(ARM_REVIEW.open(newline="", encoding="utf-8"))
+    } if ARM_REVIEW.exists() else set()
 
     # Kendi kendini sinama. Dogru degismez su: byte-matching bir fonksiyonun
     # ULASILABILIR KODU, onu iceren dogrulanmis bolgenin disina tasamaz.
@@ -234,7 +305,8 @@ def main() -> None:
         if size <= 0:
             continue
         if start in ARM_FUNCTIONS or in_arm_range(start):
-            skipped_arm.append(row)
+            if start not in reviewed_arm:
+                skipped_arm.append(row)
             continue
         w = Walker(rom, start)
         w.run()
@@ -247,7 +319,7 @@ def main() -> None:
         if w.unresolved:
             skipped_jump.append((row, size, got))
             continue
-        if got > SANE_MAX:
+        if got - size > SANE_GROWTH:
             skipped_big.append((row, size, got))
             continue
         eaten = [a for a in known if start < a < start + got]
@@ -266,7 +338,7 @@ def main() -> None:
     print(f"Denetim disi birakilanlar (sessizce atilmadi, elle bakilmali):")
     print(f"  {len(skipped_arm):4d} ARM araliginda")
     print(f"  {len(skipped_jump):4d} cozulemeyen dolayli atlama iceriyor")
-    print(f"  {len(skipped_big):4d} akil disi buyume (>{SANE_MAX} bayt), "
+    print(f"  {len(skipped_big):4d} akil disi ek buyume (>{SANE_GROWTH} bayt), "
           f"kip hatasi olabilir")
     print(f"  {len(conflicts):4d} dogrulanmis bir fonksiyonun uzerine buyuyor")
     print()
@@ -278,6 +350,21 @@ def main() -> None:
         if len(eaten) > 3:
             tag += f" (+{len(eaten) - 3})"
         print(f"{row['address']} {old:>6} {new:>6}  {tag}")
+
+    snapshot = build_snapshot(grown, skipped_arm, skipped_jump, skipped_big, conflicts)
+    if write_baseline:
+        BASELINE.write_text(
+            json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"\nSinir baseline yazildi: {BASELINE.relative_to(ROOT)}")
+        return
+    if check_baseline:
+        if bad:
+            sys.exit("HATA: byte-matching fonksiyon tasmasi baseline ile kabul edilemez")
+        print()
+        compare_baseline(snapshot)
+        return
 
     if not apply:
         print("\n(yalnizca rapor; degistirmek icin --apply)")
@@ -297,7 +384,7 @@ def main() -> None:
         out.append(row)
 
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(out)
     print(f"\nfunctions.csv guncellendi: {len(grown)} boyut duzeltildi, "

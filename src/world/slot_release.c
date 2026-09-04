@@ -1,7 +1,7 @@
 /* Yuva serbest birakma cagricisi — 0x080308A0-0x080308AB
  *
  * Tek satirlik devretme. Asil is FUN_080308EC'de.
- * Kardesi ReleaseSlot (0x080308AC) henuz eslesmedigi icin ayri dosyada:
+ * Kardesi ReleaseSlot ayri dosyada ve byte-matching:
  * src/world/release_slot.c
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

@@ -4,14 +4,9 @@
  * kismi (>> 13) kayittaki sayaca aktarip biriktiriciyi maskeliyor.
  * Sondaki karsilastirma tasma korumasi.
  *
- * HENUZ ESLESMIYOR: 36 komutun 27'si tutuyor, 38 bayt fark. Iki neden:
- *   - ROM biriktirici tabanini fonksiyonun basinda, isaret duzeltmesinden
- *     ONCE bir kez yukluyor; bizimki sonra yukleyip bir kez daha yukluyor.
- *   - ROM saklanan mesafeyi karsilastirma icin bellekten YENIDEN OKUYOR
- *     (`ldrh`); bizimki degeri register'da tutup `lsls/lsrs` ile
- *     genisletiyor. Ikisi de dogru, ROM'unki farkli secim.
- * Denenenler: ayri `next` yereli (44), karsilastirmayi ters cevirmek (38),
- * biriktiriciyi ayri deyimde okumak (43). Hicbiri temeli gecmedi.
+ * BYTE-MATCHING. Ayrı `accum` isaretcisi tabani isaret duzeltmesinden once
+ * r4'e yukletir. Yalniz tasma karsilastirmasindaki dar volatile gorunum,
+ * yazilan distance alanini ROM'daki gibi bellekten yeniden okutur.
  *
  * Ayni kumedeki eslesen uc sayac: src/world/stat_counters.c
  *
@@ -36,20 +31,22 @@ extern u32 gDistanceAccum;
 /* 0x08067274 */
 void AddDistance(int delta)
 {
+    u32 *accum;
     u32 total;
     u16 old;
 
+    accum = &gDistanceAccum;
     if (delta < 0)
         delta = -delta;
 
-    total = gDistanceAccum + (delta >> DELTA_SHIFT);
-    gDistanceAccum = total;
+    total = *accum + (delta >> DELTA_SHIFT);
+    *accum = total;
 
     if (total > ACCUM_MASK) {
         old = gSaveBuffer.distance;
         gSaveBuffer.distance = old + (total >> ACCUM_SHIFT);
-        gDistanceAccum = total & ACCUM_MASK;
-        if (gSaveBuffer.distance < old)
+        *accum = total & ACCUM_MASK;
+        if (*(volatile u16 *)&gSaveBuffer.distance < old)
             gSaveBuffer.distance = old;
     }
 }

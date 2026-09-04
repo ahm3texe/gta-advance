@@ -11,6 +11,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 #define PICK_A          1
 #define PICK_B          2
@@ -21,19 +22,17 @@ typedef struct SlotHead {
     u32 range;                  /* +0x10 */
 } SlotHead;
 
-extern SlotHead gRam02000F10;
-extern SlotHead gRam02001140;
 extern u8       gGameState[];
 
 /* 0x0803C178 */
 u32 GetSlotRange(u32 which)
 {
     if (which == PICK_A)
-        return gRam02000F10.range;
+        return ((SlotHead *)gRam02000F10)->range;
 
     if (which == PICK_B) {
         if (gGameState[12] != 0)
-            return gRam02001140.range;
+            return ((SlotHead *)gRam02001140)->range;
     }
 
     return DEFAULT_RANGE;

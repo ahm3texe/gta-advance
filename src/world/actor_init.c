@@ -8,21 +8,16 @@
  * erisirken derleyici yeni bir taban hesapliyor; ROM'daki `adds r1, #40`
  * zincirleri bundan.
  *
- * HENUZ ESLESMIYOR: 94 komutun 86'si birebir tutuyor, 14 bayt fark. Kalan
- * fark 0xA8 alanini maskeleyen taban isaretcisinin register'i:
- *     ROM  : taban r2, okunan bayt r3
- *     bizim: taban r3, okunan bayt r4
- * Cunku sifir sabiti bizde bir komut once maddelesip r2'yi kapiyor. Sifirin
- * dort referansi (0x90, 0x98, 0xA5, 0xAC) tabanin ucunden onde geliyor
- * (docs/COMPILER.md, register dagitiminin mekanizmasi).
+ * BYTE-MATCHING. 0x90 kuyruk isaretcisini `i = 0` atamasindan once acikca
+ * hesaplamak, ROM'daki adres-hazirlama / sifir-sabiti sirasini koruyor.
  *
  * Cozulen: 0x8A ve 0xA8 alanlari s8 olmali. u8 iken derleyici maskeyi
  * 8 bite daraltip `mov r1,#0xF0` yaziyor; ROM ise 32 bitlik -16'yi
  * `mov r1,#0x10; neg r1,r1` ile kuruyor. Bu tek degisiklik 40 -> 14.
  *
- * Denenenler (hicbiri ilerletmedi): maskeyi -16 yazmak, yerel int maske,
- * tum slot alanlarini s8 yapmak (113), dongu sayacini int yapmak (78),
- * dort ayri dongu bicimi, alan tiplerini degistirmek.
+ * Son iki adim: dongu sayacini maskeden sonra sifir degeri olarak yeniden
+ * kullanmak farki 14'ten tek komut tasinmasina indirdi; `tail` isaretcisini
+ * once hesaplamak o son farki da kapatti.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/actor_init.c
@@ -83,6 +78,7 @@ typedef struct Actor {
 /* 0x080154D8 */
 void InitActor(Actor *actor, u32 owner, u32 param)
 {
+    u32 *tail;
     u8 i;
 
     actor->unk20 = ACTOR_COORD_UNSET;
@@ -113,9 +109,11 @@ void InitActor(Actor *actor, u32 owner, u32 param)
     actor->slot8B |= SLOT_UNSET;
     actor->slotA8 &= ~0x0F;
 
-    actor->unk90 = 0;
-    actor->unk98 = 0;
+    tail = &actor->unk90;
+    i = 0;
+    *tail = i;
+    actor->unk98 = i;
     actor->slot8A &= ~0x0F;
-    actor->unkA5 = 0;
-    actor->unkAC = 0;
+    actor->unkA5 = i;
+    actor->unkAC = i;
 }

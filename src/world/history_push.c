@@ -7,11 +7,9 @@
  * Kaydirma GERIYE dogru yuruyor (yuksek adresten alcaga), yani kuyruk
  * son elemani ezerek asagi iniyor.
  *
- * HENUZ ESLESMIYOR: 24 komutun 18'i tutuyor, 31 bayt fark. ROM tabani
- * r0'a yukleyip `current`i oradan okuyor, sonra `adds r4, r0, #0` ile
- * r4'e KOPYALIYOR; bizimki dogrudan r4'e yukluyor. Denenenler: tek taban
- * yereli (33), `current`i ayri yerele okumak (33), dongu degiskenlerinin
- * sirasini degistirmek (33), iki ayri taban yereli (31, secildi).
+ * BYTE-MATCHING. `current` degerini ayri okuyup `h2 = h` taban kopyasini
+ * karsilastirmadan once yapmak ROM'daki r0 -> r4 yasam araligini korur ve
+ * esitlik dalinin sondaki store ile birlestirilmesini engeller.
  *
  * Kardesi SetIndexReturnOne: src/world/set_index.c
  *
@@ -38,16 +36,18 @@ void PushHistory(u32 value)
     History *h;
     History *h2;
     u32     *cur;
+    u32      current;
     s32      i;
 
     if (value == 0)
         return;
 
     h = &gHistory;
-    if (value == h->current)
+    current = h->current;
+    h2 = h;
+    if (value == current)
         return;
 
-    h2 = &gHistory;
     i = HISTORY_LAST;
     cur = h2->slots;
 

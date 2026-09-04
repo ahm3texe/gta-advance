@@ -8,6 +8,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 
 typedef struct Pack {
@@ -17,10 +18,9 @@ typedef struct Pack {
     u32 src;                    /* +0x14 */
 } Pack;
 
-extern Pack gRam02025810;
-
 /* 0x0805AC44 */
 void CopySrcToDest(void)
 {
-    gRam02025810.dest = gRam02025810.src;
+    Pack *pack = (Pack *)gRam02025810;
+    pack->dest = pack->src;
 }

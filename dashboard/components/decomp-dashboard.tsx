@@ -19,12 +19,14 @@ import {
   Binary,
   Boxes,
   CheckCircle2,
+  ClipboardList,
   Crosshair,
   Database,
   ExternalLink,
   FolderOpen,
   RotateCcw,
   Search,
+  ShieldAlert,
   X,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -42,8 +44,16 @@ type FunctionStatus =
 type DisplayStatus = FunctionStatus | 'cMatching';
 
 function displayStatus(fn: FunctionRecord): DisplayStatus {
-  return fn.status === 'matching' && fn.source === 'c' ? 'cMatching' : fn.status;
+  return fn.status === 'matching' && fn.cMatching ? 'cMatching' : fn.status;
 }
+
+type SourceType = 'c' | 'asm' | 'none';
+
+const SOURCE_LABELS: Record<SourceType, string> = {
+  c: 'C kaynağı',
+  asm: 'Assembly',
+  none: 'Kaynak yok',
+};
 
 export type FunctionRecord = {
   address: string;
@@ -54,8 +64,9 @@ export type FunctionRecord = {
   notes: string;
   matchedBytes: number;
   matchPercent: number;
-  source: 'c' | 'asm';
+  sourceType: SourceType;
   sourcePath: string;
+  cMatching: boolean;
   cluster: string;
   clusterLabel: string;
   analysisPath?: string;
@@ -66,7 +77,7 @@ export type FunctionRecord = {
 export type DashboardData = {
   summary: {
     functionCount: number;
-    verifiedCount: number;
+    reviewedCount: number;
     matchingCount: number;
     totalCodeBytes: number;
     matchingCodeBytes: number;
@@ -76,10 +87,24 @@ export type DashboardData = {
     verifiedRomBytes: number;
     clusterCount: number;
     cSourceCount: number;
+    cMatchingCount: number;
     cSourceBytes: number;
+    boundaryDebtCount: number;
   };
   functions: FunctionRecord[];
   regions: Array<{ start: string; end: string; size: number; label: string }>;
+  workQueue: WorkItem[];
+};
+
+type WorkItem = {
+  id: string;
+  priority: 'P0' | 'P1' | 'P2' | 'P3';
+  area: string;
+  status: 'todo' | 'in_progress' | 'blocked' | 'done';
+  title: string;
+  acceptance: string;
+  evidence: string;
+  updated: string;
 };
 
 type TreeDatum = {
@@ -172,6 +197,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
   const [query, setQuery] = useState('');
   const [moduleFilter, setModuleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
   const [grouping, setGrouping] = useState<Grouping>('cluster');
   const [focusGroup, setFocusGroup] = useState<string | null>(null);
   const [inspectorOpen, setInspectorOpen] = useState(false);
@@ -202,10 +228,11 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
       return (
         matchesQuery &&
         (moduleFilter === 'all' || fn.module === moduleFilter) &&
-        (statusFilter === 'all' || displayStatus(fn) === statusFilter)
+        (statusFilter === 'all' || displayStatus(fn) === statusFilter) &&
+        (sourceFilter === 'all' || fn.sourceType === sourceFilter)
       );
     });
-  }, [data.functions, moduleFilter, query, statusFilter]);
+  }, [data.functions, moduleFilter, query, sourceFilter, statusFilter]);
 
   const visibleFunctions = useMemo(
     () =>
@@ -250,8 +277,12 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
     setQuery('');
     setModuleFilter('all');
     setStatusFilter('all');
+    setSourceFilter('all');
     setFocusGroup(null);
   };
+
+  const activeTask = data.workQueue.find((task) => task.status === 'in_progress');
+  const nextTasks = data.workQueue.filter((task) => task.status === 'todo').slice(0, 4);
 
   return (
     <main className="dashboard-shell">
@@ -263,7 +294,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             <h1>Decomp Map</h1>
           </div>
         </div>
-        <div className="live-state"><span /> ROM verisi doğrulandı</div>
+        <div className="live-state"><span /> {formatBytes(data.summary.verifiedRomBytes)} kaynak doğrulandı</div>
       </header>
 
       <section className="summary-grid" aria-label="Proje özeti">
@@ -277,7 +308,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         </article>
         <article className="stat-card">
           <FolderOpen aria-hidden="true" />
-          <div><strong>{data.summary.cSourceCount}</strong><span>Kaynağı C olan</span></div>
+          <div><strong>{data.summary.cSourceCount}</strong><span>C kaynağı · {data.summary.cMatchingCount} eşleşen</span></div>
         </article>
         <article className="stat-card stat-card-accent">
           <Crosshair aria-hidden="true" />
@@ -287,6 +318,29 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
           <Database aria-hidden="true" />
           <div><strong>{formatBytes(data.summary.verifiedRomBytes)}</strong><span>Doğrulanmış ROM bölgesi</span></div>
         </article>
+        <article className="stat-card stat-card-warning">
+          <ShieldAlert aria-hidden="true" />
+          <div><strong>{data.summary.boundaryDebtCount}</strong><span>Açık sınır bulgusu</span></div>
+        </article>
+      </section>
+
+      <section className="queue-panel" aria-label="Aktif çalışma kuyruğu">
+        <div className="queue-heading">
+          <div><ClipboardList aria-hidden="true" /><span>Tek aktif iş</span></div>
+          <strong>{activeTask?.id ?? 'Aktif iş yok'}</strong>
+        </div>
+        {activeTask ? (
+          <div className="active-task">
+            <div><Badge variant="outline">{activeTask.priority}</Badge><h2>{activeTask.title}</h2></div>
+            <p>Bitti sayılması için: {activeTask.acceptance}</p>
+          </div>
+        ) : <p className="queue-empty">Yeni işe başlamadan önce kuyruktan tek bir kayıt aktif yapılmalı.</p>}
+        {nextTasks.length > 0 && (
+          <div className="next-tasks">
+            <span>Sıradaki işler</span>
+            <ol>{nextTasks.map((task) => <li key={task.id}><b>{task.id}</b><span>{task.title}</span><small>{task.priority}</small></li>)}</ol>
+          </div>
+        )}
       </section>
 
       <section className="control-panel" aria-label="Harita filtreleri">
@@ -306,6 +360,12 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         <NativeSelect value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Durum filtresi">
           <NativeSelectOption value="all">Tüm durumlar</NativeSelectOption>
           {Object.entries(STATUS_META).map(([status, meta]) => <NativeSelectOption value={status} key={status}>{meta.label}</NativeSelectOption>)}
+        </NativeSelect>
+        <NativeSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)} aria-label="Kaynak türü filtresi">
+          <NativeSelectOption value="all">Tüm kaynak türleri</NativeSelectOption>
+          <NativeSelectOption value="c">C kaynağı</NativeSelectOption>
+          <NativeSelectOption value="asm">Assembly</NativeSelectOption>
+          <NativeSelectOption value="none">Kaynak yok</NativeSelectOption>
         </NativeSelect>
         <NativeSelect value={grouping} onChange={(event) => { setGrouping(event.target.value as Grouping); setFocusGroup(null); }} aria-label="Gruplama">
           <NativeSelectOption value="cluster">Bitişik bloğa göre grupla</NativeSelectOption>
@@ -403,7 +463,8 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
           <dl>
             <div><dt>ROM adresi</dt><dd>{selected.address}</dd></div>
             <div><dt>Boyut</dt><dd>{formatBytes(selected.size)} ({selected.size} byte)</dd></div>
-            <div><dt>Kaynak</dt><dd>{selected.sourcePath || 'assembly'}</dd></div>
+            <div><dt>Kaynak türü</dt><dd>{SOURCE_LABELS[selected.sourceType]}</dd></div>
+            <div><dt>Kaynak yolu</dt><dd>{selected.sourcePath || '—'}</dd></div>
             <div><dt>Modül</dt><dd>{MODULE_LABELS[selected.module] ?? selected.module}</dd></div>
             <div><dt>Durum</dt><dd>{STATUS_META[displayStatus(selected)].label}</dd></div>
           </dl>
@@ -431,7 +492,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             </header>
             <div className="inspector-toolbar">
               <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
-              <span>{selected.sourcePath || selected.analysisPath || 'Ghidra C çıktısı henüz dışa aktarılmadı'}</span>
+              <span>{selected.sourcePath || selected.analysisPath || 'Kaynak veya Ghidra çıktısı henüz yok'}</span>
             </div>
             {selected.sourceCode ? (
               <pre><code>{selected.sourceCode}</code></pre>

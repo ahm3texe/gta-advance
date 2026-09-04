@@ -104,6 +104,15 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 31 | Döngü sayacının işaretliliği `bls` (unsigned) vs `ble` (signed) dallanma seçimini belirler | `for (u32 i = 0; i <= N; i++)` → `bls`; `for (s32 i = 0; i <= N; i++)` → `ble`. ROM her ikisini de kullanır — hangisinin çıktığını sayaç tipi belirler. `slot_scan.c`'de tek başına 1 bayt farkı 0'a indirdi. `MaybeAdvance`'in park nedeni buydu; oradaki `u16 counter` yerine `int counter` denenebilir |
 | 29 | İki dal aynı işi yapıyorsa **erken `return` + ortak kuyruk** yazılır, ortak değişkene atama değil | `if (k) { p->h = A; return; } ... p->h = B;` ROM'daki gibi iki ayrı kopya üretiyor; `handler = A else B; p->h = handler;` agbcc'ye dalları birleştirtiyor (cross-jumping) ve 39 bayt fark veriyor |
 | 28 | Ölçekli tabana iki terim eklenirken **işaretçi aritmetiği** ile **dizi indeksi** farklı kod üretir | `*(t + x + (y << s))` her terimi ayrı ölçekliyor (`lsl` + `lsl` + iki toplama); `t[x + (y << s)]` önce toplayıp bir kez ölçekliyor. `IsTileTypeInRange`'de dizi biçimi 33 bayt fark **ve** gereksiz bir `push {r4,lr}` veriyordu, işaretçi biçimi 3'e indirip fonksiyonu yaprak yaptı |
+| 33 | Değişkeni sabitle maskelemek için sabiti **ayrı sonuç yereline** koyup yerinde `&=` kullan | `return (flags & 3) << 8` sonucu `flags` register'ında tutarken; `mask = 3; mask &= flags; return mask << 8` sonucu sabitin register'ında tutar. `QueryEntity` 2 bayt farktan birebir eşleşmeye geçti |
+| 34 | Aynı sıfır dönüşüne giden null kontrollerini gerekirse **açık erken dönüşler** olarak yaz | İç içe `if` eşdeğer semantiğe rağmen ortak sıfır bloğunu değer bloğundan sonra kurdu. `if (!p) return 0;` zinciri `ProbeObject` ve `GetInnerId`de ROM blok sırasını ve literal havuzu yerleşimini üretti |
+| 35 | Çağrıdan sonra `pop {r0}; bx r0` varsa sarmalayıcının dönüş tipi büyük olasılıkla **`void`** | `u32` dönüşte r0 canlı kaldığı için agbcc dönüş adresini r1'e alır. `CallWithOffset` imzasını `void` yapmak 10 baytlık register/epilog farkını tamamen kapattı |
+| 36 | Bellek adresi sabit yazımdan önce kurulacaksa hedef alanın **işaretçisini önce ayrı yerele al** | `tail = &actor->unk90; i = 0; *tail = i` sırası agbcc'ye önce adresi, sonra sıfır sabitini kurdurdu. `InitActor`ın son komut-sırası farkını kapattı |
+| 37 | Aynı tabandan türeyen paralel yürüyüşlerde **tabanı da ayrı yerel olarak koru** | Doğrudan `cur = g; kind = cur + 100` tabanı `cur` ile birleştirdi. `base = g; kind = base + 100; cur = base` ROM'daki ayrı r0/r1/r2 yaşamlarını ve literal havuzu yerleşimini üretti; `HasWantedEntry` 25 bayt farktan eşleşmeye geçti |
+| 38 | Erken karşılaştırma ile sondaki store aynı değeri taşısa bile ROM ayrı dal istiyorsa değeri ve **taban kopyasını karşılaştırmadan önce** ayır | `current = h->current; h2 = h; if (value == current) return;` biçimi agbcc'nin eşitlik yolunu sondaki store ile birleştirmesini engelledi ve `PushHistory`de 31 bayt farkı kapattı |
+| 39 | ROM yalnız belirli bir yazımdan sonra belleği yeniden okuyorsa `volatile`ı **tüm alana değil o erişime** uygula | `*(volatile u16 *)&gSaveBuffer.distance` yalnız taşma kontrolündeki ikinci `ldrh`yi zorladı. Alanı bütünüyle volatile yapmak register baskısını artırıp `AddDistance`ı 53 bayt bozarken dar kullanım fonksiyonu eşleştirdi |
+| 40 | ROM iki dalda ayrı taban yükleyip tek store paylaşıyorsa kontrol akışını **etiketlerle açık kur** | Yapısal `if/else` agbcc tarafından ters çevrilip tabanlar birleştirildi. `reset:`, `increment:` ve `store:` etiketleri `BumpOrReset`ın iki `ldr` + ortak `strb` düzenini üretti; bu, temiz C içinde kabul edilebilir düşük seviye CFG ifadesidir |
+| 41 | Ölçekli ofset birden çok tabanda kullanılacaksa çarpımı **tek atamada**, alan tabanlarını ayrı yerellerde kur | `scaled = index; scaled *= 180` pseudo önceliğini artırıp r3/r4'ü ters çevirdi. `scaled = index * 180` ile `heldBase`/`extraBase` ayrımı `ReleaseSlot`ta ROM'un tek r3 ofset + iki taban desenini üretti |
 
 ## Register dağıtımının mekanizması
 
@@ -241,9 +250,12 @@ byte-matching.
 make agbcc
 ```
 
-`tools/setup_agbcc.sh`, pret/agbcc kaynağını çeker ve derler. agbcc 1998
-dönemi C kaynağı olduğu için modern clang'in varsayılanlarıyla derlenmiyor;
-betik gerekli uyumluluk bayraklarını taşıyan bir sarmalayıcı kuruyor.
+`tools/setup_agbcc.sh`, pret/agbcc kaynağını
+`config/toolchain.lock.json` içindeki uyumlu revizyona sabitler ve derler.
+agbcc 1998 dönemi C kaynağı olduğu için modern clang'in varsayılanlarıyla
+derlenmiyor; izlenen `tools/agbcc_host_cc.sh` gerekli uyumluluk bayraklarını
+taşıyor. Kurulum sonunda 23 fonksiyonluk sabit temsil corpus'unun parmak izi
+doğrulanır; yeni kaynak eklenmesi bu kilidi kendiliğinden değiştirmez.
 
 ## Doğrulama döngüsü
 

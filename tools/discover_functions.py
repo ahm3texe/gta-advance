@@ -43,6 +43,7 @@ from audit_boundaries import Walker, in_arm_range, ARM_FUNCTIONS  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
+NON_FUNCTIONS = ROOT / "data/non_function_entries.csv"
 ROM_BASE = 0x08000000
 MIN_SIZE, MAX_SIZE = 8, 4096
 
@@ -53,6 +54,10 @@ def main() -> None:
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
         fields = list(rows[0].keys())
+    rejected = {
+        int(row["address"], 16)
+        for row in csv.DictReader(NON_FUNCTIONS.open(newline="", encoding="utf-8"))
+    } if NON_FUNCTIONS.exists() else set()
 
     known = sorted((int(r["address"], 16), int(r["size"] or 0)) for r in rows
                    if r["size"].strip())
@@ -89,6 +94,8 @@ def main() -> None:
     from_calls = []
     inside_known = []
     for target in sorted(call_targets):
+        if target in rejected:
+            continue
         if target in known_starts:
             continue
         if target in covered:
@@ -111,7 +118,8 @@ def main() -> None:
         if not (ROM_BASE <= word < limit and (word & 1)):
             continue
         target = word & ~1
-        if target in known_starts or target in covered or target in seen_ptr:
+        if (target in known_starts or target in covered or target in seen_ptr
+                or target in rejected):
             continue
         if in_arm_range(target) or target in ARM_FUNCTIONS:
             continue
@@ -131,7 +139,8 @@ def main() -> None:
         while addr + 2 <= gap_end:
             word = half(addr)
             if (word & 0xFF00) == 0xB500 and half(addr + 2) not in (0x0000, 0xFFFF):
-                if not in_arm_range(addr) and addr not in ARM_FUNCTIONS:
+                if (not in_arm_range(addr) and addr not in ARM_FUNCTIONS
+                        and addr not in rejected):
                     walker = Walker(rom, addr)
                     walker.run()
                     size = walker.code_extent()
@@ -162,6 +171,9 @@ def main() -> None:
     print(f"C) Prolog deseninden olasi:  "
           f"{len(unique) - len(from_calls) - len(from_pointers)} fonksiyon")
     print(f"Toplam: {len(unique)} fonksiyon, {total} bayt")
+    if rejected:
+        print(f"Elle reddedilmis sahte giris: {len(rejected)} "
+              "(data/non_function_entries.csv)")
     if inside_known:
         print(f"\nUYARI: {len(inside_known)} `bl` hedefi bilinen bir fonksiyonun "
               f"ICINE dusuyor -- o fonksiyonlarin siniri yanlis olabilir.")
@@ -188,7 +200,7 @@ def main() -> None:
         })
     rows.sort(key=lambda r: int(r["address"], 16))
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     print(f"\nfunctions.csv: {len(unique)} yeni fonksiyon eklendi.")

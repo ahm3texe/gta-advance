@@ -1,0 +1,5 @@
+address,recorded_size,corrected_size,resolution,evidence
+0x0800EEA0,4340,4654,extend_and_remove_0x0801001A,"continuous reachable Thumb body; shared block at 0x0801001A; return at 0x080100CC"
+0x0801AEE4,4236,4472,extend_and_remove_0x0801C04A,"continuous reachable Thumb body; 0x0801C04A is an internal store; return at 0x0801C05A"
+0x0802BDF0,930,8320,extend_and_remove_0x0802C192,"single stack frame from push/sub sp at 0x0802BDF0 to shared epilogue at 0x0802DE60; return at 0x0802DE6E"
+0x0802C192,7302,7390,remove_internal_split_and_0x0802DE60,"starts with subs inside the 0x0802BDF0 stack frame; 0x0802DE60 restores that parent's 140-byte frame"

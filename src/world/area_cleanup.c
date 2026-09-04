@@ -17,6 +17,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 #define TILE_FILL      0xF0E8
 #define TILE_RUN       3
@@ -28,7 +29,6 @@ typedef struct Progress {
     u8 pendingCleanup;          /* +0x137E */
 } Progress;
 
-extern Progress gRam02025810;
 extern u32      gRam02026E80;
 
 extern void FUN_08013abc(u32 *block);
@@ -42,7 +42,7 @@ void CleanupAreaTiles(void)
     u32 i;
     u16 fill;
 
-    if (gRam02025810.pendingCleanup == 0)
+    if (((Progress *)gRam02025810)->pendingCleanup == 0)
         return;
 
     i = 0;
@@ -59,5 +59,5 @@ void CleanupAreaTiles(void)
     } while (i <= TILE_RUN - 1);
 
     FUN_08013abc(block);
-    gRam02025810.pendingCleanup = 0;
+    ((Progress *)gRam02025810)->pendingCleanup = 0;
 }

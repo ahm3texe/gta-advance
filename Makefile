@@ -1,6 +1,14 @@
-.PHONY: check consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: check check-full status status-update status-check queue-check boundary-check boundary-baseline toolchain-check toolchain-corpus consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build dashboard-lint analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
+
+# c_sources.csv, hangi C ceviri birimlerinin matching build hedefi oldugunun
+# tek kaynagidir. Ortak header/build araci/toolchain kilidi degisince bu
+# hedeflerin tamami yeniden uretilir; bayat .bin kullanilamaz.
+MATCHING_C_SOURCES := $(shell python3 -c 'import csv; print(" ".join(sorted({r["source"] for r in csv.DictReader(open("data/c_sources.csv")) if r["matching"] == "yes"})))')
+MATCHING_C_BINS := $(sort $(patsubst src/%.c,build/%.bin,$(MATCHING_C_SOURCES)))
+C_BUILD_DEPS := $(wildcard include/*.h) tools/build_c.py tools/agbcc_build.py config/toolchain.lock.json
+$(MATCHING_C_BINS): $(C_BUILD_DEPS)
 
 prepare-rom:
 	@test -n "$(ROM_ZIP)" || (echo 'ROM_ZIP yolunu belirtin.' >&2; exit 2)
@@ -14,6 +22,32 @@ doctor:
 
 progress:
 	@python3 tools/progress.py data/functions.csv
+
+# Canli ve tekil durum gorunumu. Sabit sayilar README/PLAN'e yazilmaz.
+status:
+	@python3 tools/project_status.py
+
+status-update: c-status
+	@python3 tools/project_status.py --write
+
+status-check:
+	@python3 tools/project_status.py --check
+
+queue-check:
+	@python3 tools/check_work_queue.py
+
+boundary-check:
+	@python3 tools/audit_boundaries.py --check-baseline
+
+# Yalnizca bulgular tek tek incelendikten sonra bilincli olarak calistirilir.
+boundary-baseline:
+	@python3 tools/audit_boundaries.py --write-baseline
+
+toolchain-check:
+	@python3 tools/verify_toolchain.py
+
+toolchain-corpus:
+	@python3 tools/verify_toolchain.py --corpus
 
 agbcc:
 	@tools/setup_agbcc.sh $(if $(FORCE),--force,)
@@ -46,17 +80,27 @@ disasm: verify-rom
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
 
-# Commit oncesi tek komut: her seyi dogrular.
-check: rom
-	@python3 tools/check_consistency.py
-	@python3 tools/audit_boundaries.py
+# Commit oncesi kapilar: bilinen borca izin verir, yeni regresyonu reddeder.
+check: toolchain-check rom
 	@python3 tools/scan_c_sources.py
+	@python3 tools/check_consistency.py
+	@python3 tools/check_work_queue.py
+	@python3 tools/audit_boundaries.py --check-baseline
 	@python3 tools/review_c_source.py
 	@python3 tools/progress.py
 	@python3 tools/generate_dashboard_data.py
+	@python3 tools/check_generated_views.py
+	@python3 tools/project_status.py --check
 
-# Tam ROM'u yeniden uretir: dogrulanmis bolgeler kendi kaynagimizdan,
-# kalani baserom.gba'dan. Sonucun SHA-1'i orijinalle ayni olmali.
+# Kilometre tasi/merge kapisi: tum matching hedefleri cache'siz uretilir,
+# C corpus parmak izi ve dashboard urun kaynaklari da dogrulanir.
+check-full:
+	@$(MAKE) -B check
+	@python3 tools/verify_toolchain.py --corpus
+	@$(MAKE) dashboard-lint dashboard-build
+
+# Hibrit ROM sinamasi: dogrulanmis bolgeler kendi kaynagimizdan, kalani
+# baserom.gba'dan gelir. Hash kaynak bolgelerinin yerlesimini denetler.
 rom: matching
 	@python3 tools/build_rom.py
 
@@ -86,6 +130,9 @@ dashboard-dev: dashboard-data
 
 dashboard-build: dashboard-data
 	@cd dashboard && npm run build
+
+dashboard-lint:
+	@cd dashboard && npm run lint
 
 analyze:
 	@./tools/run_initial_analysis.sh
@@ -691,5 +738,96 @@ build/world/submit_object.bin: src/world/submit_object.c data/functions.csv data
 world-submit-object-match: verify-rom build/world/submit_object.bin
 	@python3 tools/compare_slice.py baserom.gba 0x38234 build/world/submit_object.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match
+build/world/scan_all.bin: src/world/scan_all.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-scan-all-match: verify-rom build/world/scan_all.bin
+	@python3 tools/compare_slice.py baserom.gba 0x29014 build/world/scan_all.bin
+
+build/world/maybe_advance.bin: src/world/maybe_advance.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-maybe-advance-match: verify-rom build/world/maybe_advance.bin
+	@python3 tools/compare_slice.py baserom.gba 0x664f0 build/world/maybe_advance.bin
+
+build/world/entity_query.bin: src/world/entity_query.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-entity-query-match: verify-rom build/world/entity_query.bin
+	@python3 tools/compare_slice.py baserom.gba 0x55af8 build/world/entity_query.bin
+
+build/world/object_query.bin: src/world/object_query.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-object-query-match: verify-rom build/world/object_query.bin
+	@python3 tools/compare_slice.py baserom.gba 0x381f8 build/world/object_query.bin
+
+build/world/get_inner_id.bin: src/world/get_inner_id.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-get-inner-id-match: verify-rom build/world/get_inner_id.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3824c build/world/get_inner_id.bin
+
+build/world/is_ram_mode.bin: src/world/is_ram_mode.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-is-ram-mode-match: verify-rom build/world/is_ram_mode.bin
+	@python3 tools/compare_slice.py baserom.gba 0x62530 build/world/is_ram_mode.bin
+
+build/world/offset_helpers.bin: src/world/offset_helpers.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-offset-helpers-match: verify-rom build/world/offset_helpers.bin
+	@python3 tools/compare_slice.py baserom.gba 0x509c4 build/world/offset_helpers.bin
+
+build/world/actor_init.bin: src/world/actor_init.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-actor-init-match: verify-rom build/world/actor_init.bin
+	@python3 tools/compare_slice.py baserom.gba 0x154d8 build/world/actor_init.bin
+
+build/world/kind_scan.bin: src/world/kind_scan.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-kind-scan-match: verify-rom build/world/kind_scan.bin
+	@python3 tools/compare_slice.py baserom.gba 0x28e3c build/world/kind_scan.bin
+
+build/world/history_push.bin: src/world/history_push.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-history-push-match: verify-rom build/world/history_push.bin
+	@python3 tools/compare_slice.py baserom.gba 0x8064 build/world/history_push.bin
+
+build/world/distance_accum.bin: src/world/distance_accum.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-distance-accum-match: verify-rom build/world/distance_accum.bin
+	@python3 tools/compare_slice.py baserom.gba 0x67274 build/world/distance_accum.bin
+
+build/world/bump_or_reset.bin: src/world/bump_or_reset.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-bump-or-reset-match: verify-rom build/world/bump_or_reset.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5ac50 build/world/bump_or_reset.bin
+
+build/world/release_slot.bin: src/world/release_slot.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-release-slot-match: verify-rom build/world/release_slot.bin
+	@python3 tools/compare_slice.py baserom.gba 0x308ac build/world/release_slot.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match
 	@python3 tools/verify_matching_regions.py

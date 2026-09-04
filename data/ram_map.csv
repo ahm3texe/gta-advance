@@ -59,7 +59,7 @@ address,size,name,source,status,notes
 0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) sabit; +12/+16 (arg << 16 | 0xFF000000)
 0x0202370C,4,gRam0202370C,decomp,provisional,0x0802392C tarafindan sifirlanan degisken
 0x02023A00,2088,gEntriesA,decomp,provisional,148 baytlik giris tablosu; 0x8028E3C 14 girisi tariyor
-0x02024650,160,gRam02024650,decomp,provisional,65536 girisli 148 bayt dizi (u16 index sarilir); boyut 9748664->160 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
+0x02024650,160,gRam02024650,decomp,provisional,148 bayt girdili tablo; ProcessFirstEntry yalnız girdi 0'ı kullanır; boyut komşu sembole kadar kırpıldı ve gerçek toplam bilinmiyor
 0x020246F0,2812,gRam020246F0,decomp,provisional,20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor; boyut 2960->2812 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
 0x020251EC,148,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri; boyut 2960->148 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02025280,1424,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime; boyut 2960->1424 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"

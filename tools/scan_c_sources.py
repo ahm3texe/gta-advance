@@ -42,12 +42,19 @@ def main() -> None:
         relative = source.relative_to(ROOT)
         for name, (offset, size) in sorted(layout.items(), key=lambda kv: kv[1][0]):
             address = int(rows[name]["address"], 16)
+            mapped_size = int(rows[name]["size"], 0)
             start = address - ROM_BASE
-            matched = blob[offset:offset + size] == rom[start:start + size]
+            # Yalnizca derleyicinin urettigi kisa bir prefix'in tutmasi tam
+            # fonksiyon eslesmesi degildir. Symbol en az haritadaki govdeyi
+            # kapsamiyorsa matching terfisi yasaktir.
+            complete = size >= mapped_size
+            matched = complete and blob[offset:offset + size] == rom[start:start + size]
             records.append({
                 "address": f"0x{address:08X}",
                 "name": name,
                 "source": str(relative),
+                "compiled_size": size,
+                "mapped_size": mapped_size,
                 "matching": "yes" if matched else "no",
             })
 
@@ -61,7 +68,13 @@ def main() -> None:
     records.sort(key=lambda r: int(r["address"], 16))
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["address", "name", "source", "matching"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "address", "name", "source", "compiled_size", "mapped_size", "matching"
+            ],
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(records)
 

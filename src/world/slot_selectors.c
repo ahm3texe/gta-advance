@@ -14,6 +14,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 #define SELECT_A     1
 #define SELECT_B     2
@@ -28,8 +29,6 @@ typedef struct SlotHead {
     SubData *sub;               /* +0x20 */
 } SlotHead;
 
-extern void     *gRam02000F10;
-extern void     *gRam02001140;
 extern u32       gRam02001060;
 extern SlotHead  gRam02000F80;
 extern u8        gGameState[];
@@ -38,9 +37,9 @@ extern u8        gGameState[];
 void *SelectSlotAB(u32 which)
 {
     if (which == SELECT_A)
-        return &gRam02000F10;
+        return gRam02000F10;
     if (which == SELECT_B)
-        return &gRam02001140;
+        return gRam02001140;
 
     return 0;
 }

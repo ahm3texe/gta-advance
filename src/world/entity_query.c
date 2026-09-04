@@ -4,15 +4,12 @@
  * degilse +0x24 -> +0x14 -> +0x22 zincirindeki bayrak, o da yoksa
  * karo sorgusu.
  *
- * HENUZ ESLESMIYOR: 28 komutun 26'si tutuyor, 2 bayt fark. Fark maskenin
- * hedef register'i: ROM `ands r0, r2` ile sonucu SABITIN register'inda
- * tutuyor, bizimki `ands r2, r0` ile bayrak degiskeninin register'inda.
- * Denenenler: operand sirasini cevirmek (2), flags'i int yapmak (33),
- * bayragi kendisiyle maskelemek (2), ayri `masked` yereli (14).
+ * BYTE-MATCHING. Maske sabitini ayri bir u32 yerele atayip yerinde `&=`
+ * yapmak, sonucu ROM'daki gibi sabitin register'inda (`r0`) tutuyor.
  *
  * Ilk derlemede 36 bayt farkliydi; ozel dali fonksiyonun SONUNA almak
- * (kosulu ters cevirerek) 2'ye indirdi -- dallarin yonu ROM'un dusme
- * sirasina uymali kuralinin bir ornegi daha.
+ * (kosulu ters cevirerek) 2'ye indirdi. Kalan fark, `flags & 3` ifadesi
+ * yerine `mask = 3; mask &= flags` ile kapandi.
  *
  * Ayni kumedeki eslesen dort fonksiyon: src/world/node_search.c
  *
@@ -51,6 +48,7 @@ extern u32 GetEntityUnk0C(Holder *holder);
 u32 QueryEntity(Entity *entity, u32 fallback)
 {
     Holder *holder;
+    u32 mask;
     u8 flags;
 
     if ((entity->kind & KIND_MASK) != KIND_SPECIAL) {
@@ -58,8 +56,11 @@ u32 QueryEntity(Entity *entity, u32 fallback)
         if (holder != 0) {
             if (holder->target != 0) {
                 flags = holder->target->flags;
-                if (flags != 0)
-                    return (flags & SUB_FLAG_MASK) << SUB_FLAG_SHIFT;
+                if (flags != 0) {
+                    mask = SUB_FLAG_MASK;
+                    mask &= flags;
+                    return mask << SUB_FLAG_SHIFT;
+                }
             }
         }
 

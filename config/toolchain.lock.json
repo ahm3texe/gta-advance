@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "https://github.com/pret/agbcc.git",
+    "compatibleRevision": "da598c1d918402c42c0c0d7128ba14567f3175e9",
+    "provenance": "Bu revizyonun old_agbcc ciktisi sabit 23-fonksiyonluk temsil corpus'u ile birebir ayni. Kurulu referans ikilinin tarihsel kaynak revizyonu bilinmiyor."
+  },
+  "compiler": {
+    "name": "old_agbcc",
+    "flags": [
+      "-mthumb-interwork",
+      "-O2",
+      "-fhex-asm"
+    ],
+    "corpusSources": [
+      "src/save/save_helpers.c",
+      "src/bootstrap/game_init.c",
+      "src/interrupt/vblank_intr.c",
+      "src/ui/menu_loop.c",
+      "src/world/actor_control.c",
+      "src/text/draw_text.c"
+    ],
+    "corpusFunctionCount": 23,
+    "corpusSha256": "9cd640a2a570228f958ec9cdd5574c4d267778f68938484158d2b4515bf76b3f"
+  },
+  "referenceArtifacts": {
+    "tools/agbcc/bin/agbcc": "4a4ed25c583a3c2c342a98ed29c9a1439a531e96f7a2a97b27f7d43a72e0abb3",
+    "tools/agbcc/bin/old_agbcc": "131120ae5c8be2b4a290c192b6bc98cb3de2ccd4b85812a0a4b3457c97267fa6",
+    "tools/agbcc/bin/agbcc_arm": "e350dcd3e69cc9245b2bfc89bb5c93446e6301500f8d9a06095801f56fb060ef",
+    "tools/agbcc/lib/libc.a": "59db9581059c9c8120210f69ef60081f4a8bcac20935b7aa3ed11b8ade39bc69",
+    "tools/agbcc/lib/libgcc.a": "34c317767a124a5776e51aa68cd2baa46fe6c7adc0c1c2655f99eda4a863a409"
+  },
+  "referenceHost": {
+    "clang": "Apple clang version 17.0.0 (clang-1700.3.19.1)",
+    "binutils": "GNU Binutils 2.47.20260726"
+  }
+}

@@ -27,6 +27,7 @@
  */
 
 #include "gba_io.h"
+#include "ram_symbols.h"
 
 #define BLEND_Y          (*(u16 *)0x04000054)
 #define PALETTE_RAM      ((void *)0x05000000)
@@ -111,8 +112,6 @@ extern u8   gUnk02010C60[];
 extern u8   gVBlankState;
 extern u8   gLoopState;
 extern u8   gGameState[];
-extern MissionEntry *gRam02000F10;
-extern int  gRam02025810[];
 extern u32  gRam03000098;
 extern u32  gRam0300009C;
 extern u16  gRam02000498;
@@ -164,7 +163,7 @@ void RunMenuScreen(int mode)
         return;
 
     if (mode == 3 || mode == 13 || mode == 14 || mode == 15) {
-        mission = gRam02000F10;
+        mission = *(MissionEntry **)gRam02000F10;
         if (gGameState[12] != 0)
             return;
         if (mission == 0)
@@ -186,7 +185,7 @@ void RunMenuScreen(int mode)
                 GetRecordWord(MSG_QUIT_MISSION);
                 FUN_08030b34();
             } else {
-                if (gRam02025810[5] <= QUIT_MISSION_FEE - 1) {
+                if (((int *)gRam02025810)[5] <= QUIT_MISSION_FEE - 1) {
                     GetRecordWord(MSG_NEED_CASH);
                     FUN_08030b34();
                     return;

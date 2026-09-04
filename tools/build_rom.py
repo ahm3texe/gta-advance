@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Tam ROM'u yeniden uretir ve SHA-1'ini orijinalle karsilastirir.
+"""Dogrulanmis kaynaklari hibrit ROM'a yerlestirip SHA-1'i karsilastirir.
 
 Dogrulanmis her bolge KENDI KAYNAGIMIZDAN uretilir; kalan alanlar
 baserom.gba'dan oldugu gibi kopyalanir. Sonucun hash'i orijinalle ayni
 cikmalidir.
 
-Bu, bolge bolge karsilastirmadan DAHA GUCLU bir iddiadir: dilim dilim
-kontroller bolge sinirlari yanlis tanimlanmis ya da iki bolge cakismis olsa
-bile gecebilir; tam ROM karsilastirmasi gecemez.
+Bu bir butunlestirme sinamasidir: kaynak bolgelerinin dogru ofsete oturdugunu
+denetler. Kopyalanan alanlar icin kaynaktan yeniden uretim iddiasi tasimaz.
 
 Kullanim:  python3 tools/build_rom.py [--out out/gtaadvance.gba]
 """

@@ -3,7 +3,7 @@
 
 DIKKAT — bu arac ARTIK BIRINCIL KAYNAK DEGIL. Fonksiyon haritasinin
 gercegi data/functions.csv'nin KENDISIDIR; onu audit_boundaries.py,
-discover_functions.py, split_at_calls.py ve add_c_region.py yeriden
+discover_functions.py ve add_c_region.py yeriden
 guncelliyor. Bu arac ise haritayi bayat Ghidra dokumunden (2 Eylul)
 yeniden kuruyor.
 

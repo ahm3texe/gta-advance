@@ -4,11 +4,9 @@
  * her giriste +0 nesne isaretcisi, +4 (blokta +0x50) yardimci alan.
  * Serbest birakirken nesnenin +0x0C bayragindan 0x02000000 temizleniyor.
  *
- * HENUZ ESLESMIYOR: 47 bayt fark. ROM `index * 180`i BIR KEZ hesaplayip
- * iki farkli tabana (base+76 ve base+80) ekliyor; benim struct bicimim
- * tek isaretci uzerinden iki alan okuyor. Denenenler: tek SlotPair
- * isaretcisi (47), acik bayt ofsetleri (53), iki ayri SlotPair yereli
- * (47). Hicbiri ROM'un iki-taban desenini uretmedi.
+ * BYTE-MATCHING. `scaled = index * 180` tek ifadesi ile `heldBase` ve
+ * `extraBase`i ayri yerellerde kurmak ROM'un bir kez hesaplanan r3 ofsetini
+ * iki tabana ekleme desenini korur.
  *
  * Eslesen kardesi: src/world/slot_release.c
  *
@@ -17,6 +15,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 #define SLOT_MAX        23
 #define SLOT_STRIDE     180
@@ -27,37 +26,31 @@ typedef struct Held {
     u32 flags;                  /* +0x0C */
 } Held;
 
-typedef struct SlotPair {
-    Held *held;
-    u32   extra;
-    u8    pad08[SLOT_STRIDE - 8];
-} SlotPair;
-
-typedef struct Pack {
-    u8       pad0000[0x4C];
-    SlotPair slots[SLOT_MAX + 1];
-} Pack;
-
-extern Pack gRam02025810;
-
 /* 0x080308AC */
 u32 ReleaseSlot(u32 index)
 {
-    SlotPair *a;
-    SlotPair *b;
-    Held     *held;
+    u8    *base;
+    u8    *heldBase;
+    u8    *extraBase;
+    Held **heldSlot;
+    u32    scaled;
+    u32   *extraSlot;
+    Held  *held;
 
     if (index <= SLOT_MAX) {
-        a = &gRam02025810.slots[index];
-        held = a->held;
+        base = gRam02025810;
+        scaled = index * SLOT_STRIDE;
+        heldBase = base + 0x4C;
+        heldSlot = (Held **)(heldBase + scaled);
+        held = *heldSlot;
         if (held != 0)
             held->flags &= FLAG_CLEAR;
 
-        b = &gRam02025810.slots[index];
-        b->extra = 0;
-        a->held = 0;
+        extraBase = base + 0x50;
+        extraSlot = (u32 *)(extraBase + scaled);
+        *extraSlot = 0;
+        *heldSlot = 0;
     }
 
     return 1;
 }
-

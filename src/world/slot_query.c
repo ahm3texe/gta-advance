@@ -12,6 +12,7 @@
  */
 
 #include "gba_types.h"
+#include "ram_symbols.h"
 
 #define SELECTOR_SECONDARY  1
 #define SCALE_BASE          1
@@ -32,8 +33,6 @@ typedef struct Target {
 } Target;
 
 extern u16       gSlotSelector;     /* 0x02000D40 */
-extern SlotValue gRam02000F10;      /* birincil */
-extern SlotValue gRam02001140;      /* ikincil  */
 extern u8        gUnk02010C60[];
 
 extern u32     FUN_0803c400(u32 value);
@@ -49,9 +48,9 @@ u32 GetUnitSize(void)
 u32 GetActiveSlot(void)
 {
     if (gSlotSelector == SELECTOR_SECONDARY)
-        return (u32)gRam02001140.entry;
+        return (u32)((SlotValue *)gRam02001140)->entry;
 
-    return (u32)gRam02000F10.entry;
+    return (u32)((SlotValue *)gRam02000F10)->entry;
 }
 
 /* 0x0803C564 */

@@ -1,13 +1,12 @@
-/* HasWantedEntry (park) — 0x08028E3C-0x08028E6B
+/* HasWantedEntry — 0x08028E3C-0x08028E6B
  *
  * Ilk fonksiyon gEntriesA'da 14 giriste (148 stride) +0 aktif ve
  * +100 == 101 olan var mi diye tariyor. Ikincisi bes fonksiyonluk
  * kare zinciri.
  *
- * HENUZ ESLESMIYOR: 24 komutun 15'i tutuyor, 25 bayt fark.
- * ROM taban yuklemesini r0 uzerinden yapip r1/r2/r3 hesaplamasi kuruyor;
- * benim iki paralel isaretci bicimim (kind, cur) yeterince ROM'un
- * register desenine cikmadi.
+ * BYTE-MATCHING. `base` yerelini `kind` ve `cur`dan ayri tutmak ROM'daki
+ * r0 taban yuklemesi ile iki ayri isaretci yasam araligini korur; bu ayni
+ * zamanda literal havuzunu dogru konuma yerlestirir.
  *
  * Kardesi FrameChain: src/world/frame_chain.c
  *
@@ -34,17 +33,17 @@ extern void FUN_08029130(void);
 extern void FUN_08027f48(void);
 extern void FUN_08019800(void);
 extern void FUN_08019a64(void);
-extern void ScanAllEntries(void);
-
 /* 0x08028E3C */
 u32 HasWantedEntry(void)
 {
+    u8 *base;
     u8 *cur;
     u8 *kind;
     u8 *end;
 
-    cur  = (u8 *)gEntriesA;
-    kind = cur + 100;
+    base = (u8 *)gEntriesA;
+    kind = base + 100;
+    cur  = base;
     end  = cur + END_OFFSET;
 
     do {

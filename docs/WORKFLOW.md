@@ -1,9 +1,11 @@
-# Çalışma kuralları
+# Fonksiyon çalışma tekniği
 
-Bu belge *nasıl çalıştığımızı* tanımlar. Derleyicinin nasıl davrandığı
-[COMPILER.md](COMPILER.md) içindedir; burası süreç.
+Projenin bağlayıcı süreç sözleşmesi [PROJECT_SYSTEM.md](PROJECT_SYSTEM.md),
+güncel durum [STATUS.md](STATUS.md), derleyici davranışı
+[COMPILER.md](COMPILER.md) içindedir. Bu belge tek fonksiyon/blok üzerindeki
+tersine mühendislik tekniğini açıklar. Çelişkide PROJECT_SYSTEM geçerlidir.
 
-## 1. Tek doğruluk kaynağı: `make check`
+## 1. Doğrulama komutları
 
 Commit öncesi tek komut:
 
@@ -11,13 +13,14 @@ Commit öncesi tek komut:
 make check
 ```
 
-Şunları çalıştırır: `make rom` (tam ROM'u yeniden üretir ve SHA-1 doğrular),
-`check_consistency.py` (veri dosyalarının kendi içinde, birbiriyle ve
-kaynakla tutarlılığı), `make c-status` (C kaynaklarını ROM ile
-karşılaştırır), `make c-review` (okunabilirlik denetimi), `make progress`
-ve dashboard verisinin yenilenmesi.
+Bu günlük kapıdır: matching kaynakları, toolchain kimliğini, veri/kaynak
+tutarlılığını, sınır baseline'ını, bütün C kaynaklarını, iş kuyruğunu ve
+üretilmiş durum belgesini denetler. Kilometre taşı öncesinde build cache'i
+yok sayan corpus ve dashboard doğrulaması için `make check-full` kullanılır.
 
-**Kural:** `make check` geçmeden commit atılmaz. Hash tutmuyorsa iş bitmemiştir.
+**Kural:** `make check` geçmeden commit atılmaz. Hibrit ROM hash'i yalnızca
+doğrulanmış kaynak bölgelerinin doğru konuma oturduğunu kanıtlar; tam ROM'un
+kaynaktan üretildiğini kanıtlamaz.
 
 ## 2. Hedef seçimi
 
@@ -61,8 +64,9 @@ adayların oluşturduğu blok*tur.
 yazmaç gerekiyorsa `gba_io.h`'ye eklenir.
 
 `data/*.csv` dosyaları elle değil araçlarla değiştirilir:
-`add_c_region.py`, `retire_asm.py`, `audit_boundaries.py`,
-`discover_functions.py`, `split_at_calls.py`.
+`add_c_region.py`, `retire_asm.py`, `audit_boundaries.py` ve
+`discover_functions.py`. Eski `split_at_calls.py` doğrusal taraması 52 sahte
+sınır ürettiği için yazma kipinde kalıcı olarak devre dışıdır.
 
 **Birincil kaynak `data/functions.csv`'nin kendisidir.**
 `sync_function_map.py` haritayı bayat Ghidra dökümünden *yeniden kurar* —

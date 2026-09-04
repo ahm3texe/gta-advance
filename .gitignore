@@ -28,3 +28,6 @@ analysis/decompiler/
 # Dashboard verisi CSV'lerden uretilir ve Ghidra ciktisi gomer.
 # Yeniden uretmek icin: make dashboard-data
 dashboard/app/decomp-data.json
+
+# Bir kerelik yerel inceleme artifakti; kaynak veya kalici dokuman degil.
+/vB.diff

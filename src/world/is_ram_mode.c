@@ -2,9 +2,8 @@
  *
  * gRam02035EA0.unk00!=0 && .mode==8 ise 1, degilse 0.
  *
- * HENUZ ESLESMIYOR: 14 komutun 10'u tutuyor, 4 bayt fark -- dallarin
- * yonu (`return 0` ve `return 1` sirasi) hem duz hem tersi biciminde
- * ayni cikti veriyor. agbcc iki bicimi de aynı yerlesime normalliyor.
+ * BYTE-MATCHING. Ilk kosulu ic ice blok yerine acik erken `return 0`
+ * yapmak, ortak sifir blogunu literal havuzundan once yerlestiriyor.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/is_ram_mode.c
@@ -26,10 +25,11 @@ extern RamBlock gRam02035EA0;
 /* 0x08062530 */
 u32 IsRamModeWanted(void)
 {
-    if (gRam02035EA0.unk00 != 0) {
-        if (gRam02035EA0.mode == WANTED_MODE)
-            return 1;
-    }
+    if (gRam02035EA0.unk00 == 0)
+        return 0;
+
+    if (gRam02035EA0.mode == WANTED_MODE)
+        return 1;
 
     return 0;
 }

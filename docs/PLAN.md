@@ -1,11 +1,13 @@
-# Yol haritası
+# Teknik yol haritası ve karar geçmişi
 
-Güncelleme: 2026-09-03. Uzun vadeli hedef tanımı [ROADMAP.md](ROADMAP.md)'de;
-bu dosya *güncel durumu* ve *sıradaki işi* tutar. Çalışma kuralları
-[WORKFLOW.md](WORKFLOW.md)'de, ölçülmüş derleyici davranışı (32 kural)
-[COMPILER.md](COMPILER.md)'de.
+Bu dosyadaki sayılar 2026-09-03 tarihli analiz anlık görüntüleridir; canlı
+durum veya iş kuyruğu değildir. Güncel ve otomatik ölçümler [STATUS.md](STATUS.md),
+tek aktif iş `data/work_queue.csv`, bağlayıcı süreç
+[PROJECT_SYSTEM.md](PROJECT_SYSTEM.md) içindedir. Uzun vadeli hedef
+[ROADMAP.md](ROADMAP.md), ölçülmüş derleyici davranışı [COMPILER.md](COMPILER.md)
+içindedir.
 
-## Şu an neredeyiz (ölçülmüş)
+## 2026-09-03 anlık görüntüsü (tarihsel)
 
 ```
 Fonksiyon haritası:   1.974 fonksiyon / 431.116 bayt kod
@@ -147,19 +149,19 @@ tek dosyayı değil, sınıfın tamamını açar.**
 | Dosya | Fark | Engel sınıfı |
 |---|---|---|
 | clear_text_area | 1/132 | B1 register dağıtımı |
-| maybe_advance | 1/42 | B2 dal yönü (`bls`/`bhi`) |
-| entity_query | 2/60 | B2 |
-| scan_all | 2/62 | B2 (+operand sırası) |
-| is_ram_mode | 4/28 | B2 normalizasyon |
-| object_query:GetInnerId | 4/20 | B2 |
-| object_query:ProbeObject | 5/58 | B2 |
-| offset_helpers | 10/24 | B1 epilog register |
-| actor_init | 14/192 | B1 |
-| kind_scan | 25/48 | B4 havuz yerleşimi |
-| history_push | 31/48 | B3 taban kopyalama |
-| distance_accum | 38/72 | B3/B4 |
-| bump_or_reset | 41/60 | B3 paylaşılan store |
-| release_slot | 47/48 | B3 iki-taban |
+| maybe_advance | 0/42 (eşleşti) | Çözüldü: önceki koşul ROM semantiğini ters okumuştu |
+| entity_query | 0/60 (eşleşti) | Çözüldü: ayrı maske yereli + yerinde `&=` |
+| scan_all | 0/62 (eşleşti) | Çözüldü: çarpım önce yazılan tamsayı toplaması |
+| is_ram_mode | 0/28 (eşleşti) | Çözüldü: ilk koşul açık erken dönüş |
+| object_query:GetInnerId | 0/20 (eşleşti) | Çözüldü: ilk null kontrolü açık erken dönüş |
+| object_query:ProbeObject | 0/58 (eşleşti) | Çözüldü: null kontrolleri açık erken dönüş |
+| offset_helpers | 0/24 (eşleşti) | Çözüldü: yanlış `u32` dönüş tipi yerine `void` |
+| actor_init | 0/192 (eşleşti) | Çözüldü: sayaçtan sıfır + adresi önce kuran `tail` yereli |
+| kind_scan | 0/48 (eşleşti) | Çözüldü: `base`, `kind`, `cur` ayrı yaşam aralıkları |
+| history_push | 0/48 (eşleşti) | Çözüldü: ayrı `current` + karşılaştırma öncesi taban kopyası |
+| distance_accum | 0/68 (eşleşti) | Çözüldü: erken `accum` işaretçisi + dar volatile yeniden okuma |
+| bump_or_reset | 0/56 (eşleşti) | Çözüldü: açık `reset/increment/store` CFG etiketleri |
+| release_slot | 0/64 (eşleşti) | Çözüldü: tek çarpım ifadesi + ayrı alan tabanları |
 | area_cleanup | 56/84 | B1/B4 |
 | entity_action | 140/210 | B5 blok yerleşimi |
 | menu_screen | 946/1456 | B1 (tüm atama kaymış) |

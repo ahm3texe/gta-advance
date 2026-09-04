@@ -14,11 +14,9 @@ Denetlenenler:
   matching_regions.csv  ust uste binen bolge, hizasiz sinir
   ram_map.csv     yinelenen adres, ayni adrese cok isim, EWRAM/IWRAM tasmasi
   src/**/*.c      her `extern` sembolu functions.csv veya ram_map.csv'de
-                  cozuluyor mu  <-- yeniden adlandirma kirilmasini yakalar
-  bicim           CSV'lerde KARISIK satir sonu. (Yalnizca CRLF normaldir:
-                  csv.DictWriter varsayilan olarak CRLF yazar ve depo baştan
-                  beri oyle. Karisik olmasi ise arac disi bir seyin dosyaya
-                  dokundugunu gosterir.)
+                  cozuluyor mu; ayni gRam sembolu celiskili C extern turleri
+                  tasiyor mu  <-- yeniden adlandirma/tur kirilmasini yakalar
+  bicim           CSV'lerde KARISIK satir sonu
 
 Cikis kodu: sorun varsa 1, temizse 0. `make check` bunu cagirir.
 """
@@ -44,7 +42,7 @@ def main() -> None:
         problems.append(f"[{section}] {message}")
 
     # --- bicim: KARISIK satir sonu (arac disi bir seyin yazdiginin isareti).
-    # Tek basina CRLF normaldir; csv.DictWriter varsayilani odur.
+    # Tek basina LF veya CRLF kabul edilir; ikisinin karisimi edilmez.
     for name in ("functions.csv", "c_sources.csv", "matching_regions.csv",
                  "ram_map.csv", "function_overrides.csv"):
         path = ROOT / "data" / name
@@ -88,6 +86,19 @@ def main() -> None:
                              f"{names[row['name']]} ve {row['address']}")
         names[row["name"]] = row["address"]
 
+    # Elle reddedilen sahte girişler tekrar fonksiyon haritasına giremez.
+    non_function_path = ROOT / "data/non_function_entries.csv"
+    if non_function_path.exists():
+        rejected: set[int] = set()
+        for row in read(non_function_path):
+            address = int(row["address"], 16)
+            if address in rejected:
+                bad("non-functions", f"yinelenen adres {row['address']}")
+            rejected.add(address)
+            if address in by_address:
+                bad("non-functions", f"{row['address']} hem reddedilmiş giriş hem "
+                    f"fonksiyon ({by_address[address]['name']})")
+
     # --- c_sources.csv <-> functions.csv <-> disk ---
     for row in read(ROOT / "data/c_sources.csv"):
         address = int(row["address"], 16)
@@ -105,6 +116,15 @@ def main() -> None:
                              f"'{target['status']}'")
         if row["matching"] == "no" and target["status"] == "matching":
             bad("c_sources", f"{row['name']} matching=no ama functions'ta 'matching'")
+        compiled_size = int(row["compiled_size"], 0)
+        mapped_size = int(row["mapped_size"], 0)
+        function_size = int(target["size"], 0)
+        if mapped_size != function_size:
+            bad("c_sources", f"{row['name']} mapped_size={mapped_size}, "
+                             f"functions size={function_size}; c-status bayat")
+        if row["matching"] == "yes" and compiled_size < mapped_size:
+            bad("c_sources", f"{row['name']} kisa C prefix'i matching sayilmis: "
+                             f"{compiled_size} < {mapped_size}")
 
     # --- matching_regions.csv ---
     regions = sorted((int(r["start"], 16), int(r["end"], 16), r["binary"])
@@ -129,6 +149,39 @@ def main() -> None:
                 bad("ram_map", f"{row['name']} {label} sonunu "
                                f"{address + size - hi} bayt asiyor")
 
+    # --- ARM inceleme tablosu: bütün overlay aralığını boşluksuz kaplar ---
+    arm_review_path = ROOT / "data/arm_boundary_review.csv"
+    if arm_review_path.exists():
+        arm_ranges = []
+        arm_seen: set[int] = set()
+        for row in read(arm_review_path):
+            address = int(row["address"], 16)
+            size = int(row["corrected_size"])
+            if address in arm_seen:
+                bad("arm-review", f"yinelenen adres {row['address']}")
+            arm_seen.add(address)
+            target = by_address.get(address)
+            if target is None:
+                bad("arm-review", f"{row['address']} functions.csv'de yok")
+            else:
+                if int(target["size"]) != size:
+                    bad("arm-review", f"{row['address']} boyut uyusmuyor: "
+                        f"review {size}, functions {target['size']}")
+                if target["module"] != "arm" or target["status"] in {
+                    "candidate", "discovered"
+                }:
+                    bad("arm-review", f"{row['address']} incelenmis ARM kaydi "
+                        f"olarak isaretlenmemis")
+            arm_ranges.append((address, address + size))
+        arm_ranges.sort()
+        if arm_ranges:
+            if arm_ranges[0][0] != 0x08067E04 or arm_ranges[-1][1] != 0x0806B84C:
+                bad("arm-review", "overlay uçları 0x08067E04-0x0806B84C değil")
+            for (_, end), (start, _) in zip(arm_ranges, arm_ranges[1:]):
+                if end != start:
+                    bad("arm-review", f"0x{end:08X}-0x{start:08X} arasında "
+                        "boşluk veya örtüşme var")
+
     # --- kaynak: her extern sembolu cozuluyor mu (RENAME KIRILMASI) ---
     symbols = set(names) | {r["name"] for r in ram}
     extern = re.compile(r"^\s*extern\s+.*?\b(\w+)\s*(?:\[|\(|;|=)", re.M)
@@ -139,6 +192,32 @@ def main() -> None:
                 bad("kaynak", f"{source.relative_to(ROOT)}: extern '{name}' "
                               f"ne functions.csv ne ram_map.csv'de — "
                               f"yeniden adlandirma kirilmasi olabilir")
+
+    # --- kaynak/header: ayni fiziksel RAM sembolune tek extern turu ---
+    ram_extern = re.compile(
+        r"^\s*extern\s+(.+?)\s+(\*?)(gRam[0-9A-Fa-f]+)"
+        r"(\s*\[[^;]*\])?\s*;",
+        re.M,
+    )
+    ram_types: dict[str, dict[str, list[str]]] = {}
+    declaration_files = sorted(ROOT.glob("src/**/*.c")) + sorted(
+        ROOT.glob("include/**/*.h")
+    )
+    for source in declaration_files:
+        text = source.read_text(encoding="utf-8")
+        for match in ram_extern.finditer(text):
+            type_text = " ".join(
+                (match.group(1) + match.group(2) + (match.group(4) or "")).split()
+            )
+            ram_types.setdefault(match.group(3), {}).setdefault(type_text, []).append(
+                str(source.relative_to(ROOT))
+            )
+    for symbol, declarations in sorted(ram_types.items()):
+        if len(declarations) > 1:
+            detail = "; ".join(
+                f"{kind} ({', '.join(paths)})" for kind, paths in declarations.items()
+            )
+            bad("ram-extern", f"{symbol} celiskili extern turlerinde: {detail}")
 
     if problems:
         print(f"TUTARSIZLIK: {len(problems)} sorun\n")

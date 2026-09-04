@@ -36,9 +36,13 @@ def main() -> None:
     matched = 0
     for name, (offset, size) in sorted(layout.items(), key=lambda kv: kv[1][0]):
         address = int(rows[name]["address"], 16)
+        mapped_size = int(rows[name]["size"], 0)
         mine = blob[offset:offset + size]
         theirs = rom[address - ROM_BASE:address - ROM_BASE + size]
-        if mine == theirs:
+        if size < mapped_size:
+            print(f"{name:22} {size:>6}  KISA C CIKTISI; harita {mapped_size} byte "
+                  f"(0x{address:08X})")
+        elif mine == theirs:
             matched += 1
             print(f"{name:22} {size:>6}  BYTE-MATCHING  (0x{address:08X})")
         else:

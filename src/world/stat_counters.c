@@ -4,8 +4,8 @@
  * +0x74), yani oyuna kaydediliyorlar. Ilk iki fonksiyon tasma korumali
  * artirim yapiyor: u16 sarmalanip 0 olursa eski deger geri yaziliyor.
  *
- * Ayni kumedeki dorduncu fonksiyon (AddDistance, 0x08067274) henuz
- * eslesmedigi icin ayri dosyada: src/world/distance_accum.c
+ * Ayni kumedeki dorduncu fonksiyon AddDistance ayri dosyada ve
+ * byte-matching: src/world/distance_accum.c
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/stat_counters.c

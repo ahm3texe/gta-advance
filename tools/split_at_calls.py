@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""Cagri hedeflerinde birlesmis fonksiyon kayitlarini ayirir.
+"""Eski dogrusal BL-hedefi deneyini adli inceleme icin saklar.
 
 audit_boundaries.py'nin yurutucusu kosulsuz `b` komutunu fonksiyon ICI
 akis sayiyor. Ama GCC `b`'yi KUYRUK CAGRISI icin de kullanir: bir
 fonksiyon isini bitirip komsusuna atlar. Bu yuzden Faz 0'da ardisik
 fonksiyonlar tek kayda birlestirildi.
 
-Olcut kesin: bir `bl` hedefi asla fonksiyon ORTASI olamaz. Bilinen kodun
-icindeki her cagri hedefi bir fonksiyon sinniridir; kayit orada bolunur.
+Bu varsayim bu ROM icin YANLISTIR: literal havuzlari BL gibi gorunebilir ve
+oyun ortak fonksiyon-ici bloklara BL ile girebilir. 2026-09-04 incelemesinde
+aracin olusturdugu 52 bolmenin tamami geri alindi. Yazma kipi kalici olarak
+devre disidir.
 
 Kullanim:
-    python3 tools/split_at_calls.py            # yalnizca rapor
-    python3 tools/split_at_calls.py --apply    # functions.csv'yi bol
+    python3 tools/split_at_calls.py                 # neden devre disi oldugunu yaz
+    python3 tools/split_at_calls.py --unsafe-report # tarihsel ham rapor
 """
 import csv
 import sys
@@ -40,6 +42,13 @@ def call_targets(rom: bytes, rows: list[tuple[int, int]]) -> set[int]:
 
 def main() -> None:
     apply = "--apply" in sys.argv
+    if apply:
+        sys.exit("DURDU: --apply kalici olarak devre disi; dogrusal BL "
+                 "taramasi 52 sahte sinir uretmisti")
+    if "--unsafe-report" not in sys.argv:
+        print("DEVRE DISI: dogrusal BL taramasi literal/ortak bloklari "
+              "fonksiyon sanabiliyor. Ayrinti: docs/WORKLOG.md (2026-09-04).")
+        return
     rom = ROM.read_bytes()
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))

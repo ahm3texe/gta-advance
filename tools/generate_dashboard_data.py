@@ -11,6 +11,8 @@ FUNCTIONS = ROOT / "data/functions.csv"
 REGIONS = ROOT / "data/matching_regions.csv"
 C_SOURCES = ROOT / "data/c_sources.csv"
 LIBC_REGIONS = ROOT / "data/libc_regions.csv"
+WORK_QUEUE = ROOT / "data/work_queue.csv"
+BOUNDARY_BASELINE = ROOT / "data/boundary_baseline.json"
 OUTPUT = ROOT / "dashboard/app/decomp-data.json"
 DECOMPILER = ROOT / "analysis/decompiler"
 
@@ -96,11 +98,13 @@ def build_clusters(rows: list[dict]) -> None:
 def main() -> None:
     function_rows = read_csv(FUNCTIONS)
     region_rows = read_csv(REGIONS)
-    # C'den byte-matching olan fonksiyonlar: assembly transkripsiyonundan
-    # ayirt edilir, cunku projenin hedefi okunabilir kaynaktir.
+    # Kaynak turu ile eslesme durumu ayri eksenlerdir. Eslesmeyen C de C'dir;
+    # kaynagi olmayan aday ise assembly degildir.
+    c_source_rows = read_csv(C_SOURCES) if C_SOURCES.exists() else []
+    c_sources = {row["address"].upper(): row for row in c_source_rows}
     c_matched = {
         row["address"].upper(): row["source"]
-        for row in (read_csv(C_SOURCES) if C_SOURCES.exists() else [])
+        for row in c_source_rows
         if row["matching"] == "yes"
     }
     status_counts = Counter(row["status"] for row in function_rows)
@@ -121,6 +125,8 @@ def main() -> None:
         if row["status"] == "matching":
             matching_code_bytes += size
         verified = matched_bytes(start, size, verified_regions)
+        c_source = c_sources.get(row["address"].upper())
+        source_type = "c" if c_source else ("asm" if row["status"] == "matching" else "none")
         function = {
             "address": row["address"],
             "name": row["name"],
@@ -130,8 +136,9 @@ def main() -> None:
             "notes": row["notes"],
             "matchedBytes": verified,
             "matchPercent": round(100 * verified / size, 2) if size else 0.0,
-            "source": "c" if row["address"].upper() in c_matched else "asm",
-            "sourcePath": c_matched.get(row["address"].upper(), ""),
+            "sourceType": source_type,
+            "sourcePath": c_source["source"] if c_source else "",
+            "cMatching": bool(c_source and c_source["matching"] == "yes"),
             "_start": start,
         }
         export = decompiler_exports.get(start)
@@ -172,10 +179,20 @@ def main() -> None:
         for row in (read_csv(LIBC_REGIONS) if LIBC_REGIONS.exists() else [])
     )
     cluster_count = len({function["cluster"] for function in functions})
+    work_queue = read_csv(WORK_QUEUE) if WORK_QUEUE.exists() else []
+    boundary_debt = 0
+    if BOUNDARY_BASELINE.exists():
+        boundary_debt = len(
+            json.loads(BOUNDARY_BASELINE.read_text(encoding="utf-8"))["shortBoundaries"]
+        )
     payload = {
         "summary": {
             "functionCount": len(functions),
-            "verifiedCount": len(functions) - status_counts["candidate"],
+            "reviewedCount": (
+                status_counts["documented"]
+                + status_counts["decompiled"]
+                + status_counts["matching"]
+            ),
             "matchingCount": status_counts["matching"],
             "totalCodeBytes": total_code_bytes,
             "matchingCodeBytes": matching_code_bytes,
@@ -184,13 +201,16 @@ def main() -> None:
             "libcRegionBytes": libc_region_bytes,
             "verifiedRomBytes": matching_region_bytes + libc_region_bytes,
             "clusterCount": cluster_count,
-            "cSourceCount": len(c_matched),
+            "cSourceCount": len(c_sources),
+            "cMatchingCount": len(c_matched),
             "cSourceBytes": sum(
-                f["size"] for f in functions if f["source"] == "c"
+                f["size"] for f in functions if f["sourceType"] == "c"
             ),
+            "boundaryDebtCount": boundary_debt,
         },
         "functions": functions,
         "regions": regions,
+        "workQueue": work_queue,
     }
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
