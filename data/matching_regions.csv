@@ -21,6 +21,7 @@ start,end,binary,module,notes
 0x08001A00,0x08001DC0,build/ui/menu_loop.bin,ui,"Menu loop: hierarchy, input and redraw"
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
+0x08005FC4,0x08005FD0,build/world/wrap_08005fc4.bin,world,kucuk fonksiyon hasadi
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; 31 girdilik geçmiş kuyruğu kaydırması
 0x08008094,0x080080A4,build/world/set_index.bin,world,SetTableIndex sarmalayicisi
 0x08008108,0x0800811C,build/core/zero_history.bin,core,gecmis tamponunu Memset ile sifirlama
@@ -29,15 +30,21 @@ start,end,binary,module,notes
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,CoordBlock +0x71 baytini sifirlama
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
+0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,kucuk fonksiyon hasadi
 0x080127FC,0x0801282C,build/core/list_ops2.bin,core,List init + push front (varyant)
 0x08012898,0x08012944,build/core/linked_list.bin,core,"Cift bagli liste: ekle, cikar, ilklendir, iki dolasim"
+0x08012A98,0x08012AA4,build/world/wrap_08012a98.bin,world,kucuk fonksiyon hasadi
+0x080138E8,0x080138F4,build/world/wrap_080138e8.bin,world,kucuk fonksiyon hasadi
+0x080138F4,0x08013900,build/world/wrap_080138f4.bin,world,kucuk fonksiyon hasadi
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
 0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Sabit cagri + DMA bosaltma
+0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,kucuk fonksiyon hasadi
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184 bayt gövde + literal havuzu
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
+0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,kucuk fonksiyon hasadi
 0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
 0x08023A80,0x08023A9C,build/world/masked_compare.bin,world,maskeli karsilastirma
@@ -54,6 +61,7 @@ start,end,binary,module,notes
 0x08030C0C,0x08030C24,build/world/lookup_then_call.bin,world,kayit sozunu bulup iletme
 0x08030C28,0x08030C4C,build/world/zero_two_blocks.bin,world,iki bayrak blogunu Memset ile sifirlama
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
+0x08030EA0,0x08030EAC,build/world/spin_delay.bin,world,kucuk fonksiyon hasadi
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08031DB8,0x08031DDC,build/world/step_then_check.bin,world,adim atip bayrak sinama
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
@@ -61,6 +69,9 @@ start,end,binary,module,notes
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
 0x0803376C,0x0803378C,build/world/zero_three_flags.bin,world,uc bayragi sifirlama
+0x0803378C,0x08033798,build/world/wrap_0803378c.bin,world,kucuk fonksiyon hasadi
+0x0803379C,0x080337A8,build/world/wrap_0803379c.bin,world,kucuk fonksiyon hasadi
+0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,kucuk fonksiyon hasadi
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
@@ -86,6 +97,9 @@ start,end,binary,module,notes
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
+0x08042784,0x08042790,build/world/wrap_08042784.bin,world,kucuk fonksiyon hasadi
+0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,kucuk fonksiyon hasadi
+0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,kucuk fonksiyon hasadi
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
 0x08050994,0x080509C4,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici

@@ -1011,7 +1011,105 @@ build/core/clear_coord_byte71.bin: src/core/clear_coord_byte71.c data/functions.
 core-clear-coord-byte71-match: verify-rom build/core/clear_coord_byte71.bin
 	@python3 tools/compare_slice.py baserom.gba 0xab30 build/core/clear_coord_byte71.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match
+build/world/wrap_08005fc4.bin: src/world/wrap_08005fc4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-08005fc4-match: verify-rom build/world/wrap_08005fc4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5fc4 build/world/wrap_08005fc4.bin
+
+build/world/wrap_080101d8.bin: src/world/wrap_080101d8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-080101d8-match: verify-rom build/world/wrap_080101d8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x101d8 build/world/wrap_080101d8.bin
+
+build/world/wrap_08012a98.bin: src/world/wrap_08012a98.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-08012a98-match: verify-rom build/world/wrap_08012a98.bin
+	@python3 tools/compare_slice.py baserom.gba 0x12a98 build/world/wrap_08012a98.bin
+
+build/world/wrap_080138e8.bin: src/world/wrap_080138e8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-080138e8-match: verify-rom build/world/wrap_080138e8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x138e8 build/world/wrap_080138e8.bin
+
+build/world/wrap_080138f4.bin: src/world/wrap_080138f4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-080138f4-match: verify-rom build/world/wrap_080138f4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x138f4 build/world/wrap_080138f4.bin
+
+build/world/wrap_08014fa0.bin: src/world/wrap_08014fa0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-08014fa0-match: verify-rom build/world/wrap_08014fa0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x14fa0 build/world/wrap_08014fa0.bin
+
+build/world/wrap_0803378c.bin: src/world/wrap_0803378c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-0803378c-match: verify-rom build/world/wrap_0803378c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3378c build/world/wrap_0803378c.bin
+
+build/world/wrap_0803379c.bin: src/world/wrap_0803379c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-0803379c-match: verify-rom build/world/wrap_0803379c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3379c build/world/wrap_0803379c.bin
+
+build/world/wrap_08035dd8.bin: src/world/wrap_08035dd8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-08035dd8-match: verify-rom build/world/wrap_08035dd8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35dd8 build/world/wrap_08035dd8.bin
+
+build/world/wrap_08042784.bin: src/world/wrap_08042784.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-08042784-match: verify-rom build/world/wrap_08042784.bin
+	@python3 tools/compare_slice.py baserom.gba 0x42784 build/world/wrap_08042784.bin
+
+build/world/wrap_080428ac.bin: src/world/wrap_080428ac.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-080428ac-match: verify-rom build/world/wrap_080428ac.bin
+	@python3 tools/compare_slice.py baserom.gba 0x428ac build/world/wrap_080428ac.bin
+
+build/world/wrap_0804fb4c.bin: src/world/wrap_0804fb4c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-wrap-0804fb4c-match: verify-rom build/world/wrap_0804fb4c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x4fb4c build/world/wrap_0804fb4c.bin
+
+build/world/get_field_100.bin: src/world/get_field_100.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-get-field-100-match: verify-rom build/world/get_field_100.bin
+	@python3 tools/compare_slice.py baserom.gba 0x1d8b0 build/world/get_field_100.bin
+
+build/world/spin_delay.bin: src/world/spin_delay.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-spin-delay-match: verify-rom build/world/spin_delay.bin
+	@python3 tools/compare_slice.py baserom.gba 0x30ea0 build/world/spin_delay.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match world-wrap-08005fc4-match world-wrap-080101d8-match world-wrap-08012a98-match world-wrap-080138e8-match world-wrap-080138f4-match world-wrap-08014fa0-match world-wrap-0803378c-match world-wrap-0803379c-match world-wrap-08035dd8-match world-wrap-08042784-match world-wrap-080428ac-match world-wrap-0804fb4c-match world-get-field-100-match world-spin-delay-match
 	@python3 tools/verify_matching_regions.py
 
 # --- permuter kancasi -------------------------------------------------
