@@ -31,3 +31,7 @@ dashboard/app/decomp-data.json
 
 # Bir kerelik yerel inceleme artifakti; kaynak veya kalici dokuman degil.
 /vB.diff
+
+# Permuter: dis kaynak ve izole ortam surumlenmez.
+tools/external/
+build/permuter/

@@ -1,0 +1,7 @@
+# decomp-permuter-agbcc ayarlari.
+# agbcc, GCC 2.8 turevidir; rastgelestirme agirliklari icin dogru profil "gcc".
+compiler_type = "gcc"
+
+# Derleme komutu Makefile'daki PERMUTER=1 kuralindan okunur
+# (bkz. tools/permuter_compile.py -- dis semboller .equ ile cozuluyor).
+build_system = "make"
