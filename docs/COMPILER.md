@@ -321,6 +321,17 @@ ROM'un prologu kac callee-saved register istediginizi soyler; oradan
 ROM'un kac canli degeri oldugunu geri hesaplayin ve kaynagi o sayiya
 getirin. Fazladan bir `push` demek fazladan bir canli deger demektir.
 
-UYARI: deger SAYISINI dusurmek gerekir, DEGISTIRMEK degil. CleanupAreaTiles'ta
-sayaci kaldirip yerine bitis isaretcisi koydum -- sayi altida kaldi, prolog
-degismedi ve fark 7'den 60'a cikti.
+UYARI 1: deger SAYISINI dusurmek gerekir, DEGISTIRMEK degil.
+CleanupAreaTiles'ta sayaci kaldirip yerine bitis isaretcisi koydum -- sayi
+altida kaldi, prolog degismedi ve fark 7'den 60'a cikti.
+
+UYARI 2 -- KURALIN ASIL SINIRI: kaynaktaki yerel sayisi, dagiticinin
+canli kumesi DEGILDIR. CleanupAreaTiles'ta `block` yerelini iki ayri
+sekilde dongu disina cikardim (satir ici cagri; dongu sonrasi atama) ve
+prolog IKISINDE DE degismedi -- agbcc sabit adresi zaten hoist ettigi
+icin `block` hicbir zaman dongu boyunca canli degildi.
+
+Yani kural izole deneyde olculebiliyor ama gercek bir fonksiyona
+uygulamak icin dagiticinin canli kumesini GORMEK gerekiyor; kaynaktaki
+yerelleri saymak yaniltiyor. Prolog kac register istedigini soyler, ama
+HANGI degerlerin sayildigini soylemez. Bu adim henuz cozulmedi.
