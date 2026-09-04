@@ -304,7 +304,7 @@ address,name,size,status,module,notes
 0x08013824,FUN_08013824,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080138E8,FUN_080138e8,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x080138F4,FUN_080138f4,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x08013900,FUN_08013900,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08013900,FlushPaletteQueue,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08013974,GetEntryOrDefault,24,matching,world,Liste basi; src/world/list_head.c
 0x0801398C,CountChain,36,matching,world,Liste basi; src/world/list_head.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080139B0,MarkChain,32,matching,world,Liste basi; src/world/list_head.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
