@@ -1,27 +1,31 @@
 id,priority,area,status,title,acceptance,evidence,updated
-PROC-001,P0,process,done,Tek doğruluk kaynağı ve doğrulama kademeleri kuruldu,"WORKFLOW veri sahipliğini tanımlar; make status/check/check-full kullanılabilir",docs/WORKFLOW.md,2026-09-04
-TOOL-001,P0,toolchain,done,agbcc uyumlu kaynak revizyonu ve corpus parmak izi kilitlendi,"Sabit revizyondan üretilen old_agbcc 23 fonksiyonluk temsil corpus'u ile aynı baytları üretir",config/toolchain.lock.json,2026-09-04
-MAP-BASE-001,P0,map,done,Sınır borcu regresyon baseline'ına alındı,"Kapanmış kısa sınırlar yeniden oluşursa veya yeni bulgu gelirse make check kırılır",data/boundary_baseline.json,2026-09-04
-DASH-001,P0,dashboard,done,Kaynak türü ve eşleşme durumu ayrıldı,"211 C kaynağının tamamı görünür; kaynaksız adaylar assembly sayılmaz",tools/generate_dashboard_data.py,2026-09-04
-BUILD-001,P1,build,done,Build bağımlılıklarını tam izle,"C hedefleri header ve build aracı değişikliklerinde otomatik yeniden derlenir",Makefile,2026-09-04
-VERIFY-001,P1,verification,done,C doğrulamasına beklenen boyut kapısı ekle,"Kısa bir prefix tam fonksiyon eşleşmesi olarak kabul edilemez",tools/verify_c_function.py,2026-09-04
-MAP-001,P1,map,done,53 sınır bulgusunu elle kapat,"53 kayıt ayrı ayrı incelendi; 52 sahte iç bölme birleştirildi ve bir literal-içi sahte başlangıç kaldırıldı",data/boundary_review.csv,2026-09-04
-SEM-001,P1,semantics,done,ScanAllEntries adını ve yorumunu düzelt,"Tek iterasyonluk gerçek davranış kanıtla uyumlu ad ve yorum taşır",src/world/scan_all.c,2026-09-04
-DOC-001,P1,docs,done,PLAN içindeki tarihsel ölçümleri ayır,"Güncel sayıların tek kaynağı docs/STATUS.md; PLAN açıkça karar geçmişidir",docs/PLAN.md,2026-09-04
-BACKUP-001,P1,repository,blocked,Özel uzak yedek oluştur,"Bütün commit geçmişi kullanıcının seçtiği özel remote'a gönderildi",Kullanıcı remote hedefini seçmeli,2026-09-04
-TYPES-001,P2,architecture,done,Ortak RAM türlerini birleştir,"Aynı sembol farklı translation unit'lerde uyumsuz extern türü taşımaz",include/ram_symbols.h + tools/check_consistency.py,2026-09-04
-DASH-QA-001,P2,dashboard,done,Kullanılmayan UI scaffold ve bağımlılık borcunu temizle,"Ürün lint'i ve tam dashboard lint'i geçer; gereksiz bileşenler kaldırılmıştır",dashboard/,2026-09-04
-MAP-LARGE-001,P1,map,done,4 aşırı büyüyen Thumb kaydını incele,"Her kayıt ARM/Thumb kipi ve kontrol akışı kanıtıyla kesin sınıra kavuşur",data/large_boundary_review.csv,2026-09-04
-MAP-ARM-001,P2,map,done,18 ARM aralığı kaydını incele,"ARM disassembly ile başlangıç ve bitişler doğrulanır",data/arm_boundary_review.csv,2026-09-04
-MATCH-001,P1,matching,done,ProcessFirstEntry son iki baytını eşleştir,"0x08029014 fonksiyonu 62/62 byte-matching olur",src/world/scan_all.c + data/matching_regions.csv,2026-09-04
-MATCH-002,P1,matching,done,MaybeAdvance tek baytlık dal farkını eşleştir,"MaybeAdvance fonksiyonu doğal C ile byte-matching olur",src/world/maybe_advance.c + data/matching_regions.csv,2026-09-04
-MATCH-003,P1,matching,done,QueryEntity iki baytlık farkını çöz,"QueryEntity doğal C ile byte-matching olur veya engeli kanıtla belgelenir",src/world/entity_query.c + data/matching_regions.csv,2026-09-04
-MATCH-004,P1,matching,done,Object query ikilisini eşleştir,"GetInnerId ve ProbeObject birlikte byte-matching olur veya engelleri kanıtla belgelenir",src/world/object_query.c + src/world/get_inner_id.c,2026-09-04
-MATCH-005,P1,matching,done,IsRamModeWanted dört baytlık farkını çöz,"IsRamModeWanted doğal C ile byte-matching olur veya engeli kanıtla belgelenir",src/world/is_ram_mode.c + data/matching_regions.csv,2026-09-04
-MATCH-006,P1,matching,done,Offset helper engelini çöz,"offset_helpers içindeki fonksiyonlar byte-matching olur veya engel ölçülerek belgelenir",src/world/offset_helpers.c + data/matching_regions.csv,2026-09-04
-MATCH-007,P1,matching,done,InitActor kalan farklarını çöz,"InitActor doğal C ile byte-matching olur veya engeller sınıflandırılır",src/world/actor_init.c + data/matching_regions.csv,2026-09-04
-MATCH-008,P1,matching,done,HasWantedEntry havuz yerleşimini çöz,"HasWantedEntry doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır",src/world/kind_scan.c + data/matching_regions.csv,2026-09-04
-MATCH-009,P1,matching,done,PushHistory taban kopyalamasını çöz,"PushHistory doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır",src/world/history_push.c + data/matching_regions.csv,2026-09-04
-MATCH-010,P1,matching,done,AddDistance taban ve havuz farkını çöz,"AddDistance doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır",src/world/distance_accum.c + data/matching_regions.csv,2026-09-04
-MATCH-011,P1,matching,done,BumpOrReset paylaşılan store farkını çöz,"BumpOrReset doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır",src/world/bump_or_reset.c + data/matching_regions.csv,2026-09-04
-MATCH-012,P1,matching,done,ReleaseSlot iki-taban farkını çöz,"ReleaseSlot doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır",src/world/release_slot.c + data/matching_regions.csv,2026-09-04
+PROC-001,P0,process,done,Tek doğruluk kaynağı ve doğrulama kademeleri kuruldu,WORKFLOW veri sahipliğini tanımlar; make status/check/check-full kullanılabilir,docs/WORKFLOW.md,2026-09-04
+TOOL-001,P0,toolchain,done,agbcc uyumlu kaynak revizyonu ve corpus parmak izi kilitlendi,Sabit revizyondan üretilen old_agbcc 23 fonksiyonluk temsil corpus'u ile aynı baytları üretir,config/toolchain.lock.json,2026-09-04
+MAP-BASE-001,P0,map,done,Sınır borcu regresyon baseline'ına alındı,Kapanmış kısa sınırlar yeniden oluşursa veya yeni bulgu gelirse make check kırılır,data/boundary_baseline.json,2026-09-04
+DASH-001,P0,dashboard,done,Kaynak türü ve eşleşme durumu ayrıldı,211 C kaynağının tamamı görünür; kaynaksız adaylar assembly sayılmaz,tools/generate_dashboard_data.py,2026-09-04
+BUILD-001,P1,build,done,Build bağımlılıklarını tam izle,C hedefleri header ve build aracı değişikliklerinde otomatik yeniden derlenir,Makefile,2026-09-04
+VERIFY-001,P1,verification,done,C doğrulamasına beklenen boyut kapısı ekle,Kısa bir prefix tam fonksiyon eşleşmesi olarak kabul edilemez,tools/verify_c_function.py,2026-09-04
+MAP-001,P1,map,done,53 sınır bulgusunu elle kapat,53 kayıt ayrı ayrı incelendi; 52 sahte iç bölme birleştirildi ve bir literal-içi sahte başlangıç kaldırıldı,data/boundary_review.csv,2026-09-04
+SEM-001,P1,semantics,done,ScanAllEntries adını ve yorumunu düzelt,Tek iterasyonluk gerçek davranış kanıtla uyumlu ad ve yorum taşır,src/world/scan_all.c,2026-09-04
+DOC-001,P1,docs,done,PLAN içindeki tarihsel ölçümleri ayır,Güncel sayıların tek kaynağı docs/STATUS.md; PLAN açıkça karar geçmişidir,docs/PLAN.md,2026-09-04
+BACKUP-001,P1,repository,blocked,Özel uzak yedek oluştur,Bütün commit geçmişi kullanıcının seçtiği özel remote'a gönderildi,Kullanıcı remote hedefini seçmeli,2026-09-04
+TYPES-001,P2,architecture,done,Ortak RAM türlerini birleştir,Aynı sembol farklı translation unit'lerde uyumsuz extern türü taşımaz,include/ram_symbols.h + tools/check_consistency.py,2026-09-04
+DASH-QA-001,P2,dashboard,done,Kullanılmayan UI scaffold ve bağımlılık borcunu temizle,Ürün lint'i ve tam dashboard lint'i geçer; gereksiz bileşenler kaldırılmıştır,dashboard/,2026-09-04
+MAP-LARGE-001,P1,map,done,4 aşırı büyüyen Thumb kaydını incele,Her kayıt ARM/Thumb kipi ve kontrol akışı kanıtıyla kesin sınıra kavuşur,data/large_boundary_review.csv,2026-09-04
+MAP-ARM-001,P2,map,done,18 ARM aralığı kaydını incele,ARM disassembly ile başlangıç ve bitişler doğrulanır,data/arm_boundary_review.csv,2026-09-04
+MATCH-001,P1,matching,done,ProcessFirstEntry son iki baytını eşleştir,0x08029014 fonksiyonu 62/62 byte-matching olur,src/world/scan_all.c + data/matching_regions.csv,2026-09-04
+MATCH-002,P1,matching,done,MaybeAdvance tek baytlık dal farkını eşleştir,MaybeAdvance fonksiyonu doğal C ile byte-matching olur,src/world/maybe_advance.c + data/matching_regions.csv,2026-09-04
+MATCH-003,P1,matching,done,QueryEntity iki baytlık farkını çöz,QueryEntity doğal C ile byte-matching olur veya engeli kanıtla belgelenir,src/world/entity_query.c + data/matching_regions.csv,2026-09-04
+MATCH-004,P1,matching,done,Object query ikilisini eşleştir,GetInnerId ve ProbeObject birlikte byte-matching olur veya engelleri kanıtla belgelenir,src/world/object_query.c + src/world/get_inner_id.c,2026-09-04
+MATCH-005,P1,matching,done,IsRamModeWanted dört baytlık farkını çöz,IsRamModeWanted doğal C ile byte-matching olur veya engeli kanıtla belgelenir,src/world/is_ram_mode.c + data/matching_regions.csv,2026-09-04
+MATCH-006,P1,matching,done,Offset helper engelini çöz,offset_helpers içindeki fonksiyonlar byte-matching olur veya engel ölçülerek belgelenir,src/world/offset_helpers.c + data/matching_regions.csv,2026-09-04
+MATCH-007,P1,matching,done,InitActor kalan farklarını çöz,InitActor doğal C ile byte-matching olur veya engeller sınıflandırılır,src/world/actor_init.c + data/matching_regions.csv,2026-09-04
+MATCH-008,P1,matching,done,HasWantedEntry havuz yerleşimini çöz,HasWantedEntry doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır,src/world/kind_scan.c + data/matching_regions.csv,2026-09-04
+MATCH-009,P1,matching,done,PushHistory taban kopyalamasını çöz,PushHistory doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır,src/world/history_push.c + data/matching_regions.csv,2026-09-04
+MATCH-010,P1,matching,done,AddDistance taban ve havuz farkını çöz,AddDistance doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır,src/world/distance_accum.c + data/matching_regions.csv,2026-09-04
+MATCH-011,P1,matching,done,BumpOrReset paylaşılan store farkını çöz,BumpOrReset doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır,src/world/bump_or_reset.c + data/matching_regions.csv,2026-09-04
+MATCH-012,P1,matching,done,ReleaseSlot iki-taban farkını çöz,ReleaseSlot doğal C ile byte-matching olur veya engel yeni kanıtla daraltılır,src/world/release_slot.c + data/matching_regions.csv,2026-09-04
+MATCH-013,P1,matching,in_progress,Kalan 4 park dosyasini kural 35-36 ile yeniden dene,"RunMenuScreen, FUN_08020a9c, CleanupAreaTiles, ClearTextArea tek tek ayri taban yasam araligi ve tek-ifade carpim kurallariyla denenir; her biri eslesir ya da engel kanitla belgelenir",,2026-09-04
+TOOL-010,P1,toolchain,todo,Yeni harita girisi icin yapisal kapi yaz,"Bir aday ancak (a) push prologuyla basliyorsa VE (b) oncesinde fonksiyon bitiren komut (pop{..,pc} / bx lr / kosulsuz b) varsa haritaya eklenebilir; bu sinama split_at_calls'in urettigi 57 sahte girisin 57 sinide yakaladi",,2026-09-04
+MAP-010,P2,map,todo,Bosluk analizinin YALNIZ sifir-riskli 16 ARM girisini uygula,ARM bolgesi bagimsiz olculdu (cond!=0xF orani tam 1.0000); bu 16 giris TOOL-010 kapisindan gecirilerek eklenir. 123 prologsuz Thumb yapragi BILEREK DISARIDA birakilir,,2026-09-04
+MATCH-014,P2,matching,todo,world/entity kucuk fonksiyon hasadi (kural 35-36 ile),Idiom kutuphanesinin en guclu oldugu modullerde 5 kumelik gruplar halinde ilerlenir; her kume sonunda make check-full gecmeli,,2026-09-04
