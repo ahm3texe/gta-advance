@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""ROM'daki basit yaprak erisimcileri bulur.
+"""ROM'daki basit yaprak erisimcileri bulur (okuma VE yazma).
 
 Kalip (6 baytlik cekirdek, ardindan hizalama + havuz):
     ldr rN, [pc, #imm]      <- havuzdan taban adres
-    ldr/ldrb/ldrh rD, [rN, #ofs]
+    ldr|ldrb|ldrh rD, [rN, #ofs]      (getirici)
+      ya da
+    str|strb|strh rD, [rN, #ofs]      (koyucu; deger r0'da gelir, taban r1'e
+                                       yuklenir cunku r0 dolu)
     bx lr
 
-C karsiligi mekanik:  u32 f(void) { return sembol.alan; }
+C karsiligi mekanik:
+    u32  f(void)      { return sembol.alan; }
+    void f(u32 value) { sembol.alan = value; }
 
 Kullanim: python3 tools/find_accessors.py [--all]
   varsayilan: yalnizca HENUZ ESLESMEYEN kayitlar
@@ -20,10 +25,14 @@ ROOT = Path(__file__).resolve().parent.parent
 ROM_BASE = 0x08000000
 
 # (maske, deger, tur, olcek) -- ofset olceklemesi Thumb kodlamasindan gelir
-LOADS = [
-    (0xF800, 0x6800, "u32", 4),
-    (0xF800, 0x7800, "u8", 1),
-    (0xF800, 0x8800, "u16", 2),
+ACCESS = [
+    # (maske, deger, tur, olcek, yon)
+    (0xF800, 0x6800, "u32", 4, "get"),
+    (0xF800, 0x7800, "u8", 1, "get"),
+    (0xF800, 0x8800, "u16", 2, "get"),
+    (0xF800, 0x6000, "u32", 4, "set"),
+    (0xF800, 0x7000, "u8", 1, "set"),
+    (0xF800, 0x8000, "u16", 2, "set"),
 ]
 
 
@@ -56,10 +65,10 @@ def main() -> None:
             continue
         if h2 != 0x4770:                            # bx lr
             continue
-        kind = scale = None
-        for mask, value, k, sc in LOADS:
+        kind = scale = direction = None
+        for mask, value, k, sc, d in ACCESS:
             if (h1 & mask) == value:
-                kind, scale = k, sc
+                kind, scale, direction = k, sc, d
                 break
         if kind is None:
             continue
@@ -69,12 +78,14 @@ def main() -> None:
         pool = ((addr + 4) & ~3) + ((h0 & 0xFF) * 4)
         sym = word(pool)
         offset = ((h1 >> 6) & 0x1F) * scale
-        found.append((addr, sym, offset, kind, ram.get(sym), row["name"]))
+        found.append((addr, sym, offset, kind, direction, ram.get(sym), row["name"]))
 
-    print(f"{len(found)} yaprak erisimci")
-    for addr, sym, off, kind, name, fname in found:
-        label = name or f"(ram_map'te yok)"
-        print(f"0x{addr:08X}  {kind:3} 0x{sym:08X}+0x{off:02X}  {label:22} {fname}")
+    gets = sum(1 for f in found if f[4] == "get")
+    print(f"{len(found)} yaprak erisimci ({gets} getirici, {len(found) - gets} koyucu)")
+    for addr, sym, off, kind, direction, name, fname in found:
+        label = name or "(ram_map'te yok)"
+        print(f"0x{addr:08X}  {direction:3} {kind:3} 0x{sym:08X}+0x{off:02X}  "
+              f"{label:22} {fname}")
 
 
 if __name__ == "__main__":

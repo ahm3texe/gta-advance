@@ -1926,7 +1926,7 @@ address,name,size,status,module,notes
 0x08071C90,FUN_08071c90,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08071CC4,FUN_08071cc4,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071D20,FUN_08071d20,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071D50,FUN_08071d50,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08071D50,FUN_08071d50,12,candidate,unknown,yaprak getirici (find_accessors.py); 0x08FD2B10'daki ROM sozunu donduruyor. YAZILMADI: newlib bolgesinde (0x08071D8C abort) ama libc.a'daki 375 govdenin hicbiriyle eslesmiyor; havuzu haritalanmamis bir ROM yapisina isaret ettigi icin gerekcesiz sembol uydurmadan yazilamaz. Once 0x08FD2B10 belgelenmeli.
 0x08071D5C,FUN_08071d5c,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08071DAC,FUN_08071dac,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
