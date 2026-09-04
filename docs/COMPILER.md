@@ -267,3 +267,60 @@ Her fonksiyonu ayrı ayrı derleyip `data/functions.csv`'deki adresinden ROM ile
 karşılaştırır. Eşleşen fonksiyonun assembly karşılığı artık gereksizdir.
 | 39 | Butun register'lar beklenenden **bir yukaridaysa**, kaynakta dokunulmadan **iletilen fazladan bir parametre** vardir | `SubmitPack`te ROM `{r4,r5,r6}` + r2/r3 kullanirken bizimki `{r3,r4,r5}` + r1/r2 uretiyordu; farkin tamami tek register kaymasiydi. r1'i KURAN komut yoktu, yani deger gelen parametreydi. Ikinci parametreyi imzaya ekleyip cagriya iletmek 8 bayt farki sifirladi. Once `FUN_08060db4(void)` -> arguman eklemek 16'dan 8'e indirmisti |
 | 40 | ROM kisa omurlu ara degerleri **scratch register**'da (r0-r3) tutuyorsa, kaynakta da **blok kapsamli ayri gecici** kullanilmali; tek bir yeniden kullanilan yerel onlari callee-saved'e itiyor | `ClipBounds`ta ROM `push {r4,r5,lr}` uretirken bizimki `push {r4,r5,r6,lr}` uretiyordu: tek `cand` degiskeni tum fonksiyon boyunca yasayip r2'yi tutuyor, ROM ise `pad` oldugunde onun register'ini yeniden kullaniyor. Her bileseni `{ s32 cand = ...; if (...) ...; }` bloguna almak alti bagimsiz kisa omurlu gecici uretti. Ayrica tekrarlanan bellek okumalari dar volatile gorunumden yapilmali; derleyici aksi halde ortak alt ifade olarak onbellege alip omru uzatiyor (96 bayt -> ROM'un 100 bayti). Ikisi birlikte 26 farki 0'a indirdi. UYARI: teknik ISLEVSEL DEGIL, YEREL -- ayni hamle CleanupAreaTiles'i 7'den 85'e kotulestirdi, SetBg1Enable'i degistirmedi |
+
+## Register dagitimi: kontrollu deneyle olculdu
+
+Bu tablo tahmin degil, kurulu `old_agbcc` ikilisi uzerinde yapilan
+kontrollu deneylerin sonucudur (probe: her varyant derlenip prolog `push`
+listesi okundu). Uc park dosyasinin ve 372 baytlik olceklendirme
+denemesinin ortak engeli buydu.
+
+### Yaprak fonksiyon (cagri YOK)
+
+| ayni anda canli deger | prolog |
+|---|---|
+| 2 | push yok |
+| 3 | push yok |
+| 4 | push yok |
+| 5 | `push {r4, lr}` |
+| 6 | `push {r4, r5, lr}` |
+| 7 | `push {r4, r5, r6, lr}` |
+
+Yani **dorde kadar canli deger `r0`-`r3`'e sigar**; besinci `r4`, altinci
+`r5`, yedinci `r6`.
+
+### Cagri varsa
+
+Cagri `r0`-`r3`'u ezdigi icin cagri boyunca yasayan HER deger
+callee-saved ister:
+
+| cagri boyunca canli | prolog | not |
+|---|---|---|
+| 1 | `push {r4, lr}` | |
+| 2 | `push {r4, r5, lr}` | |
+| 3 | `push {r4, r5, r6, lr}` | |
+| 4+ | `push {r4, r5, r6, lr}` | liste BUYUMEZ, yigina tasar |
+
+Dortte komut sayisi 13'ten 20'ye firliyor: r7'ye gecmek yerine spill
+ediyor. **`r7` ancak 7+ canli degerde geliyor.**
+
+### Etkisi olmayanlar (olculdu)
+
+- **Cagri SAYISI**: 3 canli deger, 1/2/3 cagri -> hepsi `{r4,r5,r6}`.
+- **Isaretci mi skaler mi**: 4 deger, ikisi de `{r4,r5,r6}`.
+- **Sabitin nerede kuruldugu**: dongu icinde/disinda/dogrudan -> ayni kod.
+  agbcc sabiti hoist ediyor.
+- **Kopya**: `w = v` HIC yasamiyor. Tek yerel, kopyali iki yerel ve
+  ikisi de sabitten kurulan iki yerel -> ucu de AYNI kod. Kural 37'nin
+  ("tabani ayri yerele al") sinirı budur: ayri isim vermek kopya
+  URETMEZ, ancak degerin iki farkli KULLANIM YERI varsa uretir.
+
+### Nasil kullanilir
+
+ROM'un prologu kac callee-saved register istediginizi soyler; oradan
+ROM'un kac canli degeri oldugunu geri hesaplayin ve kaynagi o sayiya
+getirin. Fazladan bir `push` demek fazladan bir canli deger demektir.
+
+UYARI: deger SAYISINI dusurmek gerekir, DEGISTIRMEK degil. CleanupAreaTiles'ta
+sayaci kaldirip yerine bitis isaretcisi koydum -- sayi altida kaldi, prolog
+degismedi ve fark 7'den 60'a cikti.
