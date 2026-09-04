@@ -24,6 +24,16 @@
  * Bildirim sirasi bu fonksiyonda ETKISIZ (uc permutasyon da 7 verdi) --
  * ClearTextArea'nin aksine; oradaki hassasiyet genellenebilir degil.
  *
+ * PERMUTER SONUCU (8.871 yineleme): bizim olcumumuzde KAZANC YOK.
+ * Arac "yeni en iyi skor 45 (50 yerine)" dedi ama uc adayin da bayt farki
+ * 7'de kaldi; yalnizca farkin yeri oynadi (0x1A -> 0x1C). Permuter'in
+ * skoru komut agirlikli bir sezgisel, birebir bayt esitligi degil --
+ * ara skorlara guvenilmez, anlamli olan tek deger 0.
+ * Bulgusu yine de bilgi verdi: `i = 0` yerine ayri bir yerelden
+ * (`start = 0; i = start`) gecmek fark SAYISINI degistirmeden YERINI
+ * oynatiyor, yani sayacin yasam araligi dagitimi gercekten etkiliyor.
+ * Kok neden (bir fazla canli deger) degismedi.
+ *
  * Onceki turda elenenler (fill2 YOKKEN olculmustu, artik gecersiz sayilmali):
  * blogu dongu oncesi yuklemek 61, dolguyu int yapmak 61, satir ici 63.
  *
