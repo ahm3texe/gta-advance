@@ -27,6 +27,15 @@
  *   - DMA kurulumunu iki kez cagrilan inline yardimciya almak: 55-59
  * Bu bicim olculmus yerel optimum.
  *
+ * PERMUTER DE KIRAMADI (decomp-permuter-agbcc, tools/setup_permuter.sh):
+ * 13.917 yinelemede taban skor 205'in ALTINA inilemedi; yalnizca esit
+ * skorlu farkli bicimler uretildi. Toplam kanit: 5040 bildirim
+ * permutasyonu + 18 hedefli elle deneme + 13.917 rastgele deneme.
+ * Artik "henuz bulamadik" degil, OLCULMUS bir duvar. Kaynak duzeyinde
+ * yeniden duzenlemeyle ulasilabilir gorunmuyor; cozum muhtemelen baska
+ * bir yerde (orn. fonksiyonun ait oldugu gercek ceviri biriminin
+ * bilinmesi, ya da henuz olcmedigimiz bir agbcc davranisi).
+ *
  * ENGEL DAHA KESIN TANIMLANDI (kural 35-38 turevleri denendi): sorun "olu
  * okumanin register'i" DEGIL. Ciplak okuma + control'u UC DEYIMDE hesaplamak
  * 0x62'yi TAM OLARAK duzeltiyor (olu okuma r0'a dusuyor) ama farki 0x38/0x3a'ya
