@@ -1,19 +1,17 @@
-/* CallWithOffset — 0x080509C4-0x080509DB
+/* Anchor +0x38 <= 15 sorgusu — 0x08050A34-0x08050A47
  *
- * Uc kucuk fonksiyon. Struct'in +0x10'undaki bir tabana offset ekleyip
- * FUN_080504B4 cagirici; +0x10 okuyucu; +0x2C yazici.
+ * Karsilastirma SIGNED (`ble`), bu yuzden alan s32 olarak okunuyor.
+ * tools/find_predicates.py ile bulundu.
  *
- * BYTE-MATCHING. ROM `pop {r0}; bx r0` ile cagrilan fonksiyonun r0
- * sonucunu eziyor; bu sarmalayicinin donus tipi u32 degil void. Dogru
- * imza epilogu ve tum register dagitimini birebir uretiyor.
- *
- * Eslesen kardesler: src/world/gRam02030330_gets.c
+ * Anchor tanimi src/world/anchor_reset.c ile BIREBIR AYNI tutulmali.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/offset_helpers.c
+ * Dogrulama:  make c-match FILE=src/world/is_anchor_small.c
  */
 
 #include "gba_types.h"
+
+#define SMALL_LIMIT 15
 
 typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
@@ -35,13 +33,10 @@ typedef struct Anchor {
 
 extern Anchor gRam02030330;
 
-extern u32 FUN_080504b4(u32 addr);
-
-/* 0x080509C4 */
-void CallWithOffset(u32 offset)
+/* 0x08050A34 */
+u32 IsAnchorSmall(void)
 {
-    u32 addr;
-
-    addr = gRam02030330.base + offset;
-    FUN_080504b4(addr);
+    if ((s32)gRam02030330.unk38 <= SMALL_LIMIT)
+        return 1;
+    return 0;
 }

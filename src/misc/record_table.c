@@ -18,7 +18,13 @@ typedef struct {
     u8  unk0C[48];
 } Record;                      /* 60 byte */
 
-extern u32    gRecordIndex;
+typedef struct RecordBlock {
+    u32 index;                  /* +0x00 */
+    u8  pad04[8];
+    u32 state;                  /* +0x0C */
+} RecordBlock;
+
+extern RecordBlock gRecordIndex;
 extern Record gRecords[];
 
 /* 0x080514C8 */
@@ -26,7 +32,7 @@ u32 GetRecordUnk04(void)
 {
     /* Yerel isaretci sart: dogrudan gRecords[i].unk04 yazilirsa agbcc +4'u
      * taban literaline katliyor, ROM ise yukleme ofsetinde birakiyor. */
-    Record *record = &gRecords[gRecordIndex];
+    Record *record = &gRecords[gRecordIndex.index];
 
     return record->unk04 << 16;
 }
@@ -34,7 +40,7 @@ u32 GetRecordUnk04(void)
 /* 0x080514E4 */
 u32 GetRecordUnk08(void)
 {
-    Record *record = &gRecords[gRecordIndex];
+    Record *record = &gRecords[gRecordIndex.index];
 
     return record->unk08 << 16;
 }

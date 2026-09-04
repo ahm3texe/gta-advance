@@ -1220,7 +1220,7 @@ address,name,size,status,module,notes
 0x080509F4,GetAnchorUnk30,12,matching,world,cagri hedefi kesin: DOGRULANMIS bir iletme sarmalayicisinin gercek bl komutu buraya gidiyor; govde tam 12 baytlik yaprak erisimci; havuzu komsulariyla ayni sembole (0x02030330) isaret ediyor; bosluga birebir oturuyor
 0x08050A00,GetAnchorUnk34,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08050A0C,FUN_08050a0c,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08050A34,FUN_08050a34,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x08050A34,IsAnchorSmall,20,matching,world,"kosullu sabit donus; tools/find_predicates.py ile bulundu, C'den byte-matching"
 0x08050A48,FUN_08050a48,68,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08050A8C,FUN_08050a8c,754,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08050D80,FUN_08050d80,680,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1240,7 +1240,7 @@ address,name,size,status,module,notes
 0x08051464,FUN_08051464,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
 0x08051470,FUN_08051470,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08051480,FUN_08051480,10,matching,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805148C,IsStateReady,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x0805148C,IsStateReady,20,matching,world,"kosullu sabit donus; tools/find_predicates.py ile bulundu, C'den byte-matching"
 0x080514C8,GetRecordUnk04,28,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080514E4,GetRecordUnk08,28,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08051500,GetRecord,20,matching,misc,Returns the address of a 60-byte record boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

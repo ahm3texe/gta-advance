@@ -31,6 +31,7 @@ typedef struct Anchor {
     u32 slot;                   /* +0x2C */
     u32 unk30;                  /* +0x30 */
     u32 unk34;                  /* +0x34 */
+    u32 unk38;                  /* +0x38 */
 } Anchor;
 
 extern Anchor gRam02030330;
