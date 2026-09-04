@@ -354,8 +354,21 @@ ILK OLCUM SASIRTICI: CleanupAreaTiles'ta 12 pseudo-register ve 5 spill
 var; ben alti canli deger sayiyordum. Kaynaktaki her yerel birden fazla
 pseudo'ya aciliyor, bu yuzden elle saymak yaniltiyordu.
 
-KARSILASTIRMA OLCUTU SPILL SAYISI: eslesen EngageActor da 12 pseudo
-tasiyor ama 3 spill; CleanupAreaTiles 12 pseudo / 5 spill. Yani hedef
-pseudo sayisini degil SPILL sayisini dusurmek. Uc varyant denendi
-(fill2 kaldirmak 11/5, block satir ici 12/5, dongu acmak 8/8) -- hicbiri
-spill'i dusurmedi.
+SPILL SAYISI OLCUT DEGIL -- 285 fonksiyonda olculdu ve hipotez CURUDU:
+
+    eslesen 277 fonksiyon : spill ort 3.85, MAX 170, %43'u sifir spill
+    eslesmeyen 8 fonksiyon: spill ort 19.75, max 99, %12'si sifir spill
+
+Eslesen fonksiyonlarda 170 spill'e kadar ornek var; yani yuksek spill
+eslesmeyi ENGELLEMIYOR. Tersi de dogru: EitherInRange 3 pseudo ve SIFIR
+spill tasiyor ama hala 8 bayt farkli (onun engeli karsilastirma sabiti
+kanonikleştirmesi, dagitimla ilgisi yok). HalvesEqual 1 pseudo/2 spill,
+yine eslesmiyor.
+
+Yani `dump_alloc.py` bir fonksiyonun KENDI varyantlarini karsilastirmak
+icin gecerli bir olcut (A bicimi B bicimine gore kac pseudo/spill
+uretiyor), ama fonksiyonlar ARASI bir esik yok. "Spill'i su sayinin
+altina indir" diye bir hedef kurulamaz.
+
+Eslesmeyenlerin pseudo ortalamasi yuksek (34.4 vs 7.0) ama bu yaniltici:
+o sekiz fonksiyon zaten bilerek secilmis en zor ornekler.
