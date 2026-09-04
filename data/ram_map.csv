@@ -17,7 +17,7 @@ address,size,name,source,status,notes
 0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
 0x02000D18,4,gRam02000D18,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
-0x02000D50,4,gSaveBuffer,decomp,provisional,Working buffer used by the save manager
+0x02000D50,10,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager; +8 ve +9 SaveBufferCopy8To9 tarafindan kullaniliyor (byte-matching kanit), yani boyut en az 10"
 0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
 0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
 0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
@@ -95,7 +95,7 @@ address,size,name,source,status,notes
 0x02030308,4,gRam02030308,decomp,provisional,0x08050190 karsilastirmasi
 0x02030324,4,gRam02030324,decomp,provisional,0x080501AC karsilastirmasi
 0x02030328,4,gRam02030328,decomp,provisional,0x0806262C icinde sifir kontrolu
-0x02030330,16,gRam02030330,decomp,provisional,"+0x10'da bir offset, +0x2C'de yaz alani; boyut 64->16 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
+0x02030330,20,gRam02030330,decomp,provisional,"+0x10 GetSlotUnk10 tarafindan okunuyor (byte-matching kanit), yani boyut en az 20; +0x2C'de yaz alani. Ust sinir bilinmiyor."
 0x02030340,1,wanted_level_true,libretro_cheat,provisional,
 0x020303D0,4,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
 0x02030C10,320,gSlotIds,decomp,provisional,160 adet u16 yuva kimligi; 0x7FEF bos demek

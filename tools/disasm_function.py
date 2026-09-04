@@ -45,6 +45,13 @@ def main() -> None:
 
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         rows = {r["name"]: r for r in csv.DictReader(handle)}
+    # Ad ya da adres kabul edilir; adres yazimi buyuk/kucuk harf farketmez.
+    if target not in rows:
+        want = target.lower()
+        if want.startswith("0x"):
+            byaddr = {r["address"].lower(): r for r in rows.values()}
+            if want in byaddr:
+                target = byaddr[want]["name"]
     if target not in rows:
         sys.exit(f"{target} data/functions.csv icinde yok")
 

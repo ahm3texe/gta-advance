@@ -48,8 +48,10 @@ start,end,binary,module,notes
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
+0x080320C8,0x080320D4,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
+0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
 0x080381F8,0x08038234,build/world/object_query.bin,world,ProbeObject; varsayılan parametrelerle nesne sınaması
 0x08038234,0x0803824C,build/world/submit_object.bin,world,Nesne gonderme sarmalayicisi
@@ -69,6 +71,7 @@ start,end,binary,module,notes
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050958,build/world/anchor_reset.bin,world,Anchor sifirlama
+0x08050994,0x080509A0,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getirici
 0x080509C4,0x080509DC,build/world/offset_helpers.bin,world,CallWithOffset; void ofsetli çağrı sarmalayıcısı
 0x080509DC,0x080509F4,build/world/gRam02030330_gets.bin,world,gRam02030330.base okuma / slot yazma
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
