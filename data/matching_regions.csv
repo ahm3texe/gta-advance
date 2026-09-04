@@ -44,10 +44,12 @@ start,end,binary,module,notes
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
+0x08030860,0x08030874,build/world/clear_bg1_enable.bin,world,DISPCNT bit 9 temizleme
 0x08030874,0x08030884,build/world/forward_with_zero.bin,world,sifir arguman ekleyerek iletme
 0x08030884,0x080308A0,build/world/notify_if_ready.bin,world,nesne hazirsa FUN_0802B2B4 bildirimi
 0x080308A0,0x080308AC,build/world/slot_release.bin,world,Yuva serbest birakma cagricisi
 0x080308AC,0x080308EC,build/world/release_slot.bin,world,ReleaseSlot; iki tabanlı yuva serbest bırakma
+0x08030C28,0x08030C4C,build/world/zero_two_blocks.bin,world,iki bayrak blogunu Memset ile sifirlama
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
@@ -58,6 +60,7 @@ start,end,binary,module,notes
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
+0x08038000,0x08038020,build/world/clear_flag_notify.bin,world,bayrak temizleyip bos ise bildirme
 0x080381F8,0x08038234,build/world/object_query.bin,world,ProbeObject; varsayılan parametrelerle nesne sınaması
 0x08038234,0x0803824C,build/world/submit_object.bin,world,Nesne gonderme sarmalayicisi
 0x0803824C,0x08038260,build/world/get_inner_id.bin,world,GetInnerId; iki halkalı iç nesne kimliği
@@ -65,6 +68,7 @@ start,end,binary,module,notes
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Dort nesne yardimcisi: devretme, bayrak sorgusu, guncelleme zinciri, varsayilanli kimlik"
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu
 0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Yuva menzili + varsayilan sabit
+0x0803C45C,0x0803C47C,build/world/select_word_source.bin,world,kaynak secip yarim soz okuma
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Uc yuva secici; SlotCD ve GetSubValue ortak kuyrukta birlesiyor
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Bes yuva sorgusu: sabit, aktif yuva, olcek adimi, hedef isaretleme"
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers

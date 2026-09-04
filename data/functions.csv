@@ -638,7 +638,7 @@ address,name,size,status,module,notes
 0x08030458,FUN_08030458,624,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080306C8,FUN_080306c8,384,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803084C,FUN_0803084c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030860,FUN_08030860,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08030860,ClearBg1Enable,20,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08030874,ForwardWithZero,14,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08030884,NotifyIfReady,28,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x080308A0,ReleaseAllSlots,10,matching,world,Yuva serbest; src/world/slot_release.c
@@ -660,7 +660,7 @@ address,name,size,status,module,notes
 0x08030B88,FUN_08030b88,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08030BE8,FUN_08030be8,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x08030C0C,FUN_08030c0c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030C28,FUN_08030c28,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08030C28,ZeroTwoBlocks,36,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08030C4C,IsAreaFlagSet,52,matching,world,Alan bayraklari; src/world/area_flags.c
 0x08030C80,SetAreaFlag,48,matching,world,Alan bayraklari; src/world/area_flags.c
 0x08030CB0,AreaFlagsNoop,2,matching,world,Alan bayraklari; src/world/area_flags.c
@@ -888,7 +888,7 @@ address,name,size,status,module,notes
 0x08037FC4,GetPoolC,12,matching,world,Havuz getirici / isaretleme; src/world/pool_gets.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08037FD0,GetPoolD,12,matching,world,Havuz getirici / isaretleme; src/world/pool_gets.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08037FDC,MarkAndClear,34,matching,world,Havuz getirici / isaretleme; src/world/pool_gets.c
-0x08038000,FUN_08038000,32,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x08038000,ClearFlagNotify,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08038020,FUN_08038020,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038044,FUN_08038044,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08038060,FUN_08038060,34,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -957,7 +957,7 @@ address,name,size,status,module,notes
 0x0803C37C,FUN_0803c37c,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C3D4,FUN_0803c3d4,44,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x0803C400,FUN_0803c400,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C45C,FUN_0803c45c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C45C,SelectWordSource,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x0803C49C,SelectSlotAB,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C4B8,SelectSlotCD,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C4D4,GetSubValue,52,matching,world,Yuva secici; src/world/slot_selectors.c
