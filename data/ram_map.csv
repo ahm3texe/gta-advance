@@ -23,7 +23,7 @@ address,size,name,source,status,notes
 0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
 0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
 0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
-0x02000EBC,4,gPostFrameState,decomp,provisional,State written after the frame completes
+0x02000EBC,4,gPostFrameState,decomp,provisional,"State written after the frame completes  IZLEME (oturum 7): f25741de 0 -> 1, arac surerken (A basili)."
 0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
 0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
 0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
@@ -40,7 +40,7 @@ address,size,name,source,status,notes
 0x020010E4,2,car_weapon_id,libretro_cheat,provisional,
 0x020010E6,1,car_weapon_ammo,libretro_cheat,provisional,
 0x02001130,4,gState3,decomp,provisional,Unidentified state word
-0x02001140,36,gRam02001140,decomp,provisional,"Referenced by a block queued for matching; role unknown; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan"
+0x02001140,36,gRam02001140,decomp,provisional,"Referenced by a block queued for matching; role unknown; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan  IZLEME (oturum 7): gRam02000F10 ile PARALEL yapi. Yeni oyunda f22512de ikisinin de +0x04 alani 2, +0x10 alani 6553600 oldu -- ayni kare, ayni degerler. Ikinci oyuncu/varlik yuvasi."
 0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems  IZLEME: acilista f4te 0->5 (dil ekraninda 5 secenek), oyun baslayinca f1068de 5->0."
 0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
 0x02001210,4,gMenuPaletteSource,decomp,provisional,"Palette data DMA-ed into palette RAM by InitMenuScreen  IZLEME: degerler BGR555 renk (0x7C1F macenta, 0x7FFF beyaz) -- ISARETCI DEGIL, palet tamponu. u32 olarak okunmamali."
@@ -104,14 +104,14 @@ address,size,name,source,status,notes
 0x0202F3D0,4,gRam0202F3D0,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
-0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi  IZLEME (oturum 6): +0x0C alani olumden ~88 kare sonra 6 -> 0 -> 7 adimladi; gorev iptali bu sirada oldu. Gorev/oyun durum makinesi adayi; DOGRULANMADI."
+0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi  IZLEME (oturum 6): +0x0C alani olumden ~88 kare sonra 6 -> 0 -> 7 adimladi; gorev iptali bu sirada oldu. Gorev/oyun durum makinesi adayi; DOGRULANMADI.  IZLEME (oturum 7): +0x10..+0x24 ve +0x28..+0x34 iki dizi tutuyor; degerler tam 65536 (16.16 sabit noktada 1.000) araliklarla ilerliyor. Konum/izgara tablosu gorunumunde."
 0x020302E0,4,gRam020302E0,decomp,provisional,"0x08050190 karsilastirmasi  IZLEME: SADECE araba turunda degisti (f3815, 2 kez). Arac sistemine ait olabilir."
 0x02030304,4,gRam02030304,decomp,provisional,0x080501AC karsilastirmasi
 0x02030308,4,gRam02030308,decomp,provisional,0x08050190 karsilastirmasi
 0x02030324,4,gRam02030324,decomp,provisional,0x080501AC karsilastirmasi
 0x02030328,4,gRam02030328,decomp,provisional,0x0806262C icinde sifir kontrolu  IZLEME (oturum 6): olumden 4 kare sonra 0 -> 0x020303C4 (EWRAM isaretcisi) yazildi. Olum/yeniden dogus yolunda kurulan bir baglam olabilir; DOGRULANMADI.
-0x02030330,60,gRam02030330,decomp,provisional,"+0x10 GetSlotUnk10 tarafindan okunuyor (byte-matching kanit), yani boyut en az 20; +0x2C'de yaz alani. Ust sinir bilinmiyor.  CAKISMA (bu turda tespit, dogrulanmadi): boyut 60 ise 0x0203036Cye kadar uzaniyor ama wanted_level_true 0x02030340ta basliyor. Ikisinden biri yanlis; wanted_level_true libretro_cheat kaynakli (dogrulanmamis), 60 degeri de olculmedi. ELLE INCELENMELI."
-0x02030340,1,wanted_level_true,libretro_cheat,provisional,
+0x02030330,60,gRam02030330,decomp,provisional,"+0x10 GetSlotUnk10 tarafindan okunuyor (byte-matching kanit), yani boyut en az 20; +0x2C'de yaz alani. Ust sinir bilinmiyor.  IZLEME (gorev oturumu, oturum 7): CAKISMA COZULDU. +0x0C, +0x18 ve +0x1C alanlarina yazildi (f22512/f22544), yani blok en az 0x02030350ye uzaniyor. wanted_level_true (0x02030340) AYRI NESNE DEGIL, bu blogun +0x10 alani. Boyut 60 dogru; kayit hatasi wanted_level_trueda."
+0x02030340,1,wanted_level_true,libretro_cheat,provisional,IZLEME (oturum 7): AYRI NESNE DEGIL -- gRam02030330 blogunun +0x10 alani. Kaynak libretro_cheat buyuk bir yapinin ic alaninin adresini vermis. Onceden isaretlenen gRam02030330 cakismasi bu yuzden GERCEK DEGIL.
 0x020303D0,16,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
 0x02030C00,4,gRam02030C00,decomp,provisional,0x08052C68 maske kapisi anahtari olarak okuyor.
 0x02030C10,320,gSlotIds,decomp,provisional,160 adet u16 yuva kimligi; 0x7FEF bos demek  IZLEME: yeni oyun + 1. yuva seciminde f1068de 0->42.
