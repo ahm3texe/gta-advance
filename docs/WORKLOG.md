@@ -761,3 +761,55 @@ carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
   fonksiyonluk toolchain corpus, sınır denetimi, dashboard lint ve production
   build temiz. Hibrit ROM SHA-1'i değişmedi:
   `06230842626da504f92396074f7c655e100f5d44`.
+
+## 2026-09-05 — Calisma zamani izleme, dil sistemi, ARM kipi
+
+Uzun oturum; uc ayri is kolu.  Sonuc: 298 -> 356 fonksiyon, %3.21 -> %4.27.
+
+### 1. mGBA izleyici ve oyun oturumlari
+`tools/make_trace_script.py` -> `tools/trace.lua`: her karede 322 RAM
+sembolunu okuyup degisenleri tus durumuyla logluyor.  Kullanici sekiz
+oturum oynadi (acilis, araba, hareketsiz, hasar/olum, dil ekrani, gorev,
+tutuklanma).  Cozumleme: `tools/analyze_trace.py --list / --session N`.
+
+Kesin sonuclar (hepsi ram_map.csv'de `verified`):
+- `gSessionPtr` -> `gRam02000F10`; `+0x10` alani CANIN 16.16 hali
+  (yeni oyunda 100.0, yumrukta -4.0, olumde 0).  `player_health` kopyasi.
+- `gLanguage`: 0=ing, 1=isp, 2=fra, 3=ita, 4=alm.  `SetLanguage` imlec
+  hareketinde cagriliyor (canli onizleme).
+- `gRam02030330` = aranma/polis blogu, alan haritasi cikti;
+  `wanted_level_true` onun +0x10 alani (cakisma degil, kayit hatasiydi).
+- `mission_timer` gercekten zamanlayici -- "mesafe" iddiam CURUTULDU.
+- Metin tablosu: 618 dize x 5 dil, dilim k = dil k, kodlama LATIN-1.
+
+Aracin iki kusuru bulunup duzeltildi: acilista dogrulama (`emu` hazir
+degilken tum liste bosaliyordu) ve cift yukleme (iki ornek ayni loga
+yaziyordu; artan sayacli koruma eklendi).
+
+### 2. Hasat
+Iki workflow turu (10 + 13 ajan): 21 eslesme.  Solo: 12 eslesme.
+Birlestirmede ajan raporlarinda gorunmeyen dort sorun yakalandi:
+`asm(".equ")` kacamagi, tip cakismasi (ortak baslik `node_list.h` ile
+cozuldu), ciplak adres, durum kaymasi.  `tools/rename_symbol.py` yazildi
+(adlandirma bir oturumda dort kez extern kirmisti).
+
+Olcum: park edilmis "zor sinif" 14 fonksiyon / 3708 bayt / %0.82 --
+darbogaz DEGIL.  512+ bandindaki 220 fonksiyon ROM'un %54'unu tutuyor;
+yuzde oradan gelecek.
+
+### 3. ARM kipi
+Derleme zinciri yalnizca Thumb'a bagliydi; `agbcc_arm` bastan beri
+duruyordu.  Baglandi (`KIP: ARM` isareti, `.align 4`).  Bayrak kesfi:
+`-fomit-frame-pointer -fno-schedule-insns -fno-schedule-insns2` ilk
+adayda 244 -> 188 bayt.  Barrel-shifter kaynasmalari C'den uretiliyor
+(olculdu), bolge ulasilabilir.
+
+YAPISAL SINIR: agbcc_arm her zaman 8 yazmac ({r4-r9,sl,lr}) itiyor,
+fp/ip'yi dagitima sokmuyor; ROM 11 itiyor.  Dokuz bayrak denendi,
+hicbiri kumeyi genisletmedi.  Ilk aday 0x0806A77C: 171/196, park.
+ARM bolgesi (14920 bayt) bu yapilandirmayla eslesmeye kapali gorunuyor.
+
+### Pano
+Unit (kaynak dosyasi) gruplamasi eklendi; bilinmeyen bolgeler adres
+araligiyla gosteriliyor.  Bitisiklikle modul cikarimi denendi ve GERI
+ALINDI: decomp yakinsaminda modul tahmin edilmez, decomp edilen dosyadir.
