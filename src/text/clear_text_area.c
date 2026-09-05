@@ -67,6 +67,14 @@
  * "cozebilecek" bir cekictir. Yine de bir bilgi veriyor: ROM'un r4 secimi
  * ulasilabilir, yani sorun dogal C'de o secimi tetikleyecek bicimi bulmak.
  *
+ * PERMUTER SONUCU (2026-09-05): decomp-permuter 24368 iterasyon kostu ve
+ * taban skorundan (5) BIR KEZ BILE iyilesmedi.  Tek baytlik fark yazmac
+ * dagitimi artefakti; permuter'in yerel kaynak mutasyonlari agbcc'nin
+ * dagitim kararini bu yonde oynatmiyor.  Arama uzayinin DISINDA -- daha
+ * uzun kosturmak duz zemini daha cok taramak demek.  Kurulum hazir:
+ *   python3 tools/make_permuter_dir.py src/text/clear_text_area.c \
+ *       ClearTextArea 0x08064590 132
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
  */
