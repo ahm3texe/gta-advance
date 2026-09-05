@@ -296,6 +296,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08053D48,StepNodeLists,src/core/nodelist_c4.c,176,176,yes
 0x080543D0,FUN_080543d0,src/core/nodelist_a1.c,126,126,no
 0x08054450,BuildNodeFreeLists,src/core/nodelist_d4.c,288,288,yes
+0x08054744,FUN_08054744,src/core/nodelist_a2.c,164,164,no
 0x080547E8,FindOrRecycleNode,src/core/nodelist_c1.c,136,136,yes
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes

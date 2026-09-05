@@ -457,6 +457,23 @@ ROM'da `beq` (ya da tersi) görüyorsanız blok sıranız terstir.
 döngüyü döndürmeye (`b` ile alttaki teste atlama) itti. ROM'un giriş
 koruması + alttan dönen biçimi için `break` yerine açık `goto` yazın.
 
+**AYNI AILEDEKI FONKSIYONLAR AYNI DONGU BICIMINI KULLANMAYABILIR.**
+`FUN_080543D0` ve `FUN_08054744` neredeyse ikiz (ikisi de sıralı listede
+kimlik arayıp yedek düğümü kuruyor) ama ROM'da farklı derlenmişler:
+
+| | ROM'un biçimi | doğru yazım |
+|---|---|---|
+| FUN_080543D0 | giriş koruması + alttan dönen do/while | `if (cur == 0) goto ...` + `goto scan` |
+| FUN_08054744 | döndürülmüş `for` (`b` ile teste atlama) | `goto test;` + `step:` / `test:` |
+
+`FUN_08054744`'te düz `for` yazmak agbcc'ye ilk turu **soydurdu** (kimlik
+karşılaştırması çıktıda iki kez); 176/164 bayt, 12 fazla. Açık atlamalarla
+ROM'un biçimini yazınca boyut tuttu ve fark 162'den 107'ye indi.
+
+Ders: kardeş dosyanın döngü biçimini KOPYALAMAYIN, her fonksiyonun biçimini
+ROM'dan okuyun. Struct'lar ve çağrılan imzaları paylaşılabilir, kontrol
+akışı paylaşılamaz.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
