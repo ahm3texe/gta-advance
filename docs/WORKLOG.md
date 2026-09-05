@@ -722,3 +722,42 @@ carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
   r3/r4 takasını düzeltti; fonksiyon 64/64 bayt eşleşti.
 - `0x080308AC–0x080308EC` kalıcı matching zincirine eklendi ve desen
   `COMPILER.md` kural 41 olarak kaydedildi.
+
+## 2026-09-05 — Sprite havuzu: beş ek C eşleşmesi
+
+| Fonksiyon | Adres | Eşleşen fonksiyon baytı |
+|---|---|---:|
+| SortSpriteList | 0x08012A00 | 152 |
+| InitSpritePool | 0x08012B20 | 124 |
+| FlushSpriteList | 0x08012B9C | 112 |
+| SortActiveSprites | 0x08012C54 | 32 |
+| InsertSpriteSorted | 0x08012C74 | 98 |
+
+- `FlushSpriteList`in 9 baytlık zamanlama farkını ileri sayan
+  `for (i = count; i < left; i++)` kapattı. agbcc'nin ürettiği azalan
+  sayaç, çıkarma işlemini sabit kurulumlarından sonra yerleştiriyor.
+  `InitSpritePool`da `i++, node++` sırası da kalan 4 baytlık farkı kapattı.
+  İki deney `COMPILER.md` kuralları 42–43 olarak kaydedildi.
+- Sıralı eklemenin aynı doğal C gövdesi hem bağımsız fonksiyonda hem
+  `SortSpriteList` döngüsüne inline açıldığında ROM'u birebir üretiyor.
+  Ortak gövde `include/sprite_sort.h` içinde. Etiketli döngü ve ayrı
+  maskelenen yereller 30/98 fark bırakıyordu; yapısal `for` ile doğrudan
+  maskeler birlikte eşleşmeyi sağladı.
+- `include/sprite_pool.h`, 128 × 16 baytlık düğümleri ve üç havuz alanını
+  tek türde topluyor. `+6` baytı sıralamanın ikincil anahtarı;
+  `+7` henüz bilinmiyor. Başlatıcı OAM'in 1024 baytını DMA3 ile sıfırlıyor.
+- Önceki oturumda zaten eşleşmiş `AllocNode` (72 bayt) kayıtlı ROM
+  bölgelerinde yoktu. O da kalıcı build zincirine alındı. Altı yeni bölge
+  toplam **592 bayt**: bu oturumda eşleşen 518 fonksiyon baytı, 2 bayt
+  hizalama ve `AllocNode`un 72 baytı. Yeni kesintisiz sprite aralığı
+  `0x08012B20–0x08012CD8` (bitiş hariç), 440 bayt.
+- `UnlinkToFree` aynı ortak türe taşındı; 53/150 farkı değişmedi.
+  İki dalın `prev` yerelini ayırmak etkisiz, serbest liste için ayrı
+  `next` kullanmak daha kötü çıktı. Fonksiyon matching sayılmadı.
+- C'den eşleşen fonksiyon sayısı 279 → 284; kayıtlı matching kod
+  13.848 → 14.366 bayt (%3,05 → %3,16). Fonksiyon sınırları değiştirilmedi;
+  yeni giriş/sınır eklenmeden mevcut kayıtların kaynakları ve adları açıldı.
+- Doğrulama: `make check-full` geçti. Cache'siz matching build, 23
+  fonksiyonluk toolchain corpus, sınır denetimi, dashboard lint ve production
+  build temiz. Hibrit ROM SHA-1'i değişmedi:
+  `06230842626da504f92396074f7c655e100f5d44`.

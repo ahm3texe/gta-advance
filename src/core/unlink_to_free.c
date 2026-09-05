@@ -1,4 +1,4 @@
-/* Dugumu cikarip serbest listeye alma — 0x08012968-0x08012A03
+/* Dugumu cikarip serbest listeye alma — 0x08012968-0x080129FD
  *
  * Dugumu cift bagli listeden cikariyor, sonra serbest listenin basina
  * ekliyor. Cikarma kesmeler KAPALIYKEN yapiliyor (REG_IME 0 -> 1).
@@ -21,6 +21,10 @@
  * sifir durumunu DUSEREK giriyor, `bne` ile sifir-olmayani atliyor)
  * boyutu tutturdu.
  *
+ * Ortak sprite_pool.h gorunumune gecis byte farkini degistirmedi.
+ * no_next yolunun prev yerelini ayirmak yine 53 fark verdi; serbest
+ * liste icin ayri next yereli 144 bayt / 117 farka geriledi.
+ *
  * Kalan engel TEK bir kaydirma: ROM `node`u r4'te tutuyor, bizimki r3'te
  * (+0x02: `adds r4,r0,#0` vs `adds r3,r0,#0`). Bu kayma fonksiyonun geri
  * kalanina yayiliyor.
@@ -36,26 +40,15 @@
  * Dogrulama:  make c-match FILE=src/core/unlink_to_free.c
  */
 
-#include "gba_types.h"
-
-#define REG_IME   (*(vu16 *)0x04000208)
-#define HEAD_OFF  0x804
-#define FREE_OFF  (0x80 << 4)
-
-typedef struct Node {
-    u8           pad00[8];
-    struct Node *next;          /* +0x08 */
-    struct Node *prev;          /* +0x0C */
-} Node;
-
-extern u8 gNodePool[];
+#include "gba_io.h"
+#include "sprite_pool.h"
 
 /* 0x08012968 */
 void UnlinkToFree(Node *node)
 {
     Node *next;
     Node *prev;
-    u8   *base;
+    NodePool *base;
     Node **slot;
 
     if (node == 0)
@@ -73,13 +66,13 @@ void UnlinkToFree(Node *node)
 
     next->prev = prev;
     node->prev->next = node->next;
-    base = gNodePool;
+    base = &gNodePool;
     goto reenable;
 
 no_prev:
     next->prev = prev;
-    base = gNodePool;
-    *(Node **)(base + HEAD_OFF) = node->next;
+    base = &gNodePool;
+    base->activeHead = node->next;
     goto reenable;
 
 no_next:
@@ -87,12 +80,12 @@ no_next:
     if (prev == 0)
         goto neither;
     prev->next = next;
-    base = gNodePool;
+    base = &gNodePool;
     goto reenable;
 
 neither:
-    base = gNodePool;
-    *(Node **)(base + HEAD_OFF) = prev;
+    base = &gNodePool;
+    base->activeHead = prev;
 
 reenable:
     REG_IME = 1;
@@ -100,7 +93,7 @@ reenable:
     /* SIRA: ROM sifir durumunu DUSEREK giriyor (`bne` ile sifir-olmayani
        atliyor). `if (next != 0)` yazmak `beq` uretip blok sirasini
        ters ceviriyordu. */
-    slot = (Node **)(base + FREE_OFF);
+    slot = &base->freeHead;
     next = *slot;
     if (next == 0) {
         *slot = node;

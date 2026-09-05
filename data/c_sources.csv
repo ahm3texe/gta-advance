@@ -68,9 +68,13 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012924,ListForEachArg,src/core/linked_list.c,32,32,yes
 0x08012944,ForEachNode,src/core/for_each_node.c,36,36,yes
 0x08012968,UnlinkToFree,src/core/unlink_to_free.c,150,150,no
+0x08012A00,SortSpriteList,src/core/sort_sprite_list.c,152,152,yes
 0x08012A98,FUN_08012a98,src/world/wrap_08012a98.c,10,10,yes
-0x08012B9C,FlushSpriteList,src/core/flush_sprite_list.c,112,112,no
+0x08012B20,InitSpritePool,src/core/init_sprite_pool.c,124,124,yes
+0x08012B9C,FlushSpriteList,src/core/flush_sprite_list.c,112,112,yes
 0x08012C0C,AllocNode,src/core/alloc_node.c,72,72,yes
+0x08012C54,SortActiveSprites,src/core/sort_active_sprites.c,32,32,yes
+0x08012C74,InsertSpriteSorted,src/core/insert_sprite_sorted.c,98,98,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
 0x080138F4,FUN_080138f4,src/world/wrap_080138f4.c,10,10,yes
 0x08013900,FlushPaletteQueue,src/core/flush_palette_queue.c,120,116,no

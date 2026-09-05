@@ -113,6 +113,8 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 39 | ROM yalnız belirli bir yazımdan sonra belleği yeniden okuyorsa `volatile`ı **tüm alana değil o erişime** uygula | `*(volatile u16 *)&gSaveBuffer.distance` yalnız taşma kontrolündeki ikinci `ldrh`yi zorladı. Alanı bütünüyle volatile yapmak register baskısını artırıp `AddDistance`ı 53 bayt bozarken dar kullanım fonksiyonu eşleştirdi |
 | 40 | ROM iki dalda ayrı taban yükleyip tek store paylaşıyorsa kontrol akışını **etiketlerle açık kur** | Yapısal `if/else` agbcc tarafından ters çevrilip tabanlar birleştirildi. `reset:`, `increment:` ve `store:` etiketleri `BumpOrReset`ın iki `ldr` + ortak `strb` düzenini üretti; bu, temiz C içinde kabul edilebilir düşük seviye CFG ifadesidir |
 | 41 | Ölçekli ofset birden çok tabanda kullanılacaksa çarpımı **tek atamada**, alan tabanlarını ayrı yerellerde kur | `scaled = index; scaled *= 180` pseudo önceliğini artırıp r3/r4'ü ters çevirdi. `scaled = index * 180` ile `heldBase`/`extraBase` ayrımı `ReleaseSlot`ta ROM'un tek r3 ofset + iki taban desenini üretti |
+| 42 | ROM azalan bir döngü sayacı kullansa da C'de **artan indeksli `for`** denenmeli | `FlushSpriteList`te `for (i = count; i < left; i++)`, agbcc tarafından `left - count` kadar azalan döngüye çevrilir. Derleyicinin ürettiği çıkarma sabit kurulumlarından sonra gelir; elle yazılmış `left -= count` önce geliyordu. Kalan 9 bayt fark kapandı: 112/112 |
+| 43 | Sayaç ve işaretçi birlikte ilerliyorsa **ikisini `for` artırımında, ROM sırasıyla** ifade et | `InitSpritePool`da gövdedeki `node++`, sayaç azaltımından önce geliyordu. `for (...; ...; i++, node++)` biçimi ROM'un sayaç-önce sırasını üretti: 4 bayt fark kapandı, 124/124 |
 
 ## Register dağıtımının mekanizması
 

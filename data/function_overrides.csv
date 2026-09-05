@@ -43,6 +43,12 @@ address,name,size,status,module,notes
 0x08001EA4,ClearMenuVram,,matching,ui,Fills the menu VRAM range through DMA3; exact in menu-graphics block
 0x08001EE4,EnableMenuDisplay,,matching,ui,Writes display control value 0x0101; exact in menu-graphics block
 0x08001EF4,EnableMenuDisplayAlt,,matching,ui,Duplicate display-control wrapper; exact in menu-graphics block
+0x08012A00,SortSpriteList,,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
+0x08012B20,InitSpritePool,,matching,core,128 dugumun serbest listesini kurar; DMA3 ile 1024 bayt OAM sifirlar; src/core/init_sprite_pool.c
+0x08012B9C,FlushSpriteList,,matching,core,Aktif sprite listesini OAM alanina yazar ve onceki karenin fazla yuvalarini gizler; src/core/flush_sprite_list.c
+0x08012C0C,AllocNode,,matching,core,Sprite havuzunun serbest basini aktif listenin basina tasir; src/core/alloc_node.c
+0x08012C54,SortActiveSprites,,matching,core,Aktif sprite listesini kesmeler kapaliyken siralar; src/core/sort_active_sprites.c
+0x08012C74,InsertSpriteSorted,,matching,core,Sprite dugumunu iki anahtara gore kararli siraya ekler; src/core/insert_sprite_sorted.c
 0x08032058,IsEntityFlagSet,50,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c

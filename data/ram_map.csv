@@ -54,7 +54,7 @@ address,size,name,source,status,notes
 0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev  IZLEME: f1508de gNodePool ile ayni karede aktiflesiyor."
 0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor
 0x0201AEE8,4,gRam0201AEE8,decomp,provisional,0x0801D7FC ile yazilan isaretci
-0x0201CEC0,2060,gNodePool,decomp,provisional,"dugum havuzu; +0x800 serbest liste basi, +0x804 aktif liste basi (byte-matching kanit)  IZLEME: f1508de aktiflesiyor -- oyun dunyasi/NPCler dogdugu an. Bagli liste sistemi burada devreye giriyor.  OLCULDU(FlushSpriteList): +0x800 bos liste basi, +0x804 aktif liste basi, +0x808 onceki kare sprite sayaci. Boyut 2056 -> 2060 duzeltildi."
+0x0201CEC0,2060,gNodePool,decomp,provisional,"dugum havuzu; +0x800 serbest liste basi, +0x804 aktif liste basi (byte-matching kanit)  IZLEME: f1508de aktiflesiyor -- oyun dunyasi/NPCler dogdugu an. Bagli liste sistemi burada devreye giriyor.  OLCULDU(FlushSpriteList): +0x800 bos liste basi, +0x804 aktif liste basi, +0x808 onceki kare sprite sayaci. Boyut 2056 -> 2060 duzeltildi.  C KANITI: InitSpritePool 128 x 16 baytlik serbest listeyi kuruyor; InsertSpriteSorted +0/+2/+4 OAM alanlari ve +6 ikincil siralama anahtarini kullaniyor. Ortak tur include/sprite_pool.h."
 0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
 0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"

@@ -270,14 +270,14 @@ address,name,size,status,module,notes
 0x08012924,ListForEachArg,32,matching,core,Cift bagli liste; src/core/linked_list.c
 0x08012944,ForEachNode,36,matching,core,C kaynagindan byte-matching; isaretci uzerinden geri cagirma dongusu
 0x08012968,UnlinkToFree,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012A00,FUN_08012a00,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08012A00,SortSpriteList,152,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
 0x08012A98,FUN_08012a98,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x08012AA4,FUN_08012aa4,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012B20,FUN_08012b20,124,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08012B9C,FlushSpriteList,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012C0C,AllocNode,72,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012C54,FUN_08012c54,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012C74,FUN_08012c74,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08012B20,InitSpritePool,124,matching,core,128 dugumun serbest listesini kurar; DMA3 ile 1024 bayt OAM sifirlar; src/core/init_sprite_pool.c
+0x08012B9C,FlushSpriteList,112,matching,core,Aktif sprite listesini OAM alanina yazar ve onceki karenin fazla yuvalarini gizler; src/core/flush_sprite_list.c
+0x08012C0C,AllocNode,72,matching,core,Sprite havuzunun serbest basini aktif listenin basina tasir; src/core/alloc_node.c
+0x08012C54,SortActiveSprites,32,matching,core,Aktif sprite listesini kesmeler kapaliyken siralar; src/core/sort_active_sprites.c
+0x08012C74,InsertSpriteSorted,98,matching,core,Sprite dugumunu iki anahtara gore kararli siraya ekler; src/core/insert_sprite_sorted.c
 0x08012CD8,FUN_08012cd8,320,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08012E18,FUN_08012e18,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08012E78,FUN_08012e78,272,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)

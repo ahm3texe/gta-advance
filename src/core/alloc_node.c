@@ -20,25 +20,8 @@
  * Dogrulama:  make c-match FILE=src/core/alloc_node.c
  */
 
-#include "gba_types.h"
-
-#define REG_IME (*(vu16 *)0x04000208)
-
-#define NODE_COUNT 128
-
-typedef struct Node {
-    u8           pad00[8];
-    struct Node *next;          /* +0x08 */
-    struct Node *prev;          /* +0x0C */
-} Node;
-
-typedef struct NodePool {
-    Node  nodes[NODE_COUNT];    /* +0x000 */
-    Node *freeHead;             /* +0x800 */
-    Node *activeHead;           /* +0x804 */
-} NodePool;
-
-extern NodePool gNodePool;
+#include "gba_io.h"
+#include "sprite_pool.h"
 
 /* 0x08012C0C */
 Node *AllocNode(void)
