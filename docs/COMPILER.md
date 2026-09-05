@@ -279,6 +279,33 @@ kaynakta bir kaldıraç vardı, burada yok. `tools/sweep_variants.py`'nin kapsam
 sınırı notunda yazan "yükleme/saklama yazmaç dağıtımı" sınıfı tam olarak budur.
 Yeni bir mekanizma bulunmadan bu fonksiyonlara dönmeyin.
 
+## Kural 45 — dal başına ayrı yerel değişkenler blok birleşmesini engeller
+
+Uzun `if/else if` zincirlerinde birden çok dalın gövdesi birbirinin aynıysa,
+agbcc onları çapraz atlamayla birleştirir ve bir dalın kodu tamamen kaybolur.
+ROM'da o dallar ayrı fiziksel kopyalar olarak duruyorsa, orijinal kaynakta
+**her dalın kendi yerel değişkenleri** vardır.
+
+`FUN_080260a8`'de (1518 bayt, 12 dallı zincir) ölçüldü. Bütün dallara ortak bir
+`bias`/`shift` çifti verince `case 8`'in gövdesi tümüyle `0x1f`/`0x28` ile
+birleşti: bizde `cmp #8` ile `cmp #30` arası **4 bayt**, ROM'da **156**. Her dala
+üçer ayrı yerel açınca 1312 → 1428 bayt.
+
+**Nasıl fark edilir:** ROM'un yığın gözlerine bakın. Aynı işi yapan iki dal
+farklı `sp` ofsetleri kullanıyorsa (burada `case 8` → `sp+8/12/16`,
+`case 0x1f` → `sp+32/36/40`) yereller ayrıdır. Ghidra bunu zaten doğru
+gösteriyor (`local_48/44/40` ve `local_30/2c/28` gibi ayrı adlar); çıktıdaki
+yerel adlarını "gürültü" diye atmayın, **yapısal bilgi taşıyorlar**.
+
+İkinci bir belirti: ROM'da tekrar eden bir havuz sabitinin kaç kez geçtiğini
+sayın. Burada `0x03FFFFFF` altı ayrı havuz kelimesinde duruyor, yani maskeyi
+kullanan altı fiziksel blok var. Bizim çıktımızda beş çıkması, bir bloğun
+birleştiğinin doğrudan kanıtıydı.
+
+Bayraklarla çözülmez: `-fno-thread-jumps`, `-fno-cse-follow-jumps`,
+`-fno-expensive-optimizations` ve `-O1` denendi, hiçbiri birleşmeyi kaldırmadı.
+Kaldıraç kaynakta, yerel değişken ayrımında.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı

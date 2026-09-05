@@ -129,6 +129,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08023A80,MaskedDiffers,src/world/masked_compare.c,28,28,yes
 0x08023CC4,FUN_08023cc4,src/world/entries_b2.c,300,300,yes
 0x08025424,FUN_08025424,src/world/entries_b1.c,242,242,yes
+0x080260A8,FUN_080260a8,src/world/state_offset.c,1430,1518,no
 0x080289B4,FUN_080289b4,src/misc/empty_stubs.c,2,2,yes
 0x080289B8,FUN_080289b8,src/misc/empty_stubs.c,2,2,yes
 0x08028A88,FUN_08028a88,src/world/entries_a5.c,162,162,yes
