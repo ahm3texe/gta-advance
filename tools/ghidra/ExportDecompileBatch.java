@@ -6,8 +6,13 @@
 //
 // Kullanim (tools/ghidra_headless.sh uzerinden):
 //   -postScript ExportDecompileBatch.java <adres_listesi> <cikti_dizini>
-// Adres listesi satir basina "0xADRES ad" bicimindedir; ad verilmezse
-// Ghidra'nin kendi adi kullanilir.
+// Adres listesi satir basina "0xADRES ad [boyut]" bicimindedir; ad
+// verilmezse Ghidra'nin kendi adi kullanilir.
+//
+// Boyut verilirse ve o adreste fonksiyon yoksa, once THUMB KIPI kuruluyor:
+// Ghidra'nin otomatik analizi bazi girisleri ARM kipinde cozmeye calisip
+// "bad instruction data" ile birakiyor (7 kacirilan giristen 5'i boyleydi).
+// TMode yazmacini 1 yapip bolgeyi temizleyip yeniden sokmek gerekiyor.
 //
 //@category GTAAdvance
 
@@ -21,6 +26,7 @@ import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.listing.Function;
+import ghidra.program.model.symbol.SourceType;
 
 public class ExportDecompileBatch extends GhidraScript {
     @Override
@@ -55,13 +61,41 @@ public class ExportDecompileBatch extends GhidraScript {
                     String addrText = parts[0];
                     try {
                         Address address = toAddr(Long.decode(addrText));
+                        String want = parts.length > 1 ? parts[1] : null;
+
+                        // Boyut verilmisse THUMB ONARIMI kosulsuz yapilir.
+                        // Ghidra bazi girisleri ARM kipinde cozup "bad
+                        // instruction data" ile birakiyor; boyle bir
+                        // fonksiyon ONCEKI kosudan kalmis olabilecegi icin
+                        // "yoksa olustur" yetmez, VARSA DA yeniden kurulur.
+                        if (parts.length > 2) {
+                            int span = Integer.decode(parts[2]);
+                            Address end = address.add(span - 1);
+                            ghidra.program.model.listing.ProgramContext ctx =
+                                currentProgram.getProgramContext();
+                            ghidra.program.model.lang.Register tmode =
+                                ctx.getRegister("TMode");
+                            if (tmode != null) {
+                                removeFunctionAt(address);
+                                clearListing(address, end);
+                                ctx.setValue(tmode, address, end,
+                                    java.math.BigInteger.ONE);
+                                disassemble(address);
+                                println("THUMB ONARILDI " + addrText);
+                            }
+                        }
+
                         Function function = getFunctionAt(address);
                         if (function == null) {
-                            println("ATLANDI (fonksiyon yok): " + addrText);
-                            fail++;
-                            continue;
+                            function = createFunction(address, want);
+                            if (function == null) {
+                                println("ATLANDI (fonksiyon kurulamadi): " + addrText);
+                                fail++;
+                                continue;
+                            }
+                            println("OLUSTURULDU " + addrText);
                         }
-                        String name = parts.length > 1 ? parts[1] : function.getName();
+                        String name = want != null ? want : function.getName();
 
                         DecompileResults result =
                             decompiler.decompileFunction(function, 240, monitor);

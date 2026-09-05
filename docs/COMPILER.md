@@ -328,6 +328,45 @@ global, iç içe döngüler). Metin benzerliği yanlış ölçüt; imza makine k
 block` (bu sinsi — çıktı derli toplu görünür ama bloklar düşmüştür,
 `FUN_0802e3fc` böyleydi), `Bad instruction`, `truncated`.
 
+## Kural 46 — switch'in aralığı, ağaç ile atlama tablosu arasındaki seçimi belirler
+
+agbcc bir `switch`i ya **karşılaştırma ağacına** ya da **atlama tablosuna**
+çevirir; kararı case kümesinin yoğunluğuna göre verir. ROM'da hiç `mov pc,rX`
+yoksa ağaç seçilmiştir ve bizim kaynağımız da ağaç üretmelidir, yoksa boyut
+tutmaz.
+
+`FUN_08017628`'de (1536 bayt, ~40 case) ölçüldü. Case'leri 1..0x97 arasında
+yazınca küme yoğun kaldı ve agbcc atlama tablosu üretti: **1814 bayt** (296
+fazla), 45 karşılaştırma, bir `mov pc,r0`. Ghidra'nın havuz sabiti gibi
+gösterdiği dört büyük değeri (0x4005, 0x4026, 0x4027, 0x4028) case olarak
+ekleyince aralık 1..0x4028'e açıldı, gcc mecburen ağaç üretti: **1510 bayt**,
+92 karşılaştırma (ROM ile birebir), sıfır `mov pc`. Tek değişiklik, 304 bayt.
+
+**Teşhis:** ROM'da ve kendi çıktınızda `mov pc,rX` (0x4687/0x468F/0x4697)
+sayın, sonra `cmp rX,#imm` sayılarını karşılaştırın. Sayılar tutuyorsa ağaç
+şekli doğrudur; sizde `mov pc` varken ROM'da yoksa case kümeniz fazla yoğun,
+uzaktaki case'leri kaçırmışsınızdır.
+
+**Ağaç okunurken tuzak:** bir aralıkta tek case kaldığında gcc eşitlik yerine
+`<` ile ayırır, o yüzden o case ROM'da `cmp` olarak görünmez. `FUN_08017628`'de
+0x0E böyle: ROM'da `cmp #14` yok ama case var, (0x0D, 0x0F) aralığına tek
+değer kaldığı için `< 0x0F` ile ayrılmış. Eksik case sanıp çıkarmayın.
+
+## Ghidra: ARM kipi tuzağı ve yanlış "atlama tablosu" etiketi
+
+Ghidra'nın otomatik analizi bazı Thumb girişlerini **ARM kipinde** çözmeye
+çalışıp `bad instruction data` ile bırakıyor ve o adreste fonksiyon bile
+tanımlamıyor. Bizim sınır tarayıcımızın bulduğu 7 girişten 5'i böyleydi
+(`FUN_08017628` dahil). Çözüm: `TMode` yazmacını 1 yapıp bölgeyi temizleyip
+yeniden sokmak — `tools/ghidra/ExportDecompileBatch.java` bunu boyut verilince
+koşulsuz yapıyor. **Koşulsuz olmalı:** bozuk bir fonksiyon önceki koşudan
+kalmış olabilir, "yoksa oluştur" yetmez. Bu onarım 8.586 baytlık beş
+fonksiyonu okunabilir hale getirdi.
+
+Ayrıca Ghidra `pop {r4,r5,r6}; pop {r0}; bx r0` dizisinin sonundaki `bx r0`ı
+"çözülemeyen atlama tablosu" sanabiliyor. `FUN_08017628`'de öyle oldu; orada
+tablo yok, sadece void dönüşün interworking biçimi var.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı

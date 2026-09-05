@@ -10,6 +10,7 @@
  * linker'daki tek nesne için çelişkili extern C türleri oluşmaz.
  */
 extern u8 gRam02000F10[];
+extern u8 gRam020303C4[];
 extern u8 gRam02001140[];
 extern u8 gRam02025810[];
 
