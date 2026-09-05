@@ -19,6 +19,18 @@ BUILD = ROOT / "build/cmatch"
 
 DEFAULT_CC = "old_agbcc"
 CC1FLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
+
+# ARM kipi.  ROM'un 0x0806xxxx bolgesindeki 18 fonksiyon ARM kipinde ve
+# bunlar simdiye kadar DERLENEMIYORDU: zincir yalnizca Thumb'a bagliydi.
+# Araç zincirinde `agbcc_arm` bastan beri duruyordu.
+# Kaynak dosyada ARM_MARKER satiri varsa bu yol kullanilir.
+ARM_MARKER = "KIP: ARM"
+ARM_CC = "agbcc_arm"
+# `-fhex-asm` agbcc_arm tarafindan TANINMIYOR (olculdu); digerleri kabul.
+# -fomit-frame-pointer OLCULDU: onsuz agbcc_arm APCS cercevesi kuruyor
+# (mov ip,sp / stmfd {fp,ip,lr,pc} / sub fp,ip,#4) ve cikti ~48 bayt
+# uzuyor; ROM duz push kullaniyor.
+ARM_CC1FLAGS = ["-mthumb-interwork", "-O2", "-fomit-frame-pointer"]
 ROM_BASE = 0x08000000
 
 
@@ -76,9 +88,19 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
 
     BUILD.mkdir(parents=True, exist_ok=True)
     stem = BUILD / source.stem
+
+    is_arm = ARM_MARKER in source.read_text(encoding="utf-8")
+    if is_arm:
+        agbcc = AGBCC_DIR / ARM_CC
+        if not agbcc.exists():
+            sys.exit(f"{ARM_CC} kurulu degil. Once: make agbcc")
+        flags = ARM_CC1FLAGS
+    else:
+        flags = CC1FLAGS
+
     run(["cpp", "-nostdinc", "-undef", f"-I{ROOT / 'include'}", str(source)],
         Path(f"{stem}.i"))
-    run([str(agbcc), *CC1FLAGS, "-o", f"{stem}.s", f"{stem}.i"])
+    run([str(agbcc), *flags, "-o", f"{stem}.s", f"{stem}.i"])
     run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
          "-o", f"{stem}.probe.o", f"{stem}.s"])
 
@@ -104,8 +126,12 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
     # Bolum sonu dolgusu: `as` Thumb bolumlerini varsayilan olarak NOP (0x46C0)
     # ile doldurur, ROM ise sifirla dolduruyor. Acik hizalama bunu duzeltir.
+    # ARM komutlari 4 bayt; Thumb 2.  Yanlis hizalama bolum sonunda
+    # fazladan dolgu birakip boyutu kaydiriyor.
+    align = "4" if is_arm else "2"
     Path(f"{stem}.s").write_text(
-        "".join(externs) + source_text + "\n    .align 2, 0\n", encoding="utf-8"
+        "".join(externs) + source_text + f"\n    .align {align}, 0\n",
+        encoding="utf-8",
     )
     run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
          "-o", f"{stem}.o", f"{stem}.s"])
