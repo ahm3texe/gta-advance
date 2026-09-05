@@ -175,3 +175,122 @@ Odak noktasinda karsiligi olmayan ucuncu bilesen:
 
 Gaz basiliyken 164.0'dan 220.0'a buyuyup birakinca geri donuyor.  Hiza gore
 acilan kamera menzili / on-bakis mesafesi gibi duruyor.
+
+---
+
+# Oturum 4-8: hedefli sinamalar
+
+Uc numarali turdan sonra izleme, belirli sorulari kapatmak icin HEDEFLI
+kullanildi.  Her oturum tek bir soruyu sinadi; gurultu bastirma sayaci
+oturum basina sifirlandigi icin ayri ayri kaydedildi.
+
+## Oturum 4 — hareketsiz bekleme
+
+**Soru:** `mission_timer` zaman mi mesafe mi sayiyor?
+
+**Yontem:** oyuncu bir dakika boyunca HICBIR tusa basmadi.
+
+**Sonuc:** 927 olayin sifirinda tus etiketi var; `mission_timer` yine de
+30 kez, her seferinde tam 0x100 artti, aralik 60-65 kare (ort. 63.9).
+
+**AD DOGRU, ONCEKI IDDIA CURUTULDU.**  Daha once "artislar sadece Up
+basiliyken oluyor, demek ki mesafe sayaci" denmisti.  O oturumlarda Up
+SUREKLI basili oldugu icin artislar tusla ayni anda gorunuyordu --
+nedensellik degil rastlanti.  Sinematikteki durus da bir gorev
+zamanlayicisi icin beklenen davranis.
+
+## Oturum 5 — hasar ve olum
+
+**Soru:** `player_health` gercekten canli sagligi mi tutuyor?
+
+**Sonuc:** her yumrukta tam 4 azaldi, 100'den 0'a 25 adim.
+`player_health_copy` 25/25 gecerte AYNI KAREDE ayni degeri aldi.
+
+**Olum zinciri (kare kare):**
+
+| Kare | Olay |
+|------|------|
+| f1794 | can 4->0 **ve ayni karede** `gRam02000F10+0x10` sifirlandi |
+| f1795 | `gNodePool` liste baslari oynadi -- varlik serbest birakildi |
+| f1798 | `gRam02011030+0x0C` temizlendi; `gRam02030328`'e EWRAM isaretcisi yazildi |
+| f1882 | `gRam0202F3E0+0x0C` 6->0->7 adimladi -- gorev iptali |
+
+`gRam02011030`, `UpdateFocusPoint` (0x0800A9E4) fonksiyonunun okudugu
+CoordBlock; yani o park edilmis fonksiyonun hangi veriyle calistigi
+boylece belli oldu.
+
+## Oturum 6-7 — dil ekrani
+
+**Soru:** metin tablosunun bes diliminden hangisi hangi dile ait?
+
+**Sonuc:** imlec asagi gezdikce `gLanguage` 0->1->2->3->4, yukari gezdikce
+geri.  Menu sirasiyla birlestirince: **0=ingilizce, 1=ispanyolca,
+2=fransizca, 3=italyanca, 4=almanca**.
+
+**Davranis:** `SetLanguage` ONAYDA DEGIL, IMLEC HAREKETINDE cagriliyor --
+menu canli onizleme yapiyor.
+
+Ayrinti ve dilim eslemesinin dogrulanmasi: docs/METIN_HARITASI.md.
+
+## Oturum 8 — tutuklanma ve aranma sistemi
+
+En verimli oturum.  Polis arabasina carpma, polis oldurme, silah alma,
+tutuklanma (BUSTED) ve gorev iptali tek kayitta.
+
+### Can aslinda 16.16 sabit noktali
+
+`gRam02000F10+0x10` uc ayri oturumda tutarli cikti:
+
+- yeni oyun: 6553600 = 100 x 65536 = **tam 100.0**
+- tutuklanma: tam **262144 (4.0)** dustu, ayni karede `player_health` 100->96
+- olum: 4.0 -> 0
+
+Yani asil deger burada; `player_health` onun tam sayi kopyasi.
+
+### gRam02030330 = aranma / polis sistemi blogu
+
+| Ofset | Gozlenen davranis |
+|-------|-------------------|
+| +0x08 | durum: aranma baslayinca 0->3->1, tutuklanmada 1->2->0 |
+| +0x0C | esik: aranmada 40->25, temizlenince 25->40 |
+| +0x10 | `wanted_level_true` |
+| +0x18, +0x1C | birlikte azalan iki geri sayim (1800->1770 / 300->270) |
+| +0x20 | aranmada 0->2400, tutuklanmada 2400->0 |
+| +0x28, +0x30 | aranma sirasinda kuruluyor, tutuklanmada sifirlaniyor |
+| +0x34 | tutuklanmada 0->1 |
+| +0x38 | BUSTED ekrani adim sayaci: 0->1->2->3->4->5 |
+
+`wanted_level_display` (0x0202581A) ve `wanted_level_true` (0x02030340)
+AYNI KAREDE ayni degeri aliyor; ikisi ayri adres, biri gosterge kopyasi.
+Ikisinin adi da DOGRU cikti.
+
+### Cozulen kayit hatasi
+
+Daha once `gRam02030330` (boyut 60) ile `wanted_level_true` (0x02030340)
+"cakisiyor" diye isaretlenmisti ve karar verilememisti.  Blogun +0x18 ve
++0x1C alanlarina yazildigi gorulunce anlasildi: cakisma YOK,
+`wanted_level_true` bu blogun **+0x10 alani**.  Cheat veritabani buyuk bir
+yapinin ic alaninin adresini vermis.
+
+## Aracin kendi kusuru: cift yukleme
+
+Bu oturumlarda log'da ayni gecisler IKI farkli kare numarasiyla gorundu
+(ornegin f32645 ve f620, aralarinda sabit 32025 fark).  Sebep: script her
+testten once yeniden yuklendi ama onceki ornekler kapanmadi; mGBA her
+ornegin kare geri cagrisini kayitli tuttu.
+
+Uretece ARTAN SAYACLI koruma eklendi: yeni yukleme `__TRACE_EPOCH`'u
+artiriyor, eski ornek ilk karede kendini kapatiyor.  Ilk yazilan koruma
+BOOLEAN bayrak kullaniyordu ve hataliydi -- ikinci yukleme ayni degeri
+yazdigi icin eski ornek sinamadan gecip calismaya devam ederdi.
+
+## Kapanan / acik kalan sorular
+
+**Kapandi:** mission_timer adi, player_health anlami, canin 16.16 biçimi,
+dil sirasi ve dilim eslemesi, metin kodlamasi (Latin-1), gRam02030330
+cakismasi, wanted_level adlarinin dogrulugu.
+
+**Acik:** `gFontIndex` adi hala supheli (degerler font indeksinden cok
+genislik/konum gibi).  `gGameState` adi desteklenmiyor (0. bayti sayac
+gibi davraniyor).  Kopru altindaki saydamlik efekti izlenemedi -- MMIO
+(REG_BLDCNT / REG_BLDALPHA) bilerek izlenmiyor, ayri bir script gerekir.
