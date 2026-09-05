@@ -27,6 +27,7 @@ Aktif iş yok.
 | BACKUP-001 | P1 | blocked | Özel uzak yedek oluştur | Bütün commit geçmişi kullanıcının seçtiği özel remote'a gönderildi |
 | TOOL-010 | P1 | todo | Yeni harita girisi icin yapisal kapi yaz | Bir aday ancak (a) push prologuyla basliyorsa VE (b) oncesinde fonksiyon bitiren komut (pop{..,pc} / bx lr / kosulsuz b) varsa haritaya eklenebilir; bu sinama split_at_calls'in urettigi 57 sahte girisin 57 sinide yakaladi |
 | MAP-010 | P2 | todo | Bosluk analizinin YALNIZ sifir-riskli 16 ARM girisini uygula | ARM bolgesi bagimsiz olculdu (cond!=0xF orani tam 1.0000); bu 16 giris TOOL-010 kapisindan gecirilerek eklenir. 123 prologsuz Thumb yapragi BILEREK DISARIDA birakilir |
+| ARM-001 | P1 | todo | ARM bolgesindeki 18 fonksiyonu C ile eslestir | ARM kipi derleme zinciri calisir durumda; her aday ROM ile olculur, eslesirse bolge kaydedilir |
 
 ## Araç zinciri kilidi
 
