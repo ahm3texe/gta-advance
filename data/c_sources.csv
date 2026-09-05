@@ -148,6 +148,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030884,NotifyIfReady,src/world/notify_if_ready.c,28,28,yes
 0x080308A0,ReleaseAllSlots,src/world/slot_release.c,10,10,yes
 0x080308AC,ReleaseSlot,src/world/release_slot.c,64,64,yes
+0x08030B60,FUN_08030b60,src/ui/hud_fields.c,40,40,yes
 0x08030BE8,HalvesEqual,src/world/halves_equal.c,24,36,no
 0x08030C0C,LookupThenCall,src/world/lookup_then_call.c,24,24,yes
 0x08030C28,ZeroTwoBlocks,src/world/zero_two_blocks.c,36,36,yes
@@ -155,7 +156,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030C80,SetAreaFlag,src/world/area_flags.c,48,48,yes
 0x08030CB0,AreaFlagsNoop,src/world/area_flags.c,2,2,yes
 0x08030CB4,CleanupAreaTiles,src/world/area_cleanup.c,88,88,no
+0x08030E78,FUN_08030e78,src/ui/hud_fields.c,36,40,no
 0x08030EA0,FUN_08030ea0,src/world/spin_delay.c,10,10,yes
+0x08030F28,FUN_08030f28,src/ui/hud_fields.c,36,40,no
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
 0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
