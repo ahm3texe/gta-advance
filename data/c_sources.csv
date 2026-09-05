@@ -251,6 +251,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080424D8,GetMapSize,src/world/tile_and_map.c,20,20,yes
 0x08042784,FUN_08042784,src/world/wrap_08042784.c,10,10,yes
 0x080428AC,FUN_080428ac,src/world/wrap_080428ac.c,10,10,yes
+0x08045AA4,FUN_08045aa4,src/world/target_near.c,540,540,no
 0x08047600,FUN_08047600,src/world/target_repeat.c,534,534,yes
 0x0804B088,FUN_0804b088,src/world/target_follow.c,564,564,yes
 0x0804FB4C,FUN_0804fb4c,src/world/wrap_0804fb4c.c,10,10,yes
