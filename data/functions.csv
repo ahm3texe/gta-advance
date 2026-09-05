@@ -190,7 +190,7 @@ address,name,size,status,module,notes
 0x0800CFC8,FUN_0800cfc8,334,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800D118,FUN_0800d118,824,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800D450,FUN_0800d450,224,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800D530,FUN_0800d530,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800D530,FUN_0800d530,304,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800D660,FUN_0800d660,676,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800D904,FUN_0800d904,604,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800DB60,FUN_0800db60,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -497,14 +497,14 @@ address,name,size,status,module,notes
 0x08023B24,FUN_08023b24,148,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08023BB8,FUN_08023bb8,132,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08023C3C,FUN_08023c3c,134,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08023CC4,FUN_08023cc4,300,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08023CC4,FUN_08023cc4,300,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08023DF0,FUN_08023df0,596,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08024044,FUN_08024044,328,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802418C,FUN_0802418c,2150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080249F4,FUN_080249f4,740,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08024CD8,FUN_08024cd8,1640,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08025340,FUN_08025340,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08025424,FUN_08025424,242,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08025424,FUN_08025424,242,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08025518,FUN_08025518,458,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080256E4,FUN_080256e4,1330,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08025C18,FUN_08025c18,162,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -1265,17 +1265,17 @@ address,name,size,status,module,notes
 0x08052988,FUN_08052988,562,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052BBC,FUN_08052bbc,170,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08052C68,FUN_08052c68,144,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08052CF8,FUN_08052cf8,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08052CF8,FUN_08052cf8,228,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052DDC,FUN_08052ddc,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08052E78,FUN_08052e78,440,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x08052E78,FUN_08052e78,440,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08053030,FUN_08053030,1144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080534A8,FUN_080534a8,424,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053650,FUN_08053650,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080536BC,FUN_080536bc,216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080536BC,FUN_080536bc,216,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053794,FUN_08053794,158,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08053834,FUN_08053834,250,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053930,FUN_08053930,196,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x080539F4,FUN_080539f4,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080539F4,FUN_080539f4,228,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053AD8,FUN_08053ad8,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053B44,FUN_08053b44,516,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053D48,FUN_08053d48,176,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1285,7 +1285,7 @@ address,name,size,status,module,notes
 0x08053FF4,FUN_08053ff4,292,discovered,unknown,3 gerçek BL çağrısı ve push prologuyla doğrulanan fonksiyon; 0x08053FF2 literal-içi sahte başlangıcı kaldırıldı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08054118,FUN_08054118,696,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080543D0,FUN_080543d0,126,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08054450,FUN_08054450,288,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08054450,FUN_08054450,288,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08054570,FUN_08054570,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08054608,FUN_08054608,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080546CC,FUN_080546cc,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1295,7 +1295,7 @@ address,name,size,status,module,notes
 0x08054E40,FUN_08054e40,220,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08054F1C,FUN_08054f1c,310,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055054,FUN_08055054,312,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805518C,FUN_0805518c,328,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0805518C,FUN_0805518c,328,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080552D4,FUN_080552d4,492,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080554C0,FUN_080554c0,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055514,FUN_08055514,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1651,8 +1651,8 @@ address,name,size,status,module,notes
 0x08063E58,FUN_08063e58,36,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08063E7C,FUN_08063e7c,48,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08063EAC,FUN_08063eac,44,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08063ED8,FUN_08063ed8,326,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08064020,FUN_08064020,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08063ED8,FUN_08063ed8,326,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08064020,FUN_08064020,352,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064180,FUN_08064180,396,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806430C,SetTextContext,64,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806434C,SetFontIndex,16,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)"
