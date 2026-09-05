@@ -55,6 +55,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
+0x0800AB88,FUN_0800ab88,src/core/frame_dispatch.c,960,960,yes
 0x0800B140,FUN_0800b140,src/world/geometry.c,44,44,yes
 0x0800BDB0,FUN_0800bdb0,src/world/geometry.c,72,72,yes
 0x0800BF18,FUN_0800bf18,src/world/quad_edge_test.c,522,522,no
@@ -96,6 +97,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08013A28,SubmitFixed,src/world/dma_flush.c,30,30,yes
 0x08013A48,FlushBlock,src/world/dma_flush.c,60,60,yes
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
+0x0801528C,FUN_0801528c,src/world/level_step.c,588,588,yes
 0x080154D8,InitActor,src/world/actor_init.c,192,192,yes
 0x08019450,IsActorMarked,src/world/actor_control.c,20,20,yes
 0x08019464,NotifyActor,src/world/actor_control.c,44,44,yes

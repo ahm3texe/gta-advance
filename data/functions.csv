@@ -154,7 +154,7 @@ address,name,size,status,module,notes
 0x0800AB4C,FUN_0800ab4c,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800AB60,FUN_0800ab60,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800AB6C,FUN_0800ab6c,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800AB88,FUN_0800ab88,960,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0800AB88,FUN_0800ab88,960,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800AF48,FUN_0800af48,174,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800AFF8,FUN_0800aff8,172,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0800B0A4,FUN_0800b0a4,46,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -336,7 +336,7 @@ address,name,size,status,module,notes
 0x08015110,FUN_08015110,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0801515C,FUN_0801515c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080151C0,FUN_080151c0,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801528C,FUN_0801528c,588,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0801528C,FUN_0801528c,588,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080154D8,InitActor,192,matching,world,Varlık varsayılan durum ilklendirmesi; src/world/actor_init.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08015598,FUN_08015598,544,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080157B8,FUN_080157b8,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
