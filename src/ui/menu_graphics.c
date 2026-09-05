@@ -25,7 +25,7 @@
 
 /* 0x0806430C — assembly kaynagi LoadGraphicsResource diye etiketlemisti;
  * govde henuz incelenmedi, dogrulanana kadar Ghidra adi kullaniliyor. */
-extern void FUN_0806430c(void *dest, u32 tileCount,
+extern void SetTextContext(void *dest, u32 tileCount,
                          const void *tilesA, const void *tilesB,
                          u32 width, u32 flags);
 
@@ -34,7 +34,7 @@ void LoadMenuGraphics(u32 offset)
 {
     u16 ime;
 
-    FUN_0806430c((void *)(VRAM_BASE + offset), 30,
+    SetTextContext((void *)(VRAM_BASE + offset), 30,
                  MENU_TILES_A, MENU_TILES_B, 160, 0);
 
     ime = REG_IME;

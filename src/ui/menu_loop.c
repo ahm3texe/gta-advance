@@ -91,8 +91,8 @@ extern void  FUN_080082c4(void);
 extern void  FUN_08012690(void);
 extern void  FUN_0803378c(int a, int b);
 extern void  FUN_08004280(u32 a, u32 b);
-extern void  FUN_0806430c(void *dest, u32 tileCount, const void *tilesA,
-                          const void *tilesB, u32 width, u32 flags);
+extern void  SetTextContext(u8 *vram, u32 stride, u8 *tiles, u8 *widths,
+                            u8 fontIndex, u32 halfSpacing);
 extern void  FUN_08063ca4(void);
 extern void  FUN_0800ab60(void);
 extern void  FUN_08005fc4(int id);
@@ -161,7 +161,7 @@ void RunMenuLoop(void)
     menu = BuildActiveMenuItems(ROOT_MENU);
     FUN_08004280(108, 0);
 
-    FUN_0806430c(VRAM, MENU_TILE_COUNT, MENU_TILES_A, MENU_TILES_B,
+    SetTextContext(VRAM, MENU_TILE_COUNT, MENU_TILES_A, MENU_TILES_B,
                  MENU_TILE_WIDTH, 0);
 
     ime = REG_IME;

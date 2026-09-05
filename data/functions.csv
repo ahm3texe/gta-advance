@@ -1654,7 +1654,7 @@ address,name,size,status,module,notes
 0x08063ED8,FUN_08063ed8,326,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064020,FUN_08064020,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064180,FUN_08064180,396,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806430C,FUN_0806430c,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806430C,SetTextContext,64,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806434C,SetFontIndex,16,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)"
 0x0806435C,DrawText,124,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)"
 0x080643D8,DrawTextCentred,134,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)"

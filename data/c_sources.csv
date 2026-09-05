@@ -270,6 +270,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,28,28,yes
 0x08062654,GetRamWord16,src/world/get_ram_word16.c,12,12,yes
 0x08063BCC,FUN_08063bcc,src/world/wrap_08063bcc.c,10,10,yes
+0x0806430C,SetTextContext,src/text/set_text_context.c,64,64,yes
 0x0806434C,SetFontIndex,src/text/draw_text.c,16,16,yes
 0x0806435C,DrawText,src/text/draw_text.c,124,124,yes
 0x080643D8,DrawTextCentred,src/text/draw_text.c,134,134,yes
