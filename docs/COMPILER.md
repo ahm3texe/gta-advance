@@ -115,6 +115,7 @@ Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
 | 41 | Ölçekli ofset birden çok tabanda kullanılacaksa çarpımı **tek atamada**, alan tabanlarını ayrı yerellerde kur | `scaled = index; scaled *= 180` pseudo önceliğini artırıp r3/r4'ü ters çevirdi. `scaled = index * 180` ile `heldBase`/`extraBase` ayrımı `ReleaseSlot`ta ROM'un tek r3 ofset + iki taban desenini üretti |
 | 42 | ROM azalan bir döngü sayacı kullansa da C'de **artan indeksli `for`** denenmeli | `FlushSpriteList`te `for (i = count; i < left; i++)`, agbcc tarafından `left - count` kadar azalan döngüye çevrilir. Derleyicinin ürettiği çıkarma sabit kurulumlarından sonra gelir; elle yazılmış `left -= count` önce geliyordu. Kalan 9 bayt fark kapandı: 112/112 |
 | 43 | Sayaç ve işaretçi birlikte ilerliyorsa **ikisini `for` artırımında, ROM sırasıyla** ifade et | `InitSpritePool`da gövdedeki `node++`, sayaç azaltımından önce geliyordu. `for (...; ...; i++, node++)` biçimi ROM'un sayaç-önce sırasını üretti: 4 bayt fark kapandı, 124/124 |
+| 44 | Karşılaştırma sabitini **yerel değişkene al**: `hi = 15; if (x < hi)` | agbcc literal karşılaştırmayı kanonikleştiriyor (`< 15` → `<= 14`, `bls`); ROM'da `cmp #15 / bcc` görülüyorsa literal yazımın hiçbir çeşidi tutmaz. Sabit değişkene alınınca kanonikleştirme atlanır ve sabit yine immediate olarak yayılır. `EitherInRange`: 8/44 → 44/44. Permuter'ın bulduğu kaldırma + kalan sınırın elle kaldırılması. |
 
 ## Register dağıtımının mekanizması
 
@@ -301,7 +302,6 @@ callee-saved ister:
 | 1 | `push {r4, lr}` | |
 | 2 | `push {r4, r5, lr}` | |
 | 3 | `push {r4, r5, r6, lr}` | |
-| 44 | Karşılaştırma sabitini **yerel değişkene al**: `hi = 15; if (x < hi)` | agbcc literal karşılaştırmayı kanonikleştiriyor (`< 15` → `<= 14`, `bls`); ROM'da `cmp #15 / bcc` görülüyorsa literal yazımın hiçbir çeşidi tutmaz. Sabit değişkene alınınca kanonikleştirme atlanır ve sabit yine immediate olarak yayılır. `EitherInRange`: 8/44 → 44/44. Permuter'ın bulduğu kaldırma + kalan sınırın elle kaldırılması. |
 | 4+ | `push {r4, r5, r6, lr}` | liste BUYUMEZ, yigina tasar |
 
 Dortte komut sayisi 13'ten 20'ye firliyor: r7'ye gecmek yerine spill
