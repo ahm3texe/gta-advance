@@ -76,7 +76,7 @@ address,size,name,source,status,notes
 0x020254D0,740,gRam020254D0,decomp,provisional,5 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
 0x02025800,4,gRam02025800,decomp,provisional,28 baytlik kayit tablosuna (gRom08852A2C) indeks; 0 ise islem atlaniyor. 0x08063E7C ve 0x08063EAC okuyor.
 0x02025810,8,gRam02025810,decomp,provisional,Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para; boyut 4991->8 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
-0x02025818,2,mission_timer,libretro_cheat,provisional,IZLEME: SUPHELI AD (kaynak libretro_cheat). 0x100er artiyor ve artislar SADECE Up basiliyken oluyor; sinematik boyunca 481 kare hic artmadi. Zaman degil MESAFE/adim sayaci gibi duruyor (8.8 sabit nokta). Dogrulanmadi.
+0x02025818,2,mission_timer,libretro_cheat,verified,"IZLEME (hareketsiz sinamasi, oturum 5): AD DOGRU, zamanlayici. Oyuncu HIC tusa basmadan 30 kez, her seferinde tam 0x100 artti; aralik 60-65 kare (ort. 63.9), yani ~64 karede bir tik. ONCEKI ""mesafe sayaci"" iddiam CURUTULDU -- o oturumlarda Up surekli basili oldugu icin artislar tusla ayni anda gorunuyordu, nedensellik degil rastlanti. Sinematikteki 481 karelik durus da beklenen davranis: gorev zamani sinematikte duruyor."
 0x0202581A,1,wanted_level_display,libretro_cheat,provisional,
 0x0202581C,4,money_display_or_copy_0,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025824,4,money_display_or_copy_1,libretro_cheat,provisional,Exact representation to verify dynamically

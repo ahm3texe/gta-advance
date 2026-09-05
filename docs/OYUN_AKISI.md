@@ -64,9 +64,10 @@ Cozumleme: `python3 tools/analyze_trace.py`
   aktiflesiyor: bagli liste sistemi varlik (entity) yonetimi icin.
 - **gMenuPaletteSource** ISARETCI DEGIL: degerleri BGR555 renk (0x7C1F, 0x7FFF).
   Palet tamponu; u32 adres olarak okunmamali.
-- **mission_timer** adi SUPHELI (kaynagi libretro_cheat).  Artislar sadece Up
-  basiliyken oluyor ve sinematik boyunca 481 kare hic artmadi -- zaman degil
-  mesafe sayaci gibi duruyor.  Kesinlesmedi.
+- **mission_timer** adi DOGRU (dorduncu oturumda kanitlandi).  Oyuncu hic
+  tusa basmadan 30 kez tam 0x100 artti, ~64 karede bir.  Onceki "mesafe
+  sayaci" iddiasi CURUTULDU: Up surekli basili oldugu icin artislar tusla
+  ayni anda gorunuyordu, nedensellik degil rastlanti.
 
 ## Ilk cikarimlar (DOGRULANMADI)
 
