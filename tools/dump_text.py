@@ -20,6 +20,7 @@ TABLE_START = 0x0EC46D4
 TABLE_END = 0x0EC771C
 ROM_BASE = 0x08000000
 LANG_COUNT = 5
+LANG_NAMES = ["ingilizce", "ispanyolca", "fransizca", "italyanca", "almanca"]
 
 
 def read_cstr(rom, off, limit=1024):
@@ -44,7 +45,7 @@ def main():
     if args.lang is None:
         for k in range(LANG_COUNT):
             seg = ptrs[k * per:(k + 1) * per]
-            print(f"  dil {k}: {min(seg):#09x} .. {max(seg):#09x}")
+            print(f"  dil {k} ({LANG_NAMES[k]}): {min(seg):#09x} .. {max(seg):#09x}")
         print("\nBir dili yazmak icin: --lang N  (cikti build/ altina)")
         return 0
 
@@ -53,7 +54,9 @@ def main():
     dest = OUT / f"text_lang{args.lang}.txt"
     with dest.open("w", encoding="utf-8") as fh:
         for i, p in enumerate(seg):
-            s = read_cstr(rom, p).decode("ascii", "replace")
+            # Kodlama LATIN-1 (ISO-8859-1), ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde,
+            # 0xC1=A-akut.  ASCII varsayimi aksanli dilleri okunamaz yapiyordu.
+            s = read_cstr(rom, p).decode("latin-1")
             fh.write(f"{i:04d}\t{p:#09x}\t{s}\n")
     print(f"yazildi: {dest.relative_to(ROOT)} ({len(seg)} dize)")
     return 0
