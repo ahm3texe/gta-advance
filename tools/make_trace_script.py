@@ -38,6 +38,20 @@ LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
 -- Yukleme: Tools > Scripting... > Load script
 -- Log:     __LOG_PATH__
 
+-- CIFT YUKLEME KORUMASI.  Script birden fazla kez yuklenirse mGBA her
+-- ornegin kare geri cagrisini AYRI KAYITLI tutuyor ve her degisiklik
+-- birden fazla kez, farkli kare sayaclariyla loglaniyor (bir kez basimiza
+-- geldi: ayni gecis f32645 ve f620 olarak iki kez gorundu).  Onceki
+-- ornegi burada etkisizlestiriyoruz.
+-- Boolean bayrak YETMEZ: ikinci yukleme de ayni degeri yazar ve eski
+-- ornek "farkli mi" sinamasindan gecip calismaya devam eder.  Her
+-- yuklemede ARTAN bir sayac gerekiyor.
+_G.__TRACE_EPOCH = (_G.__TRACE_EPOCH or 0) + 1
+local MY_EPOCH = _G.__TRACE_EPOCH
+if MY_EPOCH > 1 then
+  console:log(string.format("[bilgi] %d. yukleme; onceki ornek(ler) susturuldu", MY_EPOCH))
+end
+
 local LOG_PATH = "__LOG_PATH__"
 local WATCH = {
 __ENTRIES__
@@ -147,6 +161,8 @@ local function validateOnce()
 end
 
 local function onFrame()
+  -- Bu ornek eskidiyse (yeni bir yukleme oldu) hicbir sey yapma.
+  if MY_EPOCH ~= _G.__TRACE_EPOCH then return end
   if not validated then validateOnce() end
   frame = frame + 1
   local keys = nil
