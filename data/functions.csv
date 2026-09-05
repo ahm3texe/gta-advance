@@ -272,7 +272,7 @@ address,name,size,status,module,notes
 0x08012968,UnlinkToFree,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08012A00,SortSpriteList,152,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
 0x08012A98,FUN_08012a98,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x08012AA4,FUN_08012aa4,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08012AA4,InitNodePool,124,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08012B20,InitSpritePool,124,matching,core,128 dugumun serbest listesini kurar; DMA3 ile 1024 bayt OAM sifirlar; src/core/init_sprite_pool.c
 0x08012B9C,FlushSpriteList,112,matching,core,Aktif sprite listesini OAM alanina yazar ve onceki karenin fazla yuvalarini gizler; src/core/flush_sprite_list.c
 0x08012C0C,AllocNode,72,matching,core,Sprite havuzunun serbest basini aktif listenin basina tasir; src/core/alloc_node.c

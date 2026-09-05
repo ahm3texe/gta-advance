@@ -1,6 +1,6 @@
 /* Iletme sarmalayicisi — 0x08012A98-0x08012AA3
  *
- * Govdesi yalnizca FUN_08012aa4 cagrisi. Ne yaptigi BILINMIYOR, bu yuzden ad
+ * Govdesi yalnizca InitNodePool cagrisi. Ne yaptigi BILINMIYOR, bu yuzden ad
  * degistirilmedi: sahte semantik uydurmaktansa FUN_ adi korunuyor.
  *
  * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
@@ -13,10 +13,10 @@
 
 #include "gba_types.h"
 
-extern void FUN_08012aa4(void);
+extern void InitNodePool(void);
 
 /* 0x08012A98 */
 void FUN_08012a98(void)
 {
-    FUN_08012aa4();
+    InitNodePool();
 }

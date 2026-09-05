@@ -70,6 +70,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012968,UnlinkToFree,src/core/unlink_to_free.c,150,150,no
 0x08012A00,SortSpriteList,src/core/sort_sprite_list.c,152,152,yes
 0x08012A98,FUN_08012a98,src/world/wrap_08012a98.c,10,10,yes
+0x08012AA4,InitNodePool,src/core/init_node_pool.c,124,124,yes
 0x08012B20,InitSpritePool,src/core/init_sprite_pool.c,124,124,yes
 0x08012B9C,FlushSpriteList,src/core/flush_sprite_list.c,112,112,yes
 0x08012C0C,AllocNode,src/core/alloc_node.c,72,72,yes
