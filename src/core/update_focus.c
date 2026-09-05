@@ -30,6 +30,32 @@
  * Yani kural: kopyanin YASAMASI icin iki farkli KULLANIM YERI gerekiyor,
  * yalnizca ayri bir isim yetmiyor. Sonraki fikir bu yonde aranmali.
  *
+ * >>> BU HIPOTEZ CURUTULDU (ucuncu deneme).
+ *
+ * ROM'da kopya GERCEKTEN iki yerde kullaniliyor:
+ *     800a9f0  adds r0,r3,#0     <- kopya
+ *     800a9f2  ldr  r1,[r0,#8]   <- birinci kullanim
+ *     800aa16  ldr  r0,[r0,#4]   <- IKINCI kullanim (orta nokta dalinda)
+ * Dusme dali ozgun tabani kullaniyor: 800a9fa ldr r0,[r3,#4].
+ *
+ * Bu yapiyi birebir yazdik (orta nokta `probe->unk04`, dusme `block->unk04`)
+ * ve AGBCC kopyayi YINE birlestirdi: cikti hala 84 bayt, hala `ldr r1,[r2,#8]`.
+ * "Iki kullanim yeri kopyayi yasatir" kurali GECERSIZ.
+ *
+ * Ayrica fark tek bir kopyadan ibaret degil; dusme dalinda yazmac dagitimi
+ * da ayrisiyor:
+ *     ROM  : ldr r1,[r0,#24] / ldr r0,[r1,#0] / str r0,[r2,#0]
+ *     bizim: ldr r0,[r0,#24] / ldr r1,[r0,#0] / str r1,[r4,#0]
+ * ROM konum isaretcisini AYRI bir yazmacta (r1) tutup degeri r0'a yukluyor;
+ * bizimki isaretciyi r0'da tutup degeri r1'e yukluyor.
+ *
+ * IZLEME LOGUNUN KATKISI (ucuncu oturum, docs/OYUN_AKISI.md):
+ * gFocusPoint'in iki adet 16.16 SABIT NOKTA s32 oldugu OLCULDU
+ * (baslangic 3360.000 / 9568.000; bazi farklar tam 65536 ve 262144).
+ * Bu, buradaki `Vec2 {s32 x; s32 y;}` tanimini DOGRULADI -- yani tip zaten
+ * dogruymus.  Izleme verisi bu fonksiyonu ACMADI; katkisi bir belirsizligi
+ * kapatmak oldu, dagitim sorununa dokunmadi.
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/core/update_focus.c
  */
@@ -100,8 +126,12 @@ void UpdateFocusPoint(void)
     return;
 
 midpoint:
+    /* Orta nokta dalinda +0x04 KOPYADAN okunuyor (ROM: ldr r0,[r0,#4]),
+       dusme dalinda ise ozgun tabandan (ROM: ldr r0,[r3,#4]).  Kopyaya
+       ikinci bir kullanim yeri veren sey bu; tek kullanimda optimizer
+       kopyayi birlestiriyordu. */
     out = &gFocusPoint;
-    first = (Target *)block->unk04;
+    first = (Target *)probe->unk04;
     out->x = (first->pos->x + second->pos->x) >> 1;
     out->y = (first->pos->y + second->pos->y) >> 1;
 }
