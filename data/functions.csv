@@ -1117,7 +1117,7 @@ address,name,size,status,module,notes
 0x08046AAC,FUN_08046aac,1086,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08046EEC,FUN_08046eec,1062,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08047314,FUN_08047314,748,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08047600,FUN_08047600,534,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08047600,FUN_08047600,534,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08047818,FUN_08047818,492,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08047A04,FUN_08047a04,172,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08047AB0,FUN_08047ab0,848,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
@@ -1140,7 +1140,7 @@ address,name,size,status,module,notes
 0x0804AAE8,FUN_0804aae8,504,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0804ACE0,FUN_0804ace0,460,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0804AEAC,FUN_0804aeac,476,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0804B088,FUN_0804b088,564,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
+0x0804B088,FUN_0804b088,564,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
 0x0804B2BC,FUN_0804b2bc,748,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0804B5A8,FUN_0804b5a8,116,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0804B61C,FUN_0804b61c,768,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -1536,7 +1536,7 @@ address,name,size,status,module,notes
 0x0805D808,FUN_0805d808,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805D82C,FUN_0805d82c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805D84C,FUN_0805d84c,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805D878,FUN_0805d878,528,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0805D878,FUN_0805d878,528,matching,misc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805DA88,FUN_0805da88,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805DAC8,FUN_0805dac8,492,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805DCB4,FUN_0805dcb4,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)

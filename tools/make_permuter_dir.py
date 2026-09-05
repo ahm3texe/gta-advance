@@ -40,14 +40,14 @@ def main():
     body = rom[addr - ROM_BASE: addr - ROM_BASE + size]
     lines = [".section .text", ".thumb", f".global {name}", ".align 2", "$t:", f"{name}:"]
     ncode = npool = 0
-    for kind, chunk in regions(rom, addr, size):
+    for region_index, (kind, chunk) in enumerate(regions(rom, addr, size)):
         if kind == 't':
-            lines.append("$t:")
+            lines.append(f"$t.region{region_index}:")
             for i in range(0, len(chunk), 2):
                 lines.append(f"    .short {int.from_bytes(chunk[i:i+2], 'little'):#06x}")
             ncode += len(chunk)
         else:
-            lines.append("$d:")
+            lines.append(f"$d.region{region_index}:")
             for i in range(0, len(chunk), 2):
                 lines.append(f"    .short {int.from_bytes(chunk[i:i+2], 'little'):#06x}")
             npool += len(chunk)

@@ -251,6 +251,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x080424D8,GetMapSize,src/world/tile_and_map.c,20,20,yes
 0x08042784,FUN_08042784,src/world/wrap_08042784.c,10,10,yes
 0x080428AC,FUN_080428ac,src/world/wrap_080428ac.c,10,10,yes
+0x08047600,FUN_08047600,src/world/target_repeat.c,534,534,yes
+0x0804B088,FUN_0804b088,src/world/target_follow.c,564,564,yes
 0x0804FB4C,FUN_0804fb4c,src/world/wrap_0804fb4c.c,10,10,yes
 0x0804FF98,FUN_0804ff98,src/world/wrap_0804ff98.c,10,10,yes
 0x0804FFB4,FUN_0804ffb4,src/world/wrap_0804ffb4.c,10,10,yes
@@ -309,6 +311,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805AB78,FUN_0805ab78,src/misc/empty_stubs.c,2,2,yes
 0x0805AC44,CopySrcToDest,src/world/counter_saturate.c,12,12,yes
 0x0805AC50,BumpOrReset,src/world/bump_or_reset.c,56,56,yes
+0x0805D878,FUN_0805d878,src/misc/id_compatibility.c,528,528,yes
 0x0805E6C4,SetLanguage,src/misc/table_lookup.c,16,16,yes
 0x0805E6D4,GetLanguage,src/misc/table_lookup.c,12,12,yes
 0x0805E6E0,GetTextString,src/misc/table_lookup.c,32,32,yes

@@ -145,6 +145,7 @@ start,end,binary,module,notes
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,iletme sarmalayicisi
 0x0805AC44,0x0805AC50,build/world/counter_saturate.bin,world,Kopyalama
 0x0805AC50,0x0805AC88,build/world/bump_or_reset.bin,world,BumpOrReset; koşullu sıfırlanan doygun sayaç
+0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode kategorisi + iki alan yazici
 0x0806233C,0x08062364,build/world/is_mode_two.bin,world,0x02036050 kip bayti == 2 sorgusu
