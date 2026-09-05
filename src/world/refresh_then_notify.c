@@ -13,6 +13,7 @@
  */
 
 #include "gba_types.h"
+#include "node_list.h"
 
 #define STATE_MASK  0xF1
 #define STATE_WANT  17
@@ -22,11 +23,10 @@ typedef struct Obj {
     u8 state;                   /* +0x0B */
 } Obj;
 
-extern u32  gRam02035780;
 
 extern Obj *FUN_08054744(u32 arg);
 extern void FUN_080536bc(Obj *obj);
-extern void FUN_08055d90(u32 *dest, u32 arg);
+extern void FUN_08055d90(NodeC4 **dest, u32 arg);
 
 /* 0x08055BBC */
 void RefreshThenNotify(u32 arg)

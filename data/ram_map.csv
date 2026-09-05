@@ -10,6 +10,7 @@ address,size,name,source,status,notes
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
+0x020004A0,4,gRam020004A0,decomp,provisional,0x08052C68 bayrak kapisi anahtari olarak okuyor.
 0x020004B0,8,gFocusPoint,decomp,provisional,"iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba, tam genislik): iki adet 16.16 SABIT NOKTA koordinat. +0x00=X, +0x04=Y. Baslangic (3360.000, 9568.000) -- tam sayilar. Up basiliyken Y tam olarak -374632 (-5.716) adimliyor, 29/29 sabit. Bazi X farklari TAM 65536 (1.000) ve 262144 (4.000): 16.16 formati boylece KANITLANDI."
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
@@ -104,6 +105,7 @@ address,size,name,source,status,notes
 0x02030330,60,gRam02030330,decomp,provisional,"+0x10 GetSlotUnk10 tarafindan okunuyor (byte-matching kanit), yani boyut en az 20; +0x2C'de yaz alani. Ust sinir bilinmiyor."
 0x02030340,1,wanted_level_true,libretro_cheat,provisional,
 0x020303D0,16,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
+0x02030C00,4,gRam02030C00,decomp,provisional,0x08052C68 maske kapisi anahtari olarak okuyor.
 0x02030C10,320,gSlotIds,decomp,provisional,160 adet u16 yuva kimligi; 0x7FEF bos demek  IZLEME: yeni oyun + 1. yuva seciminde f1068de 0->42.
 0x02030D50,7680,gSlotArray,decomp,provisional,128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi
 0x02035780,4,gRam02035780,decomp,provisional,FUN_08055D90 cagrisinda ilk arguman (byte-matching kanit)
@@ -141,4 +143,5 @@ address,size,name,source,status,notes
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
+0x08D49C00,0,gAreaBank,decomp,provisional,ROM: alan kayitlari bankasi; 0x08052C68 .entries alanindan yuruyor.
 0x08EC46D4,0,gTextTable,decomp,verified,Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.

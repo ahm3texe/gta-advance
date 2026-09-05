@@ -55,6 +55,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
+0x0800DB80,FUN_0800db80,src/core/list_b1.c,104,104,yes
 0x0800DBE8,ListPushFront,src/world/list_ops.c,36,36,yes
 0x0800DC0C,ListRemove2,src/world/list_ops.c,56,56,yes
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
@@ -112,14 +113,19 @@ address,name,source,compiled_size,mapped_size,matching
 0x08023A4C,SetToMax,src/world/threshold.c,10,10,yes
 0x08023A58,ReloadMeter,src/world/threshold.c,16,16,yes
 0x08023A80,MaskedDiffers,src/world/masked_compare.c,28,28,yes
+0x08028A88,FUN_08028a88,src/world/entries_a5.c,162,162,yes
 0x08028C48,IsEntryActive,src/world/table_entries.c,32,32,yes
 0x08028C68,ReleaseEntry,src/world/table_entries.c,64,64,yes
 0x08028CA8,ClearEntry,src/world/table_entries.c,64,64,yes
 0x08028D44,StepEntryTimer,src/world/step_entry_timer.c,124,128,no
+0x08028DF4,FUN_08028df4,src/world/entries_a1.c,70,70,yes
 0x08028E3C,HasWantedEntry,src/world/kind_scan.c,48,48,yes
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
+0x08028F4C,FUN_08028f4c,src/world/entries_a2.c,76,76,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
+0x08029244,FUN_08029244,src/world/entries_a4.c,86,86,yes
+0x0802929C,FUN_0802929c,src/world/entries_a3.c,80,80,yes
 0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
@@ -242,6 +248,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,28,28,yes
 0x08051500,GetRecord,src/misc/record_table.c,20,20,yes
 0x0805151C,DrainTwoChains,src/world/drain_two_chains.c,34,34,yes
+0x08052C68,FUN_08052c68,src/core/nodelist_c3.c,144,144,yes
+0x08053D48,FUN_08053d48,src/core/nodelist_c4.c,176,176,yes
+0x080547E8,FUN_080547e8,src/core/nodelist_c1.c,136,136,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
 0x08055A94,FindNodeAfter,src/world/node_search.c,20,20,yes
 0x08055AA8,FindNode,src/world/node_search.c,28,28,yes
@@ -250,6 +259,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055B34,EngageActor,src/world/engage_actor.c,74,74,yes
 0x08055BBC,RefreshThenNotify,src/world/refresh_then_notify.c,44,44,yes
 0x08055BF8,ForwardZeroArg2,src/world/forward_zero_arg2.c,12,12,yes
+0x08055C04,FUN_08055c04,src/core/nodelist_c2.c,136,136,yes
 0x08055C8C,FindNthFreeSlot,src/world/slot_scan.c,58,58,yes
 0x08055CC8,ClearSlots,src/world/slot_scan.c,64,64,yes
 0x08055D08,GetEntrySlot,src/world/slot_table.c,16,16,yes
@@ -270,6 +280,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x08062530,IsRamModeWanted,src/world/is_ram_mode.c,28,28,yes
 0x08062654,GetRamWord16,src/world/get_ram_word16.c,12,12,yes
 0x08063BCC,FUN_08063bcc,src/world/wrap_08063bcc.c,10,10,yes
+0x08063E38,FUN_08063e38,src/text/queue_glyph_wrappers.c,16,16,yes
+0x08063E48,FUN_08063e48,src/text/queue_glyph_wrappers.c,16,16,yes
+0x08063E58,FUN_08063e58,src/text/frame_wait_and_hooks.c,36,36,yes
+0x08063E7C,FUN_08063e7c,src/text/frame_wait_and_hooks.c,48,48,yes
+0x08063EAC,FUN_08063eac,src/text/frame_wait_and_hooks.c,44,44,yes
 0x0806430C,SetTextContext,src/text/set_text_context.c,64,64,yes
 0x0806434C,SetFontIndex,src/text/draw_text.c,16,16,yes
 0x0806435C,DrawText,src/text/draw_text.c,124,124,yes
@@ -278,6 +293,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x080644E4,GetGlyphWidth,src/text/draw_text.c,64,64,yes
 0x08064524,GetTextWidth,src/text/draw_text.c,108,108,yes
 0x08064590,ClearTextArea,src/text/clear_text_area.c,132,132,no
+0x08064698,FUN_08064698,src/text/glyph_table_access.c,20,20,yes
+0x080646F8,FUN_080646f8,src/text/glyph_table_access.c,44,44,yes
 0x080664A4,GetBaseValue,src/world/pause_helpers.c,6,6,yes
 0x080664AC,MaybeReset,src/world/pause_helpers.c,24,24,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes
