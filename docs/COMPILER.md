@@ -421,6 +421,42 @@ REG_DMA3.control;          /* geri okuma; atlanirsa iki bayt eksik */
 REG_IME = ime;
 ```
 
+## Kural 49 — ROM seyrek gövdeleri fonksiyonun SONUNDA tutar
+
+agbcc `if` gövdelerini kaynak sırasında yayıyor. ROM'da bir dal **ileri**
+atlıyorsa (`beq` uzağa, `bne` uzağa) o gövde fonksiyonun sonundadır; aynı
+gövdeyi akışın içine yazmak bloğu öne alır ve dallanmayı tersine çevirir.
+
+`FUN_080543D0`'da (126 bayt) üç kez arka arkaya uygulandı ve her seferinde
+kazandırdı:
+
+| taşınan | önce | sonra |
+|---|---|---|
+| "bulundu" gövdesi döngüden sona | 128 B | fark 87 |
+| `return 0` sona | fark 87 | **fark 56** |
+
+Yazım biçimi: erken dönüş yerine sona `goto`, gövdeyi `return`dan sonra
+etiketle. Proje bu biçimi zaten kullanıyor (`target_follow.c`, `menu_screen.c`).
+
+```c
+    if (spare->id != SPARE_ID) goto none;   /* `return 0;` DEGIL */
+    ...
+    return spare;
+found:                                       /* seyrek govdeler sonda */
+    ...
+    return cur;
+none:
+    return 0;
+```
+
+**Nasıl fark edilir:** ROM'daki koşullu dallanmanın YÖNÜNE bakın. İleri
+atlıyorsa hedef gövde ileridedir; sizin çıktınızda aynı yerde `bne` varken
+ROM'da `beq` (ya da tersi) görüyorsanız blok sıranız terstir.
+
+**Yan bulgu — döngü döndürme.** Aynı fonksiyonda `break` kullanmak agbcc'yi
+döngüyü döndürmeye (`b` ile alttaki teste atlama) itti. ROM'un giriş
+koruması + alttan dönen biçimi için `break` yerine açık `goto` yazın.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
