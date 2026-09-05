@@ -85,7 +85,7 @@ extern u32  gRam030000A0;
 
 extern Menu *BuildActiveMenuItems(Menu *menu);
 extern void  DrawMenuItems(Menu *menu, int selected, int firstItem);
-extern void  SetTableIndex(int index);
+extern void  SetLanguage(int index);
 
 extern void  FUN_080082c4(void);
 extern void  FUN_08012690(void);
@@ -114,7 +114,7 @@ void RunMenuLoop(void)
     int redraw;
     int running;
 
-    SetTableIndex(0);
+    SetLanguage(0);
     FUN_080082c4();
 
     REG_BLDCNT = BLEND_ALL;
@@ -279,7 +279,7 @@ void RunMenuLoop(void)
             FUN_08005fc4(SOUND_MENU_MOVE);
             if (sel > 0) {
                 sel--;
-                SetTableIndex(sel);
+                SetLanguage(sel);
                 if (sel < scrollTop) {
                     scrollTop--;
                     FUN_08004280(GetRecordIndex() + 108, 0);
@@ -292,7 +292,7 @@ void RunMenuLoop(void)
             FUN_08005fc4(SOUND_MENU_MOVE);
             if (sel < gActiveMenuItemCount - 1) {
                 sel++;
-                SetTableIndex(sel);
+                SetLanguage(sel);
                 if (sel > scrollTop + (MENU_VISIBLE_MAX - 1)) {
                     scrollTop++;
                     FUN_08004280(GetRecordIndex() + 108, 0);

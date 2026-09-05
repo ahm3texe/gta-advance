@@ -40,7 +40,7 @@ extern MenuItem *gActiveMenuItems[20];
 
 /* Isimleri henuz cozulmedi; data/functions.csv'deki adlar kullanildi. */
 extern void SetFontIndex(int style);            /* 0x0806434C metin stilini ayarlar */
-extern u32  GetRecordWord(u32 textId);           /* 0x0805E6E0 metin kimligini cozer */
+extern u32  GetTextString(u32 textId);           /* 0x0805E6E0 metin kimligini cozer */
 extern void DrawTextCentred(u32 text, int x, int y); /* 0x080643D8 metni cizer */
 extern void DrawText(u32 text, int x, int y); /* 0x0806435C metni stiliyle cizer */
 extern void DrawTextRightAligned(const char *text, int x, int y); /* 0x08064460 hazir dizi cizer */
@@ -60,7 +60,7 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
 
     SetFontIndex(STYLE_SELECTED);
     if (*titleText != 0)
-        DrawTextCentred(GetRecordWord(*titleText), TITLE_X,
+        DrawTextCentred(GetTextString(*titleText), TITLE_X,
                      gMenuPositionX - TITLE_Y_OFFSET);
 
     count = gActiveMenuItemCount;
@@ -76,10 +76,10 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
 
         if (gActiveMenuItems[item]->value < 0) {
             /* Sadece etiket: satirda gosterilecek sayi yok. */
-            DrawTextCentred(GetRecordWord(gActiveMenuItems[item]->label), LABEL_X,
+            DrawTextCentred(GetTextString(gActiveMenuItems[item]->label), LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
         } else {
-            DrawText(GetRecordWord(gActiveMenuItems[item]->label),
+            DrawText(GetTextString(gActiveMenuItems[item]->label),
                          VALUE_LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
 

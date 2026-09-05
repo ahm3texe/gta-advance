@@ -110,7 +110,7 @@ address,size,name,source,status,notes
 0x02035A9C,1,gRam02035A9C,decomp,provisional,254'te doyan u8 sayac
 0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
 0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
-0x02035CC0,4,gTableIndex,decomp,provisional,Clamped to 0..4 by the setter at 0x0805E6C4 and used to select a 0x9A8-byte record
+0x02035CC0,4,gLanguage,decomp,verified,"Dil secimi (0..4, bes dil). Ayarlayici 0x0805E6C4 kirpiyor; okuyucu 0x0805E6E0 metin tablosunda dil basina 618 dizelik blok seciyor. Bkz. docs/METIN_HARITASI.md"
 0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 kimlik
 0x02036050,1,gRam02036050,decomp,provisional,kip bayti; IsModeReady okuyor (byte-matching kanit)
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
@@ -136,4 +136,4 @@ address,size,name,source,status,notes
 0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
-0x08EC46D4,0,gRecordTable,decomp,provisional,ROM table of 0x9A8-byte records selected by gTableIndex
+0x08EC46D4,0,gTextTable,decomp,verified,Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.

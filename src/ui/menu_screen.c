@@ -120,7 +120,7 @@ extern u32  gRam030000A0;
 extern Menu *BuildActiveMenuItems(Menu *menu);
 extern void  DrawMenuItems(Menu *menu, int selected, int firstItem);
 extern void  InitMenuScreen(void);
-extern u32   GetRecordWord(int id);
+extern u32   GetTextString(int id);
 
 extern void  FUN_080082c4(void);
 extern void  FUN_08012690(void);
@@ -177,21 +177,21 @@ void RunMenuScreen(int mode)
 
         switch (mission->subtype) {
         case 17: case 21: case 25: case 35: case 47: case 56: case 57:
-            GetRecordWord(MSG_MISSION_BUSY);
+            GetTextString(MSG_MISSION_BUSY);
             FUN_08030b34();
             return;
         default:
             if (mode == 13 || mode == 15) {
-                GetRecordWord(MSG_QUIT_MISSION);
+                GetTextString(MSG_QUIT_MISSION);
                 FUN_08030b34();
             } else {
                 if (((int *)gRam02025810)[5] <= QUIT_MISSION_FEE - 1) {
-                    GetRecordWord(MSG_NEED_CASH);
+                    GetTextString(MSG_NEED_CASH);
                     FUN_08030b34();
                     return;
                 }
                 FUN_08030b1c(-QUIT_MISSION_FEE);
-                GetRecordWord(MSG_NO_SAVE);
+                GetTextString(MSG_NO_SAVE);
                 FUN_08030b34();
             }
             FUN_080081d4(mode);

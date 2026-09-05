@@ -1548,9 +1548,9 @@ address,name,size,status,module,notes
 0x0805E28C,FUN_0805e28c,912,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805E61C,FUN_0805e61c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805E68C,FUN_0805e68c,56,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805E6C4,SetTableIndex,16,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0805E6D4,GetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0805E6E0,GetRecordWord,32,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
+0x0805E6C4,SetLanguage,16,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
+0x0805E6D4,GetLanguage,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
+0x0805E6E0,GetTextString,32,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0805E700,FUN_0805e700,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805E7C8,FUN_0805e7c8,540,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0805E9E4,FUN_0805e9e4,712,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
