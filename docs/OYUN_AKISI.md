@@ -85,3 +85,42 @@ Cozumleme: `python3 tools/analyze_trace.py`
 Izleme scripti (tools/trace.lua) calisir hale gelince ayni akis tekrar
 oynanip her adimda hangi RAM sembolunun degistigi kaydedilecek.  Bu belge
 o zaman "gozlem + adres" olarak guncellenecek.
+
+
+## Araba turu (ikinci oturum)
+
+Kullanici arabaya bindi; geri, ileri, sag, sol surdu.  Oncesinde yaya olarak
+da sag/sol/geri hareket etti.  `tools/analyze_trace.py` ile yuruyus turuna
+gore fark alindi.
+
+**Sadece araba turunda degisen 4 sembol** (yuruyus turunda degisen ama araba
+turunda degismeyen HIC sembol yok -- araba turu yuruyusun ustune ekleniyor):
+
+| Sembol | Degisim | Ilk kare |
+|--------|---------|----------|
+| `gFocusPoint`  | 31 | f1345 |
+| `gClipBounds`  | 31 | f1345 |
+| `gRam020302E0` | 2  | f3815 |
+| `gUnk02028290` | 1  | f2864 |
+
+### Kesin bulgu: odak noktasi IWRAM'e aynalaniyor
+
+`gFocusPoint` (0x020004B0, EWRAM) ve `gClipBounds` (0x03000014, IWRAM) ayri
+adresler -- aralarinda 16 MB var -- ama 31 gecisin HEPSINDE ayni degeri
+tasidilar, ayni karelerde.  Tesadüf degil: odak noktasi IWRAM'deki calisma
+kopyasina yazilıyor.
+
+Bu, uzerinde zaten calistigimiz iki fonksiyonu birbirine bagliyor:
+- `UpdateFocusPoint` (0x0800A9E4) -- PARK EDILMIS (4/88)
+- `ClipBounds` -- ESLESMIS (src/core/clip_bounds.c)
+
+Degerler yon tusuna gore sabit adimlarla artiyor ve 256'da sariyor:
+Up +156, Right +104, Left +152.  Bu, cok baytli bir kamera koordinatinin
+DUSUK BAYTI; tam deger icin genisletilmis izleme gerekiyor.
+
+### Aracin kendi kor noktasi
+
+Bu tur, izleme aracinin ciddi bir sinirini ortaya cikardi: 1/2/4 disindaki
+boyutlar sessizce 1 bayta kirpiliyordu.  37 sembolun 19086 bayti icin sadece
+37 bayt izleniyordu.  Uretec artik yapilari kelime kelime aciyor (275 giris)
+ve buyuk dizileri ORNEKLEYIP izlenmeyen 18382 bayti raporluyor.

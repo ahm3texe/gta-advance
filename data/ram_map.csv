@@ -10,7 +10,7 @@ address,size,name,source,status,notes
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
-0x020004B0,8,gFocusPoint,decomp,provisional,iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)
+0x020004B0,8,gFocusPoint,decomp,provisional,iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba): 0. bayti surus boyunca 31 kez degisti ve gClipBounds[0] ile HER KAREDE AYNI degeri tasidi. Odak noktasi IWRAMe aynalaniyor.
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
 0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour  IZLEME: 16 baytlik blok; 0. bayti f52den itibaren her kare 1 artiyor (sayac davranisi).
@@ -84,7 +84,7 @@ address,size,name,source,status,notes
 0x02027344,264,gAddrTable,decomp,provisional,6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi
 0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
 0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown
-0x02028290,4,gUnk02028290,decomp,provisional,Read by a small getter at 0x08037F58; role unknown
+0x02028290,4,gUnk02028290,decomp,provisional,"Read by a small getter at 0x08037F58; role unknown  IZLEME: SADECE araba turunda degisti (f2864, 1 kez). Arac sistemine ait olabilir."
 0x020282A0,4,gUnk020282A0,decomp,provisional,Read by a small getter at 0x08037F40; role unknown
 0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,Read by a small getter at 0x08037F1C; role unknown
 0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
@@ -95,7 +95,7 @@ address,size,name,source,status,notes
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi"
-0x020302E0,4,gRam020302E0,decomp,provisional,0x08050190 karsilastirmasi
+0x020302E0,4,gRam020302E0,decomp,provisional,"0x08050190 karsilastirmasi  IZLEME: SADECE araba turunda degisti (f3815, 2 kez). Arac sistemine ait olabilir."
 0x02030304,4,gRam02030304,decomp,provisional,0x080501AC karsilastirmasi
 0x02030308,4,gRam02030308,decomp,provisional,0x08050190 karsilastirmasi
 0x02030324,4,gRam02030324,decomp,provisional,0x080501AC karsilastirmasi
@@ -125,7 +125,7 @@ address,size,name,source,status,notes
 0x02036340,8,gDistanceAccum,decomp,provisional,Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor  IZLEME: yuruyus baslamadan hemen once f1783te aktif; mission_timer ile ayni pencerede.
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
 0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
-0x03000014,12,gClipBounds,decomp,provisional,uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)
+0x03000014,12,gClipBounds,decomp,provisional,uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)  IZLEME(araba): 0. bayti gFocusPoint[0] ile birebir ayni (31/31 gecis). EWRAM odak noktasinin IWRAM kopyasi/turevi; ClipBounds bunu daraltiyor.
 0x03000078,4,gRam03000078,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x03000098,4,gRam03000098,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0300009C,4,gRam0300009C,decomp,provisional,Referenced by FUN_08001A00; role unknown

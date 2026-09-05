@@ -25,6 +25,11 @@ LOG = ROOT / "build" / "trace.log"
 # karede degisiyor, logu bogar; ROM adresleri zaten sabit.
 WATCH_PREFIXES = (0x02, 0x03)
 
+# Bu boyuta kadar olan yapilar TAMAMEN izleniyor; ustu orneklenip
+# izlenmeyen kismi raporlaniyor.
+STRUCT_FULL_LIMIT = 64
+SAMPLE_WORDS = 4
+
 
 LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
 -- Elle duzenleme; ram_map.csv'yi guncelleyip ureteci tekrar calistir.
@@ -206,7 +211,7 @@ def validate_lua(text: str):
 
 def main() -> int:
     rows = list(csv.DictReader(RAM_MAP.open()))
-    watched, skipped = [], []
+    watched, skipped, sampled = [], [], []
     for r in rows:
         addr = int(r["address"], 16)
         if (addr >> 24) not in WATCH_PREFIXES:
@@ -216,9 +221,19 @@ def main() -> int:
             size = int(r["size"] or 1)
         except ValueError:
             size = 1
-        if size not in (1, 2, 4):
-            size = 1          # dizi/yapi: ilk baytini izle
-        watched.append((addr, size, r["name"]))
+        if size in (1, 2, 4):
+            watched.append((addr, size, r["name"]))
+            continue
+        # Cok baytli yapi/dizi.  Eskiden sessizce 1 bayta kirpiliyordu ve
+        # 37 sembolun 19086 baytinin 19049'u KOR kaliyordu.  Simdi kelime
+        # kelime aciliyor; buyuk diziler ORNEKLENIYOR ve izlenmeyen kisim
+        # raporlaniyor (her kareyi 19 KB okumak emulatoru boguyor).
+        words = (size + 3) // 4
+        take = words if size <= STRUCT_FULL_LIMIT else SAMPLE_WORDS
+        for w in range(take):
+            watched.append((addr + w * 4, 4, f'{r["name"]}+0x{w * 4:02X}'))
+        if take < words:
+            sampled.append((r["name"], size, take * 4))
 
     watched.sort()
     entries = ",\n".join(
@@ -242,6 +257,11 @@ def main() -> int:
     print(f"yazildi: {OUT.relative_to(ROOT)}")
     print(f"  izlenen: {len(watched)} sembol")
     print(f"  atlanan: {len(skipped)} (MMIO/ROM) -> {', '.join(skipped)}")
+    if sampled:
+        blind = sum(size - seen for _, size, seen in sampled)
+        print(f"  ORNEKLENEN: {len(sampled)} buyuk dizi, {blind} bayt izlenmiyor")
+        for name, size, seen in sorted(sampled, key=lambda x: -x[1])[:6]:
+            print(f"    {name:<22} {size:>6} bayttan ilk {seen}")
     print(f"  log:     {LOG.relative_to(ROOT)}")
     return 0
 
