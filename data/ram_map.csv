@@ -46,6 +46,8 @@ address,size,name,source,status,notes
 0x02001210,4,gMenuPaletteSource,decomp,verified,"Palette data DMA-ed into palette RAM by InitMenuScreen  IZLEME: degerler BGR555 renk (0x7C1F macenta, 0x7FFF beyaz) -- ISARETCI DEGIL, palet tamponu. u32 olarak okunmamali."
 0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
 0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
+0x02001440,8,gRam02001440,decomp,provisional,"FUN_08003454 icinde {kare tablosu isaretcisi, indeks} ciftini tutuyor: +0x00 8 baytlik girislerden olusan tablonun tabani, +0x04 gecerli indeks. Girisin ilk kelimesi LZ77 sikistirilmis karo verisi, ikinci kelimesi (varsa) palet. Ilk kelime 0 olunca indeks sifirlaniyor."
+0x02001450,4,gRam02001450,decomp,provisional,FUN_08003454 icinde LZ77UnCompWram hedefi ve ardindan DMA3 kaynagi olarak kullanilan tampon. Boyut DOGRULANMADI; yalnizca tabani biliniyor.
 0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
 0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed

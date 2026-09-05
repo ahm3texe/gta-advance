@@ -41,6 +41,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,64,64,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,16,16,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,16,16,yes
+0x08003454,FUN_08003454,src/core/cutscene_frame.c,152,152,yes
 0x08005FC4,FUN_08005fc4,src/world/wrap_08005fc4.c,10,10,yes
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
@@ -99,6 +100,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x0801528C,FUN_0801528c,src/world/level_step.c,588,588,yes
 0x080154D8,InitActor,src/world/actor_init.c,192,192,yes
+0x08016768,FUN_08016768,src/world/actor_reset.c,160,160,yes
 0x08017628,FUN_08017628,src/world/actor_state_step.c,1494,1536,no
 0x08019450,IsActorMarked,src/world/actor_control.c,20,20,yes
 0x08019464,NotifyActor,src/world/actor_control.c,44,44,yes

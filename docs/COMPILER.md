@@ -367,6 +367,47 @@ Ayrıca Ghidra `pop {r4,r5,r6}; pop {r0}; bx r0` dizisinin sonundaki `bx r0`ı
 "çözülemeyen atlama tablosu" sanabiliyor. `FUN_08017628`'de öyle oldu; orada
 tablo yok, sadece void dönüşün interworking biçimi var.
 
+## Kural 47 — bayt alanının işaretliliği maskenin nasıl kurulacağını belirler
+
+`x &= ~15` bir **`u8`** alan üzerinde yazılırsa agbcc sabiti `0xF0`'a indirger
+(`movs r1,#240`). Aynı satır **`s8`** alan üzerinde yazılırsa alan `int`'e
+yükselir ve maske `-16` olarak kurulur (`movs r1,#16 / negs r1,r1`) — bir komut
+daha, iki bayt.
+
+`FUN_08016768`'de ölçüldü: alanları `u8` bırakınca fonksiyon iki bayt kısa
+kalıyor ve ayrıca komut sıralaması kayıyordu; `s8` yapınca ikisi birden düzeldi
+ve fonksiyon **eşleşti**. ROM'da `negs` görüyorsanız alan işaretlidir.
+
+Maskeyi geniş tipte bir yerele almak (`s32 m = ~15; x &= m;`) `negs`i geri
+getiriyor ama sabiti ifadeden ÖNCE yaydığı için adres hesabıyla sırası ters
+düşüyor. Doğru çözüm alanın tipini düzeltmek, maskeyi taşımak değil.
+
+## Kural 48 — koşulun sonucunu değişkende maddeleştirmek
+
+ROM'da `movs r0,#0 / ... / movs r0,#1 / cmp r0,#0 / beq` dizisi görüyorsanız
+kaynak koşulu doğrudan dallanmıyor, **sonucu bir değişkene yazıp onu sınıyor**:
+
+```c
+ok = 0;
+if (ent->kind == 4) ok = 1;
+if (ok) FUN_0803c400(ent);
+```
+
+Kısa devreli `if (ent != 0 && ent->kind == 4)` yazımı doğrudan dallanma üretir
+ve altı bayt eksiltir. Kalıp projede daha önce `target_follow.c`'de de görülmüştü.
+
+## DMA kurulumundan sonra denetim yazmacı geri okunuyor
+
+ROM DMA3 denetim kelimesini yazdıktan sonra onu bir kez **geri okuyor**
+(`ldr rX,[rY,#8]`). İşlevsel görünmüyor ama atlanırsa her DMA bloğu iki bayt
+eksilir. `cutscene_frame.c` (eşleşti) ve `flush_palette_queue.c` ikisinde de var:
+
+```c
+REG_DMA3.control = TILE_CTRL;
+REG_DMA3.control;          /* geri okuma; atlanirsa iki bayt eksik */
+REG_IME = ime;
+```
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
