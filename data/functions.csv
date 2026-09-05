@@ -159,7 +159,7 @@ address,name,size,status,module,notes
 0x0800AFF8,FUN_0800aff8,172,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0800B0A4,FUN_0800b0a4,46,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0800B0D4,FUN_0800b0d4,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800B140,FUN_0800b140,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0800B140,FUN_0800b140,44,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800B16C,FUN_0800b16c,280,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800B284,FUN_0800b284,758,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800B57C,FUN_0800b57c,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -167,7 +167,7 @@ address,name,size,status,module,notes
 0x0800B63C,FUN_0800b63c,532,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800B850,FUN_0800b850,336,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800B9A0,FUN_0800b9a0,1040,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0800BDB0,FUN_0800bdb0,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0800BDB0,FUN_0800bdb0,72,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800BDF8,FUN_0800bdf8,198,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0800BEC0,FUN_0800bec0,88,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0800BF18,FUN_0800bf18,522,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

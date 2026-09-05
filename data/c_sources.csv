@@ -55,6 +55,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
+0x0800B140,FUN_0800b140,src/world/geometry.c,44,44,yes
+0x0800BDB0,FUN_0800bdb0,src/world/geometry.c,72,72,yes
+0x0800BF18,FUN_0800bf18,src/world/quad_edge_test.c,522,522,no
 0x0800CB08,FUN_0800cb08,src/core/listhead_e2.c,348,348,no
 0x0800D530,FUN_0800d530,src/core/listhead_e1.c,304,304,yes
 0x0800DB7C,FUN_0800db7c,src/misc/empty_stubs.c,2,2,yes
