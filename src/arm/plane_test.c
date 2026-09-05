@@ -17,15 +17,26 @@
  *
  * Fonksiyon tamamen ACILMIS; dongu yok, o yuzden kaynak da acilmis yazildi.
  *
- * DURUM: PARK — 230/244 fark, ROM 196 bayt (bizimki 48 bayt UZUN).
+ * DURUM: PARK — 171/196 fark, cikti 188 bayt (ROM 196).
  *
  * Bu, projedeki ILK ARM kipi denemesi.  Onceki tum denemeler teknik olarak
  * imkansizdi: derleme zinciri yalnizca Thumb'a bagliydi.
  *
- * DENENDI: -fomit-frame-pointer ARM bayraklarina eklendi (agbcc_arm
- * varsayilan olarak APCS cercevesi kuruyordu).  Kazanc VAR ama kucuk:
- * 244 -> 240 bayt, fark 230 -> 216.  Cerceve tek sebep degilmis; bayrak
- * yine de kalici olarak eklendi cunku ROM duz push kullaniyor.
+ * BAYRAK KESFI (kalici olarak agbcc_build.py'ye eklendi):
+ *   -fomit-frame-pointer                244 -> 240 bayt
+ *   + -fno-schedule-insns               240 -> 216
+ *   + -fno-schedule-insns2              216 -> 188  (ROM 196)
+ * Bunlar olmadan agbcc_arm yigin cercevesi kurup ara sonuclari
+ * tasiriyordu.  Butun ARM adaylari bundan yararlanacak.
+ *
+ * DAGITIM TAVANI — ONEMLI SINIR:
+ * ROM ONBIR yazmac itiyor (r3,r4,...,sl,fp,ip,lr) ve hic tasma yapmiyor.
+ * agbcc_arm on canli degerle sinandi: HER ZAMAN yalnizca sekiz yazmac
+ * ({r4,r5,r6,r7,r8,r9,sl,lr}) itiyor ve fp/ip'yi genel dagitima HIC
+ * sokmuyor.  Dokuz ayri bayrak denendi (-mapcs-frame, -mno-apcs-frame,
+ * -ffixed-fp, -mapcs-reentrant, -fcall-used-fp, -fcall-used-ip, -O3,
+ * -fforce-mem, -fno-schedule-insns); yalnizca sonuncusu fark yaratti,
+ * hicbiri yazmac kumesini genisletmedi.
  *
  * KRITIK BULGU — ARM BOLGESI C'DEN ULASILABILIR:
  * ROM'daki ARM kodu barrel-shifter kaynasmalari kullaniyor
@@ -37,7 +48,12 @@
  *     a + (b >> 16)   ->  add r0, r0, r1, asr #16
  * Yani 14920 baytlik ARM bolgesi normal bir eslestirme problemi.
  *
- * ELENEN: yapi atamasiyla `ldm`/`stmia` blok transferi uretme denendi
+ * ELENEN (2): acik kaydirma bicimi -- kaynagi u16 okuyup `<< 16`'yi ayri
+ * yerelde tutup `>> 16`'yi aritmetige kaynastirma denendi (ilerleyen ve
+ * indeksli cikis yazimiyla).  IKISI DE GERILEDI: 232/207 ve 216/179.
+ * Duz s16 + indeksli yazim (188/171) en iyisi olarak kaldi.
+ *
+ * ELENEN (1): yapi atamasiyla `ldm`/`stmia` blok transferi uretme denendi
  * (uc bicim: dizi indeksli, ilerleyen kaynak, ilerleyen kaynak+hedef).
  * UCU DE BELIRGIN GERILEDI: 304 bayt / ~288 fark.  agbcc_arm yapi
  * atamalarini daha AZ degil daha COK koda aciyor.  Skaler bicim

@@ -30,7 +30,13 @@ ARM_CC = "agbcc_arm"
 # -fomit-frame-pointer OLCULDU: onsuz agbcc_arm APCS cercevesi kuruyor
 # (mov ip,sp / stmfd {fp,ip,lr,pc} / sub fp,ip,#4) ve cikti ~48 bayt
 # uzuyor; ROM duz push kullaniyor.
-ARM_CC1FLAGS = ["-mthumb-interwork", "-O2", "-fomit-frame-pointer"]
+# -fno-schedule-insns / -fno-schedule-insns2 OLCULDU: bunlar olmadan
+# agbcc_arm yigin cercevesi kurup ara sonuclari tasiriyordu.  Ilk ARM
+# adayinda etkisi 240 -> 216 -> 188 bayt (ROM 196).  Kalici olarak eklendi.
+ARM_CC1FLAGS = [
+    "-mthumb-interwork", "-O2", "-fomit-frame-pointer",
+    "-fno-schedule-insns", "-fno-schedule-insns2",
+]
 ROM_BASE = 0x08000000
 
 

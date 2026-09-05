@@ -358,6 +358,6 @@ address,name,source,compiled_size,mapped_size,matching
 0x08067390,BumpCount84,src/world/more_counters_2.c,28,28,yes
 0x080673C4,BumpCount70,src/world/more_counters_3.c,28,28,yes
 0x080673E0,BumpCount80,src/world/more_counters_3.c,28,28,yes
-0x0806A77C,FUN_0806a77c,src/arm/plane_test.c,240,196,no
+0x0806A77C,FUN_0806a77c,src/arm/plane_test.c,188,196,no
 0x08070D94,FUN_08070d94,src/misc/empty_stubs.c,2,2,yes
 0x08070D98,FUN_08070d98,src/misc/empty_stubs.c,2,2,yes
