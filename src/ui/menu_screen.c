@@ -18,7 +18,11 @@
  * Yapi dogru, atamanin tamami bir register kaymis (docs/COMPILER.md,
  * register dagitiminin mekanizmasi).
  *
- * Denenenler (hicbiri ilerletmedi): case1/KEY_B dallarini ters cevirmek,
+ * Denenenler (hicbiri ilerletmedi): sifiri yerele alip yazmacta sabitlemek
+ * (`u16 off = 0; REG_IME = off;`) -- bayt farki 949'dan 924'e dusuyor ama
+ * KOMUT HIZALAMASI 494'ten 473'e geriliyor ve boyut 1456'da kaliyor, yani
+ * kazanc degil kayma; iki olcut celisince yapisal olana bakildi.  Ayrica:
+ * case1/KEY_B dallarini ters cevirmek,
  * `saved`i blend register'larindan once yuklemek (448 komuta dusuyor),
  * `ime`yi int yapmak, DMA3 icin yerel isaretci (501).
  *
