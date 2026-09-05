@@ -2,8 +2,10 @@
 """build/trace.log'u ozetler: sembol basina degisim, deger gecisleri, isaretci cozumu.
 
 Kullanim:
-    python3 tools/analyze_trace.py              # son oturumun ozeti
-    python3 tools/analyze_trace.py gSessionPtr  # tek sembolun gecisleri
+    python3 tools/analyze_trace.py                 # son oturumun ozeti
+    python3 tools/analyze_trace.py --list          # logdaki tum oturumlar
+    python3 tools/analyze_trace.py --session 2     # 2. oturumu incele
+    python3 tools/analyze_trace.py gSessionPtr     # tek sembolun gecisleri
 """
 import csv
 import pathlib
@@ -32,9 +34,23 @@ def classify(value, syms):
     return f"-> {region}" if region else ""
 
 
-def last_session(lines):
+def sessions(lines):
+    """Log birden cok oturum tutar; her biri ayri dondurulur."""
     marks = [i for i, l in enumerate(lines) if "yeni oturum" in l]
-    return lines[marks[-1]:] if marks else lines
+    if not marks:
+        return [lines]
+    bounds = marks + [len(lines)]
+    return [lines[bounds[i]:bounds[i + 1]] for i in range(len(marks))]
+
+
+def pick_session(lines, index):
+    """index: None -> sonuncu, 1-tabanli sayi -> o oturum."""
+    blocks = sessions(lines)
+    if index is None:
+        return blocks[-1], len(blocks), len(blocks)
+    if not 1 <= index <= len(blocks):
+        raise SystemExit(f"oturum {index} yok; logda {len(blocks)} oturum var")
+    return blocks[index - 1], index, len(blocks)
 
 
 def main(argv):
@@ -42,7 +58,13 @@ def main(argv):
         print(f"log yok: {LOG}")
         return 1
     lines = LOG.read_text(errors="replace").splitlines()
-    sess = last_session(lines)
+    idx = None
+    if "--session" in argv:
+        idx = int(argv[argv.index("--session") + 1])
+        argv = [a for i, a in enumerate(argv)
+                if i not in (argv.index("--session"), argv.index("--session") + 1)]
+    sess, used, total = pick_session(lines, idx)
+    print(f"[oturum {used}/{total}]")
     events = [(int(m.group(1)), m.group(2), m.group(3))
               for m in (LINE.match(l) for l in sess) if m]
     if not events:
@@ -53,6 +75,15 @@ def main(argv):
         return 1
 
     syms = ram_symbols()
+
+    if len(argv) > 1 and argv[1] == "--list":
+        blocks = sessions(lines)
+        print(f"logda {len(blocks)} oturum:")
+        for i, b in enumerate(blocks, 1):
+            ev = [l for l in b if LINE.match(l)]
+            frames = [int(LINE.match(l).group(1)) for l in ev] or [0]
+            print(f"  oturum {i}: {len(ev):>5} olay, kare {min(frames)}-{max(frames)}")
+        return 0
 
     if len(argv) > 1:
         name = argv[1]
