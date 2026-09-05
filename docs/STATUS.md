@@ -10,7 +10,7 @@ baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make sta
 | Fonksiyon haritası | 1933 fonksiyon / 454068 bayt |
 | İnsan incelemesi (`documented+`) | 406 / 1933 |
 | Byte-matching | 362 fonksiyon / 22628 bayt (%4.98) |
-| C kaynağı | 367 toplam / 350 matching |
+| C kaynağı | 368 toplam / 350 matching |
 | Kaynaktan doğrulanan ROM | 15064 bayt |
 | libc doğrulaması | 448 bayt |
 | Toplam doğrulanmış ROM alanı | 15512 bayt |
