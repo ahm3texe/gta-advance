@@ -27,6 +27,22 @@
  * 244 -> 240 bayt, fark 230 -> 216.  Cerceve tek sebep degilmis; bayrak
  * yine de kalici olarak eklendi cunku ROM duz push kullaniyor.
  *
+ * KRITIK BULGU — ARM BOLGESI C'DEN ULASILABILIR:
+ * ROM'daki ARM kodu barrel-shifter kaynasmalari kullaniyor
+ * (`rsb r6, r3, r6, asr #16` gibi) ve bunlarin elle yazilmis assembly
+ * olabilecegi supheniyle sinandi.  agbcc_arm bu kaliplarin UCUNU DE
+ * C'den uretiyor (olculdu):
+ *     a - (b >> 16)   ->  sub r0, r0, r1, asr #16
+ *     (b >> 16) - a   ->  rsb r0, r0, r1, asr #16
+ *     a + (b >> 16)   ->  add r0, r0, r1, asr #16
+ * Yani 14920 baytlik ARM bolgesi normal bir eslestirme problemi.
+ *
+ * ELENEN: yapi atamasiyla `ldm`/`stmia` blok transferi uretme denendi
+ * (uc bicim: dizi indeksli, ilerleyen kaynak, ilerleyen kaynak+hedef).
+ * UCU DE BELIRGIN GERILEDI: 304 bayt / ~288 fark.  agbcc_arm yapi
+ * atamalarini daha AZ degil daha COK koda aciyor.  Skaler bicim
+ * (240 bayt / 216 fark) en iyisi olarak kaldi.
+ *
  * Sonraki adimlar (denenmedi):
  *   1. Cikis ofsetleri 20 bayt adimla ilerliyor; dst[5]/dst[10] yerine
  *      20 baytlik yapi dizisi denenebilir
