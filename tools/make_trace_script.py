@@ -83,7 +83,66 @@ local function keyString()
   return " [" .. table.concat(held, "+") .. "]"
 end
 
+-- Dogrulama ILK KAREDE yapiliyor, script yuklenirken DEGIL: `emu`
+-- nesnesi yukleme aninda henuz hazir olmuyor ve acilista dogrulamak
+-- tum listeyi bosaltip oturumu sifir veriyle bitiriyordu.
+local validated = false
+
+-- "hepsi basarisiz" belirtisi iki ayri sebepten olabilir: `emu` hazir
+-- degil, YA DA metot adlari bu surumde farkli.  Ikisi ayni gorunuyor,
+-- o yuzden once API bicimini yoklayip HATA METNINI yaziyoruz; boylece
+-- tek bir oturum hangisi oldugunu kesin soyluyor.
+local function probeApi()
+  local probe = 0x02000000
+  local attempts = {
+    {"emu:read32(addr)",        function() return emu:read32(probe) end},
+    {"emu:read8(addr)",         function() return emu:read8(probe) end},
+    {"emu.memory.wram:read32()",function() return emu.memory.wram:read32(probe) end},
+    {"emu:readRange(addr,4)",   function() return emu:readRange(probe, 4) end},
+  }
+  out("--- API yoklamasi ---")
+  local winner = nil
+  for i = 1, #attempts do
+    local name, fn = attempts[i][1], attempts[i][2]
+    local ok, res = pcall(fn)
+    if ok then
+      out(string.format("  CALISTI  %-26s -> %s", name, tostring(res)))
+      if winner == nil then winner = name end
+    else
+      out(string.format("  hata     %-26s -> %s", name, tostring(res)))
+    end
+  end
+  if winner == nil then
+    out("[HATA] hicbir okuma bicimi calismadi. Yukaridaki hata metinlerini")
+    out("       Claude'a gonder; dogru API bicimi oradan cikar.")
+  else
+    out("kullanilan bicim: " .. winner)
+  end
+  out("--- yoklama sonu ---")
+  return winner ~= nil
+end
+
+local function validateOnce()
+  validated = true
+  if not probeApi() then return end
+  local bad, first_err = 0, nil
+  for i = #WATCH, 1, -1 do
+    local ok, err = pcall(readN, WATCH[i][1], WATCH[i][2])
+    if not ok then
+      if first_err == nil then
+        first_err = tostring(err)
+        out("[uyari] ilk okuma hatasi: " .. first_err)
+      end
+      table.remove(WATCH, i)
+      bad = bad + 1
+    end
+  end
+  out(string.format("izleme aktif: %d sembol (%d atlandi), gurultu esigi %d",
+        #WATCH, bad, NOISE_LIMIT))
+end
+
 local function onFrame()
+  if not validated then validateOnce() end
   frame = frame + 1
   local keys = nil
   for i = 1, #WATCH do
@@ -119,21 +178,7 @@ else
   console:log("[uyari] log dosyasi acilamadi: " .. LOG_PATH)
 end
 
--- Acilista her adresi BIR KEZ dogrula; okunamayani listeden dus.
-do
-  local bad = 0
-  for i = #WATCH, 1, -1 do
-    local ok = pcall(readN, WATCH[i][1], WATCH[i][2])
-    if not ok then
-      out("[uyari] okunamadi, atlandi: " .. WATCH[i][3])
-      table.remove(WATCH, i)
-      bad = bad + 1
-    end
-  end
-  out(string.format("izleme basladi: %d sembol (%d atlandi), gurultu esigi %d",
-        #WATCH, bad, NOISE_LIMIT))
-end
-
+out(string.format("script yuklendi: %d sembol; dogrulama ilk karede", #WATCH))
 callbacks:add("frame", onFrame)
 """
 
