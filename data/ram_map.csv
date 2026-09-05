@@ -65,6 +65,7 @@ address,size,name,source,status,notes
 0x020246F0,2812,gRam020246F0,decomp,provisional,20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor; boyut 2960->2812 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
 0x020251EC,148,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri; boyut 2960->148 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02025280,1424,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime; boyut 2960->1424 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
+0x02025800,4,gRam02025800,decomp,provisional,28 baytlik kayit tablosuna (gRom08852A2C) indeks; 0 ise islem atlaniyor. 0x08063E7C ve 0x08063EAC okuyor.
 0x02025810,8,gRam02025810,decomp,provisional,Oyuncu ilerleme blogu; +0x14 gorevden cikma ucreti (1000) icin karsilastirilip dusulen para; boyut 4991->8 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)
 0x02025818,2,mission_timer,libretro_cheat,provisional,IZLEME: SUPHELI AD (kaynak libretro_cheat). 0x100er artiyor ve artislar SADECE Up basiliyken oluyor; sinematik boyunca 481 kare hic artmadi. Zaman degil MESAFE/adim sayaci gibi duruyor (8.8 sabit nokta). Dogrulanmadi.
 0x0202581A,1,wanted_level_display,libretro_cheat,provisional,
@@ -108,6 +109,7 @@ address,size,name,source,status,notes
 0x02035780,4,gRam02035780,decomp,provisional,FUN_08055D90 cagrisinda ilk arguman (byte-matching kanit)
 0x02035A70,4,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik"
 0x02035A9C,1,gRam02035A9C,decomp,provisional,254'te doyan u8 sayac
+0x02035B1C,1,gRam02035B1C,decomp,provisional,0x08063E58 bekleme dongusu bittiginde sifirliyor.
 0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
 0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
 0x02035CC0,4,gLanguage,decomp,verified,"Dil secimi (0..4, bes dil). Ayarlayici 0x0805E6C4 kirpiyor; okuyucu 0x0805E6E0 metin tablosunda dil basina 618 dizelik blok seciyor. Bkz. docs/METIN_HARITASI.md"
@@ -136,5 +138,7 @@ address,size,name,source,status,notes
 0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
 0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
+0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
+0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
 0x08EC46D4,0,gTextTable,decomp,verified,Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.
