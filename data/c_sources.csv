@@ -99,7 +99,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x0801528C,FUN_0801528c,src/world/level_step.c,588,588,yes
 0x080154D8,InitActor,src/world/actor_init.c,192,192,yes
-0x08017628,FUN_08017628,src/world/actor_state_step.c,1510,1536,no
+0x08017628,FUN_08017628,src/world/actor_state_step.c,1494,1536,no
 0x08019450,IsActorMarked,src/world/actor_control.c,20,20,yes
 0x08019464,NotifyActor,src/world/actor_control.c,44,44,yes
 0x08019490,ReleaseActorRefs,src/world/actor_control.c,34,34,yes

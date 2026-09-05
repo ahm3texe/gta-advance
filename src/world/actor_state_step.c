@@ -23,10 +23,41 @@
  * yazmaci elle 1 yapilip bolge yeniden sokuldu (tools/ghidra/
  * ExportDecompileBatch.java).
  *
- * DURUM: 1510/1536, 26 bayt kisa.  Karsilastirma sayisi 92/92 TAM ESLESIYOR
- * ve `mov pc,rX` iki tarafta da yok, yani switch dogru bicimde AGAC olarak
- * derleniyor.  Agacin 92 dugumunun 52'si dogru sirada; kok bizde 0x36, ROM'da
- * 0x38, yani case kumesi birkac deger kayik.
+ * DURUM: 1494/1536, 42 bayt kisa.  Prolog, dagitim agaci ve havuz sayisi
+ * oturdu; kalan fark case GOVDELERINDE.
+ *
+ *   prolog          push {r4,r5,r6,lr}  BIREBIR
+ *   agac koku       0x38                BIREBIR
+ *   karsilastirma   91/92, 78'i dogru sirada
+ *   `mov pc,rX`     iki tarafta da 0 (atlama tablosu yok)
+ *   0x020303C4      havuz 9/9
+ *
+ * AGACI OTURTAN UC DEGISIKLIK, sirasiyla:
+ *
+ *   1. `case STATE_IDLE` eklendi -> KOK 0x38 OLDU.  agbcc'nin
+ *      balance_case_nodes'u pivotu `(case + aralik + 1) / 2` ile seciyor;
+ *      40 case'te pivot 19. indeks = 0x36 cikiyordu.  Yeniden esleme
+ *      tablosu STATE_IDLE uretebildigi icin ROM'da bunun BOS govdeli bir
+ *      case'i var (Ghidra'da `uVar2 != uVar6` dali).  41 case ile pivot
+ *      20. indeks = 0x38, yani ROM'un koku.
+ *
+ *   2. Uc kume GNU ARALIK bicimiyle yazildi (0x21...0x29, 0x2f...0x30,
+ *      0x4e...0x51).  Aralik dugumu ROM'da YUKSEK-sonra-DUSUK iki TEK
+ *      karsilastirma uretiyor (41 sonra 33); ayri case yazilinca deger
+ *      CIFT geciyor (33, 33).  Sirali eslesme 58 -> 72.
+ *
+ *   3. Case'ler ROM'un GOVDE YERLESIMINE gore siralandi: gcc govdeleri
+ *      kaynak sirasinda yayiyor, ROM'da ilk govde ortak "9,1" blogu
+ *      (0x08017824), en sonda varsayilan (0x08017b40).  72 -> 78.
+ *
+ * Prologu oturtan: ROM sabit 0x20'yi r6'da tutuyor ve {r4,r5,r6,lr} itiyor.
+ * Deger dort yerde yaziliyor, agbcc onu callee-saved yazmaca kaldiriyor.
+ * Yerele almak ayni etkiyi verdi (ortak onek 0 -> 5 bayt).
+ *
+ * KALAN 42 BAYT.  Ortak "9,1" govdesi tek kopya yazilinca (ROM'da da tek
+ * havuz kelimesi var) 28 bayt eksildi; ROM o bolgede 28 bayt daha tasiyor,
+ * yani sekiz sicrama saplamasinin bicimi henuz tam degil.  Ayrica bir
+ * karsilastirma eksik (91/92) ve iki govde yer degistirmis.
  *
  * BELIRLEYICI BULGU -- 0x4005/0x4026/0x4027/0x4028 DE CASE.
  * Ghidra bunlari havuz sabiti gibi gosteriyor (_DAT_080177d0 ve komsulari)
@@ -109,7 +140,7 @@ typedef struct Actor {
 } Actor;
 
 extern s32 FUN_0803c400(Entity *entity);
-extern s32 SelectSlotCD(void);
+extern u8 *SelectSlotCD(void);
 extern void FUN_0801686c(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080198e4(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080426ec(Task *task, s32 a, Entity *entity);
@@ -136,12 +167,18 @@ extern void FUN_08019260(Actor *self);
 
 void FUN_08017628(Actor *self)
 {
-    s32 slot;
+    u8 *slot;   /* SelectSlotCD sonucu; +0x1C'de tablo indeksi tasiyor */
     u32 state;
+    s32 nine;
+    /* ROM sabit 0x20'yi r6'da (callee-saved) tutuyor ve prologda
+     * {r4,r5,r6,lr} itiyor: deger fonksiyon boyunca DORT yerde yaziliyor,
+     * agbcc de onu yazmaca kaldiriyor.  Yerele almak ayni etkiyi veriyor. */
+    u8 mode20;
 
+    mode20 = 0x20;
     if (FUN_0803c400(self->entity) == 0) return;
     slot = SelectSlotCD();
-    if (self->visual != 0) self->visual->mode = 0x20;
+    if (self->visual != 0) self->visual->mode = mode20;
 
     state = self->state;
     if (state != STATE_IDLE) {
@@ -150,21 +187,53 @@ void FUN_08017628(Actor *self)
         }
         state = self->state;
         switch (state) {
-        case 0x38: {
-            if (self->prev != 0x38 && self->prev != 0x96) self->sub = 2;
-            FUN_0801686c(self, 0x38, 3, 0);
-            if (self->visual != 0) self->visual->mode = 0x40;
-            break;
-        }
-        case 0x4027:
-        case 0x96: {
-            if (self->prev != 0x96) self->sub = 2;
-            FUN_0801686c(self, 0x96, 3, 0);
-            if (self->visual != 0) self->visual->mode = 0x40;
-            break;
-        }
+        /* Gövde sirasi ROM'un yerlesimine gore: gcc case govdelerini KAYNAK
+         * sirasinda yayiyor.  ROM'da ilk govde ortak "9,1" blogu (0x08017824),
+         * en sonda varsayilan (0x08017b40) duruyor. */
+
+        /* ORTAK GOVDE: sekiz case bunu paylasiyor ve degeri yazmacta
+         * tasiyor.  ROM'da TEK fiziksel kopya var (havuz kelimesi
+         * _DAT_08017858), o yuzden burada da tek kopya yazilir -- kural 45
+         * ancak ROM'da AYRI kopyalar varsa gecerlidir. */
+        case 0x02: nine = 0x02; goto body_nine;
+        case 0x03: nine = 0x03; goto body_nine;
+        case 0x2c: nine = 0x2c; goto body_nine;
+        case 0x2d: nine = 0x2d; goto body_nine;
+        case 0x5c: nine = 0x5c; goto body_nine;
+        case 0x5d: nine = 0x5d; goto body_nine;
+        case 0x67: nine = 0x67; goto body_nine;
+        case 0x68: nine = 0x68; goto body_nine;
+        body_nine: { Entity *e; Task *t;
+            FUN_0801686c(self, nine, 9, 1);
+            e = self->entity; NUDGE(e, t); break; }
+
+        /* Asagidaki sekiz case'in HER BIRI ROM'da kendi havuz kelimesinden
+         * 0x020303C4'u yukluyor -- ayri fiziksel bloklar, kural 45 geregi
+         * her birine kendi yerelleri veriliyor. */
+        case 0x01: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x87, 1, 0x0f); break; }
+        case 0x2b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x8a, 1, 0x0f); break; }
+        case 0x4b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x91, 1, 0x0f); break; }
+        case 0x4e ... 0x51:
+                   { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x94, 1, 0x0f); break; }
+        case 0x57: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x97, 1, 0x07); break; }
+        case 0x5b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x9a, 1, 0x0f); break; }
+        case 0x66: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x8d, 1, 0x0f); break; }
+        case 0x2f ... 0x30:
+                   { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
+                     FUN_080198e4(self, 0x90, 1, 0x47); break; }
+
+        case 0x63: FUN_0801686c(self, 0x63, 10, 2); break;
+        case 0x4c: FUN_0801686c(self, 0x4c, 10, 2); break;
+
         case 0x18: {
-            u32 v18 = *(u16 *)(TABLE_18 + **(u8 **)&self->entity->kind * 2);
+            u32 v18 = *(u16 *)(TABLE_18 + **(u8 **)(slot + 0x1c) * 2);
             if (v18 == 0) {
                 FUN_0801686c(self, 0x18, 2, 1);
             } else {
@@ -173,23 +242,18 @@ void FUN_08017628(Actor *self)
             }
             break;
         }
-        /* 0x4005/0x4026/0x4027/0x4028 de AYNI switch'in case'leri.  Ghidra
-         * bunlari havuz sabiti (_DAT_080177d0 vb.) diye gosteriyor ama
-         * karsilastirma agacinin dugumleri.  Onemli: bu dort deger switch'in
-         * ARALIGINI 1..0x4028'e genisletiyor; onlarsiz kume yogun kaliyor ve
-         * agbcc atlama tablosu uretiyor (ROM'da hic `mov pc,rX` yok). */
-        case 0x4005:
-        case 0x17: {
-            u32 v17 = *(u16 *)(TABLE_17 + **(u8 **)&self->entity->kind * 2);
-            if (v17 == 0) {
-                FUN_0801686c(self, state, 1, 1);
-            } else {
-                FUN_0801686c(self, 0x6a, 1, 1);
-                FUN_080198e4(self, v17 + 8, 1, 0x13);
-            }
-            if (self->visual != 0) self->visual->mode = 0x20;
+
+        case 0x21 ... 0x29:
+        case 0x58: FUN_080198e4(self, 0x79, 1, 0x23); break;
+        case 0x35: FUN_080198e4(self, 0x81, 1, 0x23); break;
+        case 0x36: FUN_080198e4(self, 0x84, 1, 0x23); break;
+
+        case 0x38:
+            if (self->prev != 0x38 && self->prev != 0x96) self->sub = 2;
+            FUN_0801686c(self, 0x38, 3, 0);
+            if (self->visual != 0) self->visual->mode = 0x40;
             break;
-        }
+
         case 0x0d: {
             Entity *e0d;
             FUN_0801686c(self, 0x0d, 2, 1);
@@ -198,70 +262,45 @@ void FUN_08017628(Actor *self)
             if (e0d != 0 && (e0d->flags & 0x8000) != 0) e0d->flags &= CLEAR_8000;
             break;
         }
+
+        case 0x4005:
+        case 0x17: {
+            u32 v17 = *(u16 *)(TABLE_17 + **(u8 **)(slot + 0x1c) * 2);
+            if (v17 == 0) {
+                FUN_0801686c(self, state, 1, 1);
+            } else {
+                FUN_0801686c(self, 0x6a, 1, 1);
+                FUN_080198e4(self, v17 + 8, 1, 0x13);
+            }
+            if (self->visual != 0) self->visual->mode = mode20;
+            break;
+        }
+
+        case 0x4027:
+        case 0x96:
+            if (self->prev != 0x96) self->sub = 2;
+            FUN_0801686c(self, 0x96, 3, 0);
+            if (self->visual != 0) self->visual->mode = 0x40;
+            break;
+
+        case 0x4028:
+        case 0x97: FUN_0801686c(self, state, 1, 0); goto lit40;
         case 0x0e: FUN_0801686c(self, 0x0e, 2, 1); goto lit40;
         case 0x0f: FUN_0801686c(self, 0x0f, 2, 1); goto lit40;
         case 0x10: FUN_0801686c(self, 0x10, 3, 1); goto lit40;
         case 0x0c: FUN_0801686c(self, 0x0c, 3, 1); goto lit40;
-        case 0x1f: FUN_0801686c(self, 0x1f, 2, 0); goto lit40;
-        case 0x4028:
-        case 0x97: FUN_0801686c(self, state, 1, 0);
+        case 0x1f: FUN_0801686c(self, 0x1f, 2, 0);
         lit40:
             if (self->visual != 0) self->visual->mode = 0x40;
             break;
 
-        case 0x01: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x87, 1, 0x0f); break; }
-        case 0x2b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x8a, 1, 0x0f); break; }
-        case 0x4b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x91, 1, 0x0f); break; }
-        case 0x57: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x97, 1, 0x07); break; }
-        case 0x5b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x9a, 1, 0x0f); break; }
-        case 0x66: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x8d, 1, 0x0f); break; }
-        /* ROM bu kumeleri ARALIK olarak siniyor (uc noktalarda `cmp`:
-         * 78/81, 47/48, 33/41).  Tek tek case yazmak switch'i yogunlastirip
-         * agbcc'yi ATLAMA TABLOSU uretmeye itiyordu; GNU aralik bicimi
-         * zinciri seyrek tutuyor. */
-        case 0x4e: case 0x51:
-                   { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x94, 1, 0x0f); break; }
-        case 0x2f: case 0x30:
-                   { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
-                     FUN_080198e4(self, 0x90, 1, 0x47); break; }
-
-        case 0x02: { Entity *e; Task *t; FUN_0801686c(self, 0x02, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x03: { Entity *e; Task *t; FUN_0801686c(self, 0x03, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x2c: { Entity *e; Task *t; FUN_0801686c(self, 0x2c, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x2d: { Entity *e; Task *t; FUN_0801686c(self, 0x2d, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x5c: { Entity *e; Task *t; FUN_0801686c(self, 0x5c, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x5d: { Entity *e; Task *t; FUN_0801686c(self, 0x5d, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x67: { Entity *e; Task *t; FUN_0801686c(self, 0x67, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-        case 0x68: { Entity *e; Task *t; FUN_0801686c(self, 0x68, 9, 1);
-                     e = self->entity; NUDGE(e, t); break; }
-
-        case 0x21: case 0x29:
-        case 0x58:
-            FUN_080198e4(self, 0x79, 1, 0x23);
-            break;
-        case 0x35: FUN_080198e4(self, 0x81, 1, 0x23); break;
-        case 0x36: FUN_080198e4(self, 0x84, 1, 0x23); break;
-
         case 0x4026:
             FUN_0801686c(self, state, 3, 1);
-            if (self->visual != 0) self->visual->mode = 0x20;
+            if (self->visual != 0) self->visual->mode = mode20;
             break;
-        case 0x63: FUN_0801686c(self, 0x63, 10, 2); break;
-        case 0x4c: FUN_0801686c(self, 0x4c, 10, 2); break;
+
+        case STATE_IDLE:
+            break;
 
         default:
             FUN_0801686c(self, state, 2, 2);
@@ -283,7 +322,7 @@ void FUN_08017628(Actor *self)
             } else {
                 self->tag = 3;
                 FUN_0801686c(self, 0x4000, 2, 3);
-                if (self->visual != 0) self->visual->mode = 0x20;
+                if (self->visual != 0) self->visual->mode = mode20;
             }
         } else {
             if (FUN_0803c400(self->entity) != 0
