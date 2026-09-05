@@ -32,7 +32,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800114C,BuildActiveMenuItems,src/ui/build_active_menu_items.c,160,160,yes
 0x080011EC,DrawMenuItems,src/ui/draw_menu_items.c,448,448,yes
 0x080013AC,InitMenuScreen,src/ui/init_menu_screen.c,172,172,yes
-0x08001458,RunMenuScreen,src/ui/menu_screen.c,1456,1448,no
+0x08001458,RunMenuScreen,src/ui/menu_screen.c,1448,1448,no
 0x08001A00,RunMenuLoop,src/ui/menu_loop.c,960,960,yes
 0x08001DC0,ResetMenuState,src/ui/menu_helpers.c,64,64,yes
 0x08001E00,IsMenuFlagSet,src/ui/menu_helpers.c,28,28,yes

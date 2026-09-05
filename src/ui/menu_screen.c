@@ -9,14 +9,23 @@
  *   0x080014CC  41 giris (case 17..57), yalnizca iki hedef
  *   0x08001874   5 giris, eylem fonksiyonunun donus degeri
  *
- * HENUZ ESLESMIYOR. Durum: 694 komutun 503'u birebir tutuyor; cikti 1456
- * bayt, hedef 1448 (8 bayt = 4 komut fazla). Bastan 0x080015D8'e kadarki
- * onsoz -- gorev kontrolu, 41 girisli atlama tablosu, uyari mesajlari --
- * TAM eslesiyor. Sapma ilk DMA blogunda basliyor ve saf register dagitimi:
- *     ROM  : saved->r2  ime->r1  sifir->r3
- *     bizim: saved->r1  ime->r0  sifir->r2   (+ blok basina `adds r3,r0,#0`)
- * Yapi dogru, atamanin tamami bir register kaymis (docs/COMPILER.md,
- * register dagitiminin mekanizmasi).
+ * HENUZ ESLESMIYOR ama BOYUT TUTTU: 1448/1448, bayt farki 502, hizali
+ * komut 582/679.  Bastan 0x080015D8'e kadarki onsoz -- gorev kontrolu, 41
+ * girisli atlama tablosu, uyari mesajlari -- ROM ile AYNI BAYT.
+ *
+ * KURAL 45 BURAYA DA UYDU (docs/COMPILER.md).  Onceki surumde alti IME
+ * sakla/geri-yaz cifti TEK bir `ime` yerelini paylasiyordu; cikti 1456 bayt
+ * (8 fazla), fark 949, hizali komut 494.  Birinci, ikinci, dorduncu ve
+ * altinci cifte KENDI blok-yerel `savedIme` degiskeni verilince boyut
+ * tuttu ve fark 502'ye indi.
+ *
+ * ALT KUME ONEMLI, hepsini kapsamak KOTU: alti cifti de blok-yerel yapmak
+ * 1444 bayt / fark 643 veriyor, ilk dordu 1444 / 643.  Yalnizca (1,2,4,6)
+ * dogru.  Bu, dagitimin blok basina degil, ROM'un canli deger duzenine
+ * gore ayarlandigi anlamina geliyor.
+ *
+ * Kalan fark hala yazmac dagitiminda: ROM saved->r2, ime->r1, sifir->r3
+ * tutuyor.
  *
  * Denenenler (hicbiri ilerletmedi): sifiri yerele alip yazmacta sabitlemek
  * (`u16 off = 0; REG_IME = off;`) -- bayt farki 949'dan 924'e dusuyor ama
@@ -219,21 +228,29 @@ void RunMenuScreen(int mode)
     BLEND_Y = BLEND_Y_MAX;
 
     saved = gMenuPaletteSource;
-    ime = REG_IME;
+    {
+        u16 savedIme;
+
+        savedIme = REG_IME;
     REG_IME = 0;
     REG_DMA3.src = PALETTE_RAM;
     REG_DMA3.dst = saved;
     REG_DMA3.control = DMA_SAVE_PALETTE;
     REG_DMA3.control;
-    REG_IME = ime;
+        REG_IME = savedIme;
+    }
 
-    ime = REG_IME;
+    {
+        u16 savedIme;
+
+        savedIme = REG_IME;
     REG_IME = 0;
     REG_DMA3.src = MENU_PALETTE_1;
     REG_DMA3.dst = PALETTE_DEST_0;
     REG_DMA3.control = DMA_COPY_PALETTE;
     REG_DMA3.control;
-    REG_IME = ime;
+        REG_IME = savedIme;
+    }
 
     ime = REG_IME;
     REG_IME = 0;
@@ -243,14 +260,18 @@ void RunMenuScreen(int mode)
     REG_DMA3.control;
     REG_IME = ime;
 
-    ime = REG_IME;
+    {
+        u16 savedIme;
+
+        savedIme = REG_IME;
     REG_IME = 0;
     fill = VRAM_FILL_VALUE;
     REG_DMA3.src = &fill;
     REG_DMA3.dst = VRAM;
     REG_DMA3.control = DMA_CLEAR_VRAM;
     REG_DMA3.control;
-    REG_IME = ime;
+        REG_IME = savedIme;
+    }
 
     FUN_08012690();
     FUN_0803378c(1, 1);
@@ -285,13 +306,17 @@ void RunMenuScreen(int mode)
     REG_DMA3.control;
     REG_IME = ime;
 
-    ime = REG_IME;
+    {
+        u16 savedIme;
+
+        savedIme = REG_IME;
     REG_IME = 0;
     REG_DMA3.src = MENU_PALETTE_1;
     REG_DMA3.dst = PALETTE_DEST_1;
     REG_DMA3.control = DMA_COPY_PALETTE;
     REG_DMA3.control;
-    REG_IME = ime;
+        REG_IME = savedIme;
+    }
 
     DrawMenuItems(menu, 0, 0);
     FUN_08063ca4();
