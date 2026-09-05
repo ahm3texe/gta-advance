@@ -24,8 +24,17 @@
  * dogru.  Bu, dagitimin blok basina degil, ROM'un canli deger duzenine
  * gore ayarlandigi anlamina geliyor.
  *
+ * IKINCI DUZELTME -- KATLANMIS HAVUZ SABITI.  `((int *)gRam02025810)[5]`
+ * yazimi taban+0x14'u TEK havuz sabitine (0x02025824) katliyor ve
+ * `ldr r1,[r0,#0]` uretiyordu; ROM tabani duz yukleyip `ldr r1,[r0,#20]`
+ * yapiyor.  Yapi uyesi bicimine gecirmek fark 502 -> 499, hizali komut
+ * 582 -> 584, ayrim blogu 57 -> 55.  Uc yazim denendi (yerel int*, yerel
+ * struct*, dogrudan uye), UCU DE ayni sonucu verdi.
+ *
  * Kalan fark hala yazmac dagitiminda: ROM saved->r2, ime->r1, sifir->r3
- * tutuyor.
+ * tutuyor.  Sonraki sapmalar havuz KONUMU farki (bizimki 4 bayt ileriyi
+ * okuyor), yani havuz sirasi kaymis; toplam boyut ayni oldugu icin bir
+ * giris yer degistirmis olmali.
  *
  * Denenenler (hicbiri ilerletmedi): sifiri yerele alip yazmacta sabitlemek
  * (`u16 off = 0; REG_IME = off;`) -- bayt farki 949'dan 924'e dusuyor ama
@@ -78,6 +87,15 @@
 #define MSG_QUIT_MISSION 0x222
 #define MSG_NEED_CASH    0x223
 #define QUIT_MISSION_FEE 1000
+
+/* Oyuncu ilerleme blogu.  ROM tabani DUZ yukleyip +0x14'u ayri ofsetle
+ * okuyor (`ldr r0,[pc] / ldr r1,[r0,#20]`).  Dizi indekslemesi
+ * (`((int *)gRam02025810)[5]`) taban+20'yi TEK havuz sabitine katliyordu ve
+ * `ldr r1,[r0,#0]` uretiyordu; yapi uyesi biciminde katlanma olmuyor. */
+typedef struct Progress {
+    u8  pad00[0x14];
+    s32 cash;                   /* 0x14 */
+} Progress;
 
 #define gKeys            (*(u16 *)0x02000D0C)
 #define gUnk02001200     (*(u8 *)0x02001200)
@@ -198,7 +216,7 @@ void RunMenuScreen(int mode)
                 GetTextString(MSG_QUIT_MISSION);
                 FUN_08030b34();
             } else {
-                if (((int *)gRam02025810)[5] <= QUIT_MISSION_FEE - 1) {
+                if (((Progress *)gRam02025810)->cash <= QUIT_MISSION_FEE - 1) {
                     GetTextString(MSG_NEED_CASH);
                     FUN_08030b34();
                     return;
