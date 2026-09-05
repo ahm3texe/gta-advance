@@ -3,7 +3,7 @@
  */
 #include "gba_types.h"
 
-u32 FUN_0805d878(u32 first, u32 second)
+u32 IdsCompatible(u32 first, u32 second)
 {
     if (first == second)
         goto compatible;

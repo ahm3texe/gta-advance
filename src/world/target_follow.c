@@ -1,6 +1,6 @@
 /* Select the current target and advance the two-phase target action. */
 #include "target_common.h"
-u32 FUN_0804b088(TargetActor *self)
+u32 AdvanceTargetAction(TargetActor *self)
 {
  TargetContext *context=self->context;
  TargetActor *candidate=context->details->target;

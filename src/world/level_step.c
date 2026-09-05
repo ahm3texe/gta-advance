@@ -72,7 +72,7 @@ typedef struct Entity {
 } Entity;
 
 /* 0x0801528C */
-void FUN_0801528c(Entity *entity, u32 kind)
+void SelectEntityHandler(Entity *entity, u32 kind)
 {
     const u16 *def;
     const u16 *cur;

@@ -139,7 +139,7 @@ extern void List2Init(List2 *list);
 extern void List2PushFront(List2 *list, Node2 *node);
 
 /* 0x08054450 */
-void FUN_08054450(void)
+void BuildNodeFreeLists(void)
 {
     EntryA *entryA;
     EntryB *entryB;

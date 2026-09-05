@@ -165,7 +165,7 @@ extern void    FUN_08055d90(u32 *head, u32 id);
 extern void    FUN_08052c68(s32 index);
 
 /* 0x08052E78 */
-void FUN_08052e78(Area *area)
+void ResetAreaIds(Area *area)
 {
     SlotDesc  *desc;
     int        i;

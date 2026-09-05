@@ -7,7 +7,7 @@
  * (firstPairs), sonra bir sonraki tile'in bas sutunlari (secondPairs).
  * Ikisinin toplami her zaman 4 piksel CIFTI = 8 piksel.
  *
- * Cagiran FUN_08064020: r0 = hedef tile, r1 = subX (x & 7, cift),
+ * Cagiran PlaceGlyph: r0 = hedef tile, r1 = subX (x & 7, cift),
  * r2 = glif verisi, r3 = tile sutunu (x >> 3). Sutun araligi [-1, 29];
  * 30 sutun x 8 piksel = 240 piksel ekran genisligi. col == -1, glifin
  * yalnizca SAG yarisinin ekranda oldugu durum: ilk dongu tamamen atlanir,
@@ -89,7 +89,7 @@
 extern u32 gFontIndex;
 
 /* 0x08063ED8 */
-void FUN_08063ed8(u16 *dest, s32 subX, const u8 *src, s32 col)
+void BlendGlyphAcrossTiles(u16 *dest, s32 subX, const u8 *src, s32 col)
 {
     s32 firstPairs;
     s32 secondPairs;

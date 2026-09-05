@@ -1,6 +1,6 @@
 /* Reissue a target action whenever its action controller becomes ready. */
 #include "target_common.h"
-u32 FUN_08047600(TargetActor *self)
+u32 ReissueTargetAction(TargetActor *self)
 {
  TargetContext *context=self->context;
  TargetActor *candidate=context->details->target;

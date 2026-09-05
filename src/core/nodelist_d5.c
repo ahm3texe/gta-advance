@@ -168,7 +168,7 @@ extern void  FUN_08055d90(u32 *head, u32 id);
 extern void  FUN_08052c68(s32 index);
 
 /* 0x0805518C */
-void FUN_0805518c(void)
+void RefreshActiveAreas(void)
 {
     AreaGroup *group;
     AreaEntry *entry;

@@ -2,7 +2,7 @@
  *
  * draw_text.c'deki DrawTextAt her karakter icin bunu cagiriyor. Gorevi:
  * kirpma testleri, karakter normalizasyonu ve glif karolarinin hedef
- * adreslerini kurup asil piksel karistiricisini (FUN_08063ed8, text_f1.c)
+ * adreslerini kurup asil piksel karistiricisini (BlendGlyphAcrossTiles, text_f1.c)
  * cagirmak.
  *
  * Akis:
@@ -48,7 +48,7 @@
  *    var. `u8` -> 311/356 fark, kelime genisligi -> 141/352. Ayrica
  *    normalizasyonun kullandigi register tum dagitimi bir kaydiriyordu.
  *    NOT: clear_text_area.c ve draw_text.c bu fonksiyonu hala
- *    `extern void FUN_08064020(u8 ch, s32 x, s32 y);` diye bildiriyor.
+ *    `extern void PlaceGlyph(u8 ch, s32 x, s32 y);` diye bildiriyor.
  *    Cagri ABI'si ayni (deger zaten r0'da u8 olarak geliyor) ve o iki
  *    dosya BYTE-MATCHING durumda, ama bildirim ile tanim tip olarak
  *    ayrisiyor; bir sonraki dokunusta oradaki bildirimler `s32`ye
@@ -93,10 +93,10 @@ extern u32  gHalfLineSpacing;
 
 extern u8   _toupper(u8 ch);
 extern s32  GetGlyphWidth(u32 ch);
-extern void FUN_08063ed8(u16 *dest, s32 subX, const u8 *src, s32 col);
+extern void BlendGlyphAcrossTiles(u16 *dest, s32 subX, const u8 *src, s32 col);
 
 /* 0x08064020 */
-void FUN_08064020(s32 ch, s32 x, s32 y)
+void PlaceGlyph(s32 ch, s32 x, s32 y)
 {
     s32 width;
     s32 row;
@@ -141,15 +141,15 @@ void FUN_08064020(s32 ch, s32 x, s32 y)
         glyph = gGlyphTiles + (ch << TILE_ORDER);
         dest = gTextVramBase + (col << TILE_ORDER)
              + ((row * gTextRowStride) << TILE_ORDER);
-        FUN_08063ed8((u16 *)dest, subX, glyph, col);
+        BlendGlyphAcrossTiles((u16 *)dest, subX, glyph, col);
         return;
     }
 
     glyph = gGlyphTiles + (ch << GLYPH_ORDER);
     dest = gTextVramBase + (col << TILE_ORDER)
          + ((row * gTextRowStride) << TILE_ORDER);
-    FUN_08063ed8((u16 *)dest, subX, glyph, col);
-    FUN_08063ed8((u16 *)(dest + (gTextRowStride << TILE_ORDER)), subX,
+    BlendGlyphAcrossTiles((u16 *)dest, subX, glyph, col);
+    BlendGlyphAcrossTiles((u16 *)(dest + (gTextRowStride << TILE_ORDER)), subX,
                  glyph + TILE_BOT_LEFT, col);
 
     if (width <= GLYPH_HALF)
@@ -160,7 +160,7 @@ void FUN_08064020(s32 ch, s32 x, s32 y)
     subX = x - (col << TILE_SHIFT);
     dest = gTextVramBase + (col << TILE_ORDER)
          + ((row * gTextRowStride) << TILE_ORDER);
-    FUN_08063ed8((u16 *)dest, subX, glyph + TILE_TOP_RIGHT, col);
-    FUN_08063ed8((u16 *)(dest + (gTextRowStride << TILE_ORDER)), subX,
+    BlendGlyphAcrossTiles((u16 *)dest, subX, glyph + TILE_TOP_RIGHT, col);
+    BlendGlyphAcrossTiles((u16 *)(dest + (gTextRowStride << TILE_ORDER)), subX,
                  glyph + TILE_BOT_RIGHT, col);
 }

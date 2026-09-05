@@ -33,7 +33,7 @@ extern u32 gFontIndex;
 extern u32 gHalfLineSpacing;
 
 extern u8   _toupper(u8 ch);
-extern void FUN_08064020(u8 ch, s32 x, s32 y);
+extern void PlaceGlyph(u8 ch, s32 x, s32 y);
 
 s32 GetGlyphWidth(u32 ch);
 s32 GetTextWidth(const u8 *text);
@@ -86,7 +86,7 @@ static __inline__ s32 DrawTextAt(const u8 *text, s32 x, s32 y)
         }
 
         ch = _toupper(ch);
-        FUN_08064020(ch, x, y);
+        PlaceGlyph(ch, x, y);
         x += GetGlyphWidth(ch);
         if (x > SCREEN_RIGHT)
             break;

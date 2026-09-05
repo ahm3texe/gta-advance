@@ -103,7 +103,7 @@ typedef struct Volume {
 extern void FUN_0800b0d4(Plane *plane, s32 *out);
 
 /* 0x0800AB88 */
-void FUN_0800ab88(Vec3 *pts, Volume *out)
+void BuildVolumePlanes(Vec3 *pts, Volume *out)
 {
     Plane n;
     s32 x0, y0, z0, x1, y1, z1, x2, y2, z2;

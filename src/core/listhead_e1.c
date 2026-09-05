@@ -87,7 +87,7 @@ extern int FUN_0800d450(Node *node);
     (((u32)(n)->score << 16) | (u32)(RANK_BIAS - (n)->owner->rank))
 
 /* 0x0800D530 */
-void FUN_0800d530(void)
+void SortListByKey(void)
 {
     Node *cur;
     Node *next;

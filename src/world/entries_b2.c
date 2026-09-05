@@ -56,7 +56,7 @@ typedef struct Entry {
 extern Entry gEntriesA[ENTRIES_A_LEN];
 
 /* 0x08023CC4 */
-void FUN_08023cc4(void)
+void ClearEntryTables(void)
 {
     volatile u32 fill;
     u16 ime;
