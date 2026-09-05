@@ -124,7 +124,19 @@ def main() -> None:
         total_code_bytes += size
         if row["status"] == "matching":
             matching_code_bytes += size
+        # IKI AYRI KAVRAM, karistirilmamali:
+        #
+        #   verified  -- fonksiyonun HIBRIT ROM derlemesine yerlestirilen
+        #                bolgelerle kesisimi (data/matching_regions.csv).
+        #                Yalnizca assembly'den kurulan bolgeler orada.
+        #   matched   -- fonksiyon byte-matching mi (functions.csv durumu).
+        #
+        # Panel eskiden "Byte eslesmesi" olarak `verified`i gosteriyordu; bu
+        # yuzden C'den eslesen 68 fonksiyon %0.00 gorunuyordu -- FUN_0800AB88
+        # 960/960 eslestigi halde sifir yaziyordu. Eslesme durumu artik
+        # dogru alandan geliyor, bolge kesisimi ayrica korunuyor.
         verified = matched_bytes(start, size, verified_regions)
+        matched = size if row["status"] == "matching" else verified
         c_source = c_sources.get(row["address"].upper())
         source_type = "c" if c_source else ("asm" if row["status"] == "matching" else "none")
         function = {
@@ -134,8 +146,9 @@ def main() -> None:
             "status": row["status"],
             "module": row["module"],
             "notes": row["notes"],
-            "matchedBytes": verified,
-            "matchPercent": round(100 * verified / size, 2) if size else 0.0,
+            "matchedBytes": matched,
+            "matchPercent": round(100 * matched / size, 2) if size else 0.0,
+            "verifiedRegionBytes": verified,
             "sourceType": source_type,
             "sourcePath": c_source["source"] if c_source else "",
             "cMatching": bool(c_source and c_source["matching"] == "yes"),
