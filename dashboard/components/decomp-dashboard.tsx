@@ -163,7 +163,25 @@ function groupKey(fn: FunctionRecord, grouping: Grouping) {
 function groupLabel(key: string, grouping: Grouping, functions: FunctionRecord[]) {
   if (grouping === 'module') return MODULE_LABELS[key] ?? key;
   if (grouping === 'bank') return key;
-  return functions.find((fn) => fn.cluster === key)?.clusterLabel ?? key;
+
+  const members = functions.filter((fn) => fn.cluster === key);
+  const raw = members[0]?.clusterLabel ?? key;
+  // Anlamli bir kume adi varsa onu kullan.
+  if (!/^0x/i.test(raw)) return MODULE_LABELS[raw] ?? raw;
+
+  // Adres etiketli kumeler: 25 kumenin 11'i boyle ve hepsinin uyeleri
+  // 'unknown' modulunde. Ciplak adres yerine baskin modulu ve buyuklugu
+  // goster; modul de bilinmiyorsa bunu ACIKCA soyle (uydurma).
+  const counts = new Map<string, number>();
+  for (const fn of members) counts.set(fn.module, (counts.get(fn.module) ?? 0) + 1);
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (top && top[0] !== 'unknown') return `${MODULE_LABELS[top[0]] ?? top[0]} · ${members.length} fn`;
+
+  // Hepsi siniflandirilmamis: "Sınıflandırılmamış" yazmak ayirt edici
+  // DEGIL (on bir grup ayni metni gosteriyordu ve kirpilinca hepsi
+  // "Sınıflandırıl…" oluyordu). Ayirt edeni one al: buyukluk + adres.
+  const addr = raw.replace(/^0x0?/i, '').toUpperCase();
+  return `? ${members.length} fn · ${addr}`;
 }
 
 // Grup etiketi 10px mono: karakter başına ölçülen genişlik 6.6px.
@@ -173,6 +191,16 @@ const LABEL_CHAR_WIDTH = 6.6;
 function truncateToWidth(text: string, pixels: number) {
   const maxChars = Math.max(3, Math.floor(pixels / LABEL_CHAR_WIDTH) - 2);
   return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
+}
+
+// Kucuk kutulara tam ad sigmiyordu ve isimler hic gorunmuyordu.
+// Iki kademe: buyuk kutuda tam ad, orta kutuda kisa bicim.
+// FUN_0802bdf0 -> 802bdf0 (bastaki sifir da atilir), adlandirilmislarda
+// ise adin kendisi kisaltilir.
+function shortLabel(name: string) {
+  const m = /^FUN_0?([0-9a-f]+)$/i.exec(name);
+  if (m) return m[1];
+  return name.length > 9 ? `${name.slice(0, 8)}…` : name;
 }
 
 function formatBytes(value: number) {
@@ -454,6 +482,9 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                         <text className="leaf-label" x={node.x0 + 7} y={node.y0 + 17}>{fn.name.length > 22 ? `${fn.name.slice(0, 20)}…` : fn.name}</text>
                         {cellHeight > 57 && <text className="leaf-meta" x={node.x0 + 7} y={node.y0 + 34}>{formatBytes(fn.size)} · %{fn.matchPercent.toFixed(0)}</text>}
                       </>}
+                      {labelAllowed && !(cellWidth > 76 && cellHeight > 38) && cellWidth > 40 && cellHeight > 18 && (
+                        <text className="leaf-label leaf-label-small" x={node.x0 + 4} y={node.y0 + 13}>{shortLabel(fn.name)}</text>
+                      )}
                     </g>
                   );
                 })}
