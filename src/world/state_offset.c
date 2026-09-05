@@ -15,7 +15,7 @@
  * Dallar arasindaki tek fark: aciya 0x2000000 eklenip eklenmedigi, ikinci
  * cagriya giden ikinci deger ve sonda yazilan kip baytı.
  *
- * DURUM: 1430/1518, 88 bayt KISA.  Dagitim zinciri ROM ile BIREBIR ayni
+ * DURUM: PARK, 1430/1518, 88 bayt KISA.  Dagitim zinciri ROM ile BIREBIR ayni
  * (25, 35, 33, 8, 30, 31, 40, 50, 32, 7, 6, 47 sirasiyla), sondaki ortak
  * epilog ve varsayilan dal da oturdu.  Kalan fark hala blok birlesmesi:
  * ROM'da 0x03FFFFFF maskesi ALTI ayri havuz kelimesinde duruyor, yani alti
@@ -34,6 +34,27 @@
  * KAZANIM 3 -- varsayilan dal.  ROM `adds r0, r7, #4` ile aktorun +4
  * adresini kurup sifira karsi siniyor, sonra oradan +34/+35'e yaziyor.
  * Ghidra bunu anlamsiz gorunen `param_1 == -4` diye gosteriyordu.
+ *
+ * DENENEN VE GERI ALINAN IKI FIKIR (olculdu, ikisi de KOTULESTIRDI):
+ *
+ *   1. Kaydirmalari cagri argumanina tasimak.  ROM once iki eksenin HAM
+ *      toplamini cikariyor, `<<23 >>24` kaydirmalarini sonra ucunu pes pese
+ *      yapiyor; bu, kaynagin kaydirmayi yerele degil dogrudan argumana
+ *      yazdigini dusundurdu.  Oyle yazinca 1430 -> 1178.  Yerelleri dal
+ *      basina ayirinca daha da kotu: 1164.  Fikir yanlis.
+ *
+ *   2. `- (rec->ox - 2)` ifadesini ayri yerelde tutmak.  ROM `ox`i yukleyip
+ *      ayrica `-2` yapiyor, derleyici bizde `+2 - ox` diye yeniden
+ *      birlestiriyor.  Ayri yerel vermek tek basina ise yaramadi; yukaridaki
+ *      1 numarali degisiklikle birlikte olculdugu icin tek basina etkisi
+ *      ayrica olculmeli.
+ *
+ * Kalan 88 bayt bloklara dagilmis durumda (0x28/0x32 blogu +44, case 8 +24,
+ * 0x1e +20, 0x1f +16) ve son blok 40 bayt UZUN.  ROM'un cakisma-atlamasi
+ * (cross-jumping) bloklari farkli derinliklerden ortak kuyruga baglamis;
+ * case 8 cagri kurulumunu kendi icinde yapip kuyruga DAHA ILERIDEN atliyor,
+ * 0x1f ise kurulumun basina atliyor.  Bunu kaynaktan yonlendirecek bilinen
+ * bir kaldirac bulamadim.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/state_offset.c
@@ -129,7 +150,6 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
     s32 dx;
     s32 dy;
     s32 nested;
-    s32 shift;
     s32 a08, b08, c08;
     s32 a1e, b1e, c1e;
     s32 a1f, b1f, c1f;
@@ -183,7 +203,10 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
         angle = actor->angle >> 16;
         b08 = a08 << 24;
         c08 = b08 >> 24;
-        shift = c08;
+        FUN_08029088(angle, 0, c08, &ox, &oy);
+        actor->px += ox << 16;
+        actor->py += oy << 16;
+        return;
     } else if (state == 0x1e) {
         nested = GetNegatedNested(entity);
         angle = (entity->source->angle + ANGLE_BIAS) & ANGLE_MASK;
@@ -197,7 +220,10 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
         angle = actor->angle >> 16;
         b1e = a1e << 24;
         c1e = b1e >> 24;
-        shift = c1e;
+        FUN_08029088(angle, 0, c1e, &ox, &oy);
+        actor->px += ox << 16;
+        actor->py += oy << 16;
+        return;
     } else if (state == 0x1f) {
         nested = GetNegatedNested(entity);
         angle = (entity->source->angle + ANGLE_BIAS) & ANGLE_MASK;
@@ -211,7 +237,10 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
         angle = actor->angle >> 16;
         b1f = a1f << 24;
         c1f = b1f >> 24;
-        shift = c1f;
+        FUN_08029088(angle, 0, c1f, &ox, &oy);
+        actor->px += ox << 16;
+        actor->py += oy << 16;
+        return;
     } else if (state == 0x28 || state == 0x32) {
         nested = GetNegatedNested(entity);
         angle = (entity->source->angle + ANGLE_BIAS) & ANGLE_MASK;
@@ -225,7 +254,10 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
         angle = actor->angle >> 16;
         b28 = a28 << 24;
         c28 = b28 >> 24;
-        shift = c28;
+        FUN_08029088(angle, 0, c28, &ox, &oy);
+        actor->px += ox << 16;
+        actor->py += oy << 16;
+        return;
     } else if (state == 0x20) {
         dx = (s32)((((rec->x1 + rec->x0) - (rec->ox - 2))) << 23) >> 24;
         dy = (s32)((((rec->y1 + rec->y0) - (rec->oy - 2))) << 23) >> 24;
@@ -278,7 +310,4 @@ void FUN_080260a8(Actor *actor, Entity *entity, Record *rec)
         return;
     }
 
-    FUN_08029088(angle, 0, shift, &ox, &oy);
-    actor->px += ox << 16;
-    actor->py += oy << 16;
 }
