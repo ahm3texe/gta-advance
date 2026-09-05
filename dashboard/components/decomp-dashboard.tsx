@@ -152,17 +152,26 @@ function hasGroupHeader(node: { x0: number; x1: number; y0: number; y1: number }
     && node.y1 - node.y0 >= GROUP_LABEL_MIN_HEIGHT;
 }
 
-type Grouping = 'cluster' | 'module' | 'bank';
+type Grouping = 'unit' | 'cluster' | 'module' | 'bank';
 
 function groupKey(fn: FunctionRecord, grouping: Grouping) {
   if (grouping === 'module') return fn.module;
   if (grouping === 'bank') return bankFor(fn.address);
+  // Decomp projelerinde asil birim CEVIRI BIRIMIDIR (.c dosyasi).
+  // Kaynagi olmayan fonksiyon henuz bir birime ait DEGILDIR; modulunu
+  // tahmin etmek yerine ROM bankasina gore gruplanir.
+  if (grouping === 'unit') return fn.sourcePath ? `u:${fn.sourcePath}` : `x:${bankFor(fn.address)}`;
   return fn.cluster;
 }
 
 function groupLabel(key: string, grouping: Grouping, functions: FunctionRecord[]) {
   if (grouping === 'module') return MODULE_LABELS[key] ?? key;
   if (grouping === 'bank') return key;
+
+  if (grouping === 'unit') {
+    if (key.startsWith('u:')) return key.slice(2).replace(/^src\//, '');
+    return `Decomp edilmemis · ${key.slice(2)}`;
+  }
 
   const members = functions.filter((fn) => fn.cluster === key);
   const raw = members[0]?.clusterLabel ?? key;
@@ -175,13 +184,16 @@ function groupLabel(key: string, grouping: Grouping, functions: FunctionRecord[]
   const counts = new Map<string, number>();
   for (const fn of members) counts.set(fn.module, (counts.get(fn.module) ?? 0) + 1);
   const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-  if (top && top[0] !== 'unknown') return `${MODULE_LABELS[top[0]] ?? top[0]} · ${members.length} fn`;
+  if (top && top[0] !== 'unknown') return MODULE_LABELS[top[0]] ?? top[0];
 
-  // Hepsi siniflandirilmamis: "Sınıflandırılmamış" yazmak ayirt edici
-  // DEGIL (on bir grup ayni metni gosteriyordu ve kirpilinca hepsi
-  // "Sınıflandırıl…" oluyordu). Ayirt edeni one al: buyukluk + adres.
-  const addr = raw.replace(/^0x0?/i, '').toUpperCase();
-  return `? ${members.length} fn · ${addr}`;
+  // Henuz decomp edilmemis bolge: modulunu TAHMIN ETME. Decomp
+  // yakinsaminda bilinmeyen bolge adres araligiyla gosterilir; bu bir
+  // eksiklik degil, bilinenin ta kendisi.
+  const starts = members.map((fn) => Number.parseInt(fn.address, 16));
+  const lo = Math.min(...starts);
+  const hi = Math.max(...starts.map((a, i) => a + members[i].size));
+  const hex = (v: number) => v.toString(16).toUpperCase().padStart(8, '0');
+  return `${hex(lo)}–${hex(hi)}`;
 }
 
 // Grup etiketi 10px mono: karakter başına ölçülen genişlik 6.6px.
@@ -400,6 +412,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         </NativeSelect>
         <NativeSelect value={grouping} onChange={(event) => { setGrouping(event.target.value as Grouping); setFocusGroup(null); }} aria-label="Gruplama">
           <NativeSelectOption value="cluster">Bitişik bloğa göre grupla</NativeSelectOption>
+          <NativeSelectOption value="unit">Kaynak dosyasına (unit) göre grupla</NativeSelectOption>
           <NativeSelectOption value="module">Modüle göre grupla</NativeSelectOption>
           <NativeSelectOption value="bank">ROM bankına göre grupla</NativeSelectOption>
         </NativeSelect>
