@@ -44,7 +44,7 @@ typedef struct FrameTable {
 
 extern void LZ77UnCompWram(const void *src, void *dst);
 
-void FUN_08003454(void)
+void ShowNextCutsceneFrame(void)
 {
     FrameTable *table;
     void *buf;

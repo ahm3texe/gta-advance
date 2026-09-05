@@ -79,7 +79,7 @@ extern void FUN_08015038(u8 *sub);
 extern void FUN_080289bc(Entry *entry);
 
 /* 0x08028A88 */
-void FUN_08028a88(Triple *src, u32 arg1, u32 phase, u32 owner)
+void CreateEntry(Triple *src, u32 arg1, u32 phase, u32 owner)
 {
     Entry *e;
     s32 i;

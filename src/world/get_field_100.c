@@ -11,7 +11,7 @@
 #include "gba_types.h"
 
 /* 0x0801D8B0 */
-u32 FUN_0801d8b0(u8 *base)
+u32 GetField100(u8 *base)
 {
     return *(u32 *)(base + (0x80 << 1));
 }

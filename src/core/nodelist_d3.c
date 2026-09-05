@@ -89,13 +89,13 @@ extern Node *gNodeListHead;         /* 0x02035A70 */
 
 extern Node *FUN_08054744(u32 id);
 extern Node *FindNode(u32 id);
-extern void  FUN_080536bc(Node *node);
+extern void  ClearObjectIdsAndSlots(Node *node);
 extern void  FUN_08052750(u32 a, u32 b);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
 /* 0x080539F4 */
-void FUN_080539f4(Node *node)
+void ClearNodeSlotArrays(Node *node)
 {
     SlotDesc *desc;
     u16      *slotB;
@@ -110,7 +110,7 @@ void FUN_080539f4(Node *node)
         Node *entry = FUN_08054744(id);
 
         if (entry->dirty && entry->level == LEVEL_BASE)
-            FUN_080536bc(entry);
+            ClearObjectIdsAndSlots(entry);
         FUN_08055d90((u32 *)&gRam02035780, id);
     }
 

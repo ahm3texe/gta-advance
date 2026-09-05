@@ -60,7 +60,7 @@ extern void FUN_08052228(NodeC4 *node);
 extern void FUN_0805ab78(void);
 
 /* 0x08053D48 */
-void FUN_08053d48(void)
+void StepNodeLists(void)
 {
     NodeC4 *node;
 

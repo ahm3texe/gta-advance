@@ -1,6 +1,6 @@
 /* Bayrak temizleyip bos ise bildirme — 0x08038000-0x0803801F
  *
- * +0x0C'deki 0x8000 bitini siliyor; +0x1C sifirsa FUN_08016768(0)
+ * +0x0C'deki 0x8000 bitini siliyor; +0x1C sifirsa ResetActor(0)
  * cagriliyor. Kural 35: `pop {r0}; bx r0` -> donus tipi void.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
@@ -18,12 +18,12 @@ typedef struct Node {
     u32 sub;                    /* +0x1C */
 } Node;
 
-extern void FUN_08016768(u32 arg);
+extern void ResetActor(u32 arg);
 
 /* 0x08038000 */
 void ClearFlagNotify(Node *node)
 {
     node->flags &= ~BUSY_FLAG;
     if (node->sub == 0)
-        FUN_08016768(0);
+        ResetActor(0);
 }

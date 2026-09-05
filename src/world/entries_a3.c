@@ -6,7 +6,7 @@
  * yarim sozune 20 yaziyor. Erken cikis yok, tum tabloyu geziyor.
  *
  * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * Kardesi FUN_08029244 (src/world/entries_a4.c) ayni dongu iskeletini
+ * Kardesi FindEntryByQuad (src/world/entries_a4.c) ayni dongu iskeletini
  * kullaniyor; `gEntriesA[i].alan` dizi-indeks bicimi ROM'un
  * (taban+ofset)+i*148 adres iliskilendirmesini uretiyor.
  *
@@ -38,7 +38,7 @@ extern Entry gEntriesA[];
 extern void FUN_0803535c(u32 a);
 
 /* 0x0802929C */
-void FUN_0802929c(u32 a)
+void RefreshEntryTimerByQuad(u32 a)
 {
     s32 i;
 

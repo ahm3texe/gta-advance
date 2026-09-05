@@ -114,13 +114,13 @@ extern Node *gNodeListHead;         /* 0x02035A70 */
 
 extern Node *FindNode(u32 id);
 extern void  FUN_08052750(u32 a, u32 b);
-extern void  FUN_08052cf8(ObjRecord *record);
+extern void  ClearAreaIdArrays(ObjRecord *record);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  ClearSlots(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
 /* 0x080536BC */
-void FUN_080536bc(Obj *obj)
+void ClearObjectIdsAndSlots(Obj *obj)
 {
     /* Sira onemli: sayaclar isaretcilerden ONCE gelmeli.
      * Ust yorumdaki "BILDIRIM SIRASI" notuna bak. */
@@ -159,7 +159,7 @@ void FUN_080536bc(Obj *obj)
 
     record = obj->records;
     for (i = 0; i < header->recordCount; i++, record++)
-        FUN_08052cf8(record);
+        ClearAreaIdArrays(record);
 
     ClearSlots(obj->records, header->recordCount);
     obj->dirty = 0;

@@ -50,7 +50,7 @@ extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
 /* 0x08055C04 */
-void FUN_08055c04(u32 id, u32 force)
+void ReleaseNodeSlots(u32 id, u32 force)
 {
     Node *node;
     u16  *slot;

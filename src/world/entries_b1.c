@@ -107,7 +107,7 @@ extern void FUN_08014ee4(u8 *dest, u32 value);
 extern void FUN_08015038(u8 *dest);
 
 /* 0x08025424 */
-u32 FUN_08025424(Entry *src, u32 unused1, u32 unused2, u8 kind, u32 phase,
+u32 CreateEntryFromTemplate(Entry *src, u32 unused1, u32 unused2, u8 kind, u32 phase,
                  u8 owner)
 {
     Entry *e;

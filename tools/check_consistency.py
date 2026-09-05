@@ -263,6 +263,29 @@ def main() -> None:
                     "struct-govde",
                     f"{symbol} icin {name} farkli govdelerle tanimli: {detail}",
                 )
+    # --- Eslesen fonksiyonlarin adi ve notu -------------------------------
+    #
+    # Bu iki denetim, gercek bir birikme yasandigi icin eklendi (2026-09-06):
+    # eslesme akisinda `status` guncelleniyor ama Ghidra'nin YER TUTUCU adina
+    # ve notuna donulmuyordu.  365 eslesen fonksiyonun 88'i hala `FUN_` adi
+    # tasiyordu ve 60'inin notu "boundary and ARM/Thumb mode are provisional"
+    # diyordu -- byte-matching tam olarak bunun tersini kanitlarken.  Mevcut
+    # denetimler adlarin dosyalar arasinda TUTARLI olmasina bakiyordu, yer
+    # tutucu olup olmadigina degil; bu yuzden hicbir kapi calmadi.
+    STALE_NOTE = "boundary and ARM/Thumb mode are provisional"
+    placeholder = []
+    for row in functions:
+        if row.get("status") != "matching":
+            continue
+        if STALE_NOTE in (row.get("notes") or ""):
+            bad(
+                "bayat-not",
+                f"{row['name']} byte-matching ama notu hala sinirin/kipin "
+                f"'gecici' oldugunu soyluyor",
+            )
+        if row["name"].startswith("FUN_"):
+            placeholder.append(row["name"])
+
     if problems:
         print(f"TUTARSIZLIK: {len(problems)} sorun\n")
         for problem in problems:
@@ -270,6 +293,13 @@ def main() -> None:
         sys.exit(1)
     print(f"tutarlilik: TEMIZ  ({len(functions)} fonksiyon, {len(ram)} RAM sembolu, "
           f"{len(regions)} bolge)")
+    # Hata degil, GORUNURLUK: bos saplamalar ve kor iletme sarmalayicilari
+    # bilerek adlandirilmiyor (ne yaptiklari bilinmiyor, ad uydurmak olurdu).
+    # Sayinin her kosuda yazilmasi, adlandirilabilir olanlarin sessizce
+    # birikmesini engelliyor.
+    if placeholder:
+        print(f"  not: {len(placeholder)} eslesen fonksiyon hala yer tutucu "
+              f"`FUN_` adi tasiyor (bos saplama / kor sarmalayici bekleniyor)")
 
 
 if __name__ == "__main__":

@@ -69,7 +69,7 @@ extern Entry gEntriesA[];
 extern u32 FUN_0803c400(u32 arg);
 
 /* 0x08028F4C */
-u32 FUN_08028f4c(u32 arg)
+u32 FindEntryByOwnerState(u32 arg)
 {
     Entry *base;
     EntryTail *tail;

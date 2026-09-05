@@ -162,7 +162,7 @@ extern Node   *FindNode(u32 id);
 extern void    FUN_08052750(u32 a, u32 b);
 extern void    FillSlotsWithNone(void *dest, u32 count);
 extern void    FUN_08055d90(u32 *head, u32 id);
-extern void    FUN_08052c68(s32 index);
+extern void    LinkAreaEntryIfEligible(s32 index);
 
 /* 0x08052E78 */
 void ResetAreaIds(Area *area)
@@ -238,6 +238,6 @@ void ResetAreaIds(Area *area)
         if (value > 0x7FFF)
             value = area->remap[value - REMAP_BASE];
         *out = value;
-        FUN_08052c68(*out);
+        LinkAreaEntryIfEligible(*out);
     }
 }

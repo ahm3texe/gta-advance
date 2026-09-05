@@ -32,7 +32,7 @@ typedef struct Entry {
 extern Entry gEntriesA[];
 
 /* 0x08029244 */
-u32 FUN_08029244(u32 a, u32 b)
+u32 FindEntryByQuad(u32 a, u32 b)
 {
     s32 i;
 

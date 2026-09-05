@@ -42,7 +42,7 @@ struct Actor {
 extern void FUN_08016990(Actor *actor, u32 arg);
 extern void FUN_08013abc(u32 *value);
 extern u32  FUN_080646ac(u32 id);
-extern u32  FUN_080646f8(u32 id, u32 zero, u32 extra);
+extern u32  GetGlyphCell(u32 id, u32 zero, u32 extra);
 extern void FUN_0803bfe4(ActorSub *sub);
 
 /* 0x08019450 */
@@ -89,7 +89,7 @@ void ResolveActorExtra(Actor *actor, int id)
         return;
 
     key = (u16)id;
-    actor->unk90 = FUN_080646f8(key, 0, FUN_080646ac(key));
+    actor->unk90 = GetGlyphCell(key, 0, FUN_080646ac(key));
 }
 
 /* 0x080194F4 */

@@ -41,7 +41,7 @@ extern u8     gRam02035B1C;
 extern Record gRom08852A2C[];
 
 /* 0x08063E58 */
-u32 FUN_08063e58(void)
+u32 WaitForFrameFlag(void)
 {
     do {
         VBlankIntrWait();

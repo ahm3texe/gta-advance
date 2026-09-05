@@ -20,7 +20,7 @@
  * isaretliligi FARK ETMIYOR (u8 ile de eslesiyor), cunku `&= ~12` bileşik
  * atamasinda islem int genisliginde yapiliyor ve `~12` zaten -13.
  * Kural 47'nin gecerli oldugu durum baska: sonuc DAR tipe indirgenerek
- * kullanildiginda (FUN_08016768'de oldugu gibi) u8 alanda sabit 0xF0'a
+ * kullanildiginda (ResetActor'de oldugu gibi) u8 alanda sabit 0xF0'a
  * katlaniyor.
  *
  * ELENEN YAZIM: sonucu once `s32` yerele alip alana geri yazmak.  agbcc
@@ -88,7 +88,7 @@ extern Node *FUN_080543d0(Node **head, s32 index);
 extern void  FUN_080521c4(Node *node, Record *record);
 
 /* 0x080526B8 */
-Node *FUN_080526b8(s32 index, u32 value)
+Node *RebuildAreaEntry(s32 index, u32 value)
 {
     Node *node;
 

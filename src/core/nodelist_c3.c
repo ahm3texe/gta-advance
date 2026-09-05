@@ -74,7 +74,7 @@ extern Node *FUN_080543d0(Node **head, s32 index);
 extern void  FUN_08052988(Node *node, AreaEntry *entry);
 
 /* 0x08052C68 */
-void FUN_08052c68(s32 index)
+void LinkAreaEntryIfEligible(s32 index)
 {
     AreaEntry *entry;
     Node      *node;

@@ -37,7 +37,7 @@
 extern void *gListHead02016280;
 
 /* 0x0800DB80 */
-void FUN_0800db80(void)
+void ResetListHead(void)
 {
     u16 ime;
     volatile u32 zero;

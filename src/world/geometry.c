@@ -25,7 +25,7 @@
 #include "gba_types.h"
 
 /* 0x0800B140 */
-s32 FUN_0800b140(const s32 *a, const s32 *b)
+s32 DotProduct(const s32 *a, const s32 *b)
 {
     return (a[0] >> 8) * (b[0] >> 8)
          + (a[1] >> 8) * (b[1] >> 8)
@@ -33,7 +33,7 @@ s32 FUN_0800b140(const s32 *a, const s32 *b)
 }
 
 /* 0x0800BDB0 */
-s32 FUN_0800bdb0(const s32 *a, s32 ra, const s32 *b, s32 rb)
+s32 BoxesOverlap(const s32 *a, s32 ra, const s32 *b, s32 rb)
 {
     s32 reach, x, y, z;
     s32 delta;

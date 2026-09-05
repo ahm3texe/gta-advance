@@ -121,7 +121,7 @@ extern void  ClearSlots(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
 /* 0x08052CF8 */
-void FUN_08052cf8(Area *area)
+void ClearAreaIdArrays(Area *area)
 {
     SlotDesc *desc;
     Node     *node;

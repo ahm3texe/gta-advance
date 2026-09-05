@@ -31,13 +31,13 @@ typedef struct GlyphRoot {
 extern GlyphRoot gRom08BD3448;
 
 /* 0x08064698 */
-u32 FUN_08064698(u16 index)
+u32 GetGlyphCount(u16 index)
 {
     return gRom08BD3448.table[index]->count;
 }
 
 /* 0x080646F8 */
-u16 *FUN_080646f8(u16 index, u32 b, u32 c)
+u16 *GetGlyphCell(u16 index, u32 b, u32 c)
 {
     GlyphEntry *entry;
     u16 *base;

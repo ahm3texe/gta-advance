@@ -56,7 +56,7 @@ extern void FUN_08014ffc(Sub *sub, u32 flags, u8 *a, u8 *b);
 extern void FUN_08015038(Sub *sub);
 extern void FUN_08015598(Actor *self);
 
-void FUN_08016768(Actor *self)
+void ResetActor(Actor *self)
 {
     Entity *ent;
     u32 mask;

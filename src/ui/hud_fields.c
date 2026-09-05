@@ -85,7 +85,7 @@
 #define COL_B_RIGHT ((vu16 *)0x06009912)
 
 /* 0x08030B60 */
-void FUN_08030b60(s32 minutes, s32 seconds)
+void SetHudTime(s32 minutes, s32 seconds)
 {
     if (minutes < 0)
         minutes = 0;

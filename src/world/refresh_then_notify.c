@@ -25,7 +25,7 @@ typedef struct Obj {
 
 
 extern Obj *FUN_08054744(u32 arg);
-extern void FUN_080536bc(Obj *obj);
+extern void ClearObjectIdsAndSlots(Obj *obj);
 extern void FUN_08055d90(NodeC4 **dest, u32 arg);
 
 /* 0x08055BBC */
@@ -38,6 +38,6 @@ void RefreshThenNotify(u32 arg)
     state = STATE_MASK;
     state &= obj->state;
     if (state == STATE_WANT)
-        FUN_080536bc(obj);
+        ClearObjectIdsAndSlots(obj);
     FUN_08055d90(&gRam02035780, arg);
 }

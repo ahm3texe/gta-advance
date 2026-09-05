@@ -94,7 +94,7 @@ extern void InsertSorted(List *list, Node *node, u32 key);
 extern void FUN_08052988(Node *node, Record *record);
 
 /* 0x080547E8 */
-Node *FUN_080547e8(int id)
+Node *FindOrRecycleNode(int id)
 {
     List *list;
     Node *cur;

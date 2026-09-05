@@ -13,7 +13,7 @@
 #define SPIN_COUNT 6
 
 /* 0x08030EA0 */
-void FUN_08030ea0(void)
+void SpinDelay(void)
 {
     s32 i;
 
