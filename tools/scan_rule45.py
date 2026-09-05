@@ -49,8 +49,16 @@ def scan(path):
     text = path.read_text(errors="replace")
     locals_ = len(set(re.findall(r"\blocal_[0-9a-f]+\b", text)))
     chain = len(re.findall(r"\bif\s*\(|\belse if\s*\(", text))
-    jumptable = "Could not recover jumptable" in text
-    return repeats, locals_, chain, jumptable
+    # Ghidra ciktisinin YARIM oldugunu soyleyen her uyari.  "Removing
+    # unreachable block" ozellikle sinsi: cikti derli toplu gorunur ama
+    # blok(lar) dusmustur, kaynak ondan yazilamaz.
+    incomplete = any(w in text for w in (
+        "Could not recover jumptable",
+        "Removing unreachable block",
+        "Bad instruction",
+        "truncated",
+    ))
+    return repeats, locals_, chain, incomplete
 
 
 def main():

@@ -306,6 +306,28 @@ Bayraklarla çözülmez: `-fno-thread-jumps`, `-fno-cse-follow-jumps`,
 `-fno-expensive-optimizations` ve `-O1` denendi, hiçbiri birleşmeyi kaldırmadı.
 Kaldıraç kaynakta, yerel değişken ayrımında.
 
+**Nerede geçerli — `tools/scan_dispatch.py`.** Kural yalnızca bir durum
+değişkenine göre dallanan uzun `if/else` zincirlerinde işe yarar, o yüzden
+adayları ROM'dan doğrudan bu imzayla arıyoruz: aynı yazmaca karşı ard arda
+gelen `cmp rX,#imm` halkaları, içlerinde yeterince **farklı sıfırdan büyük**
+değer. `cmp rX,#0` halkaları boş kontroldür, elenir.
+
+Araç kendini doğruluyor: `FUN_080260a8` listede tam da eşleştirilen değerlerle
+çıkıyor (35, 33, 8, 30, 31, 40, 50, 32, 7, 6). Eşiği 6 halka / 5 farklı değer
+alınca **13 aday, 18.788 bayt** kalıyor; en büyüğü `FUN_08017628` (1536 bayt,
+26 farklı değer, 35 halka).
+
+**Bir yol denendi ve terk edildi:** aynı tarama önce Ghidra çıktısı üzerinden,
+"birbirinin aynı ard arda ifade blokları" sayılarak yapıldı. Yanlış pozitif
+veriyor — `FUN_080108f4`'te 139 tekrar saydı ama o fonksiyon tekrar eden dal
+gövdesi değil, tekrar eden küresel erişim kalıbı içeriyor (40 ayrı `DAT_`
+global, iç içe döngüler). Metin benzerliği yanlış ölçüt; imza makine kodunda.
+
+**Ghidra çıktısının yarım olduğunu gösteren uyarılar** aday elemede şart:
+`Could not recover jumptable` (33 çıktının 19'unda), `Removing unreachable
+block` (bu sinsi — çıktı derli toplu görünür ama bloklar düşmüştür,
+`FUN_0802e3fc` böyleydi), `Bad instruction`, `truncated`.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
