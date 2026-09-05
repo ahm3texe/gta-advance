@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Bir fonksiyon icin decomp-permuter calisma dizini kurar.
+
+Kullanim: python3 tools/make_permuter_dir.py <kaynak.c> <FonksiyonAdi> <adres> <boyut>
+Cikti:    build/permuter/<FonksiyonAdi>/{base.c,target.o,settings.toml,compile.sh}
+
+ESLEME SEMBOLLERI: kod govdesi `$t`, literal havuz `$d`.  Havuz `$t` icinde
+kalirsa objdump onu komut diye cozer ve permuter yanlis hedefe kosar
+(ClearTextArea'da olculdu: 66 gorunen komut, gercek 61).  Kod sonu
+tools/dump_cfg.py'nin blok araliklarindan aliniyor.
+"""
+import re, subprocess, sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+ROM = ROOT / "baserom.gba"
+ROM_BASE = 0x08000000
+
+sys.path.insert(0, str(ROOT / "tools"))
+from audit_boundaries import Walker  # noqa: E402
+
+def regions(rom: bytes, addr: int, size: int):
+    """(tur, bayt) listesi: tur 't' (komut) ya da 'd' (havuz). Ozyinelemeli
+    inisle cozulur; havuz fonksiyon ORTASINDA olsa bile dogru ayrilir."""
+    w = Walker(rom, addr); w.run()
+    out = []
+    for a in range(addr, addr + size, 2):
+        kind = 't' if a in w.code else 'd'
+        if out and out[-1][0] == kind:
+            out[-1][1] += rom[a - ROM_BASE:a - ROM_BASE + 2]
+        else:
+            out.append([kind, bytes(rom[a - ROM_BASE:a - ROM_BASE + 2])])
+    return out
+
+def main():
+    src, name, addr, size = Path(sys.argv[1]), sys.argv[2], int(sys.argv[3], 16), int(sys.argv[4])
+    work = ROOT / "build" / "permuter" / name
+    work.mkdir(parents=True, exist_ok=True)
+    rom = ROM.read_bytes()
+    body = rom[addr - ROM_BASE: addr - ROM_BASE + size]
+    lines = [".section .text", ".thumb", f".global {name}", ".align 2", "$t:", f"{name}:"]
+    ncode = npool = 0
+    for kind, chunk in regions(rom, addr, size):
+        if kind == 't':
+            lines.append("$t:")
+            for i in range(0, len(chunk), 2):
+                lines.append(f"    .short {int.from_bytes(chunk[i:i+2], 'little'):#06x}")
+            ncode += len(chunk)
+        else:
+            lines.append("$d:")
+            for i in range(0, len(chunk), 2):
+                lines.append(f"    .short {int.from_bytes(chunk[i:i+2], 'little'):#06x}")
+            npool += len(chunk)
+    code = b"\0" * ncode; pool = b"\0" * npool   # yalnizca ozet icin
+    (work / "target.s").write_text("\n".join(lines) + "\n")
+    subprocess.run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
+                    "-o", str(work / "target.o"), str(work / "target.s")], check=True)
+
+    # base.c: onislemciden gecmis, kendi kendine yeten, govde PERM_RANDOMIZE icinde
+    pre = subprocess.run(["cpp", "-nostdinc", "-undef", "-P", f"-I{ROOT/'include'}", str(src)],
+                         capture_output=True, text=True, check=True).stdout
+    m = re.search(rf"\b{re.escape(name)}\s*\([^)]*\)\s*\{{", pre)
+    if not m:
+        sys.exit(f"{name} govdesi bulunamadi")
+    open_brace = m.end() - 1
+    depth, i = 0, open_brace
+    while True:
+        if pre[i] == "{": depth += 1
+        elif pre[i] == "}":
+            depth -= 1
+            if depth == 0: break
+        i += 1
+    base = pre[:open_brace+1] + "\nPERM_RANDOMIZE(\n" + pre[open_brace+1:i] + "\n)\n" + pre[i:]
+    # pycparser GCC'nin __inline__ anahtar sozcugunu tanimiyor (recete, adim 3).
+    base = base.replace("__inline__", "inline")
+    (work / "base.c").write_text(base)
+
+    (work / "settings.toml").write_text(f'compiler_type = "gcc"\nfunc_name = "{name}"\n')
+    (work / "compile.sh").write_text(
+        "#!/bin/sh\n" f'exec python3 "{ROOT}/tools/permuter_compile.py" "$@"\n')
+    (work / "compile.sh").chmod(0o755)
+    print(f"{name}: kod {len(code)} B ({len(code)//2} komut) + havuz {len(pool)} B -> {work.relative_to(ROOT)}")
+
+if __name__ == "__main__":
+    main()

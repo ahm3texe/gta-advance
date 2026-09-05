@@ -103,7 +103,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080194B4,ResolveActorExtra,src/world/actor_control.c,64,64,yes
 0x080194F4,ActivateActor,src/world/actor_control.c,28,28,yes
 0x08019510,IsActorBusy,src/world/actor_control.c,26,26,yes
-0x080195F4,EitherInRange,src/world/either_in_range.c,44,44,no
+0x080195F4,EitherInRange,src/world/either_in_range.c,44,44,yes
 0x08019670,ScaleByMode,src/world/object_state.c,42,42,yes
 0x0801969C,ReleaseObjectSlot,src/world/object_state.c,42,42,yes
 0x080196C8,IsObjectReadyA,src/world/object_state.c,36,36,yes

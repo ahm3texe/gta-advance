@@ -9,34 +9,7 @@
  * (2 bayt fazla). Ikinci alan u32 oldugu icin karsilastirmalari
  * isaretsiz kaliyor.
  *
- * HENUZ ESLESMIYOR: 8/44. Boyut DOGRU; kalan farklarin HEPSI ayni sinif --
- * karsilastirma sabitinin kanonikleştirilmesi:
- *     bizim: cmp #11 / ble        ROM: cmp #12 / blt
- *     bizim: cmp #14 / bgt        ROM: cmp #15 / bge
- * Anlamca ayni, bicimce farkli. agbcc `< 12`yi `<= 11`e ceviriyor ve
- * sabit bir eksik yaziliyor. Sekiz yerde birden.
- *
- * ALTI VARYANT SISTEMATIK OLARAK DENENDI, HICBIRI 8'I GECEMEDI:
- *     erken cikisli `goto`                  8  (en iyi, mevcut)
- *     ters kosullu erken cikis              8  (esit)
- *     ic ice pozitif kosul                 15
- *     `> 11` bicimi (sabit 11 dogrudan)    15
- *     kind yereli yok, alan dogrudan       10
- *     kind u32                             10
- *     kind int                              8  (esit)
- *     acik esitlik zinciri (kural 30)      46 bayt, boyut bile tutmadi
- *
- * Yani `cmp #12 / blt` bicimini kaynaktan STEERING edemiyoruz; agbcc
- * `< 12`yi `<= 11`e ceviriyor ve bu kanonikleştirme kaynak bicimine
- * duyarli degil. Karsilastirma OPERATORU, operand TIPI ve blok YAPISI
- * ayri ayri denendi.
- *
- * Kalan fikir: permuter (kurulu, tools/setup_permuter.sh) bu tur yerel
- * bicim aramasi icin uygun -- ama ara skorlari bizim olcutumuz DEGIL,
- * yalnizca skor 0 anlamli (bkz. ClearTextArea sonucu).
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/either_in_range.c
+ * ESLESTI (44/44) -- bkz. fonksiyon ustundeki MEKANIZMA notu.
  */
 
 #include "gba_types.h"
@@ -49,31 +22,40 @@ typedef struct Entry {
 } Entry;
 
 /* 0x080195F4 */
+/* MEKANIZMA (permuter + elle, 2026-09-05): karsilastirma sabiti bir
+ * DEGISKENE alininca agbcc `x < 15`i `x <= 14`e KANONIKLESTIREMIYOR ve
+ * ROM'un `cmp #15 / bcc` biciminin aynisini uretiyor.  Literal yazimin
+ * hicbir cesidi (< 15, <= 14, > 14 ...) bunu vermiyordu: hepsi ayni
+ * kanonik forma cokuyor.  Uc sinir da boyle tasindi.  docs/COMPILER.md
+ * kural 44. */
 u32 EitherInRange(Entry *entry)
 {
+    s32 lowBound;
+    s32 highBound;
     s32 kind;
     u32 alt;
+    u32 altHigh;
 
     kind = entry->kind;
-    if (kind >= 12) {
+    lowBound = 12;
+    if (kind >= lowBound) {
         if (kind <= 13)
             goto yes;
         if (kind <= 16) {
-            if (kind >= 15)
+            if (kind >= (highBound = 15))
                 goto yes;
         }
     }
-
     alt = entry->alt;
-    if (alt < 12)
+    if (alt < lowBound)
         goto no;
     if (alt <= 13)
         goto yes;
     if (alt > 16)
         goto no;
-    if (alt < 15)
+    altHigh = 15;
+    if (alt < altHigh)
         goto no;
-
 yes:
     return 1;
 no:

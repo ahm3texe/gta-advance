@@ -301,6 +301,7 @@ callee-saved ister:
 | 1 | `push {r4, lr}` | |
 | 2 | `push {r4, r5, lr}` | |
 | 3 | `push {r4, r5, r6, lr}` | |
+| 44 | Karşılaştırma sabitini **yerel değişkene al**: `hi = 15; if (x < hi)` | agbcc literal karşılaştırmayı kanonikleştiriyor (`< 15` → `<= 14`, `bls`); ROM'da `cmp #15 / bcc` görülüyorsa literal yazımın hiçbir çeşidi tutmaz. Sabit değişkene alınınca kanonikleştirme atlanır ve sabit yine immediate olarak yayılır. `EitherInRange`: 8/44 → 44/44. Permuter'ın bulduğu kaldırma + kalan sınırın elle kaldırılması. |
 | 4+ | `push {r4, r5, r6, lr}` | liste BUYUMEZ, yigina tasar |
 
 Dortte komut sayisi 13'ten 20'ye firliyor: r7'ye gecmek yerine spill

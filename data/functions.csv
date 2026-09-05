@@ -381,7 +381,7 @@ address,name,size,status,module,notes
 0x08019510,IsActorBusy,26,matching,world,Varlik denetimi; src/world/actor_control.c
 0x0801952C,FUN_0801952c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019590,FUN_08019590,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080195F4,EitherInRange,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080195F4,EitherInRange,44,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019620,FUN_08019620,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019670,ScaleByMode,42,matching,world,Nesne durum sorgusu; src/world/object_state.c
 0x0801969C,ReleaseObjectSlot,42,matching,world,Nesne durum sorgusu; src/world/object_state.c
