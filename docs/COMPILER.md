@@ -376,7 +376,20 @@ daha, iki bayt.
 
 `FUN_08016768`'de ölçüldü: alanları `u8` bırakınca fonksiyon iki bayt kısa
 kalıyor ve ayrıca komut sıralaması kayıyordu; `s8` yapınca ikisi birden düzeldi
-ve fonksiyon **eşleşti**. ROM'da `negs` görüyorsanız alan işaretlidir.
+ve fonksiyon **eşleşti**.
+
+**Kural dar, genellemeyin (2026-09-06 düzeltmesi).** Belirleyici olan alanın
+işaretliliği değil, AND sonucunun hangi genişlikte tüketildiği. `FUN_080526b8`'de
+`node->kind &= ~12` bileşik ataması **`u8` alanda da** `-13` üretiyor ve eşleşiyor,
+çünkü işlem int genişliğinde yapılıyor. `FUN_08016768`'de sonuç dar tipe
+indirgenerek kullanıldığı için `u8` alanda sabit `0xF0`'a katlanıyordu. Yani
+ROM'da `negs` görmek "alan işaretli" demek değil; "sabit int genişliğinde
+kurulmuş" demek. Alan tipini ancak başka bir kanıt varken değiştirin.
+
+**Ayrı bir tuzak — ara yerele almayın.** Aynı işi `s32 k = field & ~12;
+field = k;` diye yazmak agbcc'yi depolamadan önce `lsls #24 / asrs #24`
+normalleştirmesi sokmaya itiyor: iki fazla komut, ROM'da yok. Bileşik atamayı
+doğrudan yazın.
 
 Maskeyi geniş tipte bir yerele almak (`s32 m = ~15; x &= m;`) `negs`i geri
 getiriyor ama sabiti ifadeden ÖNCE yaydığı için adres hesabıyla sırası ters

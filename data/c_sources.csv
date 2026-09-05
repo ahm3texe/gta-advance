@@ -287,6 +287,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08051500,GetRecord,src/misc/record_table.c,20,20,yes
 0x0805151C,DrainTwoChains,src/world/drain_two_chains.c,34,34,yes
 0x08051960,FUN_08051960,src/misc/empty_stubs.c,2,2,yes
+0x080526B8,FUN_080526b8,src/core/nodelist_b6.c,152,152,yes
 0x08052C68,FUN_08052c68,src/core/nodelist_c3.c,144,144,yes
 0x08052CF8,FUN_08052cf8,src/core/nodelist_d2.c,228,228,yes
 0x08052E78,FUN_08052e78,src/core/nodelist_d6.c,440,440,yes
