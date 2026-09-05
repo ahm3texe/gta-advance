@@ -10,7 +10,7 @@ address,size,name,source,status,notes
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
-0x020004B0,8,gFocusPoint,decomp,provisional,iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba): 0. bayti surus boyunca 31 kez degisti ve gClipBounds[0] ile HER KAREDE AYNI degeri tasidi. Odak noktasi IWRAMe aynalaniyor.
+0x020004B0,8,gFocusPoint,decomp,provisional,"iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba, tam genislik): iki adet 16.16 SABIT NOKTA koordinat. +0x00=X, +0x04=Y. Baslangic (3360.000, 9568.000) -- tam sayilar. Up basiliyken Y tam olarak -374632 (-5.716) adimliyor, 29/29 sabit. Bazi X farklari TAM 65536 (1.000) ve 262144 (4.000): 16.16 formati boylece KANITLANDI."
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
 0x02000CE0,16,gGameState,decomp,provisional,Game state block; byte 12 selects the VBlank frame-delay behaviour  IZLEME: 16 baytlik blok; 0. bayti f52den itibaren her kare 1 artiyor (sayac davranisi).
@@ -125,7 +125,7 @@ address,size,name,source,status,notes
 0x02036340,8,gDistanceAccum,decomp,provisional,Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor  IZLEME: yuruyus baslamadan hemen once f1783te aktif; mission_timer ile ayni pencerede.
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"
 0x03000004,4,gIwramFrameCounter,decomp,provisional,IWRAM frame counter copied into gFrameDelay then cleared
-0x03000014,12,gClipBounds,decomp,provisional,uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)  IZLEME(araba): 0. bayti gFocusPoint[0] ile birebir ayni (31/31 gecis). EWRAM odak noktasinin IWRAM kopyasi/turevi; ClipBounds bunu daraltiyor.
+0x03000014,12,gClipBounds,decomp,provisional,"uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)  IZLEME(araba, tam genislik): uc adet 16.16 deger; baslangic (3360.000, 9568.000, 164.000). DUZELTME: onceki ""gFocusPointin aynasi"" sonucu YANLISTI -- tek bayt okumasinin yaniltmasiydi. Tam genislikte +0x00 alti ortak karenin besinde uyusuyor ama +0x04 on bes ortak karenin SIFIRINDA uyusuyor. Ayri degerler. +0x08 (odakta karsiligi yok) gaz basiliyken 164.0 -> 220.0 buyuyup birakinca geri donuyor: hiza gore acilan kamera menzili/on-bakisi gibi."
 0x03000078,4,gRam03000078,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x03000098,4,gRam03000098,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0300009C,4,gRam0300009C,decomp,provisional,Referenced by FUN_08001A00; role unknown

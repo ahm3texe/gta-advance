@@ -103,7 +103,7 @@ turunda degismeyen HIC sembol yok -- araba turu yuruyusun ustune ekleniyor):
 | `gRam020302E0` | 2  | f3815 |
 | `gUnk02028290` | 1  | f2864 |
 
-### Kesin bulgu: odak noktasi IWRAM'e aynalaniyor
+### ~~Kesin bulgu: odak noktasi IWRAM'e aynalaniyor~~ (GERI ALINDI -- asagi bak)
 
 `gFocusPoint` (0x020004B0, EWRAM) ve `gClipBounds` (0x03000014, IWRAM) ayri
 adresler -- aralarinda 16 MB var -- ama 31 gecisin HEPSINDE ayni degeri
@@ -124,3 +124,53 @@ Bu tur, izleme aracinin ciddi bir sinirini ortaya cikardi: 1/2/4 disindaki
 boyutlar sessizce 1 bayta kirpiliyordu.  37 sembolun 19086 bayti icin sadece
 37 bayt izleniyordu.  Uretec artik yapilari kelime kelime aciyor (275 giris)
 ve buyuk dizileri ORNEKLEYIP izlenmeyen 18382 bayti raporluyor.
+
+
+## Ucuncu tur: tam genislikte odak noktasi
+
+Izleyici artik yapilari kelime kelime aciyor (275 giris), yani `gFocusPoint`in
+8 bayti da `gClipBounds`in 12 bayti da tam gorunuyor.
+
+### DUZELTME: "aynalama" sonucu yanlisti
+
+Ikinci turda "gFocusPoint ile gClipBounds 31/31 ayni deger" demistik.  O
+sonuc SADECE 0. BAYT okunarak cikarilmisti.  Tam genislikte durum farkli:
+
+| Karsilastirma | Ortak kare | Ayni deger |
+|---|---|---|
+| `gFocusPoint+0x00` vs `gClipBounds+0x00` | 6  | 5 |
+| `gFocusPoint+0x04` vs `gClipBounds+0x04` | 15 | **0** |
+
+Y bileseni HIC uyusmuyor.  Iki yapi kopya DEGIL; rolleri yakin, degerleri
+ayri.  Cogu zaman ayri karelerde de degisiyorlar.
+
+Bu, izleyiciyi genisletmenin neden gerektigini gosteriyor: dar okuma kendi
+sonucumuzu uydurmustu.
+
+### KANITLANAN: 16.16 sabit nokta
+
+Format tahmin degil, olculdu:
+
+- Baslangic degerleri TAM sayi: `gFocusPoint` = (3360.000, 9568.000),
+  `gClipBounds` = (3360.000, 9568.000, 164.000)
+- Bazi farklar TAM 65536 (= 1.000) ve TAM 262144 (= 4.000)
+- Up basiliyken `gFocusPoint+0x04` her seferinde TAM -374632 (-5.716)
+  adimliyor: **29/29 sabit** -> sabit hizla hareket
+
+Yuvarlak olmayan -5.716'lik adim, yon acisina bagli bir hiz bileseni
+olabilir (arac yonelimi), ama bu DOGRULANMADI.
+
+### gClipBounds+0x08: hiza gore acilan menzil
+
+Odak noktasinda karsiligi olmayan ucuncu bilesen:
+
+| Kare | Deger | Tus |
+|---|---|---|
+| f688  | 164.0 | (ilk deger) |
+| f3457 | 167.2 | A+Left |
+| f3471 | 189.6 | A+Left |
+| f3492 | **220.0** | A |
+| f3916+ | geri 164.0'a dogru | (gaz birakildi) |
+
+Gaz basiliyken 164.0'dan 220.0'a buyuyup birakinca geri donuyor.  Hiza gore
+acilan kamera menzili / on-bakis mesafesi gibi duruyor.
