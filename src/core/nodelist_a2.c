@@ -31,7 +31,7 @@
  */
 
 #include "gba_types.h"
-#include "ram_symbols.h"
+#include "node_list.h"
 
 #define SPARE_ID   0x7FEF
 #define RECORD_SZ  28
@@ -53,10 +53,11 @@ typedef struct Node {
     s32   c;                    /* 0x24 */
 } Node;
 
-typedef struct NodeList {
-    Node *head;                 /* 0x00 */
-    Node *spare;                /* 0x04 */
-} NodeList;
+/* gRam02035780 include/node_list.h'de `NodeC4 *` olarak bildirilmis
+ * (liste BASI, +0x00).  Yedek dugum +0x04'te; ayni sembole ikinci bir
+ * extern tur vermek check_consistency'nin `ram-extern` denetimine takiliyor,
+ * bu yuzden paylasilan bildirim uzerinden ikinci kelimeye eriliyor. */
+#define NODE_LIST ((Node **)&gRam02035780)
 
 typedef struct AreaBank {
     u8    pad00[0x20];
@@ -64,21 +65,21 @@ typedef struct AreaBank {
 } AreaBank;
 
 extern AreaBank gAreaBank;
-extern void ListRemove(NodeList *list, Node *node);
-extern void InsertSorted(NodeList *list, Node *node, s32 id);
+extern void ListRemove(Node **list, Node *node);
+extern void InsertSorted(Node **list, Node *node, s32 id);
 
 /* 0x08054744 */
 Node *FUN_08054744(s32 id)
 {
-    NodeList *list;
+    Node **list;
     Node *cur;
     Node *spare;
     Node *node;
     s32 k;
 
-    list = (NodeList *)gRam02035780;
-    cur = list->head;
-    spare = list->spare;
+    list = NODE_LIST;           /* ROM tabani r6'da TUTUYOR */
+    cur = list[0];
+    spare = list[1];
     goto test;                  /* ROM `b` ile alttaki teste atliyor */
 
 step:
