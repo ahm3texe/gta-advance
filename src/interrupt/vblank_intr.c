@@ -50,7 +50,7 @@ extern u8  gGameState[16];
 extern void FUN_08033264(void);
 extern void FUN_08011ec4(void);
 extern void FUN_0806686c(void);
-extern void FUN_08012b9c(void);
+extern void FlushSpriteList(void);
 extern void FUN_080133a8(void);
 extern void FUN_080130f4(void);
 extern void FlushPaletteQueue(void);
@@ -79,7 +79,7 @@ void VBlankIntr(void)
         if ((u16)(REG_VCOUNT - VBLANK_FIRST_LINE) <= BUDGET_SHORT) {
             if (gVBlankState == VBLANK_READY) {
                 /* Gecen karede pencere kacirilmisti: dogrudan aktar. */
-                FUN_08012b9c();
+                FlushSpriteList();
                 FUN_080133a8();
                 FUN_080130f4();
                 FlushPaletteQueue();
@@ -105,7 +105,7 @@ void VBlankIntr(void)
                 if ((u16)(REG_VCOUNT - VBLANK_FIRST_LINE) > BUDGET_LONG) {
                     gVBlankState = VBLANK_READY;
                 } else {
-                    FUN_08012b9c();
+                    FlushSpriteList();
                     FUN_080133a8();
                     FUN_080130f4();
                     FlushPaletteQueue();

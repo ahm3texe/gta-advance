@@ -21,7 +21,7 @@ extern u8  gGameState[16];
 #define gIwramFrameCounter (*(u32 *)0x03000004)
 
 /* VBlank sirasinda calisan aktarim adimlari; henuz adlandirilmadi. */
-extern void FUN_08012b9c(void);
+extern void FlushSpriteList(void);
 extern void FUN_080133a8(void);
 extern void FUN_080130f4(void);
 extern void FlushPaletteQueue(void);
@@ -44,7 +44,7 @@ void RunVBlankTransfers(void)
     u32 counter;
     u8 phase;
 
-    FUN_08012b9c();
+    FlushSpriteList();
     FUN_080133a8();
     FUN_080130f4();
     FlushPaletteQueue();
