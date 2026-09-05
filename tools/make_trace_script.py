@@ -26,42 +26,21 @@ LOG = ROOT / "build" / "trace.log"
 WATCH_PREFIXES = (0x02, 0x03)
 
 
-def main() -> int:
-    rows = list(csv.DictReader(RAM_MAP.open()))
-    watched, skipped = [], []
-    for r in rows:
-        addr = int(r["address"], 16)
-        if (addr >> 24) not in WATCH_PREFIXES:
-            skipped.append(r["name"])
-            continue
-        try:
-            size = int(r["size"] or 1)
-        except ValueError:
-            size = 1
-        if size not in (1, 2, 4):
-            size = 1          # dizi/yapi: ilk baytini izle
-        watched.append((addr, size, r["name"]))
-
-    watched.sort()
-    entries = ",\n".join(
-        f'  {{0x{a:08X}, {s}, "{n}"}}' for a, s, n in watched
-    )
-
-    OUT.write_text(f"""-- OTOMATIK URETILDI: tools/make_trace_script.py
+LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
 -- Elle duzenleme; ram_map.csv'yi guncelleyip ureteci tekrar calistir.
 --
 -- mGBA 0.10.5 icin RAM degisim izleyicisi.
 -- Yukleme: Tools > Scripting... > Load script
--- Log:     {LOG}
+-- Log:     __LOG_PATH__
 
-local LOG_PATH = "{LOG}"
-local WATCH = {{
-{entries}
-}}
+local LOG_PATH = "__LOG_PATH__"
+local WATCH = {
+__ENTRIES__
+}
 
-local prev    = {{}}
-local nchg    = {{}}   -- sembol basina degisim sayisi
-local noisy   = {{}}   -- gurultulu diye susturulanlar
+local prev    = {}
+local nchg    = {}   -- sembol basina degisim sayisi
+local noisy   = {}   -- gurultulu diye susturulanlar
 local frame   = 0
 local fh      = nil
 local keys_ok = true
@@ -70,10 +49,10 @@ local keys_ok = true
 -- gecerse susturulup bir kez rapor ediliyor.
 local NOISE_LIMIT = 30
 
-local KEY_NAMES = {{
+local KEY_NAMES = {
   [0]="A", [1]="B", [2]="Select", [3]="Start",
   [4]="Right", [5]="Left", [6]="Up", [7]="Down", [8]="R", [9]="L",
-}}
+}
 
 local function out(line)
   console:log(line)
@@ -96,7 +75,7 @@ local function keyString()
     out("[uyari] emu:getKeys() yok; tus sutunu kapatildi")
     return ""
   end
-  local held = {{}}
+  local held = {}
   for bit = 0, 9 do
     if mask & (1 << bit) ~= 0 then held[#held + 1] = KEY_NAMES[bit] end
   end
@@ -156,7 +135,64 @@ do
 end
 
 callbacks:add("frame", onFrame)
-""")
+"""
+
+
+def validate_lua(text: str):
+    """Kapanmamis string literali olan satirlari dondur.
+
+    Lua'da string literalleri satir sonunu gecemez.  Kacis hatasi tam
+    olarak bunu uretiyordu, o yuzden uretim bunun uzerinde durur.
+    """
+    bad = []
+    for i, line in enumerate(text.splitlines(), 1):
+        depth, esc, quotes = 0, False, 0
+        for ch in line:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                quotes += 1
+        if quotes % 2:
+            bad.append((i, line))
+    return bad
+
+
+def main() -> int:
+    rows = list(csv.DictReader(RAM_MAP.open()))
+    watched, skipped = [], []
+    for r in rows:
+        addr = int(r["address"], 16)
+        if (addr >> 24) not in WATCH_PREFIXES:
+            skipped.append(r["name"])
+            continue
+        try:
+            size = int(r["size"] or 1)
+        except ValueError:
+            size = 1
+        if size not in (1, 2, 4):
+            size = 1          # dizi/yapi: ilk baytini izle
+        watched.append((addr, size, r["name"]))
+
+    watched.sort()
+    entries = ",\n".join(
+        f'  {{0x{a:08X}, {s}, "{n}"}}' for a, s, n in watched
+    )
+
+    # Template HAM (raw) string ve yer tutuculu: f-string kullanilirsa
+    # Lua'nin \n kacislari Python tarafindan gercek satir sonuna cevrilip
+    # string literalleri ikiye boluyor (bir kez basimiza geldi).
+    lua = LUA_TEMPLATE.replace("__LOG_PATH__", str(LOG))\
+                      .replace("__ENTRIES__", entries)
+
+    problems = validate_lua(lua)
+    if problems:
+        for line_no, text in problems:
+            print(f"HATA: satir {line_no}: kapanmamis string -> {text.strip()[:60]}")
+        return 1
+
+    OUT.write_text(lua)
 
     print(f"yazildi: {OUT.relative_to(ROOT)}")
     print(f"  izlenen: {len(watched)} sembol")
