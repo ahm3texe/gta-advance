@@ -198,24 +198,24 @@ address,name,size,status,module,notes
 0x0800DB80,FUN_0800db80,104,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0800DBE8,ListPushFront,36,matching,world,Liste islemleri; src/world/list_ops.c
 0x0800DC0C,ListRemove2,56,matching,world,Liste islemleri; src/world/list_ops.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0800DC44,FUN_0800dc44,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800DCB4,FUN_0800dcb4,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800DD50,FUN_0800dd50,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800DE5C,FUN_0800de5c,44,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0800DEA4,FUN_0800dea4,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800DF14,FUN_0800df14,1216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800E3D4,FUN_0800e3d4,546,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800E5F8,FUN_0800e5f8,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800E69C,FUN_0800e69c,246,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800E794,FUN_0800e794,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800E878,FUN_0800e878,616,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800EAE0,FUN_0800eae0,288,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800EC00,FUN_0800ec00,672,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0800EEA0,FUN_0800eea0,4654,candidate,unknown,2026-09-04 Thumb akış incelemesi; tek stack frame ve 0x080100CC dönüşüyle sınır doğrulandı
-0x080100D0,FUN_080100d0,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801014C,FUN_0801014c,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08010198,FUN_08010198,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801019C,FUN_0801019c,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0800DC44,FUN_0800dc44,112,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800DCB4,FUN_0800dcb4,154,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800DD50,FUN_0800dd50,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800DE5C,FUN_0800de5c,44,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0800DEA4,FUN_0800dea4,112,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800DF14,FUN_0800df14,1216,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800E3D4,FUN_0800e3d4,546,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800E5F8,FUN_0800e5f8,164,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800E69C,FUN_0800e69c,246,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800E794,FUN_0800e794,228,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800E878,FUN_0800e878,616,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800EAE0,FUN_0800eae0,288,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800EC00,FUN_0800ec00,672,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0800EEA0,FUN_0800eea0,4654,candidate,world,2026-09-04 Thumb akış incelemesi; tek stack frame ve 0x080100CC dönüşüyle sınır doğrulandı  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080100D0,FUN_080100d0,124,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801014C,FUN_0801014c,76,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08010198,FUN_08010198,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801019C,FUN_0801019c,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080101D8,FUN_080101d8,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x080101E4,FUN_080101e4,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080101E8,FUN_080101e8,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -269,7 +269,7 @@ address,name,size,status,module,notes
 0x08012908,ListForEach,28,matching,core,Cift bagli liste; src/core/linked_list.c
 0x08012924,ListForEachArg,32,matching,core,Cift bagli liste; src/core/linked_list.c
 0x08012944,ForEachNode,36,matching,core,C kaynagindan byte-matching; isaretci uzerinden geri cagirma dongusu
-0x08012968,UnlinkToFree,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08012968,UnlinkToFree,150,candidate,core,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'core'.
 0x08012A00,SortSpriteList,152,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
 0x08012A98,FUN_08012a98,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x08012AA4,InitNodePool,124,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -304,39 +304,39 @@ address,name,size,status,module,notes
 0x08013824,FUN_08013824,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080138E8,FUN_080138e8,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x080138F4,FUN_080138f4,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x08013900,FlushPaletteQueue,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08013900,FlushPaletteQueue,116,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08013974,GetEntryOrDefault,24,matching,world,Liste basi; src/world/list_head.c
 0x0801398C,CountChain,36,matching,world,Liste basi; src/world/list_head.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080139B0,MarkChain,32,matching,world,Liste basi; src/world/list_head.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08013A28,SubmitFixed,30,matching,world,DMA bosaltma; src/world/dma_flush.c
 0x08013A48,FlushBlock,60,matching,world,DMA bosaltma; src/world/dma_flush.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08013ABC,FUN_08013abc,224,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08013B9C,FUN_08013b9c,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08013CFC,FUN_08013cfc,836,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014040,FUN_08014040,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014108,FUN_08014108,354,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801426C,FUN_0801426c,296,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08014394,FUN_08014394,300,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x080144C0,FUN_080144c0,552,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080146E8,FUN_080146e8,204,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080147B4,FUN_080147b4,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014820,FUN_08014820,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080148B0,FUN_080148b0,1432,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014E48,FUN_08014e48,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08014EE4,FUN_08014ee4,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08013ABC,FUN_08013abc,224,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08013B9C,FUN_08013b9c,352,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08013CFC,FUN_08013cfc,836,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014040,FUN_08014040,200,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014108,FUN_08014108,354,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801426C,FUN_0801426c,296,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08014394,FUN_08014394,300,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080144C0,FUN_080144c0,552,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080146E8,FUN_080146e8,204,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080147B4,FUN_080147b4,108,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014820,FUN_08014820,144,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080148B0,FUN_080148b0,1432,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014E48,FUN_08014e48,154,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014EE4,FUN_08014ee4,124,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08014FA0,FUN_08014fa0,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x08014FAC,FUN_08014fac,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014FB8,FUN_08014fb8,12,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08014FC4,FUN_08014fc4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08014FFC,FUN_08014ffc,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08015038,FUN_08015038,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801508C,FUN_0801508c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080150B4,FUN_080150b4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080150D0,FUN_080150d0,64,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08015110,FUN_08015110,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801515C,FUN_0801515c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080151C0,FUN_080151c0,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801528C,FUN_0801528c,588,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08014FAC,FUN_08014fac,12,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014FB8,FUN_08014fb8,12,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08014FC4,FUN_08014fc4,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08014FFC,FUN_08014ffc,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08015038,FUN_08015038,84,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801508C,FUN_0801508c,40,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080150B4,FUN_080150b4,26,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080150D0,FUN_080150d0,64,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08015110,FUN_08015110,76,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801515C,FUN_0801515c,100,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080151C0,FUN_080151c0,124,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801528C,FUN_0801528c,588,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080154D8,InitActor,192,matching,world,Varlık varsayılan durum ilklendirmesi; src/world/actor_init.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08015598,FUN_08015598,544,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080157B8,FUN_080157b8,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -379,54 +379,54 @@ address,name,size,status,module,notes
 0x080194B4,ResolveActorExtra,64,matching,world,Varlik denetimi; src/world/actor_control.c
 0x080194F4,ActivateActor,28,matching,world,Varlik denetimi; src/world/actor_control.c
 0x08019510,IsActorBusy,26,matching,world,Varlik denetimi; src/world/actor_control.c
-0x0801952C,FUN_0801952c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019590,FUN_08019590,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080195F4,EitherInRange,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019620,FUN_08019620,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0801952C,FUN_0801952c,100,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019590,FUN_08019590,98,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080195F4,EitherInRange,44,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019620,FUN_08019620,80,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08019670,ScaleByMode,42,matching,world,Nesne durum sorgusu; src/world/object_state.c
 0x0801969C,ReleaseObjectSlot,42,matching,world,Nesne durum sorgusu; src/world/object_state.c
 0x080196C8,IsObjectReadyA,36,matching,world,Nesne durum sorgusu; src/world/object_state.c
 0x080196EC,IsObjectReadyB,36,matching,world,Nesne durum sorgusu; src/world/object_state.c
-0x08019710,FUN_08019710,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801979C,FUN_0801979c,96,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x080197FC,FUN_080197fc,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019800,FUN_08019800,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801981C,FUN_0801981c,32,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0801983C,FUN_0801983c,168,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080198E4,FUN_080198e4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801994C,FUN_0801994c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080199BC,FUN_080199bc,134,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019A64,FUN_08019a64,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019A80,FUN_08019a80,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08019710,FUN_08019710,140,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801979C,FUN_0801979c,96,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080197FC,FUN_080197fc,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019800,FUN_08019800,26,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801981C,FUN_0801981c,32,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0801983C,FUN_0801983c,168,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080198E4,FUN_080198e4,104,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801994C,FUN_0801994c,112,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080199BC,FUN_080199bc,134,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019A64,FUN_08019a64,26,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019A80,FUN_08019a80,76,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08019B08,IsActorUsable,52,matching,world,Aktor durum; src/world/actor_check.c
 0x08019B3C,GetAngleField,30,matching,world,Aktor durum; src/world/actor_check.c
-0x08019B5C,FUN_08019b5c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019BCC,FUN_08019bcc,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019C04,FUN_08019c04,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019C10,FUN_08019c10,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08019C24,FUN_08019c24,264,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019D2C,FUN_08019d2c,132,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019DB0,FUN_08019db0,322,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08019EF4,FUN_08019ef4,414,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801A094,FUN_0801a094,564,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801A2C8,FUN_0801a2c8,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801A354,FUN_0801a354,522,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801A560,FUN_0801a560,400,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801A6F0,FUN_0801a6f0,986,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801AACC,FUN_0801aacc,1046,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı
-0x0801AEE4,FUN_0801aee4,4476,candidate,unknown,2026-09-04 Thumb akış incelemesi; 0x0801C04A iç store ve 0x0801C05A dönüşüyle sınır doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801C060,FUN_0801c060,1560,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801C678,FUN_0801c678,1500,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801CC54,FUN_0801cc54,1274,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801D150,FUN_0801d150,560,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801D380,FUN_0801d380,980,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801D754,FUN_0801d754,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08019B5C,FUN_08019b5c,112,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019BCC,FUN_08019bcc,54,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019C04,FUN_08019c04,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019C10,FUN_08019c10,20,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019C24,FUN_08019c24,264,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019D2C,FUN_08019d2c,132,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019DB0,FUN_08019db0,322,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08019EF4,FUN_08019ef4,414,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801A094,FUN_0801a094,564,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801A2C8,FUN_0801a2c8,140,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801A354,FUN_0801a354,522,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801A560,FUN_0801a560,400,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801A6F0,FUN_0801a6f0,986,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801AACC,FUN_0801aacc,1046,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801AEE4,FUN_0801aee4,4476,candidate,world,2026-09-04 Thumb akış incelemesi; 0x0801C04A iç store ve 0x0801C05A dönüşüyle sınır doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801C060,FUN_0801c060,1560,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801C678,FUN_0801c678,1500,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801CC54,FUN_0801cc54,1274,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801D150,FUN_0801d150,560,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801D380,FUN_0801d380,980,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801D754,FUN_0801d754,136,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0801D7DC,SetWindow,32,matching,world,Pencere ayari; src/world/window_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0801D7FC,StoreRam0201AEE8,12,matching,world,Pencere ayari; src/world/window_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x0801D818,FUN_0801d818,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801D818,FUN_0801d818,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0801D848,InitAndMirror,34,matching,world,C kaynagindan byte-matching; karmasik hasat
-0x0801D86C,FUN_0801d86c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0801D8A0,FUN_0801d8a0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801D86C,FUN_0801d86c,24,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0801D8A0,FUN_0801d8a0,6,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0801D8B0,FUN_0801d8b0,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x0801D8BC,FUN_0801d8bc,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801D920,FUN_0801d920,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -487,7 +487,7 @@ address,name,size,status,module,notes
 0x08023868,FUN_08023868,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802392C,ClearRam0202370C,12,matching,world,Cift indeksleme; src/world/pair_lookup.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08023938,PairIndex,60,matching,world,Cift indeksleme; src/world/pair_lookup.c
-0x08023974,StepDecay,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08023974,StepDecay,152,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08023A0C,ApplyThreshold,52,matching,world,Bant hesaplayici; src/world/threshold.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08023A40,ResetMeter,10,matching,world,Bant hesaplayici; src/world/threshold.c
 0x08023A4C,SetToMax,10,matching,world,Bant hesaplayici; src/world/threshold.c
@@ -550,19 +550,19 @@ address,name,size,status,module,notes
 0x08028C48,IsEntryActive,32,matching,world,Tablo girdisi; src/world/table_entries.c
 0x08028C68,ReleaseEntry,64,matching,world,Tablo girdisi; src/world/table_entries.c
 0x08028CA8,ClearEntry,64,matching,world,Tablo girdisi; src/world/table_entries.c
-0x08028CE8,FUN_08028ce8,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08028D44,StepEntryTimer,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028DC4,FUN_08028dc4,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028DF4,FUN_08028df4,70,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08028CE8,FUN_08028ce8,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028D44,StepEntryTimer,128,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028DC4,FUN_08028dc4,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028DF4,FUN_08028df4,70,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08028E3C,HasWantedEntry,48,matching,world,14 girdilik etkin tür taraması; src/world/kind_scan.c
 0x08028E6C,FrameChain,26,matching,world,Giris tarayici + kare zinciri; src/world/kind_scan.c
-0x08028E88,FUN_08028e88,26,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08028EA4,FUN_08028ea4,26,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08028EC0,FUN_08028ec0,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028EF4,FUN_08028ef4,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028F4C,FUN_08028f4c,76,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028F98,FUN_08028f98,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08028FB8,FUN_08028fb8,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08028E88,FUN_08028e88,26,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08028EA4,FUN_08028ea4,26,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08028EC0,FUN_08028ec0,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028EF4,FUN_08028ef4,88,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028F4C,FUN_08028f4c,76,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028F98,FUN_08028f98,32,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08028FB8,FUN_08028fb8,68,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08028FFC,GetNegatedNested,24,matching,world,Zincir + tarama; src/world/scan_active.c
 0x08029014,ProcessFirstEntry,62,matching,world,Yalnız 0 numaralı tablo girdisini işler; src/world/scan_all.c
 0x08029058,FUN_08029058,48,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -643,35 +643,35 @@ address,name,size,status,module,notes
 0x08030884,NotifyIfReady,28,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x080308A0,ReleaseAllSlots,10,matching,world,Yuva serbest; src/world/slot_release.c
 0x080308AC,ReleaseSlot,64,matching,world,İki tabanlı yuva serbest bırakma; src/world/release_slot.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x080308EC,FUN_080308ec,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030934,FUN_08030934,38,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803095C,FUN_0803095c,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080309A8,FUN_080309a8,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080309D4,FUN_080309d4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030A3C,FUN_08030a3c,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030A60,FUN_08030a60,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030A9C,FUN_08030a9c,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030AE4,FUN_08030ae4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030B1C,FUN_08030b1c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030B34,FUN_08030b34,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030B40,FUN_08030b40,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030B50,FUN_08030b50,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08030B60,FUN_08030b60,40,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08030B88,FUN_08030b88,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08030BE8,HalvesEqual,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x080308EC,FUN_080308ec,72,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030934,FUN_08030934,38,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803095C,FUN_0803095c,76,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080309A8,FUN_080309a8,42,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080309D4,FUN_080309d4,104,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030A3C,FUN_08030a3c,36,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030A60,FUN_08030a60,58,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030A9C,FUN_08030a9c,72,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030AE4,FUN_08030ae4,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030B1C,FUN_08030b1c,24,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030B34,FUN_08030b34,12,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030B40,FUN_08030b40,16,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030B50,FUN_08030b50,16,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08030B60,FUN_08030b60,40,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08030B88,FUN_08030b88,20,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08030BE8,HalvesEqual,36,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08030C0C,LookupThenCall,24,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
 0x08030C28,ZeroTwoBlocks,36,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08030C4C,IsAreaFlagSet,52,matching,world,Alan bayraklari; src/world/area_flags.c
 0x08030C80,SetAreaFlag,48,matching,world,Alan bayraklari; src/world/area_flags.c
 0x08030CB0,AreaFlagsNoop,2,matching,world,Alan bayraklari; src/world/area_flags.c
 0x08030CB4,CleanupAreaTiles,88,decompiled,world,"Alan bayraklari; src/world/area_flags.c kuyruk literal havuzu dahil (62->88, olculdu)"
-0x08030D0C,FUN_08030d0c,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030D4C,FUN_08030d4c,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030D84,FUN_08030d84,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030DB4,FUN_08030db4,36,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x08030DD8,FUN_08030dd8,56,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08030E10,FUN_08030e10,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08030E78,FUN_08030e78,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08030D0C,FUN_08030d0c,64,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030D4C,FUN_08030d4c,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030D84,FUN_08030d84,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030DB4,FUN_08030db4,36,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08030DD8,FUN_08030dd8,56,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08030E10,FUN_08030e10,104,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08030E78,FUN_08030e78,40,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08030EA0,FUN_08030ea0,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x08030EAC,FUN_08030eac,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08030F28,FUN_08030f28,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -709,16 +709,16 @@ address,name,size,status,module,notes
 0x08031D24,AnyPairSet,46,matching,world,Bayrak dizisi; src/world/flag_arrays.c
 0x08031D54,ClearAllBlocks,52,matching,world,Bayrak dizisi; src/world/flag_arrays.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08031DB8,StepThenCheck,36,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 3)
-0x08031DDC,FUN_08031ddc,60,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08031E18,FUN_08031e18,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031E44,FUN_08031e44,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031E94,FUN_08031e94,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031EEC,FUN_08031eec,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031F18,FUN_08031f18,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031F48,FUN_08031f48,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031FB4,FUN_08031fb4,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031FF0,FUN_08031ff0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08032008,FUN_08032008,80,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x08031DDC,FUN_08031ddc,60,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08031E18,FUN_08031e18,40,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031E44,FUN_08031e44,80,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031E94,FUN_08031e94,86,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031EEC,FUN_08031eec,44,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031F18,FUN_08031f18,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031F48,FUN_08031f48,108,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031FB4,FUN_08031fb4,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08031FF0,FUN_08031ff0,22,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08032008,FUN_08032008,80,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08032058,IsEntityFlagSet,56,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
@@ -891,12 +891,12 @@ address,name,size,status,module,notes
 0x08038000,ClearFlagNotify,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x08038020,ForwardZeroArg4,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
 0x08038044,SlotRangeOrField,26,matching,world,C kaynagindan byte-matching; karmasik hasat
-0x08038060,FUN_08038060,34,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08038084,FUN_08038084,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803809C,FUN_0803809c,24,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080380B4,FUN_080380b4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038108,FUN_08038108,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080381A4,FUN_080381a4,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08038060,FUN_08038060,34,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08038084,FUN_08038084,22,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803809C,FUN_0803809c,24,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080380B4,FUN_080380b4,22,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038108,FUN_08038108,154,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080381A4,FUN_080381a4,84,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080381F8,ProbeObject,58,matching,world,Varsayılan parametrelerle nesne sınaması; src/world/object_query.c
 0x08038234,SubmitObject,22,matching,world,Nesne sorgusu; src/world/object_query.c
 0x0803824C,GetInnerId,20,matching,world,İki halkalı iç nesne kimliği; src/world/get_inner_id.c
@@ -905,58 +905,58 @@ address,name,size,status,module,notes
 0x08038364,IsObjectActive,28,matching,world,Nesne yardimcisi; src/world/object_helpers.c
 0x08038380,UpdateObject,32,matching,world,Nesne yardimcisi; src/world/object_helpers.c
 0x080383A0,GetObjectLinkId,24,matching,world,Nesne yardimcisi; src/world/object_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x080383B8,FUN_080383b8,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080383E8,FUN_080383e8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038420,FUN_08038420,30,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08038440,FUN_08038440,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803846C,FUN_0803846c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080384F0,FUN_080384f0,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038530,FUN_08038530,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038584,FUN_08038584,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080385C4,FUN_080385c4,68,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08038608,FUN_08038608,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038644,FUN_08038644,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038680,FUN_08038680,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080386A8,FUN_080386a8,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080387E8,FUN_080387e8,160,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038888,FUN_08038888,188,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038944,FUN_08038944,122,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080389C0,FUN_080389c0,160,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08038A60,FUN_08038a60,3204,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080396E4,FUN_080396e4,264,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x080383B8,FUN_080383b8,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080383E8,FUN_080383e8,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038420,FUN_08038420,30,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08038440,FUN_08038440,44,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803846C,FUN_0803846c,112,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080384F0,FUN_080384f0,64,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038530,FUN_08038530,84,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038584,FUN_08038584,24,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080385C4,FUN_080385c4,68,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08038608,FUN_08038608,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038644,FUN_08038644,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038680,FUN_08038680,38,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080386A8,FUN_080386a8,320,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080387E8,FUN_080387e8,160,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038888,FUN_08038888,188,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038944,FUN_08038944,122,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080389C0,FUN_080389c0,160,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08038A60,FUN_08038a60,3204,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080396E4,FUN_080396e4,264,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x080397EC,FUN_080397ec,3432,candidate,world,Ghidra kacirmisti; 0x0803C050 yuva ayarlayicisinin isleyici hedefi; boyut 3410->3254 (gercek cagri hedefine kadar kisaltildi); sınır 2026-09-04 ROM akış incelemesiyle doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803A554,FUN_0803a554,1280,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803AA54,FUN_0803aa54,184,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803AB0C,FUN_0803ab0c,184,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0803ABC4,FUN_0803abc4,424,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803AD6C,FUN_0803ad6c,224,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803AE4C,FUN_0803ae4c,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803AEDC,FUN_0803aedc,224,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803AFBC,FUN_0803afbc,480,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803B19C,FUN_0803b19c,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803B1A0,FUN_0803b1a0,904,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803B528,FUN_0803b528,254,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803B628,FUN_0803b628,156,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0803B6C4,FUN_0803b6c4,840,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803BA0C,FUN_0803ba0c,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803BAF0,FUN_0803baf0,480,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803BCD0,FUN_0803bcd0,248,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803BDC8,FUN_0803bdc8,540,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803BFE4,FUN_0803bfe4,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803A554,FUN_0803a554,1280,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803AA54,FUN_0803aa54,184,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803AB0C,FUN_0803ab0c,184,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803ABC4,FUN_0803abc4,424,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803AD6C,FUN_0803ad6c,224,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803AE4C,FUN_0803ae4c,144,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803AEDC,FUN_0803aedc,224,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803AFBC,FUN_0803afbc,480,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803B19C,FUN_0803b19c,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803B1A0,FUN_0803b1a0,904,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803B528,FUN_0803b528,254,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803B628,FUN_0803b628,156,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803B6C4,FUN_0803b6c4,840,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803BA0C,FUN_0803ba0c,228,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803BAF0,FUN_0803baf0,480,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803BCD0,FUN_0803bcd0,248,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803BDC8,FUN_0803bdc8,540,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803BFE4,FUN_0803bfe4,96,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0803C050,ConfigureSlot,64,matching,world,Yuva yapilandirmasi; src/world/slot_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C090,GetActiveSlotValue,36,matching,world,Yuva yapilandirmasi; src/world/slot_config.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C0B4,GetSlotField,48,matching,world,Yuva yapilandirmasi; src/world/slot_config.c
 0x0803C0E4,ApplyTwoLevels,148,matching,world,"C kaynagindan byte-matching; 148 bayt, 128-256 bandinin ilk eslesmesi"
 0x0803C178,GetSlotRange,50,matching,world,Yuva menzili; src/world/slot_range.c
 0x0803C1AC,GetDefaultRange,6,matching,world,Yuva menzili; src/world/slot_range.c
-0x0803C1B4,FUN_0803c1b4,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C20C,FUN_0803c20c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C268,FUN_0803c268,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C2C4,FUN_0803c2c4,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C320,FUN_0803c320,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C37C,FUN_0803c37c,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C3D4,FUN_0803c3d4,44,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803C400,FUN_0803c400,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C1B4,FUN_0803c1b4,88,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C20C,FUN_0803c20c,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C268,FUN_0803c268,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C2C4,FUN_0803c2c4,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C320,FUN_0803c320,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C37C,FUN_0803c37c,86,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C3D4,FUN_0803c3d4,44,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803C400,FUN_0803c400,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0803C45C,SelectWordSource,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x0803C49C,SelectSlotAB,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C4B8,SelectSlotCD,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -976,42 +976,42 @@ address,name,size,status,module,notes
 0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
 0x0803C798,ResetSessionNode,40,matching,misc,Clears two node fields and two session flag bits boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C7D4,SubmitPack,24,matching,world,C kaynagindan byte-matching (MATCH-014)
-0x0803C7EC,FUN_0803c7ec,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C840,FUN_0803c840,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C8A0,FUN_0803c8a0,94,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C964,FUN_0803c964,138,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C9F0,FUN_0803c9f0,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CA58,FUN_0803ca58,116,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803CACC,FUN_0803cacc,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CB1C,FUN_0803cb1c,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CB4C,FUN_0803cb4c,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CBB4,FUN_0803cbb4,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CBC4,FUN_0803cbc4,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803CC30,FUN_0803cc30,374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803CDA8,FUN_0803cda8,188,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803CE64,FUN_0803ce64,728,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D13C,FUN_0803d13c,204,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D208,FUN_0803d208,736,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D4E8,FUN_0803d4e8,700,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D7A4,FUN_0803d7a4,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D8E8,FUN_0803d8e8,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803D9A8,FUN_0803d9a8,172,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803DA54,FUN_0803da54,284,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803DB70,FUN_0803db70,132,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803DBF4,FUN_0803dbf4,482,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803DDD8,FUN_0803ddd8,208,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0803C7EC,FUN_0803c7ec,80,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C840,FUN_0803c840,96,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C8A0,FUN_0803c8a0,94,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C964,FUN_0803c964,138,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803C9F0,FUN_0803c9f0,104,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CA58,FUN_0803ca58,116,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803CACC,FUN_0803cacc,80,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CB1C,FUN_0803cb1c,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CB4C,FUN_0803cb4c,104,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CBB4,FUN_0803cbb4,16,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CBC4,FUN_0803cbc4,108,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CC30,FUN_0803cc30,374,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CDA8,FUN_0803cda8,188,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803CE64,FUN_0803ce64,728,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D13C,FUN_0803d13c,204,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D208,FUN_0803d208,736,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D4E8,FUN_0803d4e8,700,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D7A4,FUN_0803d7a4,324,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D8E8,FUN_0803d8e8,192,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803D9A8,FUN_0803d9a8,172,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803DA54,FUN_0803da54,284,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803DB70,FUN_0803db70,132,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803DBF4,FUN_0803dbf4,482,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803DDD8,FUN_0803ddd8,208,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x0803DEA8,FUN_0803dea8,140,candidate,world,Ghidra kacirmisti; 0x0803F6xx durum ayarlayicilarinin isleyici hedefi
-0x0803DF34,FUN_0803df34,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803DFF8,FUN_0803dff8,648,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803DF34,FUN_0803df34,196,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803DFF8,FUN_0803dff8,648,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0803E280,FUN_0803e280,656,candidate,world,Ghidra kacirmisti; 0x0803F6xx durum ayarlayicilarinin isleyici hedefi
-0x0803E510,FUN_0803e510,226,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803E5F4,FUN_0803e5f4,1336,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0803EB2C,FUN_0803eb2c,462,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803ECFC,FUN_0803ecfc,538,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0803EF18,FUN_0803ef18,464,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x0803E510,FUN_0803e510,226,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803E5F4,FUN_0803e5f4,1336,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803EB2C,FUN_0803eb2c,462,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803ECFC,FUN_0803ecfc,538,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0803EF18,FUN_0803ef18,464,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x0803F0E8,FUN_0803f0e8,628,candidate,world,Ghidra kacirmisti; 0x0803F6xx durum ayarlayicilarinin isleyici hedefi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803F35C,FUN_0803f35c,350,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803F4BC,TryEngageTarget,372,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803F35C,FUN_0803f35c,350,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0803F4BC,TryEngageTarget,372,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0803F630,InitState,26,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F64C,StateNoop,2,matching,world,Durum kurulumu; src/world/state_init.c
 0x0803F650,RunState,12,matching,world,Durum kurulumu; src/world/state_init.c
@@ -1066,25 +1066,25 @@ address,name,size,status,module,notes
 0x0804200C,FUN_0804200c,76,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08042058,GetTileFieldA,48,matching,world,Karo alan getirici; src/world/map_tile_fields.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08042088,GetTileType,44,matching,world,Karo alan getirici; src/world/map_tile_fields.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x080420F8,FUN_080420f8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0804211C,FUN_0804211c,40,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08042144,FUN_08042144,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08042280,FUN_08042280,236,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0804236C,FUN_0804236c,100,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080423D0,FUN_080423d0,40,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x080420F8,FUN_080420f8,36,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0804211C,FUN_0804211c,40,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08042144,FUN_08042144,96,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08042280,FUN_08042280,236,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804236C,FUN_0804236c,100,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080423D0,FUN_080423d0,40,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08042434,IsTileTypeInRange,60,matching,world,"Karo turu sorgusu; Ghidra 56 bayt saymisti, havuz kelimesi govdenin icinde"
-0x08042470,FUN_08042470,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08042470,FUN_08042470,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080424A8,GetTileFieldA2,48,matching,world,Karo ve harita; src/world/tile_and_map.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080424D8,GetMapSize,20,matching,world,Karo ve harita; src/world/tile_and_map.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x080424EC,FUN_080424ec,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08042574,FUN_08042574,180,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08042628,FUN_08042628,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080426EC,FUN_080426ec,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080424EC,FUN_080424ec,136,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08042574,FUN_08042574,180,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08042628,FUN_08042628,196,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080426EC,FUN_080426ec,150,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08042784,FUN_08042784,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x08042790,FUN_08042790,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080427C0,FUN_080427c0,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0804283C,FUN_0804283c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08042864,FUN_08042864,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08042790,FUN_08042790,44,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080427C0,FUN_080427c0,124,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0804283C,FUN_0804283c,40,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08042864,FUN_08042864,70,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080428AC,FUN_080428ac,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
 0x080428B8,FUN_080428b8,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08042900,FUN_08042900,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1178,36 +1178,36 @@ address,name,size,status,module,notes
 0x0804FB2C,FUN_0804fb2c,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0804FB3C,FUN_0804fb3c,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0804FB4C,FUN_0804fb4c,10,matching,world,C kaynagindan byte-matching (kucuk fonksiyon hasadi)
-0x0804FB58,FUN_0804fb58,96,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0804FBD0,FUN_0804fbd0,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0804FC48,FUN_0804fc48,404,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0804FDDC,FUN_0804fddc,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0804FE14,FUN_0804fe14,80,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0804FE64,FUN_0804fe64,120,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0804FEE4,FUN_0804fee4,28,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0804FF00,FUN_0804ff00,96,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0804FF60,FUN_0804ff60,56,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
+0x0804FB58,FUN_0804fb58,96,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804FBD0,FUN_0804fbd0,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0804FC48,FUN_0804fc48,404,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0804FDDC,FUN_0804fddc,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0804FE14,FUN_0804fe14,80,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804FE64,FUN_0804fe64,120,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804FEE4,FUN_0804fee4,28,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804FF00,FUN_0804ff00,96,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0804FF60,FUN_0804ff60,56,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x0804FF98,FUN_0804ff98,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
-0x0804FFA4,FUN_0804ffa4,14,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0804FFA4,FUN_0804ffa4,14,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x0804FFB4,FUN_0804ffb4,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
-0x0804FFD8,FUN_0804ffd8,78,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08050040,FUN_08050040,62,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
-0x08050080,FUN_08050080,64,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080500C0,FUN_080500c0,14,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0804FFD8,FUN_0804ffd8,78,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08050040,FUN_08050040,62,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08050080,FUN_08050080,64,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080500C0,FUN_080500c0,14,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x080500D0,FUN_080500d0,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
-0x080500DC,FUN_080500dc,28,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080500F8,FUN_080500f8,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x080500DC,FUN_080500dc,28,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080500F8,FUN_080500f8,16,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08050108,BumpOrTrigger,40,matching,world,C kaynagindan byte-matching; karmasik hasat
-0x08050130,FUN_08050130,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08050130,FUN_08050130,96,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08050190,CompareA,28,matching,world,Kelime karsilastirici; src/world/word_compare.c
 0x080501AC,CompareB,28,matching,world,Kelime karsilastirici; src/world/word_compare.c
-0x080501C8,FUN_080501c8,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08050288,FUN_08050288,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080502F8,FUN_080502f8,290,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805041C,FUN_0805041c,152,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x080504B4,FUN_080504b4,392,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805063C,FUN_0805063c,440,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080507F4,FUN_080507f4,290,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080501C8,FUN_080501c8,192,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08050288,FUN_08050288,110,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080502F8,FUN_080502f8,290,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805041C,FUN_0805041c,152,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080504B4,FUN_080504b4,392,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805063C,FUN_0805063c,440,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080507F4,FUN_080507f4,290,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08050918,ResetAnchorSmall,28,matching,world,Anchor sifirlama; src/world/anchor_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08050934,ResetAnchorFull,36,matching,world,Anchor sifirlama; src/world/anchor_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08050958,ResetAnchorPartial,24,matching,world,C kaynagindan byte-matching (MATCH-014); anchor_reset kumesinin ucuncusu
@@ -1221,24 +1221,24 @@ address,name,size,status,module,notes
 0x08050A00,GetAnchorUnk34,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
 0x08050A0C,CheckCurrentEntity,38,matching,world,C kaynagindan byte-matching; karmasik fonksiyon
 0x08050A34,IsAnchorSmall,20,matching,world,"kosullu sabit donus; tools/find_predicates.py ile bulundu, C'den byte-matching"
-0x08050A48,FUN_08050a48,68,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08050A8C,FUN_08050a8c,754,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08050D80,FUN_08050d80,680,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805102C,FUN_0805102c,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805104C,FUN_0805104c,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08051094,FUN_08051094,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080510B8,FUN_080510b8,32,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080510D8,FUN_080510d8,112,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08051148,FUN_08051148,12,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08051154,FUN_08051154,348,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08050A48,FUN_08050a48,68,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08050A8C,FUN_08050a8c,754,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08050D80,FUN_08050d80,680,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805102C,FUN_0805102c,28,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805104C,FUN_0805104c,56,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08051094,FUN_08051094,30,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080510B8,FUN_080510b8,32,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080510D8,FUN_080510d8,112,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08051148,FUN_08051148,12,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08051154,FUN_08051154,348,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080512B0,GetRecordIndex,12,matching,world,"yaprak erisimci; tools/find_accessors.py ile bulundu, C'den byte-matching"
-0x080512BC,FUN_080512bc,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08051300,FUN_08051300,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805131C,FUN_0805131c,62,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805135C,FUN_0805135c,132,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080513E0,FUN_080513e0,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080512BC,FUN_080512bc,68,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08051300,FUN_08051300,28,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805131C,FUN_0805131c,62,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805135C,FUN_0805135c,132,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080513E0,FUN_080513e0,120,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08051464,FUN_08051464,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
-0x08051470,FUN_08051470,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08051470,FUN_08051470,16,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08051480,FUN_08051480,10,matching,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x0805148C,IsStateReady,20,matching,world,"kosullu sabit donus; tools/find_predicates.py ile bulundu, C'den byte-matching"
 0x080514C8,GetRecordUnk04,28,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1324,9 +1324,9 @@ address,name,size,status,module,notes
 0x08055AF8,QueryEntity,60,matching,world,Varlık türü ve alt-hedef bayrak sorgusu; src/world/entity_query.c
 0x08055B34,EngageActor,74,matching,world,"C kaynagindan byte-matching; iki kapili aktor devreye alma, etiketli kontrol akisi"
 0x08055BBC,RefreshThenNotify,44,matching,world,C kaynagindan byte-matching; karmasik fonksiyon
-0x08055BE8,FUN_08055be8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08055BE8,FUN_08055be8,14,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08055BF8,ForwardZeroArg2,12,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
-0x08055C04,FUN_08055c04,136,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08055C04,FUN_08055c04,136,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08055C8C,FindNthFreeSlot,58,matching,world,Yuva tarayici; src/world/slot_scan.c
 0x08055CC8,ClearSlots,64,matching,world,Yuva tarayici; src/world/slot_scan.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08055D08,GetEntrySlot,16,matching,world,Yuva tablosu; src/world/slot_table.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1440,26 +1440,26 @@ address,name,size,status,module,notes
 0x0805A450,FUN_0805a450,68,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0805A494,FUN_0805a494,96,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0805A4F4,FUN_0805a4f4,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
-0x0805A500,FUN_0805a500,12,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805A50C,FUN_0805a50c,82,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805A78C,FUN_0805a78c,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
-0x0805A7A0,FUN_0805a7a0,132,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805A824,FUN_0805a824,92,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805A880,FUN_0805a880,168,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805A928,FUN_0805a928,76,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805A974,FUN_0805a974,50,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805A9A8,FUN_0805a9a8,114,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AA1C,FUN_0805aa1c,20,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AA30,FUN_0805aa30,120,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805AAA8,FUN_0805aaa8,52,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0805AB04,FUN_0805ab04,16,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AB18,FUN_0805ab18,44,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AB44,FUN_0805ab44,50,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AB78,FUN_0805ab78,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805AB7C,FUN_0805ab7c,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805AB90,FUN_0805ab90,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805ABDC,FUN_0805abdc,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805AC10,FUN_0805ac10,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0805A500,FUN_0805a500,12,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A50C,FUN_0805a50c,82,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A78C,FUN_0805a78c,20,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A7A0,FUN_0805a7a0,132,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A824,FUN_0805a824,92,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A880,FUN_0805a880,168,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A928,FUN_0805a928,76,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A974,FUN_0805a974,50,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805A9A8,FUN_0805a9a8,114,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AA1C,FUN_0805aa1c,20,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AA30,FUN_0805aa30,120,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AAA8,FUN_0805aaa8,52,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AB04,FUN_0805ab04,16,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AB18,FUN_0805ab18,44,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AB44,FUN_0805ab44,50,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0805AB78,FUN_0805ab78,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805AB7C,FUN_0805ab7c,20,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805AB90,FUN_0805ab90,76,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805ABDC,FUN_0805abdc,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0805AC10,FUN_0805ac10,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x0805AC44,CopySrcToDest,12,matching,world,Doyan sayac; src/world/counter_saturate.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0805AC50,BumpOrReset,56,matching,world,Koşullu sıfırlanan doygun sayaç; src/world/bump_or_reset.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0805AC94,FUN_0805ac94,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1603,39 +1603,39 @@ address,name,size,status,module,notes
 0x080622B4,SetRamState,12,matching,world,gRam02035EA0 durum; src/world/ram_state.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0806233C,IsModeReady,20,matching,world,C kaynagindan byte-matching (MATCH-014)
 0x08062350,IsModeDone,20,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume)
-0x08062370,FUN_08062370,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080623AC,FUN_080623ac,56,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x080623E4,FUN_080623e4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806240C,FUN_0806240c,80,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0806245C,FUN_0806245c,92,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
-0x080624B8,FUN_080624b8,92,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08062370,FUN_08062370,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080623AC,FUN_080623ac,56,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080623E4,FUN_080623e4,38,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806240C,FUN_0806240c,80,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0806245C,FUN_0806245c,92,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x080624B8,FUN_080624b8,92,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
 0x08062514,GetRamType,28,matching,world,gRam02035EA0 sorgusu; src/world/ram_flags.c
 0x08062530,IsRamModeWanted,28,matching,world,RAM etkinlik ve mod sorgusu; src/world/is_ram_mode.c
-0x0806254C,FUN_0806254c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080625A0,FUN_080625a0,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080625D0,FUN_080625d0,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806262C,FUN_0806262c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806254C,FUN_0806254c,84,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080625A0,FUN_080625a0,48,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080625D0,FUN_080625d0,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806262C,FUN_0806262c,40,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08062654,GetRamWord16,12,matching,world,"yaprak erisimci; tools/find_accessors.py ile bulundu, C'den byte-matching"
-0x08062660,FUN_08062660,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806269C,FUN_0806269c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080626BC,FUN_080626bc,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062720,FUN_08062720,64,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08062760,FUN_08062760,60,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0806279C,FUN_0806279c,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080627EC,FUN_080627ec,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08062820,FUN_08062820,492,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062A0C,FUN_08062a0c,536,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062C24,FUN_08062c24,280,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062D3C,FUN_08062d3c,156,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08062DD8,FUN_08062dd8,2100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806360C,FUN_0806360c,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806369C,FUN_0806369c,264,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080638A0,FUN_080638a0,650,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x08063B2C,FUN_08063b2c,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08063B38,FUN_08063b38,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08063B74,FUN_08063b74,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08063B98,FUN_08063b98,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08063BA4,FUN_08063ba4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08062660,FUN_08062660,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806269C,FUN_0806269c,32,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080626BC,FUN_080626bc,100,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062720,FUN_08062720,64,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08062760,FUN_08062760,60,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x0806279C,FUN_0806279c,62,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080627EC,FUN_080627ec,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062820,FUN_08062820,492,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062A0C,FUN_08062a0c,536,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062C24,FUN_08062c24,280,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062D3C,FUN_08062d3c,156,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08062DD8,FUN_08062dd8,2100,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806360C,FUN_0806360c,144,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806369C,FUN_0806369c,264,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x080638A0,FUN_080638a0,650,discovered,world,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'."
+0x08063B2C,FUN_08063b2c,12,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08063B38,FUN_08063b38,60,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08063B74,FUN_08063b74,36,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08063B98,FUN_08063b98,12,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08063BA4,FUN_08063ba4,38,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08063BCC,FUN_08063bcc,10,matching,world,"iletme sarmalayicisi; tools/find_wrappers.py ile bulundu, C'den byte-matching"
 0x08063BD8,FUN_08063bd8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08063BE8,FUN_08063be8,92,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
@@ -1695,21 +1695,21 @@ address,name,size,status,module,notes
 0x080664C4,IsSessionActive,44,matching,world,Duraklatma; src/world/pause_helpers.c
 0x080664F0,MaybeAdvance,42,matching,world,Duraklatma; src/world/maybe_advance.c
 0x08066540,ResetSessionFlags,40,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
-0x08066568,FUN_08066568,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806660C,FUN_0806660c,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806673C,FUN_0806673c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066798,FUN_08066798,212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806686C,FUN_0806686c,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066904,FUN_08066904,316,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066568,FUN_08066568,164,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806660C,FUN_0806660c,304,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806673C,FUN_0806673c,92,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066798,FUN_08066798,212,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x0806686C,FUN_0806686c,152,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066904,FUN_08066904,316,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08066A40,MaybeSetCommByte6,20,matching,world,Iletisim bayragi; src/world/comm_flag.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08066A54,FUN_08066a54,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066AA8,FUN_08066aa8,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066B40,FUN_08066b40,340,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066C94,FUN_08066c94,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08067014,FUN_08067014,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08067184,FUN_08067184,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066A54,FUN_08066a54,84,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066AA8,FUN_08066aa8,152,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066B40,FUN_08066b40,340,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066C94,FUN_08066c94,192,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066D54,FUN_08066d54,378,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08066ED0,FUN_08066ed0,324,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08067014,FUN_08067014,368,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08067184,FUN_08067184,52,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x080671B8,BumpCount6A,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671D4,BumpCount68,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671F0,BumpCount64,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1719,8 +1719,8 @@ address,name,size,status,module,notes
 0x08067260,ResetDistanceAccum,20,matching,world,Istatistik sayaci; src/world/stat_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067274,AddDistance,68,matching,world,Mutlak delta mesafe ve taşma biriktiricisi; src/world/distance_accum.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080672B8,AccumulateDistance,68,matching,world,C kaynagindan byte-matching; karmasik (mutlak deger + doyuran tasma sayaci)
-0x080672FC,FUN_080672fc,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08067370,FUN_08067370,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080672FC,FUN_080672fc,116,candidate,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
+0x08067370,FUN_08067370,2,matching,world,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'world'.
 0x08067374,BumpCount7A,28,matching,world,Ek sayac; src/world/more_counters_2.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067390,BumpCount84,28,matching,world,Ek sayac; src/world/more_counters_2.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080673C4,BumpCount70,28,matching,world,Ek sayac; src/world/more_counters_3.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1773,13 +1773,13 @@ address,name,size,status,module,notes
 0x0806BCD0,LibraryAssertWrapper0,16,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCE0,LibraryAssertWrapper1,16,discovered,sdk,Provisional Thumb boundary; calls shared handler
 0x0806BCF0,LibraryAssertHandler,68,discovered,sdk,References assertion format at 0x08BD3470; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806BD34,FUN_0806bd34,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806BD7C,FUN_0806bd7c,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806BDFC,FUN_0806bdfc,176,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806BEAC,FUN_0806beac,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806BEC0,FUN_0806bec0,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806C020,FUN_0806c020,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806C078,FUN_0806c078,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806BD34,FUN_0806bd34,72,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806BD7C,FUN_0806bd7c,128,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806BDFC,FUN_0806bdfc,176,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806BEAC,FUN_0806beac,20,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806BEC0,FUN_0806bec0,352,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806C020,FUN_0806c020,86,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
+0x0806C078,FUN_0806c078,62,candidate,sdk,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'sdk'.
 0x0806C0B8,_call_via_r0,2,documented,sdk,GCC call-via veneer: bx r0
 0x0806C0BC,_call_via_r1,2,documented,sdk,GCC call-via veneer: bx r1
 0x0806C0C0,_call_via_r2,2,documented,sdk,GCC call-via veneer: bx r2
@@ -1875,59 +1875,59 @@ address,name,size,status,module,notes
 0x080707C0,FUN_080707c0,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08070920,FUN_08070920,964,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08070CE4,_mbtowc_r,42,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x08070D10,FUN_08070d10,132,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08070D94,FUN_08070d94,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08070D98,FUN_08070d98,2,matching,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08070D9C,FUN_08070d9c,90,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08070D10,FUN_08070d10,132,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08070D94,FUN_08070d94,2,matching,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08070D98,FUN_08070d98,2,matching,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08070D9C,FUN_08070d9c,90,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
 0x08070DF8,_Bfree,24,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x08070E10,FUN_08070e10,156,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08070EAC,FUN_08070eac,134,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08070E10,FUN_08070e10,156,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08070EAC,FUN_08070eac,134,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
 0x08070F34,_hi0bits,88,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08070F8C,_lo0bits,130,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x08071010,FUN_08071010,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071028,FUN_08071028,366,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071198,FUN_08071198,156,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071234,FUN_08071234,162,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080712D8,FUN_080712d8,66,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0807131C,FUN_0807131c,244,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071410,FUN_08071410,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071460,FUN_08071460,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071520,FUN_08071520,236,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0807160C,FUN_0807160c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071660,FUN_08071660,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08071010,FUN_08071010,22,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071028,FUN_08071028,366,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071198,FUN_08071198,156,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071234,FUN_08071234,162,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x080712D8,FUN_080712d8,66,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x0807131C,FUN_0807131c,244,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071410,FUN_08071410,80,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071460,FUN_08071460,192,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071520,FUN_08071520,236,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x0807160C,FUN_0807160c,84,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071660,FUN_08071660,68,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
 0x080716A4,isinf,36,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x080716E8,FUN_080716e8,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071718,FUN_08071718,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071750,FUN_08071750,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071794,FUN_08071794,66,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080717D8,FUN_080717d8,18,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x080716E8,FUN_080716e8,48,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071718,FUN_08071718,56,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071750,FUN_08071750,68,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071794,FUN_08071794,66,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x080717D8,FUN_080717d8,18,discovered,libc,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'."
 0x080717EC,findslot,30,documented,libc,"newlib syscalls.o; libc.a ile MASKELI eslesme (sirasiyla %86 ve %78 sabit byte). Yer degistirme iceriyor, bu yuzden bayt-birebir dogrulanamiyor ve libc_regions.csv'ye girmiyor -- kimlik kesin, kapsama sayilmaz."
 0x0807180C,remap_handle,76,documented,libc,"newlib syscalls.o; libc.a ile MASKELI eslesme (sirasiyla %86 ve %78 sabit byte). Yer degistirme iceriyor, bu yuzden bayt-birebir dogrulanamiyor ve libc_regions.csv'ye girmiyor -- kimlik kesin, kapsama sayilmaz.; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08071858,FUN_08071858,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080718CC,FUN_080718cc,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080718E4,FUN_080718e4,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080718FC,FUN_080718fc,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071918,FUN_08071918,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071940,FUN_08071940,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0807198C,FUN_0807198c,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071A14,FUN_08071a14,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071A24,FUN_08071a24,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071A4C,FUN_08071a4c,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071A9C,FUN_08071a9c,162,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071B54,FUN_08071b54,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071B8C,FUN_08071b8c,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08071858,FUN_08071858,116,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x080718CC,FUN_080718cc,22,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x080718E4,FUN_080718e4,24,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x080718FC,FUN_080718fc,26,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071918,FUN_08071918,38,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071940,FUN_08071940,76,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x0807198C,FUN_0807198c,136,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071A14,FUN_08071a14,14,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071A24,FUN_08071a24,38,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071A4C,FUN_08071a4c,80,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071A9C,FUN_08071a9c,162,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071B54,FUN_08071b54,56,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071B8C,FUN_08071b8c,14,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
 0x08071B9C,_exit,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
 0x08071BBC,_kill,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
-0x08071BE0,FUN_08071be0,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071C20,FUN_08071c20,10,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071C38,FUN_08071c38,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071C68,FUN_08071c68,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071C90,FUN_08071c90,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071CC4,FUN_08071cc4,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08071D20,FUN_08071d20,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071D50,FUN_08071d50,12,candidate,unknown,yaprak getirici (find_accessors.py); 0x08FD2B10'daki ROM sozunu donduruyor. YAZILMADI: newlib bolgesinde (0x08071D8C abort) ama libc.a'daki 375 govdenin hicbiriyle eslesmiyor; havuzu haritalanmamis bir ROM yapisina isaret ettigi icin gerekcesiz sembol uydurmadan yazilamaz. Once 0x08FD2B10 belgelenmeli.
-0x08071D5C,FUN_08071d5c,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08071BE0,FUN_08071be0,64,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071C20,FUN_08071c20,10,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071C38,FUN_08071c38,48,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071C68,FUN_08071c68,38,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071C90,FUN_08071c90,52,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071CC4,FUN_08071cc4,92,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071D20,FUN_08071d20,48,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071D50,FUN_08071d50,12,candidate,libc,yaprak getirici (find_accessors.py); 0x08FD2B10'daki ROM sozunu donduruyor. YAZILMADI: newlib bolgesinde (0x08071D8C abort) ama libc.a'daki 375 govdenin hicbiriyle eslesmiyor; havuzu haritalanmamis bir ROM yapisina isaret ettigi icin gerekcesiz sembol uydurmadan yazilamaz. Once 0x08FD2B10 belgelenmeli.  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
+0x08071D5C,FUN_08071d5c,48,candidate,libc,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)  MODUL CIKARIMI (tools/infer_modules.py): iki yanindaki bilinen komsu da 'libc'.
 0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08071DAC,FUN_08071dac,4,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071DB4,FUN_08071db4,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
