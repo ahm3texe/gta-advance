@@ -19,22 +19,50 @@
  *
  * DURUM — 0x08030E78 ve 0x08030F28 PARK (36/40, dort bayt KISA).
  *
- * Iki VRAM adresi arasindaki fark 0x40 oldugu icin agbcc ikincisini
- * havuzdan yuklemek yerine BIRINCIDEN hesapliyor ve bir havuz kelimesi
- * (4 bayt) eksiliyor.  ROM ikisini de AYRI havuz kelimesinden yukluyor.
+ * ONCEKI TESHIS YANLISTI, DUZELTILDI (2026-09-05).
  *
- * ELENEN BES BICIM (hepsi 36 bayt, hicbiri havuz birlesmesini kirmadi):
- *   1. Isaretci degiskenleri + ayri `tile` yereli
- *   2. Dizi gorunumu: ((vu16 *)ADRES)[7 - i]
- *   3. do/while dongusu, sayac ayri kurulmus
- *   4. `tile` en basta bildirilmis (bildirim sirasi degistirildi)
- *   5. volatile olmayan u16* isaretciler
+ * Eski not "iki VRAM adresi arasindaki fark 0x40 oldugu icin agbcc
+ * ikincisini havuzdan yuklemek yerine birinciden hesapliyor, bir havuz
+ * kelimesi eksiliyor" diyordu.  OLCUM bunu curutuyor: bizim havuzumuzda
+ * da ROM'unkinde de UC kelime var (iki adres + karo) ve iki taraf da
+ * UC ayri `ldr rX,[pc]` uretiyor.  Havuz birlesmesi diye bir sey YOK.
+ * Eski notun "r0'a yukleyip r2'ye kopyalama saglandi" cumlesi de
+ * yanlisti; o kopya hicbir zaman uretilemedi.
  *
- * KAZANIM: fazladan `push {r4,lr}` sorunu COZULDU.  Karo sabiti
- * dogrudan yazilinca agbcc onu r4'e yukluyor ve yigin kullanan bir
- * fonksiyon uretiyordu (44 bayt).  Sabiti KENDI yereline almak, ROM'un
- * yaptigi gibi r0'a yukleyip r2'ye kopyalamayi ve r0'i sayac olarak
- * yeniden kullanmayi sagladi -- yigin kullanmayan yaprak.
+ * GERCEK TEK FARK: ROM'da fazladan bir YAZMAC KOPYASI var.
+ *
+ *   ROM                        old_agbcc (bizim)
+ *   ldr r3,[pc]   ; p          ldr r2,[pc]   ; p
+ *   ldr r1,[pc]   ; q          ldr r1,[pc]   ; q
+ *   ldr r0,[pc]   ; karo       ldr r3,[pc]   ; karo
+ *   adds r2,r0,#0 ; <-- FAZLA  (yok)
+ *   movs r0,#7                 movs r0,#7
+ *   ...govde AYNI...           ...govde AYNI...
+ *   bx lr                      bx lr
+ *   (2 bayt hizalama dolgusu)  (dolgu yok)
+ *
+ * ROM karo sabitini once r0'a yukleyip r2'ye TASIYOR, cunku ayirici r0'i
+ * dongu sayacina birakiyor.  Bizim ayiricimiz karoyu dogrudan r3'e verip
+ * kopyadan kaciniyor.  Eksik 4 bayt = 2 (kopya komutu) + 2 (dolgu).
+ *
+ * TARANAN VE ELENEN (hepsi olculdu, hicbiri kopyayi uretmedi):
+ *   - 144 bildirim/atama sirasi (4! x 3!)  -> hepsi 36 bayt
+ *   - 13 bayrak kumesi: O0/O1/O2/O3/Os, -fno-omit-frame-pointer,
+ *     -fforce-mem, -fforce-addr, -fno-strength-reduce, -fno-defer-pop,
+ *     -fcaller-saves, -fno-cse-follow-jumps  -> hicbiri 36'yi degistirmedi
+ *   - yapisal aileler: for/while/do-while, *p++ / *p=t;p++,
+ *     karo tipi u16/s32/int/vu16, ara kopya degiskeni, sayac degiskeni,
+ *     q = p + 32  -> hepsi 36 bayt
+ *
+ * agbcc DENENDI, ISE YARAMIYOR: `agbcc` (old_agbcc degil) 40/40 uretiyor
+ * ama bu YANILTICI.  Boyutu tutturmasinin sebebi ROM'un fazladan kopyasi
+ * degil, gereksiz bir `push {lr}` / `pop {r0}; bx r0` sarmali (+4 bayt).
+ * Govde old_agbcc ile birebir ayni; fark 14 ve 20'de sabit kaliyor.
+ * Yani agbcc bir ADIM ILERI DEGIL, ayni yere baska yoldan varan bir
+ * tesaduf.  Bu yuzden derleyici-secim isaretcisi eklenmedi.
+ *
+ * SONUC: tikanma KAYNAK DUZEYINDE DEGIL, YAZMAC DAGITIMINDA.  Bilinen bir
+ * kaynak kaldiraci yok; yeni bir mekanizma bulunmadan tekrar denemeyin.
  *
  * 0x08030B60 ESLESTI (40/40).
  *

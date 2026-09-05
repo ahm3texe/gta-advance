@@ -223,6 +223,62 @@ Yani sorun hiçbir zaman derleyicide değildi. Bu, negatif sonuçların "yol
 kapalı" diye okunmasının nasıl yanıltabileceğinin örneğidir: asıl değişken
 başka yerdeydi.
 
+## `agbcc` varyantı 18 park fonksiyonunda denendi — hiçbiri eşleşmedi
+
+2026-09-05. Proje kurulduğundan beri ölçülen 44 kuralın tamamı `old_agbcc` ile
+türetilmişti; `tools/agbcc_build.py` içindeki `--cc=agbcc` seçeneği belgeliydi
+ama hiç kullanılmamıştı. Park listesindeki 18 fonksiyonun tamamı iki derleyiciyle
+yeniden ölçüldü.
+
+**`agbcc` hiçbirini eşleştirmedi.** Dördünde fark azaldı, üçünde arttı:
+
+| fonksiyon | old_agbcc | agbcc |
+|---|---|---|
+| FUN_0800cb08 | 291 | 146 |
+| FUN_08030e78 | 34 | 14 |
+| FUN_08030f28 | 28 | 15 |
+| TryEngageTarget | 211 | 208 |
+| FUN_08045aa4 | 12 | **40** |
+| RunMenuScreen | 949 | **955** |
+| StepEntryTimer | 55 | **64** |
+
+İki VRAM doldurucusundaki iyileşme **yanıltıcı**. `agbcc` boyutu 36 yerine 40
+tutturuyor, ama sebebi ROM'un yaptığı şey değil: gövde `old_agbcc` ile birebir
+aynı, üstüne gereksiz bir `push {lr}` / `pop {r0}; bx r0` sarmalı biniyor (+4
+bayt). ROM'daki +4 ise fazladan bir yazmaç kopyası artı hizalama dolgusu. Aynı
+boyuta başka yoldan varan bir tesadüf, ilerleme değil.
+
+**Sonuç: `agbcc_build.py`'ye dosya başına derleyici seçim işaretçisi
+EKLENMEDİ.** `KIP: ARM` benzeri bir `DERLEYICI: agbcc` işaretçisi ancak bir
+eşleşme onunla mümkün olsaydı gerekliydi; öyle bir eşleşme yok. Eklemek, hiçbir
+şey kazandırmadan derleme katmanına bir dal daha sokardı.
+
+`FUN_0800cb08`'in 291'den 146'ya inmesi (348 bayt, hâlâ eşleşmiyor) tek başına
+tekrar bakılmaya değer olabilir; ötekiler için bu yol kapalı.
+
+## Yazmaç kopyası: kaynak düzeyinden üretilemeyen sınıf
+
+`FUN_08030e78` / `FUN_08030f28` (ikisi de 36/40, dört bayt kısa) bu sınıfın
+temiz örneği. `old_agbcc` ROM'un gövdesini komut komut aynı üretiyor; tek eksik
+ROM'daki fazladan `adds r2, r0, #0`. ROM karo sabitini önce r0'a yükleyip r2'ye
+taşıyor çünkü dağıtıcı r0'ı döngü sayacına bırakıyor; bizimki sabiti doğrudan
+r3'e verip kopyadan kaçınıyor.
+
+Bu kopyayı üretmek için taranan ve elenen her şey:
+
+- **144 bildirim/atama sırası** (4! bildirim × 3! atama) — hepsi 36 bayt
+- **13 bayrak kümesi** — `-O0/-O1/-O2/-O3/-Os`, `-fno-omit-frame-pointer`,
+  `-fforce-mem`, `-fforce-addr`, `-fno-strength-reduce`, `-fno-defer-pop`,
+  `-fcaller-saves`, `-fno-cse-follow-jumps` — hiçbiri 36'yı değiştirmedi
+- **Yapısal aileler** — `for` / `while` / `do-while`, `*p++` ile `*p=t; p++`,
+  karo tipi `u16` / `s32` / `int` / `vu16`, ara kopya değişkeni, sayaç
+  değişkeni, `q = p + 32` — hepsi 36 bayt
+
+Yani bu, kural 44'ün (karşılaştırma kanonikleştirmesi) tersi bir durum: orada
+kaynakta bir kaldıraç vardı, burada yok. `tools/sweep_variants.py`'nin kapsam
+sınırı notunda yazan "yükleme/saklama yazmaç dağıtımı" sınıfı tam olarak budur.
+Yeni bir mekanizma bulunmadan bu fonksiyonlara dönmeyin.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
