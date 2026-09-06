@@ -23,7 +23,7 @@ fonksiyonlar: FUN_080657d8 (2374 B), SerialIrqHandler, FUN_0806660c,
 InitLinkBlock, ServiceLinkFrame, ResetLinkHardware. Toplam ~3,4 KB, hiçbiri yazılmamış.
 
 **Giriş okuma iki fonksiyonda.** `KEYINPUT` (0x04000130) havuzda yedi kez;
-sahipleri PollInput (228 B) ve FUN_0806620c (320 B). İkisi de yazılmamış.
+sahipleri PollInput (228 B) ve WaitForPartner (320 B). İkisi de yazılmamış.
 
 ## ÇIKARIM — kod tabanı iki ekipten geliyor
 

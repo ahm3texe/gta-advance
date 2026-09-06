@@ -887,3 +887,24 @@ Elenen yazımlar (etkisi yok): sayacı u16/u32/s32, önce bildirmek, iç içe
 `if`, tanımda ilklemek, `|=`, ters operand sırası, yerele almak, `(u16)`
 daraltma. Sabiti `+` ile eklemek ve IME'yi volatile'sız yazmak eşleşmeyi
 **bozuyor**.
+
+## Kural 58 — Döngü ön-başlığındaki taşıma sırası ile blok yerleşimi çakışabilir
+
+`WaitForPartner` @ 0x0806620C ölçümü: 134/139 komut aynı, kalan 5 komut
+yalnızca döngü değişmezlerinin (sabitler ve global adresleri) ön-başlığa
+**hangi sırayla** taşındığı.
+
+Taşıma sırası kaynaktaki **kullanım** sırasını izliyor. Ama bu fonksiyonda
+iki gereksinim birbirini dışlıyor:
+
+| yazım | sonuç |
+|---|---|
+| `if (armed == 0) {B} else {A}` | ROM'un blok yerleşimi doğru, taşıma sırası ters → 12 bayt fark |
+| `if (armed != 0) {A} else {B}` | taşıma sırası doğru, ama derleyici B'yi döngünün üstüne çıkarıp giriş atlaması ekliyor → 316 bayt |
+
+Elle taşıma (`bit1 = 2; irq = &gBiosIrqFlags;`) birinci döngüyü tam
+kapatıyor (8/320) — kaynak düzeyinde değişken ilklemesinin `loop.c`'nin
+taşımalarından ÖNCE üretildiğini kanıtlıyor — ama ikinci döngüde bir
+yazmaç boşaltıp sabitin de taşınmasına yol açıyor ve r8'e taşıyor
+(336/344). Ayrıca `bit1 = 2` savunulabilir kaynak değil, o yüzden
+alınmadı.

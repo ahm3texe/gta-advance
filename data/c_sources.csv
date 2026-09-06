@@ -424,7 +424,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08065650,ShutdownAndReset,src/world/shutdown_reset.c,180,164,no
 0x080656F4,PollInput,src/world/poll_input.c,224,228,no
 0x08066144,ResetLinkSession,src/world/link_session_reset.c,200,200,yes
-0x0806620C,FUN_0806620c,src/world/input_extra.c,316,320,no
+0x0806620C,WaitForPartner,src/world/input_extra.c,320,320,no
 0x080663E8,ShutdownLinkSession,src/world/link_session.c,44,44,yes
 0x08066414,FadeOutIfLinkState3,src/world/link_session.c,64,64,yes
 0x08066454,WaitLinkSettle,src/world/link_session.c,80,80,yes
@@ -434,7 +434,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,42,42,yes
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066568,InitLinkBlock,src/world/link_init.c,164,164,yes
-0x0806660C,FUN_0806660c,src/world/link_frame_step.c,298,304,no
+0x0806660C,FUN_0806660c,src/world/link_frame_step.c,304,304,yes
 0x0806673C,BuildLinkPacket,src/world/link_packet.c,92,92,no
 0x08066798,ReceiveLinkPackets,src/world/link_receive.c,204,212,no
 0x0806686C,ServiceLinkFrame,src/world/link_service.c,144,152,no
