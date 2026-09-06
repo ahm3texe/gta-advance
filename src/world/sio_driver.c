@@ -119,7 +119,6 @@ void FUN_080657d8(u32 mode)
 {
     CommBlock *blk;
     CommBlock *tx;
-    u8 *slot;
     u32 status;
     u32 id;
     u32 step;
@@ -134,6 +133,7 @@ void FUN_080657d8(u32 mode)
     s32 j;
     s32 k;
     s32 startTime;
+    u8 *slot;
     u16 prevA;
     u16 prevB;
     u16 keysA;
@@ -143,10 +143,10 @@ void FUN_080657d8(u32 mode)
         gGameState.word00++;
         if (gVBlankEnabled != 0 && mode == 0
                 && FUN_0806c2d4(gGameState.word00, 5) != 0) {
-            gRam02036330.half00 = gRam0300009C = gRam03000098 = mode;
+            gRam0300009C = gRam03000098 = mode;
+            gRam02036330.half00 = mode;
             gRam02000498 = gRam020003EC = gRam02000D0C = gRam02000134 = mode;
-            gRam020004C0 = mode;
-            gRam030000A0 = mode;
+            gRam030000A0 = gRam020004C0 = mode;
             MaybeReset();
             return;
         }
