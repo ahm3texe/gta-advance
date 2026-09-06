@@ -411,6 +411,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080646F8,GetGlyphCell,src/text/glyph_table_access.c,44,44,yes
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
+0x08065130,SpawnSlotEffect,src/world/spawn_slot_effect.c,176,176,yes
 0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
 0x080653D4,AccumulateActorMotion,src/world/actor_tracking.c,104,104,yes
 0x0806543C,IsOwnerMarked,src/world/player_slot_query.c,32,32,yes
@@ -431,10 +432,12 @@ address,name,source,compiled_size,mapped_size,matching
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066568,InitLinkBlock,src/world/link_init.c,164,164,yes
 0x0806673C,BuildLinkPacket,src/world/link_packet.c,92,92,no
+0x08066798,ReceiveLinkPackets,src/world/link_receive.c,204,212,no
 0x0806686C,ServiceLinkFrame,src/world/link_service.c,148,152,no
 0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,20,20,yes
 0x08066A54,ResetLinkHardware,src/world/link_hw_reset.c,84,84,yes
 0x08066AA8,BuildLinkReport,src/world/link_report.c,152,152,yes
+0x08066C94,BumpRankCounter,src/world/bump_rank_counter.c,192,192,yes
 0x08067184,BumpCount82,src/world/bump_count_82.c,52,52,yes
 0x080671B8,BumpCount6A,src/world/more_counters.c,28,28,yes
 0x080671D4,BumpCount68,src/world/more_counters.c,28,28,yes

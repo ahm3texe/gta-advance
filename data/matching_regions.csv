@@ -162,6 +162,7 @@ start,end,binary,module,notes
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,yaprak erisimci
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
+0x08065130,0x080651E0,build/world/spawn_slot_effect.bin,world,Etkin yuva icin 51 numarali girisi uretir; dogal C byte-matching.
 0x08065378,0x0806543C,build/world/actor_tracking.bin,world,Aktor hareket izleme kurulumu ve birikim adimi; dogal C byte-matching.
 0x0806543C,0x0806549C,build/world/player_slot_query.bin,world,Oyuncu yuvasi bayragi ve varlik mesguliyet sorgulari; dogal C byte-matching ve 2 bayt hizalama.
 0x0806549C,0x08065518,build/world/scale_by_band.bin,world,Mesafe bandina gore 8.8 sabit noktali olcekleme.
@@ -175,6 +176,7 @@ start,end,binary,module,notes
 0x08066A40,0x08066A54,build/world/comm_flag.bin,world,Iletisim bayragi
 0x08066A54,0x08066AA8,build/world/link_hw_reset.bin,world,"Timer3/seri kesmeleri kapatir, SIOCNT ve Timer3 sifirlar."
 0x08066AA8,0x08066B40,build/world/link_report.bin,world,Baglanti ozet kaydini yedi sorgu ve 36 baytlik blok kopyasiyla doldurur.
+0x08066C94,0x08066D54,build/world/bump_rank_counter.bin,world,Etkin kaydin 5 bitlik sayacini artirip 20de doyurur; dogal C byte-matching.
 0x08067184,0x080671B8,build/world/bump_count_82.bin,world,Gecikmeyle cevrelenmis +0x82 kayit sayaci; dogal C byte-matching.
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
 0x0806720C,0x08067228,build/world/bump_save_counter.bin,world,gSaveBuffer +0x66 doyuran sayac

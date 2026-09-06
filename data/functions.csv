@@ -1672,7 +1672,7 @@ address,name,size,status,module,notes
 0x08064DF8,FUN_08064df8,2,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu)
 0x08064DFC,FUN_08064dfc,294,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064F24,FUN_08064f24,524,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08065130,FUN_08065130,176,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08065130,SpawnSlotEffect,176,matching,world,Etkin yuva icin efekt/giris uretir; src/world/spawn_slot_effect.c
 0x080651E0,FUN_080651e0,408,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08065378,ResetActorTracking,92,matching,world,"Izlemeyi sifirlar: baslangic konumunu kopyalar, dort birikimi siler; src/world/actor_tracking.c"
 0x080653D4,AccumulateActorMotion,104,matching,world,En buyuk z farkini ve uc eksenin mutlak hizlarini biriktirir; src/world/actor_tracking.c
@@ -1699,14 +1699,14 @@ address,name,size,status,module,notes
 0x08066568,InitLinkBlock,164,matching,world,Baglanti blogunu sifirlayip SIO kaydini ve tampon isaretcilerini kurar; src/world/link_init.c
 0x0806660C,FUN_0806660c,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806673C,BuildLinkPacket,92,candidate,world,"Gonderilecek paketi kurar ve saglama toplamini yazar. PARK: 92/92 boyut, 20 bayt fark; agbcc global adres icin iki ayri pseudo uretiyor, ROM tek canli aralik kullaniyor; src/world/link_packet.c"
-0x08066798,FUN_08066798,212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066798,ReceiveLinkPackets,212,candidate,world,"Gelen paketleri saglama sinamasiyla toplar. PARK: 204/212 bayt; ROM uc yuksek yazmac kullaniyor, biz iki; permuter 1095->195 ama aday semantik olarak yanlis; src/world/link_receive.c"
 0x0806686C,ServiceLinkFrame,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066904,FUN_08066904,316,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066A40,MaybeSetCommByte6,20,matching,world,Iletisim bayragi; src/world/comm_flag.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08066A54,ResetLinkHardware,84,matching,world,"Timer3/seri kesmelerini kapatir, SIOCNT ve Timer3 sifirlar; src/world/link_hw_reset.c"
 0x08066AA8,BuildLinkReport,152,matching,world,Baglanti ozet kaydini doldurur; src/world/link_report.c
 0x08066B40,FUN_08066b40,340,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066C94,FUN_08066c94,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066C94,BumpRankCounter,192,matching,world,Etkin kaydin 5 bitlik sayacini doyumlu artirir; src/world/bump_rank_counter.c
 0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08067014,FUN_08067014,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

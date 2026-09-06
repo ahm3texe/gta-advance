@@ -29,7 +29,7 @@ typedef struct CommBlock {
     u8         byte02;                  /* +0x02 */
     u8         byte03;                  /* +0x03 */
     u8         ready;                   /* +0x04 */
-    u8         pad05;
+    u8         arrived;                 /* +0x05 */
     u8         ready06;                 /* +0x06 */
     u8         errorBit;                /* +0x07 */
     u8         pad08;
