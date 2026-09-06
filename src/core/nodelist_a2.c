@@ -94,7 +94,15 @@ scanned:
         node = 0;
         goto tail;
     }
+    goto insert;
 
+    /* Kural 49: ROM'da `found` blogu literal havuzunun HEMEN ardinda,
+     * insert govdesinden ONCE duruyor. */
+found:
+    node = cur;
+    goto tail;
+
+insert:
     ListRemove(list, spare);
     spare->id = id;
     k = spare->kind & 15;
@@ -104,9 +112,6 @@ scanned:
     InsertSorted(list, spare, id);
     node = spare;
     goto tail;
-
-found:
-    node = cur;
 
 tail:
     k = node->kind;

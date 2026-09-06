@@ -65,6 +65,7 @@ Node *FUN_080543d0(NodeList *list, s32 id)
     s32 k;
     s32 cid;
     s32 hi;
+    s32 k2;
 
     cur = list->head;
     spare = list->spare;
@@ -94,9 +95,11 @@ insert:
     /* ROM bu govdeyi fonksiyonun SONUNDA tutuyor (`beq` ileri atliyor);
      * dongunun icine yazmak blogu one aliyor ve dallanma tersine donuyor. */
 found:
-    k = cur->kind;
-    hi = (s32)(k << 24) >> 28;
-    cur->kind = (k & 15) | ((hi + 1) << 4);
+    /* AYRI yerel: `k` hem insert hem found dalinda kullanilinca 19 referansa
+     * cikip r2'ye dusuyordu; bolununce 12'ye inip ROM'un r0'ini aliyor. */
+    k2 = cur->kind;
+    hi = (s32)(k2 << 24) >> 28;
+    cur->kind = ((hi + 1) << 4) | (k2 & 15);   /* ROM once (hi+1)<<4 kuruyor */
     return cur;
 
 none:

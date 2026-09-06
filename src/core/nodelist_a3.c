@@ -69,6 +69,7 @@ void FUN_08052ddc(Entry *entry)
     s32 i;
     s32 j;
     u16 *p;
+    u16 *p2;
     u16 *q;
 
     rec = entry->record;
@@ -81,9 +82,15 @@ void FUN_08052ddc(Entry *entry)
         FUN_08055be8(*p);
     }
 
-    p = entry->slots;
-    for (i = 0; i < rec->slotCount; i++, p++) {
-        node = FindOrRecycleNode(*p);
+    /* IKINCI dongunun isaretcisi AYRI yerel olmali.  Tek `p` kullanmak
+     * refs'i 14'e cikariyor; oncelik floor_log2(refs)*refs/omur oldugu icin
+     * 3*14/29 = 1.448 ile sayacin 1.185'ini geciyor ve r4'u kapiyor.
+     * Bolununce 2*7/14 = 1.000'e dusuyor, sayac once dagitilip r4'u aliyor
+     * -- ROM'un yerlesimi.  Belirleyici olan oran degil, floor_log2'nin bir
+     * basamak dusmesi. */
+    p2 = entry->slots;
+    for (i = 0; i < rec->slotCount; i++, p2++) {
+        node = FindOrRecycleNode(*p2);
         if (node != 0) {
             /* ROM ikisini de bayrak sinamalarindan ONCE yazmaca aliyor;
              * kaydi dongu kosulunda birakmak her turda yeniden okutuyor. */

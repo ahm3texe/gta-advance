@@ -54,6 +54,7 @@ address,size,name,source,status,notes
 0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
 0x02011030,114,gRam02011030,decomp,verified,"+12/+16 ikili koordinat cifti, +72 ayri kelime; ayrica +0x30/+0x34/+0x38 ReadTriple tarafindan okunuyor (byte-matching kanit); +0x71 ClearCoordByte71 tarafindan yaziliyor (byte-matching kanit)  IZLEME (oturum 6): +0x0C alaninin dusuk bayti olumde temizlendi (0x1000030 -> 0x1000000). Bu blok UpdateFocusPointin (0x0800A9E4) okudugu CoordBlock."
 0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
+0x020110C0,4,gRam020110C0,decomp,provisional,"FUN_08052750 icinde FUN_0800c804 cagrisina ILK arguman olarak yalnizca ADRESI geciyor; uye erisimi yok, bu yuzden ic yapisi BILINMIYOR. En yakin kayitli komsu 0x020110AC (gRam020110AC) ama ROM ayri bir havuz sabiti kullaniyor, yani ayri nesne."
 0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev  IZLEME: f1508de gNodePool ile ayni karede aktiflesiyor.  PROVISIONAL BIRAKILDI -- DOLAYLI: yalnizca gNodePool ile ayni karede aktiflesmesi gozlendi; kimligi dogrudan kanitlanmadi."
 0x02016288,4,gSortedHead02016288,decomp,provisional,0x0800D530 siralama sirasinda ikinci (sirali) listenin bas isaretcisi; gListHead02016280 ile ayni dugum tipi. ROM ikisini AYRI literal yukluyor.
 0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor

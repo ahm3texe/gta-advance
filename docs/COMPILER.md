@@ -474,6 +474,52 @@ Ders: kardeş dosyanın döngü biçimini KOPYALAMAYIN, her fonksiyonun biçimin
 ROM'dan okuyun. Struct'lar ve çağrılan imzaları paylaşılabilir, kontrol
 akışı paylaşılamaz.
 
+## Kural 50 — yazmaç önceliğini kaynaktan çevirmenin tek yolu: değişkeni BÖL
+
+agbcc'nin dağıtım sırası ölçüldü ve doğrulandı (2026-09-06, üç fonksiyon, 39
+allocno elle yeniden türetildi):
+
+```
+öncelik = floor_log2(refs) * refs / ömür        (eşitlikte küçük pseudo önce)
+```
+
+Sıra geldiğinde `find_reg` çakışma çizgesindeki **en küçük boş** yazmacı verir;
+allocno bir çağrıyı aşıyorsa yalnızca callee-saved (r4+) adaylara bakar.
+
+**Kaldıraç `floor_log2`'nin basamak fonksiyonu olmasında.** Bir değişkeni ikiye
+bölmek refs'i ve ömrü kabaca yarıya indirir — oran hemen hemen aynı kalır ama
+`floor_log2(refs)` bir tam basamak düşer, öncelik ~1/3'e iner.
+
+`FUN_08052DDC`'de ölçüldü: iki dış döngü tek `p` işaretçisini paylaşırken
+`3*14/29 = 1.448`, sayacın `1.185`'ini geçip r4'ü kapıyordu. İkinci döngüye
+ayrı işaretçi verilince `2*7/14 = 1.000`'e düştü, sayaç önce dağıtılıp r4'ü
+aldı: **fark 17 → 0, byte-matching.**
+
+**BÖLME YALNIZCA İKİ AYRI ÜRETİM YERİ VARSA İŞE YARAR.** Kopya tabanlı bölme
+(`lst = list;`) her zaman eleniyor — 16 yazım denendi, hiçbiri yeni allocno
+üretmedi. `p = entry->ids` / `p2 = entry->slots` gibi gerçekten iki ayrı
+kaynaktan doğan değerler bölünebilir.
+
+**refs döngü derinliğiyle ağırlıklandırılmıyor** — döngü içindeki referanslar
+ekstra sayılmıyor, yani tabloyu kaynaktan elle saymak mümkün.
+
+**Araç eksiği:** `tools/dump_alloc.py` `.greg` dökümünün yalnızca öncelik
+tablosunu okuyor. Asıl cevap altındaki **`Register dispositions`** bölümünde:
+pseudo → donanım yazmacı haritası. "Hangi değişkenim r4'ü kaptı" sorusunun tek
+satırlık cevabı orada; araç onu basmıyor.
+
+## Kural 47'ye karşı örnek — işaretlilik BAZEN fark ediyor
+
+`FUN_080526B8`'de (nodelist_b6.c) `+0x0B` alanının `u8` mi `s8` mi olduğu fark
+etmemişti. `FUN_08052750`'de **fark ediyor**: `u8` alanda `kind &= ~1` tek
+komuta katlanıyor (`movs r0,#254`), ROM ise `movs r0,#2 / negs r0,r0` ile −2
+kuruyor. Alan `s8` olmalı. Ters yönde bedel yok: `s8` iken de `kind & 1` ve
+`(kind & 0xF) | 0x10` hâlâ `ldrb` üretiyor, agbcc 0x100'den küçük maskede
+sign-extend eklemiyor.
+
+Yani kural 47'nin kararı "AND sonucunun genişliği" değil, **her iki yönü de
+ölçmek**. İki satırlık deney, tahminden ucuz.
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı

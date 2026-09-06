@@ -1260,13 +1260,13 @@ address,name,size,status,module,notes
 0x080521C4,FUN_080521c4,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052228,FUN_08052228,1166,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080526B8,RebuildAreaEntry,152,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08052750,FUN_08052750,216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08052750,FUN_08052750,216,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052828,FUN_08052828,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052988,FUN_08052988,562,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08052BBC,FUN_08052bbc,170,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08052BBC,FUN_08052bbc,170,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu)
 0x08052C68,LinkAreaEntryIfEligible,144,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08052CF8,ClearAreaIdArrays,228,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08052DDC,FUN_08052ddc,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08052DDC,FUN_08052ddc,154,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu)
 0x08052E78,ResetAreaIds,440,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08053030,FUN_08053030,1144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080534A8,FUN_080534a8,424,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1274,12 +1274,12 @@ address,name,size,status,module,notes
 0x080536BC,ClearObjectIdsAndSlots,216,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053794,FUN_08053794,158,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08053834,FUN_08053834,250,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08053930,FUN_08053930,196,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
+0x08053930,FUN_08053930,196,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x080539F4,ClearNodeSlotArrays,228,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053AD8,FUN_08053ad8,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053B44,FUN_08053b44,516,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053D48,StepNodeLists,176,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08053DF8,FUN_08053df8,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08053DF8,FUN_08053df8,164,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu); sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053E9C,FUN_08053e9c,206,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053F6C,FUN_08053f6c,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08053FF4,FUN_08053ff4,292,discovered,unknown,3 gerçek BL çağrısı ve push prologuyla doğrulanan fonksiyon; 0x08053FF2 literal-içi sahte başlangıcı kaldırıldı; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
