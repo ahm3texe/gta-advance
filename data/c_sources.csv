@@ -290,6 +290,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080526B8,RebuildAreaEntry,src/core/nodelist_b6.c,152,152,yes
 0x08052C68,LinkAreaEntryIfEligible,src/core/nodelist_c3.c,144,144,yes
 0x08052CF8,ClearAreaIdArrays,src/core/nodelist_d2.c,228,228,yes
+0x08052DDC,FUN_08052ddc,src/core/nodelist_a3.c,154,154,no
 0x08052E78,ResetAreaIds,src/core/nodelist_d6.c,440,440,yes
 0x080536BC,ClearObjectIdsAndSlots,src/core/nodelist_d1.c,216,216,yes
 0x080539F4,ClearNodeSlotArrays,src/core/nodelist_d3.c,228,228,yes
