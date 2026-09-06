@@ -993,3 +993,41 @@ büyük ofsetteki her bayt alanı `adds r0,r2,#0 / adds r0,#N / ldrb`
 Ayrıca: switch gövdeleri ROM'da **kaynak sırasına** göre yerleşiyor, tablo
 sırasına göre değil. ROM'un blok sırasını yakalamak için `case`'leri
 ROM'daki gövde sırasına göre yaz.
+
+## Kural 62 — Donanım yazmacına YAZARKEN volatile görünüm kullanma
+
+`ShutdownAndReset` @ 0x08065650 ölçümü, kural 57'nin DMA denetimi için
+doğrulanmış hali:
+
+```c
+REG_DMA0.control = REG_DMA0.control & MASK;   /* volatile DmaRegs:
+                                                 ldrh / and / ldrh(ölü) / strh */
+```
+
+Volatile bir görünüm üzerinden yazmak, `strh`'den önce **ölü bir `ldrh`**
+üretiyor. Adres için iki görünüm tanımla — okuma (ve bilinçli boş okuma)
+için volatile olan, yazma için volatile olmayan:
+
+```c
+#define DMA_W(n)  (*(DmaRegs *)(0x040000B0 + (n) * 12))          /* yazma */
+#define REG_DMA(n) (*(volatile DmaRegs *)(0x040000B0 + (n) * 12)) /* okuma */
+```
+
+Dört kanalda 8 ölü yükleme = **16 bayt**; fark 139'dan 4 bayta indi.
+
+## Kural 63 — `a = b = 0` zinciri sabiti adresten SONRA üretir
+
+Aynı fonksiyonun son 4 baytı. ROM `ldr r0,=IME / movs r5,#0 / strh`
+üretiyor: önce adres, sonra sabit. Ayrı bir `zero = 0;` deyimi sabiti
+**önce** üretiyor.
+
+```c
+zero = 0;  REG_IME = zero;    /* sabit once  -> ROM'dan sapiyor */
+REG_IME = zero = 0;           /* sabit dis atamanin RHS'i olarak
+                                 LHS adresinden SONRA -> ROM  */
+```
+
+Kural 52'nin (`b = (a = 0)` iki adresi eş zamanlı canlı tutar) kardeşi:
+zincirleme atama yalnız canlılığı değil, **üretim sırasını** da
+belirliyor. Elenen: tüm sıfırları düz sabit yazmak (168 bayt, 137 fark —
+sıfır artık r5'te tutulmuyor).

@@ -1673,7 +1673,7 @@ address,name,size,status,module,notes
 0x08064DFC,FUN_08064dfc,294,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064F24,FUN_08064f24,524,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08065130,SpawnSlotEffect,176,matching,world,Etkin yuva icin efekt/giris uretir; src/world/spawn_slot_effect.c
-0x080651E0,FUN_080651e0,408,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080651E0,PlaceProbeEntries,408,matching,world,Dort sonda noktasini harita izgarasinda sinayip 51/52 fazli girisler uretir; src/world/slot_probe.c
 0x08065378,ResetActorTracking,92,matching,world,"Izlemeyi sifirlar: baslangic konumunu kopyalar, dort birikimi siler; src/world/actor_tracking.c"
 0x080653D4,AccumulateActorMotion,104,matching,world,En buyuk z farkini ve uc eksenin mutlak hizlarini biriktirir; src/world/actor_tracking.c
 0x0806543C,IsOwnerMarked,32,matching,world,Oyuncu yuvasinin +0x25 bayragini sorgular; src/world/player_slot_query.c
@@ -1683,7 +1683,7 @@ address,name,size,status,module,notes
 0x08065538,IsSlotValueInRange,48,matching,world,A yuvasindaki +0x4C ust yarim kelimesi verilen aralikta mi; src/world/slot_range_query.c
 0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
 0x08065574,LoadBitmapAsset,220,matching,world,Kare ve paleti RL acilimi veya DMA3 ile yukler; src/world/bitmap_asset.c
-0x08065650,ShutdownAndReset,164,candidate,world,"Dort DMA kanalini kapatip ekran/kesme yazmaclarini siler ve BIOS yumusak sifirlamasini cagirir. PARK: 180/180 boyut, 139 bayt fark, 73/89 komut ayni; sifir sabiti ROM'da r5'te uzun omurlu, bizde yerel kisa omurlu; src/world/shutdown_reset.c"
+0x08065650,ShutdownAndReset,164,matching,world,"Dort DMA kanalini kapatir, ekran/kesme yazmaclarini siler, yumusak sifirlar; src/world/shutdown_reset.c"
 0x080656F4,PollInput,228,candidate,world,Tus okuma ve giris gecmisi halka tamponu. PARK: 224/228 bayt; kalan fark omuz maskesi testinde ROM ikinci operandi da kopyaliyor; src/world/poll_input.c
 0x080657D8,FUN_080657d8,2374,candidate,world,"Baglanti surucusunun ana dagitici fonksiyonu, kod moduyle cagriliyor (0, 2 gorulen degerler). YAPISAL KESIF (ROM olcumu): sinir DOGRU -- tek prolog (0x080657D8, yuksek yazmaclar dahil) ve tek epilog (0x08066110), govdede baska push/pop/bx lr yok. ATLAMA TABLOSU YOK (mov pc sayisi 0), yani yazilabilir; 13 cagri / 8 farkli hedef, 55 kosullu dal, 134 literal yukleme. Cagirdiklari: BuildLinkPacket, StepLinkFrame, MaybeSetCommByte6, MaybeReset, PollInput, FUN_0806c2d4. 16 bayt yigin cercevesi ve r8/r9/sl kullaniyor. Bolgede kalan baytin yarisi bu tek fonksiyon."
 0x08066144,ResetLinkSession,200,matching,world,Baglanti oturumunu bastan kurar; src/world/link_session_reset.c
@@ -1709,7 +1709,7 @@ address,name,size,status,module,notes
 0x08066C94,BumpRankCounter,192,matching,world,Etkin kaydin 5 bitlik sayacini doyumlu artirir; src/world/bump_rank_counter.c
 0x08066D54,GetRecordField,378,matching,world,Kayit alanini 0-35 kimligiyle dondurur; atlama tablosu 0x08066D6C; src/world/rank_query.c
 0x08066ED0,GetStepIconId,324,matching,world,Adim indeksini (0-35) 0xB0+n simge kimligine cevirir; atlama tablosu; src/world/link_menu_step.c
-0x08067014,FUN_08067014,368,candidate,world,"Baglanti raporundan yuzde skoru hesaplar. PARK: 332/368 bayt, 82/183 komut ayni; ROM report isaretcisini ip'de tutuyor ve baytlari her kullanimda yeniden okuyor; src/world/link_score.c"
+0x08067014,FUN_08067014,368,candidate,world,"Baglanti raporundan yuzde skoru. PARK: 332/368 bayt, 85/183 komut ayni; ROM report isaretcisini ipde tutuyor, kap genisligi farki CSE davranisini degistiriyor; src/world/link_score.c"
 0x08067184,BumpCount82,52,matching,world,Iki bos dongu gecikmesi arasinda +0x82 sayacini tasma korumali artirir; src/world/bump_count_82.c
 0x080671B8,BumpCount6A,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671D4,BumpCount68,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

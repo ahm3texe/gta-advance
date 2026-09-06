@@ -13,6 +13,7 @@
  */
 
 #include "gba_types.h"
+#include "map_grid.h"
 
 #define UNIT_ONE      0x01000000
 #define OFFSET_HIGH   0xFF000000
@@ -26,7 +27,6 @@ typedef struct WinConfig {
 } WinConfig;
 
 extern WinConfig gRam020230D0;
-extern void     *gRam0201AEE8;
 
 /* 0x0801D7DC */
 void SetWindow(u16 a, u16 b)

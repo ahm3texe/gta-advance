@@ -55,6 +55,17 @@
  *     (336/344). Uydurma degisken oldugu icin REDDEDILDI — 8 bayt icin
  *     savunulamayan kaynak yazmaktansa temiz kaynakla 12 bayt.
  *
+ * KURAL 54-61 TURU (hepsi olculdu, hicbiri iyilestirmedi):
+ *   - Dongu 1'i A-onculu + `continue` ile yazmak: 316 bayt (kural 58'in
+ *     belgeledigi yerlesim bozulmasinin aynisi).
+ *   - Kural 54 (kaydi iki yerele bolmek): `armed`i iki ayri yerele
+ *     (armed/armed2) bolmek 12 -> 17 bayt, kotulesiyor. Burada tek
+ *     degisken dogru: iki dongu de ayni yazmaci (r5) istiyor.
+ *   - Dongu 2 kosulunu ic ice `if` ile yazmak (kural 60 bicimi): 12,
+ *     degisiklik yok.
+ *   - Kural 57: `gBiosIrqFlags`i volatile gorunumle yazmak 12 -> 24 bayt.
+ *     `gVBlankEnabled`i volatile yapmak: 12, degisiklik yok.
+ *
  * PERMUTER KOSTURULDU (1222 yineleme): temel 80 -> en iyi 20, sifir yok.
  * En iyi aday REDDEDILDI: VBlankIntrWait'i iki kez cagiriyor (davranis
  * degisikligi), `held` degiskenini alakasiz bir deger icin yeniden

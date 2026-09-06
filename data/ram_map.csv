@@ -81,7 +81,7 @@ address,size,name,source,status,notes
 0x0201AAA8,4,gBufferStateA0201AAA8,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumunda sifirlanan durum kelimesi.
 0x0201AAB0,2064,gBufferClear0201AAB0,decomp,provisional,FUN_080100D0 DMA3 ile 0x102 kelime sifirliyor; boyut bu yazimdan gelir.
 0x0201AECC,0,gRam0201AECC,decomp,provisional,"FUN_080126E4 icinde kullaniliyor; ic yapisi BILINMIYOR, boyut olculmedi (0). src/core/insert_b1.c basliginda ayrintisi var."
-0x0201AEE8,4,gRam0201AEE8,decomp,provisional,0x0801D7FC ile yazilan isaretci
+0x0201AEE8,8,gRam0201AEE8,decomp,provisional,"Harita izgarasina isaretci. Hedef yapi 0x080651E0dan OLCULDU: +0x00 u16 en, +0x02 u16 boy, +0x04 u16* karo dizisi (y*en+x ile indeksleniyor). Tek tanim include/map_grid.h. 0x0801D7FC ile yaziliyor."
 0x0201AEF0,0,gRam0201AEF0,decomp,provisional,BG2 goruntu konumu dahil calisma blogu; +0x1F88 ve +0x1F8C alanlari kullaniliyor
 0x0201CEC0,2060,gNodePool,decomp,verified,"dugum havuzu; +0x800 serbest liste basi, +0x804 aktif liste basi (byte-matching kanit)  IZLEME: f1508de aktiflesiyor -- oyun dunyasi/NPCler dogdugu an. Bagli liste sistemi burada devreye giriyor.  OLCULDU(FlushSpriteList): +0x800 bos liste basi, +0x804 aktif liste basi, +0x808 onceki kare sprite sayaci. Boyut 2056 -> 2060 duzeltildi.  C KANITI: InitSpritePool 128 x 16 baytlik serbest listeyi kuruyor; InsertSpriteSorted +0/+2/+4 OAM alanlari ve +6 ikincil siralama anahtarini kullaniyor. Ortak tur include/sprite_pool.h.  IZLEME (oturum 6): olumden 1 kare sonra +0x08 ve +0x0C (bos/aktif liste baslari) degisti -- oyuncu varligi serbest birakiliyor."
 0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
@@ -212,7 +212,7 @@ address,size,name,source,status,notes
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
 0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM dizisi: uc bos alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
 0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM dizisi: uc ozel alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
-0x08852A1C,0,gRom08852A1C,decomp,provisional,"ROM: 0x080651E0 indeksliyor. 0x08852A2C ile ayni bolgede (16 bayt oncesi), muhtemelen ayni tablonun onceki alani. Boyut ve eleman tipi BILINMIYOR. DIZI olarak bildirilmeli."
+0x08852A1C,16,gRom08852A1C,decomp,provisional,"ROM: dort s32, degerler OLCULDU {-128, 128, -384, 384}. 0x080651E0 bunlari yerel diziye kopyalayip sonda noktalarinin kimlik ofseti olarak kullaniyor."
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
 0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). FUN_08025518 icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."

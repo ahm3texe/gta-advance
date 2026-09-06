@@ -163,11 +163,13 @@ start,end,binary,module,notes
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x08065130,0x080651E0,build/world/spawn_slot_effect.bin,world,Etkin yuva icin 51 numarali girisi uretir; dogal C byte-matching.
+0x080651E0,0x08065378,build/world/slot_probe.bin,world,Sonda noktalarini harita izgarasinda sinayip giris uretir.
 0x08065378,0x0806543C,build/world/actor_tracking.bin,world,Aktor hareket izleme kurulumu ve birikim adimi; dogal C byte-matching.
 0x0806543C,0x0806549C,build/world/player_slot_query.bin,world,Oyuncu yuvasi bayragi ve varlik mesguliyet sorgulari; dogal C byte-matching ve 2 bayt hizalama.
 0x0806549C,0x08065518,build/world/scale_by_band.bin,world,Mesafe bandina gore 8.8 sabit noktali olcekleme.
 0x08065518,0x08065574,build/world/slot_range_query.bin,world,"Yuva isareti, deger araligi ve ROM bayt tablosu; dogal C byte-matching."
 0x08065574,0x08065650,build/world/bitmap_asset.bin,world,"Kare ve palet yukleyici; RL acilimi veya DMA3, ardindan palet ofseti."
+0x08065650,0x080656F4,build/world/shutdown_reset.bin,world,DMA kanallarini kapatip ekran/kesme yazmaclarini siler ve BIOS yumusak sifirlamasi cagirir.
 0x08066144,0x0806620C,build/world/link_session_reset.bin,world,"Baglanti oturumunu bastan kurar: blok kurulumu, sekiz tampon Memset, durum alanlari."
 0x080663E8,0x080664A4,build/world/link_session.bin,world,"Baglanti oturumu kapanis, karartma ve bekleme adimlari; dogal C byte-matching."
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"

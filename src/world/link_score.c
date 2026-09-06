@@ -12,20 +12,46 @@
  * Bolme dogrudan FUN_0806c0f4 cagrisi olarak yazildi; `/` operatoru
  * baska bir yardimci uretiyor (src/text/text_f5.c'deki olcum).
  *
- * DURUM: PARK — 332/368 bayt, 82/183 komut ayni. Yapisi ve esik zinciri
+ * DURUM: PARK — 332/368 bayt, 85/183 komut ayni. Yapisi ve esik zinciri
  * dogru; kalan fark yazmac dagitimi.
  *
- * ROM `report` isaretcisini `ip`'de (r12) tutup her erisimden once dusuk
- * bir yazmaca kopyaliyor (`mov r0, ip`); biz dogrudan dusuk yazmacta
- * tutuyoruz. Ayrica ROM +0x06 ve +0x07 baytlarini her kullanimda YENIDEN
- * OKUYOR, bizim derleme onlari bir kez okuyup genisletilmis kopyayi
- * saklıyor. Ikisi de ayni sinif: ROM'un yazmac baskisi bizimkinden
- * yuksek, kaynak tarafinda bunu zorlayacak kol bulunamadi.
+ * SON TURDA KAPATILAN IKI SINIF:
+ *   - `rankA/B/C > 19` ISARETSIZ olmali (`> (u32)19`). Alan `u32 : 5`
+ *     olmasina ragmen `int`'e yukseldigi icin duz `> 19` ISARETLI `ble`
+ *     uretiyordu; ROM'da `bls` var (kural 56'nin doyum satiri). lapA/B/C
+ *     ayni yazimla zaten `bls` uretiyor, cast gerekmiyor.
+ *   - Kuyruk blogunun SIRASI: `if (total >= limit) return 100;` sonra duz
+ *     hesap. Onceki `if (total < limit) { hesap } return 100;` yazimi
+ *     hesabi one aliyordu; ROM once 100 donusunu yerlestiriyor
+ *     (`blt <hesap> / movs r0,#100 / b <son>`). Kuyruk artik tam ayni.
+ *
+ * KALAN TEK SINIF (36 bayt = ~18 komut): ROM `report` isaretcisini
+ * `ip`'de (r12) tutup her erisimden once dusuk bir yazmaca kopyaliyor
+ * (`mov r0, ip`); biz onu r3'te tutuyoruz ve o 15 kopya komutu hic
+ * uretmiyoruz. Sebep dagitim tablosunda gorunuyor (dump_alloc):
+ *   - lap ucllusunde biz de ROM gibi `<<` ARA sonucunu canli tutuyoruz
+ *     (109/114/121 -> r6/r5/r4) ve toplamlarda `lsrs`i yeniden uretiyoruz;
+ *     bu blok ROM ile bire bir ayni.
+ *   - rank ucllusunde ise CSE `(x<<k)>>27` ifadesinin TAMAMINI birlestirip
+ *     CIKARILMIS degeri canli tutuyor (95/98/103 -> r12/r8/r1) ve iki
+ *     toplam testini de tek hesaba indiriyor; ROM her ikisini yeniden
+ *     hesapliyor. Fark kabin genisliginden geliyor: lap alanlari `u16`
+ *     kapta (HImode ara donusumleri CSE'yi kiriyor), rank alanlari `u32`
+ *     kapta. rankB 13-17. bitleri kapsadigi icin kap `u32` OLMAK ZORUNDA
+ *     (kural 61; ROM `ldr r0,[r1,#32]` yapiyor), yani bu kolu kaynak
+ *     tarafindan cevirmek mumkun degil. Dusuk yazmaclar bosaldigi icin
+ *     `report` r3'te kaliyor ve ROM'un `ip` bicimi cikmiyor.
  *
  * BULUNAN KOL (uygulandi): bir `u8` alani birden fazla ifadede
  * kullaniyorsan ONCE YERELE al. Dogrudan uye erisimi agbcc'ye gereksiz
  * `lsls #24 / lsrs #24` sifir-genisletme cifti urettiriyor; yerel bunu
  * kaldiriyor. queryA ikilisinde olculdu.
+ *
+ * ELENEN YAZIMLAR (bu turda olculdu):
+ *   - Ayni kolu queryB dortlusune uygulamak (curB/altB yerelleri):
+ *     85 -> 59 komut. ROM +0x06 ve +0x07'yi YENIDEN OKUDUGU icin orada
+ *     dogrudan uye erisimi sart — kural 55'in ters yonu dogrulandi.
+ *   - Toplam testlerinden `(s32)` cast'ini kaldirmak: degisiklik yok (85).
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/link_score.c
@@ -123,11 +149,11 @@ s32 FUN_08067014(ScoreReport *report)
     if (report->g5v3 >= report->g5v3Alt)
         count++;
 
-    if (report->stats.rankA > 19)
+    if (report->stats.rankA > (u32)19)
         count++;
-    if (report->stats.rankB > 19)
+    if (report->stats.rankB > (u32)19)
         count++;
-    if (report->stats.rankC > 19)
+    if (report->stats.rankC > (u32)19)
         count++;
 
     if (report->stats.lapA > 19)
@@ -156,12 +182,11 @@ s32 FUN_08067014(ScoreReport *report)
     limit = report->headAlt + LIMIT_BONUS;
     total = report->head + count;
 
-    if (total < limit) {
-        result = FUN_0806c0f4(SCORE_FULL * total, limit);
-        if (result > SCORE_CAP)
-            result = SCORE_CAP;
-        return result;
-    }
+    if (total >= limit)
+        return SCORE_FULL;
 
-    return SCORE_FULL;
+    result = FUN_0806c0f4(SCORE_FULL * total, limit);
+    if (result > SCORE_CAP)
+        result = SCORE_CAP;
+    return result;
 }
