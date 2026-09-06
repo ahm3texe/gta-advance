@@ -1697,7 +1697,7 @@ address,name,size,status,module,notes
 0x080664F0,MaybeAdvance,42,matching,world,Duraklatma; src/world/maybe_advance.c
 0x08066540,ResetSessionFlags,40,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
 0x08066568,InitLinkBlock,164,matching,world,Baglanti blogunu sifirlayip SIO kaydini ve tampon isaretcilerini kurar; src/world/link_init.c
-0x0806660C,FUN_0806660c,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806660C,StepLinkFrame,304,matching,world,Kare basi baglanti surucusu; uc durumlu makine; src/world/link_frame_step.c
 0x0806673C,BuildLinkPacket,92,candidate,world,"Gonderilecek paketi kurar ve saglama toplamini yazar. PARK: 92/92 boyut, 20 bayt fark; agbcc global adres icin iki ayri pseudo uretiyor, ROM tek canli aralik kullaniyor; src/world/link_packet.c"
 0x08066798,ReceiveLinkPackets,212,candidate,world,"Gelen paketleri saglama sinamasiyla toplar. PARK: 204/212 bayt; ROM uc yuksek yazmac kullaniyor, biz iki; permuter 1095->195 ama aday semantik olarak yanlis; src/world/link_receive.c"
 0x0806686C,ServiceLinkFrame,152,candidate,unknown,"Baglanti kare servisi. PARK: 144/152 bayt; ROM global adresini r4te tutuyor, biz r3te; src/world/link_service.c"

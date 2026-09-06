@@ -434,7 +434,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,42,42,yes
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066568,InitLinkBlock,src/world/link_init.c,164,164,yes
-0x0806660C,FUN_0806660c,src/world/link_frame_step.c,304,304,yes
+0x0806660C,StepLinkFrame,src/world/link_frame_step.c,304,304,yes
 0x0806673C,BuildLinkPacket,src/world/link_packet.c,92,92,no
 0x08066798,ReceiveLinkPackets,src/world/link_receive.c,204,212,no
 0x0806686C,ServiceLinkFrame,src/world/link_service.c,144,152,no

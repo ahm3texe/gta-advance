@@ -75,7 +75,7 @@ address,name,size,outcome,source,evidence
 0x08064724,FUN_08064724,536,parked,src/text/text_f5.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08064DFC,FUN_08064dfc,294,parked,,ROM statik triyaj: 4 cagri / 16 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x08066568,InitLinkBlock,164,matching,src/world/link_init.c,ROM byte-matching; data/functions.csv
-0x0806660C,FUN_0806660c,304,parked,,ROM statik triyaj: 1 cagri / 13 kosullu dal / 9 literal; RAM tur blogu gerekli
+0x0806660C,StepLinkFrame,304,parked,,ROM statik triyaj: 1 cagri / 13 kosullu dal / 9 literal; RAM tur blogu gerekli
 0x08066904,SerialIrqHandler,316,parked,,ROM statik triyaj: 0 cagri / 14 kosullu dal / 12 literal; RAM tur blogu gerekli
 0x08066AA8,BuildLinkReport,152,matching,src/world/link_report.c,ROM byte-matching; data/functions.csv
 0x08067014,FUN_08067014,368,parked,,ROM statik triyaj: 1 cagri / 25 kosullu dal / 1 literal; karsilastirma agaci C denemesi gerekli

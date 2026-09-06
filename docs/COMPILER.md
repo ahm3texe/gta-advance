@@ -908,3 +908,30 @@ taşımalarından ÖNCE üretildiğini kanıtlıyor — ama ikinci döngüde bir
 yazmaç boşaltıp sabitin de taşınmasına yol açıyor ve r8'e taşıyor
 (336/344). Ayrıca `bit1 = 2` savunulabilir kaynak değil, o yüzden
 alınmadı.
+
+## Kural 59 — Maske sonucunu `u8` yerele almak birleştirmeyi engeller
+
+`StepLinkFrame` @ 0x0806660C ölçümü. Bir maske sonucunu `u32` yerele
+alırsan agbcc'nin `regmove` geçişi sabit pseudo'yu AND sonucuyla
+**birleştiriyor** ve tek komut çıkıyor:
+
+```c
+u32 m = cnt & 0x30;      /* movs r0,#0x30 / ands r0,r6 */
+u8  m = cnt & 0x30;      /* movs r1,#0x30 / adds r0,r6,#0 / ands r0,r1  <- ROM */
+```
+
+`u8` yerel sabiti QImode pseudo yapıyor, birleştirme olmuyor ve ROM'un
+üç komutlu biçimi çıkıyor. Maske düşük bayttaysa fazladan daraltma da
+üretmiyor. (RTL dökümlerinde doğrulandı: `combine` ROM'un biçimini
+veriyor, adlandırma `regmove`'da bozuluyor.)
+
+Aynı fonksiyonda ölçülen üç ek nokta:
+- Donanım yazmacında **tek bir bit** temizlemek `bitfield` ataması
+  olmalı. `&= ~0x40` maskeyi 8 bite daraltıp `movs #0xBF` üretiyor;
+  bitfield ise ROM gibi 32 bitte kuruyor (`movs #65 / negs`).
+- If/else'in sonucunu ara bir değişkene alıp sonra atamak, ROM'un
+  birleşme noktasındaki `adds r3,r0,#0` kopyasını koruyor. Doğrudan
+  atarsan agbcc iki kolun ortak son `orr`'unu cross-jump ediyor.
+- Aynı struct'ın üç ayrı bölgesi için **üç ayrı yerel işaretçi** kullan;
+  tek paylaşılan değişken referans sayısını şişirip r4/r5 dağıtımını
+  ters çeviriyor.
