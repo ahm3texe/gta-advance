@@ -22,13 +22,13 @@ typedef struct Obj {
     Sub *sub;                   /* +0x30 */
 } Obj;
 
-extern u32 FUN_0803c400(Obj *obj);
+extern u32 GetOwnerSlot(Obj *obj);
 extern u32 GetSlotRange(u32 arg);
 
 /* 0x08038044 */
 u32 SlotRangeOrField(Obj *obj)
 {
     if (obj->kind == KIND_SLOT)
-        return GetSlotRange(FUN_0803c400(obj));
+        return GetSlotRange(GetOwnerSlot(obj));
     return obj->sub->value;
 }

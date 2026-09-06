@@ -4,7 +4,7 @@
  * 1 ise ikincil (0x02001140), degilse birincil (0x02000F10). Yuva
  * yapisinin tam hali src/world/slot_config.c'de.
  *
- * Son iki fonksiyon ayni zinciri kuruyor: FUN_0803c400 sonucu
+ * Son iki fonksiyon ayni zinciri kuruyor: GetOwnerSlot sonucu
  * SelectSlotAB'ye veriliyor, donen isaretcinin +80 bayti okunuyor/yaziliyor.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
@@ -35,7 +35,7 @@ typedef struct Target {
 extern u16       gSlotSelector;     /* 0x02000D40 */
 extern u8        gUnk02010C60[];
 
-extern u32     FUN_0803c400(u32 value);
+extern u32     GetOwnerSlot(u32 value);
 extern Target *SelectSlotAB(u32 value);
 
 /* 0x0803C53C */
@@ -72,7 +72,7 @@ void MarkTarget(u32 value)
 {
     Target *target;
 
-    target = SelectSlotAB(FUN_0803c400(value));
+    target = SelectSlotAB(GetOwnerSlot(value));
     if (target != 0)
         target->mark = MARK_VALUE;
 }
@@ -82,7 +82,7 @@ u32 IsTargetMarked(u32 value)
 {
     Target *target;
 
-    target = SelectSlotAB(FUN_0803c400(value));
+    target = SelectSlotAB(GetOwnerSlot(value));
     if (target == 0)
         return 0;
     if (target->mark != 0)

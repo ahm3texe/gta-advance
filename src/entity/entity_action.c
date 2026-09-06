@@ -43,7 +43,7 @@ typedef struct Entity {
     u8   state;             /* +0x114 */
 } Entity;
 
-extern u32 FUN_0803c400(u32 sub);
+extern u32 GetOwnerSlot(u32 sub);
 extern u32 FUN_08023660(u32 sub);
 extern u32 FUN_080208a8(Entity *e, void *b, u32 flags, int *a,
                         int *c, int *d, int *f, void *owner);
@@ -55,19 +55,19 @@ u32 FUN_08020a9c(Entity *e, void *b, int unused, u32 flags)
     int slot2;
     int slot3;
 
-    FUN_0803c400(e->sub);
+    GetOwnerSlot(e->sub);
     if (FUN_080208a8(e, b, flags, &slot0, &slot1, &slot2, &slot3, e) != 0) {
 
         if ((flags & FLAG_SKIP_RETRY) == 0) {
-            FUN_0803c400(e->sub);
+            GetOwnerSlot(e->sub);
             if (FUN_080208a8(e, b, flags, &slot0, &slot1, &slot2, &slot3,
                              (u8 *)e + SUB_OFFSET) != 0) {
-                FUN_0803c400(e->sub);
+                GetOwnerSlot(e->sub);
                 return 0;
             }
         }
 
-        if (FUN_0803c400(e->sub) != 0 && FUN_08023660(e->sub) != 0
+        if (GetOwnerSlot(e->sub) != 0 && FUN_08023660(e->sub) != 0
             && (flags & FLAG_ALLOW_BLOCK) != 0) {
             if (e->state > STATE_BLOCK_MAX)
                 return 0;

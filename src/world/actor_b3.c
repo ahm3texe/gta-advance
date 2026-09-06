@@ -25,7 +25,7 @@
  *     Aralik sirasi ROM'dan: `a` icin EWRAM,IWRAM; node->unk10 icin
  *     ROM,EWRAM,IWRAM. Sirayi degistirmek fark birakiyor.
  *   - DAL SIRASI: iki yerde kosulu TERS yazmak gerekti. ROM'un ic (dusen)
- *     dali `FUN_0806545c(...) == 0` ve `a->unk98 == 0` tarafi; dogru
+ *     dali `IsEntityEngaged(...) == 0` ve `a->unk98 == 0` tarafi; dogru
  *     tarafini once yazinca 542 -> 538 -> 544 gitti. `!= 0` yazimi ayni
  *     komutlari uretiyor ama bloklari ters diziyor.
  *   - `self` KOPYASI GEREKLI (ROM: `mov r9, r4` girişte, `mov r0, r9` besinci
@@ -155,7 +155,7 @@ typedef struct Actor {
 extern u32   FUN_08013cfc(Attr *attr, RomNode *node, u32 idx);
 extern void  FUN_08014ee4(Attr *attr, u32 value);
 extern Attr *FUN_08028f98(u8 slot);
-extern u32   FUN_0806545c(Context *ctx);
+extern u32   IsEntityEngaged(Context *ctx);
 extern void  FUN_08015a84(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_08015af8(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_080159a0(Actor *a, RomNode *node, u32 idx);
@@ -226,7 +226,7 @@ void FUN_08015598(Actor *a)
         return;
 
     if (a->attr != 0) {
-        if (FUN_0806545c(a->ctx) == 0) {
+        if (IsEntityEngaged(a->ctx) == 0) {
             a->attr->bits &= ~ATTR_BIT;
             attr = FUN_08028f98(a->attrSlot);
             if (attr != 0)

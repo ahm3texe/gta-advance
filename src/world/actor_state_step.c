@@ -139,7 +139,7 @@ typedef struct Actor {
     Visual *visual;           /* +0x3C */
 } Actor;
 
-extern s32 FUN_0803c400(Entity *entity);
+extern s32 GetOwnerSlot(Entity *entity);
 extern u8 *SelectSlotCD(void);
 extern void FUN_0801686c(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080198e4(Actor *self, s32 a, s32 b, s32 c);
@@ -176,7 +176,7 @@ void FUN_08017628(Actor *self)
     u8 mode20;
 
     mode20 = 0x20;
-    if (FUN_0803c400(self->entity) == 0) return;
+    if (GetOwnerSlot(self->entity) == 0) return;
     slot = SelectSlotCD();
     if (self->visual != 0) self->visual->mode = mode20;
 
@@ -325,7 +325,7 @@ void FUN_08017628(Actor *self)
                 if (self->visual != 0) self->visual->mode = mode20;
             }
         } else {
-            if (FUN_0803c400(self->entity) != 0
+            if (GetOwnerSlot(self->entity) != 0
                 && *(s8 *)(self->entity->detail + 0x114) == 2
                 && self->speed > 0x30000) {
                 self->speed = 0x30000;

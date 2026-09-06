@@ -96,7 +96,7 @@ typedef struct Actor {
     Link *link;               /* +0xAC */
 } Actor;
 
-extern void FUN_0803c400(Entity *entity);
+extern void GetOwnerSlot(Entity *entity);
 
 void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
 {
@@ -130,7 +130,7 @@ void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
     if (value == 0x7fff) return;              /* cevrim de nobetci verdi */
     /* Kimlik zaten yuruyor: varliga haber verilip cikiliyor. */
     if (self->current == value && self->state != 2) {
-        FUN_0803c400(self->entity);
+        GetOwnerSlot(self->entity);
         return;
     }
 

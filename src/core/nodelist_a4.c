@@ -124,7 +124,7 @@ extern Node    *gList02035A80;          /* 0x02035A80 */
 #define gRam020110C0 ((u32 *)0x020110C0)
 
 extern Node *FindNodeAfter(Node *node, s32 id);   /* 0x08055A94 */
-extern u32   FUN_0803c400(u32 sub);               /* 0x0803C400 */
+extern u32   GetOwnerSlot(u32 sub);               /* 0x0803C400 */
 extern void  ForwardZeroArg2(u32 id);             /* 0x08055BF8 */
 extern void  FUN_0800c804(u32 *dest, u32 value);  /* 0x0800C804 */
 extern void  FUN_08055d90(u32 *head, u32 id);     /* 0x08055D90 */
@@ -140,7 +140,7 @@ void FUN_08052750(s32 index, u32 arm)
     node = FindNodeAfter((Node *)&gList02035A80, index);
     if (node == 0) return;
     if ((node->bits & BITS_BUSY) != 0) return;
-    if (node->sub != 0 && FUN_0803c400((u32)node->sub) != 0) return;
+    if (node->sub != 0 && GetOwnerSlot((u32)node->sub) != 0) return;
 
     if ((node->kind & KIND_ARMED) != 0 && arm != 0)
         node->kind = (node->kind & KIND_LOW) | KIND_READY;

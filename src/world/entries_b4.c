@@ -5,7 +5,7 @@
  *  1. Dorduncu arguman (off) NULL degilse ve icindeki iki isaretli bayt
  *     offsetinden en az biri sifir degilse, aktorun mevcut acisiyla o
  *     offseti dondurup (FUN_08029088) sonucu 41/32 ile olcekliyor ve
- *     16.16 konuma (+0x4C / +0x50) EKLIYOR.  Arada FUN_0803c400(actor->owner)
+ *     16.16 konuma (+0x4C / +0x50) EKLIYOR.  Arada GetOwnerSlot(actor->owner)
  *     cagriliyor; donus degeri hemen r0 uzerine yazildigi icin KULLANILMIYOR.
  *  2. Aci + turn degerinden 10 bitlik tablo indeksi cikarip 0x08CA30D8'deki
  *     1024 girisli s16 sinus tablosundan sin ve cos okuyor, dorde katlayip
@@ -94,7 +94,7 @@ typedef struct Offsets {
 
 /* src/world/state_offset.c'deki Actor gorunumuyle ayni ofsetler; hiz
  * vektoru (+0x70/+0x74) burada aciliyor.  owner'in icerigi bu ceviri
- * biriminde okunmuyor, sadece FUN_0803c400'e veriliyor. */
+ * biriminde okunmuyor, sadece GetOwnerSlot'e veriliyor. */
 typedef struct Actor {
     u8    pad00[0x4c];
     s32   px;            /* +0x4C, 16.16 */
@@ -111,7 +111,7 @@ typedef struct Actor {
 /* Imza state_offset.c'de ROM'dan dogrulandi. */
 extern void FUN_08029088(s32 angle, s32 dx, s32 dy, s8 *outX, s8 *outY);
 /* Donus degeri burada kullanilmiyor (r0 cagri sonrasi hemen eziliyor). */
-extern void FUN_0803c400(void *owner);
+extern void GetOwnerSlot(void *owner);
 
 /* 0x08025340 */
 void FUN_08025340(Actor *actor, s32 turn, s32 speed, Offsets *off)
@@ -138,7 +138,7 @@ void FUN_08025340(Actor *actor, s32 turn, s32 speed, Offsets *off)
         if (sx != 0 || ry != 0) {
             FUN_08029088((actor->angle + ANGLE_ROUND) >> 16, sx, (s8)ry,
                          &ox, &oy);
-            FUN_0803c400(actor->owner);
+            GetOwnerSlot(actor->owner);
             ox = (ox * SCALE_NUM) >> SCALE_SH;
             oy = (oy * SCALE_NUM) >> SCALE_SH;
             actor->px += ox << 16;

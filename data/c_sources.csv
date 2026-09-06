@@ -411,6 +411,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x080646F8,GetGlyphCell,src/text/glyph_table_access.c,44,44,yes
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
+0x0806543C,IsOwnerMarked,src/world/player_slot_query.c,32,32,yes
+0x0806545C,IsEntityEngaged,src/world/player_slot_query.c,62,62,yes
+0x08065518,SetOwnerMark,src/world/slot_range_query.c,32,32,yes
+0x08065538,IsSlotValueInRange,src/world/slot_range_query.c,48,48,yes
+0x08065568,LookupRomByte,src/world/slot_range_query.c,12,12,yes
 0x080664A4,GetBaseValue,src/world/pause_helpers.c,6,6,yes
 0x080664AC,MaybeReset,src/world/pause_helpers.c,24,24,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes

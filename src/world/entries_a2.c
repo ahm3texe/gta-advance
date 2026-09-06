@@ -1,6 +1,6 @@
 /* gEntriesA'da sahip + durum aramasi — 0x08028F4C-0x08028F97
  *
- * Once FUN_0803c400 ile parametreyi dogrular; sonuc 0 ise hemen 0 doner.
+ * Once GetOwnerSlot ile parametreyi dogrular; sonuc 0 ise hemen 0 doner.
  * Gecerliyse gEntriesA'daki 15 girise (stride 148) bakar ve su ucluyu arar:
  * giris aktif (+0x00 sifir degil), +0x84 alani parametreye esit, +0x90 alani
  * 51 ya da 52. Bulursa 1, bulamazsa 0 doner.
@@ -66,7 +66,7 @@ typedef struct Entry {
 
 extern Entry gEntriesA[];
 
-extern u32 FUN_0803c400(u32 arg);
+extern u32 GetOwnerSlot(u32 arg);
 
 /* 0x08028F4C */
 u32 FindEntryByOwnerState(u32 arg)
@@ -75,7 +75,7 @@ u32 FindEntryByOwnerState(u32 arg)
     EntryTail *tail;
     s32 i;
 
-    if (FUN_0803c400(arg) == 0)
+    if (GetOwnerSlot(arg) == 0)
         return 0;
 
     base = gEntriesA;

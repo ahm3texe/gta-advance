@@ -51,7 +51,7 @@ typedef struct Actor {
     s8 lowB;                  /* +0xA8 */
 } Actor;
 
-extern void FUN_0803c400(Entity *entity);
+extern void GetOwnerSlot(Entity *entity);
 extern void FUN_08014ffc(Sub *sub, u32 flags, u8 *a, u8 *b);
 extern void FUN_08015038(Sub *sub);
 extern void FUN_08015598(Actor *self);
@@ -72,7 +72,7 @@ void ResetActor(Actor *self)
     if (ent != 0) {
         s32 ok = 0;
         if (ent->kind == 4) ok = 1;
-        if (ok) FUN_0803c400(ent);
+        if (ok) GetOwnerSlot(ent);
     }
 
     mask = self->entity->flags & STATE_FLAG;

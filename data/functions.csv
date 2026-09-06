@@ -956,7 +956,7 @@ address,name,size,status,module,notes
 0x0803C320,FUN_0803c320,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C37C,FUN_0803c37c,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0803C3D4,FUN_0803c3d4,44,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
-0x0803C400,FUN_0803c400,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C400,GetOwnerSlot,92,candidate,world,"Varligin hangi oyuncuya ait oldugunu dondurur: 0x02000F10/0x020272C8+0x28 zinciri icin 1, gGameState[12] kuruluyken 0x02001140/0x02026F34+0x28 icin 2, yoksa 0. Sonucu dogrudan SelectSlotAB'a beslenir."
 0x0803C45C,SelectWordSource,32,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 2)
 0x0803C49C,SelectSlotAB,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x0803C4B8,SelectSlotCD,28,matching,world,Yuva secici; src/world/slot_selectors.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1676,12 +1676,12 @@ address,name,size,status,module,notes
 0x080651E0,FUN_080651e0,408,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08065378,FUN_08065378,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080653D4,FUN_080653d4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806543C,FUN_0806543c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806545C,FUN_0806545c,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806543C,IsOwnerMarked,32,matching,world,Oyuncu yuvasinin +0x25 bayragini sorgular; src/world/player_slot_query.c
+0x0806545C,IsEntityEngaged,62,matching,world,Varligin +0x14 blogundaki tur bayti veya yuva bayragi; src/world/player_slot_query.c
 0x0806549C,FUN_0806549c,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08065518,FUN_08065518,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08065538,FUN_08065538,48,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08065568,FUN_08065568,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08065518,SetOwnerMark,32,matching,world,Varligin sahibinin yuvasina +0x25 isaretini yazar; src/world/slot_range_query.c
+0x08065538,IsSlotValueInRange,48,matching,world,A yuvasindaki +0x4C ust yarim kelimesi verilen aralikta mi; src/world/slot_range_query.c
+0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
 0x08065574,FUN_08065574,220,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08065650,FUN_08065650,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080656F4,FUN_080656f4,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

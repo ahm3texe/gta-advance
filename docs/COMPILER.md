@@ -403,7 +403,7 @@ kaynak koşulu doğrudan dallanmıyor, **sonucu bir değişkene yazıp onu sın�
 ```c
 ok = 0;
 if (ent->kind == 4) ok = 1;
-if (ok) FUN_0803c400(ent);
+if (ok) GetOwnerSlot(ent);
 ```
 
 Kısa devreli `if (ent != 0 && ent->kind == 4)` yazımı doğrudan dallanma üretir
@@ -725,3 +725,28 @@ agbcc yaprak fonksiyon uretti ve ROM'dan 22 komut sasti. Ilk iki adresi yerel
 pointer'da tutmak `r4`/`r3` yasam araligini ve `{r4,lr}` prologunu geri getirdi;
 fonksiyon 204/204 byte-matching oldu. Ardarda global store'larda ROM callee-save
 yazmaci kullaniyorsa, adres yereli anlamsal olarak gereksiz diye silinmemeli.
+
+## Kural 51 — Eşit öncelikli iki değişkende yazmacı akış şekli belirler
+
+Aynı sayıda referansı ve aynı ömrü olan iki pseudo, kural 50'nin öncelik
+formülünde **tam eşitliğe** düşer (`floor_log2(refs) * refs / ömür`). Eşitlikte
+agbcc allocno numarasına göre sıralar, yani parametre sırası kazanır ve
+istediğin yazmaç eşlemesini sözcük düzeyinde yazım değişiklikleriyle (karşılaştırma
+operandını çevirmek, `(u32)` cast'i, yerel değişkene kopyalamak, bildirim
+sırasını değiştirmek) **kıramazsın** — 13 yazım denendi, dokuzu aynı tabloyu
+üretti.
+
+Eşitliği kıran şey **kontrol akışının şekli**: tek bir `&&` zinciri her iki
+değeri de aynı temel bloğa kadar canlı tutar, erken çıkışlı `if (...) return`
+zinciri ise önce sınanan değerin ömrünü bir komut uzatır ve önceliğini düşürür.
+
+Ölçüm — `IsSlotValueInRange` @ 0x08065538:
+
+| yazım | low pseudo | high pseudo | sonuç |
+|---|---|---|---|
+| `a && b && c && d` tek ifade | ömür 13, öncelik 0,154 | ömür 13, öncelik 0,154 | eşitlik; low r4 alıyor, **4 bayt fark** |
+| erken çıkışlı `if` zinciri | ömür 14, öncelik 0,143 | ömür 13, öncelik 0,154 | high r4 alıyor, **byte-matching** |
+
+Teşhis tek komut: `dump_alloc.py --function <ad>`. İki pseudo'nun önceliği
+eşitse sorun yazım değil akış şeklidir; ifadeyi bölmeyi dene, sözcük
+varyantlarını tarama.

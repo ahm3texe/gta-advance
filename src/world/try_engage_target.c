@@ -95,7 +95,7 @@ typedef struct Peer {
 } Peer;
 
 extern u32   FUN_0804fc48(u32 arg, Obj *obj);
-extern u32   FUN_0803c400(u32 arg);
+extern u32   GetOwnerSlot(u32 arg);
 extern u32   SelectSlotAB(u32 arg);
 extern u32   GetBaseAlt(void);
 extern u32   FUN_08042144(Obj *a, Obj *b, u32 range);
@@ -120,7 +120,7 @@ u32 TryEngageTarget(Ctx *ctx)
 
     other = (Obj *)FUN_0804fc48(ctx->arg, ctx->obj);
     self = ctx->obj;
-    pa = (Vec2 *)SelectSlotAB(FUN_0803c400((u32)other));
+    pa = (Vec2 *)SelectSlotAB(GetOwnerSlot((u32)other));
 
     peer = (Peer *)self->link;
     flag = 0;
