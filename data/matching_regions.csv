@@ -181,6 +181,7 @@ start,end,binary,module,notes
 0x08066AA8,0x08066B40,build/world/link_report.bin,world,Baglanti ozet kaydini yedi sorgu ve 36 baytlik blok kopyasiyla doldurur.
 0x08066B40,0x08066C94,build/world/link_state_step.bin,world,"Etkin kaydin adim sayacini artirip 20de doyurur, 19/9 esiginde uyari bayragi kaldirir."
 0x08066C94,0x08066D54,build/world/bump_rank_counter.bin,world,Etkin kaydin 5 bitlik sayacini artirip 20de doyurur; dogal C byte-matching.
+0x08066ED0,0x08067014,build/world/link_menu_step.bin,world,Adim indeksini simge kimligine ceviren 36 durumlu atlama tablosu.
 0x08067184,0x080671B8,build/world/bump_count_82.bin,world,Gecikmeyle cevrelenmis +0x82 kayit sayaci; dogal C byte-matching.
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
 0x0806720C,0x08067228,build/world/bump_save_counter.bin,world,gSaveBuffer +0x66 doyuran sayac

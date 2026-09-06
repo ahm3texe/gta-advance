@@ -935,3 +935,31 @@ Aynı fonksiyonda ölçülen üç ek nokta:
 - Aynı struct'ın üç ayrı bölgesi için **üç ayrı yerel işaretçi** kullan;
   tek paylaşılan değişken referans sayısını şişirip r4/r5 dağıtımını
   ters çeviriyor.
+
+## Kural 60 — Aralık koruması `||` ile değil, iki ayrı `if` ile yazılır
+
+`GetStepIconId` @ 0x08066ED0 ölçümü — projedeki **ilk atlama tablolu**
+eşleşme (36 durum, tablo 0x08066EF0'da).
+
+```c
+if (n < 0 || n > 35) return X;      /* agbcc ikisini TEK isaretsiz
+                                       `cmp r0,#35 / bls`e katliyor ve
+                                       switch'in kendi aralik kontrolüyle
+                                       birlestiriyor -> 312 bayt, 12 eksik */
+
+if (n < 0)  return X;               /* isaretli `cmp #0 / blt` */
+if (n > 35) return X;               /* isaretli `cmp #35 / ble`; iki
+                                       `return` cross-jump ile tek gövdede
+                                       birlesiyor, switch kendi bagimsiz
+                                       `cmp #0x23 / bls`ini uretiyor
+                                       -> 324/324 BYTE-MATCHING */
+```
+
+Parametre **işaretli** olmalı (`s32`): korumadaki `blt`/`ble` bunu
+gerektiriyor. Switch'in kendi kontrolü ise agbcc'nin atlama tablolarında
+her zaman ürettiği gibi işaretsizdir (`bls`).
+
+Ayrıca doğrulandı: Ghidra'nın düşük satır yoğunluğu + "Could not recover
+jumptable" uyarısı bu ROM'da **atlama tablosu** demek. Tablo girişleri
+`ldr`/`lsrs` çöpü olarak sökülüyor; ROM'dan 4 bayt aralıklı kod adresleri
+okuyarak doğrula.
