@@ -1705,7 +1705,7 @@ address,name,size,status,module,notes
 0x08066A40,MaybeSetCommByte6,20,matching,world,Iletisim bayragi; src/world/comm_flag.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08066A54,ResetLinkHardware,84,matching,world,"Timer3/seri kesmelerini kapatir, SIOCNT ve Timer3 sifirlar; src/world/link_hw_reset.c"
 0x08066AA8,BuildLinkReport,152,matching,world,Baglanti ozet kaydini doldurur; src/world/link_report.c
-0x08066B40,FUN_08066b40,340,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066B40,BumpStepCounter,340,matching,world,Etkin kaydin 5 bitlik adim sayacini doyumlu artirir; src/world/link_state_step.c
 0x08066C94,BumpRankCounter,192,matching,world,Etkin kaydin 5 bitlik sayacini doyumlu artirir; src/world/bump_rank_counter.c
 0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

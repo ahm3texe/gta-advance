@@ -846,3 +846,23 @@ if (curA >= altB) ...
 ROM'unkiyle hizalandı. Not: bu kolun tersi de var — ROM bazen aynı baytı
 her kullanımda **yeniden okuyor**; o durumda yerel KULLANMA, doğrudan üye
 erişimi yaz. Hangisi olduğunu ROM'un `ldrb` sayısından oku.
+
+## Kural 56 — Bitfield karşılaştırması: eşitlik maskeli, doyum işaretsiz
+
+`BumpStepCounter` @ 0x08066B40 ölçümü, iki ayrı tuzak:
+
+**Eşitlik testi.** agbcc bir bitfield eşitlik testini asla maske
+karşılaştırmasına çevirmiyor; alan `int`'e yükseltildiği için
+`optimize_bit_field_compare` hiç çalışmıyor ve `x.f == 19` daima
+`lsl/lsr` çıkarımı + `cmp` üretiyor. ROM'da `ands r0,#MASK /
+cmp r0,#(DEGER<<KAYDIRMA)` görüyorsan **kaynağın kendisi** kaydırılmamış
+maskeli karşılaştırmayı yazmıştır — yani aynı adrese hem bitfield hem ham
+erişim veren bir `union`. Bitfield görünümü ile ham görünüm aynı taban
+yazmacını paylaşıyor, ROM'daki gibi.
+
+**Doyum testi.** `x.f > 20` işaretli `ble` üretiyor; ROM'da `bls` varsa
+sabit açıkça işaretsiz olmalı: `> (u32)20`. Alan zaten `unsigned`
+bildirildiği için gözden kaçması kolay.
+
+Elenen yazımlar: yalnız bitfield'lı struct + `alan == 19` (316 bayt, 24
+eksik); `> 20` düz `int` sabitiyle (`ble`, `bls` değil).
