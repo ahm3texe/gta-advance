@@ -1,18 +1,25 @@
-/* YARIM IS — HENUZ DERLEME YOLUNDA DEGIL (.wip uzantisi bilerek).
+/* DURUM: PARK — 2372/2374 bayt AMA yalnizca 532/1174 KOMUT ayni.
  *
- * FUN_080657d8 @ 0x080657D8, 2374 bayt. Yapi 2280/2374 bayta kadar
- * derleniyor. Devam etmeden ONCE iki is var:
- *   1. Eksik RAM sembolleri data/ram_map.csv'ye eklenecek:
- *      0x02000134, 0x02000288, 0x020003EC, 0x020004A4, 0x020004C0,
- *      0x02000D0C, 0x02036324  (hepsi bu fonksiyondan referansli)
- *   2. Iki tur catismasi cozulecek:
- *      gRam02000230  u8[] (link_session_reset.c) vs u16[] (burada)
- *      gRam02036330  LinkCounters (link_session_reset.c) vs u16[] (burada)
- * Cozulunce dosyayi .c olarak geri adlandir ve
- * `make c-match FILE=src/world/sio_driver.c` ile olc.
+ * Boyutun iki bayt yakin olmasi YANILTICI: govdenin yarisindan
+ * fazlasi hala yanlis. Olcut komut dizisi, bayt sayisi degil.
+ *
+ * Bu turda cozulenler (ajanin birakti'gi 2280 -> derlenebilir 2372):
+ *   - 7 eksik RAM sembolu data/ram_map.csv'ye eklendi; tipleri ROM'dan
+ *     okundu (alti strh = u16, biri str/ldr = u32).
+ *   - gRam02036330 tur catismasi cozuldu: LinkCounters artik
+ *     include/comm_block.h'de, +0x00 ve +0x02 alanlariyla. ROM o
+ *     adrese yalnizca ofset 0 ve 2'den yaziyor (dogrulandi).
+ *   - gRam02000230 iki dosyada da u16[] yapildi.
+ *
+ * ILK SAPMA girisin hemen ardinda: ROM mod degerini bir dizi globale
+ * belirli bir SIRAYLA yaziyor ve bizde olmayan fazladan bir
+ * `mov r4,sp / ldrh r4 / strh r4,[r0]` blogu var. Buradan baslamak
+ * gerekiyor -- ilk blok duzelmeden asagisi hizalanmaz.
  *
  * Yapisal harita: tools/dump_cfg.py FUN_080657d8 (103 blok, atlama
  * tablosu YOK, tek prolog/epilog -- sinir dogru).
+ * Olcum: make c-match FILE=src/world/sio_driver.c
+ *        python3 tools/diff_function.py src/world/sio_driver.c FUN_080657d8
  */
 
 /* Baglanti (SIO) surucusunun ana dagiticisi — 0x080657D8-0x0806611D
@@ -75,7 +82,6 @@ extern u16 gRam02000498;
 #define gRam03000098 (*(u32 *)0x03000098)
 #define gRam0300009C (*(u32 *)0x0300009C)
 #define gRam030000A0 (*(u32 *)0x030000A0)
-extern u16 gRam02036330[];
 extern u16 gRam02000230[];
 extern u16 gRam02000420[];
 extern u8  gRam02000100[];
@@ -92,13 +98,6 @@ extern s16 gSlotSelector;               /* 0x02000D40 */
  * veriliyor; sembol referansi kalmasi SART, adres sabiti yazmak cse'ye
  * ("ldr" yerine "adds rX,#fark") sahte tureme yaptiriyor. Haritaya
  * eklendiginde bu blok silinip yalnizca `extern` bildirimleri kalmali. */
-asm(".equ gRam02000134, 0x02000134");
-asm(".equ gRam02000288, 0x02000288");
-asm(".equ gRam020003EC, 0x020003ec");
-asm(".equ gRam020004A4, 0x020004a4");
-asm(".equ gRam020004C0, 0x020004c0");
-asm(".equ gRam02000D0C, 0x02000d0c");
-asm(".equ gRam02036324, 0x02036324");
 
 extern u16 gRam02000134;
 extern u16 gRam02000288;
@@ -144,7 +143,7 @@ void FUN_080657d8(u32 mode)
         gGameState.word00++;
         if (gVBlankEnabled != 0 && mode == 0
                 && FUN_0806c2d4(gGameState.word00, 5) != 0) {
-            gRam02036330[0] = gRam0300009C = gRam03000098 = mode;
+            gRam02036330.half00 = gRam0300009C = gRam03000098 = mode;
             gRam02000498 = gRam020003EC = gRam02000D0C = gRam02000134 = mode;
             gRam020004C0 = mode;
             gRam030000A0 = mode;
@@ -161,8 +160,8 @@ void FUN_080657d8(u32 mode)
         gRam03000098 = gGameState.half04 & ~gRam0300009C;
         gRam030000A0 = gRam0300009C & ~gGameState.half04;
         gRam0300009C = gGameState.half04;
-        gRam02036330[0] = 0;
-        gRam02036330[1] = 0;
+        gRam02036330.half00 = 0;
+        gRam02036330.half02 = 0;
         gRam02000498 = gRam0300009C;
         gRam02000D0C = gRam03000098;
         gRam020004C0 = gRam020003EC = gRam02000134 = 0;
@@ -186,8 +185,8 @@ void FUN_080657d8(u32 mode)
         gRam03000098 = gGameState.half04 & ~gRam0300009C;
         gRam030000A0 = gRam0300009C & ~gGameState.half04;
         gRam0300009C = gGameState.half04;
-        gRam02036330[0] = 0;
-        gRam02036330[1] = 0;
+        gRam02036330.half00 = 0;
+        gRam02036330.half02 = 0;
 
         tx = gRam02036338;
         TX(tx, SLOT_INDEX)    = 0;
@@ -366,10 +365,10 @@ void FUN_080657d8(u32 mode)
             if (*slot != 0 || gRam0200048C <= 1) {
                 if (gRam0200048C > 1) {
                     prevA = gGameState.half04;
-                    prevB = gRam02036330[1];
+                    prevB = gRam02036330.half02;
                     keysB = gRam02000230[base];
-                    gRam02036330[1] = keysB;
-                    gRam02036330[0] = (prevB ^ keysB) & keysB;
+                    gRam02036330.half02 = keysB;
+                    gRam02036330.half00 = (prevB ^ keysB) & keysB;
                     keysA = gRam02000420[base];
                     gGameState.half04 = keysA;
                     gGameState.pad06  = (prevA ^ keysA) & keysA;
@@ -378,19 +377,19 @@ void FUN_080657d8(u32 mode)
                         gRam03000098 = gGameState.pad06;
                         gRam030000A0 = gRam0300009C & ~gGameState.half04;
                         gRam0300009C = gGameState.half04;
-                        gRam02000134 = gRam02036330[0];
+                        gRam02000134 = gRam02036330.half00;
                         gRam020004C0 = gRam020003EC & ~keysB;
                         gRam020003EC = keysB;
                     } else {
-                        gRam03000098 = gRam02036330[0];
-                        gRam030000A0 = gRam0300009C & ~gRam02036330[1];
-                        gRam0300009C = gRam02036330[1];
+                        gRam03000098 = gRam02036330.half00;
+                        gRam030000A0 = gRam0300009C & ~gRam02036330.half02;
+                        gRam0300009C = gRam02036330.half02;
                         gRam02000134 = gGameState.pad06;
                         gRam020004C0 = gRam020003EC & ~keysA;
                         gRam020003EC = keysA;
                     }
                 } else {
-                    gRam02036330[1] = 0;
+                    gRam02036330.half02 = 0;
                     gGameState.half04 = 0;
                     gRam0300009C = 0;
                     gRam03000098 = 0;
@@ -398,7 +397,7 @@ void FUN_080657d8(u32 mode)
                     gRam02000134 = 0;
                 }
 
-                gRam020110B8 += (gRam02036330[1] + gGameState.half04)
+                gRam020110B8 += (gRam02036330.half02 + gGameState.half04)
                                 << (gRam0200048C & 15);
                 gRam02000498 = gRam0300009C | gRam020003EC;
                 gRam02000D0C = gRam03000098 | gRam02000134;
@@ -417,8 +416,8 @@ void FUN_080657d8(u32 mode)
         gRam03000098 = gGameState.half04 & ~gRam0300009C;
         gRam030000A0 = gRam0300009C & ~gGameState.half04;
         gRam0300009C = gGameState.half04;
-        gRam02036330[0] = 0;
-        gRam02036330[1] = 0;
+        gRam02036330.half00 = 0;
+        gRam02036330.half02 = 0;
         gRam02000498 = gRam0300009C;
         gRam02000D0C = gRam03000098;
         gRam020004C0 = gRam020003EC = gRam02000134 = 0;

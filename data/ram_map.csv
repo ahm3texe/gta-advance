@@ -1,14 +1,17 @@
 address,size,name,source,status,notes
 0x02000100,32,gRam02000100,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
+0x02000134,2,gRam02000134,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
 0x02000140,32,gRam02000140,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
 0x02000224,4,gRam02000224,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x02000230,64,gRam02000230,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
+0x02000288,2,gRam02000288,decomp,provisional,0x080657D8 icinde `1 - r2` degerini strh ile yaziyor; deger negatif olabilecegi icin kaynak s16 olarak bildiriyor. Boyut 2.
 0x020003C0,32,gRam020003C0,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
 0x020003E4,1,gCartFlag,decomp,verified,"0x080336EC/2C tarafindan test edilen bayrak (=1 iken islem yapiliyor)  IZLEME: kayit kontrolunde f684te 0->1, yeni oyunda f1066da 1->0, bolum yuklenince f1101de 0->1."
+0x020003EC,2,gRam020003EC,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
 0x02000400,32,gRam02000400,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000420,64,gRam02000420,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
@@ -17,12 +20,15 @@ address,size,name,source,status,notes
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
 0x020004A0,4,gRam020004A0,decomp,provisional,0x08052C68 bayrak kapisi anahtari olarak okuyor.
+0x020004A4,2,gRam020004A4,decomp,provisional,0x080657D8 icinde `1 - r2` degerini strh ile yaziyor; deger negatif olabilecegi icin kaynak s16 olarak bildiriyor. Boyut 2.
 0x020004B0,8,gFocusPoint,decomp,verified,"iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba, tam genislik): iki adet 16.16 SABIT NOKTA koordinat. +0x00=X, +0x04=Y. Baslangic (3360.000, 9568.000) -- tam sayilar. Up basiliyken Y tam olarak -374632 (-5.716) adimliyor, 29/29 sabit. Bazi X farklari TAM 65536 (1.000) ve 262144 (4.000): 16.16 formati boylece KANITLANDI."
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
+0x020004C0,2,gRam020004C0,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
 0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour  IZLEME: 16 baytlik blok; 0. bayti f52den itibaren her kare 1 artiyor (sayac davranisi).  PROVISIONAL BIRAKILDI -- AD SUPHELI: 0. bayti her kare artiyor, yani sayac davranisi; ""durum"" adi desteklenmiyor."
 0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
 0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
+0x02000D0C,2,gRam02000D0C,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
 0x02000D14,4,gGlobalState02000D14,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumu sonunda sifirlanan durum kelimesi.
 0x02000D18,4,gRam02000D18,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
@@ -187,6 +193,7 @@ address,size,name,source,status,notes
 0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C  IZLEME: metin cizimiyle degisiyor; diyalog kutusunda (f1319) ve A basimlariyla (f1384/f1402) oynuyor.  PROVISIONAL BIRAKILDI -- AD SUPHELI: degerler (160/192/128/240/242) font indeksinden cok genislik/konum gibi. Izleme metinle iliskiyi kanitliyor, ADI kanitlamiyor."
 0x0203631C,4,gHalfLineSpacing,decomp,verified,"Nonzero halves the line height used by the text drawing helpers  IZLEME: diyalog kutusu acilinca 0->1 (f1319), kapaninca 1->0 (f2303). Metin kutusuna bagli."
 0x02036320,1,gRam02036320,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
+0x02036324,4,gRam02036324,decomp,provisional,u32; 0x080657D8 MaybeSetCommByte6 cagrisinin oncesinde yazip sonrasinda geri okuyor
 0x02036328,4,gRam02036328,decomp,provisional,Ek bayrak; 0x080664C4 kontrolu
 0x0203632C,1,gRam0203632C,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
 0x02036330,8,gRam02036330,decomp,provisional,"Boyut 8 OLCULDU (Memset cagrisi, 0x08066144). +0x02 alani u16 olarak sifirlaniyor"

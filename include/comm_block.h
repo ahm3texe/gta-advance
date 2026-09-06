@@ -23,6 +23,20 @@ typedef struct LinkPacket {
     u8  payload[16];                    /* +0x04 */
 } LinkPacket;
 
+/* 0x02036330'daki 8 baytlik sayac blogu. Boyut 0x08066144'teki
+ * Memset cagrisindan OLCULDU. Iki kaynak kullaniyor:
+ *   src/world/link_session_reset.c  +0x02'yi sifirliyor
+ *   src/world/sio_driver.c          +0x00'i yaziyor
+ * Ayni sembol icin farkli extern turleri tutarlilik denetimini
+ * durduruyor; tek tanim burada. */
+typedef struct LinkCounters {
+    u16 half00;                         /* +0x00 */
+    u16 half02;                         /* +0x02 */
+    u8  pad04[4];
+} LinkCounters;
+
+extern LinkCounters gRam02036330;
+
 typedef struct CommBlock {
     u8         byte0;                   /* +0x00 */
     u8         byte01;                  /* +0x01 */

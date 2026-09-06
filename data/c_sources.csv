@@ -424,6 +424,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08065574,LoadBitmapAsset,src/world/bitmap_asset.c,220,220,yes
 0x08065650,ShutdownAndReset,src/world/shutdown_reset.c,164,164,yes
 0x080656F4,PollInput,src/world/poll_input.c,224,228,no
+0x080657D8,FUN_080657d8,src/world/sio_driver.c,2372,2374,no
 0x08066144,ResetLinkSession,src/world/link_session_reset.c,200,200,yes
 0x0806620C,WaitForPartner,src/world/input_extra.c,320,320,no
 0x080663E8,ShutdownLinkSession,src/world/link_session.c,44,44,yes

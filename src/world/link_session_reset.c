@@ -20,16 +20,9 @@
 
 #define LINK_STATE_READY 1
 
-typedef struct LinkCounters {
-    u8  pad00[2];
-    u16 half02;                 /* +0x02 */
-    u8  pad04[4];
-} LinkCounters;
-
 extern CommBlock   gLinkBlock;
-extern LinkCounters gRam02036330;
 extern u16 gRam02000420[];
-extern u8  gRam02000230[];
+extern u16 gRam02000230[];
 extern u8  gRam020003C0[];
 extern u8  gRam02000E80[];
 extern u8  gRam02000100[];
