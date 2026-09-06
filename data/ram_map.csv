@@ -158,6 +158,7 @@ address,size,name,source,status,notes
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
+0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). FUN_08025518 icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
 0x08D49C00,0,gAreaBank,decomp,provisional,ROM: alan kayitlari bankasi; 0x08052C68 .entries alanindan yuruyor.
 0x08EC46D4,0,gTextTable,decomp,verified,"Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.  DOGRULANDI (oturum 7): dilim k = dil k, dogrudan. Ayni indeksin bes dilimdeki degeri okunarak sinandi (ENGLISH/ANGLAIS/INGLESE/ENGLISCH). Kodlama LATIN-1, ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde, 0xC1=A-akut."
