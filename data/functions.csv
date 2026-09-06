@@ -1709,7 +1709,7 @@ address,name,size,status,module,notes
 0x08066C94,BumpRankCounter,192,matching,world,Etkin kaydin 5 bitlik sayacini doyumlu artirir; src/world/bump_rank_counter.c
 0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08067014,FUN_08067014,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08067014,FUN_08067014,368,candidate,world,"Baglanti raporundan yuzde skoru hesaplar. PARK: 332/368 bayt, 82/183 komut ayni; ROM report isaretcisini ip'de tutuyor ve baytlari her kullanimda yeniden okuyor; src/world/link_score.c"
 0x08067184,BumpCount82,52,matching,world,Iki bos dongu gecikmesi arasinda +0x82 sayacini tasma korumali artirir; src/world/bump_count_82.c
 0x080671B8,BumpCount6A,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671D4,BumpCount68,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

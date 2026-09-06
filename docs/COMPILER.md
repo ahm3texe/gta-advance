@@ -820,3 +820,29 @@ yerel** kullan. Tek değişken, canlı aralığı iki bloğu birden kapsatıp
 yazmaç baskısını artırıyor: `LoadBitmapAsset`'te bu, `dest`'i callee-saved
 yüksek yazmaca itip fazladan bir push/pop çifti ekledi — **12 bayt**.
 ROM ikinci kaydı `ip`'de tutuyor, yani ayrı ve kısa ömürlü bir değer.
+
+## Kural 55 — Çok kullanılan `u8` alanını önce yerele al
+
+Bir `u8` yapı alanını aynı bloktan birden fazla ifadede kullanırsan
+(örneğin hem `x >> 1` hem `x` ile karşılaştırma), doğrudan üye erişimi
+agbcc'ye gereksiz bir sıfır-genişletme çifti ürettiriyor:
+
+```c
+if (r->a >= r->b >> 1) ...      /* ldrb / lsls #24 / lsrs #24 / lsrs #25 */
+if (r->a >= r->b) ...
+```
+
+Değeri önce yerele almak `ldrb`'nin zaten yaptığı genişletmeyi tekrar
+etmiyor ve ROM'un şeklini veriyor:
+
+```c
+altB = r->b;                    /* ldrb */
+curA = r->a;                    /* ldrb */
+if (curA >= altB >> 1) ...      /* lsrs #1 */
+if (curA >= altB) ...
+```
+
+Ölçüm: `FUN_08067014` @ 0x08067014, iki komut kazandı ve komut dizisi
+ROM'unkiyle hizalandı. Not: bu kolun tersi de var — ROM bazen aynı baytı
+her kullanımda **yeniden okuyor**; o durumda yerel KULLANMA, doğrudan üye
+erişimi yaz. Hangisi olduğunu ROM'un `ldrb` sayısından oku.

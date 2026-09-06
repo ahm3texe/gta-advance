@@ -212,6 +212,7 @@ address,size,name,source,status,notes
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
 0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM dizisi: uc bos alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
 0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM dizisi: uc ozel alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
+0x08852A1C,0,gRom08852A1C,decomp,provisional,"ROM: 0x080651E0 indeksliyor. 0x08852A2C ile ayni bolgede (16 bayt oncesi), muhtemelen ayni tablonun onceki alani. Boyut ve eleman tipi BILINMIYOR. DIZI olarak bildirilmeli."
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
 0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). FUN_08025518 icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
