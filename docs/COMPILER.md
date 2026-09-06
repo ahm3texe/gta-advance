@@ -764,3 +764,42 @@ Teşhis işareti: ROM bir global adresini döngünün içinde tekrar tekrar
 yüklüyorsa, o blok ROM'un kaynağında döngü gövdesinin *rotasyonlu*
 kısmındadır. Bayrağı döngüden önce kurup `while (bayrak)` yazmak
 rotasyonu ROM'unkine oturtuyor.
+
+## Kural 52 — Zincirli atama iki hedefi eş zamanlı canlı tutar
+
+Aynı değeri iki ayrı global'e yazarken yazım biçimi **yazmaç dağıtımını
+değiştiriyor**:
+
+```c
+a = 0;              /* iki ayri ifade */
+b = 0;
+```
+Yerel dağıtıcı her adresi kendi yazımının hemen öncesinde **aynı** yazmaca
+koyar ve sırayla kullanır:
+`ldr r0,=a / movs r1,#0 / strb r1,[r0] / ldr r0,=b / strb r1,[r0]`
+
+```c
+b = (a = 0);        /* tek zincir */
+```
+Tek bir sıfır değeri üretilir, **iki adres eş zamanlı canlı** olur:
+`ldr r2,=b / ldr r1,=a / movs r0,#0 / strb r0,[r1] / strb r0,[r2]`
+
+Ölçüm — `ResetLinkSession` @ 0x08066144: ayrı ifadelerle 8 bayt fark,
+zincirle **byte-matching**.
+
+### Bu, daha önce yazdığım bir yargıyı çürütüyor
+
+`dump_alloc` iki adres sabitini ayrı pseudo olarak, ikisini de yerel
+dağıtıcıda ve ikisini de aynı yazmaçta gösterdiğinde "global yarışa
+girmiyorlar, kural 50'nin önceliği işlemiyor, kaynak kolu yok" diye park
+etmiştim. **Yanlıştı.** Kol var; teşhis aracı onu göstermiyor çünkü
+dağıtım tablosu *sonucu* gösteriyor, ifadenin RTL'de kaç değer ürettiğini
+değil. Yerel dağıtıcıda buluşan iki pseudo gördüğünde park etme; önce
+ifadeyi birleştirmeyi dene.
+
+### Nasıl bulundu
+
+Permuter (`build/permuter/ResetLinkSession`, temel skor 230, ~560
+yinelemede skor 0). Kural 44'ün öngördüğü şey: elle taramanın kapatamadığı
+küçük farklarda permuter **mekanizmayı** buluyor. Buradaki mekanizma tek
+satırlık ve genellenebilir olduğu için ayrı bir kural oldu.

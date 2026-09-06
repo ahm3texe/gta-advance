@@ -420,7 +420,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08065538,IsSlotValueInRange,src/world/slot_range_query.c,48,48,yes
 0x08065568,LookupRomByte,src/world/slot_range_query.c,12,12,yes
 0x08065650,ShutdownAndReset,src/world/shutdown_reset.c,180,164,no
-0x08066144,ResetLinkSession,src/world/link_session_reset.c,200,200,no
+0x08066144,ResetLinkSession,src/world/link_session_reset.c,200,200,yes
 0x080663E8,ShutdownLinkSession,src/world/link_session.c,44,44,yes
 0x08066414,FadeOutIfLinkState3,src/world/link_session.c,64,64,yes
 0x08066454,WaitLinkSettle,src/world/link_session.c,80,80,yes

@@ -8,12 +8,12 @@ baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make sta
 | Ölçüm | Değer |
 |---|---:|
 | Fonksiyon haritası | 1934 fonksiyon / 454072 bayt |
-| İnsan incelemesi (`documented+`) | 493 / 1934 |
-| Byte-matching | 444 fonksiyon / 36078 bayt (%7.95) |
-| C kaynağı | 455 toplam / 431 matching |
-| Kaynaktan doğrulanan ROM | 17592 bayt |
+| İnsan incelemesi (`documented+`) | 494 / 1934 |
+| Byte-matching | 445 fonksiyon / 36278 bayt (%7.99) |
+| C kaynağı | 455 toplam / 432 matching |
+| Kaynaktan doğrulanan ROM | 17792 bayt |
 | libc doğrulaması | 448 bayt |
-| Toplam doğrulanmış ROM alanı | 18040 bayt |
+| Toplam doğrulanmış ROM alanı | 18240 bayt |
 | Açık sınır borcu | 0 kısa sınır + 0 ARM incelemesi + 0 aşırı büyüme |
 
 ## Şu anki tek aktif iş
