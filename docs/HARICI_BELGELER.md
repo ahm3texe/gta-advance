@@ -19,7 +19,7 @@ Belgelerdeki banka/imza/kişisel bilgiler hiçbir yere aktarılmadı.
 **Link kablosu kodu ROM'da var.** Belge 2 oyunculu link oyununu planlıyor.
 Seri yazmaç sabitleri havuzda bulundu: `SIOCNT` (0x04000128) altı yerde,
 `SIODATA32` (0x04000120) ve `RCNT` (0x04000134) birer yerde. Taşıyan
-fonksiyonlar: FUN_080657d8 (2374 B), FUN_08066904, FUN_0806660c,
+fonksiyonlar: FUN_080657d8 (2374 B), SerialIrqHandler, FUN_0806660c,
 InitLinkBlock, ServiceLinkFrame, ResetLinkHardware. Toplam ~3,4 KB, hiçbiri yazılmamış.
 
 **Giriş okuma iki fonksiyonda.** `KEYINPUT` (0x04000130) havuzda yedi kez;

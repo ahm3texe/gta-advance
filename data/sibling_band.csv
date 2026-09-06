@@ -76,7 +76,7 @@ address,name,size,outcome,source,evidence
 0x08064DFC,FUN_08064dfc,294,parked,,ROM statik triyaj: 4 cagri / 16 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x08066568,InitLinkBlock,164,matching,src/world/link_init.c,ROM byte-matching; data/functions.csv
 0x0806660C,FUN_0806660c,304,parked,,ROM statik triyaj: 1 cagri / 13 kosullu dal / 9 literal; RAM tur blogu gerekli
-0x08066904,FUN_08066904,316,parked,,ROM statik triyaj: 0 cagri / 14 kosullu dal / 12 literal; RAM tur blogu gerekli
+0x08066904,SerialIrqHandler,316,parked,,ROM statik triyaj: 0 cagri / 14 kosullu dal / 12 literal; RAM tur blogu gerekli
 0x08066AA8,BuildLinkReport,152,matching,src/world/link_report.c,ROM byte-matching; data/functions.csv
 0x08067014,FUN_08067014,368,parked,,ROM statik triyaj: 1 cagri / 25 kosullu dal / 1 literal; karsilastirma agaci C denemesi gerekli
 0x08067404,FUN_08067404,172,parked,,ROM statik triyaj: 0 cagri / 1 kosullu dal / 1 literal; 36 girisli atlama tablosu rekonstruksiyonu gerekli

@@ -866,3 +866,24 @@ bildirildiği için gözden kaçması kolay.
 
 Elenen yazımlar: yalnız bitfield'lı struct + `alan == 19` (316 bayt, 24
 eksik); `> 20` düz `int` sabitiyle (`ble`, `bls` değil).
+
+## Kural 57 — SIO yazmaçlarında `volatile` seçici kullanılır
+
+`SerialIrqHandler` @ 0x08066904 ölçümü. Aynı adres için üç ayrı görünüm
+gerekiyor ve hangisinin `volatile` olacağı ROM'dan okunur:
+
+| erişim | doğru biçim | yanlış biçimin bedeli |
+|---|---|---|
+| SIOMLT_SEND yazımı | **volatile değil** | volatile görünüm yazımdan önce ölü bir `ldrh` üretiyor |
+| İlk SIOCNT okuması | **volatile değil** | volatile fazladan `ldrh` + `adds` çifti, +4 bayt |
+| `gBiosIrqFlags` güncellemesi | **volatile** (`*(volatile u16 *)&gBiosIrqFlags`) | volatile olmayan extern sabiti bellekten önce yükleyip o bloğun yazmaç dağıtımını bozuyor |
+| REG_IME | **volatile** | volatile olmayan yazım eşleşmeyi kırıyor |
+
+Ayrıca SIOMULTI kopyası **4 hizalı** olmalı: düz `u16 data[4]` 2 hizalı
+ve agbcc `memcpy` çağrısı üretiyor; `u32 word[2]` içeren bir `union`
+ROM'un `ldr/ldr/str/str` çiftini veriyor.
+
+Elenen yazımlar (etkisi yok): sayacı u16/u32/s32, önce bildirmek, iç içe
+`if`, tanımda ilklemek, `|=`, ters operand sırası, yerele almak, `(u16)`
+daraltma. Sabiti `+` ile eklemek ve IME'yi volatile'sız yazmak eşleşmeyi
+**bozuyor**.
