@@ -13,21 +13,13 @@
 
 #include "gba_types.h"
 #include "gba_io.h"
+#include "comm_block.h"
 
 #define IE_KEEP_MASK   0xFF3F   /* Timer3 ve seri disindaki her sey */
 #define IF_ACK_LINK    0xC0     /* Timer3 | seri */
 #define SIOCNT_RESET   0x2003
 #define TM3_RELOAD     0x0000ABFB
 
-/* src/world/comm_flag.c ile ayni tur: iki dosya ayni sembolu farkli
- * struct'la bildirirse tutarlilik denetimi hakli olarak duruyor. */
-typedef struct CommBlock {
-    u8  byte0;
-    u8  pad01[5];
-    u8  byte6;                  /* +0x06 */
-} CommBlock;
-
-extern CommBlock *gRam02036338;
 
 /* 0x08066A54 */
 void ResetLinkHardware(void)
@@ -40,5 +32,5 @@ void ResetLinkHardware(void)
     REG_TM3CNT = TM3_RELOAD;
     REG_IF = IF_ACK_LINK;
 
-    gRam02036338->byte6 = 0;
+    gRam02036338->ready06 = 0;
 }

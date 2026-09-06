@@ -1674,11 +1674,11 @@ address,name,size,status,module,notes
 0x08064F24,FUN_08064f24,524,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08065130,FUN_08065130,176,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080651E0,FUN_080651e0,408,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08065378,FUN_08065378,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080653D4,FUN_080653d4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08065378,ResetActorTracking,92,matching,world,"Izlemeyi sifirlar: baslangic konumunu kopyalar, dort birikimi siler; src/world/actor_tracking.c"
+0x080653D4,AccumulateActorMotion,104,matching,world,En buyuk z farkini ve uc eksenin mutlak hizlarini biriktirir; src/world/actor_tracking.c
 0x0806543C,IsOwnerMarked,32,matching,world,Oyuncu yuvasinin +0x25 bayragini sorgular; src/world/player_slot_query.c
 0x0806545C,IsEntityEngaged,62,matching,world,Varligin +0x14 blogundaki tur bayti veya yuva bayragi; src/world/player_slot_query.c
-0x0806549C,FUN_0806549c,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806549C,ScaleByDistanceBand,124,matching,world,Anahtari sekiz banda ayirip 8.8 katsayiyla olcekler; src/world/scale_by_band.c
 0x08065518,SetOwnerMark,32,matching,world,Varligin sahibinin yuvasina +0x25 isaretini yazar; src/world/slot_range_query.c
 0x08065538,IsSlotValueInRange,48,matching,world,A yuvasindaki +0x4C ust yarim kelimesi verilen aralikta mi; src/world/slot_range_query.c
 0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
@@ -1696,9 +1696,9 @@ address,name,size,status,module,notes
 0x080664C4,IsSessionActive,44,matching,world,Duraklatma; src/world/pause_helpers.c
 0x080664F0,MaybeAdvance,42,matching,world,Duraklatma; src/world/maybe_advance.c
 0x08066540,ResetSessionFlags,40,matching,world,C kaynagindan byte-matching (MATCH-014 toplu kume 4)
-0x08066568,FUN_08066568,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066568,InitLinkBlock,164,matching,world,Baglanti blogunu sifirlayip SIO kaydini ve tampon isaretcilerini kurar; src/world/link_init.c
 0x0806660C,FUN_0806660c,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806673C,FUN_0806673c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806673C,BuildLinkPacket,92,candidate,world,"Gonderilecek paketi kurar ve saglama toplamini yazar. PARK: 92/92 boyut, 20 bayt fark; agbcc global adres icin iki ayri pseudo uretiyor, ROM tek canli aralik kullaniyor; src/world/link_packet.c"
 0x08066798,FUN_08066798,212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806686C,FUN_0806686c,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066904,FUN_08066904,316,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

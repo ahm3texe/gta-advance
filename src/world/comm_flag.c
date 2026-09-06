@@ -8,14 +8,8 @@
  */
 
 #include "gba_types.h"
+#include "comm_block.h"
 
-typedef struct CommBlock {
-    u8  byte0;
-    u8  pad01[5];
-    u8  byte6;                  /* +0x06 */
-} CommBlock;
-
-extern CommBlock *gRam02036338;
 
 /* 0x08066A40 */
 void MaybeSetCommByte6(void)
@@ -24,5 +18,5 @@ void MaybeSetCommByte6(void)
 
     b = gRam02036338;
     if (b->byte0 != 0)
-        b->byte6 = 1;
+        b->ready06 = 1;
 }

@@ -411,8 +411,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x080646F8,GetGlyphCell,src/text/glyph_table_access.c,44,44,yes
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
+0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
+0x080653D4,AccumulateActorMotion,src/world/actor_tracking.c,104,104,yes
 0x0806543C,IsOwnerMarked,src/world/player_slot_query.c,32,32,yes
 0x0806545C,IsEntityEngaged,src/world/player_slot_query.c,62,62,yes
+0x0806549C,ScaleByDistanceBand,src/world/scale_by_band.c,124,124,yes
 0x08065518,SetOwnerMark,src/world/slot_range_query.c,32,32,yes
 0x08065538,IsSlotValueInRange,src/world/slot_range_query.c,48,48,yes
 0x08065568,LookupRomByte,src/world/slot_range_query.c,12,12,yes
@@ -424,6 +427,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,42,42,yes
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
+0x08066568,InitLinkBlock,src/world/link_init.c,164,164,yes
+0x0806673C,BuildLinkPacket,src/world/link_packet.c,92,92,no
 0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,20,20,yes
 0x08066A54,ResetLinkHardware,src/world/link_hw_reset.c,84,84,yes
 0x08066AA8,BuildLinkReport,src/world/link_report.c,152,152,yes

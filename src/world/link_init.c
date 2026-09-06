@@ -1,0 +1,56 @@
+/* Baglanti blogunu kurar — 0x08066568-0x0806660B
+ *
+ * Bloğu 464 bayt sifirliyor (CpuSet sabit kaynakli 116 kelime), seri
+ * kesmeyi kapatip RCNT/SIOCNT'yi cok oyunculu kipe aliyor, blok icindeki
+ * bes tamponun isaretcilerini yaziyor ve cikista seri kesmeyi aciyor.
+ *
+ * IE yazimlari IME kapaliyken; sira ROM'dan okundu. Sabit 1 iki kez
+ * kullanildigi icin agbcc onu yuksek yazmacta (r8) tutuyor.
+ *
+ * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Dogrulama:  make c-match FILE=src/world/link_init.c
+ */
+
+#include "gba_types.h"
+#include "gba_io.h"
+#include "comm_block.h"
+
+#define CPUSET_FILL_WORDS  0x05000074   /* sabit kaynak + 32 bit + 116 kelime */
+#define IE_KEEP_MASK       0xFF3F
+#define IE_SERIAL          0x0080
+#define RCNT_SIO           0x0000
+#define SIOCNT_MULTI       0x2000
+#define SIOCNT_ENABLE      0x4003
+
+extern void CpuSet(const void *src, void *dst, u32 control);
+
+/* 0x08066568 */
+void InitLinkBlock(CommBlock *block)
+{
+    s32 zero;
+
+    gRam02036338 = block;
+
+    zero = 0;
+    CpuSet(&zero, block, CPUSET_FILL_WORDS);
+
+    REG_IME = 0;
+    REG_IE = REG_IE & IE_KEEP_MASK;
+    REG_IME = 1;
+
+    REG_RCNT   = RCNT_SIO;
+    REG_SIOCNT = SIOCNT_MULTI;
+    REG_SIOCNT = REG_SIOCNT | SIOCNT_ENABLE;
+
+    gRam02036338->sendLen   = 12;
+    gRam02036338->recvLen   = 12;
+    gRam02036338->packetPtr = &gRam02036338->packet;
+    gRam02036338->bufBPtr   = gRam02036338->bufB;
+    gRam02036338->bufCPtr   = gRam02036338->bufC;
+    gRam02036338->bufDPtr   = gRam02036338->bufD;
+    gRam02036338->bufEPtr   = gRam02036338->bufE;
+
+    REG_IME = 0;
+    REG_IE = REG_IE | IE_SERIAL;
+    REG_IME = 1;
+}
