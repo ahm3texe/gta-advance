@@ -14,26 +14,46 @@
  * isaretli bir sayac. ALAN TIPI YINE DE u8: ROM `ldrb` ile okuyor; s8
  * yapinca derleyici `ldrsb` + `asrs #4`e katliyor (fark +6).
  *
- * DURUM: PARK, 126/126 boyut TUTUYOR, fark 7  (bu oturumda 41 -> 7).
- * Kalan 4 komut: (a) `ldrh r2,[r4,#8]`, ROM'da `adds r2,r5,#0`  [2 bayt]
- *                (b) found blogundaki ands/orrs/strb yon farki   [5 bayt]
+ * DURUM: BYTE-MATCHING, 126/126.  (Onceki oturum 41 -> 7'ye indirmisti;
+ * bu oturumda kalan 7 bayt iki olcumle kapandi -- asagida (0) ve (1).)
  *
  * ----------------------------------------------------------------------
- * BU OTURUMDA OLCULEN UC MEKANIZMA (hepsi -da dokumleriyle dogrulandi)
+ * OLCULEN MEKANIZMALAR (hepsi -da dokumleriyle / diff_function ile dogrulandi)
  * ----------------------------------------------------------------------
- * 1) r5/r6 TAKASI -- `InsertSorted(list, spare, spare->id)`
- *    ROM r6=list r5=id, bizde tersiydi (~14 bayt). Sebep: global dagitici
- *    onceligi floor_log2(refs)*refs/omur; list (5 ref / 43 insn) = 2325,
- *    id (5 / 44) = 2272. list ONCE isleniyor ve find_reg EN KUCUK bos
+ * 0) found blogu: BIRIKTIRICIYI SABITE KUR, KAYMAYI ONCE HESAPLA  [5 bayt]
+ *    ROM: `movs r2,#15 / ands r2,r0 / orrs r2,r1 / strb r2,[r3,#11]` --
+ *    yani iki adresli `andsi3`in hedefi SABITIN yazmaci, k2'nin degil.
+ *    `(k2 & 15) | ...` gibi her IFADE yaziminda regmove hedefi k2'nin
+ *    pseudo'suna bagliyor (onceki oturumun 20+ denemesi hep bunda takildi).
+ *    KALDIRAC: sabiti bir yerele atayip UZERINE bileske atama yapmak --
+ *        m = 15;  m &= k2;  m |= t;  cur->kind = m;
+ *    Boylece expand daha en basta `(set m (and m k2))` uretiyor; regmove'un
+ *    ceviresek bir seyi kalmiyor. Bu tek basina yonu duzeltti (7 -> ...),
+ *    AMA sirayi bozdu: `movs r2,#15 / ands r2,r0` kaymadan ONCE cikti.
+ *    Ikinci yari: `(hi + 1) << 4` AYRI bir deyimle (`t`) once hesaplanmali.
+ *    Ikisi birlikte ROM'un komut sirasini aynen veriyor (fark 12 -> 4).
+ *
+ * 1) r5/r6 TAKASI -- COZUM: DONGUYU GERCEK do/while YAP  [4 bayt]
+ *    ROM r6=list r5=id; duz yazimda tersiydi (~10 bayt). Sebep: global
+ *    dagitici onceligi floor_log2(refs)*refs/omur; list 5 ref/45 = 0.2222,
+ *    id 5 ref/46 = 0.2174. list ONCE isleniyor ve find_reg EN KUCUK bos
  *    yazmaci (r5) veriyor. id'nin omru list'inkinden HER ZAMAN 1 fazla:
  *    prologda list once kopyalaniyor (def -1), cagri argumanlari ise her
- *    zaman r0,r1,r2 sirasinda uretiliyor (son kullanim +2). Yani duz
- *    yazimda bu esik ASLA asilamaz.
- *    COZUM: 3. argumani BELLEKTEN oku. gcc'nin expand_call'i MEM olan
- *    yazmac argumanlarini `copy_to_mode_reg` ile ONCEDEN hesapliyor;
- *    boylece id'nin son kullanimi `strh spare->id` oluyor: id 5 ref/44
- *    yerine 4 ref/26 (oncelik 3076) oluyor, id ONCE isleniyor, r5'i o
- *    aliyor. BEDELI: fazladan `ldrh r2,[r4,#8]` (2 bayt). Net +12.
+ *    zaman r0,r1,r2 sirasinda uretiliyor (son kullanim +2).
+ *    KALDIRAC (yeni, genel): tarama dongusu `goto scan` ile yazilinca gcc
+ *    NOTE_INSN_LOOP_BEG/END NOTU URETMIYOR, dolayisiyla flow.c'nin
+ *    `REG_N_REFS += loop_depth` agirliklandirmasi calismiyor ve dongu ici
+ *    referanslar 1 sayiliyor. Ayni govde giris korumali `do { } while` ile
+ *    yazilinca dongu notlari cikiyor: id'nin dongudeki IKI `cmp` referansi
+ *    agirlik kazaniyor (5 -> 7), floor_log2(7)*7/46 = 0.304 ile list'in
+ *    0.2222'sini geciyor, id ONCE isleniyor ve r5'i aliyor.
+ *    list dongu icinde HIC gecmedigi icin onun agirligi degismiyor --
+ *    esik bu yuzden asilabiliyor.
+ *    Bunun yan faydasi: 3. argumani artik BELLEKTEN okumaya gerek yok,
+ *    `InsertSorted(list, spare, id)` dogrudan `adds r2,r5,#0` veriyor
+ *    (onceki cozumun bedeli olan fazladan `ldrh r2,[r4,#8]` gitti).
+ *    NOT: dongu bicimi ROM'dan okundu -- giris korumali do/while; `while`
+ *    ya da `for` yazimi ust testi one alip dallanmayi tersine ceviriyor.
  *
  * 2) `movs r1,#2 / negs r1,r1` -- (u8) DARALTMASI
  *    Duz yazimda derleyici bunu `subs r1,#4` diye tek komuta indiriyordu;
@@ -61,10 +81,14 @@
  *   - `(k | 2) & ~1 & ~12` tek ifade: 122 bayt, ANDler birlesiyor.
  *   - `spare->slot = 0;` magazasini `| 16` ile `| 2` arasindan cikarmak:
  *     iki `orrs` tek `orrs #18`e katlaniyor. Yeri ROM'daki gibi kalmali.
- *   - InsertSorted 3. argumani `id` iken omru kisaltmanin BASKA yolu yok
- *     (arg kopyalari her zaman r0,r1,r2 sirasinda); `spare->slot = id`
- *     gibi fazladan referans da 46'ya cikariyor.
- *   - found blogundaki `ands r2,r0` yonu icin DENENEN VE ELENEN 20+ yazim:
+ *   - InsertSorted 3. argumanini `spare->id` yapip BELLEKTEN okumak:
+ *     r5/r6'yi duzeltiyor ama fazladan `ldrh r2,[r4,#8]` biraktigi icin
+ *     4 bayt fark kaliyor. (1)'deki dongu kaldiraci bunun yerini aldi.
+ *   - `id`nin omrunu kisaltmanin BASKA yolu yok (arg kopyalari her zaman
+ *     r0,r1,r2 sirasinda); `spare->slot = id` gibi fazladan referans da
+ *     omru 46'ya cikariyor.
+ *   - found blogundaki `ands r2,r0` yonu icin denenen ve elenen 20+ IFADE
+ *     yazimi (cozum ifade degil, BILESKE ATAMA -- bkz. (0)):
  *       `(k2&15) | ((hi+1)<<4)`, `(15&k2)`, `(m15&k2)` (m15 yerel; ilk ya
  *       da son bildirim, blok icinde/disinda atanmis), sonucu s32/u8 k3
  *       yereline alma, `hi+1`i ayri komuta bolme, kaymayi t degiskenine
@@ -75,9 +99,11 @@
  *     `(set (reg 81) (and (reg 29) (reg 80)))`, .regmove'da
  *     `(set (reg 29) (and (reg 29) (reg 80)))` -- operand sirasindan
  *     BAGIMSIZ olarak (m15 ile operandlari cevirince de ayni). ROM sabitin
- *     yazmacina bagliyor. Kaynak duzeyinde bu secimi ceviren kaldirac
- *     bulunamadi; sonraki denemede regmove'un hangi kosulu kacirdigina
- *     bakilmali (aday: `reg/v` kullanici degiskeni onceligi).
+ *     yazmacina bagliyor. Cozum regmove'u ikna etmek degil, ona hic is
+ *     birakmamak: `m = 15; m &= k2;` (bkz. (0)).
+ *   - `m |= (hi + 1) << 4;` tek deyimde: yon dogru ama sira ters
+ *     (`movs #15/ands` kaymadan once cikiyor, fark 12). Kaymayi ayri bir
+ *     `t` deyimine almak sart.
  *
  * Kardes dosyalar: nodelist_c3.c bu fonksiyonun imzasini zaten
  * bildiriyordu (`Node *FUN_080543d0(Node **head, s32 index)`), nodelist_b6.c
@@ -116,19 +142,23 @@ Node *FUN_080543d0(NodeList *list, s32 id)
     s32 cid;
     s32 hi;
     s32 k2;
+    s32 m;
+    s32 t;
 
     cur = list->head;
     spare = list->spare;
-    if (cur == 0) goto insert;
+    /* GERCEK dongu deyimi sart: `goto` ile yazilinca gcc dongu notu
+     * uretmiyor, `id`nin dongu ici iki referansi agirlik kazanmiyor ve
+     * r5 list'e gidiyor -- basliktaki (1). */
+    if (cur != 0) {
+        do {
+            cid = cur->id;
+            if (cid == id) goto found;
+            if (cid > id) break;
+            cur = cur->next;
+        } while (cur != 0);
+    }
 
-scan:
-    cid = cur->id;
-    if (cid == id) goto found;
-    if (cid > id) goto insert;
-    cur = cur->next;
-    if (cur != 0) goto scan;
-
-insert:
     if (spare->id != SPARE_ID) goto none;
 
     ListRemove(list, spare);
@@ -142,9 +172,7 @@ insert:
     k = k & ~1;
     k = k & ~12;
     spare->kind = k;
-    /* 3. arguman BELLEKTEN: id'nin omrunu kisaltip r5'i ona kaptiriyor,
-     * basliktaki (1). Deger `id` ile ayni, hemen ustte oraya yazildi. */
-    InsertSorted(list, spare, spare->id);
+    InsertSorted(list, spare, id);
     return spare;
 
     /* ROM bu govdeyi fonksiyonun SONUNDA tutuyor (`beq` ileri atliyor);
@@ -154,7 +182,15 @@ found:
      * cikip r2'ye dusuyordu; bolununce 12'ye inip ROM'un r0'ini aliyor. */
     k2 = cur->kind;
     hi = (s32)(k2 << 24) >> 28;
-    cur->kind = ((hi + 1) << 4) | (k2 & 15);   /* ROM once (hi+1)<<4 kuruyor */
+    /* Kayma ONCE ayri bir deyimde: ROM `adds #1 / lsls #4`i maskeden once
+     * kuruyor; tek ifadede yazilinca `movs #15 / ands` one geciyor. */
+    t = (hi + 1) << 4;
+    /* Sabiti yerele kurup UZERINE bileske atama: iki adresli `ands`in
+     * hedefi boylece sabitin yazmaci oluyor -- basliktaki (0). */
+    m = 15;
+    m &= k2;
+    m |= t;
+    cur->kind = m;
     return cur;
 
 none:

@@ -148,6 +148,64 @@
  * Yeni bir fikir denemeden once yukaridaki uc yolun sayilarini kontrol et;
  * onlari tekrarlamak zaman kaybi.
  *
+ * ================================================================
+ * 2026-09-06 -- ENGEL TAM SAYIYA INDIRILDI, ARAMA UZAYI KAPATILDI
+ * ================================================================
+ * Onceki tur "0.476 vs 0.519" diyordu; oncelik agbcc'de TAMSAYIYA kirpiliyor
+ * (global.c allocno_compare: pri = (int)(floor_log2(refs)*refs/omur * 10000),
+ * esitlikte KUCUK allocno kazanir).  Gercek sayilar:
+ *
+ *     control p29 : 5 ref / 21 omur -> 4761      <- kaybediyor
+ *     dma     p30 : 9 ref / 52 omur -> 5192
+ *
+ * control p29 < dma p30 oldugu icin ESITLIK BILE YETERDI; 431 puan eksik.
+ * Kazanmanin TUM yollari ve neden kapali olduklari:
+ *
+ *   (A) control 6 ref / omur<=23  -> 5217+.  6. referansin TEK kaynagi olu
+ *       okumanin control'a atanmasi; o da yuklemeyi r3'e dusuruyor.  ROM'un
+ *       kendi komut dizisinde control tam 5 kez geciyor (asr 1, orr 2,
+ *       iki store 2) -- bedava 6. referans FIZIKSEL OLARAK YOK.
+ *   (B) control 5 ref / omur<=19  -> 5263.  omur = tanim (orr/asr) ile
+ *       blok 3'teki store arasindaki RTL komut sayisi; ikisi de ROM'a cakili,
+ *       20 komut, kisaltilamaz.
+ *   (C) dma omur >= 57 -> 4736.  Olculdu: omur = 2 x (araliktaki RTL komut).
+ *       Tanim yerine gore KUANTUM 52/56/60/68/86 (bayt: 13/18/10/17/43) --
+ *       57..59 URETILEMIYOR, ve her adim `ldr r4,[pc]` komutunu ROM'daki
+ *       yerinden kaydiriyor.
+ *   (D) dma 8 ref -> 4615.  refs = tanim + 8 bellek erisimi; sekizinin de
+ *       ROM'da r4 tabanli olmasi zorunlu, hicbiri dusurulemez.
+ *   (E) dma'dan ONCE r3'u kapatacak bir allocno.  Cakisma cizgesinde dma ile
+ *       cakisip control ile CAKISMAYAN yalnizca IKI pseudo var: p24 (height)
+ *       ve p48 (height<<6 gecicisi).  p48 zaten ROM'da r0 olmak ZORUNDA
+ *       (`lsls r0,r3,#6`).  p24: 2 ref / 28 omur -> 714; dma'yi gecmesi icin
+ *       8 referans gerekir, ROM'da 2 tane var.  Ucuncu aday yok.
+ *
+ * BU TURDA ELENEN YENI MEKANIZMALAR (hepsi olculdu):
+ *   - 243 varyantlik TAM capraz tarama: 3 control-tanim bicimi x 9 olu-okuma
+ *     hedefi (bare/control/x/y/height/row/col/dest/ime) x iki blok.  TABAN 1;
+ *     alti ayri bicim 1'de plato yapiyor, hicbiri 0 vermiyor.
+ *   - RTL komutu EKLEYIP dma omrunu uzatma (reload'un sildigi kopya umuduyla):
+ *     dest2=dest, fp=&fill, dmb=dma, iki asamali kopya, bloklar arasi
+ *     ctl2=control -- ALTISI DA global dagitimdan ONCE yok ediliyor,
+ *     29 ve 30'un refs/omur degerleri BIREBIR ayni kaliyor (hepsi 13).
+ *   - `fill`i her bloga ayri kapsamda bildirmek: 50.  control'u erken
+ *     hesaplamak: 34 (dma omru 52->44'e DUSUYOR, ters yon).
+ *   - Bildirim sirasini ters cevirmek (dma once): 34; ayrica esitlik
+ *     kazancini da kaybettiriyor.
+ *
+ * IKINCI BAGIMSIZ 2-BAYT YOLU BULUNDU (kayit icin): control'u YERINDE
+ * hesaplamak -- `control = height << 6; control >>= 1; control |= K;` --
+ * control'a 7 ref / 24 omur -> 5833 veriyor, DAGITIM ROM'UN AYNISI
+ * (control r3, dma r4) ve HER IKI olu okuma da `ldr r0` cikiyor.  Tek kusur
+ * kaydirmanin yerinde olmasi (`lsls r3,r3,#6` / `asrs r3,r3,#1`).  Ara
+ * degeri ayiran her bicim (f2/f3/f8/f9/f14/f16/f19 denendi) refs'i 5'e
+ * dusurup sirayi bozuyor.  Yani: 6+ referans ancak YERINDE kaydirmayla,
+ * dogru kaydirma ancak 5 referansla elde ediliyor -- ikisi ayni anda yok.
+ *
+ * Bu fonksiyon icin kaynak-duzeyi arama uzayi TUKENMISTIR.  Yeni bir sey
+ * denenecekse once (A)-(E) sayilarini yeniden uret; hepsi tek komutla
+ * olculebiliyor.
+ *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
  * Teshis:     python3 tools/dump_alloc.py src/text/clear_text_area.c \

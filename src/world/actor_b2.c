@@ -50,9 +50,9 @@ extern void FUN_0803c400(Entity *entity);
 void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
 {
     u32 value;
-    Owner *owner;
     u32 flags;
-    u32 mask;
+    Link *lnk;
+    Link *volatile *slotp;
 
     if (id == 0x7fff) return;
     if (self->rank < rank && self->state != 2) return;
@@ -60,10 +60,14 @@ void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
 
     {
         u32 t;
-        if (self->table != 0 && id > 0x3fff)
-            t = self->table[id - 0x4000];
-        else
+        if (self->table != 0) {
+            if (id > 0x3fff)
+                t = self->table[id - 0x4000];
+            else
+                t = id;
+        } else {
             t = id;
+        }
         value = t;
     }
 
@@ -84,30 +88,34 @@ void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
     case 12:
     case 13:
     case 15:
-        if (self->link == 0) return;
-        flags = self->link->flags;
+        lnk = self->link;
+        slotp = &self->link;
+        if (lnk == 0) return;
+        flags = lnk->flags;
         if ((flags & 0x80) == 0) {
             if ((flags & 1) == 0) return;
             if ((flags & 0x800) != 0) return;
-            if (self->link->holder->kind == 2) return;
+            if (lnk->holder->kind == 2) return;
         }
-        owner = self->link->owner;
-        mask = 0x3f;
-        mask &= owner->mode;
-        owner->mode = mask | 0x80;
+        {
+            Owner *own = (*slotp)->owner;
+            own->mode = (own->mode & 0x3f) | 0x80;
+        }
         break;
     case 16:
-        if (self->link == 0) return;
-        flags = self->link->flags;
+        lnk = self->link;
+        slotp = &self->link;
+        if (lnk == 0) return;
+        flags = lnk->flags;
         if ((flags & 0x80) == 0) {
             if ((flags & 1) == 0) return;
             if ((flags & 0x800) != 0) return;
-            if (self->link->holder->kind == 2) return;
+            if (lnk->holder->kind == 2) return;
         }
-        owner = self->link->owner;
-        mask = 0x3f;
-        mask &= owner->mode;
-        owner->mode = mask | 0x40;
+        {
+            Owner *own = (*slotp)->owner;
+            own->mode = (own->mode & 0x3f) | 0x40;
+        }
         break;
     }
 }
