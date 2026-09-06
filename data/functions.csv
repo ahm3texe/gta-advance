@@ -1683,10 +1683,10 @@ address,name,size,status,module,notes
 0x08065538,IsSlotValueInRange,48,matching,world,A yuvasindaki +0x4C ust yarim kelimesi verilen aralikta mi; src/world/slot_range_query.c
 0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
 0x08065574,FUN_08065574,220,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08065650,FUN_08065650,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08065650,ShutdownAndReset,164,candidate,world,"Dort DMA kanalini kapatip ekran/kesme yazmaclarini siler ve BIOS yumusak sifirlamasini cagirir. PARK: 180/180 boyut, 139 bayt fark, 73/89 komut ayni; sifir sabiti ROM'da r5'te uzun omurlu, bizde yerel kisa omurlu; src/world/shutdown_reset.c"
 0x080656F4,FUN_080656f4,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080657D8,FUN_080657d8,2374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı
-0x08066144,FUN_08066144,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066144,ResetLinkSession,200,candidate,world,"Baglanti oturumunu bastan kurar: blok kurulumu, sekiz tampon Memset, durum alanlari. PARK: 200/200 boyut, 8 bayt fark; iki adres sabiti yerel dagiticida ayni yazmaci paylasiyor, ROM ikisini esZamanli tutuyor; src/world/link_session_reset.c"
 0x0806620C,FUN_0806620c,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080663E8,ShutdownLinkSession,44,matching,world,Surucuyu 15 kare 2 koduyla adimlayip oturumu kapatir; src/world/link_session.c
 0x08066414,FadeOutIfLinkState3,64,matching,world,Durum 3 ise ekrani karartip 60 kare bekler; src/world/link_session.c

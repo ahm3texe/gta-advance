@@ -55,6 +55,29 @@ typedef struct {
  * bellekten once yukluyor ve ROM'dan sapiyor. */
 extern u16 gBiosIrqFlags;   /* 0x03007FF8 */
 
+/* DMA kanallari, denetim alani u16 olarak gorulen bicim.
+ *
+ * gba_io.h'deki DmaChannel denetimi tek u32 olarak yaziyor (DMA3 doldurma
+ * icin dogru bicim). Kanal kapatma yolu ise YALNIZ ust yarim kelimeyi
+ * maskeliyor, o yuzden ayri bir gorunum gerekiyor. ROM taban olarak
+ * kaynagi (SAD) tutup +10 ofsetiyle yaziyor; struct bu yerlesimi veriyor. */
+typedef struct DmaRegs {
+    const void *src;                /* +0x00 */
+    void       *dst;                /* +0x04 */
+    u16         count;              /* +0x08 */
+    u16         control;            /* +0x0A */
+} DmaRegs;
+
+#define REG_DMA0 (*(volatile DmaRegs *)0x040000B0)
+#define REG_DMA1 (*(volatile DmaRegs *)0x040000BC)
+#define REG_DMA2 (*(volatile DmaRegs *)0x040000C8)
+#define REG_DMA3H (*(volatile DmaRegs *)0x040000D4)
+
+#define REG_BG0CNT   (*(u16 *)0x04000008)
+#define REG_BG1CNT   (*(u16 *)0x0400000A)
+#define REG_BG2CNT   (*(u16 *)0x0400000C)
+#define REG_BG3CNT   (*(u16 *)0x0400000E)
+
 #define EWRAM_BASE 0x02000000
 #define IWRAM_BASE 0x03000000
 #define VRAM_BASE  0x06000000

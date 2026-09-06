@@ -1,10 +1,16 @@
 address,size,name,source,status,notes
+0x02000100,32,gRam02000100,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
+0x02000140,32,gRam02000140,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
 0x02000224,4,gRam02000224,decomp,provisional,Referenced by a block queued for matching; role unknown
+0x02000230,64,gRam02000230,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
+0x020003C0,32,gRam020003C0,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
 0x020003E4,1,gCartFlag,decomp,verified,"0x080336EC/2C tarafindan test edilen bayrak (=1 iken islem yapiliyor)  IZLEME: kayit kontrolunde f684te 0->1, yeni oyunda f1066da 1->0, bolum yuklenince f1101de 0->1."
+0x02000400,32,gRam02000400,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000420,64,gRam02000420,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
 0x0200048C,4,gRam0200048C,decomp,provisional,u16 sayac; 0x080664F0 kontrolu
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
@@ -22,6 +28,7 @@ address,size,name,source,status,notes
 0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
 0x02000D50,10,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager; +8 ve +9 SaveBufferCopy8To9 tarafindan kullaniliyor (byte-matching kanit), yani boyut en az 10"
 0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
+0x02000E80,32,gRam02000E80,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
 0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
 0x02000EBC,4,gPostFrameState,decomp,provisional,"State written after the frame completes  IZLEME (oturum 7): f25741de 0 -> 1, arac surerken (A basili).  PROVISIONAL BIRAKILDI -- TEK GOZLEM: yalnizca bir kez 0->1 goruldu, davranis kalibi cikarilamadi."
@@ -50,6 +57,7 @@ address,size,name,source,status,notes
 0x02001440,8,gRam02001440,decomp,provisional,"FUN_08003454 icinde {kare tablosu isaretcisi, indeks} ciftini tutuyor: +0x00 8 baytlik girislerden olusan tablonun tabani, +0x04 gecerli indeks. Girisin ilk kelimesi LZ77 sikistirilmis karo verisi, ikinci kelimesi (varsa) palet. Ilk kelime 0 olunca indeks sifirlaniyor."
 0x02001450,4,gRam02001450,decomp,provisional,FUN_08003454 icinde LZ77UnCompWram hedefi ve ardindan DMA3 kaynagi olarak kullanilan tampon. Boyut DOGRULANMADI; yalnizca tabani biliniyor.
 0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
+0x0200F280,464,gLinkBlock,decomp,provisional,ROM: 0x08066144 bunu InitLinkBlock ile 464 bayt sifirlayip kuruyor; gRam02036338 buna isaret ediyor
 0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
 0x02010F48,4,gRam02010F48,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
@@ -60,6 +68,7 @@ address,size,name,source,status,notes
 0x02011030,114,gRam02011030,decomp,verified,"+12/+16 ikili koordinat cifti, +72 ayri kelime; ayrica +0x30/+0x34/+0x38 ReadTriple tarafindan okunuyor (byte-matching kanit); +0x71 ClearCoordByte71 tarafindan yaziliyor (byte-matching kanit)  IZLEME (oturum 6): +0x0C alaninin dusuk bayti olumde temizlendi (0x1000030 -> 0x1000000). Bu blok UpdateFocusPointin (0x0800A9E4) okudugu CoordBlock."
 0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
 0x020110B0,4,gRam020110B0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
+0x020110B8,4,gRam020110B8,decomp,provisional,u32; 0x08066144 oturum kurulumunda sifirliyor
 0x020110C0,4,gRam020110C0,decomp,provisional,"FUN_08052750 icinde FUN_0800c804 cagrisina ILK arguman olarak yalnizca ADRESI geciyor; uye erisimi yok, bu yuzden ic yapisi BILINMIYOR. En yakin kayitli komsu 0x020110AC (gRam020110AC) ama ROM ayri bir havuz sabiti kullaniyor, yani ayri nesne."
 0x02014ED0,0,gBufferBase02014ED0,decomp,provisional,FUN_080100D0 iki ayirma cagrisina ayni taban adresini geciyor; boyut ve sahiplik bilinmiyor.
 0x02015650,0,gRam02015650,decomp,provisional,FUN_0800DCB4 icinde giris tablosu olarak kullaniliyor. Boyut BILINMIYOR (0); yalnizca tabani olculdu. src/core/list_b2.c basliginda ayrintisi var.
@@ -177,7 +186,10 @@ address,size,name,source,status,notes
 0x02036314,4,gGlyphWidths,decomp,provisional,"Pointer to the per-glyph width table, indexed from space (0x20)"
 0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C  IZLEME: metin cizimiyle degisiyor; diyalog kutusunda (f1319) ve A basimlariyla (f1384/f1402) oynuyor.  PROVISIONAL BIRAKILDI -- AD SUPHELI: degerler (160/192/128/240/242) font indeksinden cok genislik/konum gibi. Izleme metinle iliskiyi kanitliyor, ADI kanitlamiyor."
 0x0203631C,4,gHalfLineSpacing,decomp,verified,"Nonzero halves the line height used by the text drawing helpers  IZLEME: diyalog kutusu acilinca 0->1 (f1319), kapaninca 1->0 (f2303). Metin kutusuna bagli."
+0x02036320,1,gRam02036320,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
 0x02036328,4,gRam02036328,decomp,provisional,Ek bayrak; 0x080664C4 kontrolu
+0x0203632C,1,gRam0203632C,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
+0x02036330,8,gRam02036330,decomp,provisional,"Boyut 8 OLCULDU (Memset cagrisi, 0x08066144). +0x02 alani u16 olarak sifirlaniyor"
 0x02036338,4,gRam02036338,decomp,provisional,"Iletisim blogu isaretcisi; hedef +0 bayrak, +6 yaz"
 0x02036340,8,gDistanceAccum,decomp,provisional,"Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor  IZLEME: yuruyus baslamadan hemen once f1783te aktif; mission_timer ile ayni pencerede.  PROVISIONAL BIRAKILDI -- AD SUPHELI: gerekcesi mission_timerin mesafe sayaci oldugu varsayimina dayaniyordu, o varsayim CURUTULDU."
 0x03000000,4,gFrameDelay,decomp,provisional,"IWRAM frame delay written each VBlank, clamped to five"

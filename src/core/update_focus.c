@@ -90,6 +90,7 @@
  */
 
 #include "gba_types.h"
+#include "game_state.h"
 
 typedef struct Vec2 {
     s32 x;                      /* +0x00 */
@@ -117,13 +118,8 @@ typedef struct CoordBlock {
     u8  byte71;                 /* +0x71 */
 } CoordBlock;
 
-typedef struct GameState {
-    u8 pad00[12];
-    u8 flag;                    /* +0x0C */
-} GameState;
-
 extern CoordBlock gRam02011030;
-extern GameState  gGameState;
+
 extern Vec2       gFocusPoint;
 
 /* 0x0800A9E4 */
