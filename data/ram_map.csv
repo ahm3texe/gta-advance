@@ -88,6 +88,7 @@ address,size,name,source,status,notes
 0x02025828,1,player_armor_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
 0x0202582A,1,player_health_copy,libretro_cheat,verified,"Possible HUD/game-state mirror  IZLEME (oturum 6): player_health ile AYNI KAREDE ayni degeri aldi, 25/25 gecis. Gercekten kopya."
 0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
+0x02026DF0,132,gRam02026DF0,decomp,provisional,"FUN_08030E10 icinde kullaniliyor; en az 0x84 bayt oldugu olculdu, ust siniri BILINMIYOR. src/world/area_cleanup_b1.c basliginda ayrintisi var."
 0x02026E80,4,gRam02026E80,decomp,provisional,0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok
 0x02026EF0,8,gFlagsB,decomp,provisional,8 girisli bayrak dizisi
 0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
@@ -124,7 +125,9 @@ address,size,name,source,status,notes
 0x02030D50,7680,gSlotArray,decomp,provisional,128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi
 0x02032B60,6656,gNodePoolA,decomp,provisional,"128 x 52 bayt dugum havuzu (+0 next, +4 prev, +8 u16 kimlik). 0x08054450 DMA ile sifirlayip gList02035A80e diziyor."
 0x02034560,4608,gNodePoolB,decomp,provisional,"64 x 72 bayt dugum havuzu, ayni baslik. 0x08054450 gNodeListHeade diziyor."
+0x02035760,0,gRam02035760,decomp,provisional,FUN_08053B44 icinde oturum blogu olarak kullaniliyor; ic yapisi ve boyutu BILINMIYOR (0). src/core/nodelist_b9.c basliginda ayrintisi var.
 0x02035780,12,gRam02035780,decomp,provisional,"FUN_08055D90 cagrisinda ilk arguman (byte-matching kanit)  OLCULDU(0x08054450): List2 basligi olarak geciyor (+0 bas, +4 son, +8 sayac)."
+0x020357E0,0,gRam020357E0,decomp,provisional,FUN_08053B44 icinde kullaniliyor; ic yapisi ve boyutu BILINMIYOR (0). src/core/nodelist_b9.c basliginda ayrintisi var.
 0x020357F0,640,gNodePoolC,decomp,provisional,"16 x 40 bayt dugum havuzu, ayni baslik. 0x08054450 gRam02035780e diziyor."
 0x02035A70,12,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik  OLCULDU(0x08054450): List2 basligi olarak geciyor (+0 bas, +4 son, +8 sayac)."
 0x02035A80,12,gList02035A80,decomp,provisional,"List2 basligi (+0 bas, +4 son, +8 sayac); gNodePoolAnin serbest listesi. gNodeListHeadin (0x02035A70) devami DEGIL, ayri nesne."
@@ -159,9 +162,12 @@ address,size,name,source,status,notes
 0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
 0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
+0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM dizisi: uc bos alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
+0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM dizisi: uc ozel alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
 0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). FUN_08025518 icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
+0x08D482E0,0,gAreaNames,decomp,provisional,"ROM alan adi tablosu. gAreaBank (0x08D49C00) +0x20 alani bu diziye isaret ediyor. Boyut BILINMIYOR (0). DIZI olarak bildirilmeli: src/core/nodelist_b9.c olcumune gore `extern const AreaName gAreaNames[];` gercek ARRAY_REF uretiyor, isaretci sabiti bicimi ROM ile ayni kodu vermiyor."
 0x08D49C00,0,gAreaBank,decomp,provisional,ROM: alan kayitlari bankasi; 0x08052C68 .entries alanindan yuruyor.
 0x08EC46D4,0,gTextTable,decomp,verified,"Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.  DOGRULANDI (oturum 7): dilim k = dil k, dogrudan. Ayni indeksin bes dilimdeki degeri okunarak sinandi (ENGLISH/ANGLAIS/INGLESE/ENGLISCH). Kodlama LATIN-1, ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde, 0xC1=A-akut."

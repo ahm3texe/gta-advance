@@ -63,17 +63,42 @@
  *    yuklemesinden ONCE cikariyor.
  *
  * KALAN 8 BAYT -- YAZMAC DAGITIMI (r0/r1 takasi)
- *   ROM: `ldr r0,=0x02015650 / ldr r1,[r0]`, bizde tam tersi.  Bu iki
- *   sozde-yazmac kapi blogunda dogup on-blokta oluyor; dagitici sirayi
- *   floor_log2(refs)*refs/omur ile veriyor (kural 50) ve bizde sayac
- *   pseudo'su once geliyor.  tools/dump_alloc.py: havuz pseudo'su
- *   p24 refs 3 / omur 10 / oncelik 0.300, sayac pseudo'su oncelik 0.500.
- *   Callee-saved dagitim (r4=i, r5=sub, r6=grid, r7=n) ROM ILE AYNI --
- *   yani sorun yalnizca gecici yazmac secimi.
- *   Denenip elenenler: 11 bildirim donusu, ic dongunun uc bicimi
- *   (do/while, while, `--k`), ROWB'nin uc yazimi, `i` tipi int/s32,
- *   kosulun `gp->count` hali (124 bayt), gp/grid rollerinin takasi
- *   (97 fark), iki ayri dongu-ici kopya (93 fark).
+ *   Komut dizisi ROM ile BIREBIR ayni; yalniz kapi blogundaki iki
+ *   sozde-yazmac ters dagitilmis:
+ *     ROM  : ldr r0,=0x02015650 / ldr r1,[r0] / cmp r4,r1 / bge
+ *            adds r6,r0,#0 / movs r0,#36 / adds r0,r0,r6 / mov ip,r0
+ *            adds r7,r1,#0
+ *     bizde: ayni dizi, r0 ile r1 yer degistirmis (8 baytin tamami bu).
+ *   tools/dump_alloc.py ile OLCULDU (kural 50):
+ *     havuz pseudo'su p24  refs 3 / omur 10 / oncelik 0.300 / sira 9 -> r1
+ *     sayac  pseudo'su p56 refs 3 / omur  6 / oncelik 0.500 / sira 8 -> r0
+ *   ROM'un sirasi icin havuz pseudo'sunun onceligi sayacinkini gecmeli:
+ *   ya refs 4 olmali (floor_log2 basamagi 1'den 2'ye ciksin) ya da omur
+ *   6'nin altina insin.  Callee-saved dagitim (r4=i, r5=sub, r6=grid,
+ *   r7=n) ve ip=cells0 ROM ILE AYNI -- yani sorun yalnizca kisa omurlu
+ *   gecici yazmac secimi; CLAUDE.md'nin "oraya kural 50 kaldiraci
+ *   uygulamak bos emek" uyarisinin sinirindayiz.
+ *
+ *   BU TURDA DENENIP ELENENLER (tekrar denemeyin)
+ *     - `cells0 = gp->cells[0];` deyimini `grid = gGrid;` ONUNE almak:
+ *       p24 refs 4 / oncelik 0.667 oluyor ve r0'i ALIYOR (kapi blogu
+ *       ROM ile birebir), ama bu sefer on-blok sirasi tersine donuyor
+ *       (cells0 kopyadan ONCE) -- yine 8 fark.  Iki sonuc birbirini
+ *       disliyor: cells0 kopyadan SONRA gelirse cse2 islenenini
+ *       `grid`e (p23) kanonikleyip p24'un dorduncu referansini
+ *       oldururyor.
+ *     - `.x` alanini `gGrid->touched[0].x` ile okumak: dagitim ROM ile
+ *       TAM AYNI oluyor (40 bayt ust uste) ama adres ikinci bir havuz
+ *       kelimesine katlaniyor -> 116 bayt.
+ *     - 11 bildirim donusu, on-blok deyimlerinin 6 permutasyonu x
+ *       2 baslangic sirasi, `while`/`for`/acik `do-while` (92 fark),
+ *       `i++`in govde ici uc konumu, dongu sinirinin 5 yazimi
+ *       (`gp->count` 124 bayt, `*(long *)&...` 8 fark, `+0`, `(s32)`),
+ *       gp'nin `u8 *` hali, gp/grid rollerinin 27 kombinasyonu,
+ *       `p` yerine iki ayri isaretci (128 bayt), adres okumalarinin
+ *       satir ici hali (116 bayt), cells0'in dongu disina alinmasi
+ *       (14 fark), extern sembol bicimi (ram_map'teki baska bir
+ *       sembolle probe edildi -- ham cast ile BIREBIR ayni kod).
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/core/list_b3.c

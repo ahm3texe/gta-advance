@@ -70,7 +70,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800DB80,ResetListHead,src/core/list_b1.c,104,104,yes
 0x0800DBE8,ListPushFront,src/world/list_ops.c,36,36,yes
 0x0800DC0C,ListRemove2,src/world/list_ops.c,56,56,yes
-0x0800DC44,FUN_0800dc44,src/core/list_b3.c,104,112,no
+0x0800DC44,FUN_0800dc44,src/core/list_b3.c,112,112,no
 0x0800DCB4,FUN_0800dcb4,src/core/list_b2.c,154,154,yes
 0x08010198,FUN_08010198,src/misc/empty_stubs.c,2,2,yes
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
@@ -113,7 +113,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08015598,FUN_08015598,src/world/actor_b3.c,544,544,yes
 0x080166E8,FUN_080166e8,src/world/actor_b1.c,128,128,yes
 0x08016768,ResetActor,src/world/actor_reset.c,160,160,yes
-0x0801686C,FUN_0801686c,src/world/actor_b2.c,288,292,no
+0x0801686C,FUN_0801686c,src/world/actor_b2.c,292,292,yes
 0x08017628,FUN_08017628,src/world/actor_state_step.c,1494,1536,no
 0x08019450,IsActorMarked,src/world/actor_control.c,20,20,yes
 0x08019464,NotifyActor,src/world/actor_control.c,44,44,yes
@@ -137,7 +137,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
 0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,12,12,yes
 0x08023938,PairIndex,src/world/pair_lookup.c,60,60,yes
-0x08023974,StepDecay,src/world/step_decay.c,156,152,no
+0x08023974,StepDecay,src/world/step_decay.c,152,152,yes
 0x08023A0C,ApplyThreshold,src/world/threshold.c,52,52,yes
 0x08023A40,ResetMeter,src/world/threshold.c,10,10,yes
 0x08023A4C,SetToMax,src/world/threshold.c,10,10,yes
@@ -172,6 +172,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08029244,FindEntryByQuad,src/world/entries_a4.c,86,86,yes
 0x0802929C,RefreshEntryTimerByQuad,src/world/entries_a3.c,80,80,yes
 0x08029390,FUN_08029390,src/world/entries_c1.c,104,104,yes
+0x080293F8,FUN_080293f8,src/world/entries_c2.c,186,186,yes
 0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
@@ -186,6 +187,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030C80,SetAreaFlag,src/world/area_flags.c,48,48,yes
 0x08030CB0,AreaFlagsNoop,src/world/area_flags.c,2,2,yes
 0x08030CB4,CleanupAreaTiles,src/world/area_cleanup.c,88,88,yes
+0x08030E10,FUN_08030e10,src/world/area_cleanup_b1.c,104,104,yes
 0x08030E78,FUN_08030e78,src/ui/hud_fields.c,40,40,yes
 0x08030EA0,SpinDelay,src/world/spin_delay.c,10,10,yes
 0x08030F28,FUN_08030f28,src/ui/hud_fields.c,40,40,yes
@@ -326,6 +328,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08053930,FUN_08053930,src/core/nodelist_a6.c,196,196,yes
 0x080539F4,ClearNodeSlotArrays,src/core/nodelist_d3.c,228,228,yes
 0x08053AD8,FUN_08053ad8,src/core/nodelist_c8.c,108,108,yes
+0x08053B44,FUN_08053b44,src/core/nodelist_b9.c,516,516,yes
 0x08053D48,StepNodeLists,src/core/nodelist_c4.c,176,176,yes
 0x08053DF8,FUN_08053df8,src/core/nodelist_a7.c,164,164,yes
 0x08053E9C,FUN_08053e9c,src/core/nodelist_a8.c,206,206,yes
