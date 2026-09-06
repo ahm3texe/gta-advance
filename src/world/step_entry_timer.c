@@ -1,4 +1,6 @@
-/* Giris zamanlayicisini ilerletme — 0x08028D44-0x08028DC3
+/* Giris zamanlayicisini ilerletme -- 0x08028D44-0x08028DC3
+ *
+ * ESLESTI: 128/128 bayt, fark 0.  make c-match TEMIZ, make c-review TEMIZ.
  *
  * Indisten 148 baytlik giris hesaplayip iki asamali ROM tablosundan
  * hedefi cozuyor; giris uygun durumdaysa ve +0x90 alani 3 ise isaretci
@@ -12,7 +14,7 @@
  * Zamanlayici sinamasi `lsls #16` + `cmp <= 0`, yani azaltilmis yarim soz
  * ISARETLI olarak sinaniyor.
  *
- * HENUZ ESLESMIYOR: 124/128 bayt (4 eksik).
+ * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
  *
  * TIP BIRLESTIRILDI: gRam020246F0 zaten src/world/table_entries.c'de
  * `Entry[20]` olarak tanimliymis ve o tanimda +0x02 (unk02) ile +0x04
@@ -22,29 +24,58 @@
  * state +0x2B, tableIndex +0x64, phase +0x90) dolgudan oyuldu ve
  * table_entries.c 3/3 KORUNDU.
  *
- * Onceki elle-hesaplamali surum 2/128 veriyordu ama tur catismasi
- * nedeniyle `make check` kiriliyordu; bu surum tutarli ama 4 bayt kisa.
- * TESHIS DUZELTILDI: havuz kelimesi EKSIK DEGIL. Iki havuz da ayni iki
- * sabiti tasiyor (0x020246F0 ve 0x08BD3448), yalnizca 4 bayt kaymis
- * duruyorlar. Yani eksik olan havuzdan ONCEKI dort baytlik KOD.
- * Ilk yorumum ("bir sabit eksik") yanlisti; havuz tarayicim komut
- * baytlarini kelime sanmisti.
+ * ------------------------------------------------------------------
+ * SON 4 BAYT NASIL KAPANDI (124 -> 128, fark 55 -> 0)
+ * ------------------------------------------------------------------
+ * Komut komut diff, TEK bir bolgenin (mark yazimi ile bl arasi) saptigini
+ * gosterdi. ROM ile bizim eski cikti:
  *
- * Elle-hesaplamali surumdeki iki fark (kayit icin):
- *     +0x4C  bizim `lsrs r0,r0,#2`   ROM `asrs r0,r0,#2`  (isaretli kaydirma)
- *     +0x56  bizim `adds r0,r4,#0`   ROM `adds r0,r4,#4`  (isaretci +4)
+ *   ROM                         eski bizim
+ *   adds r0, r4, #0             adds r0, r4, #4     <- arg1 ONCE
+ *   adds r0, #140               adds r1, #98        <- r1 = entry+0x2A idi
+ *   ldr  r0, [r0, #0]           ldr  r1, [r1, #0]
+ *   asrs r0, r0, #2             lsrs r1, r1, #2
+ *   ldr  r1, [r3, #4]           ldr  r2, [r3, #4]
+ *   lsls r0, r0, #2             lsls r1, r1, #2
+ *   adds r0, r0, r1             adds r1, r1, r2
+ *   ldr  r1, [r0, #0]           ldr  r1, [r1, #0]
+ *   adds r0, r4, #4             (yok -- yukarida yapilmisti)
  *
- * IKISI DE TEK BASINA DUZELTILEBILIYOR AMA HER BIRI 4 BAYTA MAL OLUYOR:
- *   offset alanini s32 yapmak            -> 124 bayt (asrs dogru, boyut yanlis)
+ * MEKANIZMA: arg2 zinciri cagri kurulumu icinde uretilince arg1 (`&entry->
+ * unk04`) ONCE r0'a girdi, arg2 zincirine r1 kaldi; r1 o anda zaten
+ * `entry+0x2A` (mark isaretcisi) tasidigi icin derleyici `entry+0x8C`yi
+ * `adds r1, #98` ile TEK komutta uretti. Iste eksik olan 2 bayt buydu --
+ * geri kalan 2 bayt da bunun sonucu: kod 2 bayt kisalinca havuz oncesi
+ * hizalama `movs r0,r0` (nop) dolgusu dusuyordu.
+ *
+ * COZUM: arg2'yi AYRI BIR DEYIME al (`src = ...;`). Boylece RTL sirasi
+ * ROM'unki gibi olur: once arg2 zinciri (r0 kazikta, o anda 0xFF olu),
+ * sonra cagri kurulumunda `adds r0, r4, #4`. r0 o noktada adres tasimadigi
+ * icin `entry+0x8C` r4'ten YENIDEN hesaplaniyor -> aranan fazladan komut.
+ *
+ * Ikinci parca: unk8C alani s32 (ISARETLI). `>> 2` boylece `asrs` uretiyor.
+ *
+ * OLCULEN KATKILAR (ayri ayri denendi):
+ *   temel (u32 unk8C, arg2 cagri icinde)   -> 124 bayt, fark 55
+ *   YALNIZ s32 unk8C                       -> 124 bayt, fark 54  (yetmez)
+ *   YALNIZ ayri `src` yereli               -> 128 bayt, fark  1  (asrs eksik)
+ *   IKISI BIRDEN                           -> 128 bayt, fark  0  ESLESTI
+ * Yani boyutu duzelten deyim ayirmasi, kalan tek bayti duzelten s32.
+ *
+ * ELENEN YOLLAR (onceki elle-hesaplamali surumden; TEKRAR DENEMEYIN):
  *   kaydirmada (s32) cast                -> 124 bayt
  *   ilk argumani (u8*)entry+4 yapmak     -> 124 bayt
  *   ilk argumani entry->pad04 yapmak     -> 124 bayt
  *   ilk argumani &entry->unk02 + 1       -> 124 bayt
- * Yani bu iki noktaya dokunmak baska bir yerde iki komut goturuyor;
- * muhtemelen struct yerlesimi tam dogru degil ve "dogal" ifade ROM'unkiyle
- * ayni bicime gelmiyor. Sonraki tur once yerlesimi dogrulamali.
+ * Bunlarin hicbiri ise yaramadi cunku sorun ARG1'IN BICIMI DEGIL, arg2'nin
+ * NE ZAMAN uretildigiydi. Arg1 ifadesini kurcalamak yanlis eksendi.
+ * DERS: "yanlis yazmac" gibi gorunen fark, aslinda YAYILIM SIRASI farkiydi;
+ * bir alt ifadeyi ayri deyime almak (kural 40'in tersi yonde kullanimi)
+ * cagri argumanlarinin uretim sirasini ROM'unkine cevirir.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Havuz notu (kayit icin): havuz kelimesi hic eksik degildi. Iki havuz da
+ * ayni iki sabiti tasiyordu (0x020246F0 ve 0x08BD3448), sadece 4 bayt
+ * kaymislardi; eksik olan havuzdan ONCEKI koddu.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/world/step_entry_timer.c
@@ -80,7 +111,7 @@ typedef struct Entry {
     u8  pad2C[0x38];
     u8  tableIndex;             /* +0x64 */
     u8  pad65[0x27];
-    u32 unk8C;                  /* +0x8C */
+    s32 unk8C;                  /* +0x8C */
     u32 phase;                  /* +0x90 */
 } Entry;
 
@@ -94,6 +125,7 @@ u32 StepEntryTimer(u32 unused, s16 index, u8 arg)
     Entry *entry;
     TableB *b;
     u32 *target;
+    u32 *src;
     u32 phase;
 
     entry = &gRam020246F0[index];
@@ -107,8 +139,8 @@ u32 StepEntryTimer(u32 unused, s16 index, u8 arg)
         return 1;
 
     entry->mark = MARK_VALUE;
-    FUN_08013cfc(&entry->unk04,
-                 (u32 *)((TableB *)target)->slots[entry->unk8C >> 2], arg);
+    src = (u32 *)((TableB *)target)->slots[entry->unk8C >> 2];
+    FUN_08013cfc(&entry->unk04, src, arg);
 
     entry->unk02 -= TIMER_STEP;
     if ((s16)entry->unk02 <= 0)
