@@ -963,3 +963,33 @@ Ayrıca doğrulandı: Ghidra'nın düşük satır yoğunluğu + "Could not recov
 jumptable" uyarısı bu ROM'da **atlama tablosu** demek. Tablo girişleri
 `ldr`/`lsrs` çöpü olarak sökülüyor; ROM'dan 4 bayt aralıklı kod adresleri
 okuyarak doğrula.
+
+## Kural 61 — Bitfield kabı, alanın SIĞDIĞI en dar erişimi belirler
+
+`GetRecordField` @ 0x08066D54 ölçümü. Aynı bit dizisini `u16` ya da `u32`
+kap ile bildirmek farklı komutlar üretiyor, çünkü agbcc her alan için
+**onu tümüyle içeren en dar erişimi** seçiyor:
+
+- Alan bir bayt sınırını aşmıyorsa → `ldrb`
+- Yarım kelime içinde ama bayt sınırını aşıyorsa → `ldrh`
+- Yarım kelime sınırını da aşıyorsa → `ldr` (tam kelime)
+
+Bu yüzden kabın genişliği, *o kaptaki en geniş alan* tarafından
+belirlenir. `RecordData+0x2C`'de 11-16. bitleri kaplayan bir alan var;
+hiçbir yarım kelime onu kapsamadığı için kap **`u32` olmak zorunda**.
+Aynı kaptaki diğer alanlar yine kendi en dar erişimlerini alıyor
+(`ldrb` 0x2E, `ldrh` 0x2E, `ldrb` 0x2F).
+
+Kardeş dosya `bump_rank_counter.c` aynı bitleri `u16` kapla tanımlıyor ve
+orada DOĞRU kalıyor — çünkü o fonksiyon 6 bitlik taşan alanı hiç okumuyor.
+Yani kap genişliği dosyaya göre değişebilir; ölçüt ROM'un o fonksiyondaki
+yükleme genişliğidir.
+
+Ek ölçüm: Thumb `ldrb` imm5 ofseti 31'de bitiyor, bu yüzden 0x20'den
+büyük ofsetteki her bayt alanı `adds r0,r2,#0 / adds r0,#N / ldrb`
+üçlüsünü gerektiriyor — bu bir kaynak tuhaflığı değil, komut seti sınırı.
+`ldrh` ofseti 2 ile ölçeklendiği için yarım kelimeler doğrudan yükleniyor.
+
+Ayrıca: switch gövdeleri ROM'da **kaynak sırasına** göre yerleşiyor, tablo
+sırasına göre değil. ROM'un blok sırasını yakalamak için `case`'leri
+ROM'daki gövde sırasına göre yaz.

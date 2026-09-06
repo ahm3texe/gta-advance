@@ -412,6 +412,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
 0x08065130,SpawnSlotEffect,src/world/spawn_slot_effect.c,176,176,yes
+0x080651E0,FUN_080651e0,src/world/slot_probe.c,404,408,no
 0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
 0x080653D4,AccumulateActorMotion,src/world/actor_tracking.c,104,104,yes
 0x0806543C,IsOwnerMarked,src/world/player_slot_query.c,32,32,yes
@@ -444,6 +445,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08066AA8,BuildLinkReport,src/world/link_report.c,152,152,yes
 0x08066B40,BumpStepCounter,src/world/link_state_step.c,340,340,yes
 0x08066C94,BumpRankCounter,src/world/bump_rank_counter.c,192,192,yes
+0x08066D54,GetRecordField,src/world/rank_query.c,378,378,yes
 0x08066ED0,GetStepIconId,src/world/link_menu_step.c,324,324,yes
 0x08067014,FUN_08067014,src/world/link_score.c,332,368,no
 0x08067184,BumpCount82,src/world/bump_count_82.c,52,52,yes

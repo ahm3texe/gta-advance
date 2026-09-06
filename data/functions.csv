@@ -1707,7 +1707,7 @@ address,name,size,status,module,notes
 0x08066AA8,BuildLinkReport,152,matching,world,Baglanti ozet kaydini doldurur; src/world/link_report.c
 0x08066B40,BumpStepCounter,340,matching,world,Etkin kaydin 5 bitlik adim sayacini doyumlu artirir; src/world/link_state_step.c
 0x08066C94,BumpRankCounter,192,matching,world,Etkin kaydin 5 bitlik sayacini doyumlu artirir; src/world/bump_rank_counter.c
-0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066D54,GetRecordField,378,matching,world,Kayit alanini 0-35 kimligiyle dondurur; atlama tablosu 0x08066D6C; src/world/rank_query.c
 0x08066ED0,GetStepIconId,324,matching,world,Adim indeksini (0-35) 0xB0+n simge kimligine cevirir; atlama tablosu; src/world/link_menu_step.c
 0x08067014,FUN_08067014,368,candidate,world,"Baglanti raporundan yuzde skoru hesaplar. PARK: 332/368 bayt, 82/183 komut ayni; ROM report isaretcisini ip'de tutuyor ve baytlari her kullanimda yeniden okuyor; src/world/link_score.c"
 0x08067184,BumpCount82,52,matching,world,Iki bos dongu gecikmesi arasinda +0x82 sayacini tasma korumali artirir; src/world/bump_count_82.c
