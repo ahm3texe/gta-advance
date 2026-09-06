@@ -22,6 +22,7 @@ typedef struct {
 #define REG_DISPSTAT_ADDR 0x04000004
 #define REG_VCOUNT_ADDR   0x04000006
 #define REG_BG1VOFS_ADDR  0x04000016
+#define REG_KEYINPUT_ADDR 0x04000130
 #define REG_BLDCNT_ADDR   0x04000050
 #define REG_BLDALPHA_ADDR 0x04000052
 #define REG_BLDY_ADDR     0x04000054
@@ -40,6 +41,7 @@ typedef struct {
 #define REG_DISPSTAT (*(volatile u16 *)REG_DISPSTAT_ADDR)
 #define REG_VCOUNT   (*(volatile u16 *)REG_VCOUNT_ADDR)
 #define REG_BG1VOFS  (*(volatile u16 *)REG_BG1VOFS_ADDR)
+#define REG_KEYINPUT (*(volatile u16 *)REG_KEYINPUT_ADDR)
 #define REG_BLDCNT   (*(u16 *)REG_BLDCNT_ADDR)
 #define REG_BLDALPHA (*(u16 *)REG_BLDALPHA_ADDR)
 #define REG_BLDY     (*(u16 *)REG_BLDY_ADDR)

@@ -1684,7 +1684,7 @@ address,name,size,status,module,notes
 0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
 0x08065574,LoadBitmapAsset,220,matching,world,Kare ve paleti RL acilimi veya DMA3 ile yukler; src/world/bitmap_asset.c
 0x08065650,ShutdownAndReset,164,candidate,world,"Dort DMA kanalini kapatip ekran/kesme yazmaclarini siler ve BIOS yumusak sifirlamasini cagirir. PARK: 180/180 boyut, 139 bayt fark, 73/89 komut ayni; sifir sabiti ROM'da r5'te uzun omurlu, bizde yerel kisa omurlu; src/world/shutdown_reset.c"
-0x080656F4,FUN_080656f4,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080656F4,PollInput,228,candidate,world,Tus okuma ve giris gecmisi halka tamponu. PARK: 224/228 bayt; kalan fark omuz maskesi testinde ROM ikinci operandi da kopyaliyor; src/world/poll_input.c
 0x080657D8,FUN_080657d8,2374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı
 0x08066144,ResetLinkSession,200,matching,world,Baglanti oturumunu bastan kurar; src/world/link_session_reset.c
 0x0806620C,FUN_0806620c,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)

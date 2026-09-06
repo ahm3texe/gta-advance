@@ -15,8 +15,10 @@
  */
 typedef struct GameState {
     u32 word00;                 /* +0x00 */
-    u16 half04;                 /* +0x04 */
-    u8  pad06[6];
+    u16 half04;                 /* +0x04: giris maskesi */
+    u16 pad06;
+    u16 held;                   /* +0x08: bu karede basili tuslar */
+    u16 pressed;                /* +0x0A: half04 ile maskelenmis hali */
     u8  flag;                   /* +0x0C */
     u8  pad0D[3];
 } GameState;

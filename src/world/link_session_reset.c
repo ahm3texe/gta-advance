@@ -28,7 +28,7 @@ typedef struct LinkCounters {
 
 extern CommBlock   gLinkBlock;
 extern LinkCounters gRam02036330;
-extern u8  gRam02000420[];
+extern u16 gRam02000420[];
 extern u8  gRam02000230[];
 extern u8  gRam020003C0[];
 extern u8  gRam02000E80[];
