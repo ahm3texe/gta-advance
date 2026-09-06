@@ -1682,7 +1682,7 @@ address,name,size,status,module,notes
 0x08065518,SetOwnerMark,32,matching,world,Varligin sahibinin yuvasina +0x25 isaretini yazar; src/world/slot_range_query.c
 0x08065538,IsSlotValueInRange,48,matching,world,A yuvasindaki +0x4C ust yarim kelimesi verilen aralikta mi; src/world/slot_range_query.c
 0x08065568,LookupRomByte,12,matching,world,0x08F72620 ROM tablosundan tek bayt okur; src/world/slot_range_query.c
-0x08065574,FUN_08065574,220,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08065574,LoadBitmapAsset,220,matching,world,Kare ve paleti RL acilimi veya DMA3 ile yukler; src/world/bitmap_asset.c
 0x08065650,ShutdownAndReset,164,candidate,world,"Dort DMA kanalini kapatip ekran/kesme yazmaclarini siler ve BIOS yumusak sifirlamasini cagirir. PARK: 180/180 boyut, 139 bayt fark, 73/89 komut ayni; sifir sabiti ROM'da r5'te uzun omurlu, bizde yerel kisa omurlu; src/world/shutdown_reset.c"
 0x080656F4,FUN_080656f4,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080657D8,FUN_080657d8,2374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı

@@ -167,6 +167,7 @@ start,end,binary,module,notes
 0x0806543C,0x0806549C,build/world/player_slot_query.bin,world,Oyuncu yuvasi bayragi ve varlik mesguliyet sorgulari; dogal C byte-matching ve 2 bayt hizalama.
 0x0806549C,0x08065518,build/world/scale_by_band.bin,world,Mesafe bandina gore 8.8 sabit noktali olcekleme.
 0x08065518,0x08065574,build/world/slot_range_query.bin,world,"Yuva isareti, deger araligi ve ROM bayt tablosu; dogal C byte-matching."
+0x08065574,0x08065650,build/world/bitmap_asset.bin,world,"Kare ve palet yukleyici; RL acilimi veya DMA3, ardindan palet ofseti."
 0x08066144,0x0806620C,build/world/link_session_reset.bin,world,"Baglanti oturumunu bastan kurar: blok kurulumu, sekiz tampon Memset, durum alanlari."
 0x080663E8,0x080664A4,build/world/link_session.bin,world,"Baglanti oturumu kapanis, karartma ve bekleme adimlari; dogal C byte-matching."
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"

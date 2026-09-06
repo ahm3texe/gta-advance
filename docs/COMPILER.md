@@ -803,3 +803,20 @@ Permuter (`build/permuter/ResetLinkSession`, temel skor 230, ~560
 yinelemede skor 0). Kural 44'ün öngördüğü şey: elle taramanın kapatamadığı
 küçük farklarda permuter **mekanizmayı** buluyor. Buradaki mekanizma tek
 satırlık ve genellenebilir olduğu için ayrı bir kural oldu.
+
+## Kural 53 — Çarpım operand sırası kaynakta terstir
+
+agbcc `a * b` için **ikinci** operandı önce yükler. `LoadBitmapAsset`
+@ 0x08065574 ölçümü: ROM `ldrh [r4,#14]` (boy) sonra `ldrh [r4,#12]` (en)
+üretiyor; bunu veren kaynak `en * boy`, `boy * en` değil. Ters yazım
+4 bayt saptırıyor ve aynı fonksiyonda iki yerde birden.
+
+Teşhis: ROM'un yükleme sırasına bak, kaynağa **tersini** yaz.
+
+## Kural 54 — Kayıt/geri-yükle değişkenini bloklara böl
+
+Aynı donanım yazmacını iki ayrı blokta kaydedip geri yüklerken **iki ayrı
+yerel** kullan. Tek değişken, canlı aralığı iki bloğu birden kapsatıp
+yazmaç baskısını artırıyor: `LoadBitmapAsset`'te bu, `dest`'i callee-saved
+yüksek yazmaca itip fazladan bir push/pop çifti ekledi — **12 bayt**.
+ROM ikinci kaydı `ip`'de tutuyor, yani ayrı ve kısa ömürlü bir değer.
