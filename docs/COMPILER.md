@@ -520,6 +520,51 @@ sign-extend eklemiyor.
 Yani kural 47'nin kararı "AND sonucunun genişliği" değil, **her iki yönü de
 ölçmek**. İki satırlık deney, tahminden ucuz.
 
+## Sorun gerçekten dağıtım mı? — `dump_alloc.py --rom` ile önce bunu ölç
+
+Kural 50'yi uygulamadan önce **sorunun dağıtım olup olmadığını** ölçün. Araç
+artık ROM'un `push` listesini ve yazmaç başına operand sayımlarını yan yana
+basıyor; ayrım tek bakışta görünüyor.
+
+**Ölçülen iki karşıt örnek (2026-09-06):**
+
+`FUN_080543D0` — fark 41. Callee-saved trafiği ROM ile **birebir aynı**:
+r3 9/9, r4 11/11, r5 8/8, r6 7/7, r7 1/1. Fark yalnızca r0/r1/r2'de
+(23/28, 26/23, 7/5). Yani dağıtım **zaten doğru**; 41 bayt geçici yazmaç ve
+komut seçiminden geliyor. Buraya değişken bölme uygulamak **boş emek** —
+üç dosyanın körlemesine kurcalanmasının sebebi tam da bu ayrımın
+yapılmamasıydı.
+
+`FUN_08054744` — fark 80. Callee-saved trafiği **sapıyor**: r3 ROM 13 /
+bizde 6, r4 ROM 16 / bizde 13, r2 ROM 10 / bizde 16. ROM ağırlığı r3+r4'te
+tutuyor, biz r2'ye yıkıyoruz. Sorumlu ölçüldü: bir allocno 12 refs / 64
+ömürle en yoğun ikinci değer ama **hiç çağrı aşmıyor**, o yüzden `find_reg`
+ona en küçük boş yazmacı (r2) veriyor ve callee-saved adaylara hiç bakmıyor.
+Kural 50 kaldıracının anlamlı olduğu dosya bu.
+
+`FUN_08052DDC` (eşleşen) kalibrasyon referansı: `push` listesi ve **tüm**
+operand sayımları ROM ile birebir. Aracın doğru okuduğunun kanıtı.
+
+**Kural: önce `--rom` çalıştır.** Callee-saved sayımları tutuyorsa dağıtım
+doğrudur, başka yere bak.
+
+## agbcc pseudo → C değişken adı: PARAMETRELER DIŞINDA İMKÂNSIZ
+
+Denendi ve ölçüldü: agbcc'de `-g` yok, `-gstabs` "invalid debug option"
+veriyor, üretilen `.s`'te tek bir `.stab` satırı yok, RTL insn'lerinin satır
+numarası alanı −1. Derleyici bu dökümlere yerel değişken adı **hiç yazmıyor**.
+
+Parametreler çıkarılabiliyor: prologda `NOTE_INSN_FUNCTION_BEG`'den önceki
+`(set (reg/v N) (reg H rH))` kalıbı argüman sırasını veriyor, ad da kaynaktaki
+**tanım** imzasından okunuyor. Yerel değişkenler için ad sütunu boş kalır ve
+yerine ilk tanım ifadesi basılır (`mem[p22+40]` gibi) — ad uydurulmaz.
+
+İki tuzak, ikisi de araç yazılırken yakalandı: `note` düğümleri taranmazsa
+`NOTE_INSN_FUNCTION_BEG` görülmez ve **çağrı dönüş değerleri parametre
+sanılır**; ayrıca parametre adı için dosyadaki ilk geçişe bakmak yanlıştır —
+başlık yorumundaki eski imza gerçek tanımla çelişebiliyor (`nodelist_a1.c`'de
+tam bu oldu).
+
 ## Diğer iki tuzak
 
 **Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
