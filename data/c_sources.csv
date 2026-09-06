@@ -138,7 +138,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08023CC4,ClearEntryTables,src/world/entries_b2.c,300,300,yes
 0x08025340,FUN_08025340,src/world/entries_b4.c,228,228,yes
 0x08025424,CreateEntryFromTemplate,src/world/entries_b1.c,242,242,yes
-0x08025518,FUN_08025518,src/world/entries_b5.c,458,458,no
+0x08025518,FUN_08025518,src/world/entries_b5.c,458,458,yes
 0x080260A8,FUN_080260a8,src/world/state_offset.c,1430,1518,no
 0x080289B4,FUN_080289b4,src/misc/empty_stubs.c,2,2,yes
 0x080289B8,FUN_080289b8,src/misc/empty_stubs.c,2,2,yes
