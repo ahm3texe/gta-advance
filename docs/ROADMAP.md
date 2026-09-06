@@ -12,7 +12,7 @@ Uzun vadeli teknik hedef, kullanıcının yerel `baserom.gba` girdisinden çalı
 | 1. Haritalama | ARM/Thumb fonksiyon ve veri sınırları | Keşfedilen fonksiyon sayısı | Devam ediyor; 1934 fonksiyon |
 | 2. İskelet | Linker script, assembly kaynakları, yeniden derleme | ROM boyutu/yerleşimi | Tamamlandı |
 | 3. Modül analizi | Grafik, giriş, dünya, görev, ses, kayıt alt sistemleri | Belgelenen fonksiyonlar | Devam ediyor; IRQ ve save haritalandı |
-| 4. Matching decomp | C/assembly kaynak ve compiler bayrakları | Matching/toplam fonksiyon ve byte | Devam ediyor; **419/1934 fonksiyon, 33.554/454.072 bayt (%7,39)** |
+| 4. Matching decomp | C/assembly kaynak ve compiler bayrakları | Matching/toplam fonksiyon ve byte | Devam ediyor; **428/1934 fonksiyon, 34.816/454.072 bayt (%7,67)** |
 | 5. Doğrulama | Otomatik ROM diff + mGBA testleri | Hash/davranış testleri | `make rom` kaynak bölgelerini hibrit görüntüye yerleştirip SHA-1 doğruluyor; tam kaynak build'i ve mGBA davranış testi hâlâ eksik |
 
 ## İlk çalışma oturumu
@@ -38,7 +38,7 @@ Tahmini yüzdeleri kesin ilerleme gibi göstermemek için boyutu bilinmeyen fonk
 
 ## Nerede duruyoruz (2026-09-06)
 
-**%7,39** — 419/1934 fonksiyon, 33.554/454.072 bayt. Kalan iş üç banda ayrılıyor
+**%7,67** — 428/1934 fonksiyon, 34.816/454.072 bayt. Kalan iş üç banda ayrılıyor
 ve bantların maliyeti çok farklı:
 
 | bant | fonksiyon | bayt | ROM payı | not |
@@ -47,18 +47,21 @@ ve bantların maliyeti çok farklı:
 | 120–560 bayt | 558 | 141.418 | %31,1 | asıl verimli bant |
 | ≥ 560 bayt | 183 | 219.322 | **%48,3** | gerçek duvar |
 
-**Kardeş bandı** — eşleşmiş bir fonksiyonun 1,6 KB komşuluğundaki 120–560 baytlık
-işler — bu oturumdaki hızın kaynağıydı ve **84 fonksiyon / 18.818 bayt (%4,1)**
-kaldı. Orada isabet oranı %90'ın üstünde çünkü ajan struct'ları, çağrılan
-imzalarını ve RAM sembollerini kardeşten hazır alıyor.
+**Kardeş bandı kapandı.** Eski metindeki “1,6 KB / 18.818 bayt” ifadesi
+yeniden üretilemiyordu. Sayıyı veren gerçek seçim, eşleşmiş bir aralığa en çok
+**200 bayt** boşluğu olan 120–560 baytlık Thumb oyun fonksiyonlarıdır:
+`9cbaf27` baseline'ında **84 fonksiyon / 19.794 bayt**. Bu sabit liste ve her
+hedefin sonucu `data/sibling_band.csv` içindedir; `make sibling-check` seçimi ve
+sonuçları doğrular. 9 hedef / 1.262 bayt yeni byte-matching C'ye geçti; kalan
+75 hedef ölçülmüş C farkı veya ROM çağrı/dal/literal triyajıyla park edildi.
 
 **Bu tempo aynen sürmez.** Kardeş bandı bitince 120–560 bandının geri kalanına
 geçilecek; orada kardeş bitişik değil, fonksiyon başına maliyet artar.
 
 ## Sıradaki adımlar
 
-**1. Kardeş bandını bitir (%4,1).** Kanıtlanmış yol. Her tur kural kütüphanesini
-de büyütüyor, yani büyük fonksiyonlar için hazırlık.
+**1. Kardeş bandını bitir. — TAMAMLANDI (2026-09-06).** 84 hedefin tamamı
+matching veya kanıtlı park sonucuna bağlandı; veri görünümü CI kapısına eklendi.
 
 **2. Giriş / link / istatistik bölgesini al.** 0x08065000–0x08067400 arası 54
 fonksiyonun 34'ü yazılmamış (~8,6 KB). Bu bölge artık **ne iş yaptığı bilinen**

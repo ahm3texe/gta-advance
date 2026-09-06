@@ -31,6 +31,7 @@ start,end,binary,module,notes
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,CoordBlock +0x71 baytini sifirlama
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
+0x080100D0,0x0801014C,build/core/memory_init.bin,core,Tampon ayirma ve DMA3 sifirlama; dogal C byte-matching.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,kucuk fonksiyon hasadi
 0x080127FC,0x0801282C,build/core/list_ops2.bin,core,List init + push front (varyant)
 0x0801282C,0x08012898,build/core/insert_sorted.bin,core,sirali listeye ekleme
@@ -51,6 +52,7 @@ start,end,binary,module,notes
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184 bayt gövde + literal havuzu
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
+0x080199BC,0x08019A44,build/world/palette_lerp.bin,world,On alti BGR555 rengin 16.16 katsayili karisimi; dogal C byte-matching ve 2 bayt hizalama.
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,karmasik hasat
@@ -73,6 +75,7 @@ start,end,binary,module,notes
 0x08030C28,0x08030C4C,build/world/zero_two_blocks.bin,world,iki bayrak blogunu Memset ile sifirlama
 0x08030C4C,0x08030CB4,build/world/area_flags.bin,world,192 bitlik alan bayraklari: test ve set
 0x08030EA0,0x08030EAC,build/world/spin_delay.bin,world,kucuk fonksiyon hasadi
+0x08031C10,0x08031C98,build/world/nibble_replace.bin,world,On alti kelimede dort nibble alani degistirme; dogal C byte-matching.
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Iki bayrak dizisi tarama + blok temizleme
 0x08031DB8,0x08031DDC,build/world/step_then_check.bin,world,adim atip bayrak sinama
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
@@ -129,11 +132,14 @@ start,end,binary,module,notes
 0x08050A0C,0x08050A34,build/world/check_current_entity.bin,world,karmasik fonksiyon hasadi
 0x08050A34,0x08050A48,build/world/is_anchor_small.bin,world,kosullu sabit donus
 0x080512B0,0x080512BC,build/world/get_record_index.bin,world,yaprak erisimci
+0x0805135C,0x08051458,build/core/frame_dispatch.bin,core,Kare isleme zincirleri ve tani isaretleri
 0x08051464,0x08051470,build/world/wrap_08051464.bin,world,iletme sarmalayicisi
 0x08051480,0x0805148C,build/world/wrap_08051480.bin,world,sarmalayici/erisimci hasadi
 0x0805148C,0x080514A0,build/world/is_state_two.bin,world,kosullu sabit donus
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
+0x08051540,0x080515D0,build/core/adjust_area_position.bin,core,Alan derinligi degisiminde konum ofsetini duzeltir
+0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Konumu dort komsu ofsette sinar
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055AF8,0x08055B34,build/world/entity_query.bin,world,QueryEntity; varlık türü ve alt-hedef bayrak sorgusu
 0x08055B34,0x08055B80,build/world/engage_actor.bin,world,aktoru devreye alma
@@ -141,10 +147,12 @@ start,end,binary,module,notes
 0x08055BF8,0x08055C04,build/world/forward_zero_arg2.bin,world,ikinci argumani sifirlayarak iletme
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
+0x0805643C,0x08056508,build/core/reset_runtime_globals.bin,core,Runtime global durum alanlarini sifirlar
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,sarmalayici/erisimci hasadi
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,iletme sarmalayicisi
 0x0805AC44,0x0805AC50,build/world/counter_saturate.bin,world,Kopyalama
 0x0805AC50,0x0805AC88,build/world/bump_or_reset.bin,world,BumpOrReset; koşullu sıfırlanan doygun sayaç
+0x0805AC94,0x0805AD10,build/world/link_objects.bin,world,Nesne baglama ve durum bitleri; dogal C byte-matching.
 0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode kategorisi + iki alan yazici

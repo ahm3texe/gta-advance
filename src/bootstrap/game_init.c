@@ -114,7 +114,7 @@ extern s32  IsSessionActive(void);          /* sifirdan farkli ise dongu biter *
 extern void FUN_08013824(void);
 extern void FUN_08012248(void);
 extern void FUN_08012198(void);
-extern void FUN_080100d0(void);
+extern void InitWorkBuffers(void);
 extern void FUN_0800db7c(void);
 extern void FUN_08011cf4(void);
 extern void FUN_08012a98(void);
@@ -278,7 +278,7 @@ void GameInit(void)
             FUN_08013824();
             FUN_08012248();
             FUN_08012198();
-            FUN_080100d0();
+            InitWorkBuffers();
             FUN_0800db7c();
             FUN_08011cf4();
             FUN_08012a98();

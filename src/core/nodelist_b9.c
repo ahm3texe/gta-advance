@@ -222,7 +222,7 @@ extern u32             gRam02025800;
 extern s32     FUN_0806dd18(const char *a, const char *b);   /* strcmp */
 extern Record *GetRecord(s32 index);
 extern void    BuildNodeFreeLists(void);
-extern void    FUN_0805643c(void);
+extern void    ResetRuntimeGlobals(void);
 extern u32     FUN_08053834(AreaCtx *ctx, AreaGroup *group, const char *name);
 extern void    FUN_08051154(s32 index);
 
@@ -311,7 +311,7 @@ found2:
     gRam020357E0 = rec->f20;
     gRam02026F34 = gRam020272C8 = 0;    /* zincirli: 6. madde */
     BuildNodeFreeLists();
-    FUN_0805643c();
+    ResetRuntimeGlobals();
     FUN_08053834(&gRam02035760, group, name);
     FUN_08051154(slot);
     gRam02025800 = 0;

@@ -58,7 +58,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AAD0,GetCoordSecond,src/misc/coord_more.c,12,12,yes
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
-0x0800AB88,BuildVolumePlanes,src/core/frame_dispatch.c,960,960,yes
+0x0800AF48,FUN_0800af48,src/world/plane_classify.c,166,174,no
 0x0800B140,DotProduct,src/world/geometry.c,44,44,yes
 0x0800BDB0,BoxesOverlap,src/world/geometry.c,72,72,yes
 0x0800BDF8,FUN_0800bdf8,src/world/quad_edge_b1.c,198,198,yes
@@ -72,10 +72,12 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800DC0C,ListRemove2,src/world/list_ops.c,56,56,yes
 0x0800DC44,FUN_0800dc44,src/core/list_b3.c,112,112,no
 0x0800DCB4,FUN_0800dcb4,src/core/list_b2.c,154,154,yes
+0x080100D0,InitWorkBuffers,src/core/memory_init.c,124,124,yes
 0x08010198,FUN_08010198,src/misc/empty_stubs.c,2,2,yes
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
 0x080101E4,FUN_080101e4,src/misc/empty_stubs.c,2,2,yes
 0x08011D4C,FUN_08011d4c,src/misc/empty_stubs.c,2,2,yes
+0x08011DD4,FUN_08011dd4,src/core/bg2_affine.c,168,176,no
 0x080126E4,FUN_080126e4,src/core/insert_b1.c,108,108,yes
 0x080127A0,FUN_080127a0,src/misc/empty_stubs.c,2,2,yes
 0x080127FC,List2Init,src/core/list_ops2.c,10,10,yes
@@ -105,6 +107,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080139B0,MarkChain,src/world/list_head.c,32,32,yes
 0x08013A28,SubmitFixed,src/world/dma_flush.c,30,30,yes
 0x08013A48,FlushBlock,src/world/dma_flush.c,60,60,yes
+0x08014E48,FUN_08014e48,src/world/transition_code.c,168,154,no
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x0801515C,FUN_0801515c,src/world/level_step_b2.c,100,100,yes
 0x080151C0,FUN_080151c0,src/world/level_step_b1.c,124,124,yes
@@ -127,6 +130,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080196C8,IsObjectReadyA,src/world/object_state.c,36,36,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,36,36,yes
 0x080197FC,FUN_080197fc,src/misc/empty_stubs.c,2,2,yes
+0x080199BC,BlendPaletteBlock,src/world/palette_lerp.c,134,134,yes
 0x08019B08,IsActorUsable,src/world/actor_check.c,52,52,yes
 0x08019B3C,GetAngleField,src/world/actor_check.c,30,30,yes
 0x08019C04,FUN_08019c04,src/misc/empty_stubs.c,2,2,yes
@@ -191,6 +195,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030E78,FUN_08030e78,src/ui/hud_fields.c,40,40,yes
 0x08030EA0,SpinDelay,src/world/spin_delay.c,10,10,yes
 0x08030F28,FUN_08030f28,src/ui/hud_fields.c,40,40,yes
+0x08031C10,ReplaceNibbleField,src/world/nibble_replace.c,136,136,yes
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
 0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
@@ -305,6 +310,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050A0C,CheckCurrentEntity,src/world/check_current_entity.c,38,38,yes
 0x08050A34,IsAnchorSmall,src/world/is_anchor_small.c,20,20,yes
 0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
+0x0805135C,RunFrameStageOne,src/core/frame_dispatch.c,132,132,yes
+0x080513E0,RunFrameStageTwo,src/core/frame_dispatch.c,120,120,yes
 0x08051464,FUN_08051464,src/world/wrap_08051464.c,10,10,yes
 0x08051480,FUN_08051480,src/world/wrap_08051480.c,10,10,yes
 0x0805148C,IsStateReady,src/world/is_state_two.c,20,20,yes
@@ -312,6 +319,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x080514E4,GetRecordUnk08,src/misc/record_table.c,28,28,yes
 0x08051500,GetRecord,src/misc/record_table.c,20,20,yes
 0x0805151C,DrainTwoChains,src/world/drain_two_chains.c,34,34,yes
+0x08051540,AdjustAreaPosition,src/core/adjust_area_position.c,144,144,yes
+0x080515D0,FUN_080515d0,src/core/mark_area_cells.c,164,164,no
 0x08051960,FUN_08051960,src/misc/empty_stubs.c,2,2,yes
 0x080526B8,RebuildAreaEntry,src/core/nodelist_b6.c,152,152,yes
 0x08052750,FUN_08052750,src/core/nodelist_a4.c,216,216,yes
@@ -344,6 +353,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055054,FUN_08055054,src/core/nodelist_b7.c,312,312,no
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x080552D4,FUN_080552d4,src/core/nodelist_b8.c,492,492,yes
+0x08055970,ProbeNearbyPosition,src/core/probe_nearby_position.c,144,144,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
 0x08055A94,FindNodeAfter,src/world/node_search.c,20,20,yes
 0x08055AA8,FindNode,src/world/node_search.c,28,28,yes
@@ -359,11 +369,14 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055D18,FindFreeSlotRun,src/world/slot_table.c,60,60,yes
 0x08055D54,FillSlotsWithNone,src/world/slot_table.c,60,60,yes
 0x080563BC,FUN_080563bc,src/misc/empty_stubs.c,2,2,yes
+0x080563C0,FUN_080563c0,src/core/count_area_entries.c,124,124,no
+0x0805643C,ResetRuntimeGlobals,src/core/reset_runtime_globals.c,204,204,yes
 0x08059D7C,FUN_08059d7c,src/world/wrap_08059d7c.c,10,10,yes
 0x0805A4F4,FUN_0805a4f4,src/world/wrap_0805a4f4.c,10,10,yes
 0x0805AB78,FUN_0805ab78,src/misc/empty_stubs.c,2,2,yes
 0x0805AC44,CopySrcToDest,src/world/counter_saturate.c,12,12,yes
 0x0805AC50,BumpOrReset,src/world/bump_or_reset.c,56,56,yes
+0x0805AC94,LinkObjectPair,src/world/link_objects.c,124,124,yes
 0x0805D878,IdsCompatible,src/misc/id_compatibility.c,528,528,yes
 0x0805E6C4,SetLanguage,src/misc/table_lookup.c,16,16,yes
 0x0805E6D4,GetLanguage,src/misc/table_lookup.c,12,12,yes
@@ -419,5 +432,6 @@ address,name,source,compiled_size,mapped_size,matching
 0x080673C4,BumpCount70,src/world/more_counters_3.c,28,28,yes
 0x080673E0,BumpCount80,src/world/more_counters_3.c,28,28,yes
 0x0806A77C,FUN_0806a77c,src/arm/plane_test.c,188,196,no
+0x08070D10,FUN_08070d10,src/misc/fast_memchr.c,136,132,no
 0x08070D94,FUN_08070d94,src/misc/empty_stubs.c,2,2,yes
 0x08070D98,FUN_08070d98,src/misc/empty_stubs.c,2,2,yes

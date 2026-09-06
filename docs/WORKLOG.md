@@ -813,3 +813,29 @@ ARM bolgesi (14920 bayt) bu yapilandirmayla eslesmeye kapali gorunuyor.
 Unit (kaynak dosyasi) gruplamasi eklendi; bilinmeyen bolgeler adres
 araligiyla gosteriliyor.  Bitisiklikle modul cikarimi denendi ve GERI
 ALINDI: decomp yakinsaminda modul tahmin edilmez, decomp edilen dosyadir.
+
+## 2026-09-06 — Kardeş fonksiyon bandı kapatıldı
+
+- Yol haritasındaki 84 hedef ilk kez sabit ve yeniden üretilebilir bir veri
+  görünümüne bağlandı: `data/sibling_band.csv`. `make sibling-check`, hedefleri
+  `9cbaf27` baseline'ından 120–560 bayt, en çok 200 bayt aralık ve Thumb oyun
+  modülü kurallarıyla tekrar seçiyor. Gerçek toplam 19.794 bayt; eski 1,6 KB ve
+  18.818 bayt ifadeleri aynı listeyi üretmiyordu ve düzeltildi.
+- 9 fonksiyon / 1.262 fonksiyon baytı ROM'a birebir eşleşti: tampon kurulumu,
+  palet lerp'i, nibble değiştirme, nesne bağlama, çalışma globallerini sıfırlama,
+  alan geçiş konumu, iki kare-dispatch zinciri ve dört yönlü konum sınaması.
+- Altı ek fonksiyon temiz C'ye çevrilip ROM'a karşı ölçüldü ve dosya içi kanıtla
+  park edildi. En yakını `FUN_080515d0`: 164/164 boyut, yalnız 20 bayt fark;
+  kalan engel iki global literalinin yükleme sırası. Diğer hedefler kesin ROM
+  çağrı/dal/literal sayımları ve bağımlılık sınıfıyla statik park edildi.
+- Eşleşmiş bölgeler hibrit ROM zincirine eklendi. Genel matching ölçümü
+  419/33.554 bayttan 428/34.816 bayta (%7,67) çıktı.
+- Dokuz yeni eşleşme, adlandırma borcunu büyütmeden gerçek adlara bağlandı
+  (`InitWorkBuffers`, `BlendPaletteBlock`, `ReplaceNibbleField`, `LinkObjectPair`,
+  `ResetRuntimeGlobals`, `AdjustAreaPosition`, `ProbeNearbyPosition`,
+  `RunFrameStageOne/Two`). Yer tutucu `FUN_` adı taşıyan eşleşmiş fonksiyon
+  sayısı 109'dan 100'e indi.
+- `make sibling-check` ilk sürümü hedefleri baseline'daki **adlarla**
+  karşılaştırıyordu ve bu adlandırma yapılır yapılmaz patladı. Dondurulması
+  gereken şey hedef kümesi olduğu için karşılaştırma adres + boyuta indirildi;
+  ad kolonu kimlik değil, güncel bilgidir.

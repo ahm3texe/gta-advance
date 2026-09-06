@@ -717,3 +717,11 @@ altina indir" diye bir hedef kurulamaz.
 
 Eslesmeyenlerin pseudo ortalamasi yuksek (34.4 vs 7.0) ama bu yaniltici:
 o sekiz fonksiyon zaten bilerek secilmis en zor ornekler.
+
+## Kural 51 — Adres yerelleri gereksiz gorunse de yazmac dagitimini belirler
+
+`ResetRuntimeGlobals` icindeki uc bagimsiz `u16` global dogrudan sifirlandiginda
+agbcc yaprak fonksiyon uretti ve ROM'dan 22 komut sasti. Ilk iki adresi yerel
+pointer'da tutmak `r4`/`r3` yasam araligini ve `{r4,lr}` prologunu geri getirdi;
+fonksiyon 204/204 byte-matching oldu. Ardarda global store'larda ROM callee-save
+yazmaci kullaniyorsa, adres yereli anlamsal olarak gereksiz diye silinmemeli.

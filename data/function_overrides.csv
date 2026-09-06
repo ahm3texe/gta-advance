@@ -43,12 +43,15 @@ address,name,size,status,module,notes
 0x08001EA4,ClearMenuVram,,matching,ui,Fills the menu VRAM range through DMA3; exact in menu-graphics block
 0x08001EE4,EnableMenuDisplay,,matching,ui,Writes display control value 0x0101; exact in menu-graphics block
 0x08001EF4,EnableMenuDisplayAlt,,matching,ui,Duplicate display-control wrapper; exact in menu-graphics block
+0x080100D0,InitWorkBuffers,124,matching,core,0x02014ED0 tabanindan iki tampon ayirir ve 0x0201AAB0 alanini DMA3 ile sifirlar; src/core/memory_init.c
 0x08012A00,SortSpriteList,,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
 0x08012B20,InitSpritePool,,matching,core,128 dugumun serbest listesini kurar; DMA3 ile 1024 bayt OAM sifirlar; src/core/init_sprite_pool.c
 0x08012B9C,FlushSpriteList,,matching,core,Aktif sprite listesini OAM alanina yazar ve onceki karenin fazla yuvalarini gizler; src/core/flush_sprite_list.c
 0x08012C0C,AllocNode,,matching,core,Sprite havuzunun serbest basini aktif listenin basina tasir; src/core/alloc_node.c
 0x08012C54,SortActiveSprites,,matching,core,Aktif sprite listesini kesmeler kapaliyken siralar; src/core/sort_active_sprites.c
 0x08012C74,InsertSpriteSorted,,matching,core,Sprite dugumunu iki anahtara gore kararli siraya ekler; src/core/insert_sprite_sorted.c
+0x080199BC,BlendPaletteBlock,134,matching,world,On alti BGR555 rengi 16.16 katsayiyla karistirir; src/world/palette_lerp.c
+0x08031C10,ReplaceNibbleField,136,matching,world,On alti kelimedeki secili nibble alanlarini degistirir; src/world/nibble_replace.c
 0x08032058,IsEntityFlagSet,50,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
@@ -60,6 +63,18 @@ address,name,size,status,module,notes
 0x08037F34,GetUnk02028270,12,matching,misc,Reads one global u32
 0x08037F40,GetUnk020282A0,12,matching,misc,Reads one global u32
 0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
+0x0805AC94,LinkObjectPair,124,matching,world,Nesne bagini ve iki kontrol blogunun durum bitlerini gunceller; src/world/link_objects.c
+0x0805643C,ResetRuntimeGlobals,204,matching,core,Calisma zamaninda kullanilan bagimsiz global durum alanlarini sifirlar; src/core/reset_runtime_globals.c
+0x08051540,AdjustAreaPosition,144,matching,core,Alan derinligi degisiminde sabit nokta konum ofsetini duzeltir; src/core/adjust_area_position.c
+0x0805135C,RunFrameStageOne,132,matching,core,Kare isleme zincirinin ilk yarisini calistirir ve tani isaretlerini gunceller; src/core/frame_dispatch.c
+0x080513E0,RunFrameStageTwo,120,matching,core,Kare isleme zincirinin ikinci yarisini calistirir ve tani isaretlerini gunceller; src/core/frame_dispatch.c
+0x08055970,ProbeNearbyPosition,144,matching,core,Konumu dort komsu ofsette sinar ve basarisizsa geri yukler; src/core/probe_nearby_position.c
+0x0800AF48,FUN_0800af48,174,decompiled,world,Dort duzlem uzakligini bit maskesine cevirir; 166/174 bayt park; src/world/plane_classify.c
+0x08011DD4,FUN_08011dd4,176,decompiled,core,BG2 affine matris ve referans koordinatlarini gunceller; 168/176 bayt park; src/core/bg2_affine.c
+0x08014E48,FUN_08014e48,154,decompiled,world,Boyut sinifi gecis kodunu kurar; 168/154 bayt park; src/world/transition_code.c
+0x080515D0,FUN_080515d0,164,decompiled,core,Koordinat listesini etkin alan hucrelerine isaretler; 20/164 fark park; src/core/mark_area_cells.c
+0x080563C0,FUN_080563c0,124,decompiled,core,Alan kayitlarini iki baytlik anahtara gore sayar; 95/124 fark park; src/core/count_area_entries.c
+0x08070D10,FUN_08070d10,132,decompiled,misc,Word hizli memchr yardimcisi; 136/132 bayt ve 83 fark park; src/misc/fast_memchr.c
 0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
 0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
 0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
