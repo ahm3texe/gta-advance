@@ -20,7 +20,7 @@ Belgelerdeki banka/imza/kişisel bilgiler hiçbir yere aktarılmadı.
 Seri yazmaç sabitleri havuzda bulundu: `SIOCNT` (0x04000128) altı yerde,
 `SIODATA32` (0x04000120) ve `RCNT` (0x04000134) birer yerde. Taşıyan
 fonksiyonlar: FUN_080657d8 (2374 B), FUN_08066904, FUN_0806660c,
-FUN_08066568, FUN_0806686c, FUN_08066a54. Toplam ~3,4 KB, hiçbiri yazılmamış.
+FUN_08066568, FUN_0806686c, ResetLinkHardware. Toplam ~3,4 KB, hiçbiri yazılmamış.
 
 **Giriş okuma iki fonksiyonda.** `KEYINPUT` (0x04000130) havuzda yedi kez;
 sahipleri FUN_080656f4 (228 B) ve FUN_0806620c (320 B). İkisi de yazılmamış.

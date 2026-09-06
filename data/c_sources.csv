@@ -416,12 +416,18 @@ address,name,source,compiled_size,mapped_size,matching
 0x08065518,SetOwnerMark,src/world/slot_range_query.c,32,32,yes
 0x08065538,IsSlotValueInRange,src/world/slot_range_query.c,48,48,yes
 0x08065568,LookupRomByte,src/world/slot_range_query.c,12,12,yes
+0x080663E8,ShutdownLinkSession,src/world/link_session.c,44,44,yes
+0x08066414,FadeOutIfLinkState3,src/world/link_session.c,64,64,yes
+0x08066454,WaitLinkSettle,src/world/link_session.c,80,80,yes
 0x080664A4,GetBaseValue,src/world/pause_helpers.c,6,6,yes
 0x080664AC,MaybeReset,src/world/pause_helpers.c,24,24,yes
 0x080664C4,IsSessionActive,src/world/pause_helpers.c,44,44,yes
 0x080664F0,MaybeAdvance,src/world/maybe_advance.c,42,42,yes
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,20,20,yes
+0x08066A54,ResetLinkHardware,src/world/link_hw_reset.c,84,84,yes
+0x08066AA8,BuildLinkReport,src/world/link_report.c,152,152,yes
+0x08067184,BumpCount82,src/world/bump_count_82.c,52,52,yes
 0x080671B8,BumpCount6A,src/world/more_counters.c,28,28,yes
 0x080671D4,BumpCount68,src/world/more_counters.c,28,28,yes
 0x080671F0,BumpCount64,src/world/more_counters.c,28,28,yes
@@ -431,6 +437,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08067260,ResetDistanceAccum,src/world/stat_counters.c,20,20,yes
 0x08067274,AddDistance,src/world/distance_accum.c,68,68,yes
 0x080672B8,AccumulateDistance,src/world/accumulate_distance.c,68,68,yes
+0x080672FC,FormatDecimal,src/misc/format_decimal.c,116,116,yes
 0x08067370,FUN_08067370,src/misc/empty_stubs.c,2,2,yes
 0x08067374,BumpCount7A,src/world/more_counters_2.c,28,28,yes
 0x08067390,BumpCount84,src/world/more_counters_2.c,28,28,yes

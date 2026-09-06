@@ -208,3 +208,4 @@ address,size,name,source,status,notes
 0x08D49C00,0,gAreaBank,decomp,provisional,ROM: alan kayitlari bankasi; 0x08052C68 .entries alanindan yuruyor.
 0x08EC46D4,0,gTextTable,decomp,verified,"Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.  DOGRULANDI (oturum 7): dilim k = dil k, dogrudan. Ayni indeksin bes dilimdeki degeri okunarak sinandi (ENGLISH/ANGLAIS/INGLESE/ENGLISCH). Kodlama LATIN-1, ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde, 0xC1=A-akut."
 0x08F72620,0,gRom08F72620,decomp,provisional,ROM bayt tablosu (RAM degil). 0x08065568 dogrudan indeksleyip tek bayt donduruyor. Boyut BILINMIYOR (0); yalnizca taban olculdu. DIZI olarak bildirilmeli: extern const u8 gRom08F72620[];
+0x08FD17FC,40,gPowersOfTen,decomp,verified,"ROM tablosu: 10 adet u32, 10^0..10^9 (1..1000000000). ROM baytlari okunarak dogrulandi. 0x080672FC ondalik basamak yazarken kullaniyor. DIZI olarak bildirilmeli: extern const u32 gPowersOfTen[];"

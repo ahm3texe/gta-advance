@@ -24,7 +24,10 @@ typedef struct {
 #define REG_BG1VOFS_ADDR  0x04000016
 #define REG_BLDCNT_ADDR   0x04000050
 #define REG_BLDALPHA_ADDR 0x04000052
+#define REG_BLDY_ADDR     0x04000054
 #define REG_DMA3_ADDR     0x040000D4
+#define REG_TM3CNT_ADDR   0x0400010C
+#define REG_SIOCNT_ADDR   0x04000128
 #define REG_IE_ADDR       0x04000200
 #define REG_IF_ADDR       0x04000202
 #define REG_WAITCNT_ADDR  0x04000204
@@ -36,7 +39,11 @@ typedef struct {
 #define REG_BG1VOFS  (*(volatile u16 *)REG_BG1VOFS_ADDR)
 #define REG_BLDCNT   (*(u16 *)REG_BLDCNT_ADDR)
 #define REG_BLDALPHA (*(u16 *)REG_BLDALPHA_ADDR)
+#define REG_BLDY     (*(u16 *)REG_BLDY_ADDR)
 #define REG_DMA3     (*(volatile DmaChannel *)REG_DMA3_ADDR)
+/* TM3CNT tek 32-bit yazimla hem yeniden yukleme hem denetim alanini siliyor. */
+#define REG_TM3CNT   (*(u32 *)REG_TM3CNT_ADDR)
+#define REG_SIOCNT   (*(u16 *)REG_SIOCNT_ADDR)
 #define REG_IE       (*(volatile u16 *)REG_IE_ADDR)
 #define REG_IF       (*(volatile u16 *)REG_IF_ADDR)
 #define REG_WAITCNT  (*(volatile u16 *)REG_WAITCNT_ADDR)

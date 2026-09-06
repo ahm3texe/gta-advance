@@ -1688,9 +1688,9 @@ address,name,size,status,module,notes
 0x080657D8,FUN_080657d8,2374,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı
 0x08066144,FUN_08066144,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806620C,FUN_0806620c,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080663E8,FUN_080663e8,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066414,FUN_08066414,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066454,FUN_08066454,80,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080663E8,ShutdownLinkSession,44,matching,world,Surucuyu 15 kare 2 koduyla adimlayip oturumu kapatir; src/world/link_session.c
+0x08066414,FadeOutIfLinkState3,64,matching,world,Durum 3 ise ekrani karartip 60 kare bekler; src/world/link_session.c
+0x08066454,WaitLinkSettle,80,matching,world,Durum stabil olana ya da 240 kare gecene kadar surucuyu adimlar; src/world/link_session.c
 0x080664A4,GetBaseValue,6,matching,world,Duraklatma; src/world/pause_helpers.c
 0x080664AC,MaybeReset,24,matching,world,Duraklatma; src/world/pause_helpers.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080664C4,IsSessionActive,44,matching,world,Duraklatma; src/world/pause_helpers.c
@@ -1703,14 +1703,14 @@ address,name,size,status,module,notes
 0x0806686C,FUN_0806686c,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066904,FUN_08066904,316,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066A40,MaybeSetCommByte6,20,matching,world,Iletisim bayragi; src/world/comm_flag.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
-0x08066A54,FUN_08066a54,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08066AA8,FUN_08066aa8,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08066A54,ResetLinkHardware,84,matching,world,"Timer3/seri kesmelerini kapatir, SIOCNT ve Timer3 sifirlar; src/world/link_hw_reset.c"
+0x08066AA8,BuildLinkReport,152,matching,world,Baglanti ozet kaydini doldurur; src/world/link_report.c
 0x08066B40,FUN_08066b40,340,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066C94,FUN_08066c94,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066D54,FUN_08066d54,378,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066ED0,FUN_08066ed0,324,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08067014,FUN_08067014,368,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08067184,FUN_08067184,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08067184,BumpCount82,52,matching,world,Iki bos dongu gecikmesi arasinda +0x82 sayacini tasma korumali artirir; src/world/bump_count_82.c
 0x080671B8,BumpCount6A,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671D4,BumpCount68,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080671F0,BumpCount64,28,matching,world,Ek sayac; src/world/more_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
@@ -1720,7 +1720,7 @@ address,name,size,status,module,notes
 0x08067260,ResetDistanceAccum,20,matching,world,Istatistik sayaci; src/world/stat_counters.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067274,AddDistance,68,matching,world,Mutlak delta mesafe ve taşma biriktiricisi; src/world/distance_accum.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x080672B8,AccumulateDistance,68,matching,world,C kaynagindan byte-matching; karmasik (mutlak deger + doyuran tasma sayaci)
-0x080672FC,FUN_080672fc,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080672FC,FormatDecimal,116,matching,misc,Sayiyi bastaki sifirlar olmadan ASCII basamaklara cevirir; src/misc/format_decimal.c
 0x08067370,FUN_08067370,2,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu)
 0x08067374,BumpCount7A,28,matching,world,Ek sayac; src/world/more_counters_2.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08067390,BumpCount84,28,matching,world,Ek sayac; src/world/more_counters_2.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)

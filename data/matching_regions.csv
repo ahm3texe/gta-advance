@@ -164,15 +164,20 @@ start,end,binary,module,notes
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x0806543C,0x0806549C,build/world/player_slot_query.bin,world,Oyuncu yuvasi bayragi ve varlik mesguliyet sorgulari; dogal C byte-matching ve 2 bayt hizalama.
 0x08065518,0x08065574,build/world/slot_range_query.bin,world,"Yuva isareti, deger araligi ve ROM bayt tablosu; dogal C byte-matching."
+0x080663E8,0x080664A4,build/world/link_session.bin,world,"Baglanti oturumu kapanis, karartma ve bekleme adimlari; dogal C byte-matching."
 0x080664A4,0x080664F0,build/world/pause_helpers.bin,world,"Duraklatma: sabit, kosullu sifirlama, oturum aktif mi"
 0x080664F0,0x0806651C,build/world/maybe_advance.bin,world,MaybeAdvance; 42 bayt fonksiyon + 2 bayt hizalama dolgusu
 0x08066540,0x08066568,build/world/reset_session_flags.bin,world,oturum bayraklarini sifirlama
 0x08066A40,0x08066A54,build/world/comm_flag.bin,world,Iletisim bayragi
+0x08066A54,0x08066AA8,build/world/link_hw_reset.bin,world,"Timer3/seri kesmeleri kapatir, SIOCNT ve Timer3 sifirlar."
+0x08066AA8,0x08066B40,build/world/link_report.bin,world,Baglanti ozet kaydini yedi sorgu ve 36 baytlik blok kopyasiyla doldurur.
+0x08067184,0x080671B8,build/world/bump_count_82.bin,world,Gecikmeyle cevrelenmis +0x82 kayit sayaci; dogal C byte-matching.
 0x080671B8,0x0806720C,build/world/more_counters.bin,world,Uc tasma korumali u16 artirici
 0x0806720C,0x08067228,build/world/bump_save_counter.bin,world,gSaveBuffer +0x66 doyuran sayac
 0x08067228,0x08067274,build/world/stat_counters.bin,world,Uc istatistik sayaci: tasma korumali artirim ve biriktirici sifirlama
 0x08067274,0x080672B8,build/world/distance_accum.bin,world,AddDistance; mutlak delta mesafe ve taşma biriktiricisi
 0x080672B8,0x080672FC,build/world/accumulate_distance.bin,world,mesafe biriktirme ve tasma sayaci
+0x080672FC,0x08067370,build/misc/format_decimal.bin,misc,Ondalik basamak yazici; 10 kuvvet tablosuyla tekrarli cikarma.
 0x08067374,0x080673AC,build/world/more_counters_2.bin,world,u16 ve u8 tasma korumali sayaclar
 0x080673C4,0x080673FC,build/world/more_counters_3.bin,world,u8 tasma korumali sayaclar
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"

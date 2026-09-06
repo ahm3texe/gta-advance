@@ -750,3 +750,17 @@ zinciri ise önce sınanan değerin ömrünü bir komut uzatır ve önceliğini 
 Teşhis tek komut: `dump_alloc.py --function <ad>`. İki pseudo'nun önceliği
 eşitse sorun yazım değil akış şeklidir; ifadeyi bölmeyi dene, sözcük
 varyantlarını tarama.
+
+### Kural 49 eki — döngü rotasyonunu bayrağın nerede kurulduğu belirler
+
+`WaitLinkSettle` @ 0x08066454 ölçümü. Aynı gövde iki yazımla:
+
+| yazım | üretilen yerleşim |
+|---|---|
+| `for (;;) { kontrol; if (!again) break; bekleme; }` | kontrol bloğu başta, bekleme sonda; agbcc döngü değişmezi olarak ikinci global adresini **döngü dışına taşıyor** (fazladan yazmaç + push) |
+| `again = 1; while (again) { kontrol; ...; bekleme; }` | bekleme bloğu başta, girişte gövdeye atlayan `b`; adres blok **içinde** yükleniyor — **byte-matching** |
+
+Teşhis işareti: ROM bir global adresini döngünün içinde tekrar tekrar
+yüklüyorsa, o blok ROM'un kaynağında döngü gövdesinin *rotasyonlu*
+kısmındadır. Bayrağı döngüden önce kurup `while (bayrak)` yazmak
+rotasyonu ROM'unkine oturtuyor.
