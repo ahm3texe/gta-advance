@@ -59,7 +59,7 @@ typedef struct ActiveSlot {
 } ActiveSlot;
 
 extern u32  GetActiveSlot(void);
-extern s32  FUN_080651e0(void *context, s32 mode);
+extern s32  PlaceProbeEntries(void *context, s32 mode);
 extern u32  FUN_08019db0(void *context, u32 arg, u32 zero1, u32 zero2);
 extern void FUN_08037564(ActiveSlot *slot, u32 arg, u32 zero1, u32 zero2);
 extern void CreateEntry(Triple *src, u32 arg1, u32 phase, u32 owner);
@@ -85,7 +85,7 @@ void SpawnSlotEffect(void)
         special = 1;
 
     if (special != 0) {
-        if (FUN_080651e0(context, 1) == 0)
+        if (PlaceProbeEntries(context, 1) == 0)
             return;
         if (slot->counter->value > COUNTER_LIMIT)
             slot->counter->value = COUNTER_LIMIT;

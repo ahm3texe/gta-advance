@@ -412,7 +412,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
 0x08065130,SpawnSlotEffect,src/world/spawn_slot_effect.c,176,176,yes
-0x080651E0,FUN_080651e0,src/world/slot_probe.c,404,408,no
+0x080651E0,PlaceProbeEntries,src/world/slot_probe.c,408,408,yes
 0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
 0x080653D4,AccumulateActorMotion,src/world/actor_tracking.c,104,104,yes
 0x0806543C,IsOwnerMarked,src/world/player_slot_query.c,32,32,yes
@@ -422,7 +422,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08065538,IsSlotValueInRange,src/world/slot_range_query.c,48,48,yes
 0x08065568,LookupRomByte,src/world/slot_range_query.c,12,12,yes
 0x08065574,LoadBitmapAsset,src/world/bitmap_asset.c,220,220,yes
-0x08065650,ShutdownAndReset,src/world/shutdown_reset.c,180,164,no
+0x08065650,ShutdownAndReset,src/world/shutdown_reset.c,164,164,yes
 0x080656F4,PollInput,src/world/poll_input.c,224,228,no
 0x08066144,ResetLinkSession,src/world/link_session_reset.c,200,200,yes
 0x0806620C,WaitForPartner,src/world/input_extra.c,320,320,no
