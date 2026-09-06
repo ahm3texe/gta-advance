@@ -25,13 +25,16 @@ typedef struct LinkPacket {
 
 typedef struct CommBlock {
     u8         byte0;                   /* +0x00 */
-    u8         pad01;
+    u8         byte01;                  /* +0x01 */
     u8         byte02;                  /* +0x02 */
     u8         byte03;                  /* +0x03 */
     u8         ready;                   /* +0x04 */
     u8         pad05;
     u8         ready06;                 /* +0x06 */
-    u8         pad07[4];
+    u8         errorBit;                /* +0x07 */
+    u8         pad08;
+    u8         retry;                   /* +0x09 */
+    u8         pad0A;
     u8         ident;                   /* +0x0B */
     u8         pad0C[0x14 - 0x0C];
     s32        sendLen;                 /* +0x14 */

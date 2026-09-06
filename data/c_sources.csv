@@ -431,6 +431,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08066540,ResetSessionFlags,src/world/reset_session_flags.c,40,40,yes
 0x08066568,InitLinkBlock,src/world/link_init.c,164,164,yes
 0x0806673C,BuildLinkPacket,src/world/link_packet.c,92,92,no
+0x0806686C,ServiceLinkFrame,src/world/link_service.c,148,152,no
 0x08066A40,MaybeSetCommByte6,src/world/comm_flag.c,20,20,yes
 0x08066A54,ResetLinkHardware,src/world/link_hw_reset.c,84,84,yes
 0x08066AA8,BuildLinkReport,src/world/link_report.c,152,152,yes

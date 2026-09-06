@@ -49,7 +49,7 @@ extern u8  gGameState[16];
 /* VBlank sirasinda calisan alt sistemler; henuz adlandirilmadi. */
 extern void FUN_08033264(void);
 extern void FUN_08011ec4(void);
-extern void FUN_0806686c(void);
+extern void ServiceLinkFrame(void);
 extern void FlushSpriteList(void);
 extern void FUN_080133a8(void);
 extern void FUN_080130f4(void);
@@ -74,7 +74,7 @@ void VBlankIntr(void)
         FUN_08033264();
         FUN_08011ec4();
         if (gVBlankEnabled != 0)
-            FUN_0806686c();
+            ServiceLinkFrame();
 
         if ((u16)(REG_VCOUNT - VBLANK_FIRST_LINE) <= BUDGET_SHORT) {
             if (gVBlankState == VBLANK_READY) {

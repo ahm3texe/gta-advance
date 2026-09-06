@@ -1700,7 +1700,7 @@ address,name,size,status,module,notes
 0x0806660C,FUN_0806660c,304,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806673C,BuildLinkPacket,92,candidate,world,"Gonderilecek paketi kurar ve saglama toplamini yazar. PARK: 92/92 boyut, 20 bayt fark; agbcc global adres icin iki ayri pseudo uretiyor, ROM tek canli aralik kullaniyor; src/world/link_packet.c"
 0x08066798,FUN_08066798,212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0806686C,FUN_0806686c,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806686C,ServiceLinkFrame,152,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066904,FUN_08066904,316,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08066A40,MaybeSetCommByte6,20,matching,world,Iletisim bayragi; src/world/comm_flag.c boyut kuyruk havuzu dahil olculdu (byte-matching kaniti)
 0x08066A54,ResetLinkHardware,84,matching,world,"Timer3/seri kesmelerini kapatir, SIOCNT ve Timer3 sifirlar; src/world/link_hw_reset.c"

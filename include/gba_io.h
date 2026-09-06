@@ -29,6 +29,8 @@ typedef struct {
 #define REG_TM3CNT_ADDR   0x0400010C
 #define REG_SIOCNT_ADDR   0x04000128
 #define REG_RCNT_ADDR     0x04000134
+#define REG_SIOMLT_SEND_ADDR 0x0400012A
+#define REG_TM3CNT_H_ADDR 0x0400010E
 #define REG_IE_ADDR       0x04000200
 #define REG_IF_ADDR       0x04000202
 #define REG_WAITCNT_ADDR  0x04000204
@@ -46,6 +48,19 @@ typedef struct {
 #define REG_TM3CNT   (*(u32 *)REG_TM3CNT_ADDR)
 #define REG_SIOCNT   (*(volatile u16 *)REG_SIOCNT_ADDR)
 #define REG_RCNT     (*(volatile u16 *)REG_RCNT_ADDR)
+#define REG_SIOMLT_SEND (*(volatile u16 *)REG_SIOMLT_SEND_ADDR)
+/* SIO denetimi ve gonderme kelimesi ard arda; ROM ikisini TEK taban
+ * yazmaciyla yaziyor (`strh r0,[r2,#2]`), ayri mutlak adresler
+ * fazladan literal uretiyor. Bu yuzden struct gorunumu gerekli. */
+typedef struct SioRegs {
+    u16 control;                    /* +0x00 */
+    u16 send;                       /* +0x02 */
+} SioRegs;
+#define REG_SIO (*(volatile SioRegs *)REG_SIOCNT_ADDR)
+#define REG_TM3CNT_H (*(volatile u16 *)REG_TM3CNT_H_ADDR)
+/* SIOCNT bazen 32 bit okunuyor: hata biti ust yarim kelimeyle birlikte
+ * tek `ldr` ile aliniyor (0x0806686C'de olculdu). */
+#define REG_SIOCNT32 (*(volatile u32 *)REG_SIOCNT_ADDR)
 #define REG_IE       (*(volatile u16 *)REG_IE_ADDR)
 #define REG_IF       (*(volatile u16 *)REG_IF_ADDR)
 #define REG_WAITCNT  (*(volatile u16 *)REG_WAITCNT_ADDR)
