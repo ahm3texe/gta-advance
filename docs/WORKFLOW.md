@@ -40,6 +40,29 @@ adayların oluşturduğu blok*tur.
    sağlık göstergesidir
 4. Büyük fonksiyonlar — bayt yüzdesini asıl hareket ettiren bunlar
 
+### Aday seçimi ELLE YAPILMAZ, araçla yapılır
+
+Hedef listesi üreten iki araç var; ikisi de salt okunurdur ve çıktısı
+`--out` ile CSV'ye yazılabilir:
+
+- `tools/find_neighbour_dense.py` — komşuluğu eşleşmiş, henüz C'si
+  yazılmamış fonksiyonlar (bölgenin tip sözlüğü hazır demektir)
+- `tools/find_twins.py` — yapısal olarak aynı fonksiyon çiftleri/kümeleri
+  (bkz. §10)
+
+**Bir sayı raporlanacaksa, onu üreten komut da yazılır.** Tek seferlik
+python parçacığıyla seçim yapmak yasak: 2026-09-07'de plana "123 taze
+komşu-yoğun aday" diye bir sayı girdi ve depoda onu yeniden üretecek
+hiçbir şey yoktu. Sayılar ayrıca ANLIK FOTOĞRAFTIR — her yeni eşleşme
+komşularının sayacını yukarı ittiği için aday sayısı *artabilir*. Bir
+sayıyı doğrulamak için ölçüldüğü commit'te koşturun:
+
+```
+git archive <commit> data/functions.csv src | tar -x -C /tmp/at
+cp tools/find_neighbour_dense.py /tmp/at/tools/ && cd /tmp/at
+python3 tools/find_neighbour_dense.py
+```
+
 ## 3. Fonksiyon döngüsü
 
 1. `tools/disasm_function.py <ad>` ile ROM'u oku, davranışı **anla**
