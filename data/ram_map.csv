@@ -95,6 +95,9 @@ address,size,name,source,status,notes
 0x0201AEE8,8,gRam0201AEE8,decomp,provisional,"Harita izgarasina isaretci. Hedef yapi 0x080651E0dan OLCULDU: +0x00 u16 en, +0x02 u16 boy, +0x04 u16* karo dizisi (y*en+x ile indeksleniyor). Tek tanim include/map_grid.h. 0x0801D7FC ile yaziliyor."
 0x0201AEF0,0,gRam0201AEF0,decomp,provisional,BG2 goruntu konumu dahil calisma blogu; +0x1F88 ve +0x1F8C alanlari kullaniliyor
 0x0201CEC0,2060,gNodePool,decomp,verified,"dugum havuzu; +0x800 serbest liste basi, +0x804 aktif liste basi (byte-matching kanit)  IZLEME: f1508de aktiflesiyor -- oyun dunyasi/NPCler dogdugu an. Bagli liste sistemi burada devreye giriyor.  OLCULDU(FlushSpriteList): +0x800 bos liste basi, +0x804 aktif liste basi, +0x808 onceki kare sprite sayaci. Boyut 2056 -> 2060 duzeltildi.  C KANITI: InitSpritePool 128 x 16 baytlik serbest listeyi kuruyor; InsertSpriteSorted +0/+2/+4 OAM alanlari ve +6 ikincil siralama anahtarini kullaniyor. Ortak tur include/sprite_pool.h.  IZLEME (oturum 6): olumden 1 kare sonra +0x08 ve +0x0C (bos/aktif liste baslari) degisti -- oyuncu varligi serbest birakiliyor."
+0x0201D6D0,0,gRam0201D6D0,decomp,provisional,"FUN_080089b0/FUN_08008a28 havuz nesnesi; ic yapisi BILINMIYOR, boyut olculmedi."
+0x0201ECB0,0,gRam0201ECB0,decomp,provisional,"12 bayt adimli kuyruk dizisi (+0 soz, +4 soz, +8 u16, +0x0A u16); giris sayisi en fazla 128."
+0x02022ABC,4,gRam02022ABC,decomp,provisional,Kuyruk sayaci; 0x08012F88 ve ikizi 128 ile sinirliyor.
 0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
 0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"

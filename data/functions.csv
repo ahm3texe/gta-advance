@@ -281,8 +281,8 @@ address,name,size,status,module,notes
 0x08012CD8,FUN_08012cd8,320,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08012E18,FUN_08012e18,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08012E78,FUN_08012e78,272,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08012F88,FUN_08012f88,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08013010,FUN_08013010,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08012F88,QueueDrawRequest,136,matching,world,Byte-matching C kaynagindan dogrulandi; QueueDrawRequest; cizim istegini 12 bayt adimli kuyruga alir (find_twins.py)
+0x08013010,QueueDrawRequestDup,136,matching,world,Byte-matching C kaynagindan dogrulandi; QueueDrawRequestDup; QueueDrawRequest'in ROM'daki ikinci kopyasi
 0x08013098,FUN_08013098,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080130D4,FUN_080130d4,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080130F4,FUN_080130f4,176,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -590,8 +590,8 @@ address,name,size,status,module,notes
 0x0802A3F0,FUN_0802a3f0,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802A480,FUN_0802a480,308,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802A5B4,FUN_0802a5b4,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0802A610,FUN_0802a610,292,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0802A734,FUN_0802a734,292,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0802A610,DrawCounterDigits8,292,matching,ui,Byte-matching C kaynagindan dogrulandi; DrawCounterDigits8; sekiz basamakli sayaci iki satirlik karolarla yazar (find_twins.py)
+0x0802A734,DrawCounterDigits3,292,matching,ui,"Byte-matching C kaynagindan dogrulandi; DrawCounterDigits3; ayni govde, yalnizca uc basamak ciziliyor"
 0x0802A858,FUN_0802a858,228,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802A93C,FUN_0802a93c,180,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0802A9F0,FUN_0802a9f0,296,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -1574,8 +1574,8 @@ address,name,size,status,module,notes
 0x08060F60,FUN_08060f60,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08061028,FUN_08061028,256,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08061128,FUN_08061128,164,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080611CC,FUN_080611cc,360,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08061334,FUN_08061334,360,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080611CC,MarkDistantActors,360,matching,world,Byte-matching C kaynagindan dogrulandi; MarkDistantActors; 0x0202F310 listesinde alti en yakin disindakileri isaretler (find_twins.py)
+0x08061334,MarkDistantActorsB,360,matching,world,"Byte-matching C kaynagindan dogrulandi; MarkDistantActorsB; ayni govde, 0x0202F2C0 listesi"
 0x0806149C,FUN_0806149c,444,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08061658,FUN_08061658,508,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08061854,FUN_08061854,218,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

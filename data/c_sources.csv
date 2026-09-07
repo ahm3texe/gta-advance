@@ -102,6 +102,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012C54,SortActiveSprites,src/core/sort_active_sprites.c,32,32,yes
 0x08012C74,InsertSpriteSorted,src/core/insert_sprite_sorted.c,98,98,yes
 0x08012CD8,FUN_08012cd8,src/core/sprite_b1.c,320,320,no
+0x08012F88,QueueDrawRequest,src/world/queue_draw_request.c,136,136,yes
+0x08013010,QueueDrawRequestDup,src/world/queue_draw_request.c,136,136,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
 0x080138F4,FUN_080138f4,src/world/wrap_080138f4.c,10,10,yes
 0x08013900,FlushPaletteQueue,src/core/flush_palette_queue.c,120,116,no
@@ -200,6 +202,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08029390,SetActorOffsetFromRecord,src/world/entries_c1.c,104,104,yes
 0x080293F8,PlaceActorFromRecords,src/world/entries_c2.c,186,186,yes
 0x080294B4,ReleaseEntryE,src/world/release_entry_e.c,48,48,yes
+0x0802A610,DrawCounterDigits8,src/ui/draw_eight_digits.c,292,292,yes
+0x0802A734,DrawCounterDigits3,src/ui/draw_eight_digits.c,292,292,yes
 0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
@@ -435,6 +439,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805E6C4,SetLanguage,src/misc/table_lookup.c,16,16,yes
 0x0805E6D4,GetLanguage,src/misc/table_lookup.c,12,12,yes
 0x0805E6E0,GetTextString,src/misc/table_lookup.c,32,32,yes
+0x080611CC,MarkDistantActors,src/world/mark_distant_actors.c,360,360,yes
+0x08061334,MarkDistantActorsB,src/world/mark_distant_actors.c,360,360,yes
 0x08062294,GetModeCategory,src/world/ram_state.c,30,30,yes
 0x080622B4,SetRamState,src/world/ram_state.c,12,12,yes
 0x0806233C,IsModeReady,src/world/is_mode_two.c,20,20,yes
