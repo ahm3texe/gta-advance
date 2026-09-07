@@ -4,7 +4,7 @@ address,name,size,outcome,source,evidence
 0x080081D4,FUN_080081d4,124,parked,,ROM statik triyaj: 5 cagri / 3 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x0800AF48,FUN_0800af48,174,parked,src/world/plane_classify.c,166/174 bayt; yerel/yazmac yasam araligi dagitimi
 0x0800AFF8,FUN_0800aff8,172,parked,,ROM statik triyaj: 1 cagri / 0 kosullu dal / 0 literal; bagimli imza-ve-tur blogu gerekli
-0x0800B16C,FUN_0800b16c,280,parked,,ROM statik triyaj: 0 cagri / 8 kosullu dal / 0 literal; karsilastirma agaci C denemesi gerekli
+0x0800B16C,FUN_0800b16c,280,matching,src/world/band_0800b16c.c,ROM byte-matching; data/functions.csv
 0x0800C180,FUN_0800c180,320,parked,,ROM statik triyaj: 8 cagri / 21 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x080100D0,InitWorkBuffers,124,matching,src/core/memory_init.c,ROM byte-matching
 0x08011BE8,FUN_08011be8,268,parked,,ROM statik triyaj: 1 cagri / 6 kosullu dal / 11 literal; RAM tur blogu gerekli
@@ -36,7 +36,7 @@ address,name,size,outcome,source,evidence
 0x08035BA8,FUN_08035ba8,300,parked,,ROM statik triyaj: 5 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08037D98,FUN_08037d98,228,parked,,ROM statik triyaj: 6 cagri / 13 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08038108,FUN_08038108,154,parked,,ROM statik triyaj: 7 cagri / 5 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
-0x0803AFBC,FUN_0803afbc,480,parked,,ROM statik triyaj: 9 cagri / 20 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
+0x0803AFBC,FUN_0803afbc,480,matching,src/world/band_0803afbc.c,ROM byte-matching; data/functions.csv
 0x0803BDC8,FUN_0803bdc8,540,parked,,ROM statik triyaj: 16 cagri / 27 kosullu dal / 16 literal; bagimli imza-ve-tur blogu gerekli
 0x0803F4BC,TryEngageTarget,372,parked,src/world/try_engage_target.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08041C64,FUN_08041c64,448,parked,,ROM statik triyaj: 4 cagri / 17 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
@@ -49,16 +49,16 @@ address,name,size,outcome,source,evidence
 0x080427C0,FUN_080427c0,124,parked,,ROM statik triyaj: 3 cagri / 2 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
 0x08045888,FUN_08045888,538,parked,,ROM statik triyaj: 20 cagri / 29 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x08047818,FUN_08047818,492,parked,,ROM statik triyaj: 4 cagri / 30 kosullu dal / 13 literal; RAM tur blogu gerekli
-0x0804AEAC,FUN_0804aeac,476,parked,,ROM statik triyaj: 3 cagri / 28 kosullu dal / 15 literal; RAM tur blogu gerekli
+0x0804AEAC,FUN_0804aeac,476,matching,src/world/band_0804aeac.c,ROM byte-matching; data/functions.csv
 0x0804FE64,FUN_0804fe64,120,parked,,ROM statik triyaj: 6 cagri / 3 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x080501C8,FUN_080501c8,192,parked,,ROM statik triyaj: 2 cagri / 14 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
 0x080507F4,FUN_080507f4,290,parked,,ROM statik triyaj: 7 cagri / 19 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
-0x08051154,FUN_08051154,348,parked,,ROM statik triyaj: 33 cagri / 6 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
+0x08051154,FUN_08051154,348,matching,src/core/band_08051154.c,ROM byte-matching; data/functions.csv
 0x0805135C,RunFrameStageOne,132,matching,src/core/frame_dispatch.c,ROM byte-matching
 0x080513E0,RunFrameStageTwo,120,matching,src/core/frame_dispatch.c,ROM byte-matching
 0x08051540,AdjustAreaPosition,144,matching,src/core/adjust_area_position.c,ROM byte-matching
 0x080515D0,FUN_080515d0,164,parked,src/core/mark_area_cells.c,164/164 bayt; 20 bayt fark; iki global literal yukleme sirasi
-0x080534A8,FUN_080534a8,424,parked,,ROM statik triyaj: 9 cagri / 21 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
+0x080534A8,FUN_080534a8,424,matching,src/world/band_080534a8.c,ROM byte-matching; data/functions.csv
 0x08053834,FUN_08053834,250,parked,src/core/nodelist_b2.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08055054,FUN_08055054,312,parked,src/core/nodelist_b7.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08055514,FUN_08055514,124,parked,,ROM statik triyaj: 2 cagri / 7 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli

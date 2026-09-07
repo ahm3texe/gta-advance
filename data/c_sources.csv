@@ -60,6 +60,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
 0x0800AF48,FUN_0800af48,src/world/plane_classify.c,166,174,no
 0x0800B140,DotProduct,src/world/geometry.c,44,44,yes
+0x0800B16C,FUN_0800b16c,src/world/band_0800b16c.c,280,280,yes
 0x0800BDB0,BoxesOverlap,src/world/geometry.c,72,72,yes
 0x0800BDF8,FUN_0800bdf8,src/world/quad_edge_b1.c,198,198,yes
 0x0800BF18,FUN_0800bf18,src/world/quad_edge_test.c,522,522,yes
@@ -243,6 +244,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038364,IsObjectActive,src/world/object_helpers.c,28,28,yes
 0x08038380,UpdateObject,src/world/object_helpers.c,32,32,yes
 0x080383A0,GetObjectLinkId,src/world/object_helpers.c,24,24,yes
+0x0803AFBC,FUN_0803afbc,src/world/band_0803afbc.c,480,480,yes
 0x0803B19C,FUN_0803b19c,src/misc/empty_stubs.c,2,2,yes
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,36,36,yes
@@ -288,6 +290,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080428AC,FUN_080428ac,src/world/wrap_080428ac.c,10,10,yes
 0x08045AA4,FUN_08045aa4,src/world/target_near.c,540,540,yes
 0x08047600,ReissueTargetAction,src/world/target_repeat.c,534,534,yes
+0x0804AEAC,FUN_0804aeac,src/world/band_0804aeac.c,476,476,yes
 0x0804B088,AdvanceTargetAction,src/world/target_follow.c,564,564,yes
 0x0804FB4C,FUN_0804fb4c,src/world/wrap_0804fb4c.c,10,10,yes
 0x0804FF98,FUN_0804ff98,src/world/wrap_0804ff98.c,10,10,yes
@@ -309,6 +312,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050A00,GetAnchorUnk34,src/world/get_anchor_unk34.c,12,12,yes
 0x08050A0C,CheckCurrentEntity,src/world/check_current_entity.c,38,38,yes
 0x08050A34,IsAnchorSmall,src/world/is_anchor_small.c,20,20,yes
+0x08051154,FUN_08051154,src/core/band_08051154.c,348,348,yes
 0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
 0x0805135C,RunFrameStageOne,src/core/frame_dispatch.c,132,132,yes
 0x080513E0,RunFrameStageTwo,src/core/frame_dispatch.c,120,120,yes
@@ -330,6 +334,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08052CF8,ClearAreaIdArrays,src/core/nodelist_d2.c,228,228,yes
 0x08052DDC,FUN_08052ddc,src/core/nodelist_a3.c,154,154,yes
 0x08052E78,ResetAreaIds,src/core/nodelist_d6.c,440,440,yes
+0x080534A8,FUN_080534a8,src/world/band_080534a8.c,424,424,yes
 0x08053650,FUN_08053650,src/core/nodelist_c5.c,108,108,yes
 0x080536BC,ClearObjectIdsAndSlots,src/core/nodelist_d1.c,216,216,yes
 0x08053794,FUN_08053794,src/core/nodelist_a9.c,158,158,yes
@@ -411,6 +416,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080646F8,GetGlyphCell,src/text/glyph_table_access.c,44,44,yes
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
+0x08064F24,FUN_08064f24,src/world/band_08064f24.c,500,524,no
 0x08065130,SpawnSlotEffect,src/world/spawn_slot_effect.c,176,176,yes
 0x080651E0,PlaceProbeEntries,src/world/slot_probe.c,408,408,yes
 0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
@@ -465,6 +471,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08067390,BumpCount84,src/world/more_counters_2.c,28,28,yes
 0x080673C4,BumpCount70,src/world/more_counters_3.c,28,28,yes
 0x080673E0,BumpCount80,src/world/more_counters_3.c,28,28,yes
+0x080674B0,FormatDecimalDup,src/misc/format_decimal_dup.c,116,116,yes
 0x0806A77C,FUN_0806a77c,src/arm/plane_test.c,188,196,no
 0x08070D10,FUN_08070d10,src/misc/fast_memchr.c,136,132,no
 0x08070D94,FUN_08070d94,src/misc/empty_stubs.c,2,2,yes
