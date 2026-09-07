@@ -70,7 +70,7 @@ extern u32  SelectWordSource(u32 slot);
 extern u32  FUN_0803c708(u32 slot);
 extern s32  FUN_08019320(Entity *entity);
 extern void FUN_080350a8(Entity *entity, s32 arg);
-extern s32  FUN_08017d78(u32 flags);
+extern s32  FlagsToAngle(u32 flags);
 extern void RequestActorAction(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080198e4(Actor *self, s32 a, s32 b, s32 c);
 
@@ -116,7 +116,7 @@ void StepActorBehaviorB3(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -180,7 +180,7 @@ void StepActorBehavior136(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -242,7 +242,7 @@ void StepActorBehavior155(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -304,7 +304,7 @@ void StepActorBehavior139(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -366,7 +366,7 @@ void StepActorBehavior142(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -428,7 +428,7 @@ void StepActorBehavior149(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -490,7 +490,7 @@ void StepActorBehavior152(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -552,7 +552,7 @@ void StepActorBehavior146(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -614,7 +614,7 @@ void StepActorBehaviorB4a(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -678,7 +678,7 @@ void StepActorBehaviorB4b(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -742,7 +742,7 @@ void StepActorBehavior130(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:
@@ -804,7 +804,7 @@ void StepActorBehavior133(Actor *self)
     } else if (owner->flags & BLEND_MASK) {
         flags = owner->flags;
         base = owner->unk0C;
-        dir = ((FUN_08017d78(flags) - base + ROUND_BIAS) >> 24) & 3;
+        dir = ((FlagsToAngle(flags) - base + ROUND_BIAS) >> 24) & 3;
         switch (dir) {
         case 0:
         case 2:

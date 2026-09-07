@@ -27,7 +27,7 @@ typedef struct Actor {
     Sub *sub;                   /* +0x18 */
 } Actor;
 
-extern s32 FUN_08017d78(u32 arg);
+extern s32 FlagsToAngle(u32 arg);
 
 /* 0x08019B08 */
 u32 IsActorUsable(Actor *a)
@@ -55,6 +55,6 @@ s32 GetAngleField(u32 base, u32 arg)
 {
     s32 diff;
 
-    diff = FUN_08017d78(arg);
+    diff = FlagsToAngle(arg);
     return ((diff - (s32)base + 0x800000) >> 24) & 3;
 }

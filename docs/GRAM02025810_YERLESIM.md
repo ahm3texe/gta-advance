@@ -177,7 +177,7 @@ bir grafik yordamına geçiriliyor. 0x114C–0x134C tam **0x200 = 512 bayt**.
 | +0x1378 | W | U | 3 | 3 | FUN_080296a0, FUN_0802e3fc, FUN_0802f55c | Orta |
 | +0x137C | B | U | 4 | 9 | FUN_0802de70, FUN_0802ead4, **FUN_08030f90** | Yüksek |
 | +0x137D | B | U | 2 | 8 | **BumpStepCounter**, FUN_08029e44 | Yüksek |
-| +0x137E | B | U | 2 | 5 | **CleanupAreaTiles**, FUN_080306c8 | Yüksek |
+| +0x137E | B | U | 2 | 5 | **CleanupAreaTiles**, ShowLevelBadge | Yüksek |
 | +0x1380 | H | U | 4 | 6 | FUN_08029c20, FUN_0802af40, FUN_0802df18 | Yüksek |
 | +0x1382 | H | U | 2 | 8 | FUN_08029c20, FUN_08029d44 | Orta |
 | +0x1384 | H | U | 4 | 6 | FUN_08029c20, FUN_0802af40, FUN_0802df18 | Yüksek |

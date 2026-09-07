@@ -29,12 +29,14 @@ start,end,binary,module,notes
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Dort koordinat erisimcisi (0x02011030 +12/+16/+72 ve 0x020110AC)
 0x0800A980,0x0800A9E4,build/core/clip_bounds.bin,core,sinir kutusu daraltma
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
+0x0800AAF4,0x0800AB30,build/world/reset_track_heading.bin,world,0x0800AAF4 ResetTrackHeading
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,CoordBlock +0x71 baytini sifirlama
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Nokta-dortgen testi; en yakin kenarin indeksini dondurur.
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
 0x080100D0,0x0801014C,build/core/memory_init.bin,core,Tampon ayirma ve DMA3 sifirlama; dogal C byte-matching.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,kucuk fonksiyon hasadi
+0x08012750,0x080127A0,build/video/setup_bg0_bg1_menu.bin,video,0x08012750 SetupBg0Bg1Menu
 0x080127A8,0x080127FC,build/video/setup_bg0_bg1.bin,video,0x080127A8 SetupBg0Bg1
 0x080127FC,0x0801282C,build/core/list_ops2.bin,core,List init + push front (varyant)
 0x0801282C,0x08012898,build/core/insert_sorted.bin,core,sirali listeye ekleme
@@ -47,6 +49,7 @@ start,end,binary,module,notes
 0x08012C0C,0x08012C54,build/core/alloc_node.bin,core,72 bayt C byte-matching; daha once eslesen AllocNode kalici build kaydi
 0x08012C54,0x08012C74,build/core/sort_active_sprites.bin,core,32 bayt C byte-matching; aktif sprite listesini kesmeler kapaliyken sirala
 0x08012C74,0x08012CD8,build/core/insert_sprite_sorted.bin,core,98 bayt C byte-matching + 2 bayt hizalama; kararli sprite ekleme
+0x08012E18,0x08012E78,build/world/queue_draw_request_direct.bin,world,0x08012E18 QueueDrawRequestDirect
 0x08012F88,0x08013098,build/world/queue_draw_request.bin,world,0x08012F88 QueueDrawRequest + 0x08013010 ikizi
 0x080138E8,0x080138F4,build/world/wrap_080138e8.bin,world,kucuk fonksiyon hasadi
 0x080138F4,0x08013900,build/world/wrap_080138f4.bin,world,kucuk fonksiyon hasadi
@@ -55,11 +58,13 @@ start,end,binary,module,notes
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,kucuk fonksiyon hasadi
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184 bayt gövde + literal havuzu
 0x08017500,0x08017628,build/world/facing_target.bin,world,0x08017500 GetFacingTarget + 0x08017594 GetFacingTargetDup (ayni govde)
+0x08017D78,0x08017E3C,build/world/flags_to_angle.bin,world,0x08017D78 FlagsToAngle
 0x08017E3C,0x08018B74,build/world/actor_behavior_steps.bin,world,"0x08017E3C-0x08018B73 aktor davranis adimlari (12 fonksiyon, tek sablon)"
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x0801952C,0x08019590,build/world/actor_desc_resolve.bin,world,0x0801952C ResolveActorDesc; gRom08BD3448 kokunden aktor tanimi
 0x08019620,0x08019670,build/world/actor_id_matches.bin,world,0x08019620 ActorIdMatches; kimlik/takma ad esleme sorgusu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
+0x08019710,0x0801979C,build/world/ping_other_actors.bin,world,0x08019710 PingOtherActors
 0x080199BC,0x08019A44,build/world/palette_lerp.bin,world,On alti BGR555 rengin 16.16 katsayili karisimi; dogal C byte-matching ve 2 bayt hizalama.
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
@@ -70,6 +75,7 @@ start,end,binary,module,notes
 0x08023A80,0x08023A9C,build/world/masked_compare.bin,world,maskeli karsilastirma
 0x08028B2C,0x08028B9C,build/world/release_entry_bc.bin,world,0x08028B2C ReleaseEntryB + 0x08028B64 ReleaseEntryC
 0x08028C48,0x08028CE8,build/world/table_entries.bin,world,"Uc tablo girdisi yardimcisi: aktiflik testi, iki serbest birakma"
+0x08028CE8,0x08028D44,build/world/spawn_at_slot.bin,world,0x08028CE8 SpawnAtSlot
 0x08028DC4,0x08028DF4,build/world/release_entry_d.bin,world,0x08028DC4 ReleaseEntryD
 0x08028E3C,0x08028E6C,build/world/kind_scan.bin,world,HasWantedEntry; 14 girdilik etkin tür taraması
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
@@ -97,6 +103,7 @@ start,end,binary,module,notes
 0x080311DC,0x08031204,build/ui/clear_map_window.bin,ui,0x080311DC ClearMapWindow
 0x08031318,0x08031328,build/world/get_record_node_by_id.bin,world,"0x08031318 GetRecordNodeById (+2 bayt hizalama dolgusu, ROM'da 0000)"
 0x08031328,0x08031388,build/ui/clear_map_window_dma.bin,ui,0x08031328 ClearMapWindowDma
+0x08031388,0x080313E0,build/world/init_session_attr.bin,world,0x08031388 InitSessionAttr
 0x08031414,0x08031498,build/world/scale_magnitude.bin,world,0x08031414 ScaleMagnitude
 0x08031498,0x08031534,build/ui/draw_two_digits.bin,ui,0x08031498 DrawTwoDigits
 0x08031534,0x08031578,build/world/band_a_31534.bin,world,Sabit noktali konumu hucreye cevirip hucrenin bos olup olmadigini doner
@@ -122,6 +129,7 @@ start,end,binary,module,notes
 0x0803378C,0x08033798,build/world/wrap_0803378c.bin,world,kucuk fonksiyon hasadi
 0x0803379C,0x080337A8,build/world/wrap_0803379c.bin,world,kucuk fonksiyon hasadi
 0x080337A8,0x08033820,build/world/stop_audio_dma.bin,world,0x080337A8 StopAudioDmaOnCartFlag
+0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
 0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,kucuk fonksiyon hasadi
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
@@ -180,6 +188,7 @@ start,end,binary,module,notes
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08051540,0x080515D0,build/core/adjust_area_position.bin,core,Alan derinligi degisiminde konum ofsetini duzeltir
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Dunya nesnesinin kare adimi: sayac, yikim, yuva ayirma, kayit kurulumu."
+0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
 0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
 0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Konumu dort komsu ofsette sinar
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
@@ -205,6 +214,7 @@ start,end,binary,module,notes
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,yaprak erisimci
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
+0x080646AC,0x080646F8,build/world/random_below_count.bin,world,0x080646AC RandomBelowCount
 0x08064F24,0x08065130,build/world/band_08064f24.bin,world,Aktor izleme turunu kapatir ve mesafe/dusus skorunu isler.
 0x08065130,0x080651E0,build/world/spawn_slot_effect.bin,world,Etkin yuva icin 51 numarali girisi uretir; dogal C byte-matching.
 0x080651E0,0x08065378,build/world/slot_probe.bin,world,Sonda noktalarini harita izgarasinda sinayip giris uretir.
@@ -238,5 +248,6 @@ start,end,binary,module,notes
 0x080672FC,0x08067370,build/misc/format_decimal.bin,misc,Ondalik basamak yazici; 10 kuvvet tablosuyla tekrarli cikarma.
 0x08067374,0x080673AC,build/world/more_counters_2.bin,world,u16 ve u8 tasma korumali sayaclar
 0x080673C4,0x080673FC,build/world/more_counters_3.bin,world,u8 tasma korumali sayaclar
+0x08067404,0x080674B0,build/world/is_kind20.bin,world,0x08067404 IsKind20 (36 girisli atlama tablosu)
 0x080674B0,0x08067524,build/misc/format_decimal_dup.bin,misc,Ondalik basamak yazicinin ROMdaki ikinci kopyasi; md5 esitligi dogrulandi.
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"

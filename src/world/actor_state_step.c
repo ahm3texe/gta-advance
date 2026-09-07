@@ -147,7 +147,7 @@ extern void FUN_080426ec(Task *task, s32 a, Entity *entity);
 extern s32 GetAnchorUnk34(void);
 extern s32 FUN_08023660(Entity *entity);
 extern void FUN_08016990(Actor *self, s32 a);
-extern void FUN_08017c28(Actor *self);
+extern void DispatchActorBehavior(Actor *self);
 extern void FUN_08019260(Actor *self);
 
 /* KURAL 45: her case bu kalibi KENDI yerelleriyle yazmali.  Makro her
@@ -317,7 +317,7 @@ void FUN_08017628(Actor *self)
                    || (*(s8 *)(self->entity->detail + 0x114) != 2
                        && (u8)(self->sub - 2) < 2)) {
             if (FUN_08023660(self->entity) == 0) {
-                FUN_08017c28(self);
+                DispatchActorBehavior(self);
                 FUN_08019260(self);
             } else {
                 self->tag = 3;

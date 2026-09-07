@@ -19,7 +19,7 @@ address,name,size,outcome,source,evidence
 0x08015834,FUN_08015834,362,parked,,ROM statik triyaj: 14 cagri / 20 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
 0x08019320,FUN_08019320,164,parked,,ROM statik triyaj: 3 cagri / 19 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
 0x080193C4,FUN_080193c4,138,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
-0x08019710,FUN_08019710,140,parked,,ROM statik triyaj: 4 cagri / 14 kosullu dal / 0 literal; bagimli imza-ve-tur blogu gerekli
+0x08019710,PingOtherActors,140,matching,src/world/ping_other_actors.c,ROM byte-matching; data/functions.csv
 0x0801983C,FUN_0801983c,168,parked,,ROM statik triyaj: 0 cagri / 1 kosullu dal / 1 literal; atlama tablosu rekonstruksiyonu gerekli
 0x080199BC,BlendPaletteBlock,134,matching,src/world/palette_lerp.c,ROM byte-matching
 0x08019C24,FUN_08019c24,264,parked,,ROM statik triyaj: 0 cagri / 11 kosullu dal / 4 literal; RAM tur blogu gerekli
@@ -27,7 +27,7 @@ address,name,size,outcome,source,evidence
 0x080237B0,FUN_080237b0,184,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
 0x08023868,FUN_08023868,196,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
 0x08029518,FUN_08029518,392,parked,,ROM statik triyaj: 2 cagri / 1 kosullu dal / 19 literal; RAM tur blogu gerekli
-0x080306C8,FUN_080306c8,384,parked,,ROM statik triyaj: 9 cagri / 9 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
+0x080306C8,ShowLevelBadge,384,parked,,ROM statik triyaj: 9 cagri / 9 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
 0x08030EAC,LoadHudPalettes,124,matching,src/ui/load_hud_palettes.c,ROM byte-matching; data/functions.csv
 0x08031C10,ReplaceNibbleField,136,matching,src/world/nibble_replace.c,ROM byte-matching
 0x08031C98,PushSlotQueueEntry,140,matching,src/world/push_slot_queue_entry.c,ROM byte-matching; data/functions.csv
@@ -73,13 +73,13 @@ address,name,size,outcome,source,evidence
 0x08064180,FUN_08064180,396,parked,src/text/text_f3.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08064590,ClearTextArea,132,parked,src/text/clear_text_area.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08064724,FUN_08064724,536,parked,src/text/text_f5.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08064DFC,FUN_08064dfc,294,parked,,ROM statik triyaj: 4 cagri / 16 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
+0x08064DFC,ApplyLaunchVelocity,294,parked,,ROM statik triyaj: 4 cagri / 16 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x08066568,InitLinkBlock,164,matching,src/world/link_init.c,ROM byte-matching; data/functions.csv
 0x0806660C,StepLinkFrame,304,matching,src/world/link_frame_step.c,ROM byte-matching; data/functions.csv
 0x08066904,SerialIrqHandler,316,matching,src/world/link_dispatch.c,ROM byte-matching; data/functions.csv
 0x08066AA8,BuildLinkReport,152,matching,src/world/link_report.c,ROM byte-matching; data/functions.csv
 0x08067014,FUN_08067014,368,parked,,ROM statik triyaj: 1 cagri / 25 kosullu dal / 1 literal; karsilastirma agaci C denemesi gerekli
-0x08067404,FUN_08067404,172,parked,,ROM statik triyaj: 0 cagri / 1 kosullu dal / 1 literal; 36 girisli atlama tablosu rekonstruksiyonu gerekli
+0x08067404,IsKind20,172,matching,src/world/is_kind20.c,ROM byte-matching; data/functions.csv
 0x0806B88C,FUN_0806b88c,370,parked,,ROM statik triyaj: 1 cagri / 5 kosullu dal / 8 literal; BIOS/SDK imza blogu gerekli
 0x08070D10,FUN_08070d10,132,parked,src/misc/fast_memchr.c,136/132 bayt; 83 bayt fark; r4-r7 dagitimi
 0x08070E10,FUN_08070e10,156,parked,,ROM statik triyaj: 3 cagri / 3 kosullu dal / 1 literal; libc kaynak kimligi gerekli
