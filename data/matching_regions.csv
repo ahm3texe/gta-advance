@@ -72,6 +72,7 @@ start,end,binary,module,notes
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Kare zinciri
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Uc katmanli zincir + negasyon
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
+0x080294B4,0x080294E4,build/world/release_entry_e.bin,world,0x080294B4 ReleaseEntryE
 0x0803084C,0x08030860,build/world/set_bg1_enable.bin,world,DISPCNT bit 9 kurma
 0x08030860,0x08030874,build/world/clear_bg1_enable.bin,world,DISPCNT bit 9 temizleme
 0x08030874,0x08030884,build/world/forward_with_zero.bin,world,sifir arguman ekleyerek iletme
@@ -99,6 +100,7 @@ start,end,binary,module,notes
 0x080315C0,0x080315CC,build/ui/send_text_mode2.bin,ui,0x080315C0 SendTextMode2
 0x080315F8,0x08031618,build/world/band_a_315f8.bin,world,Nesneyi yuva dizisinde bulup yuvayi birakir
 0x08031618,0x08031658,build/world/release_actor_and_slot.bin,world,0x08031618 ReleaseActorAndSlot
+0x08031658,0x08031684,build/world/release_slot_held.bin,world,0x08031658 ReleaseSlotHeld
 0x08031684,0x080317F0,build/video/blit_strip_plain.bin,video,0x08031684 ReleaseSlotSub + 0x080316B0 BlitStripPlain4bpp (+2 bayt hizalama dolgusu)
 0x080317F0,0x08031844,build/world/band_a_317f0.bin,world,8bpp pikselleri 4bpp karo satirlarina paketler
 0x08031844,0x08031A1C,build/video/blit_strip_clip_left.bin,video,0x08031844 BlitStripClipLeft4bpp (+2 bayt hizalama dolgusu)
@@ -174,6 +176,7 @@ start,end,binary,module,notes
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08051540,0x080515D0,build/core/adjust_area_position.bin,core,Alan derinligi degisiminde konum ofsetini duzeltir
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Dunya nesnesinin kare adimi: sayac, yikim, yuva ayirma, kayit kurulumu."
+0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
 0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Konumu dort komsu ofsette sinar
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma
 0x08055AF8,0x08055B34,build/world/entity_query.bin,world,QueryEntity; varlık türü ve alt-hedef bayrak sorgusu

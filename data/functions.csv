@@ -576,7 +576,7 @@ address,name,size,status,module,notes
 0x08029374,FUN_08029374,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08029390,SetActorOffsetFromRecord,104,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
 0x080293F8,PlaceActorFromRecords,186,matching,unknown,Ghidra kacirmisti; tools/discover_functions.py ile bulundu. Govdesi COZULDU ve byte-matching C kaynagi var
-0x080294B4,FUN_080294b4,48,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x080294B4,ReleaseEntryE,48,matching,world,"Byte-matching C kaynagindan dogrulandi; ReleaseEntryE; ReleaseEntryD ikizi, taban gRam020254D0 (find_twins.py)"
 0x080294E4,FUN_080294e4,52,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08029518,FUN_08029518,392,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080296A0,FUN_080296a0,632,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
@@ -698,7 +698,7 @@ address,name,size,status,module,notes
 0x080315C0,SendTextMode2,12,matching,ui,Byte-matching C kaynagindan dogrulandi; SendTextMode2; hazir metni 2 kipiyle gonderir
 0x080315F8,FUN_080315f8,30,matching,world,Nesneyi yuva dizisinde bulup yuvayi birakir; src/world/band_a_315f8.c
 0x08031618,ReleaseActorAndSlot,64,matching,world,Byte-matching C kaynagindan dogrulandi; ReleaseActorAndSlot; aktoru ve sahibinin yuvasini birakir
-0x08031658,FUN_08031658,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08031658,ReleaseSlotHeld,44,matching,world,"Byte-matching C kaynagindan dogrulandi; ReleaseSlotHeld; ReleaseSlotSub ikizi, +0xEC/+0x58 (find_twins.py)"
 0x08031684,ReleaseSlotSub,44,matching,video,Byte-matching C kaynagindan dogrulandi; ReleaseSlotSub; gRam02025810 yuvasinin alt nesnesini birakir
 0x080316B0,BlitStripPlain4bpp,318,matching,video,Byte-matching C kaynagindan dogrulandi; BlitStripPlain4bpp; sutun kirpmasiz 8x48 4bpp serit cizici
 0x080317F0,FUN_080317f0,84,matching,world,8bpp pikselleri 4bpp karo satirlarina paketler; src/world/band_a_317f0.c
@@ -1314,7 +1314,7 @@ address,name,size,status,module,notes
 0x08055840,FUN_08055840,70,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
 0x08055888,FUN_08055888,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x080558E4,FUN_080558e4,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08055954,FUN_08055954,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08055954,FindFreeNode,28,matching,core,"Byte-matching C kaynagindan dogrulandi; FindFreeNode; FindNode ikizi, liste basi gList02035A80 (find_twins.py)"
 0x08055970,ProbeNearbyPosition,144,matching,core,Konumu dort komsu ofsette sinar ve basarisizsa geri yukler; src/core/probe_nearby_position.c
 0x08055A00,FUN_08055a00,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08055A24,FUN_08055a24,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)

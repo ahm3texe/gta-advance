@@ -84,7 +84,7 @@ Genişlik: `B`=1 bayt, `H`=2 bayt, `W`=4 bayt. İşaret: `S` = `ldrsb`/`ldrsh` g
 
 | Ofset | Gen. | İşaret | Dizi? | Fn | Erişim | Örnek fonksiyonlar | Güven |
 |---|---|---|---|---|---|---|---|
-| +0x00 | B | **S** | hayır | 10 | 19 | FUN_080296a0, FUN_0802a3f0, FUN_080309d4, FUN_08031658 | Yüksek |
+| +0x00 | B | **S** | hayır | 10 | 19 | FUN_080296a0, FUN_0802a3f0, FUN_080309d4, ReleaseSlotHeld | Yüksek |
 | +0x02 | H | **S** | hayır | 3 | 4 | FUN_080296a0, FUN_0802a480, FUN_08030a3c | Yüksek |
 | +0x04 | B (+H) | **S** | hayır | 13 | 26 | FUN_08030114, FUN_08030dd8, HalvesEqual | Yüksek (çelişki: §5.1) |
 | +0x05 | B | **S** | hayır | 11 | 18 | FUN_08029e44, FUN_0802fe44, FUN_08030b88 | Yüksek |
@@ -126,7 +126,7 @@ biçiminde register indeksiyle erişiliyor.
 | +0x4C | +0x10 | W (ptr) | **EVET** | 3 | **ReleaseSlot**, FUN_080296a0, FUN_0802b394 | Yüksek |
 | +0x50 | +0x14 | W (+B) | **EVET** | 7 | ReleaseSlot, FUN_0802b4e8, FUN_0803095c | Yüksek (çelişki: §5.2) |
 | +0x54 | +0x18 | W | **EVET** | 3 | FUN_080296a0, FUN_0802b394, FUN_0802b4e8 | Yüksek |
-| +0x58 | +0x1C | adres alındı | **EVET** | 4 | FUN_080299b0, FUN_0802b484, FUN_08031658 | Orta |
+| +0x58 | +0x1C | adres alındı | **EVET** | 4 | FUN_080299b0, FUN_0802b484, ReleaseSlotHeld | Orta |
 | +0xA0 | +0x64 | adres alındı | **EVET** | 1 | FUN_080299b0 | Düşük |
 | +0xE8 | +0xAC | W | **EVET** | 3 | FUN_080296a0, FUN_0802b394, FUN_0802b4e8 | Yüksek |
 | +0xEC | +0xB0 | B | **EVET** | 5 | FUN_080296a0, FUN_080299b0, FUN_0802b4e8 | Yüksek |

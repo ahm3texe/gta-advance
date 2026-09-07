@@ -185,6 +185,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0802929C,RefreshEntryTimerByQuad,src/world/entries_a3.c,80,80,yes
 0x08029390,SetActorOffsetFromRecord,src/world/entries_c1.c,104,104,yes
 0x080293F8,PlaceActorFromRecords,src/world/entries_c2.c,186,186,yes
+0x080294B4,ReleaseEntryE,src/world/release_entry_e.c,48,48,yes
 0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
@@ -220,6 +221,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080315C0,SendTextMode2,src/ui/send_text_mode2.c,12,12,yes
 0x080315F8,FUN_080315f8,src/world/band_a_315f8.c,30,30,yes
 0x08031618,ReleaseActorAndSlot,src/world/release_actor_and_slot.c,64,64,yes
+0x08031658,ReleaseSlotHeld,src/world/release_slot_held.c,44,44,yes
 0x08031684,ReleaseSlotSub,src/video/blit_strip_plain.c,44,44,yes
 0x080316B0,BlitStripPlain4bpp,src/video/blit_strip_plain.c,318,318,yes
 0x080317F0,FUN_080317f0,src/world/band_a_317f0.c,84,84,yes
@@ -390,6 +392,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055054,FUN_08055054,src/core/nodelist_b7.c,312,312,no
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x080552D4,IsProgressThresholdMet,src/core/nodelist_b8.c,492,492,yes
+0x08055954,FindFreeNode,src/core/find_free_node.c,28,28,yes
 0x08055970,ProbeNearbyPosition,src/core/probe_nearby_position.c,144,144,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
 0x08055A94,FindNodeAfter,src/world/node_search.c,20,20,yes

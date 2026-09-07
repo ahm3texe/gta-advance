@@ -50,7 +50,7 @@
  *    oluyor. Kural 45: her aramaya kendi yereli (`linked` / `other`)
  *    verilince fark 0. ROM'un birinci sonucu r0'da tuketip ikinciyi r2'ye
  *    koymasi tam olarak bu ayrimin izi.
- * 2. Ikinci aramaya yerel `id`i vermek (`FUN_08055954(id)`): fark 8.
+ * 2. Ikinci aramaya yerel `id`i vermek (`FindFreeNode(id)`): fark 8.
  *    Deger cagriyi asiyor, prolog `push {r4,r5,lr}` oluyor ve kimlik r5'e
  *    dagitiliyor; ROM'da r5 YOK. Bu, "ikinci okuma bellekten" iddiasinin
  *    dogrudan kaniti -- kural 11'in tersi yonu.
@@ -97,7 +97,7 @@ typedef struct Entity {
     Node *node;                 /* +0x2C */
 } Entity;
 
-extern Node *FUN_08055954(u32 id);      /* 0x08055954: listede kimlik arar */
+extern Node *FindFreeNode(u32 id);      /* 0x08055954: listede kimlik arar */
 
 /* 0x08053F6C */
 void ResetNodeLinkBits(Entity *ent)
@@ -118,14 +118,14 @@ void ResetNodeLinkBits(Entity *ent)
 
     id = node->linkId;
     if (id != 0 && id != LINK_NONE) {
-        linked = FUN_08055954(id);
+        linked = FindFreeNode(id);
         if (linked != 0 && (linked->bits & LINK_BIT))
             node->bits |= LINK_BIT;
     }
 
     /* Ikinci arama argumanini bellekten yeniden okuyor (yukaridaki prolog
        notu); yerel `id` burada KULLANILMIYOR. */
-    other = FUN_08055954(node->linkId);
+    other = FindFreeNode(node->linkId);
     flags = node->bits;
     if ((flags & LINK_BIT) == 0
      && (other == 0 || (other->bits & LINK_BIT) == 0))

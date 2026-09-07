@@ -8,7 +8,7 @@
  *   1) ROM bankasindaki (gAreaBank +0x24) 36 baytlik alan girisini aliyor;
  *      girisin +0x06 yuva sayisi kadar +0x10 yuva dizisini geziyor. Her
  *      yuva kimligi icin:
- *        - FUN_08055954 ile isaret nesnesi aranip bulunursa +0x18 bayrak
+ *        - FindFreeNode ile isaret nesnesi aranip bulunursa +0x18 bayrak
  *          kelimesi 0xE3FF0000 ile maskeleniyor,
  *        - ReleaseAreaNode cagriliyor,
  *        - ayni kimlikle bankanin +0x1C alanindaki 64 baytlik alt kayit
@@ -157,7 +157,7 @@ typedef struct Area {
 extern AreaBank gAreaBank;
 extern Node    *gNodeListHead;
 
-extern Marker *FUN_08055954(u32 id);
+extern Marker *FindFreeNode(u32 id);
 extern Node   *FindNode(u32 id);
 extern void    ReleaseAreaNode(u32 a, u32 b);
 extern void    FillSlotsWithNone(void *dest, u32 count);
@@ -192,7 +192,7 @@ void ResetAreaIds(Area *area)
         entry = &gAreaBank.entries[*ids];
 
         for (j = 0; j < entry->count; j++) {
-            marker = FUN_08055954(entry->slots[j]);
+            marker = FindFreeNode(entry->slots[j]);
             if (marker != 0)
                 marker->flags &= MARKER_KEEP;
             ReleaseAreaNode(entry->slots[j], 0);
@@ -202,7 +202,7 @@ void ResetAreaIds(Area *area)
                 continue;
 
             for (k = 0; k < sub->count; k++) {
-                marker = FUN_08055954(sub->slots[k]);
+                marker = FindFreeNode(sub->slots[k]);
                 if (marker != 0)
                     marker->flags &= MARKER_KEEP;
                 ReleaseAreaNode(sub->slots[k], 0);
