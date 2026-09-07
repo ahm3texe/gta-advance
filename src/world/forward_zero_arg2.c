@@ -8,10 +8,10 @@
 
 #include "gba_types.h"
 
-extern void FUN_08052750(u32 a, u32 b);
+extern void ReleaseAreaNode(u32 a, u32 b);
 
 /* 0x08055BF8 */
 void ForwardZeroArg2(u32 a)
 {
-    FUN_08052750(a, 0);
+    ReleaseAreaNode(a, 0);
 }

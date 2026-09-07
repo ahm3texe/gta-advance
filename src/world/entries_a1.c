@@ -1,4 +1,4 @@
-/* FUN_08028df4 — 0x08028DF4-0x08028E39
+/* HasActiveEntryOfKind — 0x08028DF4-0x08028E39
  *
  * gEntriesA tablosunu (15 giris, 148 bayt stride) bastan sona tariyor.
  * Bir giris etkinse (+0x00 sifirdan farkli) uc kosuldan biri tutuyor mu
@@ -49,7 +49,7 @@ typedef struct Entry {
 extern Entry gEntriesA[];
 
 /* 0x08028DF4 */
-u32 FUN_08028df4(void)
+u32 HasActiveEntryOfKind(void)
 {
     u8 *base;
     u8 *extra;

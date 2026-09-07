@@ -3,7 +3,7 @@
  * ROM'daki dongu kosulu ilk artirimdan sonra yalniz `i == 0` iken geri
  * donuyor. i sifirdan basladigi icin pratikte sadece 0 numarali girdi
  * isleniyor; bu fonksiyon 65536 girdiyi taramiyor. Ilk girdi aktifse
- * subActive degerine gore FUN_080289b8 veya FUN_080289b4 cagriliyor.
+ * subActive degerine gore NoOp080289B8 veya NoOp080289B4 cagriliyor.
  *
  * BYTE-MATCHING: carpimi isaretci tabanindan once yazan acik tamsayi
  * toplami, agbcc'nin ROM'daki `adds r1, r0, r5` operand sirasini korur.
@@ -23,8 +23,8 @@ typedef struct Entry {
 
 extern Entry gRam02024650[];
 
-extern u32 FUN_080289b8(u16 i);
-extern u32 FUN_080289b4(u16 i);
+extern u32 NoOp080289B8(u16 i);
+extern u32 NoOp080289B4(u16 i);
 
 /* 0x08029014 */
 void ProcessFirstEntry(void)
@@ -40,9 +40,9 @@ void ProcessFirstEntry(void)
         e = (Entry *)((u32)i * sizeof(Entry) + (u32)tbl);
         if (e->active != 0) {
             if (e->subActive == 0)
-                FUN_080289b8(i);
+                NoOp080289B8(i);
             else
-                FUN_080289b4(i);
+                NoOp080289B4(i);
         }
         i++;
     } while (i == 0);

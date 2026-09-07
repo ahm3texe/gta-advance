@@ -35,7 +35,7 @@ taşıyor ve o tarihte oyunu %50 tamamlanmış sayıyor.
 
 **Bizim için anlamı:** ROM tek bir ekibin tutarlı kod tabanı değil. Bu oturumda
 ölçtüğümüz bir bulmacaya makul açıklama veriyor — `FUN_080543D0` ile
-`FUN_08054744` neredeyse ikiz fonksiyonlar ama biri giriş korumalı `do/while`,
+`FindOrInitAreaNode` neredeyse ikiz fonksiyonlar ama biri giriş korumalı `do/while`,
 öteki döndürülmüş `for` derlenmiş (bkz. COMPILER.md kural 49 yan bulgusu).
 Kuralı değiştirmez: **döngü biçimi her fonksiyon için ROM'dan okunmalı**,
 kardeşten kopyalanmamalı.

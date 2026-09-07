@@ -15,7 +15,7 @@
 extern u32 GetAnchorUnk04(void);
 
 /* 0x08051480 */
-u32 FUN_08051480(void)
+u32 ForwardToGetAnchorUnk04(void)
 {
     return GetAnchorUnk04();
 }

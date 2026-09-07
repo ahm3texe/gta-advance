@@ -10,12 +10,12 @@
  *      yuva kimligi icin:
  *        - FUN_08055954 ile isaret nesnesi aranip bulunursa +0x18 bayrak
  *          kelimesi 0xE3FF0000 ile maskeleniyor,
- *        - FUN_08052750 cagriliyor,
+ *        - ReleaseAreaNode cagriliyor,
  *        - ayni kimlikle bankanin +0x1C alanindaki 64 baytlik alt kayit
  *          aliniyor; onun +0x0D yuva sayisi sifir degilse +0x10 dizisi de
  *          ayni iki adimla geziliyor.
  *   2) Kimlik sirali dugum listesinde aranıyor (FindNode). Dugum varsa:
- *        - kirliyse (bit 0) dugumun kendi yuva dizisi FUN_08052750 ile
+ *        - kirliyse (bit 0) dugumun kendi yuva dizisi ReleaseAreaNode ile
  *          gezilip FillSlotsWithNone ile bos kimlige cekiliyor ve kirli
  *          biti temizleniyor (nodelist_c2.c / d1.c ile ayni govde),
  *        - seviyesi 1'den BUYUKSE 1'e cekiliyor,
@@ -159,7 +159,7 @@ extern Node    *gNodeListHead;
 
 extern Marker *FUN_08055954(u32 id);
 extern Node   *FindNode(u32 id);
-extern void    FUN_08052750(u32 a, u32 b);
+extern void    ReleaseAreaNode(u32 a, u32 b);
 extern void    FillSlotsWithNone(void *dest, u32 count);
 extern void    FUN_08055d90(u32 *head, u32 id);
 extern void    LinkAreaEntryIfEligible(s32 index);
@@ -195,7 +195,7 @@ void ResetAreaIds(Area *area)
             marker = FUN_08055954(entry->slots[j]);
             if (marker != 0)
                 marker->flags &= MARKER_KEEP;
-            FUN_08052750(entry->slots[j], 0);
+            ReleaseAreaNode(entry->slots[j], 0);
 
             sub = &gAreaBank.subs[entry->slots[j]];
             if (sub->count == 0)
@@ -205,7 +205,7 @@ void ResetAreaIds(Area *area)
                 marker = FUN_08055954(sub->slots[k]);
                 if (marker != 0)
                     marker->flags &= MARKER_KEEP;
-                FUN_08052750(sub->slots[k], 0);
+                ReleaseAreaNode(sub->slots[k], 0);
             }
         }
 
@@ -217,7 +217,7 @@ void ResetAreaIds(Area *area)
         if (node->dirty) {
             slot = node->slots;
             for (m = 0; m < node->desc->countB; m++, slot++)
-                FUN_08052750(*slot, 0);
+                ReleaseAreaNode(*slot, 0);
             FillSlotsWithNone(node->slots, node->desc->countB);
             node->dirty = 0;
         }

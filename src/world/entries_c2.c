@@ -136,7 +136,7 @@ typedef struct Actor {
 extern void FUN_0802915c(s32 angle, s32 dx, s32 dy, s32 *outX, s32 *outY);
 
 /* 0x080293F8 */
-void FUN_080293f8(Entity *entity, Actor *actor, Record *recA, Record *recB)
+void PlaceActorFromRecords(Entity *entity, Actor *actor, Record *recA, Record *recB)
 {
     Source *src;
     Facing *facing;

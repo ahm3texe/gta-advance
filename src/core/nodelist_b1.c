@@ -1,6 +1,6 @@
 /* Dugumu ve bagli alt nesnelerini kapatma. 0x08052828, 352 bayt. ESLESTI.
  *
- * Kardes FUN_08052750 (src/core/nodelist_a4.c, 0x08052750) ile ayni aileden:
+ * Kardes ReleaseAreaNode (src/core/nodelist_a4.c, 0x08052750) ile ayni aileden:
  * ayni `index >= gAreaBank.count` kapisi, ayni gList02035A80 liste basi, ayni
  * FindNodeAfter (0x08055A94) aramasi, ayni +0x18 bayrak kelimesi ve ayni
  * 0x020110C0 kuyruk cagrisi. Farklari: burada bir ON kapi daha var
@@ -28,7 +28,7 @@
  *     `push {r4-r7,lr}`.
  *   - 0x08041EE0 BIR ARGUMAN ALIYOR. Ikinci cagri oncesi acik `adds r0,r2,#0`
  *     var; birinci cagri oncesi yok cunku alt nesne zaten r0'a dagitilmis.
- *     src/core/nodelist_a8.c orayi `void FUN_08041ee0(void)` diye bildirmis ve
+ *     src/core/nodelist_a8.c orayi `void NoOp08041EE0(void)` diye bildirmis ve
  *     eslesmis (orada r0 tesadufen doluydu) -- BURADA argumansiz bildirim
  *     8 bayt fark veriyor (olculdu).
  *   - Maskeler int genisliginde: `movs #17 / negs` = ~0x10, `movs #129 / negs`
@@ -46,7 +46,7 @@
  *   - `else if (arm != 0) {...} else {...}` diye ters yazim: fonksiyon 348
  *     bayta iniyor ve 80 bayt farkli. agbcc kosulu cevirmiyor; ROM'daki
  *     `cmp r6,#0 / bne` ancak kaynakta ONCE `arm == 0` dali varken cikiyor.
- *   - `FUN_08041ee0()` argumansiz: 8 bayt fark (yukarida).
+ *   - `NoOp08041EE0()` argumansiz: 8 bayt fark (yukarida).
  *   - +0x0B alani `u8` vs `s8`: FARK ETMIYOR, ikisi de 0 fark veriyor.
  *     Alan yalniz `& 2` ile okunuyor, hicbir yerde yazilmiyor; kural 47'nin
  *     kaldiraci burada yok. a4'teki `s8` secimiyle tutarli kalsin diye `s8`
@@ -124,11 +124,11 @@ extern Node    *gList02035A80;          /* 0x02035A80 */
 
 extern Node *FindNodeAfter(Node *node, s32 id);      /* 0x08055A94 */
 extern s32   FUN_08055888(Node *node, s32 mode);     /* 0x08055888 */
-extern void  FUN_08041ee0(Sub *sub);                 /* 0x08041EE0 */
+extern void  NoOp08041EE0(Sub *sub);                 /* 0x08041EE0 */
 extern void  FUN_0800c804(u32 *dest, u32 value);     /* 0x0800C804 */
 
 /* 0x08052828 */
-void FUN_08052828(s32 index, u32 arm)
+void DeactivateAreaNode(s32 index, u32 arm)
 {
     Node *node;
     Node *owner;
@@ -151,12 +151,12 @@ void FUN_08052828(s32 index, u32 arm)
         && FUN_08055888(owner, 0) == 0) {
         osub = owner->sub;
         osub->flags &= ~SUB_E;
-        FUN_08041ee0(osub);
+        NoOp08041EE0(osub);
     }
 
     if ((node->bits & BITS_LIST) != 0) {
         for (i = 0; i < node->shape->count; i++)
-            FUN_08052828(node->shape->list[i], 1);
+            DeactivateAreaNode(node->shape->list[i], 1);
     }
 
     sub = node->sub;
@@ -172,7 +172,7 @@ void FUN_08052828(s32 index, u32 arm)
             if ((sub->flags & SUB_B) != 0)
                 sub->flags = (sub->flags & ~SUB_C) | SUB_D;
             sub->flags &= ~SUB_E;
-            FUN_08041ee0(sub);
+            NoOp08041EE0(sub);
         } else if (arm == 0) {
             sub->flags = (sub->flags & ~SUB_F) | SUB_G;
             node->bits |= BITS_HOLD;

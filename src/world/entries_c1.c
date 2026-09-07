@@ -112,7 +112,7 @@ typedef struct Actor {
 extern void FUN_08029088(s32 angle, s32 dx, s32 dy, s8 *outX, s8 *outY);
 
 /* 0x08029390 */
-void FUN_08029390(Actor *actor, Record *rec)
+void SetActorOffsetFromRecord(Actor *actor, Record *rec)
 {
     s32 dx;
     s32 dy;

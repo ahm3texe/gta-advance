@@ -86,7 +86,7 @@
 extern u16 gRam0201AECC;
 
 /* 0x080126E4 */
-void FUN_080126e4(void)
+void ConfigureBgControlRegs(void)
 {
     DISPCNT = DISPLAY_MODE;
 

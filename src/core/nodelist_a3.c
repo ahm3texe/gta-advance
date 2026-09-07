@@ -5,7 +5,7 @@
  *   +0x30'daki dizi  -> her kimlik FindOrRecycleNode'a; donen dugumun
  *                       +0x0B bayraklarinda 2 biti YOK ve 1 biti VARSA,
  *                       dugumun kendi +0x18 dizisi de gezilip her kimlik
- *                       FUN_08052828'e (ikinci arguman 1) veriliyor
+ *                       DeactivateAreaNode'e (ikinci arguman 1) veriliyor
  *
  * Dizi uzunluklari kayittan (+0x28) her turda YENIDEN okunuyor: ROM ic
  * donguye girmeden once `ldrb [r9,#6]` yapip cikista tekrar yapiyor, yani
@@ -58,10 +58,10 @@ typedef struct Entry {
 
 extern void  FUN_08055be8(u16 id);
 extern Node *FindOrRecycleNode(s32 id);
-extern void  FUN_08052828(u16 id, s32 flag);
+extern void  DeactivateAreaNode(u16 id, s32 flag);
 
 /* 0x08052DDC */
-void FUN_08052ddc(Entry *entry)
+void ReleaseEntryNodeRefs(Entry *entry)
 {
     Record *rec;
     Record *rec2;
@@ -98,7 +98,7 @@ void FUN_08052ddc(Entry *entry)
             rec2 = node->record;
             if ((node->kind & 2) == 0 && (node->kind & 1) != 0) {
                 for (j = 0; j < rec2->idCount; j++, q++) {
-                    FUN_08052828(*q, 1);
+                    DeactivateAreaNode(*q, 1);
                 }
             }
         }

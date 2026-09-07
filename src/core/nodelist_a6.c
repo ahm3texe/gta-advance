@@ -11,7 +11,7 @@
  *      fonksiyon biter.
  *   4. Ayni sey countA / node->slotsA icin.
  *   5. Iki kopyalama dongusu: slotsB <- desc->listB (+0x0C), her yazilan
- *      kimlikle FUN_08053650; slotsA <- desc->listA (+0x08), her yazilan
+ *      kimlikle PrepareAreaNode; slotsA <- desc->listA (+0x08), her yazilan
  *      kimlikle LinkAreaEntryIfEligible (0x08052C68).
  *   6. node->desc = desc (+0x14), node->unk0A = 0xFF (+0x0A).
  *
@@ -71,9 +71,9 @@
  * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
  * Kural 1: 0x02030C00 extern sembol (gRam02030C00), sabit cast degil.
  *
- * `*dst = *src; FUN_08053650(*dst);` — cagri argumani KAYNAKTAN degil
+ * `*dst = *src; PrepareAreaNode(*dst);` — cagri argumani KAYNAKTAN degil
  * HEDEFTEN yeniden okunuyor (`strh r0,[r4]` hemen ardindan `ldrh r0,[r4]`).
- * `FUN_08053650(*src)` yazmak bu ikinci `ldrh`yi eler.
+ * `PrepareAreaNode(*src)` yazmak bu ikinci `ldrh`yi eler.
  *
  * ESLESME: 196/196 bayt.
  *
@@ -114,11 +114,11 @@ typedef struct Node {
 extern u32 gRam02030C00;
 
 extern u16 *FindFreeSlotRun(int count);
-extern void FUN_08053650(s32 index);
+extern void PrepareAreaNode(s32 index);
 extern void LinkAreaEntryIfEligible(s32 index);
 
 /* 0x08053930 */
-void FUN_08053930(Node *node, SlotDesc *desc)
+void InitNodeFromDesc(Node *node, SlotDesc *desc)
 {
     u16 *dst;
     u16 *srcB;
@@ -153,7 +153,7 @@ void FUN_08053930(Node *node, SlotDesc *desc)
     srcB = desc->listB;
     for (i = 0; i < desc->countB; i++, dst++, srcB++) {
         *dst = *srcB;
-        FUN_08053650(*dst);
+        PrepareAreaNode(*dst);
     }
 
     dst = node->slotsA;

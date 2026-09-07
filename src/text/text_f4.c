@@ -64,7 +64,7 @@
  * (karo indeksi / palet indeksi / font sapmasi). GLYPH_TILES ve
  * GLYPH_WIDTHS adlari SetTextContext'in 3. ve 4. parametrelerinin kardes
  * dosyada aldigi adlardan geliyor; oradaki `gGlyphTiles` adi da GECICI
- * olarak isaretli. Fonksiyon adi FUN_08064614 olarak birakildi.
+ * olarak isaretli. Fonksiyon adi InitTextTilesAndPalette olarak birakildi.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/text/text_f4.c  -> BYTE-MATCHING 132/132
@@ -84,7 +84,7 @@ extern void SetTextContext(u8 *vram, u32 stride, u8 *tiles, u8 *widths,
                            u8 fontIndex, u32 halfSpacing);
 
 /* 0x08064614 */
-void FUN_08064614(u32 tile, u32 palette, u32 bias)
+void InitTextTilesAndPalette(u32 tile, u32 palette, u32 bias)
 {
     volatile u16 fill;
     u16 ime;

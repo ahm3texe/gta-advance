@@ -69,7 +69,7 @@
 extern s32 gCountdownTimers[4];
 
 /* 0x08053AD8 */
-void FUN_08053ad8(void)
+void StepCountdownTimers(void)
 {
     if (gCountdownTimers[0] > 0) {
         gCountdownTimers[0] -= gFrameDelay;

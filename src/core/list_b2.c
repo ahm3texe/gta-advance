@@ -31,7 +31,7 @@
  * kaynakta da yerele alinmadan her seferinde alan okundu.
  *
  * DENENENLER (tekrar etme):
- *   - Parametreyi DOGRUDAN yurutmek (`void FUN_0800dcb4(SourceEntry *src)`
+ *   - Parametreyi DOGRUDAN yurutmek (`void BuildEntryTableRows(SourceEntry *src)`
  *     + `src++`): 154/154 boyut, tek fark parametre kopyasinin sirasi.
  *     agbcc parametre->pseudo kopyasini prologa koyuyor, o yuzden
  *     `adds r3,r0,#0` havuz literalinden ONCE cikiyordu; ROM'da SONRA.
@@ -82,7 +82,7 @@ typedef struct {
 extern EntryTable gRam02015650;
 
 /* 0x0800DCB4 */
-void FUN_0800dcb4(SourceEntry *entries)
+void BuildEntryTableRows(SourceEntry *entries)
 {
     u32 *pool;
     SourceEntry *src;

@@ -84,7 +84,7 @@ extern AreaBank gAreaBank;
 extern u32      gRam020004A0;
 extern Node    *gList02035A80;
 
-extern Node *FUN_080543d0(Node **head, s32 index);
+extern Node *FindOrClaimNode(Node **head, s32 index);
 extern void  FUN_080521c4(Node *node, Record *record);
 
 /* 0x080526B8 */
@@ -97,7 +97,7 @@ Node *RebuildAreaEntry(s32 index, u32 value)
         if ((gAreaBank.records[index].flags & 8) != 0) return 0;
     }
 
-    node = FUN_080543d0(&gList02035A80, index);
+    node = FindOrClaimNode(&gList02035A80, index);
 
     node->kind &= ~KIND_CLEAR;
     if ((node->kind & 2) != 0) {

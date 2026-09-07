@@ -235,10 +235,10 @@ yeniden ölçüldü.
 | fonksiyon | old_agbcc | agbcc |
 |---|---|---|
 | FUN_0800cb08 | 291 | 146 |
-| FUN_08030e78 | 34 | 14 |
-| FUN_08030f28 | 28 | 15 |
+| ClearHudFieldA | 34 | 14 |
+| ClearHudFieldB | 28 | 15 |
 | TryEngageTarget | 211 | 208 |
-| FUN_08045aa4 | 12 | **40** |
+| IsTargetNear | 12 | **40** |
 | RunMenuScreen | 949 | **955** |
 | StepEntryTimer | 55 | **64** |
 
@@ -258,7 +258,7 @@ tekrar bakılmaya değer olabilir; ötekiler için bu yol kapalı.
 
 ## Yazmaç kopyası: kaynak düzeyinden üretilemeyen sınıf
 
-`FUN_08030e78` / `FUN_08030f28` (ikisi de 36/40, dört bayt kısa) bu sınıfın
+`ClearHudFieldA` / `ClearHudFieldB` (ikisi de 36/40, dört bayt kısa) bu sınıfın
 temiz örneği. `old_agbcc` ROM'un gövdesini komut komut aynı üretiyor; tek eksik
 ROM'daki fazladan `adds r2, r0, #0`. ROM karo sabitini önce r0'a yükleyip r2'ye
 taşıyor çünkü dağıtıcı r0'ı döngü sayacına bırakıyor; bizimki sabiti doğrudan
@@ -458,15 +458,15 @@ döngüyü döndürmeye (`b` ile alttaki teste atlama) itti. ROM'un giriş
 koruması + alttan dönen biçimi için `break` yerine açık `goto` yazın.
 
 **AYNI AILEDEKI FONKSIYONLAR AYNI DONGU BICIMINI KULLANMAYABILIR.**
-`FUN_080543D0` ve `FUN_08054744` neredeyse ikiz (ikisi de sıralı listede
+`FUN_080543D0` ve `FindOrInitAreaNode` neredeyse ikiz (ikisi de sıralı listede
 kimlik arayıp yedek düğümü kuruyor) ama ROM'da farklı derlenmişler:
 
 | | ROM'un biçimi | doğru yazım |
 |---|---|---|
 | FUN_080543D0 | giriş koruması + alttan dönen do/while | `if (cur == 0) goto ...` + `goto scan` |
-| FUN_08054744 | döndürülmüş `for` (`b` ile teste atlama) | `goto test;` + `step:` / `test:` |
+| FindOrInitAreaNode | döndürülmüş `for` (`b` ile teste atlama) | `goto test;` + `step:` / `test:` |
 
-`FUN_08054744`'te düz `for` yazmak agbcc'ye ilk turu **soydurdu** (kimlik
+`FindOrInitAreaNode`'te düz `for` yazmak agbcc'ye ilk turu **soydurdu** (kimlik
 karşılaştırması çıktıda iki kez); 176/164 bayt, 12 fazla. Açık atlamalarla
 ROM'un biçimini yazınca boyut tuttu ve fark 162'den 107'ye indi.
 
@@ -511,7 +511,7 @@ satırlık cevabı orada; araç onu basmıyor.
 ## Kural 47'ye karşı örnek — işaretlilik BAZEN fark ediyor
 
 `FUN_080526B8`'de (nodelist_b6.c) `+0x0B` alanının `u8` mi `s8` mi olduğu fark
-etmemişti. `FUN_08052750`'de **fark ediyor**: `u8` alanda `kind &= ~1` tek
+etmemişti. `ReleaseAreaNode`'de **fark ediyor**: `u8` alanda `kind &= ~1` tek
 komuta katlanıyor (`movs r0,#254`), ROM ise `movs r0,#2 / negs r0,r0` ile −2
 kuruyor. Alan `s8` olmalı. Ters yönde bedel yok: `s8` iken de `kind & 1` ve
 `(kind & 0xF) | 0x10` hâlâ `ldrb` üretiyor, agbcc 0x100'den küçük maskede
@@ -535,7 +535,7 @@ komut seçiminden geliyor. Buraya değişken bölme uygulamak **boş emek** —
 üç dosyanın körlemesine kurcalanmasının sebebi tam da bu ayrımın
 yapılmamasıydı.
 
-`FUN_08054744` — fark 80. Callee-saved trafiği **sapıyor**: r3 ROM 13 /
+`FindOrInitAreaNode` — fark 80. Callee-saved trafiği **sapıyor**: r3 ROM 13 /
 bizde 6, r4 ROM 16 / bizde 13, r2 ROM 10 / bizde 16. ROM ağırlığı r3+r4'te
 tutuyor, biz r2'ye yıkıyoruz. Sorumlu ölçüldü: bir allocno 12 refs / 64
 ömürle en yoğun ikinci değer ama **hiç çağrı aşmıyor**, o yüzden `find_reg`

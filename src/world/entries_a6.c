@@ -152,7 +152,7 @@ extern u32 GetActiveSlot(void);
 extern void FUN_08035230(u32 slot, u32 id);
 
 /* 0x080289BC */
-void FUN_080289bc(Entry *e)
+void AdvanceEntryFrame(Entry *e)
 {
     RomNode *node;
     RomNode *frame;

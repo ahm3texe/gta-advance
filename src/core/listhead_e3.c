@@ -105,7 +105,7 @@ typedef struct Vec3 {
 extern Vec3 gClipBounds;
 
 /* 0x0800D450 */
-int FUN_0800d450(Node *node)
+int GetNodeBoxDistance(Node *node)
 {
     Owner *box;
     int x, y;

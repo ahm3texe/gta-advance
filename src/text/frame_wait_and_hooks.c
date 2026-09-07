@@ -53,7 +53,7 @@ u32 WaitForFrameFlag(void)
 }
 
 /* 0x08063E7C */
-void FUN_08063e7c(void)
+void RunKind6HooksA(void)
 {
     u32 index;
 
@@ -65,7 +65,7 @@ void FUN_08063e7c(void)
 }
 
 /* 0x08063EAC */
-void FUN_08063eac(void)
+void RunKind6HooksB(void)
 {
     u32 index;
 

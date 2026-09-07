@@ -115,7 +115,7 @@ extern Node *gList02035A80;         /* 0x02035A80 liste basligi */
 extern void FUN_080521c4(Node *node, Entry *entry);
 
 /* 0x080546CC */
-Node *FUN_080546cc(int id)
+Node *FindRecordNodeEnd(int id)
 {
     const RecordTable *probe;   /* kisa omurlu: yalniz sayac okumasi   */
     const RecordTable *table;   /* uzun omurlu: +0x1C dizi tabani icin */

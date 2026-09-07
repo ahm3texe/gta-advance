@@ -1,7 +1,7 @@
 /* Kimlik icin serbest listeden dugum edinip zincirin sonuna yurumek
  * 0x08054608-0x080546CB  (196 bayt)
  *
- * Kardes: FUN_08054570 (src/core/nodelist_b5.c, byte-matching dogrulandi).
+ * Kardes: GetOrCreateRecordNode (src/core/nodelist_b5.c, byte-matching dogrulandi).
  * Ortak govde (kimlik tarama + yedek dugum devralma + FUN_080521c4 cagrisi)
  * oradan alindi; bu fonksiyonun ek iki parcasi var:
  *   1. Girisde SPARE_ID (0x7FEF) kimliginin kendisi reddediliyor.
@@ -69,7 +69,7 @@ extern void InsertSorted(Node **list, Node *node, s32 id);
 extern void FUN_080521c4(Node *node, const Entry *entry);
 
 /* 0x08054608 */
-Node *FUN_08054608(s32 id)
+Node *ResolveRecordNodeChain(s32 id)
 {
     Node **list;
     Node  *cur;

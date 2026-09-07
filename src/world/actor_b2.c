@@ -27,7 +27,7 @@
  *    0.493'ten 0.522'ye cikip `value`nun 0.500'unu geciyor ve dagitim
  *    ROM'unki oluyor (id r1, value r2, slot r5).  `&&` yazimiyla sira
  *    tersine donuyor: id r5, value r1 -- govdenin yarisi kayiyor.
- *    Olcum: python3 tools/dump_alloc.py src/world/actor_b2.c FUN_0801686c
+ *    Olcum: python3 tools/dump_alloc.py src/world/actor_b2.c RequestActorAction
  *
  * 3) BAGLI YAPI KUYRUKTA YENIDEN OKUNUYOR.  ROM, `+0xAC` ADRESINI r3'te
  *    saklayip birlesme noktasinda isaretciyi TEKRAR yukluyor
@@ -98,7 +98,7 @@ typedef struct Actor {
 
 extern void GetOwnerSlot(Entity *entity);
 
-void FUN_0801686c(Actor *self, u32 id, u32 slot, u32 rank)
+void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
 {
     u32 value;                /* cevrilmis kimlik */
     u32 flags;                /* bagli yapinin +0x0C bayraklari */

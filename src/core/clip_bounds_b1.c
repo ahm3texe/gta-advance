@@ -121,7 +121,7 @@ extern u16        gSlotSelector;
 extern void FUN_0803220c(Actor *actor, Actor *previous);
 
 /* 0x0800A8A8 */
-void FUN_0800a8a8(Actor *actor, u32 slot, u32 value)
+void BindActorToCoordSlot(Actor *actor, u32 slot, u32 value)
 {
     u32 sel;
 

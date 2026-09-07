@@ -33,7 +33,7 @@
  *
  *   Bizim TU'da nearest() satir disi da derlendigi icin (baslikta static
  *   __inline__; .rtl dokumunde ";; Function nearest" var) .LC0-.LC6'yi o
- *   yiyor, FUN_08045aa4 .LC7'den basliyordu:
+ *   yiyor, IsTargetNear .LC7'den basliyordu:
  *       .LC7=gGameState .LC8=gRam02000F10 .LC9=gRam0202F3D8
  *       .LC10=gRam02000224(kova 21) .LC11=gRam0202F3D0(kova 22)
  *   21 < 22 -> 224 once -> 224 r7'yi kapiyor.  ROM'un istedigi tersi.
@@ -86,7 +86,7 @@
  */
 
 #include "target_common.h"
-u32 FUN_08045aa4(TargetActor *self)
+u32 IsTargetNear(TargetActor *self)
 {
  TargetActor *target;
  int separation;

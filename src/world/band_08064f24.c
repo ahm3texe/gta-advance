@@ -54,11 +54,11 @@
  *    `ldr r0,[r0]` sonrasi r0 hemen eziliyor. Olu yuklemeyi ayakta
  *    tutmanin tek yolu volatile gorunum (ram_symbols.h'nin "her
  *    translation unit kendi gorunumunu bildirir" kuralina uygun).
- *    Ayrica bu okuma r0'i tuttugu icin FUN_08067370'in argumani r1'de
+ *    Ayrica bu okuma r0'i tuttugu icin NoOp08067370'in argumani r1'de
  *    hesaplanip r0'a kopyalaniyor; cagriya AYNI degerin iki kez
  *    verilmesi (r0 ve r1) ROM'un `adds r0,r1,#0` kopyasini veren tek
  *    yazim. Elenen: tek argumanli cagri (250/251, bir komut eksik),
- *    `FUN_08067370(gRam02035B10, dist>>16)` (249), ucuncu arguman `0`
+ *    `NoOp08067370(gRam02035B10, dist>>16)` (249), ucuncu arguman `0`
  *    (250), virgul operatoru, ara `scaled` yereli.
  *
  * ESLESME: 524/524 bayt.
@@ -145,7 +145,7 @@ typedef struct TrackedActor {
 extern u32   GetOwnerSlot(void *owner);
 extern void *SelectSlotAB(u32 which);
 extern void  AreaFlagsNoop(u32 marked);
-extern void  FUN_08067370(s32 value, s32 target);
+extern void  NoOp08067370(s32 value, s32 target);
 extern void  FUN_080627ec(s32 dist, s32 drop, s32 rateB, s32 rateC,
                           s32 rateA, s32 rateD);
 extern s32   PlaceProbeEntries(void *actor, s32 mode);
@@ -219,7 +219,7 @@ void FUN_08064f24(TrackedActor *actor)
         owner = actor->owner;
         AreaFlagsNoop(marked);
         (void)*(volatile u32 *)&gRam02035B10;
-        FUN_08067370(dist >> 16, dist >> 16);
+        NoOp08067370(dist >> 16, dist >> 16);
 
         if (dist > DIST_STEP * 3 - 1)
             drop = owner->counter->step * 3 >> 2;

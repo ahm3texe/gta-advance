@@ -13,7 +13,7 @@
  *   1) listB'deki (+0x34) her kimlik icin RefreshThenNotify cagriliyor.
  *   2) listA'daki (+0x30) her kimlik icin dugum aranıyor. Dugum bulunduysa
  *      ve kirliyse (bit 0) ve seviyesi 1 ise, dugumun yuva dizisindeki her
- *      kimlik icin FUN_08052750 cagrilip yuvalar bos kimlikle doldurularak
+ *      kimlik icin ReleaseAreaNode cagrilip yuvalar bos kimlikle doldurularak
  *      kirli biti temizleniyor. Dugum bulunduysa HER DURUMDA liste basi +
  *      kimlik ile FUN_08055D90 cagriliyor.
  *   3) Iki dizi de bos kimlikle dolduruluyor, yuva blogu DMA ile siliniyor.
@@ -115,7 +115,7 @@ extern Node *gNodeListHead;         /* 0x02035A70 */
 
 extern Node *FindNode(u32 id);
 extern void  RefreshThenNotify(u32 id);
-extern void  FUN_08052750(u32 a, u32 b);
+extern void  ReleaseAreaNode(u32 a, u32 b);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  ClearSlots(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
@@ -151,7 +151,7 @@ void ClearAreaIdArrays(Area *area)
             if (node->level == LEVEL_BASE) {
                 slot = node->slots;
                 for (k = 0; k < node->desc->countB; k++, slot++)
-                    FUN_08052750(*slot, 0);
+                    ReleaseAreaNode(*slot, 0);
                 FillSlotsWithNone(node->slots, node->desc->countB);
                 node->dirty = 0;
             }

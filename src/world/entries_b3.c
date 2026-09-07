@@ -1,4 +1,4 @@
-/* FUN_08023c3c — 0x08023C3C-0x08023CC1 (134 bayt)
+/* ShiftColumnsUp — 0x08023C3C-0x08023CC1 (134 bayt)
  *
  * Sutun sutun yukari kaydirma. Kaynak tamponundan her sutun icin bir bayt
  * okuyup `shift` kadar saga kaydiriyor; cikan `n` degeri o sutunun kac
@@ -74,7 +74,7 @@
 #include "gba_types.h"
 
 /* 0x08023C3C */
-void FUN_08023c3c(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
+void ShiftColumnsUp(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
                   u8 *src, int shift)
 {
     u8 *p;

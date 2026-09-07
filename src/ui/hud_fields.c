@@ -161,7 +161,7 @@ void SetHudTime(s32 minutes, s32 seconds)
 }
 
 /* 0x08030E78 */
-void FUN_08030e78(void)
+void ClearHudFieldA(void)
 {
     vu16 *a;
     vu16 *b;
@@ -189,7 +189,7 @@ void FUN_08030e78(void)
 }
 
 /* 0x08030F28 */
-void FUN_08030f28(void)
+void ClearHudFieldB(void)
 {
     vu16 *a;
     vu16 *b;

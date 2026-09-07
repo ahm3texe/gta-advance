@@ -5,7 +5,7 @@
  *   1. gRam020004A0 acikken girisin +0x23 bayrak baytinda 8 biti varsa cik
  *   2. giris maskesi (+0x1C) -1 degilse ve gRam02030C00 ile kesismiyorsa cik
  *   3. +0x18 alan bayragi kuruluysa (IsAreaFlagSet) cik
- *   4. +0x1A kimligi FUN_080552d4'u gecemiyorsa cik
+ *   4. +0x1A kimligi IsProgressThresholdMet'u gecemiyorsa cik
  * Hepsi gecilirse sirali dugum listesinde (gNodeListHead) index aranir;
  * bulunan dugumun +0x0B baytinin ust yarisi 0x10 ise FUN_08052988 cagrilir.
  *
@@ -69,8 +69,8 @@ extern u32      gRam02030C00;
 extern Node    *gNodeListHead;
 
 extern u32   IsAreaFlagSet(s32 index);
-extern u32   FUN_080552d4(s32 id);
-extern Node *FUN_080543d0(Node **head, s32 index);
+extern u32   IsProgressThresholdMet(s32 id);
+extern Node *FindOrClaimNode(Node **head, s32 index);
 extern void  FUN_08052988(Node *node, AreaEntry *entry);
 
 /* 0x08052C68 */
@@ -94,11 +94,11 @@ void LinkAreaEntryIfEligible(s32 index)
             return;
     }
     if (entry->checkId != 0) {
-        if (FUN_080552d4(entry->checkId) == 0)
+        if (IsProgressThresholdMet(entry->checkId) == 0)
             return;
     }
 
-    node = FUN_080543d0(&gNodeListHead, index);
+    node = FindOrClaimNode(&gNodeListHead, index);
     if (node == 0)
         return;
     if ((node->kind & 0xF0) != 0x10)

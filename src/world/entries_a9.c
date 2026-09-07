@@ -1,4 +1,4 @@
-/* FUN_080291b8 — 0x080291B8-0x0802922F (120 bayt)
+/* SpawnFollowupEntry — 0x080291B8-0x0802922F (120 bayt)
  *
  * Bir gEntriesA girisini sablon olarak verip ondan tur 34'ten yeni bir
  * giris kuruyor, sonra iki genel bayragi tazeliyor.  Evre secimi girisin
@@ -13,7 +13,7 @@
  *
  * Her iki durumda da sonunda gRam020245A0 = 1 ve gRam02024344 = 0.
  *
- * KARDES: bu govde, src/world/entries_b5.c (FUN_08025518, 0x08025518)
+ * KARDES: bu govde, src/world/entries_b5.c (StepEntryPhase, 0x08025518)
  * icindeki ikinci is blogunun BIREBIR aynisi.  Struct yerlesimi, cagri
  * imzalari ve RAM sembolleri oradan alindi; orada zaten byte-matching
  * oldugu icin sabitlerin/argumanlarin dogrulugu ikinci kez kanitli.
@@ -22,7 +22,7 @@
  * --------------------------
  *  1. Kural 35 -- DONUS TIPI void.  Epilog `add sp,#8; pop {r0}; bx r0`:
  *     donus adresi r0'a aliniyor, yani r0 canli DEGIL.  Deger dondurse
- *     (kardes FUN_08025518'de oldugu gibi) `pop {r1}; bx r1` olurdu.
+ *     (kardes StepEntryPhase'de oldugu gibi) `pop {r1}; bx r1` olurdu.
  *
  *  2. PROLOG `push {lr}` -- HIC callee-saved yazmac yok.  `e` yalnizca
  *     `adds r1,r0,#0` ile r1'e aliniyor ve son cagridan ONCE tuketiliyor
@@ -125,7 +125,7 @@ extern u32  CreateEntryFromTemplate(Entry *src, u32 unused1, u32 unused2,
                                     u8 kind, u32 phase, u8 owner);
 
 /* 0x080291B8 */
-void FUN_080291b8(Entry *e)
+void SpawnFollowupEntry(Entry *e)
 {
     if (e->kind == KIND_76 || e->phase == PHASE_46) {
         CreateEntryFromTemplate(e, 1, 0, KIND_34, PHASE_47, e->owner);

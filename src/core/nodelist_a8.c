@@ -19,7 +19,7 @@
  * - `movs r2,#17; negs r2,r2` -> maske int genisliginde kuruluyor, yani
  *   yuva bayragi u32 (kural 47: dar alan olsaydi 0xEF'e katlanirdi).
  * - 0x08041EE0 argumansiz (data/functions.csv'de 2 bayt, empty_stubs.c'de
- *   `void FUN_08041ee0(void)`); cagridan onceki r0 tesadufen yuvayi tutuyor.
+ *   `void NoOp08041EE0(void)`); cagridan onceki r0 tesadufen yuvayi tutuyor.
  * - 0x02026F34 ve 0x020272C8 ram_map'te `u32` bildirilmis. Kardes
  *   nodelist_a7.c gibi tur DEGISTIRILMEDI, adres alinip cast edildi --
  *   celiskili extern tur yaratmamak icin.
@@ -117,10 +117,10 @@ extern u32 gRam02026F34;            /* 0x02026F34 */
 extern u32 gRam020272C8;            /* 0x020272C8 */
 
 extern s32  FUN_08055888(ListNode *node, s32 mode);
-extern void FUN_08041ee0(void);
+extern void NoOp08041EE0(void);
 
 /* 0x08053E9C */
-Slot *FUN_08053e9c(s32 kind)
+Slot *ReleaseSelectedNode(s32 kind)
 {
     Ctx **secondary = (Ctx **)&gRam020272C8;
     Ctx *active;
@@ -183,7 +183,7 @@ Slot *FUN_08053e9c(s32 kind)
             if (FUN_08055888(sel, 0) == 0) {
                 held = sel->slot;
                 held->flags &= ~0x10;
-                FUN_08041ee0();
+                NoOp08041EE0();
             }
         }
     }

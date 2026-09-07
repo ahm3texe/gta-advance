@@ -106,7 +106,7 @@
  *     `t` deyimine almak sart.
  *
  * Kardes dosyalar: nodelist_c3.c bu fonksiyonun imzasini zaten
- * bildiriyordu (`Node *FUN_080543d0(Node **head, s32 index)`), nodelist_b6.c
+ * bildiriyordu (`Node *FindOrClaimNode(Node **head, s32 index)`), nodelist_b6.c
  * de cagiriyor. Node yerlesimi oradan alindi.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
@@ -134,7 +134,7 @@ extern void ListRemove(NodeList *list, Node *node);
 extern void InsertSorted(NodeList *list, Node *node, s32 id);
 
 /* 0x080543D0 */
-Node *FUN_080543d0(NodeList *list, s32 id)
+Node *FindOrClaimNode(NodeList *list, s32 id)
 {
     Node *cur;
     Node *spare;

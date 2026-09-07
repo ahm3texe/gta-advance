@@ -159,12 +159,12 @@ extern u32   IsEntityEngaged(Context *ctx);
 extern void  FUN_08015a84(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_08015af8(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_080159a0(Actor *a, RomNode *node, u32 idx);
-extern void  FUN_080197fc(Actor *a, RomNode *node, u32 idx);
+extern void  NoOp080197FC(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_08015834(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_080157b8(Actor *a, u32 idx);
 
 /* 0x08015598 */
-void FUN_08015598(Actor *a)
+void UpdateActorFrame(Actor *a)
 {
     RomGroup *group;
     RomEntry *entry;
@@ -255,7 +255,7 @@ void FUN_08015598(Actor *a)
     FUN_08015a84(a, node, idx);
     FUN_08015af8(a, node, idx);
     FUN_080159a0(a, node, idx);
-    FUN_080197fc(a, node, idx);
+    NoOp080197FC(a, node, idx);
     FUN_08015834(self, node, idx);
     FUN_080157b8(a, idx);
 }

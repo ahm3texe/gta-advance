@@ -114,7 +114,7 @@ extern void FUN_08029088(s32 angle, s32 dx, s32 dy, s8 *outX, s8 *outY);
 extern void GetOwnerSlot(void *owner);
 
 /* 0x08025340 */
-void FUN_08025340(Actor *actor, s32 turn, s32 speed, Offsets *off)
+void MoveActorAlongAngle(Actor *actor, s32 turn, s32 speed, Offsets *off)
 {
     s32  idx;
     s32  vx;

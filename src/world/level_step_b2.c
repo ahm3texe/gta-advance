@@ -1,7 +1,7 @@
 /* Iki katmanli varlik listesinde her dugum icin cizim gonderimi
  * 0x0801515C-0x080151BF, 100 bayt  [ESLESTI]
  *
- * ROM'un yaptigi is (kardes FUN_080151c0 ile ayni gezinme iskeleti):
+ * ROM'un yaptigi is (kardes ReleaseEntryResources ile ayni gezinme iskeleti):
  *   0x020230A0'daki bas isaretcisinden baslayarak +0x3C ile bagli dis
  *   listeyi geziyor.  Her dis dugum ayni zamanda +0x44 ile bagli ic
  *   listenin BASI oluyor.  Ic listedeki her dugum icin, +0x30 alani
@@ -99,7 +99,7 @@ typedef struct Entry {
 #define gListHead020230A0 (*(Entry **)0x020230A0)
 
 /* 0x0801515C */
-void FUN_0801515c(void)
+void LoadEntryTileData(void)
 {
     Entry *outer;
     Entry *node;

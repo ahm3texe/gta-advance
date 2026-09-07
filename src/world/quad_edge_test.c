@@ -103,7 +103,7 @@
 
 #include "gba_types.h"
 
-s32 FUN_0800bf18(const s32 quad[4][3], const s32 *from, const s32 *to,
+s32 FindQuadEdgeCrossing(const s32 quad[4][3], const s32 *from, const s32 *to,
                   s32 radius, s32 height, s32 *outX1, s32 *outY1,
                   s32 *outX2, s32 *outY2)
 {

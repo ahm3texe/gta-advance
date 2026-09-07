@@ -54,7 +54,7 @@ typedef struct Actor {
 extern void GetOwnerSlot(Entity *entity);
 extern void FUN_08014ffc(Sub *sub, u32 flags, u8 *a, u8 *b);
 extern void FUN_08015038(Sub *sub);
-extern void FUN_08015598(Actor *self);
+extern void UpdateActorFrame(Actor *self);
 
 void ResetActor(Actor *self)
 {
@@ -89,5 +89,5 @@ void ResetActor(Actor *self)
      * indirgiyor ve `negs` komutu kayboluyor. */
     self->lowA &= ~15;
     self->lowB &= ~15;
-    FUN_08015598(self);
+    UpdateActorFrame(self);
 }

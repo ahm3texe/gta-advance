@@ -20,137 +20,137 @@
 #include "gba_types.h"
 
 /* 0x0800db7c */
-void FUN_0800db7c(void)
+void NoOp0800DB7C(void)
 {
 }
 
 /* 0x08010198 */
-void FUN_08010198(void)
+void NoOp08010198(void)
 {
 }
 
 /* 0x080101e4 */
-void FUN_080101e4(void)
+void NoOp080101E4(void)
 {
 }
 
 /* 0x08011d4c */
-void FUN_08011d4c(void)
+void NoOp08011D4C(void)
 {
 }
 
 /* 0x080127a0 */
-void FUN_080127a0(void)
+void NoOp080127A0(void)
 {
 }
 
 /* 0x080197fc */
-void FUN_080197fc(void)
+void NoOp080197FC(void)
 {
 }
 
 /* 0x08019c04 */
-void FUN_08019c04(void)
+void NoOp08019C04(void)
 {
 }
 
 /* 0x080289b4 */
-void FUN_080289b4(void)
+void NoOp080289B4(void)
 {
 }
 
 /* 0x080289b8 */
-void FUN_080289b8(void)
+void NoOp080289B8(void)
 {
 }
 
 /* 0x08033820 */
-void FUN_08033820(void)
+void NoOp08033820(void)
 {
 }
 
 /* 0x08033898 */
-void FUN_08033898(void)
+void NoOp08033898(void)
 {
 }
 
 /* 0x08034fb0 */
-void FUN_08034fb0(void)
+void NoOp08034FB0(void)
 {
 }
 
 /* 0x08034fc8 */
-void FUN_08034fc8(void)
+void NoOp08034FC8(void)
 {
 }
 
 /* 0x08034fcc */
-void FUN_08034fcc(void)
+void NoOp08034FCC(void)
 {
 }
 
 /* 0x08035cd4 */
-void FUN_08035cd4(void)
+void NoOp08035CD4(void)
 {
 }
 
 /* 0x0803b19c */
-void FUN_0803b19c(void)
+void NoOp0803B19C(void)
 {
 }
 
 /* 0x08041ee0 */
-void FUN_08041ee0(void)
+void NoOp08041EE0(void)
 {
 }
 
 /* 0x08041ef0 */
-void FUN_08041ef0(void)
+void NoOp08041EF0(void)
 {
 }
 
 /* 0x08041ef4 */
-void FUN_08041ef4(void)
+void NoOp08041EF4(void)
 {
 }
 
 /* 0x08051960 */
-void FUN_08051960(void)
+void NoOp08051960(void)
 {
 }
 
 /* 0x080563bc */
-void FUN_080563bc(void)
+void NoOp080563BC(void)
 {
 }
 
 /* 0x0805ab78 */
-void FUN_0805ab78(void)
+void NoOp0805AB78(void)
 {
 }
 
 /* 0x08062370 */
-void FUN_08062370(void)
+void NoOp08062370(void)
 {
 }
 
 /* 0x08064df8 */
-void FUN_08064df8(void)
+void NoOp08064DF8(void)
 {
 }
 
 /* 0x08067370 */
-void FUN_08067370(void)
+void NoOp08067370(void)
 {
 }
 
 /* 0x08070d94 */
-void FUN_08070d94(void)
+void NoOp08070D94(void)
 {
 }
 
 /* 0x08070d98 */
-void FUN_08070d98(void)
+void NoOp08070D98(void)
 {
 }
 

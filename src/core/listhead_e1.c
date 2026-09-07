@@ -4,7 +4,7 @@
  * ikinci listeye ekleme siralamasiyla (insertion sort) yeniden diziyor,
  * sonunda sirali listenin basini 0x02016280'e geri yaziyor.
  *
- * Siralama anahtari 32 bit: ust yariya FUN_0800d450'nin dondurdugu puan
+ * Siralama anahtari 32 bit: ust yariya GetNodeBoxDistance'nin dondurdugu puan
  * (dugumun +0x1C alanina da yaziliyor), alt yariya 255 - dugumun sahip
  * kaydindaki (+0x10 -> +0x14) sira degeri konuyor. Karsilastirmalar
  * ISARETSIZ (`bls`/`bhi`), yani anahtar u32. Liste anahtara gore AZALAN
@@ -16,7 +16,7 @@
  *
  * Dugum yerlesimi: +0x10 sahip kaydi, +0x14 next, +0x18 prev, +0x1C puan.
  * +0x14/+0x18 src/world/list_ops.c'deki Node ile ayni; sahip kaydinin
- * +0x14 alani FUN_0800d450'nin de okudugu blok.
+ * +0x14 alani GetNodeBoxDistance'nin de okudugu blok.
  *
  * ADRES NOTU: 0x02016280 data/ram_map.csv'de kayitli, extern sembol
  * olarak kullanildi (kural 1). 0x02016288 KAYITLI DEGIL ve bu oturumda
@@ -81,7 +81,7 @@ typedef struct Node {
 extern Node *gListHead02016280;
 
 /* 0x0800D450: dugumun kamera/bolge kaydina uzakligindan puan uretiyor. */
-extern int FUN_0800d450(Node *node);
+extern int GetNodeBoxDistance(Node *node);
 
 #define SORT_KEY(n) \
     (((u32)(n)->score << 16) | (u32)(RANK_BIAS - (n)->owner->rank))
@@ -107,12 +107,12 @@ void SortListByKey(void)
     gSortedHead02016288 = gListHead02016280;
     gListHead02016280->next = 0;
     gListHead02016280->prev = 0;
-    gSortedHead02016288->score = FUN_0800d450(gListHead02016280);
+    gSortedHead02016288->score = GetNodeBoxDistance(gListHead02016280);
     prev = gListHead02016280;
 
     while (cur != 0) {
         next = cur->next;
-        score = FUN_0800d450(cur);
+        score = GetNodeBoxDistance(cur);
         cur->score = score;
         key = ((u32)score << 16) | (u32)(RANK_BIAS - cur->owner->rank);
 

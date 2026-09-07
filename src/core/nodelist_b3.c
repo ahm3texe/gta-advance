@@ -100,7 +100,7 @@ typedef struct Entity {
 extern Node *FUN_08055954(u32 id);      /* 0x08055954: listede kimlik arar */
 
 /* 0x08053F6C */
-void FUN_08053f6c(Entity *ent)
+void ResetNodeLinkBits(Entity *ent)
 {
     Node *node;
     Node *linked;

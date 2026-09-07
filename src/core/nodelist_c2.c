@@ -2,7 +2,7 @@
  *
  * Kimlikten dugumu buluyor. Dugum "kirli" (bit 0) ise ve ya seviyesi 1 ise
  * ya da zorlama bayragi verilmisse: dugumun yuva dizisindeki her kimlik icin
- * FUN_08052750 cagriliyor, ardindan yuvalar DMA ile bos kimlikle doldurulup
+ * ReleaseAreaNode cagriliyor, ardindan yuvalar DMA ile bos kimlikle doldurulup
  * kirli biti temizleniyor. Zorlama varsa seviye 1'in ustundeyse 1'e cekiliyor.
  * Sonunda liste basi + kimlik ile FUN_08055D90 cagriliyor.
  *
@@ -45,7 +45,7 @@ typedef struct Node {
 extern Node *gNodeListHead;         /* 0x02035A70 */
 
 extern Node *FindNode(u32 id);
-extern void  FUN_08052750(u32 a, u32 b);
+extern void  ReleaseAreaNode(u32 a, u32 b);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
@@ -64,7 +64,7 @@ void ReleaseNodeSlots(u32 id, u32 force)
         if (node->level == LEVEL_BASE || force != 0) {
             slot = node->slots;
             for (i = 0; i < node->desc->count; i++, slot++)
-                FUN_08052750(*slot, 0);
+                ReleaseAreaNode(*slot, 0);
             FillSlotsWithNone(node->slots, node->desc->count);
             node->dirty = 0;
         }

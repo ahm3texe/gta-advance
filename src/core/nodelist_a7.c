@@ -93,7 +93,7 @@ extern u32 gRam020272C8;            /* 0x020272C8 */
 extern void FUN_08041ee4(Slot *slot);
 
 /* 0x08053DF8 */
-u32 FUN_08053df8(s32 unused, Slot *target, s32 kind)
+u32 SelectNodeForSlot(s32 unused, Slot *target, s32 kind)
 {
     ListNode *node;
     Ctx *volatile *base;

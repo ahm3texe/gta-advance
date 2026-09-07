@@ -69,7 +69,7 @@
 #define AFFINE_ONE  0x100
 
 /* 0x080034EC */
-void FUN_080034ec(void)
+void ResetBgScrollAndAffine(void)
 {
     REG_BG0VOFS = 0;
     REG_BG0HOFS = 0;

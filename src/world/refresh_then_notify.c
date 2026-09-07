@@ -1,6 +1,6 @@
 /* Durum sinayip bildirme — 0x08055BBC-0x08055BE7
  *
- * FUN_08054744 ile nesneyi alip +0x0B baytinin 0xF1 maskesi 17 ise
+ * FindOrInitAreaNode ile nesneyi alip +0x0B baytinin 0xF1 maskesi 17 ise
  * FUN_080536BC'yi cagiriyor, ardindan her durumda FUN_08055D90'i
  * cagiriyor.
  *
@@ -24,7 +24,7 @@ typedef struct Obj {
 } Obj;
 
 
-extern Obj *FUN_08054744(u32 arg);
+extern Obj *FindOrInitAreaNode(u32 arg);
 extern void ClearObjectIdsAndSlots(Obj *obj);
 extern void FUN_08055d90(NodeC4 **dest, u32 arg);
 
@@ -34,7 +34,7 @@ void RefreshThenNotify(u32 arg)
     Obj *obj;
     u32 state;
 
-    obj = FUN_08054744(arg);
+    obj = FindOrInitAreaNode(arg);
     state = STATE_MASK;
     state &= obj->state;
     if (state == STATE_WANT)

@@ -4,7 +4,7 @@
  * Once baglam DMA ile sifirlaniyor, sonra ada karsilik gelen kimlik
  * aranip tek yuvaya yaziliyor, ardindan tanimdaki kimlik dizisi
  * baglamin yuva dizisine kopyalanip her kimlik baglantiya diziliyor.
- * Kardesi FUN_08053794 (src/core/nodelist_a9.c) ile ayni yapi ailesi.
+ * Kardesi ReleaseObjectNodeRefs (src/core/nodelist_a9.c) ile ayni yapi ailesi.
  *
  * DURUM: PARK, 246/250 (dort bayt KISA), fark 13 -- gercekte TEK KOMUT.
  *   Onceki tur da 246 idi ama fark 137 ve elenen yollar YAZILMAMISTI.
@@ -39,8 +39,8 @@
  *   ya reg62 kopyadan SONRA da kullanilmali, ya da kopya ile idx'in ilk
  *   kullanimi ARASINDA bir CSE blok siniri (cok-onculu etiket) olmali.
  *   Ikisi de kaynaktan uretilemedi (asagi).  Bu, docs/COMPILER.md'deki
- *   "Yazmac kopyasi: kaynak duzeyinden uretilemeyen sinif" (FUN_08030e78 /
- *   FUN_08030f28, ikisi de dort bayt kisa, fazladan `adds rX,rY,#0`)
+ *   "Yazmac kopyasi: kaynak duzeyinden uretilemeyen sinif" (ClearHudFieldA /
+ *   ClearHudFieldB, ikisi de dort bayt kisa, fazladan `adds rX,rY,#0`)
  *   ile AYNI imza.  Yeni mekanizma cikmadan dokunmayin.
  *
  * DENENIP ELENENLER (~55 varyant; belirtilmedikce 246 bayt / fark 13):
@@ -62,7 +62,7 @@
  *     `idx` ile goto zinciri; init + `break`; `while` bicimi; iki ayri
  *     `found` etiketi; testten once yapay birlesme etiketi (bir ve iki
  *     onculu) -- 246..258, hepsi daha kotu
- *   - cmp / `*slot =` / `FUN_08053650()` argumaninda idx yerine raw'in 8
+ *   - cmp / `*slot =` / `PrepareAreaNode()` argumaninda idx yerine raw'in 8
  *     kombinasyonu (238..246, fark 16..58)
  *   - fonksiyon basinda `idx = ID_NONE` on-atamasi: 250 bayt / fark 18
  *     (sabit yuklemesi proloha tasiniyor, kopya yine cikmiyor)
@@ -114,7 +114,7 @@ extern u32      gRam02030C00;
 
 extern s32  FUN_0806dd18(const char *a, const char *b);
 extern u16 *FindFreeSlotRun(int count);
-extern void FUN_08053650(s32 id);
+extern void PrepareAreaNode(s32 id);
 extern void LinkAreaEntryIfEligible(s32 index);
 
 /* 0x08053834 */
@@ -162,7 +162,7 @@ found:
         if (slot == 0)
             goto fail;
         *slot = idx;
-        FUN_08053650(idx);
+        PrepareAreaNode(idx);
     }
 
     /* `run` ve `dst` ayri: ROM ilkini caller-saved r1'de tutuyor, ikincisi

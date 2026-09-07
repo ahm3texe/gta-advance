@@ -37,7 +37,7 @@ extern void InsertSorted(Node **list, Node *node, s32 id);
 extern void FUN_080521c4(Node *node, const Entry *entry);
 
 /* 0x08054570 */
-Node *FUN_08054570(s32 id)
+Node *GetOrCreateRecordNode(s32 id)
 {
     Node **list;
     Node  *cur;

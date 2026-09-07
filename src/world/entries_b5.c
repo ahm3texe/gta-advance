@@ -1,4 +1,4 @@
-/* FUN_08025518 — 0x08025518-0x080256E1 (458 bayt)
+/* StepEntryPhase — 0x08025518-0x080256E1 (458 bayt)
  *
  * Bir gEntriesA girisini turune (+0x64) ve evresine (+0x90) gore isliyor.
  * Uc is yapiyor:
@@ -212,7 +212,7 @@ extern u32  CreateEntryFromTemplate(Entry *src, u32 unused1, u32 unused2,
                                     u8 kind, u32 phase, u8 owner);
 
 /* 0x08025518 */
-u32 FUN_08025518(Entry *e)
+u32 StepEntryPhase(Entry *e)
 {
     /* Kural 45: her cagri dalinin KENDI uclusu var.  Bildirim sirasi
      * degistirilmemeli, dagitim sirasini belirliyor (bkz. dosya basi 4). */

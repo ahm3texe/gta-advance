@@ -14,7 +14,7 @@
 extern u32 HalvesEqual(void);
 
 /* 0x0805A4F4 */
-u32 FUN_0805a4f4(void)
+u32 ForwardToHalvesEqual(void)
 {
     return HalvesEqual();
 }

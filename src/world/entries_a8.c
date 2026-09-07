@@ -75,10 +75,10 @@ extern void FUN_08014ffc(u8 *dest, u32 count, Triple *src, u32 *value);
 extern void FUN_08013cfc(u8 *dest, RomNode *desc, u32 arg);
 extern void FUN_08014ee4(u8 *dest, u32 value);
 extern void FUN_08015038(u8 *dest);
-extern void FUN_08025340(Entry *e, s32 turn, s32 speed, void *off);
+extern void MoveActorAlongAngle(Entry *e, s32 turn, s32 speed, void *off);
 
 /* 0x08028894 */
-void FUN_08028894(Source *h, Holder *src, u32 phase, u32 kind)
+void SpawnEntryFromSource(Source *h, Holder *src, u32 phase, u32 kind)
 {
     Entry *e;
     RomNode *node;
@@ -122,8 +122,8 @@ void FUN_08028894(Source *h, Holder *src, u32 phase, u32 kind)
     FUN_08014ee4(e->sub, desc->unk14);
     FUN_08015038(e->sub);
 
-    FUN_08025340(e, 0, kind, 0);
-    FUN_08025340(e, SPAWN_BITS, 2, 0);
+    MoveActorAlongAngle(e, 0, kind, 0);
+    MoveActorAlongAngle(e, SPAWN_BITS, 2, 0);
 
     e->active = 1;
     h->flags &= ~FLAG_CLEAR;

@@ -130,7 +130,7 @@ extern void  FUN_0800c804(u32 *dest, u32 value);  /* 0x0800C804 */
 extern void  FUN_08055d90(u32 *head, u32 id);     /* 0x08055D90 */
 
 /* 0x08052750 */
-void FUN_08052750(s32 index, u32 arm)
+void ReleaseAreaNode(s32 index, u32 arm)
 {
     Node *node;
     s32 i;

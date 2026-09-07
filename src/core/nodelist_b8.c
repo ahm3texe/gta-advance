@@ -123,7 +123,7 @@ extern s32 FUN_08030390(s32 a, s32 b);
 extern s32 FUN_08061ec0(s32 a);
 
 /* 0x080552D4 */
-u32 FUN_080552d4(u32 kind)
+u32 IsProgressThresholdMet(u32 kind)
 {
     switch (kind) {
     case 0:

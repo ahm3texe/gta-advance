@@ -1,4 +1,4 @@
-/* FUN_08023b24 -- 0x08023B24-0x08023BB7 (148 bayt)
+/* ShiftColumnsDown -- 0x08023B24-0x08023BB7 (148 bayt)
  *
  * Sutun sutun ASAGI kaydirma. Kaynak tamponundan her sutun icin bir bayt
  * okuyup `shift` kadar saga kaydiriyor; cikan `n` degeri o sutunun kac
@@ -75,7 +75,7 @@
  * ortasinda baska bir ajan tarafindan uzerine yazildi ve iki varyant
  * kosusu (dest + height*stride - stride ile genis n) sanki 0x08023BB8'i
  * eslestiriyormus gibi gorundu. Oyle degil: derlenen sey o ajanin
- * FUN_08023bb8 taslagiydi. O iki varyant BURADA gecerli bir olcum DEGIL,
+ * ShiftRowsLeft taslagiydi. O iki varyant BURADA gecerli bir olcum DEGIL,
  * tekrar denenmeleri gerekir; yanlis kayit birakmamak icin yukaridaki
  * elenenler listesine almadim.
  *
@@ -86,7 +86,7 @@
 #include "gba_types.h"
 
 /* 0x08023B24 */
-void FUN_08023b24(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
+void ShiftColumnsDown(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
                   u8 *src, int shift)
 {
     u8 *p;

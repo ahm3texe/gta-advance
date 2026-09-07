@@ -77,7 +77,7 @@ address,size,name,source,status,notes
 0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
 0x020110B0,4,gRam020110B0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
 0x020110B8,4,gRam020110B8,decomp,provisional,u32; 0x08066144 oturum kurulumunda sifirliyor
-0x020110C0,4,gRam020110C0,decomp,provisional,"FUN_08052750 icinde FUN_0800c804 cagrisina ILK arguman olarak yalnizca ADRESI geciyor; uye erisimi yok, bu yuzden ic yapisi BILINMIYOR. En yakin kayitli komsu 0x020110AC (gRam020110AC) ama ROM ayri bir havuz sabiti kullaniyor, yani ayri nesne."
+0x020110C0,4,gRam020110C0,decomp,provisional,"ReleaseAreaNode icinde FUN_0800c804 cagrisina ILK arguman olarak yalnizca ADRESI geciyor; uye erisimi yok, bu yuzden ic yapisi BILINMIYOR. En yakin kayitli komsu 0x020110AC (gRam020110AC) ama ROM ayri bir havuz sabiti kullaniyor, yani ayri nesne."
 0x02014ED0,0,gBufferBase02014ED0,decomp,provisional,FUN_080100D0 iki ayirma cagrisina ayni taban adresini geciyor; boyut ve sahiplik bilinmiyor.
 0x02015650,0,gRam02015650,decomp,provisional,FUN_0800DCB4 icinde giris tablosu olarak kullaniliyor. Boyut BILINMIYOR (0); yalnizca tabani olculdu. src/core/list_b2.c basliginda ayrintisi var.
 0x0201627C,4,gRam0201627C,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
@@ -225,7 +225,7 @@ address,size,name,source,status,notes
 0x08852A1C,16,gRom08852A1C,decomp,provisional,"ROM: dort s32, degerler OLCULDU {-128, 128, -384, 384}. 0x080651E0 bunlari yerel diziye kopyalayip sonda noktalarinin kimlik ofseti olarak kullaniyor."
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
-0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). FUN_08025518 icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
+0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). StepEntryPhase icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
 0x08CAA3E4,0,gRomAsset08CAA3E4,decomp,provisional,ROM varlik isaretcisi; 0x08051154 bunu FUN_08036cac cagrisina veriyor ve donen isaretciyi gRam020303C4e yaziyor. Boyut BILINMIYOR.
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
 0x08D482E0,0,gAreaNames,decomp,provisional,"ROM alan adi tablosu. gAreaBank (0x08D49C00) +0x20 alani bu diziye isaret ediyor. Boyut BILINMIYOR (0). DIZI olarak bildirilmeli: src/core/nodelist_b9.c olcumune gore `extern const AreaName gAreaNames[];` gercek ARRAY_REF uretiyor, isaretci sabiti bicimi ROM ile ayni kodu vermiyor."

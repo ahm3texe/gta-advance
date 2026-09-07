@@ -162,7 +162,7 @@ extern u8       gGameState[16];
 extern u32   FUN_080313f0(s32 x, s32 y);
 extern u32   GetRecordIndex(void);
 extern Node *FindNode(u32 id);
-extern void  FUN_08052750(u32 a, u32 b);
+extern void  ReleaseAreaNode(u32 a, u32 b);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 extern void  LinkAreaEntryIfEligible(s32 index);
@@ -230,7 +230,7 @@ void RefreshActiveAreas(void)
                 if (node->level == LEVEL_BASE) {
                     slot = node->slots;
                     for (j = 0; j < node->desc->count; j++, slot++)
-                        FUN_08052750(*slot, 0);
+                        ReleaseAreaNode(*slot, 0);
                     FillSlotsWithNone(node->slots, node->desc->count);
                     node->dirty = 0;
                 }

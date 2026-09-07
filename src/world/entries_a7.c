@@ -174,7 +174,7 @@ extern void FUN_08014ee4(u8 *dest, u32 value);
 extern void FUN_08015038(u8 *dest);
 
 /* 0x08028B9C */
-u32 FUN_08028b9c(Source *h, u32 unused1, u8 arg2, u8 index)
+u32 SpawnEntryFromTable(Source *h, u32 unused1, u8 arg2, u8 index)
 {
     Entry *e;
     RomNode *desc;

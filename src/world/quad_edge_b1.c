@@ -89,7 +89,7 @@
 
 #include "gba_types.h"
 
-s32 FUN_0800bdf8(const s32 poly[][3], u16 count, const s32 *point, s32 tolerance)
+s32 IsPointInPolygon(const s32 poly[][3], u16 count, const s32 *point, s32 tolerance)
 {
     s32 maxZ;
     s32 minZ;

@@ -97,7 +97,7 @@ extern void  ReleaseNodeSlots(u32 id, u32 force);
 extern void  FUN_08051d10(Node *node, void *table, u32 mode);
 
 /* 0x08052BBC */
-void FUN_08052bbc(Node *node)
+void AllocateNodeSlots(Node *node)
 {
     SlotDesc *desc;
     u16 *dst;

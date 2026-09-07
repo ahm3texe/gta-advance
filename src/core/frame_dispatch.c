@@ -33,7 +33,7 @@ extern void FUN_0800d660(void);
 extern void FrameChain(void);
 extern void FUN_08029e44(u32 value, u32 zero);
 extern void FUN_0805e28c(u32 value);
-extern void FUN_08035cd4(void);
+extern void NoOp08035CD4(void);
 extern void FUN_0806020c(void);
 extern void FUN_08014fc4(void);
 extern void SortActiveSprites(void);
@@ -99,7 +99,7 @@ void RunFrameStageTwo(void)
     FUN_08029e44(gFrameDelay, 0);
     FUN_0805e28c(gFrameDelay);
     gRam02023700 = 0x74;
-    FUN_08035cd4();
+    NoOp08035CD4();
     gRam02023700 = 0x75;
     FUN_0806020c();
     FUN_08014fc4();

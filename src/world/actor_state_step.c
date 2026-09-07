@@ -141,7 +141,7 @@ typedef struct Actor {
 
 extern s32 GetOwnerSlot(Entity *entity);
 extern u8 *SelectSlotCD(void);
-extern void FUN_0801686c(Actor *self, s32 a, s32 b, s32 c);
+extern void RequestActorAction(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080198e4(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080426ec(Task *task, s32 a, Entity *entity);
 extern s32 GetAnchorUnk34(void);
@@ -204,7 +204,7 @@ void FUN_08017628(Actor *self)
         case 0x67: nine = 0x67; goto body_nine;
         case 0x68: nine = 0x68; goto body_nine;
         body_nine: { Entity *e; Task *t;
-            FUN_0801686c(self, nine, 9, 1);
+            RequestActorAction(self, nine, 9, 1);
             e = self->entity; NUDGE(e, t); break; }
 
         /* Asagidaki sekiz case'in HER BIRI ROM'da kendi havuz kelimesinden
@@ -229,15 +229,15 @@ void FUN_08017628(Actor *self)
                    { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
                      FUN_080198e4(self, 0x90, 1, 0x47); break; }
 
-        case 0x63: FUN_0801686c(self, 0x63, 10, 2); break;
-        case 0x4c: FUN_0801686c(self, 0x4c, 10, 2); break;
+        case 0x63: RequestActorAction(self, 0x63, 10, 2); break;
+        case 0x4c: RequestActorAction(self, 0x4c, 10, 2); break;
 
         case 0x18: {
             u32 v18 = *(u16 *)(TABLE_18 + **(u8 **)(slot + 0x1c) * 2);
             if (v18 == 0) {
-                FUN_0801686c(self, 0x18, 2, 1);
+                RequestActorAction(self, 0x18, 2, 1);
             } else {
-                FUN_0801686c(self, 0x6c, 2, 1);
+                RequestActorAction(self, 0x6c, 2, 1);
                 FUN_080198e4(self, v18 + 8, 1, 0);
             }
             break;
@@ -250,13 +250,13 @@ void FUN_08017628(Actor *self)
 
         case 0x38:
             if (self->prev != 0x38 && self->prev != 0x96) self->sub = 2;
-            FUN_0801686c(self, 0x38, 3, 0);
+            RequestActorAction(self, 0x38, 3, 0);
             if (self->visual != 0) self->visual->mode = 0x40;
             break;
 
         case 0x0d: {
             Entity *e0d;
-            FUN_0801686c(self, 0x0d, 2, 1);
+            RequestActorAction(self, 0x0d, 2, 1);
             if (self->visual != 0) self->visual->mode = 0x40;
             e0d = self->entity;
             if (e0d != 0 && (e0d->flags & 0x8000) != 0) e0d->flags &= CLEAR_8000;
@@ -267,9 +267,9 @@ void FUN_08017628(Actor *self)
         case 0x17: {
             u32 v17 = *(u16 *)(TABLE_17 + **(u8 **)(slot + 0x1c) * 2);
             if (v17 == 0) {
-                FUN_0801686c(self, state, 1, 1);
+                RequestActorAction(self, state, 1, 1);
             } else {
-                FUN_0801686c(self, 0x6a, 1, 1);
+                RequestActorAction(self, 0x6a, 1, 1);
                 FUN_080198e4(self, v17 + 8, 1, 0x13);
             }
             if (self->visual != 0) self->visual->mode = mode20;
@@ -279,23 +279,23 @@ void FUN_08017628(Actor *self)
         case 0x4027:
         case 0x96:
             if (self->prev != 0x96) self->sub = 2;
-            FUN_0801686c(self, 0x96, 3, 0);
+            RequestActorAction(self, 0x96, 3, 0);
             if (self->visual != 0) self->visual->mode = 0x40;
             break;
 
         case 0x4028:
-        case 0x97: FUN_0801686c(self, state, 1, 0); goto lit40;
-        case 0x0e: FUN_0801686c(self, 0x0e, 2, 1); goto lit40;
-        case 0x0f: FUN_0801686c(self, 0x0f, 2, 1); goto lit40;
-        case 0x10: FUN_0801686c(self, 0x10, 3, 1); goto lit40;
-        case 0x0c: FUN_0801686c(self, 0x0c, 3, 1); goto lit40;
-        case 0x1f: FUN_0801686c(self, 0x1f, 2, 0);
+        case 0x97: RequestActorAction(self, state, 1, 0); goto lit40;
+        case 0x0e: RequestActorAction(self, 0x0e, 2, 1); goto lit40;
+        case 0x0f: RequestActorAction(self, 0x0f, 2, 1); goto lit40;
+        case 0x10: RequestActorAction(self, 0x10, 3, 1); goto lit40;
+        case 0x0c: RequestActorAction(self, 0x0c, 3, 1); goto lit40;
+        case 0x1f: RequestActorAction(self, 0x1f, 2, 0);
         lit40:
             if (self->visual != 0) self->visual->mode = 0x40;
             break;
 
         case 0x4026:
-            FUN_0801686c(self, state, 3, 1);
+            RequestActorAction(self, state, 3, 1);
             if (self->visual != 0) self->visual->mode = mode20;
             break;
 
@@ -303,7 +303,7 @@ void FUN_08017628(Actor *self)
             break;
 
         default:
-            FUN_0801686c(self, state, 2, 2);
+            RequestActorAction(self, state, 2, 2);
             break;
         }
         self->state = STATE_IDLE;
@@ -312,7 +312,7 @@ void FUN_08017628(Actor *self)
     if (GetAnchorUnk34() == 0) {
         if ((u8)(self->owner->phase - 2) < 2) {
             if (self->visual != 0) self->visual->mode = 0x40;
-            if (self->prev != 0x38) FUN_0801686c(self, 0x20, 3, 0);
+            if (self->prev != 0x38) RequestActorAction(self, 0x20, 3, 0);
         } else if (FUN_08023660(self->entity) == 0
                    || (*(s8 *)(self->entity->detail + 0x114) != 2
                        && (u8)(self->sub - 2) < 2)) {
@@ -321,7 +321,7 @@ void FUN_08017628(Actor *self)
                 FUN_08019260(self);
             } else {
                 self->tag = 3;
-                FUN_0801686c(self, 0x4000, 2, 3);
+                RequestActorAction(self, 0x4000, 2, 3);
                 if (self->visual != 0) self->visual->mode = mode20;
             }
         } else {

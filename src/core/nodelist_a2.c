@@ -53,7 +53,7 @@
  * sabitle kuruyor; move2add in izledigi "ayni yazmacta bilinen sabit"
  * durumu olusmadigi icin -2 `movs #2 / negs` olarak kaliyor.
  * ESLESEN KARDES KANITI: src/core/nodelist_c1.c (FindOrRecycleNode) ve
- * src/core/nodelist_b5.c (FUN_08054570) ROM da 0x08054830 ve 0x080545C4 te
+ * src/core/nodelist_b5.c (GetOrCreateRecordNode) ROM da 0x08054830 ve 0x080545C4 te
  * BAYT BAYT AYNI diziyi tasiyor ve ikisi de bitfield yazimiyla eslesmis.
  * nodelist_c1.c basligindaki 2. madde bu tuzagi zaten kaydetmis.
  *
@@ -213,7 +213,7 @@ extern void ListRemove(Node **list, Node *node);
 extern void InsertSorted(Node **list, Node *node, s32 id);
 
 /* 0x08054744 */
-Node *FUN_08054744(s32 id)
+Node *FindOrInitAreaNode(s32 id)
 {
     Node **list;
     Node *cur;

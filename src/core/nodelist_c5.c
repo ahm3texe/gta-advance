@@ -11,7 +11,7 @@
  *   3) Dugumun +0x0B baytinin ust yarisi 0x10 ise kayit isaretcisi kurulup
  *      dort alan sifirlaniyor ve +0x0B'den iki bit temizleniyor.
  *
- * KUYRUK GOVDESI src/core/nodelist_a2.c (FUN_08054744) ILE BIREBIR AYNI:
+ * KUYRUK GOVDESI src/core/nodelist_a2.c (FindOrInitAreaNode) ILE BIREBIR AYNI:
  *   record = id*28 + bank->records / mark=0 / init=0x3FF / a=b=c=0 /
  *   kind &= ~1 ... kind &= ~2.  O dosyada olculen uc mekanizma buraya
  *   dogrudan uygulandi:
@@ -103,10 +103,10 @@ typedef struct AreaBank {
 extern AreaBank gAreaBank;
 extern u32      gRam020004A0;
 
-extern Node *FUN_080543d0(Node **list, s32 id);
+extern Node *FindOrClaimNode(Node **list, s32 id);
 
 /* 0x08053650 */
-void FUN_08053650(s32 id)
+void PrepareAreaNode(s32 id)
 {
     AreaBank   *bank;
     AreaRecord *rec;
@@ -117,7 +117,7 @@ void FUN_08053650(s32 id)
     s32         m;
     s32         n;
 
-    node = FUN_080543d0(NODE_LIST, id);
+    node = FindOrClaimNode(NODE_LIST, id);
 
     bank = &gAreaBank;
     recs = (s32)bank->records;

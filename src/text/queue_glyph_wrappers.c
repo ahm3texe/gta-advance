@@ -20,13 +20,13 @@
 extern u32 FUN_080638a0(u16 value, u32 flag);
 
 /* 0x08063E38 */
-u32 FUN_08063e38(s32 unused, u16 value)
+u32 ForwardU16WithFlag0(s32 unused, u16 value)
 {
     return FUN_080638a0(value, 0);
 }
 
 /* 0x08063E48 */
-u32 FUN_08063e48(s32 unused, u16 value)
+u32 ForwardU16WithFlag1(s32 unused, u16 value)
 {
     return FUN_080638a0(value, 1);
 }

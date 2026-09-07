@@ -5,12 +5,12 @@
  * ikincil diziyi, sonra birincil diziyi geziyor, en sonda ikisini de bos
  * kimlikle dolduruyor.
  *
- *   1. Ikincil dizi: her kimlik icin FUN_08054744 ile dugum aliniyor; dugum
+ *   1. Ikincil dizi: her kimlik icin FindOrInitAreaNode ile dugum aliniyor; dugum
  *      kirli VE seviyesi 1 ise FUN_080536BC cagriliyor. Ardindan
  *      gRam02035780 listesi o kimlikle tazeleniyor.
  *   2. Birincil dizi: her kimlik icin FindNode; dugum varsa, kirliyse ve
  *      seviyesi 1 ise o dugumun KENDI yuva dizisi bosaltiliyor
- *      (src/core/nodelist_c2.c ile ayni kalip: her yuva icin FUN_08052750,
+ *      (src/core/nodelist_c2.c ile ayni kalip: her yuva icin ReleaseAreaNode,
  *      sonra FillSlotsWithNone, sonra kirli biti temizle). Dugum bulunduysa
  *      gNodeListHead tazeleniyor.
  *   3. Iki dizi de FillSlotsWithNone ile bos kimlige cekiliyor.
@@ -87,10 +87,10 @@ typedef struct Node {
 
 extern Node *gNodeListHead;         /* 0x02035A70 */
 
-extern Node *FUN_08054744(u32 id);
+extern Node *FindOrInitAreaNode(u32 id);
 extern Node *FindNode(u32 id);
 extern void  ClearObjectIdsAndSlots(Node *node);
-extern void  FUN_08052750(u32 a, u32 b);
+extern void  ReleaseAreaNode(u32 a, u32 b);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  FUN_08055d90(u32 *head, u32 id);
 
@@ -107,7 +107,7 @@ void ClearNodeSlotArrays(Node *node)
     slotB = node->slotsB;
     for (i = 0; i < desc->countB; i++, slotB++) {
         u16   id = *slotB;
-        Node *entry = FUN_08054744(id);
+        Node *entry = FindOrInitAreaNode(id);
 
         if (entry->dirty && entry->level == LEVEL_BASE)
             ClearObjectIdsAndSlots(entry);
@@ -126,7 +126,7 @@ void ClearNodeSlotArrays(Node *node)
                     int  j;
 
                     for (j = 0; j < entry->desc->count; j++, inner++)
-                        FUN_08052750(*inner, 0);
+                        ReleaseAreaNode(*inner, 0);
                     FillSlotsWithNone(entry->slotsA, entry->desc->count);
                     entry->dirty = 0;
                 }

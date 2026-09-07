@@ -7,7 +7,7 @@
  * uclu kopyalaniyor, +0x68 = arg1 << 16, +0x8c = 0. Ardindan
  * FUN_08014ffc(&e->sub, 3, &e->payload, &e->unk68) cagriliyor;
  * phase 51 ise +0x2a'ya 1, degilse 64 yaziliyor; son olarak
- * FUN_08015038(&e->sub) ve FUN_080289bc(e) cagriliyor.
+ * FUN_08015038(&e->sub) ve AdvanceEntryFrame(e) cagriliyor.
  *
  * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
  * Kural 32: `ldmia r0!,{r3,r6,r7}` / `stmia r1!,{r3,r6,r7}` ucluyu
@@ -76,7 +76,7 @@ extern Entry gEntriesA[];
 
 extern void FUN_08014ffc(u8 *dest, u32 count, Triple *src, u32 *value);
 extern void FUN_08015038(u8 *sub);
-extern void FUN_080289bc(Entry *entry);
+extern void AdvanceEntryFrame(Entry *entry);
 
 /* 0x08028A88 */
 void CreateEntry(Triple *src, u32 arg1, u32 phase, u32 owner)
@@ -109,5 +109,5 @@ void CreateEntry(Triple *src, u32 arg1, u32 phase, u32 owner)
         e->mode = MODE_DEFAULT;
 
     FUN_08015038(e->sub);
-    FUN_080289bc(e);
+    AdvanceEntryFrame(e);
 }

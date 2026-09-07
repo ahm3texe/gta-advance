@@ -1,4 +1,4 @@
-/* FUN_08023bb8 -- 0x08023BB8-0x08023C3B (132 bayt)
+/* ShiftRowsLeft -- 0x08023BB8-0x08023C3B (132 bayt)
  *
  * Satir satir kaydirma. Kaynak tamponundan her satir icin bir bayt okuyup
  * `shift` kadar saga kaydiriyor; cikan `n` degeri o satirin kac bayt sola
@@ -6,7 +6,7 @@
  * satirdan satira `stride` bayt atlaniyor. Once (length - n) bayt sagdan
  * sola cekiliyor, sonra sagda kalan n bayt sifirlaniyor.
  *
- * KARDESIYLE ILISKISI -- bu fonksiyon FUN_08023c3c'nin (entries_b3.c)
+ * KARDESIYLE ILISKISI -- bu fonksiyon ShiftColumnsUp'nin (entries_b3.c)
  * EKSEN DEGISTIRILMIS ikizi. Ayni imza, ayni kontrol akisi; tek fark iki
  * adimin yer degistirmesi:
  *
@@ -92,7 +92,7 @@
 #include "gba_types.h"
 
 /* 0x08023BB8 */
-void FUN_08023bb8(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
+void ShiftRowsLeft(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
                   u8 *src, int shift)
 {
     u8 *p;

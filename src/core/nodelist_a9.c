@@ -9,11 +9,11 @@
  *       node varsa: node->ids (+0x18) ve node->record (+0x14) YAZMACA
  *       aliniyor, ardindan kind'in 2 biti YOK ve 1 biti VARSA dugumun
  *       kendi kimlik dizisi record->idCount (+0x06) kadar gezilip her
- *       kimlik FUN_08052828'e (ikinci arguman 1) veriliyor
+ *       kimlik DeactivateAreaNode'e (ikinci arguman 1) veriliyor
  *   sonra obj->records (+0x24) uzerinde header->recordCount (+0x07) kadar
- *   donulup her 60 baytlik kayit FUN_08052ddc'ye veriliyor
+ *   donulup her 60 baytlik kayit ReleaseEntryNodeRefs'ye veriliyor
  *
- * Bu, nodelist_a3.c'deki FUN_08052ddc'nin ic dongusuyle BIREBIR ayni govde;
+ * Bu, nodelist_a3.c'deki ReleaseEntryNodeRefs'nin ic dongusuyle BIREBIR ayni govde;
  * struct gorunumleri oradan alindi (Node +0x0B kind, +0x14 record, +0x18
  * ids; Record +0x06 idCount). Nesne gorunumu (ObjHeader, ObjRecord)
  * nodelist_d1.c'den alindi.
@@ -94,11 +94,11 @@ typedef struct Obj {
 } Obj;
 
 extern Node *FindOrRecycleNode(s32 id);
-extern void  FUN_08052828(u16 id, s32 flag);
-extern void  FUN_08052ddc(ObjRecord *record);
+extern void  DeactivateAreaNode(u16 id, s32 flag);
+extern void  ReleaseEntryNodeRefs(ObjRecord *record);
 
 /* 0x08053794 */
-void FUN_08053794(Obj *obj)
+void ReleaseObjectNodeRefs(Obj *obj)
 {
     /* Sira onemli: sayaclar isaretcilerden ONCE gelmeli. */
     int        i;
@@ -122,12 +122,12 @@ void FUN_08053794(Obj *obj)
             rec = node->record;
             if ((node->kind & 2) == 0 && (node->kind & 1) != 0) {
                 for (j = 0; j < rec->idCount; j++, slot++)
-                    FUN_08052828(*slot, 1);
+                    DeactivateAreaNode(*slot, 1);
             }
         }
     }
 
     record = obj->records;
     for (i = 0; i < header->recordCount; i++, record++)
-        FUN_08052ddc(record);
+        ReleaseEntryNodeRefs(record);
 }

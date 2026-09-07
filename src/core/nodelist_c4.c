@@ -1,6 +1,6 @@
 /* Uc dugum listesinin kare basi gezilmesi — 0x08053D48-0x08053DF7
  *
- * Once FUN_08053ad8 cagriliyor (aldigi r0 argumanini kullanmiyor, kendi
+ * Once StepCountdownTimers cagriliyor (aldigi r0 argumanini kullanmiyor, kendi
  * tabanini yukluyor; yine de ROM argumani kuruyor: 0x02035760).
  * Ardindan UC ayri bagli liste ayni kalipla geziliyor:
  *
@@ -14,7 +14,7 @@
  * yuklenen r0 ile yapiyor: bu, `for (n = head; n && n->id != SENTINEL; ...)`
  * biciminin agbcc tarafindan dondurulmus (rotated) halidir.
  *
- * Sonunda FUN_0805ab78 cagriliyor.
+ * Sonunda NoOp0805AB78 cagriliyor.
  *
  * Dugum yerlesimi (ROM'dan olculdu):
  *     +0x00  struct Node *next        ldr rX,[rY,#0]
@@ -41,7 +41,7 @@
 #include "gba_types.h"
 #include "node_list.h"
 
-/* 0x02035780 liste basinin hemen oncesindeki blok; FUN_08053ad8 bunu
+/* 0x02035780 liste basinin hemen oncesindeki blok; StepCountdownTimers bunu
    temizliyor.  Ayri bir sembol olarak dogrulanmadi, o yuzden adres. */
 #define NODE_BLOCK_BASE ((void *)0x02035760)
 
@@ -53,18 +53,18 @@
 
 extern NodeC4 *gNodeListHead;       /* 0x02035A70 */
 
-extern void FUN_08053ad8(void *arg);
+extern void StepCountdownTimers(void *arg);
 extern void FUN_080534a8(NodeC4 *node);
-extern void FUN_08052bbc(NodeC4 *node);
+extern void AllocateNodeSlots(NodeC4 *node);
 extern void FUN_08052228(NodeC4 *node);
-extern void FUN_0805ab78(void);
+extern void NoOp0805AB78(void);
 
 /* 0x08053D48 */
 void StepNodeLists(void)
 {
     NodeC4 *node;
 
-    FUN_08053ad8(NODE_BLOCK_BASE);
+    StepCountdownTimers(NODE_BLOCK_BASE);
 
     for (node = gRam02035780;
          node != 0 && node->id != NODE_SENTINEL_ID;
@@ -77,7 +77,7 @@ void StepNodeLists(void)
          node != 0 && node->id != NODE_SENTINEL_ID;
          node = node->next) {
         if (node->kind > 0)
-            FUN_08052bbc(node);
+            AllocateNodeSlots(node);
     }
 
     for (node = gNodeListC;
@@ -87,5 +87,5 @@ void StepNodeLists(void)
             FUN_08052228(node);
     }
 
-    FUN_0805ab78();
+    NoOp0805AB78();
 }

@@ -112,11 +112,11 @@ extern SlotEntry *FUN_08038608(void *object);
 extern void       ConfigureSlot(Entity *e, u32 kind, int which);
 extern void       FUN_0801d8a0(void *sub, u32 zero);
 extern void       FUN_08008f74(u32 arg);
-extern void       FUN_0800a8a8(Entity *e, u32 kind, u32 zero);
+extern void       BindActorToCoordSlot(Entity *e, u32 kind, u32 zero);
 extern void       FUN_0800a484(u32 zero);
 
 /* 0x08053FF4 */
-u32 FUN_08053ff4(Node *node, u32 arg)
+u32 SpawnNodeObject(Node *node, u32 arg)
 {
     Node   *cur;
     Entity *obj;
@@ -132,7 +132,7 @@ u32 FUN_08053ff4(Node *node, u32 arg)
         FUN_0801d8a0(obj->unk14, 0);
         if (gSlotSelector == 1)
             FUN_08008f74(arg);
-        FUN_0800a8a8(obj, SLOT_SECONDARY_KIND, 0);
+        BindActorToCoordSlot(obj, SLOT_SECONDARY_KIND, 0);
         if (gSlotSelector == 1)
             FUN_0800a484(0);
         /* Kuyruk her iki dalda da tam yazilmali (elenen yol 1). */
@@ -151,7 +151,7 @@ u32 FUN_08053ff4(Node *node, u32 arg)
         FUN_0801d8a0(obj->unk14, 0);
         if (gSlotSelector == 0)
             FUN_08008f74(arg);
-        FUN_0800a8a8(obj, SLOT_PRIMARY_KIND, 0);
+        BindActorToCoordSlot(obj, SLOT_PRIMARY_KIND, 0);
         if (gSlotSelector == 0)
             FUN_0800a484(0);
         node->sub = obj;

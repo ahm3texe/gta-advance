@@ -16,7 +16,7 @@
 extern void InitNodePool(void);
 
 /* 0x08012A98 */
-void FUN_08012a98(void)
+void ForwardToInitNodePool(void)
 {
     InitNodePool();
 }

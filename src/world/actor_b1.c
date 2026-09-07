@@ -69,7 +69,7 @@ typedef struct Actor {
 
 extern Actor *GetUnk0202F310(void);
 
-u32 FUN_080166e8(Actor *self)
+u32 IsAnyActorNearby(Actor *self)
 {
     Actor *cur;
     Pose *here;

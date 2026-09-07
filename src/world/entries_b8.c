@@ -1,4 +1,4 @@
-/* FUN_08023aa0 -- 0x08023AA0-0x08023B21 (130 bayt)
+/* ShiftRowsRight -- 0x08023AA0-0x08023B21 (130 bayt)
  *
  * Satir satir SAGA kaydirma. Kaynak tamponundan her satir icin bir bayt
  * okuyup `shift` kadar saga kaydiriyor; cikan `n` degeri o satirin kac bayt
@@ -88,7 +88,7 @@
 #include "gba_types.h"
 
 /* 0x08023AA0 */
-void FUN_08023aa0(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
+void ShiftRowsRight(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
                   u8 *src, int shift)
 {
     u8 *p;

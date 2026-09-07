@@ -34,7 +34,7 @@ typedef struct Params {
     u32 c;
 } Params;
 
-extern void FUN_08041ef0(void *arg);
+extern void NoOp08041EF0(void *arg);
 
 /* 0x0803F630 */
 void InitState(State *s, void *ptr, StateSlot *slot)
@@ -56,7 +56,7 @@ void StateNoop(void)
 /* 0x0803F650 */
 void RunState(State *s)
 {
-    FUN_08041ef0(s->ptr0);
+    NoOp08041EF0(s->ptr0);
 }
 
 /* 0x0803F65C */

@@ -87,7 +87,7 @@ typedef struct Entry {
 #define gListHead020230A0 (*(Entry **)0x020230A0)
 
 /* 0x080151C0 */
-void FUN_080151c0(void)
+void ReleaseEntryResources(void)
 {
     Entry *outer;
     Entry *node;

@@ -5,7 +5,7 @@
  * aliyor. Kimlik dizisinin her girisi icin:
  *   - kimlikten dugum bulunuyor (FindNode),
  *   - dugum "kirli" (bit 0) ve seviyesi 1 ise dugumun kendi yuva dizisindeki
- *     her kimlik icin FUN_08052750 cagriliyor, yuvalar DMA ile bos kimlikle
+ *     her kimlik icin ReleaseAreaNode cagriliyor, yuvalar DMA ile bos kimlikle
  *     dolduruluyor ve kirli biti temizleniyor -- bu govde nodelist_c2.c'deki
  *     FUN_08055C04 ile birebir ayni,
  *   - dugum bulunduysa liste basi + kimlik ile FUN_08055D90 cagriliyor.
@@ -113,7 +113,7 @@ typedef struct Obj {
 extern Node *gNodeListHead;         /* 0x02035A70 */
 
 extern Node *FindNode(u32 id);
-extern void  FUN_08052750(u32 a, u32 b);
+extern void  ReleaseAreaNode(u32 a, u32 b);
 extern void  ClearAreaIdArrays(ObjRecord *record);
 extern void  FillSlotsWithNone(void *dest, u32 count);
 extern void  ClearSlots(void *dest, u32 count);
@@ -146,7 +146,7 @@ void ClearObjectIdsAndSlots(Obj *obj)
             if (node->level == LEVEL_BASE) {
                 slot = node->slots;
                 for (j = 0; j < node->desc->count; j++, slot++)
-                    FUN_08052750(*slot, 0);
+                    ReleaseAreaNode(*slot, 0);
                 FillSlotsWithNone(node->slots, node->desc->count);
                 node->dirty = 0;
             }

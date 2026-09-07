@@ -101,7 +101,7 @@ extern Session    gRam02026DF0;         /* 0x02026DF0 -- ram_map kaydi gerekli *
 extern void FUN_0802fd48(Record *record, s32 kind);
 
 /* 0x08030E10 */
-u32 FUN_08030e10(void)
+u32 CaptureSessionSnapshot(void)
 {
     Session *session;
 

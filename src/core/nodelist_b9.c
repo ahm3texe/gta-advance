@@ -227,7 +227,7 @@ extern u32     FUN_08053834(AreaCtx *ctx, AreaGroup *group, const char *name);
 extern void    FUN_08051154(s32 index);
 
 /* 0x08053B44 */
-void FUN_08053b44(void)
+void LoadAreaByName(void)
 {
     NameTable   empty;
     NameTable   special;
