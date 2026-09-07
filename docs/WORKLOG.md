@@ -864,3 +864,32 @@ ALINDI: decomp yakinsaminda modul tahmin edilmez, decomp edilen dosyadir.
   check` geçti: toolchain, kayıtlı bölgeler, hibrit ROM hash'i, C taraması,
   tutarlılık, iş kuyruğu, sınır denetimi ve üretilmiş görünümler temiz.
   `c_sources.csv` içindeki bayat 2372 bayt ölçümü de taramayla yenilendi.
+
+## 2026-09-07 — Oyunun gerçek kare hızı ölçüldü: ~15 fps
+
+- Soru koddan cevaplandı, sonra oynanışla doğrulandı. `vblank_intr.c`
+  (0x08000220, byte-matching) her VBlank'te `gIwramFrameCounter`'ı artırıyor;
+  mantık karesi bitince değeri `gFrameDelay`'e (0x03000000) kopyalayıp 5'te
+  kırpıyor ve sayacı sıfırlıyor.
+- `gFrameDelay` bir **zaman adımı çarpanı**, ölçüm değil kullanım: `nodelist_c8.c`
+  notuna göre 0x08053AD8 sayaçları her karede `gFrameDelay` kadar azaltıyor.
+- **Oynanış ölçümü: ~15 fps**, yani mantık karesi başına 4 donanım karesi,
+  `gFrameDelay ≈ 4`. Ara sahnelerde çok daha kötü (0-1 fps gözlendi).
+- Bunu bağımsız doğrulayan kod kanıtı: **`FRAME_DELAY_MAX = 5`**. 60 fps'te
+  koşan bir oyunda telafi değeri 1'i geçmez; 5'te kırpmak, 4-5 değerlerinin
+  normal işletim sayıldığını gösterir. Yani düşük kare hızı bir performans
+  kazası değil, tasarımın kabul ettiği aralık.
+- Kırpmanın ikinci sonucu: mantık karesi 5 donanım karesinden uzun sürerse
+  telafi tavana çarpıyor ve **simülasyon ağır çekime giriyor** (hareket
+  gerçek zamanın altında ilerliyor). Ara sahnelerdeki "donmuş" his muhtemelen
+  budur — kare hızı düşüşü değil, zamanın yavaşlaması.
+- Bağlantı/iki oyunculu kipte (`gGameState[12]` 1 veya 2) `gFrameDelay` gerçek
+  geçen kareye BAKMAKSIZIN 5'e sabitleniyor. Sebebi kodda yazmıyor; makul
+  tahmin iki cihazın deterministik kalması, ama bu çıkarım.
+- `tools/fps_watch.lua` eklendi: mGBA'da sayacın sıfırlandığı anı yakalayıp
+  adım dağılımını basıyor. mGBA'nın başlık çubuğundaki FPS emülatörün hızıdır,
+  oyunun mantık adımını göstermez.
+
+DÜZELTME: Bu bulgudan önce "oyun sabit FPS'e kilitlenmiyor, değişken zaman
+adımı kullanıyor" demiştim. Mekanizma doğruydu ama sonucu varsaymıştım;
+oyunun 60 fps'e yakın koştuğu izlenimini verdi. Ölçüm bunu çürüttü.
