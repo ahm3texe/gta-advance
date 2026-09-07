@@ -167,6 +167,7 @@ start,end,binary,module,notes
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,yaprak erisimci
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
+0x08064F24,0x08065130,build/world/band_08064f24.bin,world,Aktor izleme turunu kapatir ve mesafe/dusus skorunu isler.
 0x08065130,0x080651E0,build/world/spawn_slot_effect.bin,world,Etkin yuva icin 51 numarali girisi uretir; dogal C byte-matching.
 0x080651E0,0x08065378,build/world/slot_probe.bin,world,Sonda noktalarini harita izgarasinda sinayip giris uretir.
 0x08065378,0x0806543C,build/world/actor_tracking.bin,world,Aktor hareket izleme kurulumu ve birikim adimi; dogal C byte-matching.

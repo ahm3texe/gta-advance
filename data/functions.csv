@@ -1671,7 +1671,7 @@ address,name,size,status,module,notes
 0x0806493C,FUN_0806493c,1212,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08064DF8,FUN_08064df8,2,matching,unknown,Byte-matching dogrulandi; sinir ve ARM/Thumb kipi ROM'a karsi KANITLANDI (eskiden Ghidra otomatik analizinden gelen 'gecici' notu tasiyordu)
 0x08064DFC,FUN_08064dfc,294,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08064F24,FUN_08064f24,524,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08064F24,FUN_08064f24,524,matching,world,Aktor izleme turunu kapatip mesafe/dusus skorunu isler; src/world/band_08064f24.c
 0x08065130,SpawnSlotEffect,176,matching,world,Etkin yuva icin efekt/giris uretir; src/world/spawn_slot_effect.c
 0x080651E0,PlaceProbeEntries,408,matching,world,Dort sonda noktasini harita izgarasinda sinayip 51/52 fazli girisler uretir; src/world/slot_probe.c
 0x08065378,ResetActorTracking,92,matching,world,"Izlemeyi sifirlar: baslangic konumunu kopyalar, dort birikimi siler; src/world/actor_tracking.c"

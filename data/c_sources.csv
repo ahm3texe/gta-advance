@@ -416,7 +416,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080646F8,GetGlyphCell,src/text/glyph_table_access.c,44,44,yes
 0x08064724,FUN_08064724,src/text/text_f5.c,508,536,no
 0x08064DF8,FUN_08064df8,src/misc/empty_stubs.c,2,2,yes
-0x08064F24,FUN_08064f24,src/world/band_08064f24.c,500,524,no
+0x08064F24,FUN_08064f24,src/world/band_08064f24.c,524,524,yes
 0x08065130,SpawnSlotEffect,src/world/spawn_slot_effect.c,176,176,yes
 0x080651E0,PlaceProbeEntries,src/world/slot_probe.c,408,408,yes
 0x08065378,ResetActorTracking,src/world/actor_tracking.c,92,92,yes
