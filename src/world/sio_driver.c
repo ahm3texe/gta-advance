@@ -33,6 +33,32 @@
  *   r3->r1 / r0->r1 adres toplamalarina karsi biz r1'i yerinde ilerletiriz.
  * Dogrusal diff bloklari yaklasik hizalar; skor tam eslesme kaniti degil.
  *
+ * 2026-09-07 EK OLCUM (skor degismedi, 669'da kaldi):
+ *
+ * 1. ILK GERCEK FARK 0x08065A52'de ve BU BIR SONUC, SEBEP DEGIL.
+ *    ROM orada `b.n 0x8065A6A` ile govdeye atliyor; zaman asimi testi
+ *    (0x08065A5C) govdeden ONCE yerlesmis. Sebebi Thumb kosullu dal
+ *    menzili: LIVE govdesi ~1232 bayt, test govdeden sonra olsaydi geri
+ *    dal menzil disi kalirdi. Yani yerlesim, govde iceriginin boyutunun
+ *    zorladigi bir sonuc; govde duzelmeden bu blok hizalanmaz.
+ *
+ * 2. DIS DONGU YAZIMI KOL DEGIL. Dort yazim BIREBIR ayni ciktiyi verdi
+ *    (2352 bayt, 669/1174): `do {...} while (cond)`, `for (;;) {... if
+ *    (!cond) break; }`, `while (1) {... break}`, ters kosullu do/while.
+ *    agbcc hepsini ayni ic bicime indirgiyor.
+ *
+ * 3. RX ILISKILENDIRMESI YENIDEN YAZIMLA KAPANMIYOR. ROM her alan icin
+ *    birlesik sabiti (0x190 + alan ofseti) kurup `taban + sabit`, sonra
+ *    `+ i*16` ekliyor (0x08065A8E'de olculdu: movs #207 / lsls #1 /
+ *    adds / adds). Biz `(taban + i*16) + sabit` uretiyoruz. Denenen ve
+ *    ELENEN dort yeni yazim:
+ *      FRAME(b)->rx           dizi bozunmasi ile RX_BASE   669 (ayni)
+ *      (&FRAME(b)->rx[0])[i]                               602
+ *      FRAME(b)->rx[0 + i]                                 669 (ayni)
+ *      (mevcut) FRAME(b)->rx[i]                            669
+ *    Ilk ve ucuncu bayt bayt ayni cikti veriyor; agbcc katliyor.
+ *    Onceki turda elenenlerle birlikte sekiz yazim denendi.
+ *
  * ONCEKI KAZANIMLAR KORUNUYOR:
  * - TX/RX yapi uyeleri: yapi disi u16 store, skaler global okumalarini
  *   olduruyordu. LinkFrame gorunumu bu alias farkini kapatti (553->568).

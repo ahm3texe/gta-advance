@@ -96,6 +96,29 @@ ters çevirmeleri 567–569; etiket yerelleri en çok 580; indeks yerelleri en
 çok 586. `step`'i ikiye bölmek etkisiz. Volatile taramasında ROM'da olmayan
 erişimler çıktığı için bu adaylar alınmadı.
 
+**2026-09-07 ikinci tur — skor değişmedi (669), üç negatif sonuç:**
+
+1. **İlk gerçek fark 0x08065A52'de ve bu bir SONUÇ, sebep değil.** ROM orada
+   `b.n 0x8065A6A` ile gövdeye atlıyor; zaman aşımı testi (0x08065A5C)
+   gövdeden **önce** yerleşmiş. Sebebi Thumb koşullu dal menzili (±256 bayt):
+   LIVE gövdesi ~1232 bayt, test gövdeden sonra olsaydı geri dal menzil dışı
+   kalırdı. Yerleşim, gövde içeriğinin boyutunun zorladığı bir sonuç —
+   **gövde düzelmeden bu blok hizalanmaz.** Yukarıdan aşağı yöntem burada
+   kırılıyor; sıradaki çalışma gövde içindeki yerleşimden bağımsız içerik
+   farklarını hedeflemeli.
+2. **Dış döngü yazımı kol değil.** Dört yazım BİREBİR aynı çıktıyı verdi
+   (2352 bayt, 669/1174): `do {...} while (cond)`, `for (;;) { ... if (!cond)
+   break; }`, `while (1) { ... break; }`, ters koşullu `do/while`.
+   agbcc hepsini aynı iç biçime indirgiyor.
+3. **RX ilişkilendirmesi yeniden yazımla kapanmıyor.** ROM her alan için
+   birleşik sabiti (0x190 + alan ofseti) kurup `taban + sabit`, sonra `+ i*16`
+   ekliyor (0x08065A8E'de ölçüldü: `movs #207 / lsls #1 / adds / adds`).
+   Biz `(taban + i*16) + sabit` üretiyoruz. Dört yeni yazım elendi:
+   `FRAME(b)->rx` dizi bozunması → 669 (bayt bayt aynı), `(&rx[0])[i]` → 602,
+   `rx[0 + i]` → 669 (aynı), mevcut → 669. Önceki turdakilerle **sekiz yazım**
+   denendi. Yapı takma-adı gereksinimi ile ROM'un ilişkilendirmesi
+   çakışıyor ve yapı biçimi kazanıyor.
+
 **Yeniden üretim:** `python3 tools/probe_sio_tx.py`; asıl kapı
 `make c-match FILE=src/world/sio_driver.c`. Probe önceki doğrudan yazımı,
 tek adımlı ve iki adımlı yardımcıyı kaynak değiştirmeden karşılaştırır.
