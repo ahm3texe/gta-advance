@@ -350,23 +350,23 @@ address,name,size,status,module,notes
 0x0801686C,RequestActorAction,292,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
 0x08016990,FUN_08016990,2318,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sınır 2026-09-04 ROM akış incelemesiyle doğrulandı
 0x080172A0,FUN_080172a0,606,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08017500,FUN_08017500,148,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08017594,FUN_08017594,148,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08017500,GetFacingTarget,148,matching,world,Byte-matching C kaynagindan dogrulandi; GetFacingTarget; bakis konisindeki hedefi verir (find_twins.py)
+0x08017594,GetFacingTargetDup,148,matching,world,Byte-matching C kaynagindan dogrulandi; GetFacingTargetDup; GetFacingTarget'in ROM'daki ikinci kopyasi
 0x08017628,FUN_08017628,1536,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08017C28,FUN_08017c28,336,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
 0x08017D78,FUN_08017d78,194,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08017E3C,FUN_08017e3c,312,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08017F74,FUN_08017f74,272,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08018084,FUN_08018084,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08018194,FUN_08018194,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080182A4,FUN_080182a4,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080183B4,FUN_080183b4,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080184C4,FUN_080184c4,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080185D4,FUN_080185d4,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080186E4,FUN_080186e4,312,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0801881C,FUN_0801881c,312,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08018954,FUN_08018954,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08018A64,FUN_08018a64,272,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08017E3C,StepActorBehaviorB3,312,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehaviorB3; 12'li davranis ailesi sablonu (find_twins.py)
+0x08017F74,StepActorBehavior136,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior136; ailenin 272 baytlik uyesi
+0x08018084,StepActorBehavior155,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior155; ailenin 272 baytlik uyesi
+0x08018194,StepActorBehavior139,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior139; ailenin 272 baytlik uyesi
+0x080182A4,StepActorBehavior142,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior142; ailenin 272 baytlik uyesi
+0x080183B4,StepActorBehavior149,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior149; ailenin 272 baytlik uyesi
+0x080184C4,StepActorBehavior152,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior152; ailenin 272 baytlik uyesi
+0x080185D4,StepActorBehavior146,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior146; ailenin 272 baytlik uyesi
+0x080186E4,StepActorBehaviorB4a,312,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehaviorB4a; ailenin 312 baytlik uyesi
+0x0801881C,StepActorBehaviorB4b,312,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehaviorB4b; ailenin 312 baytlik uyesi
+0x08018954,StepActorBehavior130,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior130; ailenin 272 baytlik uyesi
+0x08018A64,StepActorBehavior133,272,matching,world,Byte-matching C kaynagindan dogrulandi; StepActorBehavior133; ailenin 272 baytlik uyesi
 0x08018B74,FUN_08018b74,996,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x08018F58,FUN_08018f58,312,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x08019090,FUN_08019090,464,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)

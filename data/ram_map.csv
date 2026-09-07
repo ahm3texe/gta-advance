@@ -98,6 +98,7 @@ address,size,name,source,status,notes
 0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
 0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
 0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"
+0x020230B4,1,gRam020230B4,decomp,provisional,Paylasilan u8 sayac; 0x08017E3C-0x08018B74 ailesindeki 12 davranis adimi artirip esigi asinca sifirliyor.
 0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) sabit; +12/+16 (arg << 16 | 0xFF000000)
 0x02023700,4,gRam02023700,decomp,provisional,Kare isleme zincirinde son tamamlanan asamayi gosteren tani isareti
 0x02023704,4,gRam02023704,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani

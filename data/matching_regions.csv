@@ -53,6 +53,8 @@ start,end,binary,module,notes
 0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Sabit cagri + DMA bosaltma
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,kucuk fonksiyon hasadi
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184 bayt gövde + literal havuzu
+0x08017500,0x08017628,build/world/facing_target.bin,world,0x08017500 GetFacingTarget + 0x08017594 GetFacingTargetDup (ayni govde)
+0x08017E3C,0x08018B74,build/world/actor_behavior_steps.bin,world,"0x08017E3C-0x08018B73 aktor davranis adimlari (12 fonksiyon, tek sablon)"
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x0801952C,0x08019590,build/world/actor_desc_resolve.bin,world,0x0801952C ResolveActorDesc; gRom08BD3448 kokunden aktor tanimi
 0x08019620,0x08019670,build/world/actor_id_matches.bin,world,0x08019620 ActorIdMatches; kimlik/takma ad esleme sorgusu
