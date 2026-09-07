@@ -19,7 +19,7 @@
  *     ScaleMagnitude 132  BYTE-MATCHING
  *     ClearHudRowsAB  72  BYTE-MATCHING
  *     ReleaseActorAndSlot  64  BYTE-MATCHING
- *     FUN_08031844 470  eslesmedi (asagida ayrintili)
+ *     BlitStripClipLeft4bpp 470  eslesmedi (asagida ayrintili)
  *     PushSlotQueueEntry 140  RAM SEMBOLU EKSIK (asagida ayrintili)
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

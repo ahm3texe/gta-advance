@@ -220,7 +220,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x080315C0,SendTextMode2,src/ui/send_text_mode2.c,12,12,yes
 0x080315F8,FUN_080315f8,src/world/band_a_315f8.c,30,30,yes
 0x08031618,ReleaseActorAndSlot,src/world/release_actor_and_slot.c,64,64,yes
+0x08031684,ReleaseSlotSub,src/video/blit_strip_plain.c,44,44,yes
+0x080316B0,BlitStripPlain4bpp,src/video/blit_strip_plain.c,318,318,yes
 0x080317F0,FUN_080317f0,src/world/band_a_317f0.c,84,84,yes
+0x08031844,BlitStripClipLeft4bpp,src/video/blit_strip_clip_left.c,470,470,yes
 0x08031A1C,BlitStrip4bpp,src/video/blit_strip_4bpp.c,470,470,yes
 0x08031BF4,FUN_08031bf4,src/world/band_a_31bf4.c,28,28,yes
 0x08031C10,ReplaceNibbleField,src/world/nibble_replace.c,136,136,yes

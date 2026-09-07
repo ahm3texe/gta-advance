@@ -99,7 +99,9 @@ start,end,binary,module,notes
 0x080315C0,0x080315CC,build/ui/send_text_mode2.bin,ui,0x080315C0 SendTextMode2
 0x080315F8,0x08031618,build/world/band_a_315f8.bin,world,Nesneyi yuva dizisinde bulup yuvayi birakir
 0x08031618,0x08031658,build/world/release_actor_and_slot.bin,world,0x08031618 ReleaseActorAndSlot
+0x08031684,0x080317F0,build/video/blit_strip_plain.bin,video,0x08031684 ReleaseSlotSub + 0x080316B0 BlitStripPlain4bpp (+2 bayt hizalama dolgusu)
 0x080317F0,0x08031844,build/world/band_a_317f0.bin,world,8bpp pikselleri 4bpp karo satirlarina paketler
+0x08031844,0x08031A1C,build/video/blit_strip_clip_left.bin,video,0x08031844 BlitStripClipLeft4bpp (+2 bayt hizalama dolgusu)
 0x08031A1C,0x08031BF4,build/video/blit_strip_4bpp.bin,video,"0x08031A1C BlitStrip4bpp (+2 bayt hizalama dolgusu, ROM'da 0000)"
 0x08031BF4,0x08031C10,build/world/band_a_31bf4.bin,world,79 bayti 84 baytlik yigin tamponuna strncpy eder
 0x08031C10,0x08031C98,build/world/nibble_replace.bin,world,On alti kelimede dort nibble alani degistirme; dogal C byte-matching.

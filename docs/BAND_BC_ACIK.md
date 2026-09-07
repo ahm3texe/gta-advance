@@ -1,8 +1,18 @@
-# Band B/C — kapanmayan is
+# Band B/C — kapanan is (tarihce)
 
-Kaynak: 0x080308EC-0x08031D24 bandini isleyen iki cozumleme ajaninin
-raporlari (2026-09-07). Bandin geri kalani (16 fonksiyon) byte-matching
-olarak kaydedildi; asagidaki iki madde acik kaldi.
+**DURUM: HER IKI MADDE DE KAPANDI (2026-09-07).**
+
+- `0x08031844` -> `src/video/blit_strip_clip_left.c`, BYTE-MATCHING.
+  Cozum: eslesen kardesi `0x08031A1C` ile ROM govdelerini diff'lemek.
+  235 komutun 235'i ayniydi; fark yalnizca sutun testinin kutbuydu
+  (`if (col++ >= 0)` -> `if (col++ < 0)`). Yontem docs/WORKFLOW.md §10.
+- `0x0803173E` sinir hatasi duzeltildi; yerine gelen `0x08031684` ve
+  `0x080316B0` -> `src/video/blit_strip_plain.c`, ikisi de BYTE-MATCHING.
+
+Asagisi, cozumden ONCEKI ajan notlaridir; yontem dersi icin birakildi:
+yazmac oncelikleri dogru olculmustu ama YANLIS SORU soruluyordu.
+
+---
 
 ## 0x08031844 — 472 bayt, 8x48 4bpp serit cizici (ESLESMEDI)
 
@@ -110,7 +120,7 @@ buradan baslanmali.
 #define PACK(a, b, c, d)  ((a) | ((b) << 4) | ((c) << 8) | ((d) << 12))
 
 /* 0x08031844 */
-void FUN_08031844(s32 y0, s32 x0, s32 height, s32 stride,
+void BlitStripClipLeft4bpp(s32 y0, s32 x0, s32 height, s32 stride,
                   const u8 *mask, const u8 *under, u16 *out, const u8 *src)
 {
     s32 i;

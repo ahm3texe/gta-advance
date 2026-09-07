@@ -137,3 +137,27 @@ Birden fazla ajan çalışıyorsa:
 - Her ajan yalnızca kendi kaynak dosyasına yazar
 - Emeklilik ve bölge kaydı kararı ana süreçte kalır
 - Ajan raporu doğrulama yerine geçmez; sonuç ROM'a karşı yeniden ölçülür
+
+## 10. Önce kardeşin ROM gövdesiyle diff'le
+
+Bir fonksiyon eşleşmiyorsa ve ROM'da **boyutu yakın bir kardeşi zaten
+eşleşiyorsa**, yazmaç dağıtımı kovalamadan önce iki ROM gövdesini
+birbiriyle karşılaştır:
+
+```
+python3 tools/disasm_function.py 0x08031844 | sed -E 's/^ *[0-9a-f]+:\t[0-9a-f ]+\t//' > a
+python3 tools/disasm_function.py 0x08031A1C | sed -E 's/^ *[0-9a-f]+:\t[0-9a-f ]+\t//' > b
+diff a b
+```
+
+Ölçülen örnek: `0x08031844` (472 bayt) bir ajanın 341 bin jetonunu yedi ve
+226/235 komutta takıldı; rapor "üç yazmaçlı döngüsel yer değiştirme, kaynak
+düzeyinde kaldıraç yok" diyordu. Kardeşi `0x08031A1C` zaten eşleşiyordu.
+İki gövdenin diff'i **235 komutun 235'inin aynı** olduğunu, farkın yalnızca
+dal hedefleri ve sutun testinin kutbu (`blt` ↔ `bge`) olduğunu gösterdi.
+Kaynakta karşılığı tek bir karakterdi: `if (col++ >= 0)` → `if (col++ < 0)`.
+Eşleşen kardeşin kaynağını kopyalayıp o testi çevirmek ilk denemede tam
+eşleşme verdi.
+
+Aynı yöntem `0x080316B0`'de de ilk denemede tuttu (aile aynı, sütun kırpması
+yok). Kural: **kardeş varsa diff ilk adımdır**, `dump_alloc.py` son adım.

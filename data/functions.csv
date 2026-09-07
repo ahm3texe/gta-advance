@@ -699,10 +699,10 @@ address,name,size,status,module,notes
 0x080315F8,FUN_080315f8,30,matching,world,Nesneyi yuva dizisinde bulup yuvayi birakir; src/world/band_a_315f8.c
 0x08031618,ReleaseActorAndSlot,64,matching,world,Byte-matching C kaynagindan dogrulandi; ReleaseActorAndSlot; aktoru ve sahibinin yuvasini birakir
 0x08031658,FUN_08031658,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08031684,FUN_08031684,44,discovered,unknown,"Kayitli degildi; 0x08031658'in bitisinden 0x080316B0'daki prologa kadar tam bir fonksiyon (push {r4,lr} ... bx r0, havuzda 0x02025810). SINIR DUZELTILDI 2026-09-07: eski 0x0803173E kaydi bir fonksiyon degildi. 0x0803073C'deki sozde `bl 0x0803173E` aslinda bir havuz kelimesi (0xF000FFFF); discover_functions.py havuzu kod sanmis. 0x0803173E'de prolog yok, 0x080317DC'deki geri dal 0x080316CE'ye (baslangictan once) gidiyor ve 0x080317DE'deki epilog 0x080316B0'daki prologa denk geliyor. Govde henuz incelenmedi."
-0x080316B0,FUN_080316b0,318,discovered,unknown,"8 nibble maskeli serit cizici; 0x08031A1C (BlitStrip4bpp) ve 0x08031844'un kardesi. SINIR DUZELTILDI 2026-09-07: eski 0x0803173E kaydi bir fonksiyon degildi. 0x0803073C'deki sozde `bl 0x0803173E` aslinda bir havuz kelimesi (0xF000FFFF); discover_functions.py havuzu kod sanmis. 0x0803173E'de prolog yok, 0x080317DC'deki geri dal 0x080316CE'ye (baslangictan once) gidiyor ve 0x080317DE'deki epilog 0x080316B0'daki prologa denk geliyor. Govde henuz incelenmedi."
+0x08031684,ReleaseSlotSub,44,matching,video,Byte-matching C kaynagindan dogrulandi; ReleaseSlotSub; gRam02025810 yuvasinin alt nesnesini birakir
+0x080316B0,BlitStripPlain4bpp,318,matching,video,Byte-matching C kaynagindan dogrulandi; BlitStripPlain4bpp; sutun kirpmasiz 8x48 4bpp serit cizici
 0x080317F0,FUN_080317f0,84,matching,world,8bpp pikselleri 4bpp karo satirlarina paketler; src/world/band_a_317f0.c
-0x08031844,FUN_08031844,470,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x08031844,BlitStripClipLeft4bpp,470,matching,video,"Byte-matching C kaynagindan dogrulandi; BlitStripClipLeft4bpp; 0x08031A1C ile ayni kaynak, sutun testi ters"
 0x08031A1C,BlitStrip4bpp,470,matching,video,Byte-matching C kaynagindan dogrulandi; BlitStrip4bpp; 48 satirlik 4bpp maskeli serit cizici
 0x08031BF4,FUN_08031bf4,28,matching,world,79 bayti 84 baytlik yigin tamponuna strncpy eder; src/world/band_a_31bf4.c
 0x08031C10,ReplaceNibbleField,136,matching,world,On alti kelimedeki secili nibble alanlarini degistirir; src/world/nibble_replace.c
