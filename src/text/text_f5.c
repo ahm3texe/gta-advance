@@ -29,7 +29,7 @@
  * ALAN 8 KULLANILMIYOR: adi verilmedi, `pad08` olarak birakildi.
  *
  * CAGRILANLAR (ikisi de ROM'da coz umlendi, bu dosyada sadece extern):
- *   FUN_0806c0f4(pay, bolen) : isaretli bolme. Imza src/save/
+ *   __divsi3(pay, bolen) : isaretli bolme. Imza src/save/
  *       init_save_system.c'de zaten bu bicimde bildirilmis, aynen alindi.
  *       `%` ve `/` YAZILAMAZ -- agbcc __divsi3 uretir, sembol yok.
  *   FUN_0800c4bc(kareToplami) : 0x0800c4bc'de tablo tabanli karekok
@@ -65,7 +65,7 @@
  *    okuyor; satiri kaldirinca agbcc yuklemeyi birlesme noktasina
  *    tasiyip yazmac omrunu kisaltiyor ve 1. maddedeki kazanc kayboluyor.
  *
- * 4. `%` yasak; bolme dogrudan FUN_0806c0f4 cagrisi olarak yazilir.
+ * 4. `%` yasak; bolme dogrudan __divsi3 cagrisi olarak yazilir.
  *
  * 5. Bayraklar tek bir `s32 flags` uzerinde `|=` ile birikir; ROM
  *    0x80647ea-0x8064830 arasinda dort kez oku/or/yaz yapiyor.
@@ -138,7 +138,7 @@ typedef struct Bounds {
 
 /* 0x0806C0F4 -- isaretli bolme (agbcc'nin __divsi3'u degil, oyunun kendi
  * yordami). Imza src/save/init_save_system.c'deki bildirimle aynidir. */
-extern s32 FUN_0806c0f4(s32 dividend, s32 divisor);
+extern s32 __divsi3(s32 dividend, s32 divisor);
 
 /* 0x0800C4BC -- tablo tabanli karekok; kare toplamini uzakliga cevirir. */
 extern s32 FUN_0800c4bc(s32 squareSum);
@@ -157,8 +157,8 @@ s32 FUN_08064724(s32 steep, const Point *from, Point *hit,
     if (steep == 0) {
         /* y = (slope*x >> 16) + offset : ust/alt kenarlarin x'i bolmeyle. */
         if (slope != 0) {
-            xTop    = FUN_0806c0f4((box->top - offset) << 16, slope);
-            xBottom = FUN_0806c0f4((box->bottom - offset) << 16, slope);
+            xTop    = __divsi3((box->top - offset) << 16, slope);
+            xBottom = __divsi3((box->bottom - offset) << 16, slope);
         } else {
             xBottom = 0;
             xTop = 0;
@@ -171,8 +171,8 @@ s32 FUN_08064724(s32 steep, const Point *from, Point *hit,
         /* x = (slope*y >> 16) + offset : roller tam simetrik yer degistirir. */
         if (slope != 0) {
             left = box->left;
-            yLeft  = FUN_0806c0f4((left - offset) << 16, slope);
-            yRight = FUN_0806c0f4((box->right - offset) << 16, slope);
+            yLeft  = __divsi3((left - offset) << 16, slope);
+            yRight = __divsi3((box->right - offset) << 16, slope);
         } else {
             yRight = 0;
             yLeft = 0;

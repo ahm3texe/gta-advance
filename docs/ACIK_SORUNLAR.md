@@ -135,7 +135,7 @@ tek adımlı ve iki adımlı yardımcıyı kaynak değiştirmeden karşılaştı
 
 **Ne yapıyor.** Bağlantı raporundaki eşikleri sayıp
 `(100 * (baş + sayı)) / (başAlt + 23)` yüzdesini döndürüyor, 99'da kırpıyor,
-eşik zaten aşılmışsa doğrudan 100. Bölme `FUN_0806c0f4` çağrısı olarak yazılmalı.
+eşik zaten aşılmışsa doğrudan 100. Bölme `__divsi3` çağrısı olarak yazılmalı.
 
 **Kalan fark.** ROM `report` işaretçisini **`ip`'de (r12)** tutuyor ve 15 erişimin
 her birinden önce düşük bir yazmaca kopyalıyor (`mov rN, ip`). Biz doğrudan düşük

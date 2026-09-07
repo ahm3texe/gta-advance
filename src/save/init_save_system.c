@@ -21,7 +21,7 @@ extern s32 gSavePayloadSize;
 extern s32 gSaveSlotCount;
 
 extern void FUN_0806bd34(s32 mode);
-extern s32  FUN_0806c0f4(s32 dividend, s32 divisor);
+extern s32  __divsi3(s32 dividend, s32 divisor);
 extern u32  ReadSaveMetadata(u8 *dest);
 extern u32  WriteSaveMetadata(const u8 *src);
 
@@ -97,7 +97,7 @@ s32 InitSaveSystem(s32 slotCount)
     payloadSize = &gSavePayloadSize;
 
     slots = gSaveSlotCount;
-    size = FUN_0806c0f4(EEPROM_TOTAL, slots);
+    size = __divsi3(EEPROM_TOTAL, slots);
     gSavePayloadSize = size;
 
     /* Slot basina boyutu sekiz byte'in altina hizala */

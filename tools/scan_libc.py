@@ -20,7 +20,12 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-LIBC = ROOT / "tools/agbcc/lib/libc.a"
+# agbcc iki kutuphane ile geliyor. Onceki surum yalnizca libc.a'ya bakiyordu;
+# libgcc.a HIC taranmamisti, oysa ROM'un bolme/mod yardimcilari oradan geliyor.
+LIBS = [
+    ("libc", ROOT / "tools/agbcc/lib/libc.a"),
+    ("libgcc", ROOT / "tools/agbcc/lib/libgcc.a"),
+]
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 ROM_BASE = 0x08000000
@@ -88,9 +93,48 @@ def masked_find(rom: bytes, body: bytes, spans: list[tuple[int, int]],
     return -1
 
 
+SCAN_STATS = {"checked": 0, "masked": 0}
+
+
+def scan_archive(rom: bytes, work: Path, binary: Path, found: list,
+                 lib_name: str) -> None:
+    """Bir arsivdeki .o'lari tarayip bulunanlari `found` icine ekler."""
+    for obj in sorted(work.glob("*.o")):
+        nm = subprocess.run(["arm-none-eabi-nm", "-S", str(obj)],
+                            capture_output=True, text=True).stdout
+        symbols = [
+            (p[3], int(p[0], 16), int(p[1], 16))
+            for p in (line.split() for line in nm.splitlines())
+            if len(p) == 4 and p[2] in "tT"
+        ]
+        if not symbols:
+            continue
+        spans = relocation_offsets(obj)
+        subprocess.run(["arm-none-eabi-objcopy", "-O", "binary",
+                        "--only-section=.text", str(obj), str(binary)],
+                       capture_output=True)
+        if not binary.exists():
+            continue
+        text = binary.read_bytes()
+        for name, offset, size in symbols:
+            if size < MIN_SIZE or offset + size > len(text):
+                continue
+            SCAN_STATS["checked"] += 1
+            body = text[offset:offset + size]
+            local = [(o, l) for o, l in spans if offset <= o < offset + size]
+            if local:
+                index = masked_find(rom, body, local, offset)
+                SCAN_STATS["masked"] += 1
+            else:
+                index = rom.find(body)
+            if index >= 0:
+                found.append((ROM_BASE + index, name, size, bool(local), lib_name))
+
+
 def main() -> None:
-    if not LIBC.exists():
-        sys.exit("tools/agbcc/lib/libc.a yok. Once: make agbcc")
+    missing = [str(path) for _, path in LIBS if not path.exists()]
+    if missing:
+        sys.exit(f"{', '.join(missing)} yok. Once: make agbcc")
     if not ROM.exists():
         sys.exit("baserom.gba yok.")
 
@@ -98,12 +142,21 @@ def main() -> None:
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         known = {int(r["address"], 16) for r in csv.DictReader(handle)}
 
-    work = Path(tempfile.mkdtemp())
-    subprocess.run(["arm-none-eabi-ar", "x", str(LIBC)], cwd=work, capture_output=True)
-    binary = work / "slice.bin"
-
     found, checked, masked = [], 0, 0
-    for obj in sorted(work.glob("*.o")):
+    per_lib = {}
+    for lib_name, lib_path in LIBS:
+        work = Path(tempfile.mkdtemp())
+        subprocess.run(["arm-none-eabi-ar", "x", str(lib_path)], cwd=work,
+                       capture_output=True)
+        binary = work / "slice.bin"
+        before = len(found)
+        scan_archive(rom, work, binary, found, lib_name)
+        per_lib[lib_name] = len(found) - before
+    checked = SCAN_STATS["checked"]
+    masked = SCAN_STATS["masked"]
+
+    if False:
+      for obj in sorted(work.glob("*.o")):
         nm = subprocess.run(["arm-none-eabi-nm", "-S", str(obj)],
                             capture_output=True, text=True).stdout
         symbols = [
@@ -136,33 +189,34 @@ def main() -> None:
     # Hangisinin o adreste durdugu byte'lardan anlasilamaz; uydurmak yerine
     # belirsiz olarak isaretlenir.
     grouped: dict[int, list] = {}
-    for address, name, size, was_masked in found:
-        grouped.setdefault(address, []).append((name, size, was_masked))
+    for address, name, size, was_masked, lib_name in found:
+        grouped.setdefault(address, []).append((name, size, was_masked, lib_name))
     found = []
     for address in sorted(grouped):
         entries = grouped[address]
-        names = sorted(n for n, _, _ in entries)
-        _, size, was_masked = entries[0]
-        found.append((address, names[0], size, was_masked, names[1:]))
+        names = sorted(n for n, _, _, _ in entries)
+        _, size, was_masked, lib_name = entries[0]
+        found.append((address, names[0], size, was_masked, names[1:], lib_name))
 
     if "--csv" in sys.argv:
         print("address,name,size,status,module,notes")
-        for address, name, size, was_masked, aliases in found:
-            note = ("newlib routine; matched against agbcc libc.a build"
+        for address, name, size, was_masked, aliases, lib_name in found:
+            note = (f"{lib_name} routine; matched against agbcc {lib_name}.a build"
                     if was_masked else
-                    "newlib routine; body byte-identical to agbcc libc.a build")
+                    f"{lib_name} routine; body byte-identical to agbcc {lib_name}.a build")
             if aliases:
                 note += (f"; identical body to {', '.join(aliases)} - which symbol "
                          f"occupies this address is undetermined")
             if address not in known:
                 note += "; missed by Ghidra auto-analysis"
             status = "discovered" if aliases else "documented"
-            print(f'0x{address:08X},{name},{size},{status},libc,"{note}"')
+            print(f'0x{address:08X},{name},{size},{status},{lib_name},"{note}"')
         return
 
-    print(f"libc.a: {checked} fonksiyon arandi ({masked} tanesi maskeli)")
-    print(f"ROM'da bulunan: {len(found)}\n")
-    for address, name, size, was_masked, aliases in found:
+    detail = ", ".join(f"{k}: {v}" for k, v in per_lib.items())
+    print(f"{checked} fonksiyon arandi ({masked} tanesi maskeli)")
+    print(f"ROM'da bulunan: {len(found)}  ({detail})\n")
+    for address, name, size, was_masked, aliases, lib_name in found:
         flags = []
         if aliases:
             flags.append(f"belirsiz: {'/'.join([name] + aliases)}")
@@ -170,7 +224,8 @@ def main() -> None:
             flags.append("maskeli")
         if address not in known:
             flags.append("Ghidra kacirmis")
-        tail = f"   <- {', '.join(flags)}" if flags else ""
+        flags.append(lib_name)
+        tail = f"   <- {', '.join(flags)}"
         print(f"  0x{address:08X}  {name:20} {size:>4}B{tail}")
 
 

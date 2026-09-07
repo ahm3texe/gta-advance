@@ -9,7 +9,7 @@
  * 36 bayt. Icindeki 5 bitlik sayaclar BumpRankCounter (0x08066C94) ile
  * ayni yerlesim: rapor +0x2E, gSaveBuffer +0x7E'nin ta kendisi.
  *
- * Bolme dogrudan FUN_0806c0f4 cagrisi olarak yazildi; `/` operatoru
+ * Bolme dogrudan __divsi3 cagrisi olarak yazildi; `/` operatoru
  * baska bir yardimci uretiyor (src/text/text_f5.c'deki olcum).
  *
  * DURUM: PARK — 332/368 bayt, 85/183 komut ayni. Yapisi ve esik zinciri
@@ -108,7 +108,7 @@ typedef struct SaveNibble {
 } SaveNibble;
 
 extern SaveNibble gSaveBuffer;
-extern s32 FUN_0806c0f4(s32 dividend, s32 divisor);
+extern s32 __divsi3(s32 dividend, s32 divisor);
 
 /* 0x08067014 */
 s32 FUN_08067014(ScoreReport *report)
@@ -185,7 +185,7 @@ s32 FUN_08067014(ScoreReport *report)
     if (total >= limit)
         return SCORE_FULL;
 
-    result = FUN_0806c0f4(SCORE_FULL * total, limit);
+    result = __divsi3(SCORE_FULL * total, limit);
     if (result > SCORE_CAP)
         result = SCORE_CAP;
     return result;

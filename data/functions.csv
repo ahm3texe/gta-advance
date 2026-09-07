@@ -1791,11 +1791,11 @@ address,name,size,status,module,notes
 0x0806C0D4,_call_via_r7,2,documented,sdk,GCC call-via veneer: bx r7
 0x0806C0D8,_call_via_r8,2,documented,sdk,GCC call-via veneer: bx r8
 0x0806C0DC,_call_via_r9,2,documented,sdk,GCC call-via veneer: bx r9
-0x0806C0F4,FUN_0806c0f4,146,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806C0F4,__divsi3,146,candidate,libgcc,"agbcc libgcc.a icindeki __divsi3. TESHIS (eslesme DEGIL): 146 baytin 142i ROM ile birebir, farkli 4 bayt fonksiyonun sonundaki __div0 cagrisinin yer degistirmesi. libc_regions mekanizmasi yalnizca yer degistirmesiz govdeleri dogruladigi icin bu bolgeler oraya EKLENEMEZ. tools/scan_libc.py --csv ile yeniden uretilir."
 0x0806C188,FUN_0806c188,2,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C18C,__modsi3,206,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C25C,FUN_0806c25c,120,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806C2D4,FUN_0806c2d4,192,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806C18C,__modsi3,206,candidate,libgcc,"agbcc libgcc.a icindeki __modsi3. TESHIS (eslesme DEGIL): 206 baytin 205i ROM ile birebir, farkli 1 bayt fonksiyonun sonundaki __div0 cagrisinin yer degistirmesi. libc_regions mekanizmasi yalnizca yer degistirmesiz govdeleri dogruladigi icin bu bolgeler oraya EKLENEMEZ. tools/scan_libc.py --csv ile yeniden uretilir."
+0x0806C25C,__udivsi3,120,candidate,libgcc,"agbcc libgcc.a icindeki __udivsi3. TESHIS (eslesme DEGIL): 120 baytin 119i ROM ile birebir, farkli 1 bayt fonksiyonun sonundaki __div0 cagrisinin yer degistirmesi. libc_regions mekanizmasi yalnizca yer degistirmesiz govdeleri dogruladigi icin bu bolgeler oraya EKLENEMEZ. tools/scan_libc.py --csv ile yeniden uretilir."
+0x0806C2D4,__umodsi3,192,candidate,libgcc,"agbcc libgcc.a icindeki __umodsi3. TESHIS (eslesme DEGIL): 192 baytin 190i ROM ile birebir, farkli 2 bayt fonksiyonun sonundaki __div0 cagrisinin yer degistirmesi. libc_regions mekanizmasi yalnizca yer degistirmesiz govdeleri dogruladigi icin bu bolgeler oraya EKLENEMEZ. tools/scan_libc.py --csv ile yeniden uretilir."
 0x0806C394,FUN_0806c394,188,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806C450,FUN_0806c450,126,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806C4D0,FUN_0806c4d0,382,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
@@ -1835,7 +1835,7 @@ address,name,size,status,module,notes
 0x0806D9F0,FUN_0806d9f0,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py); sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806DA70,FUN_0806da70,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
 0x0806DAE4,FUN_0806dae4,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806DB0C,FUN_0806db0c,38,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi"
+0x0806DB0C,__make_dp,38,discovered,libgcc,"agbcc libgcc.a icindeki __make_dp. TESHIS (eslesme DEGIL): 38 baytin 36i ROM ile birebir, farkli 2 bayt fonksiyonun sonundaki __div0 cagrisinin yer degistirmesi. libc_regions mekanizmasi yalnizca yer degistirmesiz govdeleri dogruladigi icin bu bolgeler oraya EKLENEMEZ. tools/scan_libc.py --csv ile yeniden uretilir."
 0x0806DB34,FUN_0806db34,72,discovered,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
 0x0806DB7C,FUN_0806db7c,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DBB4,FUN_0806dbb4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

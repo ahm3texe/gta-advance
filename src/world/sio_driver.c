@@ -184,7 +184,7 @@ extern u16 gRam020004C0;
 extern u16 gRam02000D0C;
 extern u32 gRam02036324;
 
-extern u32  FUN_0806c2d4(u32 counter, u32 kind);
+extern u32  __umodsi3(u32 counter, u32 kind);
 extern void MaybeReset(void);
 extern void PollInput(void);
 extern u32  StepLinkFrame(u8 *dest);
@@ -242,7 +242,7 @@ void FUN_080657d8(u32 mode)
     if (mode != LINK_STATE_LIVE) {
         gGameState.word00++;
         if (gVBlankEnabled != 0 && mode == 0
-                && FUN_0806c2d4(gGameState.word00, 5) != 0) {
+                && __umodsi3(gGameState.word00, 5) != 0) {
             gRam0300009C = gRam03000098 = mode;
             gRam02036330.half00 = mode;
             gRam02000498 = gRam020003EC = gRam02000D0C = gRam02000134 = mode;
