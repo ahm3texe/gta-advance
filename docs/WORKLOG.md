@@ -839,3 +839,28 @@ ALINDI: decomp yakinsaminda modul tahmin edilmez, decomp edilen dosyadir.
   karşılaştırıyordu ve bu adlandırma yapılır yapılmaz patladı. Dondurulması
   gereken şey hedef kümesi olduğu için karşılaştırma adres + boyuta indirildi;
   ad kolonu kimlik değil, güncel bilgidir.
+
+
+## 2026-09-07 — SIO TX yazmaç çakışması giderildi (MATCH-018)
+
+- `FUN_080657d8` başlangıç ölçümü 575/1174 komut, 2356 bayt; korunan
+  kaynak 669/1174 komut, 2352 bayt. **Tam byte-matching yok**; 505 komut
+  farkı MATCH-019'da açık. Matching yüzdesi bu değişiklikle artmadı.
+- `PackLocalLinkTag` iki paralel halkadaki kaydın etiketini paketler.
+  Halka işaretçisini iki adımda ilerletmek, yerel dağıtıcının bir taban
+  sabitini TX boyunca r4'te tutmasını engelledi. k=r4, tx2=r5, cur=r6 ve
+  tuş halkası tabanı=r7 dağılımı ROM ile hizalandı. Girişteki 0x08065834
+  üçlüsü de eşleşti. Yeni dış çağrı veya volatile erişim eklenmedi.
+- Devir notundaki r4 sembolü düzeltildi: eski derlemede r4'te
+  `gRam020003C0` vardı; `gRam02000E80` r3'teydi. Çakışmanın giderilmesi
+  kalan farkların çoğunu kapatmadı; bu beklenti doğrulanmış sonuç olarak
+  sunulmuyor. RX adres ilişkisi ve başka blok farkları sürüyor.
+- `tools/probe_sio_tx.py` üç kontrollü adayı geçici dizinde yeniden
+  derler: doğrudan ifadeler 575, tek adımlı yardımcı 573, korunan iki
+  adımlı yardımcı 669. Ölçüm COMPILER kural 64'te. Saf taban takma adıyla
+  677 veren tanısal aday kaynak kabul ölçütü nedeniyle alınmadı.
+- `make c-match FILE=src/world/sio_driver.c` beklenen biçimde kısa çıktı
+  bildiriyor (2352/2374); kaynak matching olarak işaretlenmedi. `make
+  check` geçti: toolchain, kayıtlı bölgeler, hibrit ROM hash'i, C taraması,
+  tutarlılık, iş kuyruğu, sınır denetimi ve üretilmiş görünümler temiz.
+  `c_sources.csv` içindeki bayat 2372 bayt ölçümü de taramayla yenilendi.

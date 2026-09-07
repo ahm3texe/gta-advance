@@ -28,7 +28,7 @@ yanıltıcı çıktı. `ServiceLinkFrame`'de boyutu hiç değiştirmeyen bir dü
 biçimi verdi; `sio_driver`'da boyut 2 bayt yakınken gövdenin yarısı yanlıştı.
 `diff_function.py`'nin son satırındaki `N/M komut ayni` gerçek skordur.
 
-**Kural kütüphanesi.** `docs/COMPILER.md`, 63 ölçülmüş kural. Aşağıdaki maddeler
+**Kural kütüphanesi.** `docs/COMPILER.md`, 64 ölçülmüş kural. Aşağıdaki maddeler
 45–63 arasına sık atıf yapar. Yeni bir kural bulursan oraya **ölçümüyle** yaz.
 
 **Yasaklar.** `asm(".equ ...")` kullanma — `agbcc_build.py` sembolleri
@@ -44,80 +44,61 @@ reddedildi.
 
 ---
 
-## 1. `FUN_080657d8` — SIO sürücüsü · **en büyük ödül**
+## 1. `FUN_080657d8` — SIO sürücüsü · yazmaç çakışması giderildi, eşleşme açık
 
 | | |
 |---|---|
-| adres / boyut | 0x080657D8 · **2374 bayt** (ROM'un %0,52'si) |
+| adres / boyut | 0x080657D8 · **2374 bayt** |
 | kaynak | `src/world/sio_driver.c` |
-| durum | **575/1174 komut aynı**, 599 farklı (boyut 2356/2374 — önemli değil) |
+| güncel durum | **669/1174 komut aynı**, 505 farklı; C boyutu 2352 |
+| önceki ölçüm | 575/1174 komut aynı; C boyutu 2356 |
 
-**Ne yapıyor.** `switch (gVBlankEnabled)` ile dört durum, atlama tablosu yok,
-103 temel blok, tek prolog/epilog (sınır doğrulandı):
+**2026-09-07 devir sonrası sonuç.** TX ikinci yarısındaki r4 çakışması
+kaldırıldı. Yeni dağılım ROM gibi `k=r4`, `tx2=r5`, `cur=r6`, tuş halkasının
+taban kopyası `r7`. Bunun kalan farkların çoğunu kapatacağı hipotezi
+**doğrulanmadı**: kazanç 94 komut; tam byte-matching hâlâ yok.
 
-- **0 IDLE** — pad durumunu kopyalar, basma/bırakma kenar maskelerini türetir,
-  bağlantı aynalarını sıfırlar.
-- **1 READY** — `StepLinkFrame` ile el sıkışır; `(status & 3) == 3` olunca slot
-  numarasını SIOCNT bit 26–27'den çıkarır, `gSlotSelector` ve
-  `gRam020004A4 = 1 - id` yazar, LIVE'a geçer.
-- **2 LIVE** — ana döngü. Her turda `StepLinkFrame`; eşin biti `status`'ta kuruluysa
-  ve eşin slot sihri `0xDEAD` ise eşin *önceki* ve *şimdiki* penceresini 32 girişlik
-  halkaya (`gRam02000230/0100/0400/0140`) birleştirir, eşin ACK'inden ileri yürür.
-  Sonra geriye doğru kararlı bant arar, yerel TX kaydını kurar, gönderir.
-  `mode == 2` ise döner; yerel slot dolunca çıkar; yoksa
-  `gFrameCounterLate - startTime > 240` olana kadar döner, sonra SETTLING'e düşer.
-- **3 SETTLING** — IDLE ile aynı temizlik.
+**Eski kök neden notuna düzeltme.** Başlangıç derlemesinde r4'ü tutan
+`gRam020003C0` adresiydi; `gRam02000E80` r3'teydi. `.lreg/.greg` ölçümü:
+p1012, L79, 6 referans / 20 komut ömür → r4.
 
-**Birebir eşleşen bloklar:** B0–B3, B5, B8, B11–B14, B16–B18, B86, B88.
-Yakın: B4 53/57, B15 48/52, B19 74/91. Gerisi LIVE gövdesi.
-(Uyarı: `diff_function.py` doğrusal hizalar, ilk sapmadan sonra blok ataması yaklaşıktır.)
+**Korunan çözüm.** `PackLocalLinkTag` iki paralel halkadan ilgili kaydın
+baytlarını paketliyor. İşaretçi önce halka tabanına kurulup `entry += index`
+ile kayda ilerletiliyor. Böylece taban iki ayrı kısa ömürlü pseudo oluyor
+(p1005 ve p1032; her biri 8 referans / 8 komut ömür → r1). İki kullanımda
+inline edilen yardımcı yeni BL üretmiyor. Tek adımlı `entry = base + index`
+yazımı tekrar 573/1174'e düşüyor. Mekanizma ve ölçüm **COMPILER kural 64**'te.
 
-**KÖK NEDEN — burası asıl iş.** Gövde tam olarak **bir yazmaç kaymış**:
+Salt taban takma adı kullanan tanısal aday 677/1174 verdi; kaynak kabul
+ölçütüne uymadığı için alınmadı. Korunan `entry` işaretçisi gerçek kayda
+ilerler ve yalnızca o kaydın baytını okumak için kullanılır.
 
-```
-ROM : k=r4   blk=r5   cur=r6   (&gRam02000420 kopyası = r7)
-biz : k=r5   blk=r6   cur=r7   (&gRam02000420 kopyası = r3)
-```
+**Davranış.** `switch (gVBlankEnabled)` ile IDLE, READY, LIVE ve SETTLING.
+LIVE, eşin önceki/şimdiki pencerelerini 32 girişlik halkalara işler; ACK'ten
+ileri, kararlı bant için geri yürür; TX kaydını kurup gönderir. `mode == 2`
+ise döner; yerel slot dolmazsa 240 kare sınırına kadar sürer.
 
-Uzun ömürlü değer sayısı aynı. Tek fark, bizim `k` pseudo'sunun **r4** üzerinde
-donanım çakışması taşıması (`dump_alloc --conflicts`: `38 conflicts ... 0 1 2 3 4 13`).
-Kaynağı: **yerel dağıtıcı** (global dağıtıcıdan ÖNCE çalışır) blok 79'da —
-TX kurulumunun ikinci yarısı, `k`'nin döngü geri kenarı boyunca canlı olduğu yer —
-`&gRam02000E80`'i r4'e koyuyor. ROM orada r3'ü iki kez kullanıyor (önce
-`0x020003C0`, sonra `0x02000E80`) ve r4'ü boş bırakıyor.
+**Korunan önceki bulgular.** TX/RX alanlarının yapı üyesi olması alias
+sınıfını düzeltiyordu (553→568). TX ikinci yarısının ayrı `tx2` işaretçisi
+ve iki pencerenin ayrı yerelleri 568→575 getirmişti; bunlar korunuyor.
 
-**Bu tek çakışmayı çözmek kalan 599 komutun büyük kısmını hizalayabilir.** Kanıtlanmış
-değil, ama en güçlü hipotez. Blok 79'da r3'ün iki kez kullanılmasını sağlayacak bir
-kaynak yazımı aranmalı.
+**Kalan farklar.** Eski 0x08065834 yığın kopyası artık eşleşiyor. İlk
+komut farkı 0x0806584C'de, epilogun konumu değiştiği için iç dalın
+hedef adresi farklı. RX adres ilişkisi ROM'da `(blok+sabit)+i*16`, C'de
+`(blok+i*16)+sabit`. Pencere ve çıkış bloklarında başka dağıtım/ifade
+farkları sürüyor. TX etiket bloğunun iki taban yüklemesi artık ayrı, ancak
+ROM'un `r3→r1` ve `r0→r1` adres toplamalarına karşı C r1'i yerinde ilerletiyor.
+Eski doğrusal diff'ten alınmış blok eşleşme listesi güncel kanıt sayılmaz.
 
-**Bulunan iki mekanizma (uygulandı, kaynakta duruyor):**
+**Yeniden elenenler.** Yeni 669 tabanında RX alan-adresi üzerinden u16
+okuma 654; LinkSlot dizi/cast biçimleri 602. Başlangıç tabanında operand
+ters çevirmeleri 567–569; etiket yerelleri en çok 580; indeks yerelleri en
+çok 586. `step`'i ikiye bölmek etkisiz. Volatile taramasında ROM'da olmayan
+erişimler çıktığı için bu adaylar alınmadı.
 
-1. **Takma ad sınıfı** (+15 komut). TX/RX alanları `*(u16 *)(taban + ofset)` diye
-   yazılıydı. gcc 2.x'te struct dışı bir `u16` yazımı struct dışı bir skaler global
-   okumasını öldürür; bu yüzden ROM'un tek kez hesapladığı `gRam0200048C & 31` bizde
-   iki kez hesaplanıyordu. Alanları struct üyesi yapmak (COMPONENT_REF →
-   `MEM_IN_STRUCT_P`) yazımın okumayı öldürmesini engelliyor.
-2. **Ayrı değişken zorunluluğu** (+7 komut). ROM comm-blok işaretçisi için TX
-   kurulumunda **iki ayrı yazmaç** kullanıyor (baş alanları r3, `end*` alanları r5) —
-   yani kaynakta iki ayrı değişken var. Mevcut bir değişkeni yeniden kullanmak 569
-   veriyor; ayrı değişken şart.
-
-**Elenen yazımlar** (hepsi `sio_driver.c` başlığında):
-
-| yazım | skor |
-|---|---|
-| RX `*(u16*)(b+0x190+f+i*16)` (struct dışı) | 568 |
-| RX `(*(LinkSlot *)(b+0x190+i*16)).alan` | 519 |
-| RX `((LinkSlot *)(b+0x190))[i].alan` | 524 |
-| RX `FRAME(b)->rx[i].alan` | **575 — korunan** |
-| TX ikinci yarısında `blk` yeniden kullanımı | 569 |
-| TX ikinci yarısında `tx` yeniden kullanımı | 569 |
-| `while (t <= 240)` yerine `do {...} while` | 575 (fark yok) |
-| pencere testini ters çevirmek | 566 |
-
-Not: ROM adresi `(blk + sabit) + i*16` diye ilişkilendiriyor, biz
-`(blk + i*16) + sabit`. Bizimki erişim başına bir komut kısa, ama struct takma adı
-gereksinimiyle çakışıyor ve struct biçimi toplamda 7 komut kazandırıyor.
+**Yeniden üretim:** `python3 tools/probe_sio_tx.py`; asıl kapı
+`make c-match FILE=src/world/sio_driver.c`. Probe önceki doğrudan yazımı,
+tek adımlı ve iki adımlı yardımcıyı kaynak değiştirmeden karşılaştırır.
 
 ---
 
@@ -357,7 +338,8 @@ Kalan işin dağılımı:
 Yukarıdaki 4 ve 5 numaralı maddeler **kapalı**, zaman harcanmamalı.
 3, 6, 7 dar ama hepsi aynı sınıfta: agbcc'nin yazmaç dağıtımı, kaynak kolu belirsiz.
 
-**En yüksek getiri 1 numaralı maddede** (SIO sürücüsü, 2.374 bayt) ve orada tek bir
-somut hipotez var: blok 79'daki r4 çakışması. Onun dışında, 120–560 bandının kardeş
+**1 numaralı maddede** (SIO sürücüsü, 2.374 bayt) blok 79 r4 çakışması
+giderildi; 505 komut farkı sürüyor. Sonraki çalışma RX adres ilişkisi ve
+pencere/çıkış bloklarını güncel diff üzerinden ayırmalı. 120–560 bandının kardeş
 olmayan kısmında isabet oranı çok daha yüksek — bu oturumda oradan yazılan
 fonksiyonların çoğu ilk denemede tuttu.

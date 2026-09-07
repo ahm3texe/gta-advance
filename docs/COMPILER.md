@@ -1031,3 +1031,49 @@ Kural 52'nin (`b = (a = 0)` iki adresi eş zamanlı canlı tutar) kardeşi:
 zincirleme atama yalnız canlılığı değil, **üretim sırasını** da
 belirliyor. Elenen: tüm sıfırları düz sabit yazmak (168 bayt, 137 fark —
 sıfır artık r5'te tutulmuyor).
+
+## Kural 64 — İşaretçiyi ilerletmek taban sabitinin ömrünü bölebilir
+
+`FUN_080657d8` TX etiketleri, 2026-09-07. İki paralel bayt halkasından
+aynı indeksteki değerleri paketleyen `PackLocalLinkTag` yardımcısında:
+
+```c
+entry = gRam020003C0 + index;  /* tek ifade */
+```
+
+yerine:
+
+```c
+entry = gRam020003C0;
+entry += index;               /* tabandan ilgili kayda ilerle */
+```
+
+yazılması, her iki inline açılımda da taban yüklemesinin ayrı ve kısa
+ömürlü kalmasını sağlıyor. `entry` yalnız bir taban takma adı değil:
+değeri değişiyor ve ilerlediği kaydın baytı okunuyor. Yardımcı halka
+indeksini 31 ile maskeliyor ve iki baytı bir `u16` etikete dönüştürüyor.
+Yeni yan etkili çağrı veya `volatile` erişim eklenmiyor.
+
+| kaynak biçimi | boyut | aynı komut |
+|---|---:|---:|
+| Önceki doğrudan iki paketleme ifadesi | 2356 | 575/1174 |
+| Yardımcı içinde tek adımlı işaretçi | 2356 | 573/1174 |
+| Yardımcı içinde iki adımlı ilerleme | 2352 | **669/1174** |
+
+Başlangıçtaki `.lreg/.greg` dökümlerinde TX bloğunun `gRam020003C0`
+tabanı p1012'dir: L79, 6 referans, 20 komut ömür, **r4**. Korunan
+yazımda onun yerini iki ayrı yerel pseudo alır: p1005 ve p1032,
+her biri 8 referans / 8 komut ömür, **r1**. `gRam02000E80` tabanı r3'te
+kalır. Böylece k'nin p44 dağıtımı r5'ten **r4**'e geçer; TX işaretçisi
+r5, cur r6 ve tuş halkasının taban kopyası r7 olur. Eski devir belgesinin
+r4'teki sembolü `gRam02000E80` diye tanımlaması yanlıştı.
+
+Bu sonuç **bütün fonksiyonun eşleştiğini göstermez**: 505 komut farkı
+sürüyor; TX'teki iki adres toplamı da hâlâ farklı yazmaç kullanıyor.
+ROM gibi k=r4 elde etmek gerekli bir ilerleme oldu, tek başına yeterli
+olmadı. Boyutun ROM'dan uzaklaşmasına rağmen net 94 komut kazancı var.
+
+Yeniden üretim: `python3 tools/probe_sio_tx.py`. Araç kaynak dosyasını
+değiştirmeden üç adayı geçici dizinde derler, `diff_function.py` ile aynı
+skoru hesaplar ve dış çağrı hedef/adetlerinin değişmediğini doğrular.
+Tam eşleşme kapısı hâlâ `make c-match FILE=src/world/sio_driver.c`.

@@ -1,90 +1,56 @@
-/* DURUM: PARK — 2356/2374 bayt, 575/1174 KOMUT ayni (onceki tur: 553/1174).
+/* DURUM: PARK — 2352/2374 bayt, 669/1174 komut ayni (2026-09-07).
+ * Onceki kaynak: 2356 bayt, 575/1174 komut. Tam byte-matching DEGIL.
  *
- * OLCUT KOMUT SAYISIDIR, BAYT DEGIL. Bayt sayisini kapatan degisiklik
- * yanlis olabilir; boyutu buyuten degisiklik dogru olabilir.
+ * TX YAZMAC CAKISMASI GIDERILDI (docs/COMPILER.md, kural 64):
+ * PackLocalLinkTag, iki paralel halkadan bir kaydin etiketini paketler.
+ * Isaretci once halka tabanina kurulur, sonra istenen kayda ilerletilir.
+ * `entry = taban + index` diye tek ifadeye indirmek AYNI anlami tasir,
+ * fakat agbcc taban sabitini iki etiket arasinda r4'te canli tutar.
+ * Iki adimli ilerleme tabani iki kisa omurlu pseudo'ya ayirir; r4 serbest
+ * kalir ve k=r4, tx2=r5, cur=r6, tus halkasi tabani=r7 olur (ROM gibi).
+ *
+ * Kontrollu olcum (tools/probe_sio_tx.py):
+ *   eski dogrudan iki ifade              575/1174, 2356 bayt
+ *   yardimci, entry = taban + index      573/1174, 2356 bayt
+ *   yardimci, entry = taban; entry += i  669/1174, 2352 bayt  <- KORUNAN
+ * `static inline` yardimci iki cagri yerinde de acilir; yeni BL yoktur.
+ * Saf taban takma-adiyla 677 veren tanisal aday alinmadi; entry ise
+ * gercekten indekslenen kayda ilerleyen, tek amacli bir isaretcidir.
+ *
+ * Eski devir notundaki sembol yanlisti: baslangic derlemesinde r4'u
+ * tutan gRam020003C0 idi; gRam02000E80 r3'teydi. Ilkinde p1012 (L79,
+ * 6 referans / 20 omur) yerine korunan kaynakta p1005 ve p1032
+ * (L79, her biri 8 referans / 8 omur, r1) var. k'nin p44 dagitimi
+ * r5'ten r4'e dondu. Bunun tum govdeyi eslestirecegi hipotezi
+ * DOGRULANMADI: net kazanc 94 komut, 505 komut farki suruyor.
+ *
+ * KALANLAR:
+ * - Eski 0x08065834 yigin kopyasi artik eslesiyor. Ilk komut farki
+ *   0x0806584C'de: epilogun yeri degistigi icin ic dalin hedefi farkli.
+ * - RX adresleri ROM'da (blok+sabit)+i*16; bizde (blok+i*16)+sabit.
+ * - Pencere/kuyruk bloklarinda baska dagitim ve ifade farklari var.
+ * - TX etiket bolumunde iki taban yuklemesi artik ayri, fakat ROM'un
+ *   r3->r1 / r0->r1 adres toplamalarina karsi biz r1'i yerinde ilerletiriz.
+ * Dogrusal diff bloklari yaklasik hizalar; skor tam eslesme kaniti degil.
+ *
+ * ONCEKI KAZANIMLAR KORUNUYOR:
+ * - TX/RX yapi uyeleri: yapi disi u16 store, skaler global okumalarini
+ *   olduruyordu. LinkFrame gorunumu bu alias farkini kapatti (553->568).
+ * - TX ikinci yarisi icin ayri tx2; iki RX penceresi icin ayri yereller
+ *   (568->575). blk/tx yeniden kullanimi 569'a dusmustu.
+ *
+ * ELENENLER (baslangic 575 uzerinden): ters OR operandlari 567/568/569;
+ * bayt/yarim-kelime/kelime etiket yerelleri en cok 580; indeks yerelleri
+ * en cok 586; step'i bolmek ve unsigned genislikleri degistirmek 575.
+ * Volatile taramasi ROM'da olmayan erisimler ekledi, alinmadi.
+ * Eski RX bicimleri yeni 669 tabaninda tekrar olculdu: alan-adresi
+ * uzerinden u16 erisimi 654; LinkSlot dizi/cast gorunumu 602.
+ *
+ * Dogrulama:
  *   make c-match FILE=src/world/sio_driver.c
  *   python3 tools/diff_function.py src/world/sio_driver.c FUN_080657d8
- *
- * ------------------------------------------------------------------
- * BU TURDA COZULEN: TAKMA-AD (ALIAS) SINIFI  [553 -> 568]
- * ------------------------------------------------------------------
- * Kare kaydinin alanlari once duz `*(u16 *)((u8 *)b + ofs)` ile
- * yaziliyordu. gcc 2.x'in takma-ad cozumlemesinde yapi DISI bir u16
- * yazmasi, yapi DISI bir skaler global okumasini gecersiz kiliyor;
- * bu yuzden ROM'un TEK KEZ hesapladigi `gRam0200048C & 31`
- *     movs r0,#31 / ldr r1,=0200048c / ldrh r1,[r1] / ands r0,r1
- * bizde SLOT_INDEX yazmasindan sonra IKINCI kez hesaplaniyordu.
- * Alanlar `LinkFrame` yapisinin uyeleri yapilinca (COMPONENT_REF ->
- * MEM_IN_STRUCT_P) yazma artik o okumayi oldurmuyor ve ROM'un bicimi
- * cikiyor. Ofsetler blok tabanina gore (0x180..0x19F) verildigi icin
- * Thumb'in strh anlik alanina sigmiyor, dolayisiyla ROM gibi her
- * erisimde sabit yazmaca kuruluyor -- ara `LinkSlot *` degiskeninin
- * urettigi `strh [r,#2]` bicimi olusmuyor.
- *
- * ------------------------------------------------------------------
- * BU TURDA COZULEN: BOLGE BASINA AYRI YEREL (kural 59)  [568 -> 575]
- * ------------------------------------------------------------------
- *   - TX kaydinin ilk yarisi `blk`, ikinci yarisi AYRI bir `tx2`
- *     isaretcisi. ROM ikisi icin farkli yazmac kullaniyor (r3 / r5),
- *     yani kaynakta da iki degisken var. Tek degisken kullanmak
- *     `blk`i iki yariya birden canli tutup r3'u bosa cikariyordu.
- *     (`tx`i yeniden kullanmak: 569 -- ayri degisken sart.)
- *   - Bolum 2'nin pencere degiskenleri (`end2/hi2/start2/prev2/i2/j2`)
- *     Bolum 1'inkilerden ayri. Paylasmak referans sayisini sisiriyor.
- *
- * ------------------------------------------------------------------
- * ILK KALAN SAPMA: 0x08065834
- * ------------------------------------------------------------------
- *   ROM : mov r7, sp / ldrh r7,[r7] / strh r7,[r3]
- *   biz : mov r0, sp / ldrh r0,[r0] / strh r0,[r3]
- * Dort `mov rN,sp / ldrh / strh` ucluSUNUN dorduncusu. Saf yerel
- * dagitim; ilk uc (r4/r5/r6) ROM ile ayni.
- *
- * ------------------------------------------------------------------
- * KOK SORUN (COZULMEDI): TUM GOVDE BIR YAZMAC KAYMIS
- * ------------------------------------------------------------------
- * Uzun omurlu degerlerin dagitimi ROM'a gore bir yukari kaymis:
- *     ROM : k=r4  blk=r5  cur=r6  (&gRam02000420 kopyasi=r7)
- *     biz : k=r5  blk=r6  cur=r7  (&gRam02000420 kopyasi=r3)
- * Sayilari ayni; tek fark bizim `k` pseudo'sunun DONANIM r4 ile
- * cakismasi (`dump_alloc --conflicts`: `38 conflicts ... 0 1 2 3 4 13`).
- * Cakisma, yerel dagiticinin (local-alloc, global'den ONCE calisir)
- * blok 79'da -- TX kaydinin ikinci yarisi, `k`nin canli oldugu yer --
- * &gRam02000E80'i r4'e koymasindan geliyor. ROM ayni blokta r3'u
- * ikinci kez kullanip (once 0x020003c0, sonra 0x02000e80) r4'u bos
- * birakiyor. Bu tek cakisma cozulurse govdenin buyuk bolumu hizalanir;
- * yuzlerce komutluk fark bundan.
- *
- * ------------------------------------------------------------------
- * DENENIP ELENEN YAZIMLAR
- * ------------------------------------------------------------------
- *   RX kaydi `*(u16*)(b + 0x190 + f + i*16)`  (yapi disi)      -> 568
- *   RX kaydi `(*(LinkSlot *)(b + 0x190 + i*16)).alan`          -> 519
- *   RX kaydi `((LinkSlot *)(b + 0x190))[i].alan`               -> 524
- *   RX kaydi `FRAME(b)->rx[i].alan`                     <- SECILDI 575
- *     (RX'te ROM'un adres birlesimi `(b+sabit)+i*16`; bizimki
- *      `(b+i*16)+sabit`. Bizimki daha kisa cikiyor ama yapi bicimi
- *      genel toplamda yine de en iyisi -- iki gereksinim carpisiyor.)
- *   TX'in ikinci yarisinda `blk`i yeniden kullanmak                569
- *   TX'in ikinci yarisinda `tx`i (READY'nin degiskeni) kullanmak   569
- *   `do {...} while (t <= 240)` yerine `while (t <= 240) {...}`    575 (fark yok)
- *   Pencere testini ters cevirmek:
- *     `if ((hi-cur)&31 > (end-cur)&31) start=cur; else {...}`      566
- *     (ROM'un blok yerlesimini taklit etmek icin denendi; agbcc
- *      bunun yerine `start`i secim gibi uretip yigina tasiyor.)
- *
- * ------------------------------------------------------------------
- * BLOK DURUMU (tools/dump_cfg.py, 103 blok)
- * ------------------------------------------------------------------
- * Komut komut AYNI: B0-B3, B5, B8, B11-B14, B16-B18, B86, B88
- *   (giris blogu + case 0/IDLE'in tamami + case 1/READY'nin buyuk
- *    kismi). B4 53/57, B15 48/52, B19 74/91.
- * Geri kalan: LIVE dongusunun govdesi -- farkin tamami orada.
- * NOT: diff dogrusal hizaladigi icin ilk sapmadan sonraki blok
- * eslesmeleri YAKLASIKTIR.
- *
- * Sinir dogru (tek prolog/epilog), atlama tablosu YOK, gereken tum RAM
- * sembolleri data/ram_map.csv'de. `asm(".equ ...")` KULLANILMAZ.
+ *   python3 tools/dump_alloc.py src/world/sio_driver.c FUN_080657d8 --conflicts
+ *   python3 tools/probe_sio_tx.py
  */
 
 /* Baglanti (SIO) surucusunun ana dagiticisi — 0x080657D8-0x0806611D
@@ -181,10 +147,8 @@ extern u32 gFrameCounterLate;
 extern u8  gRam02036328;
 extern s16 gSlotSelector;               /* 0x02000D40 */
 
-/* Bu yedi sembol data/ram_map.csv'de YOK. Adresleri burada `.equ` ile
- * veriliyor; sembol referansi kalmasi SART, adres sabiti yazmak cse'ye
- * ("ldr" yerine "adds rX,#fark") sahte tureme yaptiriyor. Haritaya
- * eklendiginde bu blok silinip yalnizca `extern` bildirimleri kalmali. */
+/* Bu sembollerin adresleri data/ram_map.csv'den cozulur. Sembol
+ * referanslari korunur; mutlak adresler sahte CSE turemeleri uretebilir. */
 
 extern u16 gRam02000134;
 extern u16 gRam02000288;
@@ -200,6 +164,18 @@ extern void PollInput(void);
 extern u32  StepLinkFrame(u8 *dest);
 extern void MaybeSetCommByte6(void);
 extern void BuildLinkPacket(const void *payload);
+
+/* Dusuk bayt adim etiketini, yuksek bayt pencere basini tasir.
+ * Halka imlecinin iki adimli ilerlemesi icin yukaridaki olcume bak. */
+static inline u16 PackLocalLinkTag(u32 index)
+{
+    const u8 *entry;
+
+    index &= RING_MASK;
+    entry = gRam020003C0;
+    entry += index;
+    return *entry | (gRam02000E80[index] << 8);
+}
 
 /* 0x080657D8 */
 void FUN_080657d8(u32 mode)
@@ -447,12 +423,8 @@ void FUN_080657d8(u32 mode)
                 tx2 = gRam02036338;
                 FRAME(tx2)->tx.endIndex = k & RING_MASK;
                 FRAME(tx2)->tx.endKeys  = gRam02000420[k & RING_MASK];
-                FRAME(tx2)->tx.tag =
-                      (gRam02000E80[gRam0200048C & RING_MASK] << 8)
-                    |  gRam020003C0[gRam0200048C & RING_MASK];
-                FRAME(tx2)->tx.endTag =
-                      (gRam02000E80[k & RING_MASK] << 8)
-                    |  gRam020003C0[k & RING_MASK];
+                FRAME(tx2)->tx.tag = PackLocalLinkTag(gRam0200048C);
+                FRAME(tx2)->tx.endTag = PackLocalLinkTag(k);
                 FRAME(tx2)->tx.magic = SLOT_MAGIC;
                 BuildLinkPacket(&FRAME(tx2)->tx);
             }
