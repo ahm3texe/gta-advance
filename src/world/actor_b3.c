@@ -158,10 +158,10 @@ extern Attr *FUN_08028f98(u8 slot);
 extern u32   IsEntityEngaged(Context *ctx);
 extern void  FUN_08015a84(Actor *a, RomNode *node, u32 idx);
 extern void  FUN_08015af8(Actor *a, RomNode *node, u32 idx);
-extern void  FUN_080159a0(Actor *a, RomNode *node, u32 idx);
+extern void  UpdateActorLane(Actor *a, RomNode *node, u32 idx);
 extern void  NoOp080197FC(Actor *a, RomNode *node, u32 idx);
-extern void  FUN_08015834(Actor *a, RomNode *node, u32 idx);
-extern void  FUN_080157b8(Actor *a, u32 idx);
+extern void  UpdateActorSlotEntry(Actor *a, RomNode *node, u32 idx);
+extern void  TryLaunchActor(Actor *a, u32 idx);
 
 /* 0x08015598 */
 void UpdateActorFrame(Actor *a)
@@ -254,8 +254,8 @@ void UpdateActorFrame(Actor *a)
 
     FUN_08015a84(a, node, idx);
     FUN_08015af8(a, node, idx);
-    FUN_080159a0(a, node, idx);
+    UpdateActorLane(a, node, idx);
     NoOp080197FC(a, node, idx);
-    FUN_08015834(self, node, idx);
-    FUN_080157b8(a, idx);
+    UpdateActorSlotEntry(self, node, idx);
+    TryLaunchActor(a, idx);
 }

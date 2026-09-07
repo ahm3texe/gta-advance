@@ -1939,7 +1939,112 @@ build/world/is_kind20.bin: src/world/is_kind20.c data/functions.csv data/ram_map
 world-is-kind20-match: verify-rom build/world/is_kind20.bin
 	@python3 tools/compare_slice.py baserom.gba 0x67404 build/world/is_kind20.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match world-wrap-08005fc4-match world-wrap-080101d8-match world-wrap-08012a98-match world-wrap-080138e8-match world-wrap-080138f4-match world-wrap-08014fa0-match world-wrap-0803378c-match world-wrap-0803379c-match world-wrap-08035dd8-match world-wrap-08042784-match world-wrap-080428ac-match world-wrap-0804fb4c-match world-get-field-100-match world-spin-delay-match world-wrap-0804ff98-match world-wrap-0804ffb4-match world-wrap-080500d0-match world-wrap-08051464-match world-wrap-0805a4f4-match world-wrap-08063bcc-match world-get-anchor-unk04-match world-get-anchor-unk30-match world-wrap-08051480-match world-wrap-08059d7c-match world-get-record-index-match world-get-ram-word16-match world-is-state-two-match world-is-anchor-small-match world-rearm-slot-match world-accumulate-distance-match core-clip-bounds-match world-engage-actor-match core-insert-sorted-match world-refresh-then-notify-match world-check-current-entity-match core-for-each-node-match world-set-bg1-enable-match world-slot-range-or-field-match world-init-and-mirror-match world-bump-or-trigger-match world-apply-two-levels-match core-sort-sprite-list-match core-init-sprite-pool-match core-flush-sprite-list-match core-alloc-node-match core-sort-active-sprites-match core-insert-sprite-sorted-match core-memory-init-match world-link-objects-match world-nibble-replace-match world-palette-lerp-match core-reset-runtime-globals-match core-adjust-area-position-match core-frame-dispatch-match core-probe-nearby-position-match world-player-slot-query-match world-slot-range-query-match world-bump-count-82-match misc-format-decimal-match world-link-session-match world-link-hw-reset-match world-link-report-match world-actor-tracking-match world-scale-by-band-match world-link-init-match world-link-session-reset-match world-spawn-slot-effect-match world-bump-rank-counter-match world-bitmap-asset-match world-link-state-step-match world-link-dispatch-match world-link-frame-step-match world-link-menu-step-match world-rank-query-match world-slot-probe-match world-shutdown-reset-match world-band-0800b16c-match core-band-08051154-match world-band-080534a8-match world-band-0803afbc-match misc-format-decimal-dup-match world-band-0804aeac-match world-band-08064f24-match world-band-a-315f8-match world-band-a-31bf4-match world-band-a-30b50-match world-band-a-30f78-match world-band-a-31534-match world-band-a-317f0-match world-actor-desc-resolve-match world-actor-id-matches-match world-release-entry-bc-match world-release-entry-d-match world-get-record16-match video-setup-bg0-bg1-match world-stop-audio-dma-match world-send-text-mode1-match ui-send-text-by-id-match ui-load-hud-palettes-match ui-clear-hud-field-c-match world-trigger-event39-match ui-clear-map-window-match ui-clear-map-window-dma-match world-scale-magnitude-match ui-draw-two-digits-match ui-clear-hud-rows-ab-match ui-send-text-mode2-match world-release-actor-and-slot-match world-get-record-node-by-id-match video-blit-strip-4bpp-match world-push-slot-queue-entry-match video-blit-strip-plain-match video-blit-strip-clip-left-match world-release-entry-e-match world-release-slot-held-match core-find-free-node-match world-actor-behavior-steps-match world-facing-target-match world-queue-draw-request-match ui-draw-eight-digits-match world-mark-distant-actors-match world-queue-draw-request-direct-match world-init-session-attr-match video-setup-bg0-bg1-menu-match world-random-below-count-match world-reset-track-heading-match world-add-to-counter-match world-spawn-at-slot-match world-ping-other-actors-match world-flags-to-angle-match world-spawn-selected-for-players-match world-is-kind20-match
+build/world/alloc_from_counter.bin: src/world/alloc_from_counter.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-alloc-from-counter-match: verify-rom build/world/alloc_from_counter.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3385c build/world/alloc_from_counter.bin
+
+build/world/finish_actor_state.bin: src/world/finish_actor_state.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-finish-actor-state-match: verify-rom build/world/finish_actor_state.bin
+	@python3 tools/compare_slice.py baserom.gba 0x1979c build/world/finish_actor_state.bin
+
+build/world/refresh_score_digits.bin: src/world/refresh_score_digits.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-refresh-score-digits-match: verify-rom build/world/refresh_score_digits.bin
+	@python3 tools/compare_slice.py baserom.gba 0x31294 build/world/refresh_score_digits.bin
+
+build/world/get_actor_route_entry.bin: src/world/get_actor_route_entry.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-get-actor-route-entry-match: verify-rom build/world/get_actor_route_entry.bin
+	@python3 tools/compare_slice.py baserom.gba 0x193c4 build/world/get_actor_route_entry.bin
+
+build/world/release_object.bin: src/world/release_object.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-release-object-match: verify-rom build/world/release_object.bin
+	@python3 tools/compare_slice.py baserom.gba 0x13abc build/world/release_object.bin
+
+build/world/find_random_tile_of_kind.bin: src/world/find_random_tile_of_kind.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-find-random-tile-of-kind-match: verify-rom build/world/find_random_tile_of_kind.bin
+	@python3 tools/compare_slice.py baserom.gba 0x424ec build/world/find_random_tile_of_kind.bin
+
+build/world/alloc_draw_entry.bin: src/world/alloc_draw_entry.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-alloc-draw-entry-match: verify-rom build/world/alloc_draw_entry.bin
+	@python3 tools/compare_slice.py baserom.gba 0x12e78 build/world/alloc_draw_entry.bin
+
+build/world/reset_map_view.bin: src/world/reset_map_view.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-reset-map-view-match: verify-rom build/world/reset_map_view.bin
+	@python3 tools/compare_slice.py baserom.gba 0x30f90 build/world/reset_map_view.bin
+
+build/world/try_launch_actor.bin: src/world/try_launch_actor.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-try-launch-actor-match: verify-rom build/world/try_launch_actor.bin
+	@python3 tools/compare_slice.py baserom.gba 0x157b8 build/world/try_launch_actor.bin
+
+build/world/release_actor_entries.bin: src/world/release_actor_entries.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-release-actor-entries-match: verify-rom build/world/release_actor_entries.bin
+	@python3 tools/compare_slice.py baserom.gba 0x16808 build/world/release_actor_entries.bin
+
+build/world/is_player_actor_ready.bin: src/world/is_player_actor_ready.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-is-player-actor-ready-match: verify-rom build/world/is_player_actor_ready.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c62c build/world/is_player_actor_ready.bin
+
+build/ui/init_menu_session.bin: src/ui/init_menu_session.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/ui
+	@python3 tools/build_c.py $< $@
+
+ui-init-menu-session-match: verify-rom build/ui/init_menu_session.bin
+	@python3 tools/compare_slice.py baserom.gba 0x320e0 build/ui/init_menu_session.bin
+
+build/world/is_near_any_actor.bin: src/world/is_near_any_actor.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-is-near-any-actor-match: verify-rom build/world/is_near_any_actor.bin
+	@python3 tools/compare_slice.py baserom.gba 0x54f1c build/world/is_near_any_actor.bin
+
+build/world/project_actor_offset.bin: src/world/project_actor_offset.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-project-actor-offset-match: verify-rom build/world/project_actor_offset.bin
+	@python3 tools/compare_slice.py baserom.gba 0x23868 build/world/project_actor_offset.bin
+
+build/world/update_actor_lane.bin: src/world/update_actor_lane.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-update-actor-lane-match: verify-rom build/world/update_actor_lane.bin
+	@python3 tools/compare_slice.py baserom.gba 0x159a0 build/world/update_actor_lane.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match world-wrap-08005fc4-match world-wrap-080101d8-match world-wrap-08012a98-match world-wrap-080138e8-match world-wrap-080138f4-match world-wrap-08014fa0-match world-wrap-0803378c-match world-wrap-0803379c-match world-wrap-08035dd8-match world-wrap-08042784-match world-wrap-080428ac-match world-wrap-0804fb4c-match world-get-field-100-match world-spin-delay-match world-wrap-0804ff98-match world-wrap-0804ffb4-match world-wrap-080500d0-match world-wrap-08051464-match world-wrap-0805a4f4-match world-wrap-08063bcc-match world-get-anchor-unk04-match world-get-anchor-unk30-match world-wrap-08051480-match world-wrap-08059d7c-match world-get-record-index-match world-get-ram-word16-match world-is-state-two-match world-is-anchor-small-match world-rearm-slot-match world-accumulate-distance-match core-clip-bounds-match world-engage-actor-match core-insert-sorted-match world-refresh-then-notify-match world-check-current-entity-match core-for-each-node-match world-set-bg1-enable-match world-slot-range-or-field-match world-init-and-mirror-match world-bump-or-trigger-match world-apply-two-levels-match core-sort-sprite-list-match core-init-sprite-pool-match core-flush-sprite-list-match core-alloc-node-match core-sort-active-sprites-match core-insert-sprite-sorted-match core-memory-init-match world-link-objects-match world-nibble-replace-match world-palette-lerp-match core-reset-runtime-globals-match core-adjust-area-position-match core-frame-dispatch-match core-probe-nearby-position-match world-player-slot-query-match world-slot-range-query-match world-bump-count-82-match misc-format-decimal-match world-link-session-match world-link-hw-reset-match world-link-report-match world-actor-tracking-match world-scale-by-band-match world-link-init-match world-link-session-reset-match world-spawn-slot-effect-match world-bump-rank-counter-match world-bitmap-asset-match world-link-state-step-match world-link-dispatch-match world-link-frame-step-match world-link-menu-step-match world-rank-query-match world-slot-probe-match world-shutdown-reset-match world-band-0800b16c-match core-band-08051154-match world-band-080534a8-match world-band-0803afbc-match misc-format-decimal-dup-match world-band-0804aeac-match world-band-08064f24-match world-band-a-315f8-match world-band-a-31bf4-match world-band-a-30b50-match world-band-a-30f78-match world-band-a-31534-match world-band-a-317f0-match world-actor-desc-resolve-match world-actor-id-matches-match world-release-entry-bc-match world-release-entry-d-match world-get-record16-match video-setup-bg0-bg1-match world-stop-audio-dma-match world-send-text-mode1-match ui-send-text-by-id-match ui-load-hud-palettes-match ui-clear-hud-field-c-match world-trigger-event39-match ui-clear-map-window-match ui-clear-map-window-dma-match world-scale-magnitude-match ui-draw-two-digits-match ui-clear-hud-rows-ab-match ui-send-text-mode2-match world-release-actor-and-slot-match world-get-record-node-by-id-match video-blit-strip-4bpp-match world-push-slot-queue-entry-match video-blit-strip-plain-match video-blit-strip-clip-left-match world-release-entry-e-match world-release-slot-held-match core-find-free-node-match world-actor-behavior-steps-match world-facing-target-match world-queue-draw-request-match ui-draw-eight-digits-match world-mark-distant-actors-match world-queue-draw-request-direct-match world-init-session-attr-match video-setup-bg0-bg1-menu-match world-random-below-count-match world-reset-track-heading-match world-add-to-counter-match world-spawn-at-slot-match world-ping-other-actors-match world-flags-to-angle-match world-spawn-selected-for-players-match world-is-kind20-match world-alloc-from-counter-match world-finish-actor-state-match world-refresh-score-digits-match world-get-actor-route-entry-match world-release-object-match world-find-random-tile-of-kind-match world-alloc-draw-entry-match world-reset-map-view-match world-try-launch-actor-match world-release-actor-entries-match world-is-player-actor-ready-match ui-init-menu-session-match world-is-near-any-actor-match world-project-actor-offset-match world-update-actor-lane-match
 	@python3 tools/verify_matching_regions.py
 
 build/misc/id_compatibility.bin: src/misc/id_compatibility.c data/functions.csv data/ram_map.csv

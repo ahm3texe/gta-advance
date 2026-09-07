@@ -11,7 +11,7 @@
  *      tur 34'ten yeni bir giris kuruyor; evre 47 + bildirim 461, ya da
  *      evre 7 + bildirim 258.  Ardindan gRam020245A0 = 1, gRam02024344 = 0.
  *   3. Evre 12 / 38 / 39 ise 1 dondurup girisi ayakta birakiyor; degilse
- *      FUN_08013abc(e->sub) ile alt nesneyi birakip +0x00'i sifirliyor ve
+ *      ReleaseObject(e->sub) ile alt nesneyi birakip +0x00'i sifirliyor ve
  *      0 donduruyor.
  *
  * IMZA: tek parametre (r0), epilog `pop {r1}; bx r1` — donus adresi r1'e
@@ -88,7 +88,7 @@
  *     veriyor.  Uc blokta 9 komut, son 20 baytlik farkin tamami buydu.
  *
  *  7. KURAL 49 -- SEYREK GOVDE SONDA.  Kuyrukta ROM `return 1`'i akisin
- *     icinde, temizlik blogunu (`FUN_08013abc` + `+0x00 = 0`) en sonda
+ *     icinde, temizlik blogunu (`ReleaseObject` + `+0x00 = 0`) en sonda
  *     tutuyor.  Duz `if (ok) return 1;` yazimi bunun TERSINI uretiyor
  *     (temizlik dusuyor, `return 1` sona atiliyor).  Uc cikisi da `goto
  *     keep;` ile ayni etikete yollayip etiketi temizlik blogundan ONCE
@@ -189,7 +189,7 @@ typedef struct Entry {
     u8     active;              /* +0x00 */
     u8     owner;               /* +0x01, ROM tablosuna indeks olarak da kullaniliyor */
     u8     pad02[2];
-    u8     sub[38];             /* +0x04, FUN_08013abc'ye verilir */
+    u8     sub[38];             /* +0x04, ReleaseObject'ye verilir */
     u8     pad2a[34];
     Triple payload;             /* +0x4C */
     u8     pad58[12];
@@ -205,7 +205,7 @@ extern u16 gRam02024344;
 
 extern void FUN_08023df0(Triple *payload, u32 value, u32 arg2, u32 arg3);
 extern void FUN_08060db4(Triple *payload, u32 value);
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 extern u32  GetActiveSlotValue(void);
 extern void FUN_08035058(u32 slot, u32 id);
 extern u32  CreateEntryFromTemplate(Entry *src, u32 unused1, u32 unused2,
@@ -302,7 +302,7 @@ u32 StepEntryPhase(Entry *e)
 keep:
     return 1;
 retire:
-    FUN_08013abc(e->sub);
+    ReleaseObject(e->sub);
     e->active = 0;
     return 0;
 }

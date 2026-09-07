@@ -6,7 +6,7 @@
  *   listeyi geziyor.  Her dis dugum ayni zamanda +0x44 ile bagli ic
  *   listenin BASI oluyor.  Ic listedeki her dugum icin, +0x30 alani
  *   doluysa:
- *     node->unk1c = FUN_08012e78(node->unk10, (w * h) >> 1,
+ *     node->unk1c = AllocDrawEntry(node->unk10, (w * h) >> 1,
  *                                w >> 3, h >> 3, node->flags20);
  *     if (node->kind27 == 1) node->flags20 |= 0x2000;
  *   Burada w = +0x14, h = +0x15 bayt alanlari; piksel olcusu gibi
@@ -69,11 +69,11 @@
 /* Gonderim yordami: kaynak, 4bpp bayt boyutu, karo olcusu ve bayraklar.
    Imza ROM'un cagri kurulumundan okundu; fonksiyonun kendisi
    (0x08012E78) henuz cozulmedi. */
-void *FUN_08012e78(void *src, s32 size, u32 tilesX, u32 tilesY, u16 flags);
+void *AllocDrawEntry(void *src, s32 size, u32 tilesX, u32 tilesY, u16 flags);
 
 typedef struct Entry {
     u8            pad00[0x10];
-    void         *unk10;        /* +0x10 FUN_08012e78'in ilk argumani */
+    void         *unk10;        /* +0x10 AllocDrawEntry'in ilk argumani */
     u8            width14;      /* +0x14 piksel genisligi */
     u8            height15;     /* +0x15 piksel yuksekligi */
     u8            pad16[6];
@@ -119,7 +119,7 @@ void LoadEntryTileData(void)
             if (node->unk30 != 0) {
                 w >>= 3;
                 h >>= 3;
-                node->unk1c = FUN_08012e78(src, half, w, h, node->flags20);
+                node->unk1c = AllocDrawEntry(src, half, w, h, node->flags20);
                 if (node->kind27 == 1) {
                     node->flags20 |= FLAG_SUBMITTED;
                 }

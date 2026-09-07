@@ -40,7 +40,7 @@ struct Actor {
 };
 
 extern void FUN_08016990(Actor *actor, u32 arg);
-extern void FUN_08013abc(u32 *value);
+extern void ReleaseObject(u32 *value);
 extern u32  RandomBelowCount(u32 id);
 extern u32  GetGlyphCell(u32 id, u32 zero, u32 extra);
 extern void FUN_0803bfe4(ActorSub *sub);
@@ -69,7 +69,7 @@ void NotifyActor(Actor *actor)
 void ReleaseActorRefs(Actor *actor)
 {
     if (actor->unk3C != 0) {
-        FUN_08013abc(actor->unk3C);
+        ReleaseObject(actor->unk3C);
         actor->unk3C = 0;
     }
 

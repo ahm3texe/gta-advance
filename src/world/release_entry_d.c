@@ -13,13 +13,13 @@ typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 timer;                  /* +0x02 */
-    u8  sub[38];                /* +0x04, FUN_08013abc'ye verilir */
+    u8  sub[38];                /* +0x04, ReleaseObject'ye verilir */
     u8  pad2a[106];             /* toplam 148 = 0x94 */
 } Entry;
 
 extern Entry gRam02023710[];    /* 5 giris */
 
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 
 /* 0x08028DC4 */
 u32 ReleaseEntryD(u8 idx)
@@ -30,7 +30,7 @@ u32 ReleaseEntryD(u8 idx)
     if (e->active == 0)
         return 0;
 
-    FUN_08013abc(e->sub);
+    ReleaseObject(e->sub);
     e->active = 0;
     e->timer = 0;
     return 1;

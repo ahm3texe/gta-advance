@@ -145,7 +145,7 @@ typedef struct Entry {
     u32    phase;               /* +0x90, stride 148 */
 } Entry;
 
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 extern void FUN_08013cfc(u8 *dest, RomNode *desc, u32 arg);
 extern void FUN_08014ee4(u8 *dest, u32 value);
 extern u32 GetActiveSlot(void);
@@ -166,7 +166,7 @@ void AdvanceEntryFrame(Entry *e)
 
     if (e->pos.value >= limit) {
         if (e->phase != PHASE_SPECIAL) {
-            FUN_08013abc(e->sub);
+            ReleaseObject(e->sub);
             e->active = 0;
             return;
         }

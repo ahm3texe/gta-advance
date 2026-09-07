@@ -1,7 +1,7 @@
 /* Havuz girisini birakma (B ve C havuzlari) — 0x08028B2C-0x08028B9B
  *
  * Iki fonksiyon KOMUT KOMUT ayni; yalniz taban tablo farkli. Giris etkin
- * degilse 0 doner; etkinse alt nesneyi FUN_08013abc'ye birakip +0x00,
+ * degilse 0 doner; etkinse alt nesneyi ReleaseObject'ye birakip +0x00,
  * +0x8C ve +0x02'yi sifirlar ve 1 doner.
  *
  * +0x8C Thumb'in `str` anlik uzakligini (en fazla 124) astigi icin ROM
@@ -20,7 +20,7 @@ typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 timer;                  /* +0x02 */
-    u8  sub[38];                /* +0x04, FUN_08013abc'ye verilir */
+    u8  sub[38];                /* +0x04, ReleaseObject'ye verilir */
     u8  pad2a[98];
     u32 unk8c;                  /* +0x8C */
     u8  pad90[4];
@@ -29,7 +29,7 @@ typedef struct Entry {
 extern Entry gRam02024350[];    /* 4 giris */
 extern Entry gRam020245B0[];    /* 1 giris */
 
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 
 /* 0x08028B2C */
 u32 ReleaseEntryB(u8 idx)
@@ -40,7 +40,7 @@ u32 ReleaseEntryB(u8 idx)
     if (e->active == 0)
         return 0;
 
-    FUN_08013abc(e->sub);
+    ReleaseObject(e->sub);
     e->active = 0;
     e->unk8c = 0;
     e->timer = 0;
@@ -56,7 +56,7 @@ u32 ReleaseEntryC(u8 idx)
     if (e->active == 0)
         return 0;
 
-    FUN_08013abc(e->sub);
+    ReleaseObject(e->sub);
     e->active = 0;
     e->unk8c = 0;
     e->timer = 0;

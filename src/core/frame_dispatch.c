@@ -10,7 +10,7 @@ extern u32 gRam02023700;
 extern void RefreshActiveAreas(void);
 extern void FUN_080386a8(void);
 extern void FUN_0805c190(void);
-extern void FUN_080507f4(void);
+extern void StepMissionTimer(void);
 extern void FUN_08051674(void);
 extern void FUN_08040d50(void);
 extern void FUN_08050d80(void);
@@ -49,7 +49,7 @@ void RunFrameStageOne(void)
     gRam02023700 = 0x66;
     FUN_0805c190();
     gRam02023700 = 0x67;
-    FUN_080507f4();
+    StepMissionTimer();
     FUN_08051674();
     gRam02023700 = 0x68;
     FUN_08040d50();

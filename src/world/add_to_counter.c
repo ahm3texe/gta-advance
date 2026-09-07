@@ -14,7 +14,7 @@
 
 #include "gba_types.h"
 #define COUNTER_MAX 3200
-typedef struct Counter { u16 pad00; u16 used; } Counter;
+typedef struct Counter { u16 alloc; u16 used; } Counter;
 extern Counter *gRom08CA6A08;
 extern u32 gRam02027320;
 u32 AddToCounter(u32 amount)

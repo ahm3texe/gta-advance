@@ -11,7 +11,7 @@
  * yalnizca tanim blogu adresiyle ayriliyor — bloklar 0x08CA45CC'den
  * baslayan bir ROM tablosunda 0x54 bayt araliklarla duruyor.
  * Tur 0 ve 1 ozel isleyicilere gidiyor; tur 27 ve aralik disi degerler
- * ortak "bos" isleyiciye (FUN_0801979c) ve NULL tanima dusuyor.
+ * ortak "bos" isleyiciye (FinishActorState) ve NULL tanima dusuyor.
  *
  * ROM'daki blok sirasi kaynak sirasini birebir yansitiyor: 0..25,
  * sonra `case 27` + `default` ortak blogu, en sonda `case 26`.
@@ -29,7 +29,7 @@
 extern u8 FUN_08017628__thumb[];
 extern u8 FUN_080172a0__thumb[];
 extern u8 FUN_08018b74__thumb[];
-extern u8 FUN_0801979c__thumb[];
+extern u8 FinishActorState__thumb[];
 
 /* Tanim bloklari salt-okunur ROM verisi; her biri tek basina kullaniliyor,
    taban + ofset katlanmasi soz konusu degil (kural 1'in gerekcesi yok).
@@ -184,7 +184,7 @@ void SelectEntityHandler(Entity *entity, u32 kind)
         break;
     case 27:
     default:
-        entity->handler = FUN_0801979c__thumb;
+        entity->handler = FinishActorState__thumb;
         def = 0;
         asm volatile ("");
         break;

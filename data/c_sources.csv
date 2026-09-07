@@ -41,6 +41,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08001EA4,ClearMenuVram,src/ui/menu_graphics.c,64,64,yes
 0x08001EE4,EnableMenuDisplay,src/ui/menu_graphics.c,16,16,yes
 0x08001EF4,EnableMenuDisplayAlt,src/ui/menu_graphics.c,16,16,yes
+0x080023F0,DrawPauseTexts,src/ui/draw_pause_texts.c,188,196,no
 0x08003454,ShowNextCutsceneFrame,src/core/cutscene_frame.c,152,152,yes
 0x080034EC,ResetBgScrollAndAffine,src/core/cutscene_b1.c,112,112,yes
 0x08005FC4,FUN_08005fc4,src/world/wrap_08005fc4.c,10,10,yes
@@ -105,6 +106,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012C74,InsertSpriteSorted,src/core/insert_sprite_sorted.c,98,98,yes
 0x08012CD8,FUN_08012cd8,src/core/sprite_b1.c,320,320,no
 0x08012E18,QueueDrawRequestDirect,src/world/queue_draw_request_direct.c,96,96,yes
+0x08012E78,AllocDrawEntry,src/world/alloc_draw_entry.c,272,272,yes
 0x08012F88,QueueDrawRequest,src/world/queue_draw_request.c,136,136,yes
 0x08013010,QueueDrawRequestDup,src/world/queue_draw_request.c,136,136,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
@@ -115,6 +117,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080139B0,MarkChain,src/world/list_head.c,32,32,yes
 0x08013A28,SubmitFixed,src/world/dma_flush.c,30,30,yes
 0x08013A48,FlushBlock,src/world/dma_flush.c,60,60,yes
+0x08013ABC,ReleaseObject,src/world/release_object.c,224,224,yes
 0x08014E48,FUN_08014e48,src/world/transition_code.c,168,154,no
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x0801515C,LoadEntryTileData,src/world/level_step_b2.c,100,100,yes
@@ -122,8 +125,12 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801528C,SelectEntityHandler,src/world/level_step.c,588,588,yes
 0x080154D8,InitActor,src/world/actor_init.c,192,192,yes
 0x08015598,UpdateActorFrame,src/world/actor_b3.c,544,544,yes
+0x080157B8,TryLaunchActor,src/world/try_launch_actor.c,124,124,yes
+0x08015834,UpdateActorSlotEntry,src/world/update_actor_slot_entry.c,362,362,no
+0x080159A0,UpdateActorLane,src/world/update_actor_lane.c,228,228,yes
 0x080166E8,IsAnyActorNearby,src/world/actor_b1.c,128,128,yes
 0x08016768,ResetActor,src/world/actor_reset.c,160,160,yes
+0x08016808,ReleaseActorEntries,src/world/release_actor_entries.c,98,98,yes
 0x0801686C,RequestActorAction,src/world/actor_b2.c,292,292,yes
 0x08017500,GetFacingTarget,src/world/facing_target.c,148,148,yes
 0x08017594,GetFacingTargetDup,src/world/facing_target.c,148,148,yes
@@ -142,6 +149,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801881C,StepActorBehaviorB4b,src/world/actor_behavior_steps.c,312,312,yes
 0x08018954,StepActorBehavior130,src/world/actor_behavior_steps.c,272,272,yes
 0x08018A64,StepActorBehavior133,src/world/actor_behavior_steps.c,272,272,yes
+0x080193C4,GetActorRouteEntry,src/world/get_actor_route_entry.c,138,138,yes
 0x08019450,IsActorMarked,src/world/actor_control.c,20,20,yes
 0x08019464,NotifyActor,src/world/actor_control.c,44,44,yes
 0x08019490,ReleaseActorRefs,src/world/actor_control.c,34,34,yes
@@ -156,6 +164,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080196C8,IsObjectReadyA,src/world/object_state.c,36,36,yes
 0x080196EC,IsObjectReadyB,src/world/object_state.c,36,36,yes
 0x08019710,PingOtherActors,src/world/ping_other_actors.c,140,140,yes
+0x0801979C,FinishActorState,src/world/finish_actor_state.c,96,96,yes
 0x080197FC,NoOp080197FC,src/misc/empty_stubs.c,2,2,yes
 0x080199BC,BlendPaletteBlock,src/world/palette_lerp.c,134,134,yes
 0x08019B08,IsActorUsable,src/world/actor_check.c,52,52,yes
@@ -166,6 +175,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801D848,InitAndMirror,src/world/init_and_mirror.c,34,34,yes
 0x0801D8B0,GetField100,src/world/get_field_100.c,10,10,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
+0x08023868,ProjectActorOffset,src/world/project_actor_offset.c,196,196,yes
 0x0802392C,ClearRam0202370C,src/world/pair_lookup.c,12,12,yes
 0x08023938,PairIndex,src/world/pair_lookup.c,60,60,yes
 0x08023974,StepDecay,src/world/step_decay.c,152,152,yes
@@ -179,6 +189,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08023BB8,ShiftRowsLeft,src/world/entries_b6.c,132,132,yes
 0x08023C3C,ShiftColumnsUp,src/world/entries_b3.c,134,134,yes
 0x08023CC4,ClearEntryTables,src/world/entries_b2.c,300,300,yes
+0x08024044,GetStateValue,src/world/get_state_value.c,318,328,no
 0x08025340,MoveActorAlongAngle,src/world/entries_b4.c,228,228,yes
 0x08025424,CreateEntryFromTemplate,src/world/entries_b1.c,242,242,yes
 0x08025518,StepEntryPhase,src/world/entries_b5.c,458,458,yes
@@ -211,6 +222,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080294B4,ReleaseEntryE,src/world/release_entry_e.c,48,48,yes
 0x0802A610,DrawCounterDigits8,src/ui/draw_eight_digits.c,292,292,yes
 0x0802A734,DrawCounterDigits3,src/ui/draw_eight_digits.c,292,292,yes
+0x080306C8,ShowLevelBadge,src/ui/show_level_badge.c,384,384,no
 0x0803084C,SetBg1Enable,src/world/set_bg1_enable.c,18,18,yes
 0x08030860,ClearBg1Enable,src/world/clear_bg1_enable.c,20,20,yes
 0x08030874,ForwardWithZero,src/world/forward_with_zero.c,14,14,yes
@@ -236,7 +248,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030F50,ClearHudFieldC,src/ui/clear_hud_field_c.c,40,40,yes
 0x08030F78,FUN_08030f78,src/world/band_a_30f78.c,12,12,yes
 0x08030F84,TriggerEvent39,src/world/trigger_event39.c,12,12,yes
+0x08030F90,ResetMapView,src/world/reset_map_view.c,116,116,yes
 0x080311DC,ClearMapWindow,src/ui/clear_map_window.c,40,40,yes
+0x08031294,RefreshScoreDigits,src/world/refresh_score_digits.c,132,132,yes
 0x08031318,GetRecordNodeById,src/world/get_record_node_by_id.c,14,14,yes
 0x08031328,ClearMapWindowDma,src/ui/clear_map_window_dma.c,96,96,yes
 0x08031388,InitSessionAttr,src/world/init_session_attr.c,88,88,yes
@@ -267,6 +281,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x080320B8,GetEntityUnk10,src/world/entity_accessors.c,4,4,yes
 0x080320C8,SaveBufferCopy8To9,src/world/copy_flag_byte.c,12,12,yes
 0x080320D4,SaveBufferCopy9To8,src/world/copy_flag_byte.c,12,12,yes
+0x080320E0,InitMenuSession,src/ui/init_menu_session.c,108,108,yes
+0x08033674,AllocPoolNode,src/world/alloc_pool_node.c,112,120,no
 0x080336EC,VerifyId,src/world/id_verify.c,64,64,yes
 0x0803372C,TriggerIfMatched,src/world/id_verify.c,64,64,yes
 0x0803376C,ZeroThreeFlags,src/world/zero_three_flags.c,32,32,yes
@@ -275,6 +291,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080337A8,StopAudioDmaOnCartFlag,src/world/stop_audio_dma.c,120,120,yes
 0x08033820,NoOp08033820,src/misc/empty_stubs.c,2,2,yes
 0x08033824,AddToCounter,src/world/add_to_counter.c,56,56,yes
+0x0803385C,AllocFromCounter,src/world/alloc_from_counter.c,52,52,yes
 0x08033898,NoOp08033898,src/misc/empty_stubs.c,2,2,yes
 0x08034FB0,NoOp08034FB0,src/misc/empty_stubs.c,2,2,yes
 0x08034FC8,NoOp08034FC8,src/misc/empty_stubs.c,2,2,yes
@@ -322,6 +339,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C564,GetScaleStep,src/world/slot_query.c,20,20,yes
 0x0803C578,MarkTarget,src/world/slot_query.c,26,26,yes
 0x0803C594,IsTargetMarked,src/world/slot_query.c,32,32,yes
+0x0803C62C,IsPlayerActorReady,src/world/is_player_actor_ready.c,106,106,yes
 0x0803C77C,GetScaleFactor,src/misc/session_reset.c,20,20,yes
 0x0803C790,ReturnOne,src/misc/session_reset.c,4,4,yes
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,2,2,yes
@@ -342,11 +360,13 @@ address,name,source,compiled_size,mapped_size,matching
 0x08041EE0,NoOp08041EE0,src/misc/empty_stubs.c,2,2,yes
 0x08041EF0,NoOp08041EF0,src/misc/empty_stubs.c,2,2,yes
 0x08041EF4,NoOp08041EF4,src/misc/empty_stubs.c,2,2,yes
+0x08041F8C,FindHitInList,src/world/find_hit_in_list.c,126,126,no
 0x08042058,GetTileFieldA,src/world/map_tile_fields.c,48,48,yes
 0x08042088,GetTileType,src/world/map_tile_fields.c,44,44,yes
 0x08042434,IsTileTypeInRange,src/world/map_tiles.c,60,60,yes
 0x080424A8,GetTileFieldA2,src/world/tile_and_map.c,48,48,yes
 0x080424D8,GetMapSize,src/world/tile_and_map.c,20,20,yes
+0x080424EC,FindRandomTileOfKind,src/world/find_random_tile_of_kind.c,136,136,yes
 0x08042784,FUN_08042784,src/world/wrap_08042784.c,10,10,yes
 0x080428AC,FUN_080428ac,src/world/wrap_080428ac.c,10,10,yes
 0x08045AA4,IsTargetNear,src/world/target_near.c,540,540,yes
@@ -360,6 +380,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050108,BumpOrTrigger,src/world/bump_or_trigger.c,40,40,yes
 0x08050190,CompareA,src/world/word_compare.c,28,28,yes
 0x080501AC,CompareB,src/world/word_compare.c,28,28,yes
+0x080507F4,StepMissionTimer,src/world/step_mission_timer.c,256,290,no
 0x08050918,ResetAnchorSmall,src/world/anchor_reset.c,28,28,yes
 0x08050934,ResetAnchorFull,src/world/anchor_reset.c,36,36,yes
 0x08050958,ResetAnchorPartial,src/world/anchor_reset.c,24,24,yes
@@ -417,6 +438,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08054744,FindOrInitAreaNode,src/core/nodelist_a2.c,164,164,yes
 0x080547E8,FindOrRecycleNode,src/core/nodelist_c1.c,136,136,yes
 0x08054E40,SpawnSelectedForPlayers,src/world/spawn_selected_for_players.c,220,220,yes
+0x08054F1C,IsNearAnyActor,src/world/is_near_any_actor.c,310,310,yes
 0x08055054,FUN_08055054,src/core/nodelist_b7.c,312,312,no
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x080552D4,IsProgressThresholdMet,src/core/nodelist_b8.c,492,492,yes

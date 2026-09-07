@@ -12,26 +12,26 @@ address,name,size,outcome,source,evidence
 0x08012CD8,FUN_08012cd8,320,parked,src/core/sprite_b1.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x080137A4,FUN_080137a4,128,parked,,ROM statik triyaj: 1 cagri / 0 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
 0x08013824,FUN_08013824,196,parked,,ROM statik triyaj: 8 cagri / 0 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
-0x08013ABC,FUN_08013abc,224,parked,,ROM statik triyaj: 8 cagri / 13 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
+0x08013ABC,ReleaseObject,224,matching,src/world/release_object.c,ROM byte-matching; data/functions.csv
 0x08014E48,FUN_08014e48,154,parked,src/world/transition_code.c,168/154 bayt; switch ve if/else karsilastirma agaclari elendi
 0x08014EE4,FUN_08014ee4,124,parked,,ROM statik triyaj: 3 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x080157B8,FUN_080157b8,124,parked,,ROM statik triyaj: 1 cagri / 8 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x08015834,FUN_08015834,362,parked,,ROM statik triyaj: 14 cagri / 20 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
+0x080157B8,TryLaunchActor,124,matching,src/world/try_launch_actor.c,ROM byte-matching; data/functions.csv
+0x08015834,UpdateActorSlotEntry,362,parked,,ROM statik triyaj: 14 cagri / 20 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
 0x08019320,FUN_08019320,164,parked,,ROM statik triyaj: 3 cagri / 19 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x080193C4,FUN_080193c4,138,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
+0x080193C4,GetActorRouteEntry,138,matching,src/world/get_actor_route_entry.c,ROM byte-matching; data/functions.csv
 0x08019710,PingOtherActors,140,matching,src/world/ping_other_actors.c,ROM byte-matching; data/functions.csv
 0x0801983C,FUN_0801983c,168,parked,,ROM statik triyaj: 0 cagri / 1 kosullu dal / 1 literal; atlama tablosu rekonstruksiyonu gerekli
 0x080199BC,BlendPaletteBlock,134,matching,src/world/palette_lerp.c,ROM byte-matching
 0x08019C24,FUN_08019c24,264,parked,,ROM statik triyaj: 0 cagri / 11 kosullu dal / 4 literal; RAM tur blogu gerekli
 0x0801D754,FUN_0801d754,136,parked,,ROM statik triyaj: 2 cagri / 10 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
 0x080237B0,FUN_080237b0,184,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
-0x08023868,FUN_08023868,196,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
+0x08023868,ProjectActorOffset,196,matching,src/world/project_actor_offset.c,ROM byte-matching; data/functions.csv
 0x08029518,FUN_08029518,392,parked,,ROM statik triyaj: 2 cagri / 1 kosullu dal / 19 literal; RAM tur blogu gerekli
 0x080306C8,ShowLevelBadge,384,parked,,ROM statik triyaj: 9 cagri / 9 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
 0x08030EAC,LoadHudPalettes,124,matching,src/ui/load_hud_palettes.c,ROM byte-matching; data/functions.csv
 0x08031C10,ReplaceNibbleField,136,matching,src/world/nibble_replace.c,ROM byte-matching
 0x08031C98,PushSlotQueueEntry,140,matching,src/world/push_slot_queue_entry.c,ROM byte-matching; data/functions.csv
-0x08033674,FUN_08033674,120,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
+0x08033674,AllocPoolNode,120,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
 0x080337A8,StopAudioDmaOnCartFlag,120,matching,src/world/stop_audio_dma.c,ROM byte-matching; data/functions.csv
 0x08035BA8,FUN_08035ba8,300,parked,,ROM statik triyaj: 5 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08037D98,FUN_08037d98,228,parked,,ROM statik triyaj: 6 cagri / 13 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
@@ -40,9 +40,9 @@ address,name,size,outcome,source,evidence
 0x0803BDC8,FUN_0803bdc8,540,parked,,ROM statik triyaj: 16 cagri / 27 kosullu dal / 16 literal; bagimli imza-ve-tur blogu gerekli
 0x0803F4BC,TryEngageTarget,372,parked,src/world/try_engage_target.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
 0x08041C64,FUN_08041c64,448,parked,,ROM statik triyaj: 4 cagri / 17 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
-0x08041F8C,FUN_08041f8c,126,parked,,ROM statik triyaj: 1 cagri / 5 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
+0x08041F8C,FindHitInList,126,parked,,ROM statik triyaj: 1 cagri / 5 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08042280,FUN_08042280,236,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x080424EC,FUN_080424ec,136,parked,,ROM statik triyaj: 2 cagri / 2 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
+0x080424EC,FindRandomTileOfKind,136,matching,src/world/find_random_tile_of_kind.c,ROM byte-matching; data/functions.csv
 0x08042574,FUN_08042574,180,parked,,ROM statik triyaj: 2 cagri / 6 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
 0x08042628,FUN_08042628,196,parked,,ROM statik triyaj: 6 cagri / 8 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
 0x080426EC,FUN_080426ec,150,parked,,ROM statik triyaj: 2 cagri / 7 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
@@ -52,7 +52,7 @@ address,name,size,outcome,source,evidence
 0x0804AEAC,FUN_0804aeac,476,matching,src/world/band_0804aeac.c,ROM byte-matching; data/functions.csv
 0x0804FE64,FUN_0804fe64,120,parked,,ROM statik triyaj: 6 cagri / 3 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x080501C8,FUN_080501c8,192,parked,,ROM statik triyaj: 2 cagri / 14 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
-0x080507F4,FUN_080507f4,290,parked,,ROM statik triyaj: 7 cagri / 19 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
+0x080507F4,StepMissionTimer,290,parked,,ROM statik triyaj: 7 cagri / 19 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
 0x08051154,FUN_08051154,348,matching,src/core/band_08051154.c,ROM byte-matching; data/functions.csv
 0x0805135C,RunFrameStageOne,132,matching,src/core/frame_dispatch.c,ROM byte-matching
 0x080513E0,RunFrameStageTwo,120,matching,src/core/frame_dispatch.c,ROM byte-matching

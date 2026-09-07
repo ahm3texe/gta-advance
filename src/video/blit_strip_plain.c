@@ -31,7 +31,7 @@
 #define OFF_SUB      0xA0           /* blok basi; eleman ici +0x64 */
 #define OFF_FLAG     0xED           /* blok basi; eleman ici +0xB1 */
 
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 
 /* 0x08031684 */
 void ReleaseSlotSub(u32 index)
@@ -48,7 +48,7 @@ void ReleaseSlotSub(u32 index)
         return;
 
     subBase = base + OFF_SUB;
-    FUN_08013abc(subBase + scaled);
+    ReleaseObject(subBase + scaled);
     *flag = 0;
 }
 

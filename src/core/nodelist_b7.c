@@ -2,7 +2,7 @@
  * 0x08055054-0x0805518B  (312 bayt; son 4 bayt literal havuzu)
  *
  * Cagriya bir konum isaretcisi (in/out) ve bir (dx, dy) kaymasi geliyor.
- * Once `konum + (dx,dy)<<16` noktasi FUN_08054f1c ile snaniyor; bos ise
+ * Once `konum + (dx,dy)<<16` noktasi IsNearAnyActor ile snaniyor; bos ise
  * konum oraya tasinip 1 donuluyor. Degilse istenen nokta cevresinde
  * +-128.0 (0x800000) genisliginde bir kutu kurulup FUN_08040700'e
  * veriliyor; o da kutuya giren en fazla 8 karonun (tx, ty) indekslerini
@@ -117,7 +117,7 @@
 
 #define BOX_RADIUS      0x00800000      /* 128.0, 16.16 sabit nokta */
 #define HALF_TILE       0x00200000      /*  32.0 = karo yarisi      */
-#define PROBE_LIMIT     0x00180000      /*  24.0; FUN_08054f1c esigi */
+#define PROBE_LIMIT     0x00180000      /*  24.0; IsNearAnyActor esigi */
 #define MAX_CELLS       8
 #define TILE_SHIFT      22              /* karo indeksi -> dunya kord. */
 #define POS_SHIFT       16              /* tam sayi -> 16.16          */
@@ -136,7 +136,7 @@ typedef struct Cell {
 } Cell;
 
 extern u32 GetTileFieldA2(const Vec3 *pos);
-extern u32 FUN_08054f1c(const Vec3 *pos, u32 mask, u32 limit);
+extern u32 IsNearAnyActor(const Vec3 *pos, u32 mask, u32 limit);
 extern int FUN_08040700(const Vec3 *box, Cell *out, int max, u32 mask, u32 opt);
 
 /* 0x08055054 */
@@ -163,7 +163,7 @@ u32 FUN_08055054(Vec3 *pos, u32 mask, u32 useTileMask, u32 probeMask,
     tileMask = 1 << GetTileFieldA2(pos);
 
     if (useTileMask != 0) {
-        if (FUN_08054f1c(&want, probeMask, PROBE_LIMIT)) {
+        if (IsNearAnyActor(&want, probeMask, PROBE_LIMIT)) {
             *pos = want;
             return 1;
         }
@@ -188,7 +188,7 @@ u32 FUN_08055054(Vec3 *pos, u32 mask, u32 useTileMask, u32 probeMask,
             yoff = (dy << POS_SHIFT) + HALF_TILE;
             pp->y = (((u16 *)cells)[i * 2 + 1] << TILE_SHIFT) + yoff;
             pp->z = 0;
-            if (FUN_08054f1c(pp, probeMask, PROBE_LIMIT)) {
+            if (IsNearAnyActor(pp, probeMask, PROBE_LIMIT)) {
                 pos->x = pp->x;
                 pos->y = pp->y;
                 return 1;

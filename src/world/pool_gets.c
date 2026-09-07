@@ -30,7 +30,7 @@ extern Pool gRam0202F300;
 extern Pool gUnk02028280;
 extern Pool gUnk0202F2C0;
 
-extern void FUN_08016808(void *sub);
+extern void ReleaseActorEntries(void *sub);
 
 /* 0x08037FAC */
 u32 GetPoolA(void) { return gUnk0202F310.value; }
@@ -49,6 +49,6 @@ void MarkAndClear(Obj *obj)
 {
     obj->state |= STATE_FLAG;
     if (obj->sub != 0)
-        FUN_08016808(obj->sub);
+        ReleaseActorEntries(obj->sub);
     obj->sub = 0;
 }

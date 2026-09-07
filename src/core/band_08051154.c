@@ -110,7 +110,7 @@ extern void FUN_08061d34(void);
 extern void FUN_0805cecc(void);
 extern void FUN_080296a0(u32 a, u32 b);
 extern void FUN_0803c20c(void);
-extern void FUN_080320e0(void);
+extern void InitMenuSession(void);
 extern void StepNodeLists(void);
 extern void FUN_0803214c(void);
 extern void FUN_08008f14(void);
@@ -158,7 +158,7 @@ void FUN_08051154(u32 index)
     FUN_0805cecc();
     FUN_080296a0(record->unk1C, record->unk28);
     FUN_0803c20c();
-    FUN_080320e0();
+    InitMenuSession();
     StepNodeLists();
     StepNodeLists();
     FUN_0803214c();

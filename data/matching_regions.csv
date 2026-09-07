@@ -50,26 +50,34 @@ start,end,binary,module,notes
 0x08012C54,0x08012C74,build/core/sort_active_sprites.bin,core,32 bayt C byte-matching; aktif sprite listesini kesmeler kapaliyken sirala
 0x08012C74,0x08012CD8,build/core/insert_sprite_sorted.bin,core,98 bayt C byte-matching + 2 bayt hizalama; kararli sprite ekleme
 0x08012E18,0x08012E78,build/world/queue_draw_request_direct.bin,world,0x08012E18 QueueDrawRequestDirect
+0x08012E78,0x08012F88,build/world/alloc_draw_entry.bin,world,0x08012E78 AllocDrawEntry
 0x08012F88,0x08013098,build/world/queue_draw_request.bin,world,0x08012F88 QueueDrawRequest + 0x08013010 ikizi
 0x080138E8,0x080138F4,build/world/wrap_080138e8.bin,world,kucuk fonksiyon hasadi
 0x080138F4,0x08013900,build/world/wrap_080138f4.bin,world,kucuk fonksiyon hasadi
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
 0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Sabit cagri + DMA bosaltma
+0x08013ABC,0x08013B9C,build/world/release_object.bin,world,ReleaseObject
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,kucuk fonksiyon hasadi
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184 bayt gövde + literal havuzu
+0x080157B8,0x08015834,build/world/try_launch_actor.bin,world,0x080157B8 TryLaunchActor
+0x080159A0,0x08015A84,build/world/update_actor_lane.bin,world,0x080159A0 UpdateActorLane
+0x08016808,0x0801686C,build/world/release_actor_entries.bin,world,0x08016808 ReleaseActorEntries (+2 dolgu)
 0x08017500,0x08017628,build/world/facing_target.bin,world,0x08017500 GetFacingTarget + 0x08017594 GetFacingTargetDup (ayni govde)
 0x08017D78,0x08017E3C,build/world/flags_to_angle.bin,world,0x08017D78 FlagsToAngle
 0x08017E3C,0x08018B74,build/world/actor_behavior_steps.bin,world,"0x08017E3C-0x08018B73 aktor davranis adimlari (12 fonksiyon, tek sablon)"
+0x080193C4,0x08019450,build/world/get_actor_route_entry.bin,world,0x080193C4 GetActorRouteEntry (+2 dolgu)
 0x08019450,0x0801952C,build/world/actor_control.bin,world,Alti varlik denetim fonksiyonu
 0x0801952C,0x08019590,build/world/actor_desc_resolve.bin,world,0x0801952C ResolveActorDesc; gRom08BD3448 kokunden aktor tanimi
 0x08019620,0x08019670,build/world/actor_id_matches.bin,world,0x08019620 ActorIdMatches; kimlik/takma ad esleme sorgusu
 0x08019670,0x08019710,build/world/object_state.bin,world,Dort nesne durum sorgusu: moda gore olcekleme ve alt nesne kilit testleri
 0x08019710,0x0801979C,build/world/ping_other_actors.bin,world,0x08019710 PingOtherActors
+0x0801979C,0x080197FC,build/world/finish_actor_state.bin,world,0x0801979C FinishActorState
 0x080199BC,0x08019A44,build/world/palette_lerp.bin,world,On alti BGR555 rengin 16.16 katsayili karisimi; dogal C byte-matching ve 2 bayt hizalama.
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Aktor durum + yon farki
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,karmasik hasat
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,kucuk fonksiyon hasadi
+0x08023868,0x0802392C,build/world/project_actor_offset.bin,world,0x08023868 ProjectActorOffset
 0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
 0x08023A80,0x08023A9C,build/world/masked_compare.bin,world,maskeli karsilastirma
@@ -100,7 +108,9 @@ start,end,binary,module,notes
 0x08030F50,0x08030F78,build/ui/clear_hud_field_c.bin,ui,0x08030F50 ClearHudFieldC
 0x08030F78,0x08030F84,build/world/band_a_30f78.bin,world,Oturum blogunun etkinlik bayragini temizler
 0x08030F84,0x08030F90,build/world/trigger_event39.bin,world,0x08030F84 TriggerEvent39
+0x08030F90,0x08031004,build/world/reset_map_view.bin,world,0x08030F90 ResetMapView
 0x080311DC,0x08031204,build/ui/clear_map_window.bin,ui,0x080311DC ClearMapWindow
+0x08031294,0x08031318,build/world/refresh_score_digits.bin,world,0x08031294 RefreshScoreDigits
 0x08031318,0x08031328,build/world/get_record_node_by_id.bin,world,"0x08031318 GetRecordNodeById (+2 bayt hizalama dolgusu, ROM'da 0000)"
 0x08031328,0x08031388,build/ui/clear_map_window_dma.bin,ui,0x08031328 ClearMapWindowDma
 0x08031388,0x080313E0,build/world/init_session_attr.bin,world,0x08031388 InitSessionAttr
@@ -124,12 +134,14 @@ start,end,binary,module,notes
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
+0x080320E0,0x0803214C,build/ui/init_menu_session.bin,ui,0x080320E0 InitMenuSession
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
 0x0803376C,0x0803378C,build/world/zero_three_flags.bin,world,uc bayragi sifirlama
 0x0803378C,0x08033798,build/world/wrap_0803378c.bin,world,kucuk fonksiyon hasadi
 0x0803379C,0x080337A8,build/world/wrap_0803379c.bin,world,kucuk fonksiyon hasadi
 0x080337A8,0x08033820,build/world/stop_audio_dma.bin,world,0x080337A8 StopAudioDmaOnCartFlag
 0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
+0x0803385C,0x08033890,build/world/alloc_from_counter.bin,world,0x0803385C AllocFromCounter
 0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,kucuk fonksiyon hasadi
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
@@ -149,6 +161,7 @@ start,end,binary,module,notes
 0x0803C45C,0x0803C47C,build/world/select_word_source.bin,world,kaynak secip yarim soz okuma
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Uc yuva secici; SlotCD ve GetSubValue ortak kuyrukta birlesiyor
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Bes yuva sorgusu: sabit, aktif yuva, olcek adimi, hedef isaretleme"
+0x0803C62C,0x0803C698,build/world/is_player_actor_ready.bin,world,0x0803C62C IsPlayerActorReady (+2 dolgu)
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,12 baytlik paketi gRam0202F360'a kopyalayip iletir
@@ -160,6 +173,7 @@ start,end,binary,module,notes
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
+0x080424EC,0x08042574,build/world/find_random_tile_of_kind.bin,world,FindRandomTileOfKind
 0x08042784,0x08042790,build/world/wrap_08042784.bin,world,kucuk fonksiyon hasadi
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,kucuk fonksiyon hasadi
 0x0804AEAC,0x0804B088,build/world/band_0804aeac.bin,world,Aktor hedef secimi; baglantili aday ya da sekizgen mesafeyle yakin olan.
@@ -189,6 +203,7 @@ start,end,binary,module,notes
 0x08051540,0x080515D0,build/core/adjust_area_position.bin,core,Alan derinligi degisiminde konum ofsetini duzeltir
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Dunya nesnesinin kare adimi: sayac, yikim, yuva ayirma, kayit kurulumu."
 0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
+0x08054F1C,0x08055054,build/world/is_near_any_actor.bin,world,0x08054F1C IsNearAnyActor (+2 dolgu)
 0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
 0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Konumu dort komsu ofsette sinar
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Sirali dugum arama ve kimlik siniflandirma

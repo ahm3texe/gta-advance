@@ -23,7 +23,7 @@ extern u8    gFlagsA[ENTRY_COUNT];
 extern u8    gFlagsB[ENTRY_COUNT];
 extern Block gBlockTable[ENTRY_COUNT];
 
-extern void FUN_08013abc(void *block);
+extern void ReleaseObject(void *block);
 
 /* 0x08031D24 */
 u32 AnyPairSet(void)
@@ -51,7 +51,7 @@ void ClearAllBlocks(void)
 
     do {
         if (gFlagsA[i] != 0) {
-            FUN_08013abc((u8 *)gBlockTable + off);
+            ReleaseObject((u8 *)gBlockTable + off);
             gFlagsA[i] = 0;
         }
         off += BLOCK_STRIDE;

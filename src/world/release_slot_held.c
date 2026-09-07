@@ -16,7 +16,7 @@
 #define OFF_HELD     0x58           /* blok basi; eleman ici +0x1C */
 #define OFF_FLAG     0xEC           /* blok basi; eleman ici +0xB0 */
 
-extern void FUN_08013abc(u8 *sub);
+extern void ReleaseObject(u8 *sub);
 
 /* 0x08031658 */
 void ReleaseSlotHeld(u32 index)
@@ -33,6 +33,6 @@ void ReleaseSlotHeld(u32 index)
         return;
 
     heldBase = base + OFF_HELD;
-    FUN_08013abc(heldBase + scaled);
+    ReleaseObject(heldBase + scaled);
     *flag = 0;
 }

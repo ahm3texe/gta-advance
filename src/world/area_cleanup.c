@@ -94,7 +94,7 @@ typedef struct Progress {
 
 extern u32      gRam02026E80;
 
-extern void FUN_08013abc(u32 *block);
+extern void ReleaseObject(u32 *block);
 
 /* 0x08030CB4 */
 void CleanupAreaTiles(void)
@@ -113,6 +113,6 @@ void CleanupAreaTiles(void)
         i++;
     } while (i <= TILE_RUN - 1);
 
-    FUN_08013abc(block);
+    ReleaseObject(block);
     ((Progress *)gRam02025810)->pendingCleanup = 0;
 }

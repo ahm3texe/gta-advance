@@ -143,8 +143,8 @@ Boşluksuz, tam ardışık on iki sözcük. Hepsi yalnız `ldr`/`str`.
 | +0x1120 | 2 | 3 | FUN_08029c20, FUN_0802df18 | Orta |
 | +0x1124 | 2 | 3 | FUN_0802df18, FUN_0802e9e4 | Orta |
 | +0x1128 | 6 | 9 | FUN_0802e048, FUN_0802f55c, **FUN_08031034** | Yüksek |
-| +0x112C | 4 | 6 | FUN_0802b01c, FUN_0802ead4, **FUN_08030f90** | Yüksek |
-| +0x1130 | 5 | 5 | FUN_080296a0, FUN_0802e048, **FUN_08030f90** | Yüksek |
+| +0x112C | 4 | 6 | FUN_0802b01c, FUN_0802ead4, **ResetMapView** | Yüksek |
+| +0x1130 | 5 | 5 | FUN_080296a0, FUN_0802e048, **ResetMapView** | Yüksek |
 | +0x1134 | 1 | 3 | FUN_0802b01c | Düşük |
 | +0x1138 | 2 | 3 | FUN_0802af40, **FUN_08030d4c** | Orta |
 | +0x113C | 3 | 4 | FUN_0802af40, FUN_0802e9e4, **FUN_08031204** | Orta |
@@ -162,12 +162,12 @@ bir grafik yordamına geçiriliyor. 0x114C–0x134C tam **0x200 = 512 bayt**.
 | Ofset | Gen. | İşaret | Fn | Erişim | Örnek fonksiyonlar | Güven |
 |---|---|---|---|---|---|---|
 | +0x134C | W | U | 4 | 6 | FUN_080296a0, FUN_08029918, FUN_08029e44 | Yüksek |
-| +0x1358 | W | U | **30** | 32 | **StepThenCheck**, FUN_08030d84, FUN_08030f90 | **Çok yüksek** |
+| +0x1358 | W | U | **30** | 32 | **StepThenCheck**, FUN_08030d84, ResetMapView | **Çok yüksek** |
 | +0x135C | W | U | 2 | 2 | FUN_080296a0, FUN_0802b01c | Düşük |
 | +0x1360 | W | U | **28** | 38 | FUN_08030458, **FUN_08030d4c**, **FUN_08030db4** | **Çok yüksek** |
-| +0x1364 | W | U | 7 | 8 | FUN_08029918, FUN_0802e048, **FUN_08030f90** | Yüksek |
-| +0x1368 | W | U | 5 | 6 | FUN_0802df18, FUN_0802ead4, **FUN_08030f90** | Yüksek |
-| +0x136C | W | U | 5 | 5 | FUN_0802b01c, FUN_0802e048, **FUN_08030f90** | Yüksek |
+| +0x1364 | W | U | 7 | 8 | FUN_08029918, FUN_0802e048, **ResetMapView** | Yüksek |
+| +0x1368 | W | U | 5 | 6 | FUN_0802df18, FUN_0802ead4, **ResetMapView** | Yüksek |
+| +0x136C | W | U | 5 | 5 | FUN_0802b01c, FUN_0802e048, **ResetMapView** | Yüksek |
 | +0x1370 | H | U | 1 | 3 | FUN_08029e44 | Düşük |
 | +0x1373 | B | U | 2 | 6 | FUN_080296a0, FUN_0802eb50 | Orta |
 | +0x1374 | B | U | 2 | 2 | FUN_0802f55c, **FUN_080310c0** | Orta |
@@ -175,7 +175,7 @@ bir grafik yordamına geçiriliyor. 0x114C–0x134C tam **0x200 = 512 bayt**.
 | +0x1376 | B | U | 2 | 4 | FUN_080296a0, FUN_08029e44 | Orta |
 | +0x1377 | B | U | 2 | 3 | FUN_08029e44, FUN_08032318 | Orta |
 | +0x1378 | W | U | 3 | 3 | FUN_080296a0, FUN_0802e3fc, FUN_0802f55c | Orta |
-| +0x137C | B | U | 4 | 9 | FUN_0802de70, FUN_0802ead4, **FUN_08030f90** | Yüksek |
+| +0x137C | B | U | 4 | 9 | FUN_0802de70, FUN_0802ead4, **ResetMapView** | Yüksek |
 | +0x137D | B | U | 2 | 8 | **BumpStepCounter**, FUN_08029e44 | Yüksek |
 | +0x137E | B | U | 2 | 5 | **CleanupAreaTiles**, ShowLevelBadge | Yüksek |
 | +0x1380 | H | U | 4 | 6 | FUN_08029c20, FUN_0802af40, FUN_0802df18 | Yüksek |

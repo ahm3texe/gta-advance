@@ -39,7 +39,7 @@ extern Entry gRam020251EC[20];
 extern Entry gRam02025280[20];
 extern Entry gRam020246F0[20];
 
-extern void FUN_08013abc(u32 *block);
+extern void ReleaseObject(u32 *block);
 
 /* 0x08028C48 */
 u32 IsEntryActive(u32 index)
@@ -65,7 +65,7 @@ u32 ReleaseEntry(Owner *owner, u32 index)
     if (entry->active == 0)
         return 0;
 
-    FUN_08013abc(&entry->unk04);
+    ReleaseObject(&entry->unk04);
     entry->active = 0;
     entry->unk8C = 0;
     owner->flags &= ~OWNER_MASK;
@@ -91,7 +91,7 @@ u32 ClearEntry(u32 idx)
     if (entry->active == 0)
         return 0;
 
-    FUN_08013abc(&entry->unk04);
+    ReleaseObject(&entry->unk04);
     entry->active = 0;
     entry->unk8C = 0;
     entry->unk02 = 0;
