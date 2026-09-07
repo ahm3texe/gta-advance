@@ -50,31 +50,15 @@
  */
 
 #include "gba_types.h"
+#include "session.h"
 #include "ram_symbols.h"
 
 /* Kayit tamponundan blogun +0x60'ina tasinan 36 baytlik kume.  Icerigi
  * bilinmiyor; yalnizca boyutu olculdu (uc ldmia/stmia cifti). */
-typedef struct Snapshot {
-    u32 word[9];
-} Snapshot;
-
 /* FUN_0802fd48'in kurdugu kayit: +0x00/+0x02 u16, +0x04 uc sozcuk,
  * +0x10 u32, +0x14 alt kayit, +0x26 u16, +0x28 u8.  Toplam 0x2C
  * (bloktaki iki ornegin arasi: 0x34 - 0x08). */
-typedef struct Record {
-    u8 pad00[0x2C];
-} Record;
-
 /* 0x02026DF0 -- oturum calisma blogu. */
-typedef struct Session {
-    u8       unk00;             /* 0x00 */
-    u8       pad01[3];
-    u32      unk04;             /* 0x04 */
-    Record   unk08;             /* 0x08 */
-    Record   unk34;             /* 0x34 */
-    Snapshot unk60;             /* 0x60 */
-} Session;
-
 /* 0x02000D50 -- kayit tamponu; yerlesim src/world/area_flags.c'den. */
 typedef struct SaveBuffer {
     u8       header[12];        /* 0x00 */

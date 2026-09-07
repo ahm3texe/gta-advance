@@ -1,4 +1,6 @@
 address,size,name,source,status,notes
+0x02000008,2,gRam02000008,decomp,provisional,u16 onbelleklenmis X; 0x08031294 HUD yeniden ciziminde kullaniyor
+0x0200000A,2,gRam0200000A,decomp,provisional,u16 onbelleklenmis Y; 0x08031294 HUD yeniden ciziminde kullaniyor
 0x02000100,32,gRam02000100,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
 0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
 0x02000134,2,gRam02000134,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
@@ -84,6 +86,7 @@ address,size,name,source,status,notes
 0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev  IZLEME: f1508de gNodePool ile ayni karede aktiflesiyor.  PROVISIONAL BIRAKILDI -- DOLAYLI: yalnizca gNodePool ile ayni karede aktiflesmesi gozlendi; kimligi dogrudan kanitlanmadi."
 0x02016288,4,gSortedHead02016288,decomp,provisional,0x0800D530 siralama sirasinda ikinci (sirali) listenin bas isaretcisi; gListHead02016280 ile ayni dugum tipi. ROM ikisini AYRI literal yukluyor.
 0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor
+0x0201AA98,4,gRam0201AA98,decomp,provisional,16 baytlik girislerden olusan bir tabloya ISARETCI; 0x0800DB60 indisi 400 ile sinirliyor.
 0x0201AAA0,4,gBufferA0201AAA0,decomp,provisional,FUN_080100D0 0x1000 baytlik ayirma sonucunu buraya yaziyor.
 0x0201AAA4,4,gBufferStateB0201AAA4,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumunda sifirlanan durum kelimesi.
 0x0201AAA8,4,gBufferStateA0201AAA8,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumunda sifirlanan durum kelimesi.
@@ -112,22 +115,32 @@ address,size,name,source,status,notes
 0x02025280,592,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime; boyut 2960->1424 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)  DUZELTME: 1424 degeri yanlisti. 0x08023CC4 yalniz 4 x 148 = 592 bayt sifirliyor ve sonraki sembol (gRam020254D0) tam 592 bayt sonra basliyor."
 0x020254D0,740,gRam020254D0,decomp,provisional,5 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
 0x02025800,4,gRam02025800,decomp,provisional,28 baytlik kayit tablosuna (gRom08852A2C) indeks; 0 ise islem atlaniyor. 0x08063E7C ve 0x08063EAC okuyor.
-0x02025810,5006,gRam02025810,decomp,provisional,"Oyuncu ilerleme blogu. Boyut EN AZ 0x138E: 0x0802DFF4 taban + 0x138D ile strb yapiyor. ONCE 8 kayitliydi, sonra 4990 yazildim -- ikisi de eksikti; kanit her seferinde ROM literal havuzunda YALNIZ tabanin olmasi. +0x14 gorevden cikma ucreti; +0x137D adim sayaci uyari bayragi."
+0x02025810,5008,gRam02025810,decomp,verified,"Oyuncu ilerleme blogu, boyut 0x1390 = 5008. KANIT: 0x080296B8 Memset(gRam02025810, 0, 0x1390) cagiriyor; 0x1390 sabiti ROM'da 4-bayt hizali kelime olarak TAM OLARAK BIR KEZ geciyor, yani hem alt hem UST sinir. Yerlesim /tmp/gram02025810_layout.md: 0x00-0x3B skalerler, 0x3C'de 24x180 baytlik yuva dizisi (0x3C+24*180 = 0x111C ile tam kapaniyor), 0x111C'de 12 u32, 0x114C'de 512 baytlik tampon (0x114C+0x200 = 0x134C), 0x134C-0x138D sayac/bayraklar. Boyut daha once 8, 4990 ve 5006 diye UC KEZ yanlis kaydedildi; ilk ikisi benim eksik olcumumdu, ucuncusu tek erisimden cikarimdi."
 0x02025818,2,mission_timer,libretro_cheat,verified,"IZLEME (hareketsiz sinamasi, oturum 5): AD DOGRU, zamanlayici. Oyuncu HIC tusa basmadan 30 kez, her seferinde tam 0x100 artti; aralik 60-65 kare (ort. 63.9), yani ~64 karede bir tik. ONCEKI ""mesafe sayaci"" iddiam CURUTULDU -- o oturumlarda Up surekli basili oldugu icin artislar tusla ayni anda gorunuyordu, nedensellik degil rastlanti. Sinematikteki 481 karelik durus da beklenen davranis: gorev zamani sinematikte duruyor."
 0x0202581A,1,wanted_level_display,libretro_cheat,verified,"IZLEME (oturum 8): AD DOGRU. Polis arabasina carpinca 0->1, tutuklanmada 1->0. wanted_level_true (gRam02030330+0x10) ile AYNI KAREDE ayni degeri aliyor -- ikisi ayri adres ama ayni degeri tasiyor, biri gosterge kopyasi."
 0x0202581C,4,money_display_or_copy_0,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025824,4,money_display_or_copy_1,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025828,1,player_armor_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
 0x0202582A,1,player_health_copy,libretro_cheat,verified,"Possible HUD/game-state mirror  IZLEME (oturum 6): player_health ile AYNI KAREDE ayni degeri aldi, 25/25 gecis. Gercekten kopya."
+0x02026BA0,0,gRam02026BA0,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
+0x02026BE0,0,gRam02026BE0,decomp,provisional,u8; 0x08030EAC (LoadHudPalettes) girisinde sifirlaniyor.
+0x02026C10,0,gRam02026C10,decomp,provisional,"u32 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
+0x02026C90,0,gRam02026C90,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
 0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
+0x02026D90,4,gRam02026D90,decomp,provisional,u32 kapi; 0x08031294 HUD yeniden cizimini bu deger uzerinden geciriyor
+0x02026DA0,4,gRam02026DA0,decomp,provisional,"0x08031388 kullaniyor; en yakin kayitli semboller (0x02026CD0, 0x02026DF0) bu adresi kapsamiyor"
 0x02026DF0,132,gRam02026DF0,decomp,provisional,"FUN_08030E10 icinde kullaniliyor; en az 0x84 bayt oldugu olculdu, ust siniri BILINMIYOR. src/world/area_cleanup_b1.c basliginda ayrintisi var."
 0x02026E80,4,gRam02026E80,decomp,provisional,0x08030CB4 temizliginde FUN_08013abc ile serbest birakilan blok
 0x02026EF0,8,gFlagsB,decomp,provisional,8 girisli bayrak dizisi
 0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
 0x02026F38,8,gFlagsA,decomp,provisional,8 girisli bayrak dizisi
+0x02026F40,0,gRam02026F40,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
+0x02026F80,0,gRam02026F80,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
 0x02026FE0,576,gBlockTable,decomp,provisional,8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik
+0x02027230,0,gRam02027230,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
 0x020272C8,4,gRam020272C8,decomp,provisional,Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor
 0x02027310,4,gRam02027310,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
+0x02027314,1,gRam02027314,decomp,provisional,0x080337A8 gCartFlag degerinin kopyasini buraya yaziyor.
 0x02027320,4,gRam02027320,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
 0x02027344,264,gAddrTable,decomp,provisional,6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi
 0x02027EE0,1,gRam02027EE0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u8 durum alani
@@ -220,12 +233,15 @@ address,size,name,source,status,notes
 0x0400002A,2,gRegBg2XHigh,decomp,verified,GBA BG2X referans koordinatinin ust yarisi
 0x0400002E,2,gRegBg2YHigh,decomp,verified,GBA BG2Y referans koordinatinin ust yarisi
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
+0x083444E8,0,gRom083444E8,decomp,provisional,ROM verisi; 0x08031388 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
 0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM dizisi: uc bos alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
 0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM dizisi: uc ozel alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
 0x08852A1C,16,gRom08852A1C,decomp,provisional,"ROM: dort s32, degerler OLCULDU {-128, 128, -384, 384}. 0x080651E0 bunlari yerel diziye kopyalayip sonda noktalarinin kimlik ofseti olarak kullaniyor."
 0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
 0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
+0x08CA45CC,0,gRom08CA45CC,decomp,provisional,ROM verisi; 0x08019620 (id - 0x4000) ile u16 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
 0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). StepEntryPhase icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
+0x08CA635C,0,gRom08CA635C,decomp,provisional,ROM verisi; 0x08031388 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
 0x08CAA3E4,0,gRomAsset08CAA3E4,decomp,provisional,ROM varlik isaretcisi; 0x08051154 bunu FUN_08036cac cagrisina veriyor ve donen isaretciyi gRam020303C4e yaziyor. Boyut BILINMIYOR.
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
 0x08D482E0,0,gAreaNames,decomp,provisional,"ROM alan adi tablosu. gAreaBank (0x08D49C00) +0x20 alani bu diziye isaret ediyor. Boyut BILINMIYOR (0). DIZI olarak bildirilmeli: src/core/nodelist_b9.c olcumune gore `extern const AreaName gAreaNames[];` gercek ARRAY_REF uretiyor, isaretci sabiti bicimi ROM ile ayni kodu vermiyor."

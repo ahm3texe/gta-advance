@@ -28,7 +28,7 @@ extern u32 gEepromAvailable;
 
 /* Kayit G/C bolgesine giris/cikis (WAITCNT ve benzeri kurulum); adlari
  * data/functions.csv'de henuz cozulmedi. */
-extern void FUN_080337a8(void);
+extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_08033b74(void);
 
 /* EEPROM tanimlama ve tek blok okuma; ikisi de sifirdan farkli bir u16 ile
@@ -54,7 +54,7 @@ u32 ReadEepromRange(u32 offset, u8 *dest, s32 length)
     s32 skip;
     s32 i;
 
-    FUN_080337a8();
+    StopAudioDmaOnCartFlag();
 
     /* Ofset yerinde blok indeksine cevrilir. Ayri bir `block` degiskeni
      * kullanilinca agbcc onu once r4'e alip r8'e kopyaliyor; ROM ofseti

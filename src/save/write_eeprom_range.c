@@ -40,7 +40,7 @@ extern u32 gEepromAvailable;
 
 /* Kayit G/C bolgesine giris/cikis; adlari data/functions.csv'de henuz
  * cozulmedi. */
-extern void FUN_080337a8(void);
+extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_08033b74(void);
 
 /* EEPROM tanimlama ve tek blok programlama; ikisi de sifirdan farkli bir
@@ -71,7 +71,7 @@ u32 WriteEepromRange(u32 offset, const u8 *src, u32 length)
     u16 err;
     u32 result;
 
-    FUN_080337a8();
+    StopAudioDmaOnCartFlag();
 
     /* `length` isaretsiz olmali: ROM (length-1)/8'i `lsrs` ile yapiyor,
      * isaretli olsaydi `asrs` cikardi (kural 13). Blok sayisi ise isaretli,

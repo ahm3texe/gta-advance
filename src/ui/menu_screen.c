@@ -169,7 +169,7 @@ extern void  FUN_08063d3c(void);
 extern void  FUN_080353bc(void);
 extern void  FUN_08031e44(void);
 extern void  FUN_080081d4(int mode);
-extern void  FUN_08030b34(void);
+extern void  SendTextMode1(void);
 extern void  FUN_08030b1c(int amount);
 extern u32   IsSessionActive(void);
 extern void  FUN_08004f74(int which);
@@ -209,21 +209,21 @@ void RunMenuScreen(int mode)
         switch (mission->subtype) {
         case 17: case 21: case 25: case 35: case 47: case 56: case 57:
             GetTextString(MSG_MISSION_BUSY);
-            FUN_08030b34();
+            SendTextMode1();
             return;
         default:
             if (mode == 13 || mode == 15) {
                 GetTextString(MSG_QUIT_MISSION);
-                FUN_08030b34();
+                SendTextMode1();
             } else {
                 if (((Progress *)gRam02025810)->cash <= QUIT_MISSION_FEE - 1) {
                     GetTextString(MSG_NEED_CASH);
-                    FUN_08030b34();
+                    SendTextMode1();
                     return;
                 }
                 FUN_08030b1c(-QUIT_MISSION_FEE);
                 GetTextString(MSG_NO_SAVE);
-                FUN_08030b34();
+                SendTextMode1();
             }
             FUN_080081d4(mode);
             return;

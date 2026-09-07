@@ -32,7 +32,7 @@ typedef struct Record {
 extern void VBlankIntrWait(void);
 extern void FUN_08006210(void);
 extern u32  FUN_08004100(void);
-extern void FUN_08031328(void);
+extern void ClearMapWindowDma(void);
 extern void FUN_080125b4(void);
 extern void FUN_08012618(void);
 
@@ -59,7 +59,7 @@ void RunKind6HooksA(void)
 
     index = gRam02025800;
     if (index != 0 && gRom08852A2C[index].kind == RECORD_MATCH) {
-        FUN_08031328();
+        ClearMapWindowDma();
         FUN_080125b4();
     }
 }

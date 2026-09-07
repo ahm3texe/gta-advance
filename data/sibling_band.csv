@@ -28,11 +28,11 @@ address,name,size,outcome,source,evidence
 0x08023868,FUN_08023868,196,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
 0x08029518,FUN_08029518,392,parked,,ROM statik triyaj: 2 cagri / 1 kosullu dal / 19 literal; RAM tur blogu gerekli
 0x080306C8,FUN_080306c8,384,parked,,ROM statik triyaj: 9 cagri / 9 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
-0x08030EAC,FUN_08030eac,124,parked,,ROM statik triyaj: 1 cagri / 0 kosullu dal / 11 literal; RAM tur blogu gerekli
+0x08030EAC,LoadHudPalettes,124,matching,src/ui/load_hud_palettes.c,ROM byte-matching; data/functions.csv
 0x08031C10,ReplaceNibbleField,136,matching,src/world/nibble_replace.c,ROM byte-matching
-0x08031C98,FUN_08031c98,140,parked,,ROM statik triyaj: 1 cagri / 1 kosullu dal / 7 literal; RAM dizi tur blogu gerekli
+0x08031C98,PushSlotQueueEntry,140,matching,src/world/push_slot_queue_entry.c,ROM byte-matching; data/functions.csv
 0x08033674,FUN_08033674,120,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x080337A8,FUN_080337a8,120,parked,,ROM statik triyaj: 1 cagri / 2 kosullu dal / 9 literal; RAM tur blogu gerekli
+0x080337A8,StopAudioDmaOnCartFlag,120,matching,src/world/stop_audio_dma.c,ROM byte-matching; data/functions.csv
 0x08035BA8,FUN_08035ba8,300,parked,,ROM statik triyaj: 5 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08037D98,FUN_08037d98,228,parked,,ROM statik triyaj: 6 cagri / 13 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
 0x08038108,FUN_08038108,154,parked,,ROM statik triyaj: 7 cagri / 5 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli

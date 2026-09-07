@@ -106,7 +106,7 @@ extern void InitSaveManager(void);
 extern void FUN_08005fa8(void);
 extern void FUN_0800858c(void);
 extern void FUN_08002600(u32 arg);
-extern void FUN_080337a8(void);
+extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_0803004c(void);
 extern void FUN_0805b1c0(s32 arg);
 extern void ZeroHistory(void);
@@ -237,7 +237,7 @@ void GameInit(void)
             FUN_0800858c();
         FUN_08002600(pending);
         pending = 0;
-        FUN_080337a8();
+        StopAudioDmaOnCartFlag();
         FUN_0803004c();
         FUN_0805b1c0(0);
         ZeroHistory();
@@ -304,7 +304,7 @@ void GameInit(void)
             FUN_0802fe44();
             FUN_08063d3c();
             *(vu16 *)REG_IME_ADDR = 0;
-            FUN_080337a8();
+            StopAudioDmaOnCartFlag();
             first = 0;
         } while (gLoopState != 1 && IsSessionActive() == 0);
 

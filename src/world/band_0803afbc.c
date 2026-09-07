@@ -4,7 +4,7 @@
  *
  * NE YAPIYOR: gRam02000F08'in gosterdigi baglam icin "sahne gecisi"
  * adimi.  Once bes kapi var (bayrak +0xAE bit 1, mesgul bayragi +0x08 ve
- * uc FUN_08019620 sorgusu 0x400C / 0x4009 / 0x400B); herhangi biri
+ * uc ActorIdMatches sorgusu 0x400C / 0x4009 / 0x400B); herhangi biri
  * tutarsa hicbir sey yapmadan cikiyor.  Ardindan dugumun (+0x1C)
  * durumuna gore bir bekleme esigi seciyor (durum 8/9 -> 18, 10 -> 24) ve
  * +0xB8'deki adim sayaci sifirdan buyuk ama esigin altindaysa yine
@@ -178,7 +178,7 @@ extern u8    gGameState[];
 extern u8    gRam02000F00;
 extern s16   gSlotSelector;
 
-extern u32  FUN_08019620(Entity *entry, u32 query);
+extern u32  ActorIdMatches(Entity *entry, u32 query);
 extern void FUN_08035058(Entity *entry, u32 id);
 extern void FUN_08035f1c(Entity *entry);
 extern void FUN_0803a554(u32 index, s32 speed, u32 arg3);
@@ -201,11 +201,11 @@ void FUN_0803afbc(void)
         return;
     if (gRam02000F08->busy != 0)
         return;
-    if (FUN_08019620(gSessionPtr->entry, QUERY_A) != 0)
+    if (ActorIdMatches(gSessionPtr->entry, QUERY_A) != 0)
         return;
-    if (FUN_08019620(gSessionPtr->entry, QUERY_B) != 0)
+    if (ActorIdMatches(gSessionPtr->entry, QUERY_B) != 0)
         return;
-    if (FUN_08019620(gSessionPtr->entry, QUERY_C) != 0)
+    if (ActorIdMatches(gSessionPtr->entry, QUERY_C) != 0)
         return;
 
     switch (gRam02000F08->node->state) {

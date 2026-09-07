@@ -45,7 +45,7 @@ extern u16 gState3;
 
 /* Kayit G/C bolgesine giris/cikis (WAITCNT ve benzeri kurulum); adlari
  * data/functions.csv'de henuz cozulmedi. */
-extern void FUN_080337a8(void);
+extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_08033b74(void);
 
 /* EEPROM tanimlama: sifirdan farkli bir u16 ile hata bildirir. */
@@ -80,7 +80,7 @@ u32 InitSaveManager(void)
     s32 complementBias;
     int i;
 
-    FUN_080337a8();
+    StopAudioDmaOnCartFlag();
 
     gState0 = 0;
     gState1 = 0;

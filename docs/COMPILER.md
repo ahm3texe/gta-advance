@@ -1077,3 +1077,60 @@ Yeniden üretim: `python3 tools/probe_sio_tx.py`. Araç kaynak dosyasını
 değiştirmeden üç adayı geçici dizinde derler, `diff_function.py` ile aynı
 skoru hesaplar ve dış çağrı hedef/adetlerinin değişmediğini doğrular.
 Tam eşleşme kapısı hâlâ `make c-match FILE=src/world/sio_driver.c`.
+
+## Kural 65 — Donanım adresi: mutlak makro CSE görmez, işaretçi değişkeni görür
+
+Aynı adres iki farklı biçimde yazıldığında agbcc'nin ürettiği kod
+farklıdır, çünkü **adres sabitinin sözde-yazmaç olup olmadığı**
+değişir:
+
+* `#define R (*(vu16 *)0x04000008)` → adres bir MEM adresi olarak kalır,
+  ortak alt ifade eleme (CSE) onu görmez, kendi havuz girişini alır.
+* `vu16 *p = (vu16 *)0x04000008;` → adres bir sözde-yazmaça girer; yakın
+  bir başka sabit varsa CSE onu ondan türetir.
+
+Ölçüm (`0x080127A8`, SetupBg0Bg1): fonksiyon önce `REG_DISPCNT`
+(0x04000000, `movs #128 / lsls #19` ile üretiliyor), sonra BG0CNT
+(0x04000008) yazıyor. İşaretçi değişkeni kullanıldığında agbcc ikincisini
+`adds r1,#8` diye türetti ve havuzdaki `0x04000008` girişi kayboldu
+(80 bayt, ROM 84). Mutlak makroyla fark sıfır.
+
+Bu **CSE'yi kapatmak** demek değil: aynı ROM BG1CNT'yi (0x0400000A)
+kendiliğinden taban+2 olarak üretiyor. Belirleyici olan CSE'nin
+yapılıp yapılmaması değil, **nereden türetildiği**.
+
+Tersi de geçerli — bkz. kural 66: ROM taban+uzaklık adreslemesi
+gösteriyorsa (`strh r0,[r1,#10]`) mutlak makro işe yaramaz, çünkü makro
+uzaklığı adres sabitine katlar ve havuza yanlış kelimeyi koyar.
+
+## Kural 66 — `volatile struct` üyesine yazmak fazladan bir okuma üretir
+
+`include/gba_io.h`'daki `REG_DMA1.control` biçimi (yani
+`(*(volatile DmaRegs *)ADDR).control = ...`) **her yazımdan önce
+fazladan bir volatile okuma** üretiyor. Aynı işi `vu16 *` taban +
+indisle yapmak üretmiyor.
+
+Ölçüm (`0x080337A8`, StopAudioDmaOnCartFlag; kanal başına 2 yazım):
+
+| yazım | okuma/yazma | aynı komut |
+|---|---|---:|
+| `REG_DMA1.control = M & REG_DMA1.control;` | 5 okuma / 2 yazma | 48/63 |
+| `v = REG_DMA1.control; REG_DMA1.control = M & v;` | 5 okuma / 2 yazma | 48/63 |
+| `REG_DMA1.control &= M;` | 5 okuma / 2 yazma | 48/63 |
+| `p1[5] = M & p1[5];` (`vu16 *p1`) | **3 okuma / 2 yazma** | **eşleşme** |
+
+ROM'da 3 okuma / 2 yazma var. Üç struct yazımının da aynı skoru vermesi,
+farkın kaynak yazımından değil **görünüm tipinden** geldiğini gösteriyor.
+
+`((vu16 *)0x040000BC)[5]` **makrosu** çözüm değil: makro `+10`'u adres
+sabitine katlayıp havuza `0x040000C6` koyuyor ve uzaklık 0 oluyor;
+ROM'da taban `0x040000BC`, uzaklık 10. Yani taban bir **işaretçi
+değişkeni** olmalı.
+
+İki kanal varken iki ayrı değişken gerekir ve **ikincisi kendi kullanım
+yerinde atanmalıdır**:
+
+* ikisi de başta atanırsa iki havuz yüklemesi de fonksiyon başına
+  toplanıyor (ROM ikincisini kullanım yerinde yüklüyor),
+* tek değişkene iki kez atanırsa agbcc ikinciyi birincinin +12'si diye
+  türetiyor (`adds r4,#12`) — kural 65'in aynısı.
