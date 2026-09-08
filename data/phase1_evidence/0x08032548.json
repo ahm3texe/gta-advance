@@ -1,0 +1,17 @@
+{
+  "address": "0x08032548",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_32548.c",
+      "sha256": "4e104b1fc084e05c130636c05c1b859c02308d26b062fa458e7fc6e6a00af6d2",
+      "compiled_size": 68,
+      "mapped_size": 68,
+      "same": 34,
+      "total": 34,
+      "matching": true,
+      "code": "/* Iki tablo imlecini ilerletip 16-bit soz uret — 0x08032548.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08032548.json. */\n#include \"gba_types.h\"\n\nextern u32 gRam02027300, gRam020272F8, gRam020272F4;\nextern const u8 gRom08CA6608[];\nu32 FUN_08032548(void)\n{\n    u32 high,low;\n    high = (gRam02027300 + 3) & 1023;\n    gRam02027300 = high;\n    low = (gRam020272F8 + 1) & 1023;\n    gRam020272F8 = low;\n    gRam020272F4++;\n    return (gRom08CA6608[high] << 8) | gRom08CA6608[low];\n}\n"
+    }
+  ]
+}

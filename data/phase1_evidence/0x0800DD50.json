@@ -1,0 +1,17 @@
+{
+  "address": "0x0800DD50",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_0dd50.c",
+      "sha256": "5b2f1f46b5ac9d40a412766929c1e1c6ab1bea957317c8e3396317392a0c8246",
+      "compiled_size": 52,
+      "mapped_size": 52,
+      "same": 26,
+      "total": 26,
+      "matching": true,
+      "code": "/* Kesmeleri saklayarak DMA32 sifir dolgusu — 0x0800DD50.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0800DD50.json. */\n#include \"gba_types.h\"\n#include \"gba_io.h\"\n\nextern u32 gRam0201AA80[];\nvoid FUN_0800dd50(void)\n{\n    volatile u32 zero;\n    u16 ime = REG_IME;\n    REG_IME = 0;\n    zero = 0;\n    REG_DMA3.src = (const void *)&zero;\n    REG_DMA3.dst = gRam0201AA80;\n    REG_DMA3.control = 0x85000000 | 3;\n    REG_DMA3.control;\n    REG_IME = ime;\n}\n"
+    }
+  ]
+}

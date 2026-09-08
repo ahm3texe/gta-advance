@@ -1,0 +1,17 @@
+{
+  "address": "0x080134A4",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_134a4.c",
+      "sha256": "c100a4225939ef55f0d730af742026c2d36b8148ce7d40510344fecc810f4120",
+      "compiled_size": 84,
+      "mapped_size": 84,
+      "same": 42,
+      "total": 42,
+      "matching": true,
+      "code": "/* Cift bagli 31 bos dugumun listesini kur — 0x080134A4.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080134A4.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1NodePool gRam02022AC0;\nvoid FUN_080134a4(void)\n{\n    Phase1ListNode *node;\n    s32 id;\n    gRam02022AC0.free = &gRam02022AC0.nodes[1];\n    gRam02022AC0.used = 0;\n    node = &gRam02022AC0.nodes[1];\n    node->next = node + 1;\n    node->previous = 0;\n    node->id = 1;\n    node++;\n    for (id = 2; id <= 30; id++, node++) {\n        node->previous = node - 1;\n        node->next = node + 1;\n        node->id = id;\n    }\n    node->previous = node - 1;\n    node->next = 0;\n    node->id = id;\n}\n"
+    }
+  ]
+}

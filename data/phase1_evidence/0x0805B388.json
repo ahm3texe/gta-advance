@@ -1,0 +1,41 @@
+{
+  "address": "0x0805B388",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_5b388.c",
+      "sha256": "c2daa67d07ab6cda468f59d882fcabcb7aeaa043dd31c46dbb73dfc5761f8a79",
+      "compiled_size": 130,
+      "mapped_size": 130,
+      "same": 45,
+      "total": 60,
+      "matching": false,
+      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nstatic inline Phase1GroupedActor *NextMember(Phase1GroupedActor *actor,s32 *cursor)\n{\n    Phase1RecordGroup *group = actor->group;\n    Phase1GroupedActor *next;\n    if (!(actor->flags & 256)) {\n        if (*cursor != 0) return 0;\n        *cursor = 1;\n        next = actor;\n    } else if (*cursor < group->count) {\n        next = GetOrCreateRecordNode(group->ids[*cursor]);\n        (*cursor)++;\n    } else next = 0;\n    return next;\n}\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *actor = FindFreeNode(id);\n    Phase1GroupedActor *member;\n    s32 cursor;\n    if (!actor) return 0;\n    actor->flags &= 0xfeffffff;\n    if (actor->flags & 256) {\n        cursor = 0;\n        if (!FUN_08056508(actor)) return 0;\n        while ((member = NextMember(actor,&cursor)) != 0)\n            member->flags &= 0xfeffffff;\n    }\n    return 1;\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Dongudeki sahip ile son uyeyi ayir; iteratoru govdede ifade et",
+      "source": "src/world/p1_5b388.c",
+      "sha256": "0cdae11e61de450223fce71806748885bfc2b3134d3da465f6a9aebb235e89b0",
+      "compiled_size": 130,
+      "mapped_size": 130,
+      "same": 55,
+      "total": 60,
+      "matching": false,
+      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                member = GetOrCreateRecordNode(group->ids[cursor]);\n                cursor++;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
+    },
+    {
+      "number": 3,
+      "note": "Sonucu ve kimligi ayri yerellerde tut; sayac artisi sonrasinda uye atamasi",
+      "source": "src/world/p1_5b388.c",
+      "sha256": "416a23514280a62da32d217bcb058aae96916823939bacf538e3143a13426cf2",
+      "compiled_size": 130,
+      "mapped_size": 130,
+      "same": 60,
+      "total": 60,
+      "matching": true,
+      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                u16 id = group->ids[cursor];\n                Phase1GroupedActor *resolved = GetOrCreateRecordNode(id);\n                cursor++;\n                member = resolved;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
+    }
+  ]
+}

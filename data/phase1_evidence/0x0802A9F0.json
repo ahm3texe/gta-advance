@@ -1,0 +1,29 @@
+{
+  "address": "0x0802A9F0",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_2a9f0.c",
+      "sha256": "abb342b30f8c0d52193195cf591561be00964f7d82a3780dfb4b440b735f3c10",
+      "compiled_size": 296,
+      "mapped_size": 296,
+      "same": 130,
+      "total": 141,
+      "matching": false,
+      "code": "/* HUD dakika ve saniye karolarini ciz; kardes DrawTwoDigits sozlugu — 0x0802A9F0.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0802A9F0.json. */\n#include \"gba_types.h\"\n#include \"ram_symbols.h\"\n\nextern s32 Div(s32,s32);\nvoid FUN_0802a9f0(s32 minutes,s32 seconds)\n{\n    s32 digits[8];\n    vu16 *top,*bottom;\n    s32 d,i;\n    if (minutes < 0) minutes = 0;\n    if (seconds < 0) seconds = 0;\n    if (minutes > 99) minutes = 99;\n    if (seconds > 59) seconds = 59;\n    gRam02025810[4] = minutes;\n    gRam02025810[5] = seconds;\n    digits[1] = Div(minutes,10);\n    digits[0] = minutes - digits[1]*10;\n    if (digits[1] == 0) digits[1] = 10;\n    top = (vu16 *)0x60098d4;\n    bottom = (vu16 *)0x6009914;\n    for (i = 0; i < 2; i++) {\n        d = digits[i];\n        if (d == 10) {\n            *top-- = 0xF0E8;\n            *bottom-- = 0xF0E8;\n        } else {\n            *top-- = (248 + d) | 0xF000;\n            *bottom-- = (258 + d) | 0xF000;\n        }\n    }\n    digits[1] = Div(seconds,10);\n    digits[0] = seconds - digits[1]*10;\n    top = (vu16 *)0x60098da;\n    bottom = (vu16 *)0x600991a;\n    for (i = 0; i < 2; i++) {\n        d = digits[i];\n        if (d == 10) {\n            *top-- = 0xF0E8;\n            *bottom-- = 0xF0E8;\n        } else {\n            *top-- = (248 + d) | 0xF000;\n            *bottom-- = (258 + d) | 0xF000;\n        }\n    }\n    *(vu16 *)0x60098d6 = 0xF0ED;\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Iki sayi grubunun sayac omurlerini ayir",
+      "source": "src/world/p1_2a9f0.c",
+      "sha256": "6ca68e2ba663cffc2e29228b4f2683fa7504b992fddc9c6cc67ba791f258e16a",
+      "compiled_size": 296,
+      "mapped_size": 296,
+      "same": 141,
+      "total": 141,
+      "matching": true,
+      "code": "/* HUD dakika ve saniye karolarini ciz; kardes DrawTwoDigits sozlugu — 0x0802A9F0.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0802A9F0.json. */\n#include \"gba_types.h\"\n#include \"ram_symbols.h\"\n\nextern s32 Div(s32,s32);\nvoid FUN_0802a9f0(s32 minutes,s32 seconds)\n{\n    s32 digits[8];\n    vu16 *top,*bottom;\n    s32 d,i,j;\n    if (minutes < 0) minutes = 0;\n    if (seconds < 0) seconds = 0;\n    if (minutes > 99) minutes = 99;\n    if (seconds > 59) seconds = 59;\n    gRam02025810[4] = minutes;\n    gRam02025810[5] = seconds;\n    digits[1] = Div(minutes,10);\n    digits[0] = minutes - digits[1]*10;\n    if (digits[1] == 0) digits[1] = 10;\n    top = (vu16 *)0x60098d4;\n    bottom = (vu16 *)0x6009914;\n    for (i = 0; i < 2; i++) {\n        d = digits[i];\n        if (d == 10) {\n            *top-- = 0xF0E8;\n            *bottom-- = 0xF0E8;\n        } else {\n            *top-- = (248 + d) | 0xF000;\n            *bottom-- = (258 + d) | 0xF000;\n        }\n    }\n    digits[1] = Div(seconds,10);\n    digits[0] = seconds - digits[1]*10;\n    top = (vu16 *)0x60098da;\n    bottom = (vu16 *)0x600991a;\n    for (j = 0; j < 2; j++) {\n        d = digits[j];\n        if (d == 10) {\n            *top-- = 0xF0E8;\n            *bottom-- = 0xF0E8;\n        } else {\n            *top-- = (248 + d) | 0xF000;\n            *bottom-- = (258 + d) | 0xF000;\n        }\n    }\n    *(vu16 *)0x60098d6 = 0xF0ED;\n}\n"
+    }
+  ]
+}

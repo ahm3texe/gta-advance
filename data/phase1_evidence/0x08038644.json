@@ -1,0 +1,53 @@
+{
+  "address": "0x08038644",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_38644.c",
+      "sha256": "0797514f0ba575a8e99c8cbf44de0293671db845c6b1c4b9c0de5cef51186a52",
+      "compiled_size": 60,
+      "mapped_size": 60,
+      "same": 17,
+      "total": 29,
+      "matching": false,
+      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = &gRom08CA7E64[index];\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Tablo tabanini indis hesabindan once ayri ifade olarak al",
+      "source": "src/world/p1_38644.c",
+      "sha256": "82963a9112a3d7e30b4db6e41e73df0f6f2998d2071b4a133819c15b02ffef28",
+      "compiled_size": 60,
+      "mapped_size": 60,
+      "same": 21,
+      "total": 29,
+      "matching": false,
+      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = gRom08CA7E64;\n    model += index;\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
+    },
+    {
+      "number": 3,
+      "note": "Model tablo erisimini dogal inline yardimciyla ifade et",
+      "source": "src/world/p1_38644.c",
+      "sha256": "b402ecf5ad16569a301d5af3eceecf5c0aff255950880e3f8da81e166dca2c00",
+      "compiled_size": 60,
+      "mapped_size": 60,
+      "same": 23,
+      "total": 29,
+      "matching": false,
+      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{ return &gRom08CA7E64[index]; }\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
+    },
+    {
+      "number": 4,
+      "note": "Inline tablo tabanini ayri yerele al; son deneme",
+      "source": "src/world/p1_38644.c",
+      "sha256": "83afd51790ce7e7cef4b1b63693bbcce9750b6b40619272781ba37e714b363ce",
+      "compiled_size": 60,
+      "mapped_size": 60,
+      "same": 23,
+      "total": 29,
+      "matching": false,
+      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{\n    const Phase1Model *table = gRom08CA7E64;\n    return table + index;\n}\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
+    }
+  ]
+}

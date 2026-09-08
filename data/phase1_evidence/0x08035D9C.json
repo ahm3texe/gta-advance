@@ -1,0 +1,17 @@
+{
+  "address": "0x08035D9C",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_35d9c.c",
+      "sha256": "5f7d6510f71b7b836d155e7f6592ffca088292ef6832da38fbc9ed6f1f16f9d4",
+      "compiled_size": 58,
+      "mapped_size": 58,
+      "same": 26,
+      "total": 26,
+      "matching": true,
+      "code": "/* Etkin iki nesneyi serbest birak ve cift kaydini sifirla — 0x08035D9C.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035D9C.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern void ReleaseObject(void *object);\nextern void FUN_08035ebc(Phase1ReleasePair *pair);\nvoid FUN_08035d9c(Phase1ReleasePair *pair)\n{\n    if (pair->active & 1) ReleaseObject(pair);\n    if (pair->active & 2) ReleaseObject(pair->objects + 72);\n    pair->active = 0;\n    FUN_08035ebc(pair);\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0x08035DE4",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_35de4.c",
+      "sha256": "9f11798cdce7d5b3c54e867f6739f0fb043136951089a2e36c20dcaf0bcee335",
+      "compiled_size": 80,
+      "mapped_size": 80,
+      "same": 36,
+      "total": 36,
+      "matching": true,
+      "code": "/* Iki nesneyi ROM tanimlariyla kur — 0x08035DE4.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035DE4.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1RomNode gRom08BD3448;\nextern void FUN_08013cfc(void *,Phase1RomNode *,u32);\nextern void FUN_08014ee4(void *,u32);\nvoid FUN_08035de4(u8 *pair)\n{\n    Phase1RomNode *group = gRom08BD3448.slots[64];\n    Phase1RomNode *desc = group->slots[4]->slots[0];\n    FUN_08013cfc(pair,desc,0);\n    FUN_08014ee4(pair,desc->value);\n    desc = group->slots[5]->slots[0];\n    pair += 72;\n    FUN_08013cfc(pair,desc,0);\n    FUN_08014ee4(pair,desc->value);\n}\n"
+    }
+  ]
+}

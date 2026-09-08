@@ -1,0 +1,29 @@
+{
+  "address": "0x0805AD68",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_5ad68.c",
+      "sha256": "f54daa1ca49dbb11659a270b8f54d01633035e6bc98995df89f806273287275b",
+      "compiled_size": 86,
+      "mapped_size": 86,
+      "same": 37,
+      "total": 42,
+      "matching": false,
+      "code": "/* Grup uyelerini veya tek nesneyi sirayla ver — 0x0805AD68.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AD68.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *ResolveRecordNodeChain(u16 id);\nu32 FUN_0805ad68(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        return 0;\n    }\n    *out = ResolveRecordNodeChain(group->ids[*cursor]);\n    (*cursor)++;\n    return 1;\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Son dali tek cikisli if/else yap; kardesin cagri hedefini koru",
+      "source": "src/world/p1_5ad68.c",
+      "sha256": "4e3884c9e813c2c71bd8b954c21867f462248c5edede40000a19d4ca9a5a1dce",
+      "compiled_size": 86,
+      "mapped_size": 86,
+      "same": 42,
+      "total": 42,
+      "matching": true,
+      "code": "/* Grup uyelerini veya tek nesneyi sirayla ver — 0x0805AD68.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AD68.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16 id);\nu32 FUN_0805ad68(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    u32 result;\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        result = 0;\n    } else {\n        *out = GetOrCreateRecordNode(group->ids[*cursor]);\n        (*cursor)++;\n        result = 1;\n    }\n    return result;\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0x080519B8",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_519b8.c",
+      "sha256": "3146f4d8e1c81829208f7932b3448d8c80f65534dd962b45e7ed482df3c72e04",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x080519B8.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080519B8.json. */\n#include \"gba_types.h\"\n\nvoid NoOp080519B8(void) {}\n"
+    }
+  ]
+}

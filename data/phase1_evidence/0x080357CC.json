@@ -1,0 +1,17 @@
+{
+  "address": "0x080357CC",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_357cc.c",
+      "sha256": "f69b4b3776cb1fef29d9bee71229106e735d1a427efb5a65ba46de8e59fa09e1",
+      "compiled_size": 52,
+      "mapped_size": 52,
+      "same": 26,
+      "total": 26,
+      "matching": true,
+      "code": "/* Kesmeleri saklayarak DMA32 sifir dolgusu — 0x080357CC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080357CC.json. */\n#include \"gba_types.h\"\n#include \"gba_io.h\"\n\nextern u32 gRam02027F00[];\nvoid FUN_080357cc(void)\n{\n    volatile u32 zero;\n    u16 ime = REG_IME;\n    REG_IME = 0;\n    zero = 0;\n    REG_DMA3.src = (const void *)&zero;\n    REG_DMA3.dst = gRam02027F00;\n    REG_DMA3.control = 0x85000000 | 144;\n    REG_DMA3.control;\n    REG_IME = ime;\n}\n"
+    }
+  ]
+}

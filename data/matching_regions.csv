@@ -34,6 +34,7 @@ start,end,binary,module,notes
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Nokta-dortgen testi; en yakin kenarin indeksini dondurur.
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front ve remove
+0x0800DD50,0x0800DD84,build/world/p1_0dd50.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x080100D0,0x0801014C,build/core/memory_init.bin,core,Tampon ayirma ve DMA3 sifirlama; dogal C byte-matching.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,kucuk fonksiyon hasadi
 0x08012750,0x080127A0,build/video/setup_bg0_bg1_menu.bin,video,0x08012750 SetupBg0Bg1Menu
@@ -52,6 +53,9 @@ start,end,binary,module,notes
 0x08012E18,0x08012E78,build/world/queue_draw_request_direct.bin,world,0x08012E18 QueueDrawRequestDirect
 0x08012E78,0x08012F88,build/world/alloc_draw_entry.bin,world,0x08012E78 AllocDrawEntry
 0x08012F88,0x08013098,build/world/queue_draw_request.bin,world,0x08012F88 QueueDrawRequest + 0x08013010 ikizi
+0x080130F0,0x080130F4,build/world/p1_130f0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08013450,0x080134A4,build/world/p1_13450.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080134A4,0x080134F8,build/world/p1_134a4.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x080138E8,0x080138F4,build/world/wrap_080138e8.bin,world,kucuk fonksiyon hasadi
 0x080138F4,0x08013900,build/world/wrap_080138f4.bin,world,kucuk fonksiyon hasadi
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
@@ -77,10 +81,14 @@ start,end,binary,module,notes
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Pencere ayarlari
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,karmasik hasat
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,kucuk fonksiyon hasadi
+0x08023778,0x08023794,build/world/p1_23778.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08023794,0x080237B0,build/world/p1_23794.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08023868,0x0802392C,build/world/project_actor_offset.bin,world,0x08023868 ProjectActorOffset
 0x0802392C,0x08023974,build/world/pair_lookup.bin,world,Sifirlayici + cift indeksleme
 0x08023A0C,0x08023A68,build/world/threshold.bin,world,Bant hesaplayici + sifirlama/max/reload
 0x08023A80,0x08023A9C,build/world/masked_compare.bin,world,maskeli karsilastirma
+0x08025FC0,0x08026034,build/world/p1_25fc0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08026034,0x080260A8,build/world/p1_26034.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08028B2C,0x08028B9C,build/world/release_entry_bc.bin,world,0x08028B2C ReleaseEntryB + 0x08028B64 ReleaseEntryC
 0x08028C48,0x08028CE8,build/world/table_entries.bin,world,"Uc tablo girdisi yardimcisi: aktiflik testi, iki serbest birakma"
 0x08028CE8,0x08028D44,build/world/spawn_at_slot.bin,world,0x08028CE8 SpawnAtSlot
@@ -91,6 +99,9 @@ start,end,binary,module,notes
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62 bayt fonksiyon + 2 bayt hizalama dolgusu
 0x080294B4,0x080294E4,build/world/release_entry_e.bin,world,0x080294B4 ReleaseEntryE
 0x0802A610,0x0802A858,build/ui/draw_eight_digits.bin,ui,0x0802A610 DrawCounterDigits8 + 0x0802A734 DrawCounterDigits3
+0x0802A9F0,0x0802AB18,build/world/p1_2a9f0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0802AB18,0x0802AC40,build/world/p1_2ab18.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08030848,0x0803084C,build/world/p1_30848.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0803084C,0x08030860,build/world/set_bg1_enable.bin,world,DISPCNT bit 9 kurma
 0x08030860,0x08030874,build/world/clear_bg1_enable.bin,world,DISPCNT bit 9 temizleme
 0x08030874,0x08030884,build/world/forward_with_zero.bin,world,sifir arguman ekleyerek iletme
@@ -110,6 +121,7 @@ start,end,binary,module,notes
 0x08030F84,0x08030F90,build/world/trigger_event39.bin,world,0x08030F84 TriggerEvent39
 0x08030F90,0x08031004,build/world/reset_map_view.bin,world,0x08030F90 ResetMapView
 0x080311DC,0x08031204,build/ui/clear_map_window.bin,ui,0x080311DC ClearMapWindow
+0x08031204,0x0803123C,build/world/p1_31204.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08031294,0x08031318,build/world/refresh_score_digits.bin,world,0x08031294 RefreshScoreDigits
 0x08031318,0x08031328,build/world/get_record_node_by_id.bin,world,"0x08031318 GetRecordNodeById (+2 bayt hizalama dolgusu, ROM'da 0000)"
 0x08031328,0x08031388,build/ui/clear_map_window_dma.bin,ui,0x08031328 ClearMapWindowDma
@@ -135,6 +147,8 @@ start,end,binary,module,notes
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,0x02000D50 +8 baytini +9'a kopyalar
 0x080320E0,0x0803214C,build/ui/init_menu_session.bin,ui,0x080320E0 InitMenuSession
+0x08032548,0x0803258C,build/world/p1_32548.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0803258C,0x080325D0,build/world/p1_3258c.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Kimlik dogrulama + tetikleme
 0x0803376C,0x0803378C,build/world/zero_three_flags.bin,world,uc bayragi sifirlama
 0x0803378C,0x08033798,build/world/wrap_0803378c.bin,world,kucuk fonksiyon hasadi
@@ -142,7 +156,17 @@ start,end,binary,module,notes
 0x080337A8,0x08033820,build/world/stop_audio_dma.bin,world,0x080337A8 StopAudioDmaOnCartFlag
 0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
 0x0803385C,0x08033890,build/world/alloc_from_counter.bin,world,0x0803385C AllocFromCounter
+0x080350A8,0x08035100,build/world/p1_350a8.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035168,0x080351AC,build/world/p1_35168.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080351AC,0x080351F0,build/world/p1_351ac.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035230,0x08035288,build/world/p1_35230.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080357CC,0x08035800,build/world/p1_357cc.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035844,0x08035848,build/world/p1_35844.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035D60,0x08035D9C,build/world/p1_35d60.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035D9C,0x08035DD8,build/world/p1_35d9c.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,kucuk fonksiyon hasadi
+0x08035DE4,0x08035E34,build/world/p1_35de4.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08035E38,0x08035E88,build/world/p1_35e38.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08037F1C,0x08037F70,build/misc/state_getters.bin,misc,Seven small state getters
 0x08037F70,0x08037F7C,build/world/pool_first.bin,world,gRam0202F300 +0 getirici
 0x08037FAC,0x08038000,build/world/pool_gets.bin,world,Dort havuz +8 getirici ve MarkAndClear
@@ -158,10 +182,13 @@ start,end,binary,module,notes
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Yuva yapilandirmasi ve iki okuyucu
 0x0803C0E4,0x0803C178,build/world/apply_two_levels.bin,world,iki seviyeyi kirpip uygulama
 0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Yuva menzili + varsayilan sabit
+0x0803C268,0x0803C2C4,build/world/p1_3c268.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0803C2C4,0x0803C320,build/world/p1_3c2c4.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0803C45C,0x0803C47C,build/world/select_word_source.bin,world,kaynak secip yarim soz okuma
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Uc yuva secici; SlotCD ve GetSubValue ortak kuyrukta birlesiyor
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Bes yuva sorgusu: sabit, aktif yuva, olcek adimi, hedef isaretleme"
 0x0803C62C,0x0803C698,build/world/is_player_actor_ready.bin,world,0x0803C62C IsPlayerActorReady (+2 dolgu)
+0x0803C708,0x0803C73C,build/world/p1_3c708.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,12 baytlik paketi gRam0202F360'a kopyalayip iletir
@@ -170,17 +197,24 @@ start,end,binary,module,notes
 0x0803F69C,0x0803F6D8,build/world/rearm_slot.bin,world,yuvayi yeniden kurma
 0x0803F6D8,0x0803F6F8,build/world/retarget_if_kind4.bin,world,tur 4 ise isleyiciyi degistirme
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Dort varlik durum ayarlayicisi
+0x0803F7F8,0x0803F81C,build/world/p1_3f7f8.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0803F85C,0x0803F880,build/world/p1_3f85c.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0803F8DC,0x0803F910,build/world/p1_3f8dc.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0803F910,0x0803F944,build/world/p1_3f910.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Karo alan getiricileri (bit 7-9, tur)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Harita karosu turu sorgusu: (y<<shift)+x karo indeksi, tur 1..4 ve engel bitleri bos"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Karo alan (2. deger) + harita boyutlari
 0x080424EC,0x08042574,build/world/find_random_tile_of_kind.bin,world,FindRandomTileOfKind
 0x08042784,0x08042790,build/world/wrap_08042784.bin,world,kucuk fonksiyon hasadi
+0x080427BC,0x080427C0,build/world/p1_427bc.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,kucuk fonksiyon hasadi
 0x0804AEAC,0x0804B088,build/world/band_0804aeac.bin,world,Aktor hedef secimi; baglantili aday ya da sekizgen mesafeyle yakin olan.
 0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,kucuk fonksiyon hasadi
+0x0804FEE4,0x0804FF00,build/world/p1_4fee4.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0804FF98,0x0804FFA4,build/world/wrap_0804ff98.bin,world,iletme sarmalayicisi
 0x0804FFB4,0x0804FFC0,build/world/wrap_0804ffb4.bin,world,iletme sarmalayicisi
 0x080500D0,0x080500DC,build/world/wrap_080500d0.bin,world,iletme sarmalayicisi
+0x080500DC,0x080500F8,build/world/p1_500dc.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08050108,0x08050130,build/world/bump_or_trigger.bin,world,karmasik hasat
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Iki kelime karsilastiricisi
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor sifirlama ; ResetAnchorPartial (0x08050958) eklendi
@@ -192,8 +226,10 @@ start,end,binary,module,notes
 0x08050A00,0x08050A0C,build/world/get_anchor_unk34.bin,world,Anchor +0x34 getirici
 0x08050A0C,0x08050A34,build/world/check_current_entity.bin,world,karmasik fonksiyon hasadi
 0x08050A34,0x08050A48,build/world/is_anchor_small.bin,world,kosullu sabit donus
+0x08051048,0x0805104C,build/world/p1_51048.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08051154,0x080512B0,build/core/band_08051154.bin,core,"Alan/kayit yukleyici: kaydi secer, dunya kurulum zincirini calistirir."
 0x080512B0,0x080512BC,build/world/get_record_index.bin,world,yaprak erisimci
+0x0805131C,0x0805135C,build/world/p1_5131c.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0805135C,0x08051458,build/core/frame_dispatch.bin,core,Kare isleme zincirleri ve tani isaretleri
 0x08051464,0x08051470,build/world/wrap_08051464.bin,world,iletme sarmalayicisi
 0x08051480,0x0805148C,build/world/wrap_08051480.bin,world,sarmalayici/erisimci hasadi
@@ -201,6 +237,7 @@ start,end,binary,module,notes
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
 0x0805151C,0x08051540,build/world/drain_two_chains.bin,world,iki zinciri sonuna kadar yurume
 0x08051540,0x080515D0,build/core/adjust_area_position.bin,core,Alan derinligi degisiminde konum ofsetini duzeltir
+0x080519B8,0x080519BC,build/world/p1_519b8.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Dunya nesnesinin kare adimi: sayac, yikim, yuva ayirma, kayit kurulumu."
 0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
 0x08054F1C,0x08055054,build/world/is_near_any_actor.bin,world,0x08054F1C IsNearAnyActor (+2 dolgu)
@@ -214,20 +251,38 @@ start,end,binary,module,notes
 0x08055C8C,0x08055D08,build/world/slot_scan.bin,world,Yuva tarayici ve DMA silici
 0x08055D08,0x08055D90,build/world/slot_table.bin,world,"Yuva kimlik tablosu: dizin, bos aralik arayici, DMA doldurucu"
 0x0805643C,0x08056508,build/core/reset_runtime_globals.bin,core,Runtime global durum alanlarini sifirlar
+0x08058140,0x080581B4,build/world/p1_58140.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080581B4,0x08058228,build/world/p1_581b4.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,sarmalayici/erisimci hasadi
+0x08059FE8,0x0805A024,build/world/p1_59fe8.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805A070,0x0805A0AC,build/world/p1_5a070.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,iletme sarmalayicisi
+0x0805AB90,0x0805ABDC,build/world/p1_5ab90.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805ABDC,0x0805AC10,build/world/p1_5abdc.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805AC10,0x0805AC44,build/world/p1_5ac10.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0805AC44,0x0805AC50,build/world/counter_saturate.bin,world,Kopyalama
 0x0805AC50,0x0805AC88,build/world/bump_or_reset.bin,world,BumpOrReset; koşullu sıfırlanan doygun sayaç
 0x0805AC94,0x0805AD10,build/world/link_objects.bin,world,Nesne baglama ve durum bitleri; dogal C byte-matching.
+0x0805AD10,0x0805AD68,build/world/p1_5ad10.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805AD68,0x0805ADC0,build/world/p1_5ad68.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805AEFC,0x0805AF48,build/world/p1_5aefc.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805B2A4,0x0805B2BC,build/world/p1_5b2a4.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805B388,0x0805B40C,build/world/p1_5b388.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805B484,0x0805B508,build/world/p1_5b484.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0805B854,0x0805B86C,build/world/p1_5b854.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x080611CC,0x0806149C,build/world/mark_distant_actors.bin,world,0x080611CC MarkDistantActors + 0x08061334 MarkDistantActorsB (0x0202F2C0 listesi)
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode kategorisi + iki alan yazici
 0x0806233C,0x08062364,build/world/is_mode_two.bin,world,0x02036050 kip bayti == 2 sorgusu
+0x0806245C,0x080624B8,build/world/p1_6245c.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080624B8,0x08062514,build/world/p1_624b8.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type sorgusu
 0x08062530,0x0806254C,build/world/is_ram_mode.bin,world,IsRamModeWanted; RAM etkinlik ve mod sorgusu
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,yaprak erisimci
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,iletme sarmalayicisi
+0x08063C88,0x08063CA4,build/world/p1_63c88.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08063D3C,0x08063D58,build/world/p1_63d3c.bin,world,Faz 1: ROM ile tam eslesen dogal C
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x080646AC,0x080646F8,build/world/random_below_count.bin,world,0x080646AC RandomBelowCount
 0x08064F24,0x08065130,build/world/band_08064f24.bin,world,Aktor izleme turunu kapatir ve mesafe/dusus skorunu isler.
@@ -266,3 +321,20 @@ start,end,binary,module,notes
 0x08067404,0x080674B0,build/world/is_kind20.bin,world,0x08067404 IsKind20 (36 girisli atlama tablosu)
 0x080674B0,0x08067524,build/misc/format_decimal_dup.bin,misc,Ondalik basamak yazicinin ROMdaki ikinci kopyasi; md5 esitligi dogrulandi.
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); C'ye cevrilemez, kalici assembly"
+0x0806CA24,0x0806CA70,build/world/p1_6ca24.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806CA70,0x0806CABC,build/world/p1_6ca70.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806CABC,0x0806CB08,build/world/p1_6cabc.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806CB08,0x0806CB54,build/world/p1_6cb08.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806CB54,0x0806CBA0,build/world/p1_6cb54.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806CBA0,0x0806CBEC,build/world/p1_6cba0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D810,0x0806D860,build/world/p1_6d810.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D860,0x0806D8B0,build/world/p1_6d860.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D8B0,0x0806D900,build/world/p1_6d8b0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D900,0x0806D950,build/world/p1_6d900.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D950,0x0806D9A0,build/world/p1_6d950.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x0806D9A0,0x0806D9F0,build/world/p1_6d9a0.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x080716E8,0x08071718,build/world/p1_716e8.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08071C90,0x08071CC4,build/world/p1_71c90.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08071D20,0x08071D50,build/world/p1_71d20.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08071DB4,0x08071DE8,build/world/p1_71db4.bin,world,Faz 1: ROM ile tam eslesen dogal C
+0x08071DE8,0x08071E1C,build/world/p1_71de8.bin,world,Faz 1: ROM ile tam eslesen dogal C

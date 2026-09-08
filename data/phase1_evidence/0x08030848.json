@@ -1,0 +1,17 @@
+{
+  "address": "0x08030848",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_30848.c",
+      "sha256": "0abc2d72e04b61b909b179708ea854229009763f0d1eabed78e1e38c56e7fb43",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x08030848.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08030848.json. */\n#include \"gba_types.h\"\n\nvoid NoOp08030848(void) {}\n"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "address": "0x0803F8DC",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_3f8dc.c",
+      "sha256": "9a3ec096f7b99edc550039a48a8afc31ecb48f16ddfa3031cd1f9a302e9525d3",
+      "compiled_size": 50,
+      "mapped_size": 50,
+      "same": 20,
+      "total": 23,
+      "matching": false,
+      "code": "/* Hedefli eylem sonucunu kaydet ve bitis bayragini kur — 0x0803F8DC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F8DC.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023648(void *owner,u32 value);\nu32 FUN_0803f8dc(Phase1Action *action)\n{\n    void *owner = action->owner;\n    action->result = FUN_08023648(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) return 0;\n    action->done = 1;\n    return 1;\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Tek cikisli sonuc degiskeni ile dal yonu",
+      "source": "src/world/p1_3f8dc.c",
+      "sha256": "89da9f5d46fd26e769b4d61ecd23d98af535f9f57531b1239eec6b13eb5f1223",
+      "compiled_size": 50,
+      "mapped_size": 50,
+      "same": 23,
+      "total": 23,
+      "matching": true,
+      "code": "/* Hedefli eylem sonucunu kaydet ve bitis bayragini kur — 0x0803F8DC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F8DC.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023648(void *owner,u32 value);\nu32 FUN_0803f8dc(Phase1Action *action)\n{\n    u32 result;\n    void *owner = action->owner;\n    action->result = FUN_08023648(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) result = 0;\n    else { action->done = 1; result = 1; }\n    return result;\n}\n"
+    }
+  ]
+}

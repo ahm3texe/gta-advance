@@ -1,0 +1,17 @@
+{
+  "address": "0x0806245C",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_6245c.c",
+      "sha256": "225b0748e333c7e68d7f6b7f7edc6062288c329efcb55123849b1e4e9b47cc15",
+      "compiled_size": 92,
+      "mapped_size": 92,
+      "same": 46,
+      "total": 46,
+      "matching": true,
+      "code": "/* Kimlikli sayaci bul ve esikle karsilastir — 0x0806245C.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0806245C.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 gRam02035AD0[];\nextern Phase1StatTable gRam02035ED0;\nstatic inline u32 LookupStat(u16 id)\n{\n    s32 i;\n    if (id == 114) return gRam02035AD0[0];\n    if (id == 115) return gRam02035AD0[1];\n    for (i = 0; i < 12; i++)\n        if (gRam02035ED0.ids[i] == id) return gRam02035ED0.values[i];\n    return 0;\n}\nu32 FUN_0806245c(void *unused,u16 id,u16 threshold)\n{\n    if (LookupStat(id) > threshold) return 1;\n    return 0;\n}\n"
+    }
+  ]
+}

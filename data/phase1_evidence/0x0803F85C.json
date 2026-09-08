@@ -1,0 +1,17 @@
+{
+  "address": "0x0803F85C",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_3f85c.c",
+      "sha256": "b3acd4c639f615db5a860cea68a7f27c01ac2153b9c7c9e2244ad90bd82c1b26",
+      "compiled_size": 36,
+      "mapped_size": 36,
+      "same": 17,
+      "total": 17,
+      "matching": true,
+      "code": "/* Eylemin hedefini ve adim isaretcisini kur — 0x0803F85C.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F85C.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0803f8dc__thumb(Phase1Action *);\nvoid FUN_0803f85c(Phase1Action *action, void *target)\n{\n    if (action) {\n        action->step = FUN_0803f8dc__thumb;\n        action->done = 0;\n        action->state = 0;\n        action->target = target;\n        action->result = 1;\n    }\n}\n"
+    }
+  ]
+}

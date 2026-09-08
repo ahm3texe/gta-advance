@@ -1,0 +1,17 @@
+{
+  "address": "0x08035844",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_35844.c",
+      "sha256": "02a9cffe608f192323e32d3434de00f9610513af92a4cb96c1e4f3f27ff8e1e3",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x08035844.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035844.json. */\n#include \"gba_types.h\"\n\nvoid NoOp08035844(void) {}\n"
+    }
+  ]
+}

@@ -271,3 +271,19 @@ address,size,name,source,status,notes
 0x08F72620,0,gRom08F72620,decomp,provisional,ROM bayt tablosu (RAM degil). 0x08065568 dogrudan indeksleyip tek bayt donduruyor. Boyut BILINMIYOR (0); yalnizca taban olculdu. DIZI olarak bildirilmeli: extern const u8 gRom08F72620[];
 0x08FD17C8,0,gBitmapAssets,decomp,provisional,"ROM tablosu: 20 baytlik kayitlar. +0x00 kare verisi, +0x04 palet, +0x08 bayraklar (bit0 = kare RL sikistirilmis, bit1 = palet RL), +0x0C u16 en, +0x0E u16 boy, +0x10 u16 palet yarim soz sayisi. Ilk iki kayit 240x160. 0x08065574 indeksliyor (indeks 1 ile sinirli). DIZI olarak bildirilmeli."
 0x08FD17FC,40,gPowersOfTen,decomp,verified,"ROM tablosu: 10 adet u32, 10^0..10^9 (1..1000000000). ROM baytlari okunarak dogrulandi. 0x080672FC ondalik basamak yazarken kullaniyor. DIZI olarak bildirilmeli: extern const u32 gPowersOfTen[];"
+0x02036110,4,gRam02036110,decomp,provisional,0x08063C88/63D3C: ldr/str 32-bit durum; tahsis boyutu belirsiz
+0x02027300,4,gRam02027300,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
+0x020272F8,4,gRam020272F8,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
+0x020272F4,4,gRam020272F4,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
+0x020272F0,4,gRam020272F0,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
+0x020272FC,4,gRam020272FC,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
+0x08CA6608,1024,gRom08CA6608,decomp,provisional,0x08032548/3258C: iki indeks 0x3FF ile maskeli; en az 1024 bayt tablo
+0x08CA788C,0,gRom08CA788C,decomp,provisional,0x08035168/351AC: kaynak isaretci tablosu; allocation boyutu belirsiz
+0x02035B40,4,gRam02035B40,decomp,provisional,32-bit cooldown timestamp; 0805ABDC
+0x08CA7E64,0,gRom08CA7E64,decomp,provisional,"80-byte records; u16 fields +22,+78 in 08038608/44; allocation unknown"
+0x0201AA80,12,gRam0201AA80,decomp,provisional,OLCULDU: DMA32 fill 3 words in 0800DD50
+0x02027F00,576,gRam02027F00,decomp,provisional,OLCULDU: DMA32 fill 144 words in 080357CC
+0x02022AC0,904,gRam02022AC0,decomp,provisional,"OLCULDU: 32 x 28-byte nodes and two pointers at +896,+900; 08013450/134A4"
+0x02035AD0,0,gRam02035AD0,decomp,provisional,Stat words +0 and +4; total allocation unknown
+0x02035ED0,36,gRam02035ED0,decomp,provisional,OLCULDU: twelve u16 IDs and twelve u8 values; 0806245C
+0x020363C4,4,gRam020363C4,decomp,provisional,newlib errno; zeroed by reentrant syscall wrappers

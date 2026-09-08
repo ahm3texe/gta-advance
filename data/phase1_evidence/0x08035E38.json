@@ -1,0 +1,17 @@
+{
+  "address": "0x08035E38",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_35e38.c",
+      "sha256": "6baae5a8aa034766aeb8b93216e05efc7b7df2b210fa63937e8c8d2e2c8d6671",
+      "compiled_size": 80,
+      "mapped_size": 80,
+      "same": 36,
+      "total": 36,
+      "matching": true,
+      "code": "/* Iki nesneyi ROM tanimlariyla kur — 0x08035E38.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035E38.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1RomNode gRom08BD3448;\nextern void FUN_08013cfc(void *,Phase1RomNode *,u32);\nextern void FUN_08014ee4(void *,u32);\nvoid FUN_08035e38(u8 *pair)\n{\n    Phase1RomNode *group = gRom08BD3448.slots[64];\n    Phase1RomNode *desc = group->slots[2]->slots[0];\n    FUN_08013cfc(pair,desc,1);\n    FUN_08014ee4(pair,desc->value);\n    desc = group->slots[3]->slots[0];\n    pair += 72;\n    FUN_08013cfc(pair,desc,1);\n    FUN_08014ee4(pair,desc->value);\n}\n"
+    }
+  ]
+}

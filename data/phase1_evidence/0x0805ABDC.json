@@ -1,0 +1,17 @@
+{
+  "address": "0x0805ABDC",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_5abdc.c",
+      "sha256": "cb1b9430b54a78913968583cff6bc1ee9252c1604320095f21ede0d0eeb3a871",
+      "compiled_size": 52,
+      "mapped_size": 52,
+      "same": 24,
+      "total": 24,
+      "matching": true,
+      "code": "/* On iki tik aralikli ses olayi — 0x0805ABDC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805ABDC.json. */\n#include \"gba_types.h\"\n\nextern u32 gRam02000224,gRam02035B40;\nextern void FUN_08035058(void *,u32);\nvoid FUN_0805abdc(void *actor)\n{\n    if (gRam02000224 < gRam02035B40 || gRam02000224 >= gRam02035B40 + 12) {\n        FUN_08035058(actor,263);\n        gRam02035B40 = gRam02000224;\n    }\n}\n"
+    }
+  ]
+}

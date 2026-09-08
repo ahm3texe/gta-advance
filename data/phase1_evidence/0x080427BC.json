@@ -1,0 +1,17 @@
+{
+  "address": "0x080427BC",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_427bc.c",
+      "sha256": "568745be922028d3fa3e3d3697ffaeaf46509eef095c4a0ea210d60e657dd3e1",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x080427BC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080427BC.json. */\n#include \"gba_types.h\"\n\nvoid NoOp080427BC(void) {}\n"
+    }
+  ]
+}

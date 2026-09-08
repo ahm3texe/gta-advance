@@ -1,0 +1,17 @@
+{
+  "address": "0x08019590",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_19590.c",
+      "sha256": "ce1f3ac91db948dc7bf7ead8c592b290f7622b44ff5c45e5d0c47fb498ed1b67",
+      "compiled_size": 98,
+      "mapped_size": 98,
+      "same": 33,
+      "total": 49,
+      "matching": false,
+      "code": "/* Bilesik sprite parcalarindan genislik ve yukseklik bul — 0x08019590.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08019590.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1SpriteDesc gRom08BD3448;\nvoid FUN_08019590(u32 kind,u32 variant,u32 *width,u32 *height)\n{\n    Phase1SpriteDesc *desc = gRom08BD3448.slots[kind]->slots[variant]->slots[0];\n    u32 w,h;\n    if (desc->count == 1) {\n        h = desc->pieces[0][1]; w = desc->pieces[0][0];\n    } else if (desc->count == 2) {\n        h = desc->pieces[1][1] + desc->pieces[0][1]; w = desc->pieces[0][0];\n    } else {\n        h = desc->pieces[2][1] + desc->pieces[0][1];\n        w = desc->pieces[1][0] + desc->pieces[0][0];\n    }\n    *width = w; *height = h;\n}\n"
+    }
+  ]
+}

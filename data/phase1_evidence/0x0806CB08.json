@@ -1,0 +1,17 @@
+{
+  "address": "0x0806CB08",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_6cb08.c",
+      "sha256": "a72890eb695e71e1382a0ec37b48a9dc63e23bf26d993080456510be6ea43c3d",
+      "compiled_size": 76,
+      "mapped_size": 76,
+      "same": 35,
+      "total": 35,
+      "matching": true,
+      "code": "/* Soft-float karsilastirma; NaN durumunu ayri isle — 0x0806CB08.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0806CB08.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern void FUN_0806c450(float *,Phase1FloatParts *);\nextern s32 FUN_0806c910(Phase1FloatParts *,Phase1FloatParts *);\nstatic inline u32 IsUnordered(Phase1FloatParts *parts) { return parts->kind <= 1; }\ns32 FUN_0806cb08(float a,float b)\n{\n    Phase1FloatParts left,right;\n    FUN_0806c450(&a,&left);\n    FUN_0806c450(&b,&right);\n    if (IsUnordered(&left) || IsUnordered(&right)) return -1;\n    return FUN_0806c910(&left,&right);\n}\n"
+    }
+  ]
+}

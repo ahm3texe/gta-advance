@@ -1,0 +1,17 @@
+{
+  "address": "0x080351AC",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_351ac.c",
+      "sha256": "ce4d20b55dba040aabcda64066570a81d0d2173c0a94d73f8dd8cc5eb3b4e856",
+      "compiled_size": 68,
+      "mapped_size": 68,
+      "same": 33,
+      "total": 33,
+      "matching": true,
+      "code": "/* Kart kaynagi tablosundaki ses kaydini isleme ver — 0x080351AC.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080351AC.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u8 gCartFlag;\nextern Phase1Resource *gRom08CA788C[];\nextern void FUN_08032d74(void *data,u32 length,u32 mode,u32 value);\nvoid FUN_080351ac(u32 id)\n{\n    Phase1Resource *resource;\n    u32 index;\n    if (gCartFlag == 1 && id > 255) {\n        index = id - 201;\n        if (index <= 271) {\n            resource = gRom08CA788C[index];\n            if (resource) FUN_08032d74(resource->data,resource->length,0,255);\n        }\n    }\n}\n"
+    }
+  ]
+}

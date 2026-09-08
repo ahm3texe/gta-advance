@@ -1,0 +1,17 @@
+{
+  "address": "0x080130F0",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_130f0.c",
+      "sha256": "65d2402665fbecc97ee3f2e06831d2f904047aa19183bc3f5236d729c3c3dc03",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x080130F0.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080130F0.json. */\n#include \"gba_types.h\"\n\nvoid NoOp080130F0(void) {}\n"
+    }
+  ]
+}

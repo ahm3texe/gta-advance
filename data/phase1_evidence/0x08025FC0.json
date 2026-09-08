@@ -1,0 +1,17 @@
+{
+  "address": "0x08025FC0",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_25fc0.c",
+      "sha256": "0ebb87f895c92fadea11a809aff454d69d8d5eacfc9b632cbc172c2b4c5e67d3",
+      "compiled_size": 116,
+      "mapped_size": 116,
+      "same": 57,
+      "total": 57,
+      "matching": true,
+      "code": "/* Gecersiz veya anahtari degismis girdiyi birak — 0x08025FC0.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08025FC0.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1Entry gRam020246F0[];\nextern void ReleaseObject(void *);\nstatic inline void ReleaseEntry(s16 index)\n{\n    Phase1Entry *entry;\n    if (index == 255) return;\n    entry = &gRam020246F0[index];\n    if ((u16)index < 20 && entry->active) {\n        ReleaseObject(entry->object);\n        entry->active = 0;\n        entry->state = 0;\n        entry->timer = 0;\n    }\n}\nu32 FUN_08025fc0(Phase1EntryOwner *owner,u32 key)\n{\n    u8 *data = owner->data;\n    Phase1Entry *entry;\n    if (data[167] != 255) {\n        entry = &gRam020246F0[data[167]];\n        if (entry->active && entry->key == key) return 1;\n        ReleaseEntry(data[167]);\n        data[167] = 255;\n    }\n    return 0;\n}\n"
+    }
+  ]
+}

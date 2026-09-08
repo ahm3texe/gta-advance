@@ -1,0 +1,29 @@
+{
+  "address": "0x0803C268",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_3c268.c",
+      "sha256": "274bd0fc3542c9e173084719bea4d55fdb8718408b40831e951d6b983e2957d6",
+      "compiled_size": 96,
+      "mapped_size": 92,
+      "same": 26,
+      "total": 46,
+      "matching": false,
+      "code": "/* Etkin yuvanin sonraki veya onceki girdisini sec — 0x0803C268.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C268.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n#include \"ram_symbols.h\"\n\nextern Phase1SlotContext *gRam02000F08;\nextern u8 gRam02000F00;\nextern void FUN_080384f0(void);\nextern u32 FUN_0803c320(s32,u32);\nvoid FUN_0803c268(void)\n{\n    s32 index = ((u32)gRam02000F08->current - 36 - (u32)gRam02000F08) >> 3;\n    s32 start = index;\n    s32 passes = 0;\n    if (((Phase1SlotHead *)gRam02000F10)->kind == 2 && (gRam02000F08->flags & 2)) return;\n    FUN_080384f0();\n    do {\n        if (index == start && ++passes > 1) return;\n        index++;\n        if (index > 14) index = 0;\n    } while (!FUN_0803c320(index,gRam02000F00));\n}\n"
+    },
+    {
+      "number": 2,
+      "note": "Ofset cikarmasini ayri anlamli konum ifadesine bol",
+      "source": "src/world/p1_3c268.c",
+      "sha256": "3eab5ec4ab2aae054cd3d44b1b88030b348d50919c8ac9f72161008afa91105c",
+      "compiled_size": 92,
+      "mapped_size": 92,
+      "same": 44,
+      "total": 44,
+      "matching": true,
+      "code": "/* Etkin yuvanin sonraki veya onceki girdisini sec — 0x0803C268.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C268.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n#include \"ram_symbols.h\"\n\nextern Phase1SlotContext *gRam02000F08;\nextern u8 gRam02000F00;\nextern void FUN_080384f0(void);\nextern u32 FUN_0803c320(s32,u32);\nvoid FUN_0803c268(void)\n{\n    u32 position = (u32)gRam02000F08->current - 36;\n    s32 index = (position - (u32)gRam02000F08) >> 3;\n    s32 start = index;\n    s32 passes = 0;\n    if (((Phase1SlotHead *)gRam02000F10)->kind == 2 && (gRam02000F08->flags & 2)) return;\n    FUN_080384f0();\n    do {\n        if (index == start && ++passes > 1) return;\n        index++;\n        if (index > 14) index = 0;\n    } while (!FUN_0803c320(index,gRam02000F00));\n}\n"
+    }
+  ]
+}

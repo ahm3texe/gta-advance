@@ -1,0 +1,17 @@
+{
+  "address": "0x08031204",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_31204.c",
+      "sha256": "1b1c1c1dd3d6d9400d02245b1399fc7ecc69b839ea39d75d74a9a9d5e6a2b85e",
+      "compiled_size": 56,
+      "mapped_size": 56,
+      "same": 25,
+      "total": 25,
+      "matching": true,
+      "code": "/* Metin durumunu ilerlet ve bosalinca kapat — 0x08031204.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08031204.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n#include \"ram_symbols.h\"\n\nextern void *FUN_0802e3fc(u32,void *,u32,void *);\nextern void FUN_0802ead4(void);\nvoid FUN_08031204(void)\n{\n    Phase1TextState *state = (Phase1TextState *)gRam02025810;\n    state->previous = state->current;\n    state->current = FUN_0802e3fc(39,state->current,1,state->buffer);\n    if (!state->current) FUN_0802ead4();\n}\n"
+    }
+  ]
+}

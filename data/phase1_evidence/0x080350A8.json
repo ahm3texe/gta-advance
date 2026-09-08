@@ -1,0 +1,17 @@
+{
+  "address": "0x080350A8",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_350a8.c",
+      "sha256": "b99c8553fe5d564280e7a6d22cd0d9be51737f56fb616569110c06fe1056e021",
+      "compiled_size": 88,
+      "mapped_size": 88,
+      "same": 41,
+      "total": 41,
+      "matching": true,
+      "code": "/* Nesneye ses kaynagi bagla ve seviyesini kur — 0x080350A8.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080350A8.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1Resource *gRom08CA788C[];\nextern u32 FUN_08033ad8(u32);\nextern u32 FUN_08032d74(void *,u32,u32,u32);\nextern void FUN_08032fc4(u32,u32);\nvoid FUN_080350a8(Phase1SoundActor *actor,u32 id)\n{\n    u32 index;\n    Phase1Resource *resource;\n    u32 handle;\n    if (actor && actor->sound && !FUN_08033ad8(0)) {\n        index = id - 201;\n        if (index <= 271) {\n            resource = gRom08CA788C[index];\n            if (resource) {\n                handle = FUN_08032d74(resource->data,resource->length,2,14);\n                actor->sound->handle = handle;\n                FUN_08032fc4(handle,32768);\n            }\n        }\n    }\n}\n"
+    }
+  ]
+}

@@ -2044,7 +2044,511 @@ build/world/update_actor_lane.bin: src/world/update_actor_lane.c data/functions.
 world-update-actor-lane-match: verify-rom build/world/update_actor_lane.bin
 	@python3 tools/compare_slice.py baserom.gba 0x159a0 build/world/update_actor_lane.bin
 
-matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match world-wrap-08005fc4-match world-wrap-080101d8-match world-wrap-08012a98-match world-wrap-080138e8-match world-wrap-080138f4-match world-wrap-08014fa0-match world-wrap-0803378c-match world-wrap-0803379c-match world-wrap-08035dd8-match world-wrap-08042784-match world-wrap-080428ac-match world-wrap-0804fb4c-match world-get-field-100-match world-spin-delay-match world-wrap-0804ff98-match world-wrap-0804ffb4-match world-wrap-080500d0-match world-wrap-08051464-match world-wrap-0805a4f4-match world-wrap-08063bcc-match world-get-anchor-unk04-match world-get-anchor-unk30-match world-wrap-08051480-match world-wrap-08059d7c-match world-get-record-index-match world-get-ram-word16-match world-is-state-two-match world-is-anchor-small-match world-rearm-slot-match world-accumulate-distance-match core-clip-bounds-match world-engage-actor-match core-insert-sorted-match world-refresh-then-notify-match world-check-current-entity-match core-for-each-node-match world-set-bg1-enable-match world-slot-range-or-field-match world-init-and-mirror-match world-bump-or-trigger-match world-apply-two-levels-match core-sort-sprite-list-match core-init-sprite-pool-match core-flush-sprite-list-match core-alloc-node-match core-sort-active-sprites-match core-insert-sprite-sorted-match core-memory-init-match world-link-objects-match world-nibble-replace-match world-palette-lerp-match core-reset-runtime-globals-match core-adjust-area-position-match core-frame-dispatch-match core-probe-nearby-position-match world-player-slot-query-match world-slot-range-query-match world-bump-count-82-match misc-format-decimal-match world-link-session-match world-link-hw-reset-match world-link-report-match world-actor-tracking-match world-scale-by-band-match world-link-init-match world-link-session-reset-match world-spawn-slot-effect-match world-bump-rank-counter-match world-bitmap-asset-match world-link-state-step-match world-link-dispatch-match world-link-frame-step-match world-link-menu-step-match world-rank-query-match world-slot-probe-match world-shutdown-reset-match world-band-0800b16c-match core-band-08051154-match world-band-080534a8-match world-band-0803afbc-match misc-format-decimal-dup-match world-band-0804aeac-match world-band-08064f24-match world-band-a-315f8-match world-band-a-31bf4-match world-band-a-30b50-match world-band-a-30f78-match world-band-a-31534-match world-band-a-317f0-match world-actor-desc-resolve-match world-actor-id-matches-match world-release-entry-bc-match world-release-entry-d-match world-get-record16-match video-setup-bg0-bg1-match world-stop-audio-dma-match world-send-text-mode1-match ui-send-text-by-id-match ui-load-hud-palettes-match ui-clear-hud-field-c-match world-trigger-event39-match ui-clear-map-window-match ui-clear-map-window-dma-match world-scale-magnitude-match ui-draw-two-digits-match ui-clear-hud-rows-ab-match ui-send-text-mode2-match world-release-actor-and-slot-match world-get-record-node-by-id-match video-blit-strip-4bpp-match world-push-slot-queue-entry-match video-blit-strip-plain-match video-blit-strip-clip-left-match world-release-entry-e-match world-release-slot-held-match core-find-free-node-match world-actor-behavior-steps-match world-facing-target-match world-queue-draw-request-match ui-draw-eight-digits-match world-mark-distant-actors-match world-queue-draw-request-direct-match world-init-session-attr-match video-setup-bg0-bg1-menu-match world-random-below-count-match world-reset-track-heading-match world-add-to-counter-match world-spawn-at-slot-match world-ping-other-actors-match world-flags-to-angle-match world-spawn-selected-for-players-match world-is-kind20-match world-alloc-from-counter-match world-finish-actor-state-match world-refresh-score-digits-match world-get-actor-route-entry-match world-release-object-match world-find-random-tile-of-kind-match world-alloc-draw-entry-match world-reset-map-view-match world-try-launch-actor-match world-release-actor-entries-match world-is-player-actor-ready-match ui-init-menu-session-match world-is-near-any-actor-match world-project-actor-offset-match world-update-actor-lane-match
+build/world/p1_23778.bin: src/world/p1_23778.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-23778-match: verify-rom build/world/p1_23778.bin
+	@python3 tools/compare_slice.py baserom.gba 0x23778 build/world/p1_23778.bin
+
+build/world/p1_23794.bin: src/world/p1_23794.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-23794-match: verify-rom build/world/p1_23794.bin
+	@python3 tools/compare_slice.py baserom.gba 0x23794 build/world/p1_23794.bin
+
+build/world/p1_5b2a4.bin: src/world/p1_5b2a4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5b2a4-match: verify-rom build/world/p1_5b2a4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5b2a4 build/world/p1_5b2a4.bin
+
+build/world/p1_5b854.bin: src/world/p1_5b854.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5b854-match: verify-rom build/world/p1_5b854.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5b854 build/world/p1_5b854.bin
+
+build/world/p1_63c88.bin: src/world/p1_63c88.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-63c88-match: verify-rom build/world/p1_63c88.bin
+	@python3 tools/compare_slice.py baserom.gba 0x63c88 build/world/p1_63c88.bin
+
+build/world/p1_63d3c.bin: src/world/p1_63d3c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-63d3c-match: verify-rom build/world/p1_63d3c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x63d3c build/world/p1_63d3c.bin
+
+build/world/p1_4fee4.bin: src/world/p1_4fee4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-4fee4-match: verify-rom build/world/p1_4fee4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x4fee4 build/world/p1_4fee4.bin
+
+build/world/p1_500dc.bin: src/world/p1_500dc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-500dc-match: verify-rom build/world/p1_500dc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x500dc build/world/p1_500dc.bin
+
+build/world/p1_3f7f8.bin: src/world/p1_3f7f8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3f7f8-match: verify-rom build/world/p1_3f7f8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3f7f8 build/world/p1_3f7f8.bin
+
+build/world/p1_3f85c.bin: src/world/p1_3f85c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3f85c-match: verify-rom build/world/p1_3f85c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3f85c build/world/p1_3f85c.bin
+
+build/world/p1_35d60.bin: src/world/p1_35d60.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35d60-match: verify-rom build/world/p1_35d60.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35d60 build/world/p1_35d60.bin
+
+build/world/p1_35d9c.bin: src/world/p1_35d9c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35d9c-match: verify-rom build/world/p1_35d9c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35d9c build/world/p1_35d9c.bin
+
+build/world/p1_32548.bin: src/world/p1_32548.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-32548-match: verify-rom build/world/p1_32548.bin
+	@python3 tools/compare_slice.py baserom.gba 0x32548 build/world/p1_32548.bin
+
+build/world/p1_3258c.bin: src/world/p1_3258c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3258c-match: verify-rom build/world/p1_3258c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3258c build/world/p1_3258c.bin
+
+build/world/p1_35168.bin: src/world/p1_35168.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35168-match: verify-rom build/world/p1_35168.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35168 build/world/p1_35168.bin
+
+build/world/p1_351ac.bin: src/world/p1_351ac.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-351ac-match: verify-rom build/world/p1_351ac.bin
+	@python3 tools/compare_slice.py baserom.gba 0x351ac build/world/p1_351ac.bin
+
+build/world/p1_3f8dc.bin: src/world/p1_3f8dc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3f8dc-match: verify-rom build/world/p1_3f8dc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3f8dc build/world/p1_3f8dc.bin
+
+build/world/p1_3f910.bin: src/world/p1_3f910.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3f910-match: verify-rom build/world/p1_3f910.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3f910 build/world/p1_3f910.bin
+
+build/world/p1_59fe8.bin: src/world/p1_59fe8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-59fe8-match: verify-rom build/world/p1_59fe8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x59fe8 build/world/p1_59fe8.bin
+
+build/world/p1_5a070.bin: src/world/p1_5a070.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5a070-match: verify-rom build/world/p1_5a070.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5a070 build/world/p1_5a070.bin
+
+build/world/p1_5abdc.bin: src/world/p1_5abdc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5abdc-match: verify-rom build/world/p1_5abdc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5abdc build/world/p1_5abdc.bin
+
+build/world/p1_5ac10.bin: src/world/p1_5ac10.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5ac10-match: verify-rom build/world/p1_5ac10.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5ac10 build/world/p1_5ac10.bin
+
+build/world/p1_0dd50.bin: src/world/p1_0dd50.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-0dd50-match: verify-rom build/world/p1_0dd50.bin
+	@python3 tools/compare_slice.py baserom.gba 0xdd50 build/world/p1_0dd50.bin
+
+build/world/p1_357cc.bin: src/world/p1_357cc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-357cc-match: verify-rom build/world/p1_357cc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x357cc build/world/p1_357cc.bin
+
+build/world/p1_5ab90.bin: src/world/p1_5ab90.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5ab90-match: verify-rom build/world/p1_5ab90.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5ab90 build/world/p1_5ab90.bin
+
+build/world/p1_5aefc.bin: src/world/p1_5aefc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5aefc-match: verify-rom build/world/p1_5aefc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5aefc build/world/p1_5aefc.bin
+
+build/world/p1_35de4.bin: src/world/p1_35de4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35de4-match: verify-rom build/world/p1_35de4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35de4 build/world/p1_35de4.bin
+
+build/world/p1_35e38.bin: src/world/p1_35e38.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35e38-match: verify-rom build/world/p1_35e38.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35e38 build/world/p1_35e38.bin
+
+build/world/p1_13450.bin: src/world/p1_13450.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-13450-match: verify-rom build/world/p1_13450.bin
+	@python3 tools/compare_slice.py baserom.gba 0x13450 build/world/p1_13450.bin
+
+build/world/p1_134a4.bin: src/world/p1_134a4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-134a4-match: verify-rom build/world/p1_134a4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x134a4 build/world/p1_134a4.bin
+
+build/world/p1_6245c.bin: src/world/p1_6245c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6245c-match: verify-rom build/world/p1_6245c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6245c build/world/p1_6245c.bin
+
+build/world/p1_624b8.bin: src/world/p1_624b8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-624b8-match: verify-rom build/world/p1_624b8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x624b8 build/world/p1_624b8.bin
+
+build/world/p1_350a8.bin: src/world/p1_350a8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-350a8-match: verify-rom build/world/p1_350a8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x350a8 build/world/p1_350a8.bin
+
+build/world/p1_35230.bin: src/world/p1_35230.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35230-match: verify-rom build/world/p1_35230.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35230 build/world/p1_35230.bin
+
+build/world/p1_5ad10.bin: src/world/p1_5ad10.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5ad10-match: verify-rom build/world/p1_5ad10.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5ad10 build/world/p1_5ad10.bin
+
+build/world/p1_5ad68.bin: src/world/p1_5ad68.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5ad68-match: verify-rom build/world/p1_5ad68.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5ad68 build/world/p1_5ad68.bin
+
+build/world/p1_25fc0.bin: src/world/p1_25fc0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-25fc0-match: verify-rom build/world/p1_25fc0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x25fc0 build/world/p1_25fc0.bin
+
+build/world/p1_26034.bin: src/world/p1_26034.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-26034-match: verify-rom build/world/p1_26034.bin
+	@python3 tools/compare_slice.py baserom.gba 0x26034 build/world/p1_26034.bin
+
+build/world/p1_3c268.bin: src/world/p1_3c268.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3c268-match: verify-rom build/world/p1_3c268.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c268 build/world/p1_3c268.bin
+
+build/world/p1_3c2c4.bin: src/world/p1_3c2c4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3c2c4-match: verify-rom build/world/p1_3c2c4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c2c4 build/world/p1_3c2c4.bin
+
+build/world/p1_6ca24.bin: src/world/p1_6ca24.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6ca24-match: verify-rom build/world/p1_6ca24.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6ca24 build/world/p1_6ca24.bin
+
+build/world/p1_6ca70.bin: src/world/p1_6ca70.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6ca70-match: verify-rom build/world/p1_6ca70.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6ca70 build/world/p1_6ca70.bin
+
+build/world/p1_6cabc.bin: src/world/p1_6cabc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6cabc-match: verify-rom build/world/p1_6cabc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6cabc build/world/p1_6cabc.bin
+
+build/world/p1_6cb08.bin: src/world/p1_6cb08.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6cb08-match: verify-rom build/world/p1_6cb08.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6cb08 build/world/p1_6cb08.bin
+
+build/world/p1_6cb54.bin: src/world/p1_6cb54.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6cb54-match: verify-rom build/world/p1_6cb54.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6cb54 build/world/p1_6cb54.bin
+
+build/world/p1_6cba0.bin: src/world/p1_6cba0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6cba0-match: verify-rom build/world/p1_6cba0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6cba0 build/world/p1_6cba0.bin
+
+build/world/p1_6d810.bin: src/world/p1_6d810.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d810-match: verify-rom build/world/p1_6d810.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d810 build/world/p1_6d810.bin
+
+build/world/p1_6d860.bin: src/world/p1_6d860.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d860-match: verify-rom build/world/p1_6d860.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d860 build/world/p1_6d860.bin
+
+build/world/p1_6d8b0.bin: src/world/p1_6d8b0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d8b0-match: verify-rom build/world/p1_6d8b0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d8b0 build/world/p1_6d8b0.bin
+
+build/world/p1_6d900.bin: src/world/p1_6d900.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d900-match: verify-rom build/world/p1_6d900.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d900 build/world/p1_6d900.bin
+
+build/world/p1_6d950.bin: src/world/p1_6d950.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d950-match: verify-rom build/world/p1_6d950.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d950 build/world/p1_6d950.bin
+
+build/world/p1_6d9a0.bin: src/world/p1_6d9a0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-6d9a0-match: verify-rom build/world/p1_6d9a0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x6d9a0 build/world/p1_6d9a0.bin
+
+build/world/p1_716e8.bin: src/world/p1_716e8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-716e8-match: verify-rom build/world/p1_716e8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x716e8 build/world/p1_716e8.bin
+
+build/world/p1_71d20.bin: src/world/p1_71d20.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-71d20-match: verify-rom build/world/p1_71d20.bin
+	@python3 tools/compare_slice.py baserom.gba 0x71d20 build/world/p1_71d20.bin
+
+build/world/p1_71c90.bin: src/world/p1_71c90.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-71c90-match: verify-rom build/world/p1_71c90.bin
+	@python3 tools/compare_slice.py baserom.gba 0x71c90 build/world/p1_71c90.bin
+
+build/world/p1_71db4.bin: src/world/p1_71db4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-71db4-match: verify-rom build/world/p1_71db4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x71db4 build/world/p1_71db4.bin
+
+build/world/p1_71de8.bin: src/world/p1_71de8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-71de8-match: verify-rom build/world/p1_71de8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x71de8 build/world/p1_71de8.bin
+
+build/world/p1_58140.bin: src/world/p1_58140.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-58140-match: verify-rom build/world/p1_58140.bin
+	@python3 tools/compare_slice.py baserom.gba 0x58140 build/world/p1_58140.bin
+
+build/world/p1_581b4.bin: src/world/p1_581b4.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-581b4-match: verify-rom build/world/p1_581b4.bin
+	@python3 tools/compare_slice.py baserom.gba 0x581b4 build/world/p1_581b4.bin
+
+build/world/p1_5b388.bin: src/world/p1_5b388.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5b388-match: verify-rom build/world/p1_5b388.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5b388 build/world/p1_5b388.bin
+
+build/world/p1_5b484.bin: src/world/p1_5b484.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5b484-match: verify-rom build/world/p1_5b484.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5b484 build/world/p1_5b484.bin
+
+build/world/p1_2a9f0.bin: src/world/p1_2a9f0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-2a9f0-match: verify-rom build/world/p1_2a9f0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x2a9f0 build/world/p1_2a9f0.bin
+
+build/world/p1_2ab18.bin: src/world/p1_2ab18.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-2ab18-match: verify-rom build/world/p1_2ab18.bin
+	@python3 tools/compare_slice.py baserom.gba 0x2ab18 build/world/p1_2ab18.bin
+
+build/world/p1_130f0.bin: src/world/p1_130f0.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-130f0-match: verify-rom build/world/p1_130f0.bin
+	@python3 tools/compare_slice.py baserom.gba 0x130f0 build/world/p1_130f0.bin
+
+build/world/p1_427bc.bin: src/world/p1_427bc.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-427bc-match: verify-rom build/world/p1_427bc.bin
+	@python3 tools/compare_slice.py baserom.gba 0x427bc build/world/p1_427bc.bin
+
+build/world/p1_51048.bin: src/world/p1_51048.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-51048-match: verify-rom build/world/p1_51048.bin
+	@python3 tools/compare_slice.py baserom.gba 0x51048 build/world/p1_51048.bin
+
+build/world/p1_519b8.bin: src/world/p1_519b8.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-519b8-match: verify-rom build/world/p1_519b8.bin
+	@python3 tools/compare_slice.py baserom.gba 0x519b8 build/world/p1_519b8.bin
+
+build/world/p1_35844.bin: src/world/p1_35844.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-35844-match: verify-rom build/world/p1_35844.bin
+	@python3 tools/compare_slice.py baserom.gba 0x35844 build/world/p1_35844.bin
+
+build/world/p1_30848.bin: src/world/p1_30848.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-30848-match: verify-rom build/world/p1_30848.bin
+	@python3 tools/compare_slice.py baserom.gba 0x30848 build/world/p1_30848.bin
+
+build/world/p1_5131c.bin: src/world/p1_5131c.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-5131c-match: verify-rom build/world/p1_5131c.bin
+	@python3 tools/compare_slice.py baserom.gba 0x5131c build/world/p1_5131c.bin
+
+build/world/p1_31204.bin: src/world/p1_31204.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-31204-match: verify-rom build/world/p1_31204.bin
+	@python3 tools/compare_slice.py baserom.gba 0x31204 build/world/p1_31204.bin
+
+build/world/p1_3c708.bin: src/world/p1_3c708.c data/functions.csv data/ram_map.csv
+	@mkdir -p build/world
+	@python3 tools/build_c.py $< $@
+
+world-p1-3c708-match: verify-rom build/world/p1_3c708.bin
+	@python3 tools/compare_slice.py baserom.gba 0x3c708 build/world/p1_3c708.bin
+
+matching: libc-verify bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match world-entity-accessors-match misc-state-getters-match misc-table-lookup-match misc-record-table-match misc-session-reset-match text-draw-text-match world-entity-flags-match misc-session-node-match ui-menu-loop-match world-map-tiles-match bios-match misc-coord-accessors-match world-object-helpers-match core-linked-list-match world-object-state-match world-actor-states-match world-slot-config-match world-slot-table-match world-stat-counters-match world-slot-query-match world-node-search-match world-actor-control-match world-area-flags-match world-object-value-match world-table-entries-match world-pause-helpers-match world-slot-selectors-match world-list-head-match world-more-counters-match world-pool-gets-match world-threshold-match world-state-init-match world-gRam02030330-gets-match world-slot-scan-match world-list-ops-match world-map-tile-fields-match world-comm-flag-match world-pair-lookup-match world-tile-and-map-match world-anchor-reset-match world-slot-range-match world-word-compare-match world-ram-flags-match world-more-counters-2-match world-more-counters-3-match core-list-ops2-match world-ram-state-match world-window-config-match misc-coord-more-match world-id-verify-match world-flag-arrays-match world-scan-active-match world-actor-check-match world-frame-chain-match world-dma-flush-match world-slot-release-match world-counter-saturate-match world-set-index-match world-submit-object-match world-scan-all-match world-maybe-advance-match world-entity-query-match world-object-query-match world-get-inner-id-match world-is-ram-mode-match world-offset-helpers-match world-actor-init-match world-kind-scan-match world-history-push-match world-distance-accum-match world-bump-or-reset-match world-release-slot-match world-pool-first-match world-copy-flag-byte-match world-get-slot-unk10-match world-is-mode-two-match world-submit-pack-match core-read-triple-match world-notify-if-ready-match world-bump-save-counter-match world-masked-compare-match world-get-anchor-unk34-match world-forward-with-zero-match world-zero-three-flags-match world-clear-bg1-enable-match world-clear-flag-notify-match world-select-word-source-match world-zero-two-blocks-match world-init-handler-pack-match world-retarget-if-kind4-match world-step-then-check-match world-drain-two-chains-match world-forward-zero-arg4-match world-forward-zero-arg2-match world-lookup-then-call-match world-reset-session-flags-match core-zero-history-match core-clear-coord-byte71-match world-wrap-08005fc4-match world-wrap-080101d8-match world-wrap-08012a98-match world-wrap-080138e8-match world-wrap-080138f4-match world-wrap-08014fa0-match world-wrap-0803378c-match world-wrap-0803379c-match world-wrap-08035dd8-match world-wrap-08042784-match world-wrap-080428ac-match world-wrap-0804fb4c-match world-get-field-100-match world-spin-delay-match world-wrap-0804ff98-match world-wrap-0804ffb4-match world-wrap-080500d0-match world-wrap-08051464-match world-wrap-0805a4f4-match world-wrap-08063bcc-match world-get-anchor-unk04-match world-get-anchor-unk30-match world-wrap-08051480-match world-wrap-08059d7c-match world-get-record-index-match world-get-ram-word16-match world-is-state-two-match world-is-anchor-small-match world-rearm-slot-match world-accumulate-distance-match core-clip-bounds-match world-engage-actor-match core-insert-sorted-match world-refresh-then-notify-match world-check-current-entity-match core-for-each-node-match world-set-bg1-enable-match world-slot-range-or-field-match world-init-and-mirror-match world-bump-or-trigger-match world-apply-two-levels-match core-sort-sprite-list-match core-init-sprite-pool-match core-flush-sprite-list-match core-alloc-node-match core-sort-active-sprites-match core-insert-sprite-sorted-match core-memory-init-match world-link-objects-match world-nibble-replace-match world-palette-lerp-match core-reset-runtime-globals-match core-adjust-area-position-match core-frame-dispatch-match core-probe-nearby-position-match world-player-slot-query-match world-slot-range-query-match world-bump-count-82-match misc-format-decimal-match world-link-session-match world-link-hw-reset-match world-link-report-match world-actor-tracking-match world-scale-by-band-match world-link-init-match world-link-session-reset-match world-spawn-slot-effect-match world-bump-rank-counter-match world-bitmap-asset-match world-link-state-step-match world-link-dispatch-match world-link-frame-step-match world-link-menu-step-match world-rank-query-match world-slot-probe-match world-shutdown-reset-match world-band-0800b16c-match core-band-08051154-match world-band-080534a8-match world-band-0803afbc-match misc-format-decimal-dup-match world-band-0804aeac-match world-band-08064f24-match world-band-a-315f8-match world-band-a-31bf4-match world-band-a-30b50-match world-band-a-30f78-match world-band-a-31534-match world-band-a-317f0-match world-actor-desc-resolve-match world-actor-id-matches-match world-release-entry-bc-match world-release-entry-d-match world-get-record16-match video-setup-bg0-bg1-match world-stop-audio-dma-match world-send-text-mode1-match ui-send-text-by-id-match ui-load-hud-palettes-match ui-clear-hud-field-c-match world-trigger-event39-match ui-clear-map-window-match ui-clear-map-window-dma-match world-scale-magnitude-match ui-draw-two-digits-match ui-clear-hud-rows-ab-match ui-send-text-mode2-match world-release-actor-and-slot-match world-get-record-node-by-id-match video-blit-strip-4bpp-match world-push-slot-queue-entry-match video-blit-strip-plain-match video-blit-strip-clip-left-match world-release-entry-e-match world-release-slot-held-match core-find-free-node-match world-actor-behavior-steps-match world-facing-target-match world-queue-draw-request-match ui-draw-eight-digits-match world-mark-distant-actors-match world-queue-draw-request-direct-match world-init-session-attr-match video-setup-bg0-bg1-menu-match world-random-below-count-match world-reset-track-heading-match world-add-to-counter-match world-spawn-at-slot-match world-ping-other-actors-match world-flags-to-angle-match world-spawn-selected-for-players-match world-is-kind20-match world-alloc-from-counter-match world-finish-actor-state-match world-refresh-score-digits-match world-get-actor-route-entry-match world-release-object-match world-find-random-tile-of-kind-match world-alloc-draw-entry-match world-reset-map-view-match world-try-launch-actor-match world-release-actor-entries-match world-is-player-actor-ready-match ui-init-menu-session-match world-is-near-any-actor-match world-project-actor-offset-match world-update-actor-lane-match world-p1-23778-match world-p1-23794-match world-p1-5b2a4-match world-p1-5b854-match world-p1-63c88-match world-p1-63d3c-match world-p1-4fee4-match world-p1-500dc-match world-p1-3f7f8-match world-p1-3f85c-match world-p1-35d60-match world-p1-35d9c-match world-p1-32548-match world-p1-3258c-match world-p1-35168-match world-p1-351ac-match world-p1-3f8dc-match world-p1-3f910-match world-p1-59fe8-match world-p1-5a070-match world-p1-5abdc-match world-p1-5ac10-match world-p1-0dd50-match world-p1-357cc-match world-p1-5ab90-match world-p1-5aefc-match world-p1-35de4-match world-p1-35e38-match world-p1-13450-match world-p1-134a4-match world-p1-6245c-match world-p1-624b8-match world-p1-350a8-match world-p1-35230-match world-p1-5ad10-match world-p1-5ad68-match world-p1-25fc0-match world-p1-26034-match world-p1-3c268-match world-p1-3c2c4-match world-p1-6ca24-match world-p1-6ca70-match world-p1-6cabc-match world-p1-6cb08-match world-p1-6cb54-match world-p1-6cba0-match world-p1-6d810-match world-p1-6d860-match world-p1-6d8b0-match world-p1-6d900-match world-p1-6d950-match world-p1-6d9a0-match world-p1-716e8-match world-p1-71d20-match world-p1-71c90-match world-p1-71db4-match world-p1-71de8-match world-p1-58140-match world-p1-581b4-match world-p1-5b388-match world-p1-5b484-match world-p1-2a9f0-match world-p1-2ab18-match world-p1-130f0-match world-p1-427bc-match world-p1-51048-match world-p1-519b8-match world-p1-35844-match world-p1-30848-match world-p1-5131c-match world-p1-31204-match world-p1-3c708-match
 	@python3 tools/verify_matching_regions.py
 
 build/misc/id_compatibility.bin: src/misc/id_compatibility.c data/functions.csv data/ram_map.csv

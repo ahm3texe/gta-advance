@@ -1,0 +1,17 @@
+{
+  "address": "0x08051048",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_51048.c",
+      "sha256": "c9b0f7e60302c873f74aab410246d87457fa3ca22dd59fae0e4b2b5f734e3e5e",
+      "compiled_size": 2,
+      "mapped_size": 2,
+      "same": 1,
+      "total": 1,
+      "matching": true,
+      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x08051048.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08051048.json. */\n#include \"gba_types.h\"\n\nvoid NoOp08051048(void) {}\n"
+    }
+  ]
+}

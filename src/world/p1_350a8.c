@@ -1,0 +1,26 @@
+/* Nesneye ses kaynagi bagla ve seviyesini kur — 0x080350A8.
+ * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080350A8.json. */
+#include "gba_types.h"
+#include "phase1_types.h"
+
+extern Phase1Resource *gRom08CA788C[];
+extern u32 FUN_08033ad8(u32);
+extern u32 FUN_08032d74(void *,u32,u32,u32);
+extern void FUN_08032fc4(u32,u32);
+void FUN_080350a8(Phase1SoundActor *actor,u32 id)
+{
+    u32 index;
+    Phase1Resource *resource;
+    u32 handle;
+    if (actor && actor->sound && !FUN_08033ad8(0)) {
+        index = id - 201;
+        if (index <= 271) {
+            resource = gRom08CA788C[index];
+            if (resource) {
+                handle = FUN_08032d74(resource->data,resource->length,2,14);
+                actor->sound->handle = handle;
+                FUN_08032fc4(handle,32768);
+            }
+        }
+    }
+}

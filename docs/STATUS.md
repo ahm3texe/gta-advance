@@ -7,18 +7,18 @@ baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make sta
 
 | Ölçüm | Değer |
 |---|---:|
-| Fonksiyon haritası | 1935 fonksiyon / 454258 bayt |
-| İnsan incelemesi (`documented+`) | 592 / 1935 |
-| Byte-matching | 543 fonksiyon / 53776 bayt (%11.84) |
-| C kaynağı | 567 toplam / 530 matching |
-| Kaynaktan doğrulanan ROM | 35312 bayt |
+| Fonksiyon haritası | 1941 fonksiyon / 454270 bayt |
+| İnsan incelemesi (`documented+`) | 664 / 1941 |
+| Byte-matching | 615 fonksiyon / 58738 bayt (%12.93) |
+| C kaynağı | 645 toplam / 602 matching |
+| Kaynaktan doğrulanan ROM | 40328 bayt |
 | libc doğrulaması | 448 bayt |
-| Toplam doğrulanmış ROM alanı | 35760 bayt |
+| Toplam doğrulanmış ROM alanı | 40776 bayt |
 | Açık sınır borcu | 0 kısa sınır + 0 ARM incelemesi + 0 aşırı büyüme |
 
 ## Şu anki tek aktif iş
 
-Aktif iş yok.
+**PHASE-001 — Faz 1: ikiz ve taze komşu hasadını tamamen bitir**
 
 ## Açık iş kuyruğu
 
@@ -29,6 +29,7 @@ Aktif iş yok.
 | MAP-010 | P2 | todo | Bosluk analizinin YALNIZ sifir-riskli 16 ARM girisini uygula | ARM bolgesi bagimsiz olculdu (cond!=0xF orani tam 1.0000); bu 16 giris TOOL-010 kapisindan gecirilerek eklenir. 123 prologsuz Thumb yapragi BILEREK DISARIDA birakilir |
 | ARM-001 | P1 | todo | ARM bolgesindeki 18 fonksiyonu C ile eslestir | ARM kipi derleme zinciri calisir durumda; her aday ROM ile olculur, eslesirse bolge kaydedilir |
 | MATCH-019 | P1 | todo | SIO sürücüsünün kalan komut farklarını çöz | FUN_080657d8 doğal C ile make c-match kapısından geçer; RX adres ilişkisi ve pencere/çıkış blokları güncel ROM diff ile ayrı ayrı incelenir |
+| PHASE-001 | P1 | in_progress | Faz 1: ikiz ve taze komşu hasadını tamamen bitir | Sabit başlangıç hedefleri ve yeni eşleşmelerin açtığı ikizler tamamen ölçülür; aday başına en çok dört deneme; her sonuç tam matching veya kaynak ve ölçüm kanıtlı park; make check-full geçer |
 
 ## Araç zinciri kilidi
 

@@ -1,0 +1,17 @@
+{
+  "address": "0x0803258C",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_3258c.c",
+      "sha256": "09c43d7ca825ef73396cb275ab66bb780a37007077eb70c886056d809f15072c",
+      "compiled_size": 68,
+      "mapped_size": 68,
+      "same": 34,
+      "total": 34,
+      "matching": true,
+      "code": "/* Iki tablo imlecini ilerletip 16-bit soz uret — 0x0803258C.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803258C.json. */\n#include \"gba_types.h\"\n\nextern u32 gRam020272F0, gRam020272FC, gRam020272F4;\nextern const u8 gRom08CA6608[];\nu32 FUN_0803258c(void)\n{\n    u32 high,low;\n    high = (gRam020272F0 + 3) & 1023;\n    gRam020272F0 = high;\n    low = (gRam020272FC + 1) & 1023;\n    gRam020272FC = low;\n    gRam020272F4++;\n    return (gRom08CA6608[high] << 8) | gRom08CA6608[low];\n}\n"
+    }
+  ]
+}

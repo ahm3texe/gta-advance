@@ -1,0 +1,17 @@
+{
+  "address": "0x08013450",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_13450.c",
+      "sha256": "f6489b72ce6d594e5515025d0c7327652fe3cc57e8c34e636cd12a7b7d33c4b4",
+      "compiled_size": 84,
+      "mapped_size": 84,
+      "same": 42,
+      "total": 42,
+      "matching": true,
+      "code": "/* Cift bagli 31 bos dugumun listesini kur — 0x08013450.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08013450.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1NodePool gRam02022AC0;\nvoid FUN_08013450(void)\n{\n    Phase1ListNode *node;\n    s32 id;\n    gRam02022AC0.free = &gRam02022AC0.nodes[1];\n    gRam02022AC0.used = 0;\n    node = &gRam02022AC0.nodes[1];\n    node->next = node + 1;\n    node->previous = 0;\n    node->id = 1;\n    node++;\n    for (id = 2; id <= 30; id++, node++) {\n        node->previous = node - 1;\n        node->next = node + 1;\n        node->id = id;\n    }\n    node->previous = node - 1;\n    node->next = 0;\n    node->id = id;\n}\n"
+    }
+  ]
+}

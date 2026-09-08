@@ -1,0 +1,17 @@
+{
+  "address": "0x0803C6B8",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_3c6b8.c",
+      "sha256": "5833a26662dc837767e85d2d6797bdc35276f6796560b5ec39dff85f3917439a",
+      "compiled_size": 84,
+      "mapped_size": 80,
+      "same": 25,
+      "total": 41,
+      "matching": false,
+      "code": "/* Oyuncu girdisi veya bagli nesne bayragini denetle — 0x0803C6B8.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C6B8.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 GetOwnerSlot(void *);\nextern u32 gRam0300009C;\nextern u8 gUnk02010C60[];\nu32 FUN_0803c6b8(Phase1LinkedActor *actor)\n{\n    Phase1GroupedActor *linked = actor->linked;\n    if (GetOwnerSlot(actor)) {\n        if (gRam0300009C & (gUnk02010C60[26] ? 4 : 3)) return 1;\n        if (gRam0300009C & 240) return 1;\n    } else if (linked->flags & 0x01000000) return 1;\n    return 0;\n}\n"
+    }
+  ]
+}

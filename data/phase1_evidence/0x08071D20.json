@@ -1,0 +1,17 @@
+{
+  "address": "0x08071D20",
+  "attempts": [
+    {
+      "number": 1,
+      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "source": "src/world/p1_71d20.c",
+      "sha256": "b21e67e5cc73961a5473d9b463f5e5ebd815a91476aea618960de8488a81320f",
+      "compiled_size": 48,
+      "mapped_size": 48,
+      "same": 23,
+      "total": 23,
+      "matching": true,
+      "code": "/* Sistem cagrisinin hata kodunu cagiran baglama tasi — 0x08071D20.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08071D20.json. */\n#include \"gba_types.h\"\n\nextern s32 gRam020363C4;\nextern s32 FUN_08071b8c(u32);\ns32 FUN_08071d20(s32 *error,u32 arg0)\n{\n    s32 result;\n    gRam020363C4 = 0;\n    result = FUN_08071b8c(arg0);\n    if (result == -1 && gRam020363C4 != 0) *error = gRam020363C4;\n    return result;\n}\n"
+    }
+  ]
+}
