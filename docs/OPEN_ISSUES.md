@@ -10,6 +10,47 @@ bytes)
 
 ---
 
+## The reported percentage is measured against an INCOMPLETE denominator
+
+`tools/find_map_gaps.py`, 2026-09-10. Read this before quoting a figure.
+
+Every percentage this project reports is matched bytes over the sum of the sizes
+in `data/functions.csv`. That sum is **454,280 bytes**. It is not the ROM's whole
+code region: 618 stretches of the image lie between one map entry's end and the
+next one's start, and after the alignment padding is taken out, **11,078 bytes of
+them hold instructions that no entry covers**.
+
+```
+gaps: 618  (11988 bytes)
+  padding :  455     910 bytes      every byte zero, or a lone 2-byte slot
+  stubs   :   40     278 bytes      split cleanly into complete bx-lr bodies
+  code    :  123   10800 bytes      instructions, boundaries not yet decided
+```
+
+Spot checks confirm these are real functions, not data:
+
+* `0x0803554C` (+640) opens `push {r4,r5,r6,lr} / ldr r5,=... / bl 0x80358D8`.
+* `0x0805A33C` (+24) is a complete script handler ending in `movs r0,#1 / bx lr`,
+  in the middle of a block whose neighbours on both sides are already decompiled.
+
+**So a figure of X/454,280 is high by a factor of 1.0244 against X/465,358.** At
+the time of writing that is 14.00% reported against **13.67%** honest. The gap
+does not shrink as work proceeds; it moves with whatever the map is missing.
+
+Two things follow, and neither is done:
+
+1. The map needs those 123 stretches split into functions. That needs a
+   disassembler pass and a boundary decision each, not a script.
+2. Until it is, `tools/gen_report.py` publishes the optimistic number. The
+   guard it does have only proves the units sum to what `functions.csv` says --
+   it cannot see code `functions.csv` never listed.
+
+Of the 54 stub bodies the tool can extract exactly, only **3** have any
+reference at all (a `bl` or a pool word holding their address), and **none** is
+branched into from the entry before it. So they are not that entry's second exit
+either; they are unreferenced two-byte functions, a weaker case than the 27 in
+`src/misc/empty_stubs.c`, every one of which is `bl`-called.
+
 ## 0. What you need to know
 
 **Goal.** A byte-matching decompilation of the GTA Advance (Europe) GBA ROM. The
