@@ -1,237 +1,237 @@
 address,size,name,source,status,notes
-0x02000008,2,gRam02000008,decomp,provisional,u16 onbelleklenmis X; 0x08031294 HUD yeniden ciziminde kullaniyor
-0x0200000A,2,gRam0200000A,decomp,provisional,u16 onbelleklenmis Y; 0x08031294 HUD yeniden ciziminde kullaniyor
-0x02000100,32,gRam02000100,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000008,2,gRam02000008,decomp,provisional,cached u16 X; 0x08031294 uses it when redrawing the HUD
+0x0200000A,2,gRam0200000A,decomp,provisional,cached u16 Y; 0x08031294 uses it when redrawing the HUD
+0x02000100,32,gRam02000100,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x02000130,1,gVBlankState,decomp,verified,Set to 1 before waiting for VBlank; cleared by the VBlank handler
-0x02000134,2,gRam02000134,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
-0x02000140,32,gRam02000140,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000134,2,gRam02000134,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
+0x02000140,32,gRam02000140,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
 0x02000224,4,gRam02000224,decomp,provisional,Referenced by a block queued for matching; role unknown
-0x02000230,64,gRam02000230,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000230,64,gRam02000230,decomp,provisional,"Size 64 MEASURED (Memset call, 0x08066144)"
 0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
-0x02000288,2,gRam02000288,decomp,provisional,0x080657D8 icinde `1 - r2` degerini strh ile yaziyor; deger negatif olabilecegi icin kaynak s16 olarak bildiriyor. Boyut 2.
-0x020003C0,32,gRam020003C0,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000288,2,gRam02000288,decomp,provisional,0x080657D8 writes the value `1 - r2` with strh; the source declares it s16 because the value can be negative. Size 2.
+0x020003C0,32,gRam020003C0,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x020003E0,4,gFrameReset,decomp,provisional,Cleared during frame reset
-0x020003E4,1,gCartFlag,decomp,verified,"0x080336EC/2C tarafindan test edilen bayrak (=1 iken islem yapiliyor)  IZLEME: kayit kontrolunde f684te 0->1, yeni oyunda f1066da 1->0, bolum yuklenince f1101de 0->1."
-0x020003EC,2,gRam020003EC,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
-0x02000400,32,gRam02000400,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
-0x02000420,64,gRam02000420,decomp,provisional,"Boyut 64 OLCULDU (Memset cagrisi, 0x08066144)"
+0x020003E4,1,gCartFlag,decomp,verified,"flag tested by 0x080336EC/2C (work is done while it is 1)  TRACE: 0->1 at f684 during the save check, 1->0 at f1066 on a new game, 0->1 at f1101 once the level is loaded."
+0x020003EC,2,gRam020003EC,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
+0x02000400,32,gRam02000400,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
+0x02000420,64,gRam02000420,decomp,provisional,"Size 64 MEASURED (Memset call, 0x08066144)"
 0x02000460,36,gSaveSlotHeaders,decomp,verified,Three 12-byte save slot headers; byte 0 of each is the validity marker
-0x0200048C,4,gRam0200048C,decomp,provisional,u16 sayac; 0x080664F0 kontrolu
+0x0200048C,4,gRam0200048C,decomp,provisional,u16 counter; checked by 0x080664F0
 0x02000494,4,gLoopState,decomp,provisional,Main loop state word
 0x02000498,4,gRam02000498,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0200049C,4,gOuterState,decomp,provisional,Outer loop state word
-0x020004A0,4,gRam020004A0,decomp,provisional,0x08052C68 bayrak kapisi anahtari olarak okuyor.
-0x020004A4,2,gRam020004A4,decomp,provisional,0x080657D8 icinde `1 - r2` degerini strh ile yaziyor; deger negatif olabilecegi icin kaynak s16 olarak bildiriyor. Boyut 2.
-0x020004B0,8,gFocusPoint,decomp,verified,"iki bilesenli odak noktasi; UpdateFocusPoint yaziyor (byte-matching kanit)  IZLEME(araba, tam genislik): iki adet 16.16 SABIT NOKTA koordinat. +0x00=X, +0x04=Y. Baslangic (3360.000, 9568.000) -- tam sayilar. Up basiliyken Y tam olarak -374632 (-5.716) adimliyor, 29/29 sabit. Bazi X farklari TAM 65536 (1.000) ve 262144 (4.000): 16.16 formati boylece KANITLANDI."
+0x020004A0,4,gRam020004A0,decomp,provisional,0x08052C68 reads it as the flag gate switch.
+0x020004A4,2,gRam020004A4,decomp,provisional,0x080657D8 writes the value `1 - r2` with strh; the source declares it s16 because the value can be negative. Size 2.
+0x020004B0,8,gFocusPoint,decomp,verified,"two-component focus point; UpdateFocusPoint writes it (byte-matching evidence)  TRACE (car, full width): two 16.16 FIXED-POINT coordinates. +0x00=X, +0x04=Y. Start (3360.000, 9568.000) -- whole numbers. While Up is held, Y steps by exactly -374632 (-5.716), constant in 29/29 samples. Some X differences are EXACTLY 65536 (1.000) and 262144 (4.000), which PROVES the 16.16 format."
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
-0x020004C0,2,gRam020004C0,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
+0x020004C0,2,gRam020004C0,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
-0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour  IZLEME: 16 baytlik blok; 0. bayti f52den itibaren her kare 1 artiyor (sayac davranisi).  PROVISIONAL BIRAKILDI -- AD SUPHELI: 0. bayti her kare artiyor, yani sayac davranisi; ""durum"" adi desteklenmiyor."
+0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour  TRACE: a 16-byte block; 0. byte increases by 1 every frame from f52 onwards (counter behaviour).  PROVISIONAL BIRAKILDI -- AD SUPHELI: 0. byte increases every frame, so counter behaviour; the name ""state"" is not supported."
 0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
 0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
-0x02000D0C,2,gRam02000D0C,decomp,provisional,"Tani isareti: 0x080657D8 girisinde mod parametresini (yigindaki [sp,#0]) buraya yaziyor. strh, yani u16. Kilitlenme aninda son calisan surucu modunu RAMden okumayi sagliyor."
-0x02000D14,4,gGlobalState02000D14,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumu sonunda sifirlanan durum kelimesi.
+0x02000D0C,2,gRam02000D0C,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
+0x02000D14,4,gGlobalState02000D14,decomp,provisional,state word zeroed by FUN_080100D0 at the end of buffer setup.
 0x02000D18,4,gRam02000D18,decomp,provisional,Referenced by a block queued for matching; role unknown
-0x02000D40,2,gSlotSelector,decomp,provisional,"1 ise ikincil yuva (0x02001140), degilse birincil (0x02000F10) secilir"
-0x02000D50,10,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager; +8 ve +9 SaveBufferCopy8To9 tarafindan kullaniliyor (byte-matching kanit), yani boyut en az 10"
+0x02000D40,2,gSlotSelector,decomp,provisional,"when 1 the secondary slot (0x02001140) is selected, otherwise the primary one (0x02000F10)"
+0x02000D50,10,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager; +8 and +9 are used by SaveBufferCopy8To9 (byte-matching evidence), so the size is at least 10"
 0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
-0x02000E80,32,gRam02000E80,decomp,provisional,"Boyut 32 OLCULDU (Memset cagrisi, 0x08066144)"
+0x02000E80,32,gRam02000E80,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x02000EB4,4,gFrameCounterEwram,decomp,provisional,EWRAM frame counter
 0x02000EB8,4,gEepromAvailable,decomp,provisional,Nonzero when EEPROM was identified; also used as IRQ depth
-0x02000EBC,4,gPostFrameState,decomp,provisional,"State written after the frame completes  IZLEME (oturum 7): f25741de 0 -> 1, arac surerken (A basili).  PROVISIONAL BIRAKILDI -- TEK GOZLEM: yalnizca bir kez 0->1 goruldu, davranis kalibi cikarilamadi."
+0x02000EBC,4,gPostFrameState,decomp,provisional,"State written after the frame completes  TRACE (session 7): 0 -> 1 at f25741 while driving a vehicle (A held).  LEFT PROVISIONAL -- A SINGLE OBSERVATION: 0->1 was seen only once, and no behavioural pattern could be derived."
 0x02000EC0,4,gSavePayloadSize,decomp,verified,"Per-slot payload size in bytes, rounded up to an eight-byte EEPROM block"
 0x02000EC4,4,gSaveSlotCount,decomp,verified,"Configured save slot count, clamped to 1..16 by InitSaveSystem"
 0x02000ED0,32,gSaveMetadata,decomp,verified,"Save metadata buffer; first 8 bytes are the CRAWSAVE signature, byte 8 is slot count, byte 16+slot is the per-slot valid flag"
-0x02000F00,1,gRam02000F00,decomp,provisional,Tek bayt; 0x0803AFBC `ldrb` ile okuyor (0x0803B168). Anlami henuz cozulmedi.
-0x02000F04,4,gSessionPtr,decomp,verified,"Pointer used by 0x0803C798; target layout partially known; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan  IZLEME: f1068de 0->0x02000F10, yani gRam02000F10u gosteriyor. Iki sembol ayni yapiyi isaret ediyor."
-0x02000F08,4,gRam02000F08,decomp,provisional,Isaretci; 0x0803AFBC dereference edip +0x1C alanini okuyor. Hedef yapi henuz cozulmedi.
+0x02000F00,1,gRam02000F00,decomp,provisional,Single byte; 0x0803AFBC reads it with `ldrb` (0x0803B168). Its meaning has not been worked out yet.
+0x02000F04,4,gSessionPtr,decomp,verified,"Pointer used by 0x0803C798; target layout partially known; +0x00 is a POINTER (menu_screen.c dereferences it: ldr r1,[r0] + ldrb r2,[r1,#8]); +8 of the pointee is `kind` in menu_screen and `flags` in session_node.c -- the same field  TRACE: 0->0x02000F10 at f1068, so it points at gRam02000F10. The two symbols point at the same structure."
+0x02000F08,4,gRam02000F08,decomp,provisional,Pointer; 0x0803AFBC dereferences it and reads the +0x1C field. The target structure has not been worked out yet.
 0x02000F0C,4,gState1,decomp,provisional,Unidentified state word
-0x02000F10,18,gRam02000F10,decomp,verified,"Referenced by a block queued for matching; role unknown; boyut 36->18 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor); +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan  IZLEME: gSessionPtr f1068de bu adresi tutuyor; oturum/kayit yapisinin govdesi.  IZLEME (oturum 6): +0x10 alani olum karesinde (health 4->0 ile ayni kare) 0x40000 -> 0 oldu. gSessionPtrin gosterdigi oyuncu/oturum yapisi oldugu bir kez daha desteklendi.  IZLEME (tutuklanma, oturum 8): +0x10 CANIN 16.16 SABIT NOKTALI HALI. Yeni oyunda 6553600 = 100*65536 = 100.0; tutuklanmada tam 262144 (4.0) dustu ve ayni karede player_health 100->96 oldu; olum oturumunda 4.0 -> 0 gitmisti. Uc ayri oturumdan tutarli. player_health onun tam sayi kopyasi."
-0x02000F22,1,player_health,libretro_cheat,verified,"Cheat value 100  IZLEME: yeni oyunda f1068de 0->100. Ad ve anlam DOGRULANDI.  IZLEME (hasar/olum sinamasi, oturum 6): AD VE ANLAM KANITLANDI. Her yumrukta tam 4 azaldi (100 -> 0, 25 adim), sifirlaninca olum dizisi basladi."
+0x02000F10,18,gRam02000F10,decomp,verified,"Referenced by a block queued for matching; role unknown; size clipped 36->18 (up to the neighbouring symbol / end of the region; the real size is unknown); +0x00 is a POINTER (menu_screen.c dereferences it: ldr r1,[r0] + ldrb r2,[r1,#8]); +8 of the pointee is `kind` in menu_screen and `flags` in session_node.c -- the same field  TRACE: gSessionPtr holds this address at f1068; the body of the session/record structure.  TRACE (session 6): the +0x10 field went 0x40000 -> 0 on the death frame (the same frame as health 4->0). This again supports it being the player/session structure that gSessionPtr points at.  TRACE (arrest, session 8): +0x10 is HEALTH IN 16.16 FIXED POINT. On a new game 6553600 = 100*65536 = 100.0; on the arrest it dropped by exactly 262144 (4.0) and player_health went 100->96 on the same frame; in the death session it had gone 4.0 -> 0. Consistent across three separate sessions. player_health is its integer copy."
+0x02000F22,1,player_health,libretro_cheat,verified,"Cheat value 100  TRACE: 0->100 at f1068 on a new game. Name and meaning VERIFIED.  TRACE (damage/death test, session 6): NAME AND MEANING PROVEN. It dropped by exactly 4 per punch (100 -> 0, 25 steps), and the death sequence started when it reached zero."
 0x02000F70,4,gState0,decomp,provisional,Unidentified state word
-0x02000F80,4,gRam02000F80,decomp,provisional,"Ucuncu yuva isaretcisi; +0x20 alanda bir struct, +0x12 u16"
+0x02000F80,4,gRam02000F80,decomp,provisional,"Third slot pointer; a struct in the +0x20 field, +0x12 u16"
 0x02001050,4,gState2,decomp,provisional,Unidentified state word
-0x02001060,4,gRam02001060,decomp,provisional,Ikincil bir yuva isaretcisi; slot_query.c'nin bagimli sembolu
+0x02001060,4,gRam02001060,decomp,provisional,A secondary slot pointer; dependent symbol of slot_query.c
 0x0200108C,2,weapon_slot_0,libretro_cheat,provisional,Start of strided weapon records
 0x0200108E,1,weapon_ammo_0,libretro_cheat,provisional,Records appear to use stride 8
 0x020010E4,2,car_weapon_id,libretro_cheat,provisional,
 0x020010E6,1,car_weapon_ammo,libretro_cheat,provisional,
 0x02001130,4,gState3,decomp,provisional,Unidentified state word
-0x02001140,36,gRam02001140,decomp,verified,"Referenced by a block queued for matching; role unknown; +0x00 bir ISARETCIDIR (menu_screen.c dereference ediyor: ldr r1,[r0] + ldrb r2,[r1,#8]); isaret edilenin +8'i menu_screen'de `kind`, session_node.c'de `flags` -- ayni alan  IZLEME (oturum 7): gRam02000F10 ile PARALEL yapi. Yeni oyunda f22512de ikisinin de +0x04 alani 2, +0x10 alani 6553600 oldu -- ayni kare, ayni degerler. Ikinci oyuncu/varlik yuvasi."
-0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems  IZLEME: acilista f4te 0->5 (dil ekraninda 5 secenek), oyun baslayinca f1068de 5->0."
+0x02001140,36,gRam02001140,decomp,verified,"Referenced by a block queued for matching; role unknown; +0x00 is a POINTER (menu_screen.c dereferences it: ldr r1,[r0] + ldrb r2,[r1,#8]); +8 of the pointee is `kind` in menu_screen and `flags` in session_node.c -- the same field  TRACE (session 7): a structure PARALLEL to gRam02000F10. On a new game at f22512 the +0x04 field of both became 2 and the +0x10 field 6553600 -- same frame, same values. The second player/entity slot."
+0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems  TRACE: 0->5 at f4 on boot (5 options on the language screen), 5->0 at f1068 when the game starts."
 0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
-0x02001210,4,gMenuPaletteSource,decomp,verified,"Palette data DMA-ed into palette RAM by InitMenuScreen  IZLEME: degerler BGR555 renk (0x7C1F macenta, 0x7FFF beyaz) -- ISARETCI DEGIL, palet tamponu. u32 olarak okunmamali."
+0x02001210,4,gMenuPaletteSource,decomp,verified,"Palette data DMA-ed into palette RAM by InitMenuScreen  TRACE: the values are BGR555 colours (0x7C1F magenta, 0x7FFF white) -- NOT A POINTER, a palette buffer. It must not be read as u32."
 0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
 0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
-0x02001440,8,gRam02001440,decomp,provisional,"FUN_08003454 icinde {kare tablosu isaretcisi, indeks} ciftini tutuyor: +0x00 8 baytlik girislerden olusan tablonun tabani, +0x04 gecerli indeks. Girisin ilk kelimesi LZ77 sikistirilmis karo verisi, ikinci kelimesi (varsa) palet. Ilk kelime 0 olunca indeks sifirlaniyor."
-0x02001450,4,gRam02001450,decomp,provisional,FUN_08003454 icinde LZ77UnCompWram hedefi ve ardindan DMA3 kaynagi olarak kullanilan tampon. Boyut DOGRULANMADI; yalnizca tabani biliniyor.
+0x02001440,8,gRam02001440,decomp,provisional,"In FUN_08003454 it holds a {frame table pointer, index} pair: +0x00 is the base of a table of 8-byte entries, +0x04 the current index. The entry's first word is LZ77-compressed tile data, its second word (when present) the palette. When the first word is 0 the index is reset."
+0x02001450,4,gRam02001450,decomp,provisional,"In FUN_08003454, the buffer used as the LZ77UnCompWram destination and then as the DMA3 source. Size NOT VERIFIED; only the base is known."
 0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
-0x0200F280,464,gLinkBlock,decomp,provisional,ROM: 0x08066144 bunu InitLinkBlock ile 464 bayt sifirlayip kuruyor; gRam02036338 buna isaret ediyor
+0x0200F280,464,gLinkBlock,decomp,provisional,ROM: 0x08066144 sets it up by zeroing 464 bytes with InitLinkBlock; gRam02036338 points at it
 0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
-0x02010F48,4,gRam02010F48,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02010F4C,4,gRam02010F4C,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02010F70,128,gHistory,decomp,provisional,"+0 guncel kayit, +0x78 asagi kaydirilan 31 girisli gecmis kuyrugu"
-0x02010FF0,1,gRam02010FF0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u8 durum alani
-0x02011018,4,gRam02011018,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02011030,114,gRam02011030,decomp,verified,"+12/+16 ikili koordinat cifti, +72 ayri kelime; ayrica +0x30/+0x34/+0x38 ReadTriple tarafindan okunuyor (byte-matching kanit); +0x71 ClearCoordByte71 tarafindan yaziliyor (byte-matching kanit)  IZLEME (oturum 6): +0x0C alaninin dusuk bayti olumde temizlendi (0x1000030 -> 0x1000000). Bu blok UpdateFocusPointin (0x0800A9E4) okudugu CoordBlock."
-0x020110AC,4,gRam020110AC,decomp,provisional,Ayri literal ile yuklenen kelime; 0x02011030+0x7C ile ayni adres ama ROM ayri sabit kullaniyor
-0x020110B0,4,gRam020110B0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x020110B8,4,gRam020110B8,decomp,provisional,u32; 0x08066144 oturum kurulumunda sifirliyor
-0x020110C0,4,gRam020110C0,decomp,provisional,"ReleaseAreaNode icinde FUN_0800c804 cagrisina ILK arguman olarak yalnizca ADRESI geciyor; uye erisimi yok, bu yuzden ic yapisi BILINMIYOR. En yakin kayitli komsu 0x020110AC (gRam020110AC) ama ROM ayri bir havuz sabiti kullaniyor, yani ayri nesne."
-0x02014ED0,0,gBufferBase02014ED0,decomp,provisional,FUN_080100D0 iki ayirma cagrisina ayni taban adresini geciyor; boyut ve sahiplik bilinmiyor.
-0x02015650,0,gRam02015650,decomp,provisional,FUN_0800DCB4 icinde giris tablosu olarak kullaniliyor. Boyut BILINMIYOR (0); yalnizca tabani olculdu. src/core/list_b2.c basliginda ayrintisi var.
-0x0201627C,4,gRam0201627C,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02016280,4,gListHead02016280,decomp,provisional,"Cift bagli listenin bas isaretcisi; dugum +20 next, +24 prev  IZLEME: f1508de gNodePool ile ayni karede aktiflesiyor.  PROVISIONAL BIRAKILDI -- DOLAYLI: yalnizca gNodePool ile ayni karede aktiflesmesi gozlendi; kimligi dogrudan kanitlanmadi."
-0x02016288,4,gSortedHead02016288,decomp,provisional,0x0800D530 siralama sirasinda ikinci (sirali) listenin bas isaretcisi; gListHead02016280 ile ayni dugum tipi. ROM ikisini AYRI literal yukluyor.
-0x0201AA90,1,gRam0201AA90,decomp,provisional,Melodi bayragi; 0x08063B98'de 6 yaziliyor
-0x0201AA98,4,gRam0201AA98,decomp,provisional,16 baytlik girislerden olusan bir tabloya ISARETCI; 0x0800DB60 indisi 400 ile sinirliyor.
-0x0201AAA0,4,gBufferA0201AAA0,decomp,provisional,FUN_080100D0 0x1000 baytlik ayirma sonucunu buraya yaziyor.
-0x0201AAA4,4,gBufferStateB0201AAA4,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumunda sifirlanan durum kelimesi.
-0x0201AAA8,4,gBufferStateA0201AAA8,decomp,provisional,FUN_080100D0 tarafindan tampon kurulumunda sifirlanan durum kelimesi.
-0x0201AAB0,2064,gBufferClear0201AAB0,decomp,provisional,FUN_080100D0 DMA3 ile 0x102 kelime sifirliyor; boyut bu yazimdan gelir.
-0x0201AECC,0,gRam0201AECC,decomp,provisional,"FUN_080126E4 icinde kullaniliyor; ic yapisi BILINMIYOR, boyut olculmedi (0). src/core/insert_b1.c basliginda ayrintisi var."
-0x0201AEE8,8,gRam0201AEE8,decomp,provisional,"Harita izgarasina isaretci. Hedef yapi 0x080651E0dan OLCULDU: +0x00 u16 en, +0x02 u16 boy, +0x04 u16* karo dizisi (y*en+x ile indeksleniyor). Tek tanim include/map_grid.h. 0x0801D7FC ile yaziliyor."
-0x0201AEF0,0,gRam0201AEF0,decomp,provisional,BG2 goruntu konumu dahil calisma blogu; +0x1F88 ve +0x1F8C alanlari kullaniliyor
-0x0201CEC0,2060,gNodePool,decomp,verified,"dugum havuzu; +0x800 serbest liste basi, +0x804 aktif liste basi (byte-matching kanit)  IZLEME: f1508de aktiflesiyor -- oyun dunyasi/NPCler dogdugu an. Bagli liste sistemi burada devreye giriyor.  OLCULDU(FlushSpriteList): +0x800 bos liste basi, +0x804 aktif liste basi, +0x808 onceki kare sprite sayaci. Boyut 2056 -> 2060 duzeltildi.  C KANITI: InitSpritePool 128 x 16 baytlik serbest listeyi kuruyor; InsertSpriteSorted +0/+2/+4 OAM alanlari ve +6 ikincil siralama anahtarini kullaniyor. Ortak tur include/sprite_pool.h.  IZLEME (oturum 6): olumden 1 kare sonra +0x08 ve +0x0C (bos/aktif liste baslari) degisti -- oyuncu varligi serbest birakiliyor."
-0x0201D6D0,0,gRam0201D6D0,decomp,provisional,"FUN_080089b0/FUN_08008a28 havuz nesnesi; ic yapisi BILINMIYOR, boyut olculmedi."
-0x0201ECB0,0,gRam0201ECB0,decomp,provisional,"12 bayt adimli kuyruk dizisi (+0 soz, +4 soz, +8 u16, +0x0A u16); giris sayisi en fazla 128."
-0x0201F2B0,0,gRam0201F2B0,decomp,provisional,0x08012E78 kuyrugu sifirlarken DMA3 ile 0xE00 soz (14336 bayt) sifirlanan tampon.
-0x02022AB0,12,gRam02022AB0,decomp,provisional,"Cizim giris kuyrugu basligi: +0 sayi, +4 giris dizisi (28 bayt adim), +8 s16 son indis; 0x08012E78 kullaniyor."
-0x02022ABC,4,gRam02022ABC,decomp,provisional,Kuyruk sayaci; 0x08012F88 ve ikizi 128 ile sinirliyor.
-0x02022E50,272,gRam02022E50,decomp,provisional,"+0x100'de bir isaretci, +0x104'te ikinci; 0x08013974 listelerinin basi; boyut 512->272 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)"
-0x02022F60,8,gRam02022F60,decomp,provisional,"+0 bayrak, +4 DMA kaynak isaretcisi"
-0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, sekiz 32 baytlik giris"
-0x020230A0,4,gRam020230A0,decomp,provisional,"Cift bagli nesne listesinin basi (dugum +0x3C onceki, +0x40 sonraki, 0xFDFDFDFD = bagli degil); ReleaseObject cikarirken guncelliyor."
-0x020230B4,1,gRam020230B4,decomp,provisional,Paylasilan u8 sayac; 0x08017E3C-0x08018B74 ailesindeki 12 davranis adimi artirip esigi asinca sifirliyor.
-0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) sabit; +12/+16 (arg << 16 | 0xFF000000)
-0x02023700,4,gRam02023700,decomp,provisional,Kare isleme zincirinde son tamamlanan asamayi gosteren tani isareti
-0x02023704,4,gRam02023704,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x0202370C,4,gRam0202370C,decomp,provisional,0x0802392C tarafindan sifirlanan degisken
-0x02023710,740,gRam02023710,decomp,provisional,5 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
-0x02023A00,2220,gEntriesA,decomp,provisional,148 baytlik giris tablosu; 0x8028E3C 14 girisi tariyor  OLCULDU(0x08023CC4): DMA 15 x 148 = 2220 bayt sifirliyor; eski 2088 degeri kirpilmisti.
-0x020242B0,148,gRam020242B0,decomp,provisional,1 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
-0x02024344,2,gRam02024344,decomp,provisional,u16; 0x08023CC4 sifirliyor (strh).
-0x02024350,592,gRam02024350,decomp,provisional,4 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
-0x020245A0,1,gRam020245A0,decomp,provisional,u8; 0x08023CC4 sifirliyor (strb).
-0x020245B0,148,gRam020245B0,decomp,provisional,1 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
-0x02024650,148,gRam02024650,decomp,provisional,148 bayt girdili tablo; ProcessFirstEntry yalnız girdi 0'ı kullanır; boyut komşu sembole kadar kırpıldı ve gerçek toplam bilinmiyor  OLCULDU(0x08023CC4): DMA 1 x 148 bayt sifirliyor.
-0x020246F0,2960,gRam020246F0,decomp,provisional,"20 girisli 148 bayt tablo; 0x08028CA8 kullaniyor; boyut 2960->2812 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)  OLCULDU(0x08023CC4): DMA kontrolu 0x850002E4 = 740 kelime = 2960 bayt, tam 0x02025280e kadar. Eski 2812 degeri ""sonraki sembole kadar"" diye turetilmisti ama o sembol (gRam020251EC) bu dizinin 20. GIRISI."
-0x020251EC,148,gRam020251EC,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +4 dallardan biri; boyut 2960->148 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)  DUZELTME: ayri nesne DEGIL -- gRam020246F0 dizisinin 20. girisi (ofset 2812 = 19 x 148). Ayri sembol olarak birakildi cunku koda atif var."
-0x02025280,592,gRam02025280,decomp,provisional,"20 girisli 148 bayt tablo; +0 aktiflik, +2 u16, +0x8A bayrak, +0x8C kelime; boyut 2960->1424 kirpildi (komsu sembole/bolge sonuna kadar; gercek boyut bilinmiyor)  DUZELTME: 1424 degeri yanlisti. 0x08023CC4 yalniz 4 x 148 = 592 bayt sifirliyor ve sonraki sembol (gRam020254D0) tam 592 bayt sonra basliyor."
-0x020254D0,740,gRam020254D0,decomp,provisional,5 x 148 giris; 0x08023CC4 DMA ile sifirliyor.
-0x02025800,4,gRam02025800,decomp,provisional,28 baytlik kayit tablosuna (gRom08852A2C) indeks; 0 ise islem atlaniyor. 0x08063E7C ve 0x08063EAC okuyor.
-0x02025810,5008,gRam02025810,decomp,verified,"Oyuncu ilerleme blogu, boyut 0x1390 = 5008. KANIT: 0x080296B8 Memset(gRam02025810, 0, 0x1390) cagiriyor; 0x1390 sabiti ROM'da 4-bayt hizali kelime olarak TAM OLARAK BIR KEZ geciyor, yani hem alt hem UST sinir. Yerlesim /tmp/gram02025810_layout.md: 0x00-0x3B skalerler, 0x3C'de 24x180 baytlik yuva dizisi (0x3C+24*180 = 0x111C ile tam kapaniyor), 0x111C'de 12 u32, 0x114C'de 512 baytlik tampon (0x114C+0x200 = 0x134C), 0x134C-0x138D sayac/bayraklar. Boyut daha once 8, 4990 ve 5006 diye UC KEZ yanlis kaydedildi; ilk ikisi benim eksik olcumumdu, ucuncusu tek erisimden cikarimdi."
-0x02025818,2,mission_timer,libretro_cheat,verified,"IZLEME (hareketsiz sinamasi, oturum 5): AD DOGRU, zamanlayici. Oyuncu HIC tusa basmadan 30 kez, her seferinde tam 0x100 artti; aralik 60-65 kare (ort. 63.9), yani ~64 karede bir tik. ONCEKI ""mesafe sayaci"" iddiam CURUTULDU -- o oturumlarda Up surekli basili oldugu icin artislar tusla ayni anda gorunuyordu, nedensellik degil rastlanti. Sinematikteki 481 karelik durus da beklenen davranis: gorev zamani sinematikte duruyor."
-0x0202581A,1,wanted_level_display,libretro_cheat,verified,"IZLEME (oturum 8): AD DOGRU. Polis arabasina carpinca 0->1, tutuklanmada 1->0. wanted_level_true (gRam02030330+0x10) ile AYNI KAREDE ayni degeri aliyor -- ikisi ayri adres ama ayni degeri tasiyor, biri gosterge kopyasi."
+0x02010F48,4,gRam02010F48,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02010F4C,4,gRam02010F4C,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02010F70,128,gHistory,decomp,provisional,"+0 is the current record, +0x78 the 31-entry history queue that is shifted down"
+0x02010FF0,1,gRam02010FF0,decomp,provisional,u8 state field zeroed by FUN_0805643C
+0x02011018,4,gRam02011018,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02011030,114,gRam02011030,decomp,verified,"+12/+16 a paired coordinate pair, +72 a separate word; additionally +0x30/+0x34/+0x38 are read by ReadTriple (byte-matching evidence); +0x71 is written by ClearCoordByte71 (byte-matching evidence)  TRACE (session 6): the low byte of the +0x0C field was cleared on death (0x1000030 -> 0x1000000). This block is the CoordBlock that UpdateFocusPoint (0x0800A9E4) reads."
+0x020110AC,4,gRam020110AC,decomp,provisional,"A word loaded through a separate literal; the same address as 0x02011030+0x7C, but the ROM uses a separate constant"
+0x020110B0,4,gRam020110B0,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x020110B8,4,gRam020110B8,decomp,provisional,u32; 0x08066144 zeroes it during session setup
+0x020110C0,4,gRam020110C0,decomp,provisional,"In ReleaseAreaNode only its ADDRESS is passed as the FIRST argument to the FUN_0800c804 call; there is no member access, so its internal structure is UNKNOWN. The nearest recorded neighbour is 0x020110AC (gRam020110AC), but the ROM uses a separate pool constant, so it is a separate object."
+0x02014ED0,0,gBufferBase02014ED0,decomp,provisional,FUN_080100D0 passes the same base address to two allocation calls; size and ownership are unknown.
+0x02015650,0,gRam02015650,decomp,provisional,Used as the entry table in FUN_0800DCB4. Size UNKNOWN (0); only the base was measured. Details in the header of src/core/list_b2.c.
+0x0201627C,4,gRam0201627C,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02016280,4,gListHead02016280,decomp,provisional,"Head pointer of the doubly linked list; node +20 next, +24 prev  TRACE: it becomes active on the same frame as gNodePool at f1508.  LEFT PROVISIONAL -- INDIRECT: only its activation on the same frame as gNodePool was observed; its identity was not proven directly."
+0x02016288,4,gSortedHead02016288,decomp,provisional,the head pointer of the second (sorted) list during the 0x0800D530 sort; the same node type as gListHead02016280. The ROM loads the two from SEPARATE literals.
+0x0201AA90,1,gRam0201AA90,decomp,provisional,Melody flag; 6 is written at 0x08063B98
+0x0201AA98,4,gRam0201AA98,decomp,provisional,a POINTER to a table of 16-byte entries; 0x0800DB60 caps the index at 400.
+0x0201AAA0,4,gBufferA0201AAA0,decomp,provisional,FUN_080100D0 writes the result of a 0x1000-byte allocation here.
+0x0201AAA4,4,gBufferStateB0201AAA4,decomp,provisional,state word zeroed by FUN_080100D0 during buffer setup.
+0x0201AAA8,4,gBufferStateA0201AAA8,decomp,provisional,state word zeroed by FUN_080100D0 during buffer setup.
+0x0201AAB0,2064,gBufferClear0201AAB0,decomp,provisional,FUN_080100D0 zeroes 0x102 words with DMA3; the size follows from that form.
+0x0201AECC,0,gRam0201AECC,decomp,provisional,used in FUN_080126E4; its internal structure is UNKNOWN and the size was not measured (0). Details in the header of src/core/insert_b1.c.
+0x0201AEE8,8,gRam0201AEE8,decomp,provisional,"Pointer to the map grid. The target structure was MEASURED from 0x080651E0: +0x00 u16 width, +0x02 u16 height, +0x04 u16* tile array (indexed by y*width+x). The single definition is include/map_grid.h. Written by 0x0801D7FC."
+0x0201AEF0,0,gRam0201AEF0,decomp,provisional,a working block that includes the BG2 display position; the +0x1F88 and +0x1F8C fields are used
+0x0201CEC0,2060,gNodePool,decomp,verified,"node pool; +0x800 free list head, +0x804 active list head (byte-matching evidence)  TRACE: it becomes active at f1508 -- the moment the game world / NPCs are spawned. This is where the linked list system comes into play.  MEASURED (FlushSpriteList): +0x800 free list head, +0x804 active list head, +0x808 previous-frame sprite count. Size corrected 2056 -> 2060.  C EVIDENCE: InitSpritePool builds the free list of 128 x 16 bytes; InsertSpriteSorted uses the +0/+2/+4 OAM fields and the +6 secondary sort key. The shared type is include/sprite_pool.h.  TRACE (session 6): one frame after death, +0x08 and +0x0C (the free/active list heads) changed -- the player entity is being released."
+0x0201D6D0,0,gRam0201D6D0,decomp,provisional,the pool object of FUN_080089b0/FUN_08008a28; its internal structure is UNKNOWN and the size was not measured.
+0x0201ECB0,0,gRam0201ECB0,decomp,provisional,"queue array with a 12-byte stride (+0 word, +4 word, +8 u16, +0x0A u16); at most 128 entries."
+0x0201F2B0,0,gRam0201F2B0,decomp,provisional,The buffer that 0x08012E78 zeroes with DMA3 for 0xE00 words (14336 bytes) while clearing the queue.
+0x02022AB0,12,gRam02022AB0,decomp,provisional,"Draw entry queue header: +0 count, +4 entry array (28-byte stride), +8 s16 last index; 0x08012E78 uses it."
+0x02022ABC,4,gRam02022ABC,decomp,provisional,Queue counter; 0x08012F88 and its twin cap it at 128.
+0x02022E50,272,gRam02022E50,decomp,provisional,a pointer at +0x100 and a second one at +0x104; head of the 0x08013974 lists; size clipped 512->272 (up to the neighbouring symbol / end of the region; the real size is unknown)
+0x02022F60,8,gRam02022F60,decomp,provisional,"+0 flag, +4 DMA source pointer"
+0x02022FA0,256,gRam02022FA0,decomp,provisional,"gRam02022E50+0x150, eight 32-byte entries"
+0x020230A0,4,gRam020230A0,decomp,provisional,"Head of the doubly linked object list (node +0x3C prev, +0x40 next, 0xFDFDFDFD = not linked); ReleaseObject updates it while unlinking."
+0x020230B4,1,gRam020230B4,decomp,provisional,Shared u8 counter; The 12 behaviours in the 0x08017E3C-0x08018B74 family increment the step and reset it once the threshold is exceeded.
+0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) constant; +12/+16 (arg << 16 | 0xFF000000)
+0x02023700,4,gRam02023700,decomp,provisional,Diagnostic marker showing the last completed stage of the frame processing chain
+0x02023704,4,gRam02023704,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x0202370C,4,gRam0202370C,decomp,provisional,Variable zeroed by 0x0802392C
+0x02023710,740,gRam02023710,decomp,provisional,5 x 148 entries; 0x08023CC4 zeroes it with DMA.
+0x02023A00,2220,gEntriesA,decomp,provisional,148-byte entry table; 0x8028E3C scans 14 entries  MEASURED (0x08023CC4): DMA zeroes 15 x 148 = 2220 bytes; the old value of 2088 had been clipped.
+0x020242B0,148,gRam020242B0,decomp,provisional,1 x 148 entries; 0x08023CC4 zeroes it with DMA.
+0x02024344,2,gRam02024344,decomp,provisional,u16; 0x08023CC4 zeroes it (strh).
+0x02024350,592,gRam02024350,decomp,provisional,4 x 148 entries; 0x08023CC4 zeroes it with DMA.
+0x020245A0,1,gRam020245A0,decomp,provisional,u8; 0x08023CC4 zeroes it (strb).
+0x020245B0,148,gRam020245B0,decomp,provisional,1 x 148 entries; 0x08023CC4 zeroes it with DMA.
+0x02024650,148,gRam02024650,decomp,provisional,table of 148-byte entries; ProcessFirstEntry uses only entry 0; the size was clipped up to the neighbouring symbol and the real total is unknown  MEASURED (0x08023CC4): DMA zeroes 1 x 148 bytes.
+0x020246F0,2960,gRam020246F0,decomp,provisional,"20-entry, 148-byte table; 0x08028CA8 uses it; size clipped 2960->2812 (up to the neighbouring symbol / end of the region; the real size is unknown)  MEASURED (0x08023CC4): the DMA control word 0x850002E4 = 740 words = 2960 bytes, exactly up to 0x02025280. The old value of 2812 was derived as ""up to the next symbol"", but that symbol (gRam020251EC) is the 20th ENTRY of this array."
+0x020251EC,148,gRam020251EC,decomp,provisional,"20-entry, 148-byte table; +0 active flag, +4 one of the branches; size clipped 2960->148 (up to the neighbouring symbol / end of the region; the real size is unknown)  CORRECTION: NOT a separate object -- the 20th entry of the gRam020246F0 array (offset 2812 = 19 x 148). It was left as a separate symbol because the code refers to it."
+0x02025280,592,gRam02025280,decomp,provisional,"20-entry, 148-byte table; +0 active flag, +2 u16, +0x8A flag, +0x8C word; size clipped 2960->1424 (up to the neighbouring symbol / end of the region; the real size is unknown)  CORRECTION: the value 1424 was wrong. 0x08023CC4 zeroes only 4 x 148 = 592 bytes, and the next symbol (gRam020254D0) starts exactly 592 bytes later."
+0x020254D0,740,gRam020254D0,decomp,provisional,5 x 148 entries; 0x08023CC4 zeroes it with DMA.
+0x02025800,4,gRam02025800,decomp,provisional,index into the 28-byte record table (gRom08852A2C); when 0 the operation is skipped. 0x08063E7C and 0x08063EAC read it.
+0x02025810,5008,gRam02025810,decomp,verified,"Player progress block, size 0x1390 = 5008. EVIDENCE: 0x080296B8 calls Memset(gRam02025810, 0, 0x1390); the constant 0x1390 occurs EXACTLY ONCE in the ROM as a 4-byte aligned word, so it is both a lower and an UPPER bound. Layout in docs/GRAM02025810_LAYOUT.md: 0x00-0x3B scalars, at 0x3C a 24x180-byte slot array (closing exactly at 0x3C+24*180 = 0x111C), at 0x111C 12 u32, at 0x114C a 512-byte buffer (0x114C+0x200 = 0x134C), 0x134C-0x138D counters/flags. The size was recorded wrongly THREE TIMES before, as 8, 4990 and 5006; the first two were my incomplete measurements, the third an inference from a single access."
+0x02025818,2,mission_timer,libretro_cheat,verified,"TRACE (idle test, session 5): NAME CORRECT, a timer. With the player pressing NO key at all it increased 30 times, by exactly 0x100 each time; the interval is 60-65 frames (avg. 63.9), so one tick roughly every 64 frames. My EARLIER ""distance counter"" claim is REFUTED -- in those sessions Up was held continuously, so the increases appeared to coincide with the key: coincidence, not causation. The 481-frame pause during the cutscene is also expected behaviour: mission time stops during cutscenes."
+0x0202581A,1,wanted_level_display,libretro_cheat,verified,"TRACE (session 8): NAME CORRECT. 0->1 when hitting a police car, 1->0 on arrest. it takes the same value as wanted_level_true (gRam02030330+0x10) ON THE SAME FRAME -- two separate addresses carrying the same value, one of them a display copy."
 0x0202581C,4,money_display_or_copy_0,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025824,4,money_display_or_copy_1,libretro_cheat,provisional,Exact representation to verify dynamically
 0x02025828,1,player_armor_copy,libretro_cheat,provisional,Possible HUD/game-state mirror
-0x0202582A,1,player_health_copy,libretro_cheat,verified,"Possible HUD/game-state mirror  IZLEME (oturum 6): player_health ile AYNI KAREDE ayni degeri aldi, 25/25 gecis. Gercekten kopya."
-0x02026BA0,0,gRam02026BA0,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02026BE0,0,gRam02026BE0,decomp,provisional,u8; 0x08030EAC (LoadHudPalettes) girisinde sifirlaniyor.
-0x02026C10,0,gRam02026C10,decomp,provisional,"u32 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02026C90,0,gRam02026C90,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 alan, +76 u32 alan"
-0x02026D90,4,gRam02026D90,decomp,provisional,u32 kapi; 0x08031294 HUD yeniden cizimini bu deger uzerinden geciriyor
-0x02026DA0,4,gRam02026DA0,decomp,provisional,"0x08031388 kullaniyor; en yakin kayitli semboller (0x02026CD0, 0x02026DF0) bu adresi kapsamiyor"
-0x02026DF0,132,gRam02026DF0,decomp,provisional,"FUN_08030E10 icinde kullaniliyor; en az 0x84 bayt oldugu olculdu, ust siniri BILINMIYOR. src/world/area_cleanup_b1.c basliginda ayrintisi var."
-0x02026E80,4,gRam02026E80,decomp,provisional,0x08030CB4 temizliginde ReleaseObject ile serbest birakilan blok
-0x02026EF0,8,gFlagsB,decomp,provisional,8 girisli bayrak dizisi
-0x02026F30,4,gRam02026F30,decomp,provisional,Menu oturumu sozu A; 0x080320E0 sifirliyor.
-0x02026F34,4,gRam02026F34,decomp,provisional,"Ikincil kimlik; yalnizca gGameState[12] kuruluyken gecerli, 2 donduruyor"
-0x02026F38,8,gFlagsA,decomp,provisional,8 girisli bayrak dizisi
-0x02026F40,0,gRam02026F40,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02026F80,0,gRam02026F80,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02026FD0,4,gRam02026FD0,decomp,provisional,Menu oturumu sozu B; 0x080320E0 sifirliyor.
-0x02026FE0,576,gBlockTable,decomp,provisional,8 girisli 72 baytlik blok tablosu; 0x02026F38 bayraklariyla eslesik
-0x02027230,0,gRam02027230,decomp,provisional,"u16 [N][8]; 0x08031C98 (ReleaseEntry... kuyrugu) [n][8] olarak indisliyor; N BILINMIYOR, DIZI olarak bildirilmeli."
-0x02027280,0,gRam02027280,decomp,provisional,ReleaseObject ile birakilan nesne (0x08030F90).
-0x020272C8,4,gRam020272C8,decomp,provisional,Birincil kimlik; 0x08055AC4 karsilastirmasinda 1 donduruyor
-0x02027310,4,gRam02027310,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
-0x02027314,1,gRam02027314,decomp,provisional,0x080337A8 gCartFlag degerinin kopyasini buraya yaziyor.
-0x02027320,4,gRam02027320,decomp,provisional,ZeroThreeFlags sifirliyor (byte-matching kanit)
-0x02027330,0,gRam02027330,decomp,provisional,0x02027344-0x14; +0xB2C ayni sekiz girisli tabloya ikinci gorunum (0x08033674).
-0x02027344,264,gAddrTable,decomp,provisional,6 girisli 44 baytlik tablo; her giristen +0 u32 ROM adresi
-0x02027EE0,1,gRam02027EE0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u8 durum alani
+0x0202582A,1,player_health_copy,libretro_cheat,verified,"Possible HUD/game-state mirror  TRACE (session 6): it took the same value as player_health ON THE SAME FRAME, 25/25 transitions. A genuine duplicate."
+0x02026BA0,0,gRam02026BA0,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02026BE0,0,gRam02026BE0,decomp,provisional,u8; Zeroed on entry to 0x08030EAC (LoadHudPalettes).
+0x02026C10,0,gRam02026C10,decomp,provisional,u32 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02026C90,0,gRam02026C90,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 field, +76 u32 field"
+0x02026D90,4,gRam02026D90,decomp,provisional,u32 gate; 0x08031294 routes the HUD redraw through this value
+0x02026DA0,4,gRam02026DA0,decomp,provisional,"0x08031388 uses it; the nearest recorded symbols (0x02026CD0, 0x02026DF0) do not cover this address"
+0x02026DF0,132,gRam02026DF0,decomp,provisional,used in FUN_08030E10; it was measured to be at least 0x84 bytes; its upper bound is UNKNOWN. Details in the header of src/world/area_cleanup_b1.c.
+0x02026E80,4,gRam02026E80,decomp,provisional,the block released with ReleaseObject during the 0x08030CB4 cleanup
+0x02026EF0,8,gFlagsB,decomp,provisional,8-entry flag array
+0x02026F30,4,gRam02026F30,decomp,provisional,Menu session word A; 0x080320E0 zeroes it.
+0x02026F34,4,gRam02026F34,decomp,provisional,"Secondary id; valid only while gGameState[12] is set, returns 2"
+0x02026F38,8,gFlagsA,decomp,provisional,8-entry flag array
+0x02026F40,0,gRam02026F40,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02026F80,0,gRam02026F80,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02026FD0,4,gRam02026FD0,decomp,provisional,Menu session word B; 0x080320E0 zeroes it.
+0x02026FE0,576,gBlockTable,decomp,provisional,"8-entry, 72-byte block table; paired with the 0x02026F38 flags"
+0x02027230,0,gRam02027230,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
+0x02027280,0,gRam02027280,decomp,provisional,The object released with ReleaseObject (0x08030F90).
+0x020272C8,4,gRam020272C8,decomp,provisional,Primary id; returns 1 in the 0x08055AC4 comparison
+0x02027310,4,gRam02027310,decomp,provisional,ZeroThreeFlags zeroes it (byte-matching evidence)
+0x02027314,1,gRam02027314,decomp,provisional,0x080337A8 writes a copy of the gCartFlag value here.
+0x02027320,4,gRam02027320,decomp,provisional,ZeroThreeFlags zeroes it (byte-matching evidence)
+0x02027330,0,gRam02027330,decomp,provisional,0x02027344-0x14; +0xB2C is a second view onto the same eight-entry table (0x08033674).
+0x02027344,264,gAddrTable,decomp,provisional,"6-entry, 44-byte table; a +0 u32 ROM address in every entry"
+0x02027EE0,1,gRam02027EE0,decomp,provisional,u8 state field zeroed by FUN_0805643C
 0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
 0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown
-0x02028290,4,gUnk02028290,decomp,provisional,"Read by a small getter at 0x08037F58; role unknown  IZLEME: SADECE araba turunda degisti (f2864, 1 kez). Arac sistemine ait olabilir."
+0x02028290,4,gUnk02028290,decomp,provisional,"Read by a small getter at 0x08037F58; role unknown  TRACE: it changed ONLY during a car ride (f2864, once). It may belong to the vehicle system."
 0x020282A0,4,gUnk020282A0,decomp,provisional,Read by a small getter at 0x08037F40; role unknown
 0x0202F2C0,4,gUnk0202F2C0,decomp,provisional,Read by a small getter at 0x08037F1C; role unknown
 0x0202F2D0,4,gUnk0202F2D0,decomp,provisional,Read by a small getter at 0x08037F4C; role unknown
-0x0202F300,4,gRam0202F300,decomp,provisional,+8'de u32 alan
+0x0202F300,4,gRam0202F300,decomp,provisional,u32 field at +8
 0x0202F310,4,gUnk0202F310,decomp,provisional,Read by a small getter at 0x08037F28; role unknown
-0x0202F360,12,gRam0202F360,decomp,provisional,SubmitPack 12 bayt kopyaliyor (byte-matching kanit)
+0x0202F360,12,gRam0202F360,decomp,provisional,SubmitPack copies 12 bytes (byte-matching evidence)
 0x0202F3D0,4,gRam0202F3D0,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
-0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Harita baglami: +0 karo verisi isaretcisi, +0x38 satir kaydirmasi  IZLEME (oturum 6): +0x0C alani olumden ~88 kare sonra 6 -> 0 -> 7 adimladi; gorev iptali bu sirada oldu. Gorev/oyun durum makinesi adayi; DOGRULANMADI.  IZLEME (oturum 7): +0x10..+0x24 ve +0x28..+0x34 iki dizi tutuyor; degerler tam 65536 (16.16 sabit noktada 1.000) araliklarla ilerliyor. Konum/izgara tablosu gorunumunde."
-0x0202F4CC,4,gRam0202F4CC,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x020302E0,4,gRam020302E0,decomp,provisional,"0x08050190 karsilastirmasi  IZLEME: SADECE araba turunda degisti (f3815, 2 kez). Arac sistemine ait olabilir."
-0x020302E4,4,gRam020302E4,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02030304,4,gRam02030304,decomp,provisional,0x080501AC karsilastirmasi
-0x02030308,4,gRam02030308,decomp,provisional,0x08050190 karsilastirmasi
-0x02030324,4,gRam02030324,decomp,provisional,0x080501AC karsilastirmasi
-0x02030328,4,gRam02030328,decomp,provisional,0x0806262C icinde sifir kontrolu  IZLEME (oturum 6): olumden 4 kare sonra 0 -> 0x020303C4 (EWRAM isaretcisi) yazildi. Olum/yeniden dogus yolunda kurulan bir baglam olabilir; DOGRULANMADI.
-0x02030330,60,gRam02030330,decomp,verified,"+0x10 GetSlotUnk10 tarafindan okunuyor (byte-matching kanit), yani boyut en az 20; +0x2C'de yaz alani. Ust sinir bilinmiyor.  IZLEME (gorev oturumu, oturum 7): CAKISMA COZULDU. +0x0C, +0x18 ve +0x1C alanlarina yazildi (f22512/f22544), yani blok en az 0x02030350ye uzaniyor. wanted_level_true (0x02030340) AYRI NESNE DEGIL, bu blogun +0x10 alani. Boyut 60 dogru; kayit hatasi wanted_level_trueda.  IZLEME (oturum 8): ARANMA/POLIS SISTEMI BLOGU. Olculen alanlar: +0x08 durum (aranma baslayinca 0->3->1, tutuklanmada 1->2->0), +0x0C esik (aranmada 40->25, temizlenince 25->40), +0x10 wanted_level_true, +0x18 ve +0x1C birlikte azalan iki geri sayim (1800->1770 / 300->270), +0x20 aranmada 0->2400, tutuklanmada 2400->0, +0x28 ve +0x30 aranma sirasinda kuruluyor, +0x34 tutuklanmada 0->1, +0x38 BUSTED ekrani adim sayaci (tutuklanmadan sonra 0->1->2->3->4->5)."
-0x02030340,1,wanted_level_true,libretro_cheat,verified,IZLEME (oturum 7): AYRI NESNE DEGIL -- gRam02030330 blogunun +0x10 alani. Kaynak libretro_cheat buyuk bir yapinin ic alaninin adresini vermis. Onceden isaretlenen gRam02030330 cakismasi bu yuzden GERCEK DEGIL.  IZLEME (oturum 8): AD DOGRU. gRam02030330 blogunun +0x10 alani; wanted_level_display ile ayni karede ayni degeri aliyor.
-0x02030370,1,gRam02030370,decomp,provisional,FUN_0805643C tarafindan sifirlanan u8 durum alani
-0x020303C0,4,gRecordLoadFlag,decomp,provisional,"u32; 0x08051154 girisinde 1 yaziliyor (str, ofset 0). gRam020303C4 ile AYRI nesne: ROM her ikisini ayri literalden yukluyor, -4 alani degil."
-0x020303C4,4,gRam020303C4,decomp,provisional,EWRAM isaretcisi. FUN_08017628 icinde DOKUZ ayri havuz kelimesinden ayni deger (0x020303C4) yukleniyor; her seferinde *(g)+0x28 okunup bayrak 0x400 kuruluyor. 0x02030328 notundaki oturum-6 izlemesi de olumden 4 kare sonra buraya yazildigini kaydetmisti. Tur DOGRULANMADI.
+0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Map context: +0 tile data pointer, +0x38 row stride  TRACE (session 6): the +0x0C field stepped 6 -> 0 -> 7 about 88 frames after death; the mission was cancelled at that point. Candidate mission/game state machine; NOT VERIFIED.  TRACE (session 7): it holds two arrays, +0x10..+0x24 and +0x28..+0x34; the values advance in steps of exactly 65536 (1.000 in 16.16 fixed point). It looks like a position/grid table."
+0x0202F4CC,4,gRam0202F4CC,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x020302E0,4,gRam020302E0,decomp,provisional,"compared at 0x08050190  TRACE: it changed ONLY during a car ride (f3815, twice). It may belong to the vehicle system."
+0x020302E4,4,gRam020302E4,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02030304,4,gRam02030304,decomp,provisional,compared at 0x080501AC
+0x02030308,4,gRam02030308,decomp,provisional,compared at 0x08050190
+0x02030324,4,gRam02030324,decomp,provisional,compared at 0x080501AC
+0x02030328,4,gRam02030328,decomp,provisional,zero-checked in 0x0806262C  TRACE (session 6): 0 -> 0x020303C4 (an EWRAM pointer) was written four frames after death. It may be a context set up on the death/respawn path; NOT VERIFIED.
+0x02030330,60,gRam02030330,decomp,verified,"+0x10 is read by GetSlotUnk10 (byte-matching evidence), so the size is at least 20; Write field at +0x2C. The upper bound is unknown.  TRACE (mission session, session 7): THE CONFLICT IS RESOLVED. the +0x0C, +0x18 and +0x1C fields were written (f22512/f22544), so the block extends at least to 0x02030350. wanted_level_true (0x02030340) is NOT a separate object; it is this block's +0x10 field. The size 60 is correct; the recording error is in wanted_level_true.  TRACE (session 8): THE WANTED-LEVEL / POLICE SYSTEM BLOCK. Measured fields: +0x08 state (0->3->1 when the wanted level starts, 1->2->0 on arrest), +0x0C threshold (40->25 while wanted, 25->40 once cleared), +0x10 wanted_level_true, +0x18 and +0x1C two countdowns that decrease together (1800->1770 / 300->270), +0x20 goes 0->2400 while wanted and 2400->0 on arrest, +0x28 and +0x30 are set up during the wanted state, +0x34 goes 0->1 on arrest, +0x38 the BUSTED screen step counter (0->1->2->3->4->5 after the arrest)."
+0x02030340,1,wanted_level_true,libretro_cheat,verified,TRACE (session 7): NOT a separate object -- the +0x10 field of the gRam02030330 block. The libretro_cheat source gave the address of an inner field of a larger structure. The gRam02030330 overlap flagged earlier is therefore NOT REAL.  TRACE (session 8): NAME CORRECT. the +0x10 field of the gRam02030330 block; It takes the same value as wanted_level_display on the same frame.
+0x02030370,1,gRam02030370,decomp,provisional,u8 state field zeroed by FUN_0805643C
+0x020303C0,4,gRecordLoadFlag,decomp,provisional,"u32; 1 is written on entry to 0x08051154 (str, offset 0). A SEPARATE object from gRam020303C4: the ROM loads both from separate literals, and it is not a -4 field."
+0x020303C4,4,gRam020303C4,decomp,provisional,An EWRAM pointer. In FUN_08017628 the same value (0x020303C4) is loaded from NINE separate pool words; each time *(g)+0x28 is read and the 0x400 flag is set. The session-6 trace in the 0x02030328 note also recorded a write here four frames after death. The type is NOT VERIFIED.
 0x020303D0,16,gRecordIndex,decomp,provisional,Selects a 60-byte record in the table at 0x08CAC248
-0x020307F0,0,gRam020307F0,decomp,provisional,Izgara kokeni ve +8'den baslayan hucre verisi; FUN_080515D0 32x32 sinir kontroluyle yazar
-0x02030C00,4,gRam02030C00,decomp,provisional,0x08052C68 maske kapisi anahtari olarak okuyor.
-0x02030C10,320,gSlotIds,decomp,verified,160 adet u16 yuva kimligi; 0x7FEF bos demek  IZLEME: yeni oyun + 1. yuva seciminde f1068de 0->42.
-0x02030D50,7680,gSlotArray,decomp,provisional,128 girisli 60 baytlik yuva dizisi; +0x28 aktiflik kelimesi
-0x02032B60,6656,gNodePoolA,decomp,provisional,"128 x 52 bayt dugum havuzu (+0 next, +4 prev, +8 u16 kimlik). 0x08054450 DMA ile sifirlayip gList02035A80e diziyor."
-0x02034560,4608,gNodePoolB,decomp,provisional,"64 x 72 bayt dugum havuzu, ayni baslik. 0x08054450 gNodeListHeade diziyor."
-0x02035760,0,gRam02035760,decomp,provisional,FUN_08053B44 icinde oturum blogu olarak kullaniliyor; ic yapisi ve boyutu BILINMIYOR (0). src/core/nodelist_b9.c basliginda ayrintisi var.
-0x02035780,12,gRam02035780,decomp,provisional,"FUN_08055D90 cagrisinda ilk arguman (byte-matching kanit)  OLCULDU(0x08054450): List2 basligi olarak geciyor (+0 bas, +4 son, +8 sayac)."
-0x020357E0,0,gRam020357E0,decomp,provisional,FUN_08053B44 icinde kullaniliyor; ic yapisi ve boyutu BILINMIYOR (0). src/core/nodelist_b9.c basliginda ayrintisi var.
-0x020357F0,640,gNodePoolC,decomp,provisional,"16 x 40 bayt dugum havuzu, ayni baslik. 0x08054450 gRam02035780e diziyor."
-0x02035A70,12,gNodeListHead,decomp,provisional,"Sirali dugum listesinin basi; dugum +0 sonraki, +8 u16 kimlik  OLCULDU(0x08054450): List2 basligi olarak geciyor (+0 bas, +4 son, +8 sayac)."
-0x02035A80,12,gList02035A80,decomp,provisional,"List2 basligi (+0 bas, +4 son, +8 sayac); gNodePoolAnin serbest listesi. gNodeListHeadin (0x02035A70) devami DEGIL, ayri nesne."
-0x02035A90,2,gRam02035A90,decomp,provisional,FUN_0805643C tarafindan sifirlanan u16 durum alani
-0x02035A98,4,gRam02035A98,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035A9C,1,gRam02035A9C,decomp,provisional,254'te doyan u8 sayac
-0x02035AA0,2,gRam02035AA0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u16 durum alani
-0x02035AA4,2,gRam02035AA4,decomp,provisional,FUN_0805643C tarafindan sifirlanan u16 durum alani
-0x02035AC4,4,gRam02035AC4,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035AE0,4,gRam02035AE0,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035AEC,4,gRam02035AEC,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035B10,4,gRam02035B10,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035B18,4,gRam02035B18,decomp,provisional,FUN_0805643C tarafindan sifirlanan u32 durum alani
-0x02035B1C,1,gRam02035B1C,decomp,provisional,0x08063E58 bekleme dongusu bittiginde sifirliyor.
-0x02035B24,1,gRam02035B24,decomp,provisional,FUN_0805643C tarafindan sifirlanan u8 durum alani
-0x02035B30,16,gCountdownTimers,decomp,provisional,Dort adet s32 geri sayim sayaci. FUN_08053AD8 dizinin ilk elemanini sinayip diziyi geziyor. Taban EXTERN SEMBOL olmali: src/core/nodelist_c8.c basligina gore `#define ((s32 *)0x02035B30)` ve yerel isaretci bicimleri eslesmeyi bozuyor.
-0x02035B90,196,gJobTable,decomp,provisional,"7 girisli 28 baytlik is tablosu; +0 durum, +4 aktif bayrak, +5 alt, +12 u16, +24 isaretci, +28 satir sonrasi ek alan"
+0x020307F0,0,gRam020307F0,decomp,provisional,Grid origin and the cell data starting at +8; FUN_080515D0 writes it with a 32x32 bounds check
+0x02030C00,4,gRam02030C00,decomp,provisional,0x08052C68 reads it as the mask gate switch.
+0x02030C10,320,gSlotIds,decomp,verified,160 u16 slot ids; 0x7FEF means empty  TRACE: new game + 1. 0->42 at f1068 during slot selection.
+0x02030D50,7680,gSlotArray,decomp,provisional,"128-entry, 60-byte slot array; +0x28 active word"
+0x02032B60,6656,gNodePoolA,decomp,provisional,"128 x 52-byte node pool (+0 next, +4 prev, +8 u16 id). 0x08054450 zeroes it with DMA and threads it onto gList02035A80."
+0x02034560,4608,gNodePoolB,decomp,provisional,"64 x 72-byte node pool, same header. 0x08054450 threads it onto gNodeListHead."
+0x02035760,0,gRam02035760,decomp,provisional,used as the session block in FUN_08053B44; its internal structure and size are UNKNOWN (0). Details in the header of src/core/nodelist_b9.c.
+0x02035780,12,gRam02035780,decomp,provisional,"the first argument in the FUN_08055D90 call (byte-matching evidence)  MEASURED (0x08054450): it is passed as a List2 header (+0 head, +4 tail, +8 count)."
+0x020357E0,0,gRam020357E0,decomp,provisional,used in FUN_08053B44; its internal structure and size are UNKNOWN (0). Details in the header of src/core/nodelist_b9.c.
+0x020357F0,640,gNodePoolC,decomp,provisional,"16 x 40-byte node pool, same header. 0x08054450 threads it onto gRam02035780."
+0x02035A70,12,gNodeListHead,decomp,provisional,"Head of the ordered node list; node +0 next, +8 u16 id  MEASURED (0x08054450): it is passed as a List2 header (+0 head, +4 tail, +8 count)."
+0x02035A80,12,gList02035A80,decomp,provisional,"List2 header (+0 head, +4 tail, +8 count); The free list of gNodePoolA. NOT a continuation of gNodeListHead (0x02035A70); a separate object."
+0x02035A90,2,gRam02035A90,decomp,provisional,u16 state field zeroed by FUN_0805643C
+0x02035A98,4,gRam02035A98,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035A9C,1,gRam02035A9C,decomp,provisional,u8 counter saturating at 254
+0x02035AA0,2,gRam02035AA0,decomp,provisional,u16 state field zeroed by FUN_0805643C
+0x02035AA4,2,gRam02035AA4,decomp,provisional,u16 state field zeroed by FUN_0805643C
+0x02035AC4,4,gRam02035AC4,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035AE0,4,gRam02035AE0,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035AEC,4,gRam02035AEC,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035B10,4,gRam02035B10,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035B18,4,gRam02035B18,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x02035B1C,1,gRam02035B1C,decomp,provisional,0x08063E58 zeroes it when the wait loop ends.
+0x02035B24,1,gRam02035B24,decomp,provisional,u8 state field zeroed by FUN_0805643C
+0x02035B30,16,gCountdownTimers,decomp,provisional,"Four s32 countdown counters. FUN_08053AD8 tests the first element and then walks the array. The base must be an EXTERN SYMBOL: according to the header of src/core/nodelist_c8.c, the `#define ((s32 *)0x02035B30)` and local-pointer forms break the match."
+0x02035B90,196,gJobTable,decomp,provisional,"7-entry, 28-byte job table; +0 state, +4 active flag, +5 sub, +12 u16, +24 pointer, +28 an extra field past the row"
 0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
-0x02035CC0,4,gLanguage,decomp,verified,"Dil secimi (0..4, bes dil). Ayarlayici 0x0805E6C4 kirpiyor; okuyucu 0x0805E6E0 metin tablosunda dil basina 618 dizelik blok seciyor. Bkz. docs/TEXT_MAP.md  IZLEME (dil ekrani, oturum 7): SIRA KANITLANDI. Imlec asagi gezdikce 0->1->2->3->4, yukari gezdikce geri. Menu sirasi: 0=ingilizce, 1=ispanyolca, 2=fransizca, 3=italyanca, 4=almanca. SetLanguage ONAYDA DEGIL, IMLEC HAREKETINDE cagriliyor -- menu canli onizleme yapiyor."
-0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 kimlik
-0x02036050,1,gRam02036050,decomp,provisional,kip bayti; IsModeReady okuyor (byte-matching kanit)
+0x02035CC0,4,gLanguage,decomp,verified,"Language selection (0..4, five languages). The setter 0x0805E6C4 clamps it; the reader 0x0805E6E0 selects a block of 618 strings per language in the text table. See docs/TEXT_MAP.md  TRACE (language screen, session 7): THE ORDER IS PROVEN. 0->1->2->3->4 as the cursor moves down, and back as it moves up. Menu order: 0=English, 1=Spanish, 2=French, 3=Italian, 4=German. SetLanguage is called ON CURSOR MOVEMENT, NOT ON CONFIRMATION -- the menu does a live preview."
+0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 id
+0x02036050,1,gRam02036050,decomp,provisional,mode byte; IsModeReady reads it (byte-matching evidence)
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
-0x02036308,4,gGlyphTiles,decomp,provisional,SetTextContext (0x0806430C) yaziyor; cagrida 0x08831880 (ROM). gGlyphWidthsin aldigi 0x0883F880 ile arasi 0xE000 bayt -> glif bitmapleri. Ad GECICI.
+0x02036308,4,gGlyphTiles,decomp,provisional,SetTextContext (0x0806430C) writes it; the call passes 0x08831880 (ROM). the 0xE000 bytes between it and the 0x0883F880 that gGlyphWidths takes -> the glyph bitmaps. Ad GECICI.
 0x0203630C,4,gTextRowStride,decomp,provisional,Row stride in tiles used when clearing a text area
 0x02036310,4,gTextVramBase,decomp,provisional,Base VRAM address of the text layer
 0x02036314,4,gGlyphWidths,decomp,provisional,"Pointer to the per-glyph width table, indexed from space (0x20)"
-0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C  IZLEME: metin cizimiyle degisiyor; diyalog kutusunda (f1319) ve A basimlariyla (f1384/f1402) oynuyor.  PROVISIONAL BIRAKILDI -- AD SUPHELI: degerler (160/192/128/240/242) font indeksinden cok genislik/konum gibi. Izleme metinle iliskiyi kanitliyor, ADI kanitlamiyor."
-0x0203631C,4,gHalfLineSpacing,decomp,verified,"Nonzero halves the line height used by the text drawing helpers  IZLEME: diyalog kutusu acilinca 0->1 (f1319), kapaninca 1->0 (f2303). Metin kutusuna bagli."
-0x02036320,1,gRam02036320,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
-0x02036324,4,gRam02036324,decomp,provisional,u32; 0x080657D8 MaybeSetCommByte6 cagrisinin oncesinde yazip sonrasinda geri okuyor
-0x02036328,4,gRam02036328,decomp,provisional,Ek bayrak; 0x080664C4 kontrolu
-0x0203632C,1,gRam0203632C,decomp,provisional,Tek bayt; 0x08066144 oturum kurulumunda sifirliyor
-0x02036330,8,gRam02036330,decomp,provisional,"Boyut 8 OLCULDU (Memset cagrisi, 0x08066144). +0x02 alani u16 olarak sifirlaniyor"
-0x02036338,4,gRam02036338,decomp,provisional,"Iletisim blogu isaretcisi; hedef +0 bayrak, +6 yaz"
-0x02036340,8,gDistanceAccum,decomp,provisional,"Mesafe biriktirici; 0x1FFF'i asinca tasan kismi kayittaki sayaca aktariliyor  IZLEME: yuruyus baslamadan hemen once f1783te aktif; mission_timer ile ayni pencerede.  PROVISIONAL BIRAKILDI -- AD SUPHELI: gerekcesi mission_timerin mesafe sayaci oldugu varsayimina dayaniyordu, o varsayim CURUTULDU."
-0x03000000,4,gFrameDelay,decomp,verified,"IWRAM kare gecikmesi = zaman adimi carpani. Her mantik karesinde gIwramFrameCounter buraya kopyalanip 5te kirpiliyor (vblank_intr.c, 0x08000220). Tuketiciler bunu adim olarak kullaniyor: 0x08053AD8 sayaclari her karede gFrameDelay kadar azaltiyor. OLCULDU (oynanis, 2026-09-07): oyun ~15 fps calisiyor, yani gFrameDelay tipik olarak 4. FRAME_DELAY_MAX=5 sabiti bunu dogruluyor: 60 fpste kosan bir oyunda telafi 1i gecmez, 5te kirpmak 4-5 degerlerinin normal isletim oldugunu gosterir."
-0x03000004,4,gIwramFrameCounter,decomp,verified,"IWRAM donanim kare sayaci. Her VBlankte artiyor, mantik karesi bitince gFrameDelaye kopyalanip sifirlaniyor. Sifirlanma ani bir mantik karesidir; sifirlanmadan onceki deger o karenin kac donanim karesi surdugudur (tools/fps_watch.lua bunu olcuyor)."
-0x03000014,12,gClipBounds,decomp,verified,"uc bilesenli sinir kutusu; ClipBounds daraltiyor (byte-matching kanit)  IZLEME(araba, tam genislik): uc adet 16.16 deger; baslangic (3360.000, 9568.000, 164.000). DUZELTME: onceki ""gFocusPointin aynasi"" sonucu YANLISTI -- tek bayt okumasinin yaniltmasiydi. Tam genislikte +0x00 alti ortak karenin besinde uyusuyor ama +0x04 on bes ortak karenin SIFIRINDA uyusuyor. Ayri degerler. +0x08 (odakta karsiligi yok) gaz basiliyken 164.0 -> 220.0 buyuyup birakinca geri donuyor: hiza gore acilan kamera menzili/on-bakisi gibi."
-0x03000028,4,gBufferB03000028,decomp,provisional,FUN_080100D0 0x2400 baytlik ayirma sonucunu IWRAM'deki bu isaretciye yaziyor.
-0x03000068,4,gBg2ScaleX,decomp,provisional,BG2 affine yatay olcegi; FUN_08011DD4 40 ile carpar
-0x0300006C,4,gBg2ScaleY,decomp,provisional,BG2 affine dikey olcegi; FUN_08011DD4 40 ile carpar
+0x02036318,4,gFontIndex,decomp,provisional,"Selected font, set by 0x0806434C  TRACE: it changes with text drawing; it moves in the dialogue box (f1319) and with A presses (f1384/f1402).  LEFT PROVISIONAL -- THE NAME IS DOUBTFUL: the values (160/192/128/240/242) look more like a width/position than a font index. The trace proves the relation to text, not the NAME."
+0x0203631C,4,gHalfLineSpacing,decomp,verified,"Nonzero halves the line height used by the text drawing helpers  TRACE: 0->1 when the dialogue box opens (f1319), 1->0 when it closes (f2303). Tied to the text box."
+0x02036320,1,gRam02036320,decomp,provisional,Single byte; 0x08066144 zeroes it during session setup
+0x02036324,4,gRam02036324,decomp,provisional,u32; 0x080657D8 writes it before the MaybeSetCommByte6 call and reads it back afterwards
+0x02036328,4,gRam02036328,decomp,provisional,Extra flag; checked by 0x080664C4
+0x0203632C,1,gRam0203632C,decomp,provisional,Single byte; 0x08066144 zeroes it during session setup
+0x02036330,8,gRam02036330,decomp,provisional,"Size 8 MEASURED (Memset call, 0x08066144). the +0x02 field is zeroed as u16"
+0x02036338,4,gRam02036338,decomp,provisional,"Communication block pointer; target +0 flag, +6 write"
+0x02036340,8,gDistanceAccum,decomp,provisional,"Distance accumulator; once it exceeds 0x1FFF the overflow is carried into the counter in the record  TRACE: active at f1783, right before walking starts; in the same window as mission_timer.  LEFT PROVISIONAL -- THE NAME IS DOUBTFUL: its justification rested on the assumption that mission_timer is a distance counter, and that assumption is REFUTED."
+0x03000000,4,gFrameDelay,decomp,verified,"IWRAM frame delay = the time step multiplier. On every logic frame gIwramFrameCounter is copied here and clamped at 5 (vblank_intr.c, 0x08000220). Consumers use it as the step: 0x08053AD8 decrements the counters by gFrameDelay every frame. MEASURED (gameplay, 2026-09-07): the game runs at about 15 fps, so gFrameDelay is typically 4. The FRAME_DELAY_MAX=5 constant confirms this: in a game running at 60 fps the compensation would never exceed 1, so clamping at 5 shows that values of 4-5 are normal operation."
+0x03000004,4,gIwramFrameCounter,decomp,verified,IWRAM hardware frame counter. It increases on every VBlank and is copied into gFrameDelay and reset when the logic frame ends. The moment it is reset is a logic frame; the value before the reset is how many hardware frames that frame lasted (tools/fps_watch.lua measures this).
+0x03000014,12,gClipBounds,decomp,verified,"three-component bounding box; ClipBounds narrows it (byte-matching evidence)  TRACE (car, full width): three 16.16 values; start (3360.000, 9568.000, 164.000). CORRECTION: the earlier ""mirror of gFocusPoint"" conclusion was WRONG -- it was an artefact of reading a single byte. At full width, +0x00 agrees on five of six shared frames, but +0x04 agrees on ZERO of fifteen shared frames. They are separate values. +0x08 (with no counterpart in the focus point) grows 164.0 -> 220.0 while the accelerator is held and returns when it is released: it looks like a camera range / look-ahead that opens up with speed."
+0x03000028,4,gBufferB03000028,decomp,provisional,FUN_080100D0 writes the result of a 0x2400-byte allocation into this pointer in IWRAM.
+0x03000068,4,gBg2ScaleX,decomp,provisional,BG2 affine horizontal scale; FUN_08011DD4 multiplies it by 40
+0x0300006C,4,gBg2ScaleY,decomp,provisional,BG2 affine vertical scale; FUN_08011DD4 multiplies it by 40
 0x03000078,4,gRam03000078,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x03000098,4,gRam03000098,decomp,provisional,Referenced by FUN_08001A00; role unknown
 0x0300009C,4,gRam0300009C,decomp,provisional,Referenced by FUN_08001A00; role unknown
@@ -240,50 +240,50 @@ address,size,name,source,status,notes
 0x03007FA0,4,gIrqStack,decomp,verified,BIOS IRQ stack pointer area
 0x03007FF8,2,gBiosIrqFlags,decomp,verified,BIOS interrupt check flags (IntrWait); handlers OR their bit here
 0x03007FFC,4,gIrqVector,decomp,verified,BIOS IRQ handler vector
-0x04000028,2,gRegBg2XLow,decomp,verified,GBA BG2X referans koordinatinin alt yarisi
-0x0400002A,2,gRegBg2XHigh,decomp,verified,GBA BG2X referans koordinatinin ust yarisi
-0x0400002E,2,gRegBg2YHigh,decomp,verified,GBA BG2Y referans koordinatinin ust yarisi
+0x04000028,2,gRegBg2XLow,decomp,verified,Low half of the GBA BG2X reference coordinate
+0x0400002A,2,gRegBg2XHigh,decomp,verified,High half of the GBA BG2X reference coordinate
+0x0400002E,2,gRegBg2YHigh,decomp,verified,High half of the GBA BG2Y reference coordinate
 0x04000202,2,gRegIf,decomp,verified,REG_IF interrupt acknowledge register
-0x08342A14,0,gRom08342A14,decomp,provisional,"ROM: u32 tablosu, yuva turu baytiyla indisleniyor; 0x7FFF = yok (0x08015834)."
-0x08342A50,0,gRom08342A50,decomp,provisional,"ROM: u32 tablosu, yuva turu baytiyla indisleniyor; 0x7FFF = yok (0x08015834)."
-0x083444E8,0,gRom083444E8,decomp,provisional,ROM verisi; 0x08031388 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
-0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM dizisi: uc bos alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
-0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM dizisi: uc ozel alan adi isaretcisi. FUN_08053B44 karsilastirmada kullaniyor.
-0x08831880,0,gRom08831880,decomp,provisional,ROM grafik: duraklatma metni karo verisi A (0x080023F0).
-0x0883F880,0,gRom0883F880,decomp,provisional,ROM grafik: duraklatma metni palet/harita A (0x080023F0).
-0x0883FB60,0,gRom0883FB60,decomp,provisional,ROM grafik: duraklatma metni karo verisi B (0x080023F0).
-0x0884DB60,0,gRom0884DB60,decomp,provisional,ROM grafik: duraklatma metni palet/harita B (0x080023F0).
-0x08852A1C,16,gRom08852A1C,decomp,provisional,"ROM: dort s32, degerler OLCULDU {-128, 128, -384, 384}. 0x080651E0 bunlari yerel diziye kopyalayip sonda noktalarinin kimlik ofseti olarak kullaniyor."
-0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: 28 baytlik kayitlardan olusan tablo; ilk alan 6 ise ozel yol isliyor (0x08063E7C/0x08063EAC).
-0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: +0x04te bir isaretci tablosuna isaretci; 0x08064698 ve 0x080646F8 u16 indeksle okuyor.
-0x08CA30D8,2048,gRom08CA30D8,decomp,provisional,ROM: 1024 girisli s16 sinus tablosu (aci & 0x3FF ile indisleniyor); 0x08064DFC okuyor.
-0x08CA45CC,0,gRom08CA45CC,decomp,provisional,ROM verisi; 0x08019620 (id - 0x4000) ile u16 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
-0x08CA6138,0,gRom08CA6138,decomp,provisional,ROM: u32 deger tablosu (A); 0x08024044 duruma gore indisliyor.
-0x08CA617C,0,gRom08CA617C,decomp,provisional,ROM: u32 deger tablosu (B); 0x08024044 arg1 != 0 iken kullaniyor.
-0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"ROM tablosu (RAM degil). StepEntryPhase icinde girisin +0x01 SAHIP alaniyla indekslenip sonuc 16 kaydiriliyor. Boyut BILINMIYOR (0 yazildi); yalnizca tabani olculdu. Eleman tipi u32. Dizi bildirimi ZORUNLU: dosyanin olcumune gore `extern u32 gRom08CA61C0[];` disindaki yazimlar (#define + cast, yerel taban, dizi-isaretci makrosu) ARGUMAN SIRASINI bozuyor ve eslesmeyi kaybettiriyor."
-0x08CA635C,0,gRom08CA635C,decomp,provisional,ROM verisi; 0x08031388 indeksliyor. Boyut BILINMIYOR. DIZI olarak bildirilmeli.
-0x08CA6A08,4,gRom08CA6A08,decomp,provisional,ROM: RAM icindeki bir sayac basligina ISARETCI (+0x02 u16 doluluk); 0x08033824 okuyup guncelliyor.
-0x08CAA3E4,0,gRomAsset08CAA3E4,decomp,provisional,ROM varlik isaretcisi; 0x08051154 bunu FUN_08036cac cagrisina veriyor ve donen isaretciyi gRam020303C4e yaziyor. Boyut BILINMIYOR.
+0x08342A14,0,gRom08342A14,decomp,provisional,ROM: a u32 table indexed by the slot kind byte; 0x7FFF = none (0x08015834).
+0x08342A50,0,gRom08342A50,decomp,provisional,ROM: a u32 table indexed by the slot kind byte; 0x7FFF = none (0x08015834).
+0x083444E8,0,gRom083444E8,decomp,provisional,ROM data; 0x08031388 indexes it. Size UNKNOWN. It must be declared as an ARRAY.
+0x083E3004,12,gEmptyAreaNames,decomp,provisional,ROM array: three empty area-name pointers. FUN_08053B44 uses it in a comparison.
+0x083E3010,12,gSpecialAreaNames,decomp,provisional,ROM array: three special area-name pointers. FUN_08053B44 uses it in a comparison.
+0x08831880,0,gRom08831880,decomp,provisional,ROM graphics: pause text tile data A (0x080023F0).
+0x0883F880,0,gRom0883F880,decomp,provisional,ROM graphics: pause text palette/map A (0x080023F0).
+0x0883FB60,0,gRom0883FB60,decomp,provisional,ROM graphics: pause text tile data B (0x080023F0).
+0x0884DB60,0,gRom0884DB60,decomp,provisional,ROM graphics: pause text palette/map B (0x080023F0).
+0x08852A1C,16,gRom08852A1C,decomp,provisional,"ROM: four s32, values MEASURED as {-128, 128, -384, 384}. 0x080651E0 copies them into a local array and uses them as the id offsets of the probe points."
+0x08852A2C,0,gRom08852A2C,decomp,provisional,ROM: a table of 28-byte records; when the first field is 6 a special path runs (0x08063E7C/0x08063EAC).
+0x08BD3448,8,gRom08BD3448,decomp,provisional,ROM: at +0x04 a pointer to a pointer table; 0x08064698 and 0x080646F8 read it with a u16 index.
+0x08CA30D8,2048,gRom08CA30D8,decomp,provisional,ROM: 1024-entry s16 sine table (indexed by angle & 0x3FF); 0x08064DFC reads it.
+0x08CA45CC,0,gRom08CA45CC,decomp,provisional,ROM data; 0x08019620 indexes it as u16 with (id - 0x4000). Size UNKNOWN. It must be declared as an ARRAY.
+0x08CA6138,0,gRom08CA6138,decomp,provisional,ROM: u32 value table (A); 0x08024044 indexes it by state.
+0x08CA617C,0,gRom08CA617C,decomp,provisional,ROM: u32 value table (B); 0x08024044 uses it while arg1 != 0.
+0x08CA61C0,0,gRom08CA61C0,decomp,provisional,"A ROM table (not RAM). In StepEntryPhase it is indexed by the entry's +0x01 OWNER field and the result is shifted by 16. Size UNKNOWN (0 was recorded); only the base was measured. The element type is u32. An array declaration is MANDATORY: as measured in that file, any form other than `extern u32 gRom08CA61C0[];` (#define + cast, a local base, an array-pointer macro) breaks the ARGUMENT ORDER and loses the match."
+0x08CA635C,0,gRom08CA635C,decomp,provisional,ROM data; 0x08031388 indexes it. Size UNKNOWN. It must be declared as an ARRAY.
+0x08CA6A08,4,gRom08CA6A08,decomp,provisional,ROM: a POINTER to a counter header in RAM (+0x02 u16 fill level); 0x08033824 reads and updates it.
+0x08CAA3E4,0,gRomAsset08CAA3E4,decomp,provisional,ROM entity pointer; 0x08051154 passes it to the FUN_08036cac call and writes the returned pointer into gRam020303C4. Size UNKNOWN.
 0x08CAC248,0,gRecords,decomp,provisional,ROM table of 60-byte records indexed by gRecordIndex
-0x08D482E0,0,gAreaNames,decomp,provisional,"ROM alan adi tablosu. gAreaBank (0x08D49C00) +0x20 alani bu diziye isaret ediyor. Boyut BILINMIYOR (0). DIZI olarak bildirilmeli: src/core/nodelist_b9.c olcumune gore `extern const AreaName gAreaNames[];` gercek ARRAY_REF uretiyor, isaretci sabiti bicimi ROM ile ayni kodu vermiyor."
-0x08D49C00,0,gAreaBank,decomp,provisional,ROM: alan kayitlari bankasi; 0x08052C68 .entries alanindan yuruyor.
-0x08EC46D4,0,gTextTable,decomp,verified,"Metin isaretci tablosu 0x08EC46D4: 618 dize x 5 dil = 3090 giris.  DOGRULANDI (oturum 7): dilim k = dil k, dogrudan. Ayni indeksin bes dilimdeki degeri okunarak sinandi (ENGLISH/ANGLAIS/INGLESE/ENGLISCH). Kodlama LATIN-1, ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde, 0xC1=A-akut."
-0x08F72620,0,gRom08F72620,decomp,provisional,ROM bayt tablosu (RAM degil). 0x08065568 dogrudan indeksleyip tek bayt donduruyor. Boyut BILINMIYOR (0); yalnizca taban olculdu. DIZI olarak bildirilmeli: extern const u8 gRom08F72620[];
-0x08FD17C8,0,gBitmapAssets,decomp,provisional,"ROM tablosu: 20 baytlik kayitlar. +0x00 kare verisi, +0x04 palet, +0x08 bayraklar (bit0 = kare RL sikistirilmis, bit1 = palet RL), +0x0C u16 en, +0x0E u16 boy, +0x10 u16 palet yarim soz sayisi. Ilk iki kayit 240x160. 0x08065574 indeksliyor (indeks 1 ile sinirli). DIZI olarak bildirilmeli."
-0x08FD17FC,40,gPowersOfTen,decomp,verified,"ROM tablosu: 10 adet u32, 10^0..10^9 (1..1000000000). ROM baytlari okunarak dogrulandi. 0x080672FC ondalik basamak yazarken kullaniyor. DIZI olarak bildirilmeli: extern const u32 gPowersOfTen[];"
-0x02036110,4,gRam02036110,decomp,provisional,0x08063C88/63D3C: ldr/str 32-bit durum; tahsis boyutu belirsiz
-0x02027300,4,gRam02027300,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
-0x020272F8,4,gRam020272F8,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
-0x020272F4,4,gRam020272F4,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
-0x020272F0,4,gRam020272F0,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
-0x020272FC,4,gRam020272FC,decomp,provisional,0x08032548/3258C: 32-bit sayac erisimi; tahsis boyutu belirsiz
-0x08CA6608,1024,gRom08CA6608,decomp,provisional,0x08032548/3258C: iki indeks 0x3FF ile maskeli; en az 1024 bayt tablo
-0x08CA788C,0,gRom08CA788C,decomp,provisional,0x08035168/351AC: kaynak isaretci tablosu; allocation boyutu belirsiz
+0x08D482E0,0,gAreaNames,decomp,provisional,"ROM area-name table. The +0x20 field of gAreaBank (0x08D49C00) points at this array. Size UNKNOWN (0). It must be declared as an ARRAY: as measured in src/core/nodelist_b9.c, `extern const AreaName gAreaNames[];` emits a real ARRAY_REF, while the pointer-constant form does not give the same code as the ROM."
+0x08D49C00,0,gAreaBank,decomp,provisional,ROM: the area record bank; 0x08052C68 walks it through the .entries field.
+0x08EC46D4,0,gTextTable,decomp,verified,"Text pointer table 0x08EC46D4: 618 strings x 5 languages = 3090 entries.  VERIFIED (session 7): slice k = language k, directly. Tested by reading the value of the same index in all five slices (ENGLISH/ANGLAIS/INGLESE/ENGLISCH). The encoding is LATIN-1, NOT ASCII: 0xC9=E-acute, 0xD1=N-tilde, 0xC1=A-acute."
+0x08F72620,0,gRom08F72620,decomp,provisional,A ROM byte table (not RAM). 0x08065568 indexes it directly and returns a single byte. Size UNKNOWN (0); only the base was measured. It must be declared as an ARRAY: extern const u8 gRom08F72620[];
+0x08FD17C8,0,gBitmapAssets,decomp,provisional,"ROM table: 20-byte records. +0x00 frame data, +0x04 palette, +0x08 flags (bit0 = frame is RL-compressed, bit1 = palette is RL), +0x0C u16 width, +0x0E u16 height, +0x10 u16 palette halfword count. The first two records are 240x160. 0x08065574 indexes it (the index is capped at 1). It must be declared as an ARRAY."
+0x08FD17FC,40,gPowersOfTen,decomp,verified,"ROM table: ten u32, 10^0..10^9 (1..1000000000). Verified by reading the ROM bytes. 0x080672FC uses it when writing decimal digits. It must be declared as an ARRAY: extern const u32 gPowersOfTen[];"
+0x02036110,4,gRam02036110,decomp,provisional,0x08063C88/63D3C: ldr/str 32-bit state; allocation size undetermined
+0x02027300,4,gRam02027300,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
+0x020272F8,4,gRam020272F8,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
+0x020272F4,4,gRam020272F4,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
+0x020272F0,4,gRam020272F0,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
+0x020272FC,4,gRam020272FC,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
+0x08CA6608,1024,gRom08CA6608,decomp,provisional,0x08032548/3258C: two indices masked with 0x3FF; a table of at least 1024 bytes
+0x08CA788C,0,gRom08CA788C,decomp,provisional,0x08035168/351AC: source pointer table; allocation size undetermined
 0x02035B40,4,gRam02035B40,decomp,provisional,32-bit cooldown timestamp; 0805ABDC
 0x08CA7E64,0,gRom08CA7E64,decomp,provisional,"80-byte records; u16 fields +22,+78 in 08038608/44; allocation unknown"
-0x0201AA80,12,gRam0201AA80,decomp,provisional,OLCULDU: DMA32 fill 3 words in 0800DD50
-0x02027F00,576,gRam02027F00,decomp,provisional,OLCULDU: DMA32 fill 144 words in 080357CC
-0x02022AC0,904,gRam02022AC0,decomp,provisional,"OLCULDU: 32 x 28-byte nodes and two pointers at +896,+900; 08013450/134A4"
+0x0201AA80,12,gRam0201AA80,decomp,provisional,MEASURED: DMA32 fill 3 words in 0800DD50
+0x02027F00,576,gRam02027F00,decomp,provisional,MEASURED: DMA32 fill 144 words in 080357CC
+0x02022AC0,904,gRam02022AC0,decomp,provisional,"MEASURED: 32 x 28-byte nodes and two pointers at +896,+900; 08013450/134A4"
 0x02035AD0,0,gRam02035AD0,decomp,provisional,Stat words +0 and +4; total allocation unknown
-0x02035ED0,36,gRam02035ED0,decomp,provisional,OLCULDU: twelve u16 IDs and twelve u8 values; 0806245C
+0x02035ED0,36,gRam02035ED0,decomp,provisional,MEASURED: twelve u16 IDs and twelve u8 values; 0806245C
 0x020363C4,4,gRam020363C4,decomp,provisional,newlib errno; zeroed by reentrant syscall wrappers

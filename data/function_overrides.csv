@@ -43,47 +43,47 @@ address,name,size,status,module,notes
 0x08001EA4,ClearMenuVram,,matching,ui,Fills the menu VRAM range through DMA3; exact in menu-graphics block
 0x08001EE4,EnableMenuDisplay,,matching,ui,Writes display control value 0x0101; exact in menu-graphics block
 0x08001EF4,EnableMenuDisplayAlt,,matching,ui,Duplicate display-control wrapper; exact in menu-graphics block
-0x0800AF48,FUN_0800af48,174,decompiled,world,Dort duzlem uzakligini bit maskesine cevirir; 166/174 bayt park; src/world/plane_classify.c
-0x0800DD50,FUN_0800dd50,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080100D0,InitWorkBuffers,124,matching,core,0x02014ED0 tabanindan iki tampon ayirir ve 0x0201AAB0 alanini DMA3 ile sifirlar; src/core/memory_init.c
-0x08011DD4,FUN_08011dd4,176,decompiled,core,BG2 affine matris ve referans koordinatlarini gunceller; 168/176 bayt park; src/core/bg2_affine.c
-0x08012A00,SortSpriteList,,matching,core,Sprite listesini attr2 & 0x0C00 ve +6 anahtarina gore kararli eklemeli siralar; src/core/sort_sprite_list.c
-0x08012B20,InitSpritePool,,matching,core,128 dugumun serbest listesini kurar; DMA3 ile 1024 bayt OAM sifirlar; src/core/init_sprite_pool.c
-0x08012B9C,FlushSpriteList,,matching,core,Aktif sprite listesini OAM alanina yazar ve onceki karenin fazla yuvalarini gizler; src/core/flush_sprite_list.c
-0x08012C0C,AllocNode,,matching,core,Sprite havuzunun serbest basini aktif listenin basina tasir; src/core/alloc_node.c
-0x08012C54,SortActiveSprites,,matching,core,Aktif sprite listesini kesmeler kapaliyken siralar; src/core/sort_active_sprites.c
-0x08012C74,InsertSpriteSorted,,matching,core,Sprite dugumunu iki anahtara gore kararli siraya ekler; src/core/insert_sprite_sorted.c
+0x0800AF48,FUN_0800af48,174,decompiled,world,Converts four plane distances into a bit mask; 166/174 bytes parked; src/world/plane_classify.c
+0x0800DD50,FUN_0800dd50,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x080100D0,InitWorkBuffers,124,matching,core,Allocates two buffers from the 0x02014ED0 base and zeroes the 0x0201AAB0 area with DMA3; src/core/memory_init.c
+0x08011DD4,FUN_08011dd4,176,decompiled,core,Updates the BG2 affine matrix and reference coordinates; 168/176 bytes parked; src/core/bg2_affine.c
+0x08012A00,SortSpriteList,,matching,core,Stable insertion sort of the sprite list by attr2 & 0x0C00 and the +6 key; src/core/sort_sprite_list.c
+0x08012B20,InitSpritePool,,matching,core,Builds the free list of 128 nodes; Zeroes 1024 bytes of OAM with DMA3; src/core/init_sprite_pool.c
+0x08012B9C,FlushSpriteList,,matching,core,Writes the active sprite list into OAM and hides the previous frame's surplus slots; src/core/flush_sprite_list.c
+0x08012C0C,AllocNode,,matching,core,Moves the sprite pool's free head to the head of the active list; src/core/alloc_node.c
+0x08012C54,SortActiveSprites,,matching,core,Sorts the active sprite list with interrupts disabled; src/core/sort_active_sprites.c
+0x08012C74,InsertSpriteSorted,,matching,core,Inserts the sprite node in stable order by two keys; src/core/insert_sprite_sorted.c
 0x080130F0,NoOp080130F0,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x08013450,FUN_08013450,84,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080134A4,FUN_080134a4,84,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08014E48,FUN_08014e48,154,decompiled,world,Boyut sinifi gecis kodunu kurar; 168/154 bayt park; src/world/transition_code.c
-0x080199BC,BlendPaletteBlock,134,matching,world,On alti BGR555 rengi 16.16 katsayiyla karistirir; src/world/palette_lerp.c
-0x08023778,FUN_08023778,26,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08023794,FUN_08023794,26,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08025FC0,FUN_08025fc0,116,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08026034,FUN_08026034,116,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0802A9F0,FUN_0802a9f0,296,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0802AB18,FUN_0802ab18,296,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08013450,FUN_08013450,84,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x080134A4,FUN_080134a4,84,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08014E48,FUN_08014e48,154,decompiled,world,Builds the size-class transition code; 168/154 bytes parked; src/world/transition_code.c
+0x080199BC,BlendPaletteBlock,134,matching,world,Blends sixteen BGR555 colours with a 16.16 coefficient; src/world/palette_lerp.c
+0x08023778,FUN_08023778,26,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08023794,FUN_08023794,26,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08025FC0,FUN_08025fc0,116,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08026034,FUN_08026034,116,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0802A9F0,FUN_0802a9f0,296,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0802AB18,FUN_0802ab18,296,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08030848,NoOp08030848,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x08031C10,ReplaceNibbleField,136,matching,world,On alti kelimedeki secili nibble alanlarini degistirir; src/world/nibble_replace.c
+0x08031C10,ReplaceNibbleField,136,matching,world,Replaces the selected nibble fields in sixteen words; src/world/nibble_replace.c
 0x08032058,IsEntityFlagSet,50,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A4,GetEntityUnk0C,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320A8,GetEntityFlags,8,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320B0,GetEntityKind,6,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
 0x080320B8,GetEntityUnk10,4,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
-0x08032548,FUN_08032548,68,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803258C,FUN_0803258c,68,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080350A8,FUN_080350a8,88,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08035168,FUN_08035168,68,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080351AC,FUN_080351ac,68,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08035230,FUN_08035230,88,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x080357CC,FUN_080357cc,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08032548,FUN_08032548,68,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0803258C,FUN_0803258c,68,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x080350A8,FUN_080350a8,88,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08035168,FUN_08035168,68,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x080351AC,FUN_080351ac,68,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08035230,FUN_08035230,88,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x080357CC,FUN_080357cc,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08035844,NoOp08035844,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x08035D60,FUN_08035d60,58,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08035D9C,FUN_08035d9c,58,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08035DE4,FUN_08035de4,80,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x08035E38,FUN_08035e38,80,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08035D60,FUN_08035d60,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08035D9C,FUN_08035d9c,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08035DE4,FUN_08035de4,80,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08035E38,FUN_08035e38,80,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08037F1C,GetUnk0202F2C0,12,matching,misc,Reads one global u32
 0x08037F28,GetUnk0202F310,12,matching,misc,Reads one global u32
 0x08037F34,GetUnk02028270,12,matching,misc,Reads one global u32
@@ -91,53 +91,53 @@ address,name,size,status,module,notes
 0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
 0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
 0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
-0x0803C268,FUN_0803c268,92,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C2C4,FUN_0803c2c4,92,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0803C268,FUN_0803c268,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0803C2C4,FUN_0803c2c4,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
 0x0803C790,ReturnOne,4,matching,misc,Returns the constant 1; missed by Ghidra auto-analysis
 0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
 0x0803C798,ResetSessionNode,34,matching,misc,Clears two node fields and two session flag bits
-0x0803F7F8,FUN_0803f7f8,36,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0803F85C,FUN_0803f85c,36,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py cagri hedefi (kesin), govdesi henuz incelenmedi; sinir ROM'a karsi duzeltildi (audit_boundaries.py)"
-0x0803F8DC,FUN_0803f8dc,50,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
-0x0803F910,FUN_0803f910,50,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0803F7F8,FUN_0803f7f8,36,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0803F85C,FUN_0803f85c,36,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0803F8DC,FUN_0803f8dc,50,matching,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
+0x0803F910,FUN_0803f910,50,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x080427BC,NoOp080427BC,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x0804FEE4,FUN_0804fee4,28,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080500DC,FUN_080500dc,28,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
+0x0804FEE4,FUN_0804fee4,28,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x080500DC,FUN_080500dc,28,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08051048,NoOp08051048,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x0805135C,RunFrameStageOne,132,matching,core,Kare isleme zincirinin ilk yarisini calistirir ve tani isaretlerini gunceller; src/core/frame_dispatch.c
-0x080513E0,RunFrameStageTwo,120,matching,core,Kare isleme zincirinin ikinci yarisini calistirir ve tani isaretlerini gunceller; src/core/frame_dispatch.c
+0x0805135C,RunFrameStageOne,132,matching,core,Runs the first half of the frame processing chain and updates the diagnostic markers; src/core/frame_dispatch.c
+0x080513E0,RunFrameStageTwo,120,matching,core,Runs the second half of the frame processing chain and updates the diagnostic markers; src/core/frame_dispatch.c
 0x080514C8,GetRecordUnk04,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
 0x080514E4,GetRecordUnk08,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
 0x08051500,GetRecord,14,matching,misc,Returns the address of a 60-byte record
-0x08051540,AdjustAreaPosition,144,matching,core,Alan derinligi degisiminde sabit nokta konum ofsetini duzeltir; src/core/adjust_area_position.c
-0x080515D0,FUN_080515d0,164,decompiled,core,Koordinat listesini etkin alan hucrelerine isaretler; 20/164 fark park; src/core/mark_area_cells.c
+0x08051540,AdjustAreaPosition,144,matching,core,Corrects the fixed-point position offset when the area depth changes; src/core/adjust_area_position.c
+0x080515D0,FUN_080515d0,164,decompiled,core,Marks the coordinate list into the active area cells; 20/164 differences parked; src/core/mark_area_cells.c
 0x080519B8,NoOp080519B8,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
-0x08055970,ProbeNearbyPosition,144,matching,core,Konumu dort komsu ofsette sinar ve basarisizsa geri yukler; src/core/probe_nearby_position.c
-0x080563C0,FUN_080563c0,124,decompiled,core,Alan kayitlarini iki baytlik anahtara gore sayar; 95/124 fark park; src/core/count_area_entries.c
-0x0805643C,ResetRuntimeGlobals,204,matching,core,Calisma zamaninda kullanilan bagimsiz global durum alanlarini sifirlar; src/core/reset_runtime_globals.c
-0x08058140,FUN_08058140,116,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x080581B4,FUN_080581b4,116,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08059FE8,FUN_08059fe8,58,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805A070,FUN_0805a070,58,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AB90,FUN_0805ab90,76,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805ABDC,FUN_0805abdc,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805AC10,FUN_0805ac10,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805AC94,LinkObjectPair,124,matching,world,Nesne bagini ve iki kontrol blogunun durum bitlerini gunceller; src/world/link_objects.c
-0x0805AD10,FUN_0805ad10,86,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0805AD68,FUN_0805ad68,86,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805AEFC,FUN_0805aefc,76,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805B2A4,FUN_0805b2a4,24,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805B388,FUN_0805b388,130,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805B484,FUN_0805b484,130,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0805B854,FUN_0805b854,24,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
+0x08055970,ProbeNearbyPosition,144,matching,core,Tests the position at four neighbouring offsets and restores it on failure; src/core/probe_nearby_position.c
+0x080563C0,FUN_080563c0,124,decompiled,core,Counts the area records by a two-byte key; 95/124 differences parked; src/core/count_area_entries.c
+0x0805643C,ResetRuntimeGlobals,204,matching,core,Zeroes the independent global state fields used at runtime; src/core/reset_runtime_globals.c
+0x08058140,FUN_08058140,116,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x080581B4,FUN_080581b4,116,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059FE8,FUN_08059fe8,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A070,FUN_0805a070,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AB90,FUN_0805ab90,76,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0805ABDC,FUN_0805abdc,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0805AC10,FUN_0805ac10,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0805AC94,LinkObjectPair,124,matching,world,Updates the object link and the state bits of two control blocks; src/world/link_objects.c
+0x0805AD10,FUN_0805ad10,86,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0805AD68,FUN_0805ad68,86,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AEFC,FUN_0805aefc,76,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0805B2A4,FUN_0805b2a4,24,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B388,FUN_0805b388,130,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B484,FUN_0805b484,130,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B854,FUN_0805b854,24,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0805E6C4,SetTableIndex,12,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6D4,GetTableIndex,6,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
 0x0805E6E0,GetRecordWord,20,matching,misc,Selects and reads a 0x9A8-byte ROM record; table contents unidentified
-0x0806245C,FUN_0806245c,92,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py fonksiyon isaretcisi, govdesi henuz incelenmedi"
-0x080624B8,FUN_080624b8,92,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08063C88,FUN_08063c88,28,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08063D3C,FUN_08063d3c,28,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x0806245C,FUN_0806245c,92,matching,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
+0x080624B8,FUN_080624b8,92,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08063C88,FUN_08063c88,28,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08063D3C,FUN_08063d3c,28,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0806434C,SetFontIndex,10,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
 0x0806435C,DrawText,120,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
 0x080643D8,DrawTextCentred,128,matching,text,"Text drawing helper; colour escapes ""@"" + digit are skipped"
@@ -158,37 +158,37 @@ address,name,size,status,module,notes
 0x0806C0D4,_call_via_r7,2,documented,sdk,GCC call-via veneer: bx r7
 0x0806C0D8,_call_via_r8,2,documented,sdk,GCC call-via veneer: bx r8
 0x0806C0DC,_call_via_r9,2,documented,sdk,GCC call-via veneer: bx r9
-0x0806CA24,FUN_0806ca24,74,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806CA70,FUN_0806ca70,74,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806CABC,FUN_0806cabc,76,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806CB08,FUN_0806cb08,76,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806CB54,FUN_0806cb54,74,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806CBA0,FUN_0806cba0,74,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x0806D810,FUN_0806d810,78,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0806D860,FUN_0806d860,78,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0806D8B0,FUN_0806d8b0,80,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0806D900,FUN_0806d900,80,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0806D950,FUN_0806d950,78,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
-0x0806D9A0,FUN_0806d9a0,78,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI
+0x0806CA24,FUN_0806ca24,74,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806CA70,FUN_0806ca70,74,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806CABC,FUN_0806cabc,76,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806CB08,FUN_0806cb08,76,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806CB54,FUN_0806cb54,74,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806CBA0,FUN_0806cba0,74,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0806D810,FUN_0806d810,78,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0806D860,FUN_0806d860,78,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0806D8B0,FUN_0806d8b0,80,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0806D900,FUN_0806d900,80,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0806D950,FUN_0806d950,78,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
+0x0806D9A0,FUN_0806d9a0,78,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0806DCC0,Memset,,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
 0x0806DE84,_toupper,28,discovered,libc,newlib routine; matched against agbcc libc.a build; identical body to toupper - which symbol occupies this address is undetermined
 0x08070CE4,_mbtowc_r,42,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x08070D10,FUN_08070d10,132,decompiled,misc,Word hizli memchr yardimcisi; 136/132 bayt ve 83 fark park; src/misc/fast_memchr.c
+0x08070D10,FUN_08070d10,132,decompiled,misc,Word-fast memchr helper; 136/132 bytes and 83 differences parked; src/misc/fast_memchr.c
 0x08070DF8,_Bfree,24,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08070F34,_hi0bits,88,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08070F8C,_lo0bits,130,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x080716A4,isinf,36,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x080716C8,isnan,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x080716E8,FUN_080716e8,48,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x080716E8,FUN_080716e8,48,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x080717EC,findslot,30,documented,libc,newlib routine; matched against agbcc libc.a build
 0x0807180C,remap_handle,76,documented,libc,newlib routine; matched against agbcc libc.a build
 0x08071B9C,_exit,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
 0x08071BBC,_kill,32,documented,libc,"newlib syscall stub; body identical to its neighbour but the pair occurs exactly twice in the ROM, 32 bytes apart, matching the syscalls.o layout (_exit at object offset 892, _kill at 924) - order is therefore certain"
-0x08071C90,FUN_08071c90,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071D20,FUN_08071d20,48,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08071C90,FUN_08071c90,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08071D20,FUN_08071d20,48,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
-0x08071DB4,FUN_08071db4,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x08071DE8,FUN_08071de8,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0805131C,FUN_0805131c,62,matching,unknown,"Ghidra kacirmisti; tools/discover_functions.py ile bulundu, govdesi henuz incelenmedi"
-0x08031204,FUN_08031204,56,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
-0x0803C708,FUN_0803c708,52,matching,unknown,Byte-matching C kaynagindan dogrulandi; sinir ve ARM/Thumb kipi ROMa karsi KANITLANDI; sinir ROM'a karsi duzeltildi (audit_boundaries.py)
+0x08071DB4,FUN_08071db4,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x08071DE8,FUN_08071de8,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0805131C,FUN_0805131c,62,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08031204,FUN_08031204,56,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0803C708,FUN_0803c708,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)

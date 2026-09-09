@@ -14,6 +14,9 @@ MIN_SIZE = 120
 MAX_SIZE = 560
 MAX_GAP = 200
 EXCLUDED_MODULES = {"arm", "libc", "sdk"}
+# Machine-read prefix: a park without a source must carry this marker in its
+# evidence column of data/sibling_band.csv.
+TRIAGE_PREFIX = "ROM static triage:"
 
 
 def load_csv(path: Path):
@@ -85,7 +88,7 @@ def main():
         elif outcome == "parked":
             if function["status"] == "matching":
                 errors.append(f"{row['address']}: it is matching now; the manifest must be updated")
-            if not row["source"] and not row["evidence"].startswith("ROM statik triyaj:"):
+            if not row["source"] and not row["evidence"].startswith(TRIAGE_PREFIX):
                 errors.append(f"{row['address']}: no ROM triage evidence for a park without source")
         else:
             errors.append(f"{row['address']}: invalid outcome {outcome!r}")

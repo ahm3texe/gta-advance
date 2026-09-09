@@ -1,85 +1,85 @@
 address,name,size,outcome,source,evidence
-0x08005E8C,FUN_08005e8c,208,parked,,ROM statik triyaj: 5 cagri / 0 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x08007FDC,FUN_08007fdc,136,parked,,ROM statik triyaj: 3 cagri / 6 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
-0x080081D4,FUN_080081d4,124,parked,,ROM statik triyaj: 5 cagri / 3 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
-0x0800AF48,FUN_0800af48,174,parked,src/world/plane_classify.c,166/174 bayt; yerel/yazmac yasam araligi dagitimi
-0x0800AFF8,FUN_0800aff8,172,parked,,ROM statik triyaj: 1 cagri / 0 kosullu dal / 0 literal; bagimli imza-ve-tur blogu gerekli
+0x08005E8C,FUN_08005e8c,208,parked,,ROM static triage: 5 calls / 0 conditional branches / 5 literals; dependent signature-and-type block needed
+0x08007FDC,FUN_08007fdc,136,parked,,ROM static triage: 3 calls / 6 conditional branches / 6 literals; dependent signature-and-type block needed
+0x080081D4,FUN_080081d4,124,parked,,ROM static triage: 5 calls / 3 conditional branches / 3 literals; dependent signature-and-type block needed
+0x0800AF48,FUN_0800af48,174,parked,src/world/plane_classify.c,166/174 bytes; local/register live range allocation
+0x0800AFF8,FUN_0800aff8,172,parked,,ROM static triage: 1 calls / 0 conditional branches / 0 literals; dependent signature-and-type block needed
 0x0800B16C,FUN_0800b16c,280,matching,src/world/band_0800b16c.c,ROM byte-matching; data/functions.csv
-0x0800C180,FUN_0800c180,320,parked,,ROM statik triyaj: 8 cagri / 21 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
+0x0800C180,FUN_0800c180,320,parked,,ROM static triage: 8 calls / 21 conditional branches / 1 literals; dependent signature-and-type block needed
 0x080100D0,InitWorkBuffers,124,matching,src/core/memory_init.c,ROM byte-matching
-0x08011BE8,FUN_08011be8,268,parked,,ROM statik triyaj: 1 cagri / 6 kosullu dal / 11 literal; RAM tur blogu gerekli
-0x08011DD4,FUN_08011dd4,176,parked,src/core/bg2_affine.c,168/176 bayt; r8/r9 yasam araligi ve ayri ofset literal havuzu
-0x08012CD8,FUN_08012cd8,320,parked,src/core/sprite_b1.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x080137A4,FUN_080137a4,128,parked,,ROM statik triyaj: 1 cagri / 0 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x08013824,FUN_08013824,196,parked,,ROM statik triyaj: 8 cagri / 0 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
+0x08011BE8,FUN_08011be8,268,parked,,ROM static triage: 1 calls / 6 conditional branches / 11 literals; RAM type block needed
+0x08011DD4,FUN_08011dd4,176,parked,src/core/bg2_affine.c,168/176 bytes; r8/r9 live ranges and a separate offset literal pool
+0x08012CD8,FUN_08012cd8,320,parked,src/core/sprite_b1.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x080137A4,FUN_080137a4,128,parked,,ROM static triage: 1 calls / 0 conditional branches / 5 literals; dependent signature-and-type block needed
+0x08013824,FUN_08013824,196,parked,,ROM static triage: 8 calls / 0 conditional branches / 6 literals; dependent signature-and-type block needed
 0x08013ABC,ReleaseObject,224,matching,src/world/release_object.c,ROM byte-matching; data/functions.csv
-0x08014E48,FUN_08014e48,154,parked,src/world/transition_code.c,168/154 bayt; switch ve if/else karsilastirma agaclari elendi
-0x08014EE4,FUN_08014ee4,124,parked,,ROM statik triyaj: 3 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
+0x08014E48,FUN_08014e48,154,parked,src/world/transition_code.c,168/154 bytes; the switch and if/else comparison trees were ruled out
+0x08014EE4,FUN_08014ee4,124,parked,,ROM static triage: 3 calls / 6 conditional branches / 1 literals; dependent signature-and-type block needed
 0x080157B8,TryLaunchActor,124,matching,src/world/try_launch_actor.c,ROM byte-matching; data/functions.csv
-0x08015834,UpdateActorSlotEntry,362,parked,,ROM statik triyaj: 14 cagri / 20 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x08019320,FUN_08019320,164,parked,,ROM statik triyaj: 3 cagri / 19 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
+0x08015834,UpdateActorSlotEntry,362,parked,,ROM static triage: 14 calls / 20 conditional branches / 5 literals; dependent signature-and-type block needed
+0x08019320,FUN_08019320,164,parked,,ROM static triage: 3 calls / 19 conditional branches / 5 literals; dependent signature-and-type block needed
 0x080193C4,GetActorRouteEntry,138,matching,src/world/get_actor_route_entry.c,ROM byte-matching; data/functions.csv
 0x08019710,PingOtherActors,140,matching,src/world/ping_other_actors.c,ROM byte-matching; data/functions.csv
-0x0801983C,FUN_0801983c,168,parked,,ROM statik triyaj: 0 cagri / 1 kosullu dal / 1 literal; atlama tablosu rekonstruksiyonu gerekli
+0x0801983C,FUN_0801983c,168,parked,,ROM static triage: 0 calls / 1 conditional branches / 1 literals; jump table reconstruction needed
 0x080199BC,BlendPaletteBlock,134,matching,src/world/palette_lerp.c,ROM byte-matching
-0x08019C24,FUN_08019c24,264,parked,,ROM statik triyaj: 0 cagri / 11 kosullu dal / 4 literal; RAM tur blogu gerekli
-0x0801D754,FUN_0801d754,136,parked,,ROM statik triyaj: 2 cagri / 10 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
-0x080237B0,FUN_080237b0,184,parked,,ROM statik triyaj: 0 cagri / 2 kosullu dal / 2 literal; sabit nokta tur blogu gerekli
+0x08019C24,FUN_08019c24,264,parked,,ROM static triage: 0 calls / 11 conditional branches / 4 literals; RAM type block needed
+0x0801D754,FUN_0801d754,136,parked,,ROM static triage: 2 calls / 10 conditional branches / 4 literals; dependent signature-and-type block needed
+0x080237B0,FUN_080237b0,184,parked,,ROM static triage: 0 calls / 2 conditional branches / 2 literals; fixed-point type block needed
 0x08023868,ProjectActorOffset,196,matching,src/world/project_actor_offset.c,ROM byte-matching; data/functions.csv
-0x08029518,FUN_08029518,392,parked,,ROM statik triyaj: 2 cagri / 1 kosullu dal / 19 literal; RAM tur blogu gerekli
-0x080306C8,ShowLevelBadge,384,parked,,ROM statik triyaj: 9 cagri / 9 kosullu dal / 18 literal; bagimli imza-ve-tur blogu gerekli
+0x08029518,FUN_08029518,392,parked,,ROM static triage: 2 calls / 1 conditional branches / 19 literals; RAM type block needed
+0x080306C8,ShowLevelBadge,384,parked,,ROM static triage: 9 calls / 9 conditional branches / 18 literals; dependent signature-and-type block needed
 0x08030EAC,LoadHudPalettes,124,matching,src/ui/load_hud_palettes.c,ROM byte-matching; data/functions.csv
 0x08031C10,ReplaceNibbleField,136,matching,src/world/nibble_replace.c,ROM byte-matching
 0x08031C98,PushSlotQueueEntry,140,matching,src/world/push_slot_queue_entry.c,ROM byte-matching; data/functions.csv
-0x08033674,AllocPoolNode,120,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
+0x08033674,AllocPoolNode,120,parked,,ROM static triage: 2 calls / 5 conditional branches / 5 literals; dependent signature-and-type block needed
 0x080337A8,StopAudioDmaOnCartFlag,120,matching,src/world/stop_audio_dma.c,ROM byte-matching; data/functions.csv
-0x08035BA8,FUN_08035ba8,300,parked,,ROM statik triyaj: 5 cagri / 6 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x08037D98,FUN_08037d98,228,parked,,ROM statik triyaj: 6 cagri / 13 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x08038108,FUN_08038108,154,parked,,ROM statik triyaj: 7 cagri / 5 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
+0x08035BA8,FUN_08035ba8,300,parked,,ROM static triage: 5 calls / 6 conditional branches / 1 literals; dependent signature-and-type block needed
+0x08037D98,FUN_08037d98,228,parked,,ROM static triage: 6 calls / 13 conditional branches / 1 literals; dependent signature-and-type block needed
+0x08038108,FUN_08038108,154,parked,,ROM static triage: 7 calls / 5 conditional branches / 2 literals; dependent signature-and-type block needed
 0x0803AFBC,FUN_0803afbc,480,matching,src/world/band_0803afbc.c,ROM byte-matching; data/functions.csv
-0x0803BDC8,FUN_0803bdc8,540,parked,,ROM statik triyaj: 16 cagri / 27 kosullu dal / 16 literal; bagimli imza-ve-tur blogu gerekli
-0x0803F4BC,TryEngageTarget,372,parked,src/world/try_engage_target.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08041C64,FUN_08041c64,448,parked,,ROM statik triyaj: 4 cagri / 17 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
-0x08041F8C,FindHitInList,126,parked,,ROM statik triyaj: 1 cagri / 5 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x08042280,FUN_08042280,236,parked,,ROM statik triyaj: 2 cagri / 5 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
+0x0803BDC8,FUN_0803bdc8,540,parked,,ROM static triage: 16 calls / 27 conditional branches / 16 literals; dependent signature-and-type block needed
+0x0803F4BC,TryEngageTarget,372,parked,src/world/try_engage_target.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08041C64,FUN_08041c64,448,parked,,ROM static triage: 4 calls / 17 conditional branches / 3 literals; dependent signature-and-type block needed
+0x08041F8C,FindHitInList,126,parked,,ROM static triage: 1 calls / 5 conditional branches / 1 literals; dependent signature-and-type block needed
+0x08042280,FUN_08042280,236,parked,,ROM static triage: 2 calls / 5 conditional branches / 1 literals; dependent signature-and-type block needed
 0x080424EC,FindRandomTileOfKind,136,matching,src/world/find_random_tile_of_kind.c,ROM byte-matching; data/functions.csv
-0x08042574,FUN_08042574,180,parked,,ROM statik triyaj: 2 cagri / 6 kosullu dal / 2 literal; bagimli imza-ve-tur blogu gerekli
-0x08042628,FUN_08042628,196,parked,,ROM statik triyaj: 6 cagri / 8 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
-0x080426EC,FUN_080426ec,150,parked,,ROM statik triyaj: 2 cagri / 7 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
-0x080427C0,FUN_080427c0,124,parked,,ROM statik triyaj: 3 cagri / 2 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
-0x08045888,FUN_08045888,538,parked,,ROM statik triyaj: 20 cagri / 29 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
-0x08047818,FUN_08047818,492,parked,,ROM statik triyaj: 4 cagri / 30 kosullu dal / 13 literal; RAM tur blogu gerekli
+0x08042574,FUN_08042574,180,parked,,ROM static triage: 2 calls / 6 conditional branches / 2 literals; dependent signature-and-type block needed
+0x08042628,FUN_08042628,196,parked,,ROM static triage: 6 calls / 8 conditional branches / 3 literals; dependent signature-and-type block needed
+0x080426EC,FUN_080426ec,150,parked,,ROM static triage: 2 calls / 7 conditional branches / 4 literals; dependent signature-and-type block needed
+0x080427C0,FUN_080427c0,124,parked,,ROM static triage: 3 calls / 2 conditional branches / 4 literals; dependent signature-and-type block needed
+0x08045888,FUN_08045888,538,parked,,ROM static triage: 20 calls / 29 conditional branches / 3 literals; dependent signature-and-type block needed
+0x08047818,FUN_08047818,492,parked,,ROM static triage: 4 calls / 30 conditional branches / 13 literals; RAM type block needed
 0x0804AEAC,FUN_0804aeac,476,matching,src/world/band_0804aeac.c,ROM byte-matching; data/functions.csv
-0x0804FE64,FUN_0804fe64,120,parked,,ROM statik triyaj: 6 cagri / 3 kosullu dal / 1 literal; bagimli imza-ve-tur blogu gerekli
-0x080501C8,FUN_080501c8,192,parked,,ROM statik triyaj: 2 cagri / 14 kosullu dal / 4 literal; bagimli imza-ve-tur blogu gerekli
-0x080507F4,StepMissionTimer,290,parked,,ROM statik triyaj: 7 cagri / 19 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
+0x0804FE64,FUN_0804fe64,120,parked,,ROM static triage: 6 calls / 3 conditional branches / 1 literals; dependent signature-and-type block needed
+0x080501C8,FUN_080501c8,192,parked,,ROM static triage: 2 calls / 14 conditional branches / 4 literals; dependent signature-and-type block needed
+0x080507F4,StepMissionTimer,290,parked,,ROM static triage: 7 calls / 19 conditional branches / 6 literals; dependent signature-and-type block needed
 0x08051154,FUN_08051154,348,matching,src/core/band_08051154.c,ROM byte-matching; data/functions.csv
 0x0805135C,RunFrameStageOne,132,matching,src/core/frame_dispatch.c,ROM byte-matching
 0x080513E0,RunFrameStageTwo,120,matching,src/core/frame_dispatch.c,ROM byte-matching
 0x08051540,AdjustAreaPosition,144,matching,src/core/adjust_area_position.c,ROM byte-matching
-0x080515D0,FUN_080515d0,164,parked,src/core/mark_area_cells.c,164/164 bayt; 20 bayt fark; iki global literal yukleme sirasi
+0x080515D0,FUN_080515d0,164,parked,src/core/mark_area_cells.c,164/164 bytes; 20 bytes differ; the load order of two global literals
 0x080534A8,FUN_080534a8,424,matching,src/world/band_080534a8.c,ROM byte-matching; data/functions.csv
-0x08053834,FUN_08053834,250,parked,src/core/nodelist_b2.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08055054,FUN_08055054,312,parked,src/core/nodelist_b7.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08055514,FUN_08055514,124,parked,,ROM statik triyaj: 2 cagri / 7 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
+0x08053834,FUN_08053834,250,parked,src/core/nodelist_b2.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08055054,FUN_08055054,312,parked,src/core/nodelist_b7.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08055514,FUN_08055514,124,parked,,ROM static triage: 2 calls / 7 conditional branches / 3 literals; dependent signature-and-type block needed
 0x08055970,ProbeNearbyPosition,144,matching,src/core/probe_nearby_position.c,ROM byte-matching
-0x08056280,FUN_08056280,124,parked,,ROM statik triyaj: 1 cagri / 7 kosullu dal / 6 literal; bagimli imza-ve-tur blogu gerekli
-0x080563C0,FUN_080563c0,124,parked,src/core/count_area_entries.c,124/124 bayt; 95 bayt fark; alan bankasi taban yasam araligi
+0x08056280,FUN_08056280,124,parked,,ROM static triage: 1 calls / 7 conditional branches / 6 literals; dependent signature-and-type block needed
+0x080563C0,FUN_080563c0,124,parked,src/core/count_area_entries.c,124/124 bytes; 95 bytes differ; live range of the area bank base
 0x0805643C,ResetRuntimeGlobals,204,matching,src/core/reset_runtime_globals.c,ROM byte-matching
 0x0805AC94,LinkObjectPair,124,matching,src/world/link_objects.c,ROM byte-matching
-0x0805DAC8,FUN_0805dac8,492,parked,,ROM statik triyaj: 35 cagri / 2 kosullu dal / 19 literal; bagimli imza-ve-tur blogu gerekli
-0x0805E700,FUN_0805e700,200,parked,,ROM statik triyaj: 9 cagri / 7 kosullu dal / 5 literal; bagimli imza-ve-tur blogu gerekli
-0x0805E7C8,FUN_0805e7c8,540,parked,,ROM statik triyaj: 16 cagri / 19 kosullu dal / 12 literal; bagimli imza-ve-tur blogu gerekli
-0x08064180,FUN_08064180,396,parked,src/text/text_f3.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08064590,ClearTextArea,132,parked,src/text/clear_text_area.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08064724,FUN_08064724,536,parked,src/text/text_f5.c,Mevcut dogal C park kaynagi; dosya ici olcum ve elenen varyant notlari
-0x08064DFC,ApplyLaunchVelocity,294,parked,,ROM statik triyaj: 4 cagri / 16 kosullu dal / 3 literal; bagimli imza-ve-tur blogu gerekli
+0x0805DAC8,FUN_0805dac8,492,parked,,ROM static triage: 35 calls / 2 conditional branches / 19 literals; dependent signature-and-type block needed
+0x0805E700,FUN_0805e700,200,parked,,ROM static triage: 9 calls / 7 conditional branches / 5 literals; dependent signature-and-type block needed
+0x0805E7C8,FUN_0805e7c8,540,parked,,ROM static triage: 16 calls / 19 conditional branches / 12 literals; dependent signature-and-type block needed
+0x08064180,FUN_08064180,396,parked,src/text/text_f3.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08064590,ClearTextArea,132,parked,src/text/clear_text_area.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08064724,FUN_08064724,536,parked,src/text/text_f5.c,The existing natural-C parked source; in-file measurement and eliminated-variant notes
+0x08064DFC,ApplyLaunchVelocity,294,parked,,ROM static triage: 4 calls / 16 conditional branches / 3 literals; dependent signature-and-type block needed
 0x08066568,InitLinkBlock,164,matching,src/world/link_init.c,ROM byte-matching; data/functions.csv
 0x0806660C,StepLinkFrame,304,matching,src/world/link_frame_step.c,ROM byte-matching; data/functions.csv
 0x08066904,SerialIrqHandler,316,matching,src/world/link_dispatch.c,ROM byte-matching; data/functions.csv
 0x08066AA8,BuildLinkReport,152,matching,src/world/link_report.c,ROM byte-matching; data/functions.csv
-0x08067014,FUN_08067014,368,parked,,ROM statik triyaj: 1 cagri / 25 kosullu dal / 1 literal; karsilastirma agaci C denemesi gerekli
+0x08067014,FUN_08067014,368,parked,,ROM static triage: 1 calls / 25 conditional branches / 1 literals; a comparison-tree C attempt is needed
 0x08067404,IsKind20,172,matching,src/world/is_kind20.c,ROM byte-matching; data/functions.csv
-0x0806B88C,FUN_0806b88c,370,parked,,ROM statik triyaj: 1 cagri / 5 kosullu dal / 8 literal; BIOS/SDK imza blogu gerekli
-0x08070D10,FUN_08070d10,132,parked,src/misc/fast_memchr.c,136/132 bayt; 83 bayt fark; r4-r7 dagitimi
-0x08070E10,FUN_08070e10,156,parked,,ROM statik triyaj: 3 cagri / 3 kosullu dal / 1 literal; libc kaynak kimligi gerekli
+0x0806B88C,FUN_0806b88c,370,parked,,ROM static triage: 1 calls / 5 conditional branches / 8 literals; BIOS/SDK signature block needed
+0x08070D10,FUN_08070d10,132,parked,src/misc/fast_memchr.c,136/132 bytes; 83 bytes differ; r4-r7 allocation
+0x08070E10,FUN_08070e10,156,parked,,ROM static triage: 3 calls / 3 conditional branches / 1 literals; libc source identification needed

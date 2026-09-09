@@ -82,8 +82,8 @@ def main() -> None:
         return
 
     out = []
-    added: set[int] = set()      # the same call target inside two parents
-                                 # kalabilir; cocugu yalnizca BIR kez ekle
+    added: set[int] = set()      # the same call target can sit inside two
+                                 # parents; add the child only ONCE
     for row in rows:
         address = int(row["address"], 16)
         if address not in splits:
@@ -94,8 +94,8 @@ def main() -> None:
         # The first fragment keeps the old record's name and shrinks.
         row["size"] = str(points[0] - address)
         note = row["notes"].strip('"')
-        row["notes"] = (note + "; kuyruk cagrisiyla birlesmisti, "
-                        "split_at_calls.py ayirdi").lstrip("; ")
+        row["notes"] = (note + "; had been merged by a tail call, "
+                        "split by split_at_calls.py").lstrip("; ")
         out.append(row)
         for i, start in enumerate(splits[address]):
             if start in added:
