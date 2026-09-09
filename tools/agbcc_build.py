@@ -24,7 +24,7 @@ CC1FLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
 # bunlar simdiye kadar DERLENEMIYORDU: zincir yalnizca Thumb'a bagliydi.
 # Araç zincirinde `agbcc_arm` bastan beri duruyordu.
 # Kaynak dosyada ARM_MARKER satiri varsa bu yol kullanilir.
-ARM_MARKER = "KIP: ARM"
+ARM_MARKER = "MODE: ARM"
 ARM_CC = "agbcc_arm"
 # `-fhex-asm` agbcc_arm tarafindan TANINMIYOR (olculdu); digerleri kabul.
 # -fomit-frame-pointer OLCULDU: onsuz agbcc_arm APCS cercevesi kuruyor

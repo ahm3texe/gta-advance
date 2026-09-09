@@ -77,7 +77,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 AGBCC_DIR = ROOT / "tools/agbcc/bin"
 AGBCC = AGBCC_DIR / "old_agbcc"
 ARM_AGBCC = AGBCC_DIR / "agbcc_arm"
-ARM_MARKER = "KIP: ARM"
+ARM_MARKER = "MODE: ARM"
 FLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
 ARM_FLAGS = ["-mthumb-interwork", "-O2", "-fomit-frame-pointer",
              "-fno-schedule-insns", "-fno-schedule-insns2"]

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Bir C dosyasini agbcc ile derler, linkler ve her fonksiyonu ROM ile karsilastirir.
+"""Compile a C file with agbcc, link it, and compare every function against the ROM.
 
-Kullanim:  python3 tools/verify_c_function.py src/save/save_helpers.c [--cc=agbcc]
+Usage:  python3 tools/verify_c_function.py src/save/save_helpers.c [--cc=agbcc]
 
-Fonksiyon adresleri data/functions.csv'den okunur. Bir fonksiyon C'den
-byte-matching oldugunda, esdeger assembly kaynagi artik gereksizdir.
+Function addresses are read from data/functions.csv. Once a function is
+byte-matching from C, its equivalent assembly source is no longer needed.
 """
 import sys
 from pathlib import Path
@@ -30,8 +30,8 @@ def main() -> None:
     rows = function_rows()
 
     print(f"{source}  [{compiler} {' '.join(CC1FLAGS)}]  "
-          f"{len(layout)} fonksiyon @ 0x{base:08X}")
-    print(f"{'fonksiyon':22} {'boyut':>6}  sonuc")
+          f"{len(layout)} functions @ 0x{base:08X}")
+    print(f"{'function':22} {'size':>6}  result")
     print("-" * 60)
     matched = 0
     for name, (offset, size) in sorted(layout.items(), key=lambda kv: kv[1][0]):
@@ -40,16 +40,16 @@ def main() -> None:
         mine = blob[offset:offset + size]
         theirs = rom[address - ROM_BASE:address - ROM_BASE + size]
         if size < mapped_size:
-            print(f"{name:22} {size:>6}  KISA C CIKTISI; harita {mapped_size} byte "
+            print(f"{name:22} {size:>6}  SHORT C OUTPUT; map says {mapped_size} bytes "
                   f"(0x{address:08X})")
         elif mine == theirs:
             matched += 1
             print(f"{name:22} {size:>6}  BYTE-MATCHING  (0x{address:08X})")
         else:
             bad = sum(a != b for a, b in zip(mine, theirs))
-            print(f"{name:22} {size:>6}  farkli: {bad}/{size} byte  (0x{address:08X})")
+            print(f"{name:22} {size:>6}  differ: {bad}/{size} bytes  (0x{address:08X})")
     print("-" * 60)
-    print(f"{matched}/{len(layout)} fonksiyon C'den byte-matching")
+    print(f"{matched}/{len(layout)} functions byte-matching from C")
     sys.exit(0 if matched == len(layout) else 1)
 
 

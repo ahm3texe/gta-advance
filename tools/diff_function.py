@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Bir fonksiyonun ROM halini derlenmis halinin yaninda gosterir.
+"""Show a function's ROM form beside the form compiled from your C.
 
-Kullanim:
+Usage:
     python3 tools/diff_function.py src/save/save_helpers.c WriteU16LE [--cc=agbcc]
 
-Sol sutun ROM'daki gercek kod, sag sutun senin C'nden uretilen kod.
-Farkli ve eksik komutlar isaretlenir. Eslesmeyen bir fonksiyonu duzeltirken
-"nerede sapiyor" sorusunun cevabi budur.
+The left column is the real code in the ROM, the right column the code
+generated from your C. Differing and missing instructions are marked. This
+answers "where does it diverge" when fixing a non-matching function.
 """
 import difflib
 import re
@@ -23,7 +23,7 @@ GREEN, RED, DIM, RESET = "\033[32m", "\033[31m", "\033[2m", "\033[0m"
 
 def disassemble(blob: bytes, base: int, thumb: bool = True,
                 tag: str = "dis") -> list[str]:
-    # Dosya adi cagriya ozel: paralel calisan araclar birbirini ezmesin.
+    # The file name is call-specific so that parallel tools do not clobber each other.
     raw = BUILD / f"{tag}.bin"
     raw.write_bytes(blob)
     out = run([
@@ -50,11 +50,11 @@ def main() -> None:
 
     rows = function_rows()
     if target not in rows:
-        sys.exit(f"{target} data/functions.csv icinde yok")
+        sys.exit(f"{target} is not in data/functions.csv")
 
     blob, layout, _ = compile_and_link(source, compiler)
     if target not in layout:
-        sys.exit(f"{target} {source} icinde tanimli degil")
+        sys.exit(f"{target} is not defined in {source}")
 
     address = int(rows[target]["address"], 16)
     rom_size = int(rows[target]["size"] or 0)
@@ -63,18 +63,18 @@ def main() -> None:
 
     mine = blob[offset:offset + size]
     start = address - ROM_BASE
-    # data/functions.csv boyutu Ghidra'nin govde tahminidir ve literal havuzu
-    # ile hizalama dolgusunu disarida birakabilir. ROM tarafini onunla kirpmak,
-    # TAM eslesen bir fonksiyonda bile sahte "ROM da YOK" satirlari uretir.
-    # Iki taraftan buyugunu al.
+    # The size in data/functions.csv is Ghidra's body estimate and may leave out
+    # the literal pool and alignment padding. Truncating the ROM side with it
+    # produces spurious "NOT IN ROM" lines even for a fully matching function.
+    # Take the larger of the two sides.
     theirs = rom_bytes()[start:start + max(rom_size, size)]
 
     rom_asm = disassemble(theirs, address, thumb, f"{source.stem}.rom")
     our_asm = disassemble(mine, address, thumb, f"{source.stem}.mine")
 
     print(f"{target}  @ 0x{address:08X}  "
-          f"ROM {len(theirs)} byte / seninki {len(mine)} byte  [{compiler}]")
-    print(f"{'ROM (hedef)':38}   senin C çıktın")
+          f"ROM {len(theirs)} bytes / yours {len(mine)} bytes  [{compiler}]")
+    print(f"{'ROM (target)':38}   your C output")
     print("-" * 78)
 
     same = 0
@@ -92,15 +92,15 @@ def main() -> None:
                 print(f"{RED}{left:38} ≠ {right}{RESET}")
         elif tag == "delete":
             for line in rom_asm[i1:i2]:
-                print(f"{RED}{line:38} ← sende YOK{RESET}")
+                print(f"{RED}{line:38} <- MISSING in yours{RESET}")
         elif tag == "insert":
             for line in our_asm[j1:j2]:
-                print(f"{RED}{'ROM da YOK':38} → {line}{RESET}")
+                print(f"{RED}{'NOT IN ROM':38} -> {line}{RESET}")
 
     print("-" * 78)
     total = max(len(rom_asm), len(our_asm))
     print(f"{GREEN}BYTE-MATCHING{RESET}" if mine == theirs
-          else f"{same}/{total} komut ayni, {total - same} farkli")
+          else f"{same}/{total} instructions identical, {total - same} differ")
     sys.exit(0 if mine == theirs else 1)
 
 

@@ -853,7 +853,7 @@ percentage will come from there.
 
 ### 3. ARM mode
 The build chain was tied to Thumb only; `agbcc_arm` had been sitting idle from the
-start. It was wired in (the `KIP: ARM` marker, `.align 4`). A flag discovery:
+start. It was wired in (the `MODE: ARM` marker, `.align 4`). A flag discovery:
 `-fomit-frame-pointer -fno-schedule-insns -fno-schedule-insns2` took the first
 candidate from 244 to 188 bytes. Barrel-shifter fusions are generated from C
 (measured), so the region is reachable.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tekrarlanabilir proje durumunu veri kaynaklarindan uretir."""
+"""Generate the reproducible project status from the data sources."""
 
 from __future__ import annotations
 
@@ -68,54 +68,55 @@ def markdown(state: dict) -> str:
             f"{task['title']} | {task['acceptance']} |"
         )
     active_text = (
-        f"**{active[0]['id']} — {active[0]['title']}**" if active else "Aktif iş yok."
+        f"**{active[0]['id']} — {active[0]['title']}**" if active else "No active task."
     )
-    return f"""# Güncel proje durumu
+    return f"""# Current project status
 
-Bu dosya elle düzenlenmez. `make status-update` ile `data/*.csv`, sınır
-baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make status`.
+This file is not edited by hand. `make status-update` generates it from
+`data/*.csv`, the boundary baseline and the toolchain lock. For a live terminal
+summary, run `make status`.
 
-## Ölçümler
+## Measurements
 
-| Ölçüm | Değer |
+| Measurement | Value |
 |---|---:|
-| Fonksiyon haritası | {state['functionCount']} fonksiyon / {state['functionBytes']} bayt |
-| İnsan incelemesi (`documented+`) | {state['reviewedCount']} / {state['functionCount']} |
-| Byte-matching | {state['matchingCount']} fonksiyon / {state['matchingBytes']} bayt (%{state['matchingPercent']:.2f}) |
-| C kaynağı | {state['cSourceCount']} toplam / {state['cMatchingCount']} matching |
-| Kaynaktan doğrulanan ROM | {state['sourceRegionBytes']} bayt |
-| libc doğrulaması | {state['libcBytes']} bayt |
-| Toplam doğrulanmış ROM alanı | {state['verifiedRomBytes']} bayt |
-| Açık sınır borcu | {state['boundaryDebt']} kısa sınır + {state['boundarySkippedArm']} ARM incelemesi + {state['boundarySkippedOversized']} aşırı büyüme |
+| Function map | {state['functionCount']} functions / {state['functionBytes']} bytes |
+| Human review (`documented+`) | {state['reviewedCount']} / {state['functionCount']} |
+| Byte-matching | {state['matchingCount']} functions / {state['matchingBytes']} bytes ({state['matchingPercent']:.2f}%) |
+| C sources | {state['cSourceCount']} total / {state['cMatchingCount']} matching |
+| ROM verified from source | {state['sourceRegionBytes']} bytes |
+| libc verification | {state['libcBytes']} bytes |
+| Total verified ROM area | {state['verifiedRomBytes']} bytes |
+| Open boundary debt | {state['boundaryDebt']} short + {state['boundarySkippedArm']} ARM review + {state['boundarySkippedOversized']} oversized |
 
-## Şu anki tek aktif iş
+## The single active task
 
 {active_text}
 
-## Açık iş kuyruğu
+## Open work queue
 
-| ID | Öncelik | Durum | İş | Bitti sayılma koşulu |
+| ID | Priority | Status | Task | Acceptance criteria |
 |---|---|---|---|---|
 {chr(10).join(task_lines)}
 
-## Araç zinciri kilidi
+## Toolchain lock
 
-- Uyumlu pret/agbcc revizyonu: `{state['toolchainRevision']}`
-- Sabit temsil C-corpus parmak izi: `{state['toolchainCorpus']}`
-- ROM çıktısı hibrit bütünleştirme sınamasıdır; bilinmeyen baytlar baserom'dan kopyalanır.
+- Compatible pret/agbcc revision: `{state['toolchainRevision']}`
+- Fixed representative C-corpus fingerprint: `{state['toolchainCorpus']}`
+- The ROM output is a hybrid integration test; unknown bytes are copied from the base ROM.
 """
 
 
 def terminal(state: dict) -> None:
     active = next((row for row in state["queue"] if row["status"] == "in_progress"), None)
-    print(f"Fonksiyon:        {state['functionCount']} / {state['functionBytes']} bayt")
-    print(f"İncelenmiş:       {state['reviewedCount']}")
-    print(f"Byte-matching:    {state['matchingCount']} / {state['matchingBytes']} bayt "
-          f"(%{state['matchingPercent']:.2f})")
-    print(f"C kaynağı:        {state['cSourceCount']} ({state['cMatchingCount']} matching)")
-    print(f"Doğrulanmış ROM:  {state['verifiedRomBytes']} bayt")
-    print(f"Sınır borcu:      {state['boundaryDebt']} kısa sınır")
-    print(f"Aktif iş:         {active['id'] + ' — ' + active['title'] if active else 'yok'}")
+    print(f"Functions:        {state['functionCount']} / {state['functionBytes']} bytes")
+    print(f"Reviewed:         {state['reviewedCount']}")
+    print(f"Byte-matching:    {state['matchingCount']} / {state['matchingBytes']} bytes "
+          f"({state['matchingPercent']:.2f}%)")
+    print(f"C sources:        {state['cSourceCount']} ({state['cMatchingCount']} matching)")
+    print(f"Verified ROM:     {state['verifiedRomBytes']} bytes")
+    print(f"Boundary debt:    {state['boundaryDebt']} short")
+    print(f"Active task:      {active['id'] + ' — ' + active['title'] if active else 'none'}")
 
 
 def main() -> int:
@@ -124,19 +125,19 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.write and args.check:
-        parser.error("--write ve --check birlikte kullanilamaz")
+        parser.error("--write and --check cannot be used together")
 
     state = snapshot()
     content = markdown(state)
     if args.write:
         OUTPUT.write_text(content, encoding="utf-8")
-        print(f"Durum belgesi güncellendi: {OUTPUT.relative_to(ROOT)}")
+        print(f"Status document updated: {OUTPUT.relative_to(ROOT)}")
         return 0
     if args.check:
         if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != content:
-            print("HATA: docs/STATUS.md bayat; `make status-update` çalıştırın.", file=sys.stderr)
+            print("ERROR: docs/STATUS.md is stale; run `make status-update`.", file=sys.stderr)
             return 1
-        print("durum belgesi: TEMIZ")
+        print("status document: CLEAN")
         return 0
     terminal(state)
     return 0

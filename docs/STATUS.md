@@ -1,38 +1,39 @@
-# Güncel proje durumu
+# Current project status
 
-Bu dosya elle düzenlenmez. `make status-update` ile `data/*.csv`, sınır
-baseline'ı ve toolchain kilidinden üretilir. Canlı terminal özeti: `make status`.
+This file is not edited by hand. `make status-update` generates it from
+`data/*.csv`, the boundary baseline and the toolchain lock. For a live terminal
+summary, run `make status`.
 
-## Ölçümler
+## Measurements
 
-| Ölçüm | Değer |
+| Measurement | Value |
 |---|---:|
-| Fonksiyon haritası | 1941 fonksiyon / 454270 bayt |
-| İnsan incelemesi (`documented+`) | 664 / 1941 |
-| Byte-matching | 615 fonksiyon / 58738 bayt (%12.93) |
-| C kaynağı | 645 toplam / 602 matching |
-| Kaynaktan doğrulanan ROM | 40328 bayt |
-| libc doğrulaması | 448 bayt |
-| Toplam doğrulanmış ROM alanı | 40776 bayt |
-| Açık sınır borcu | 0 kısa sınır + 0 ARM incelemesi + 0 aşırı büyüme |
+| Function map | 1941 functions / 454270 bytes |
+| Human review (`documented+`) | 664 / 1941 |
+| Byte-matching | 615 functions / 58738 bytes (12.93%) |
+| C sources | 645 total / 602 matching |
+| ROM verified from source | 40328 bytes |
+| libc verification | 448 bytes |
+| Total verified ROM area | 40776 bytes |
+| Open boundary debt | 0 short + 0 ARM review + 0 oversized |
 
-## Şu anki tek aktif iş
+## The single active task
 
-**PHASE-001 — Faz 1: ikiz ve taze komşu hasadını tamamen bitir**
+**PHASE-001 — Phase 1: finish the twin and fresh-neighbor harvest completely**
 
-## Açık iş kuyruğu
+## Open work queue
 
-| ID | Öncelik | Durum | İş | Bitti sayılma koşulu |
+| ID | Priority | Status | Task | Acceptance criteria |
 |---|---|---|---|---|
-| BACKUP-001 | P1 | blocked | Özel uzak yedek oluştur | Bütün commit geçmişi kullanıcının seçtiği özel remote'a gönderildi |
-| TOOL-010 | P1 | todo | Yeni harita girisi icin yapisal kapi yaz | Bir aday ancak (a) push prologuyla basliyorsa VE (b) oncesinde fonksiyon bitiren komut (pop{..,pc} / bx lr / kosulsuz b) varsa haritaya eklenebilir; bu sinama split_at_calls'in urettigi 57 sahte girisin 57 sinide yakaladi |
-| MAP-010 | P2 | todo | Bosluk analizinin YALNIZ sifir-riskli 16 ARM girisini uygula | ARM bolgesi bagimsiz olculdu (cond!=0xF orani tam 1.0000); bu 16 giris TOOL-010 kapisindan gecirilerek eklenir. 123 prologsuz Thumb yapragi BILEREK DISARIDA birakilir |
-| ARM-001 | P1 | todo | ARM bolgesindeki 18 fonksiyonu C ile eslestir | ARM kipi derleme zinciri calisir durumda; her aday ROM ile olculur, eslesirse bolge kaydedilir |
-| MATCH-019 | P1 | todo | SIO sürücüsünün kalan komut farklarını çöz | FUN_080657d8 doğal C ile make c-match kapısından geçer; RX adres ilişkisi ve pencere/çıkış blokları güncel ROM diff ile ayrı ayrı incelenir |
-| PHASE-001 | P1 | in_progress | Faz 1: ikiz ve taze komşu hasadını tamamen bitir | Sabit başlangıç hedefleri ve yeni eşleşmelerin açtığı ikizler tamamen ölçülür; aday başına en çok dört deneme; her sonuç tam matching veya kaynak ve ölçüm kanıtlı park; make check-full geçer |
+| BACKUP-001 | P1 | blocked | Create a private remote backup | The full commit history is pushed to a private remote chosen by the user |
+| TOOL-010 | P1 | todo | Write a structural gate for new map entries | A candidate may be added to the map only if (a) it starts with a push prologue AND (b) it is preceded by a function-ending instruction (pop{..,pc} / bx lr / unconditional b); this test caught 57 of the 57 false entries produced by split_at_calls |
+| MAP-010 | P2 | todo | Apply ONLY the 16 zero-risk ARM entries from the gap analysis | The ARM region was measured independently (the cond!=0xF ratio is exactly 1.0000); these 16 entries are added after passing the TOOL-010 gate. The 123 Thumb leaves without prologues are DELIBERATELY left out |
+| ARM-001 | P1 | todo | Match the 18 functions in the ARM region with C | The ARM-mode build chain is working; each candidate is measured against the ROM, and if it matches its region is recorded |
+| MATCH-019 | P1 | todo | Resolve the SIO driver's remaining instruction differences | FUN_080657d8 passes the make c-match gate with natural C; the RX address relation and the window/exit blocks are examined separately against the current ROM diff |
+| PHASE-001 | P1 | in_progress | Phase 1: finish the twin and fresh-neighbor harvest completely | The fixed initial targets and the twins opened up by new matches are fully measured; at most four attempts per candidate; every result is either a full match or a park with source and measurement evidence; make check-full passes |
 
-## Araç zinciri kilidi
+## Toolchain lock
 
-- Uyumlu pret/agbcc revizyonu: `da598c1d918402c42c0c0d7128ba14567f3175e9`
-- Sabit temsil C-corpus parmak izi: `9cd640a2a570228f958ec9cdd5574c4d267778f68938484158d2b4515bf76b3f`
-- ROM çıktısı hibrit bütünleştirme sınamasıdır; bilinmeyen baytlar baserom'dan kopyalanır.
+- Compatible pret/agbcc revision: `da598c1d918402c42c0c0d7128ba14567f3175e9`
+- Fixed representative C-corpus fingerprint: `9cd640a2a570228f958ec9cdd5574c4d267778f68938484158d2b4515bf76b3f`
+- The ROM output is a hybrid integration test; unknown bytes are copied from the base ROM.

@@ -29,7 +29,7 @@ A grouping by function size. The “60–127 band” contains functions of 60 th
 Compiled C reproduces exactly the original ROM bytes. This is the project's
 matching criterion, not merely similar behavior.
 
-**`farkli: 97/120` (97/120 bytes differ)**
+**`differ: 97/120 bytes`**
 The compiled output contains 120 bytes, 97 of which differ from the ROM. Zero
 differences indicates a match only when the complete intended range is covered.
 

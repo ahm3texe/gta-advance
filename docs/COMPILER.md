@@ -257,7 +257,7 @@ padding. A coincidence that arrives at the same size by another route, not
 progress.
 
 **Conclusion: a per-file compiler selection marker was NOT ADDED to
-`agbcc_build.py`.** A `DERLEYICI: agbcc` marker analogous to `KIP: ARM` would
+`agbcc_build.py`.** A `COMPILER: agbcc` marker analogous to `MODE: ARM` would
 have been necessary only if a match were possible with it; there is no such
 match. Adding it would have introduced another branch into the build layer while
 gaining nothing.

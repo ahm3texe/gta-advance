@@ -29,8 +29,9 @@ python3 tools/dump_alloc.py <source.c> --function <Name>   # agbcc register allo
 **The most important rule: do not look at the byte count, look at the instruction
 sequence.** It was misleading twice in this session. In `ServiceLinkFrame`, a fix
 that did not change the size at all produced the correct form; in `sio_driver`,
-the size was within 2 bytes while half the body was wrong. The `N/M komut ayni`
-line at the end of `diff_function.py` is the real score.
+the size was within 2 bytes while half the body was wrong. The
+`N/M instructions identical` line at the end of `diff_function.py` is the real
+score.
 
 **Rule library.** `docs/COMPILER.md`, 64 measured rules. The items below refer
 frequently to rules 45–63. If you find a new rule, write it there **with its

@@ -1,6 +1,6 @@
 /* Ucgen donusumu ve gorunurluk sinamasi — 0x0806A77C-0x0806A83F (196 bayt)
  *
- * KIP: ARM   <- derleme zinciri bu isaretle agbcc_arm'a geciyor
+ * MODE: ARM   <- the build chain switches to agbcc_arm on this marker
  *
  * Uc kosenin her birini (uc adet s16) okuyup taban ucluye gore donusturuyor,
  * donusmus ucluleri cikis tamponuna yaziyor, ilk iki kosenin CAPRAZ
