@@ -22,24 +22,24 @@ OUT = ROOT / "tools" / "trace.lua"
 LOG = ROOT / "build" / "trace.log"
 
 # Sadece EWRAM (0x02......) ve IWRAM (0x03......).  MMIO (0x04......) her
-# karede degisiyor, logu bogar; ROM adresleri zaten sabit.
+# change every frame and flood the log; ROM addresses are constant anyway.
 WATCH_PREFIXES = (0x02, 0x03)
 
-# Bu boyuta kadar olan yapilar TAMAMEN izleniyor; ustu orneklenip
+# Structures up to this size are traced COMPLETELY; larger ones are sampled
 # izlenmeyen kismi raporlaniyor.
 STRUCT_FULL_LIMIT = 64
 SAMPLE_WORDS = 4
 
 
 LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
--- Elle duzenleme; ram_map.csv'yi guncelleyip ureteci tekrar calistir.
+-- Do not edit by hand; update ram_map.csv and re-run the generator.
 --
 -- RAM change tracer for mGBA 0.10.5.
 -- Yukleme: Tools > Scripting... > Load script
 -- Log:     __LOG_PATH__
 
 -- CIFT YUKLEME KORUMASI.  Script birden fazla kez yuklenirse mGBA her
--- ornegin kare geri cagrisini AYRI KAYITLI tutuyor ve her degisiklik
+-- keeps each frame callback SEPARATELY REGISTERED, so every change is
 -- logged more than once with different frame counters (this happened to us:
 -- the same transition appeared twice, as f32645 and f620). The previous
 -- ornegi burada etkisizlestiriyoruz.
@@ -49,7 +49,7 @@ LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
 _G.__TRACE_EPOCH = (_G.__TRACE_EPOCH or 0) + 1
 local MY_EPOCH = _G.__TRACE_EPOCH
 if MY_EPOCH > 1 then
-  console:log(string.format("[bilgi] %d. yukleme; onceki ornek(ler) susturuldu", MY_EPOCH))
+  console:log(string.format("[info] load %d; previous instance(s) silenced", MY_EPOCH))
 end
 
 local LOG_PATH = "__LOG_PATH__"
@@ -84,7 +84,7 @@ local function readN(addr, size)
   else return emu:read8(addr) end
 end
 
--- Tus durumunu okumak surumden surume degisiyor; basarisiz olursa
+-- Reading the key state differs between versions; on failure
 -- izlemeye tussuz devam et, cokme.
 local function keyString()
   if not keys_ok then return "" end
@@ -103,14 +103,14 @@ local function keyString()
 end
 
 -- Validation happens ON THE FIRST FRAME, NOT while the script loads: `emu`
--- nesnesi yukleme aninda henuz hazir olmuyor ve acilista dogrulamak
--- tum listeyi bosaltip oturumu sifir veriyle bitiriyordu.
+-- object is not ready yet at load time, and validating at startup
+-- emptied the whole list and ended the session with zero data.
 local validated = false
 
--- "hepsi basarisiz" belirtisi iki ayri sebepten olabilir: `emu` hazir
+-- an "all failed" symptom can have two causes: `emu` is not ready
 -- ready, OR the method names differ in this version. The two look the same,
 -- so we probe the API form first and print the ERROR TEXT; that way
--- tek bir oturum hangisi oldugunu kesin soyluyor.
+-- a single session tells you exactly which one it is.
 local function probeApi()
   local probe = 0x02000000
   local attempts = {
@@ -125,7 +125,7 @@ local function probeApi()
     local name, fn = attempts[i][1], attempts[i][2]
     local ok, res = pcall(fn)
     if ok then
-      out(string.format("  CALISTI  %-26s -> %s", name, tostring(res)))
+      out(string.format("  WORKED   %-26s -> %s", name, tostring(res)))
       if winner == nil then winner = name end
     else
       out(string.format("  error    %-26s -> %s", name, tostring(res)))
@@ -150,7 +150,7 @@ local function validateOnce()
     if not ok then
       if first_err == nil then
         first_err = tostring(err)
-        out("[uyari] ilk okuma hatasi: " .. first_err)
+        out("[warning] first read error: " .. first_err)
       end
       table.remove(WATCH, i)
       bad = bad + 1
@@ -161,7 +161,7 @@ local function validateOnce()
 end
 
 local function onFrame()
-  -- Bu ornek eskidiyse (yeni bir yukleme oldu) hicbir sey yapma.
+  -- If this instance is stale (a new load happened) do nothing.
   if MY_EPOCH ~= _G.__TRACE_EPOCH then return end
   if not validated then validateOnce() end
   frame = frame + 1
@@ -178,7 +178,7 @@ local function onFrame()
         nchg[i] = c
         if c > NOISE_LIMIT then
           noisy[i] = true
-          out(string.format("f%-7d %-24s ... SUSTURULDU (%d degisim; sayac/RNG olabilir)",
+          out(string.format("f%-7d %-24s ... SUPPRESSED (%d changes; may be a counter/RNG)",
                 frame, e[3], c))
         else
           if keys == nil then keys = keyString() end
@@ -193,10 +193,10 @@ end
 
 fh = io.open(LOG_PATH, "a")
 if fh then
-  fh:write("\n==== yeni oturum ====\n")
+  fh:write("\n==== new session ====\n")
   fh:flush()
 else
-  console:log("[uyari] log dosyasi acilamadi: " .. LOG_PATH)
+  console:log("[warning] could not open log file: " .. LOG_PATH)
 end
 
 out(string.format("script loaded: %d symbols; validation on the first frame", #WATCH))
@@ -205,9 +205,9 @@ callbacks:add("frame", onFrame)
 
 
 def validate_lua(text: str):
-    """Kapanmamis string literali olan satirlari dondur.
+    """Return the lines that contain an unterminated string literal.
 
-    Lua'da string literalleri satir sonunu gecemez.  Kacis hatasi tam
+    In Lua a string literal cannot cross a line break. An escaping bug is
     produced this form, so generation builds on it.
     """
     bad = []
@@ -240,9 +240,9 @@ def main() -> int:
         if size in (1, 2, 4):
             watched.append((addr, size, r["name"]))
             continue
-        # Cok baytli yapi/dizi.  Eskiden sessizce 1 bayta kirpiliyordu ve
-        # 37 sembolun 19086 baytinin 19049'u KOR kaliyordu.  Simdi kelime
-        # kelime aciliyor; buyuk diziler ORNEKLENIYOR ve izlenmeyen kisim
+        # A multi-byte structure/array. It used to be silently truncated to
+        # 1 byte, leaving 19049 of 37 symbols' 19086 bytes BLIND. Now it is
+        # expanded word by word; large arrays are SAMPLED and the untraced part
         # raporlaniyor (her kareyi 19 KB okumak emulatoru boguyor).
         words = (size + 3) // 4
         take = words if size <= STRUCT_FULL_LIMIT else SAMPLE_WORDS
@@ -257,7 +257,7 @@ def main() -> int:
     )
 
     # Template HAM (raw) string ve yer tutuculu: f-string kullanilirsa
-    # Lua'nin \n kacislari Python tarafindan gercek satir sonuna cevrilip
+    # Lua's \n escapes must not be turned into real line breaks by Python and
     # string literalleri ikiye boluyor (bir kez basimiza geldi).
     lua = LUA_TEMPLATE.replace("__LOG_PATH__", str(LOG))\
                       .replace("__ENTRIES__", entries)
@@ -270,14 +270,14 @@ def main() -> int:
 
     OUT.write_text(lua)
 
-    print(f"yazildi: {OUT.relative_to(ROOT)}")
+    print(f"written: {OUT.relative_to(ROOT)}")
     print(f"  traced: {len(watched)} symbols")
-    print(f"  atlanan: {len(skipped)} (MMIO/ROM) -> {', '.join(skipped)}")
+    print(f"  skipped: {len(skipped)} (MMIO/ROM) -> {', '.join(skipped)}")
     if sampled:
         blind = sum(size - seen for _, size, seen in sampled)
         print(f"  SAMPLED: {len(sampled)} large arrays, {blind} bytes not traced")
         for name, size, seen in sorted(sampled, key=lambda x: -x[1])[:6]:
-            print(f"    {name:<22} {size:>6} bayttan ilk {seen}")
+            print(f"    {name:<22} {size:>6} bytes, first {seen} traced")
     print(f"  log:     {LOG.relative_to(ROOT)}")
     return 0
 

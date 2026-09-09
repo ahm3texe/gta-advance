@@ -34,7 +34,7 @@ local ADDR_GAME_STATE    = 0x02000CE0   -- +12 = player count / mode flag
 local REPORT_EVERY       = 60           -- donanim karesi
 
 -- Cift yukleme korumasi: mGBA her yuklemede yeni bir geri cagri kaydeder
--- ve eskisi calismaya devam eder, sayilar ikiye katlanir.
+-- and the old one keeps running, doubling the numbers.
 _G.__FPS_EPOCH = (_G.__FPS_EPOCH or 0) + 1
 local MY_EPOCH = _G.__FPS_EPOCH
 if MY_EPOCH > 1 then
@@ -50,13 +50,13 @@ end
 out(string.format("=== measurement started (load %d) ===", MY_EPOCH))
 
 local frames        = 0        -- bu pencerede gecen donanim karesi
-local logicFrames   = 0        -- sayacin sifirlandigi an = bir mantik karesi
+local logicFrames   = 0        -- the moment the counter resets = one logic frame
 local prevCounter   = -1
 local hist          = {}       -- gozlenen adim -> kac kez
 local windows       = 0
 
 callbacks:add("frame", function()
-  if MY_EPOCH ~= _G.__FPS_EPOCH then return end   -- eski ornek sussun
+  if MY_EPOCH ~= _G.__FPS_EPOCH then return end   -- silence the stale instance
 
   frames = frames + 1
 
@@ -90,8 +90,8 @@ callbacks:add("frame", function()
       table.concat(parts, " ")))
 
     if mode == 1 or mode == 2 then
-      out("             UYARI: bu kipte gFrameDelay 5'e SABITLENIYOR; " ..
-          "gercek adim yalnizca dagilimdan okunur")
+      out("             WARNING: gFrameDelay is FIXED at 5 in this mode; " ..
+          "the real step can only be read from the distribution")
     end
 
     frames, logicFrames, hist = 0, 0, {}
@@ -99,5 +99,5 @@ callbacks:add("frame", function()
 end)
 
 out("Oyunu oynat; her saniye bir satir dusecek.")
-out("adim dagilimi 1:60 ise her karede calisiyor (60 fps).")
-out("2:30 ise her iki karede bir calisiyor (30 fps) — 'atliyor' hissi budur.")
+out("a step distribution of 1:60 means it runs every frame (60 fps).")
+out("2:30 means every other frame (30 fps) - that is the 'stutter' feel.")

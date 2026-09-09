@@ -81,7 +81,7 @@ def _undefined(obj: Path) -> list[str]:
 
 
 def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
-    """C dosyasini derler, ROM adresine linkler ve sonuclari dondurur.
+    """Compile a C file, link it at its ROM address and return the results.
 
     Returns: (linked binary, {function: (offset, size)}, base address)
     Ofsetler ikilinin basina goredir.
@@ -111,16 +111,16 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
          "-o", f"{stem}.probe.o", f"{stem}.s"])
 
     rows = function_rows()
-    # Dis semboller assembler'a .equ ile verilir: `bl` boylece dogrudan
+    # External symbols are given to the assembler with .equ, so that `bl`
     # kodlanir ve linker'a hic gitmez. Linker'a birakilirsa, mutlak sembolu
     # Because it is not recognized as a Thumb function, an interworking veneer
-    # sokar ve `bl` hedefi yanlis cikar.
+    # inserts a veneer and the `bl` target comes out wrong.
     ram = ram_rows()
     externs = []
     for name in _undefined(Path(f"{stem}.probe.o")):
         # The `__thumb` suffix resolves to the symbol address | 1. Stored
         # function pointers must have the Thumb bit set; in a `bl` target
-        # ise bit eklemek dal ofsetini bozar, o yuzden AYRI bir ad kullanilir.
+        # adding the bit would break the branch offset, so a SEPARATE name is used.
         thumb = name.endswith("__thumb")
         key = name[: -len("__thumb")] if thumb else name
         row = rows.get(key) or ram.get(key)
@@ -151,7 +151,8 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     base = min(int(row["address"], 16) for row in known)
 
     # The section address is set explicitly: agbcc aligns .text to 8, and if the
-    # 8'in kati degilse linker bolumu ileri iterek tum olcumleri kaydiriyor.
+    # base is not a multiple of 8 the linker pushes the section forward and
+    # shifts every measurement.
     script = Path(f"{stem}.ld")
     script.write_text(
         "SECTIONS\n{\n"

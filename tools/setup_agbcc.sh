@@ -1,8 +1,8 @@
 #!/bin/sh
 # Install the agbcc compiler (Nintendo's GCC 2.8.1 patched for the GBA).
 #
-# ROM'un bu derleyiciyle uretildigi src/save/save_helpers.c uzerinde
-# byte duzeyinde dogrulandi; ayrinti docs/COMPILER.md icinde.
+# That the ROM was built with this compiler was verified at byte level on
+# src/save/save_helpers.c; details in docs/COMPILER.md.
 #
 # The binaries do not enter the repository (8.8 MB); this script rebuilds them.
 set -e
@@ -13,7 +13,7 @@ AGBCC_REPO=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["so
 AGBCC_COMMIT=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source"]["compatibleRevision"])' "$ROOT/config/toolchain.lock.json")
 
 if [ -x "$ROOT/tools/agbcc/bin/agbcc" ] && [ "$1" != "--force" ]; then
-    echo "agbcc zaten kurulu: tools/agbcc/bin/agbcc"
+    echo "agbcc is already installed: tools/agbcc/bin/agbcc"
     python3 "$ROOT/tools/verify_toolchain.py"
     echo "To reinstall: $0 --force"
     exit 0
@@ -25,8 +25,8 @@ if ! command -v arm-none-eabi-as >/dev/null 2>&1 || ! command -v arm-none-eabi-a
     exit 1
 fi
 
-# agbcc 1998 donemi C kaynagi; modern clang'in varsayilanlariyla derlenmez.
-# Bayraklar ayri bir izlenen dosyada tutulur ki kurulum betigi ile yeniden
+# agbcc is 1998-era C source; it does not build with modern clang's defaults.
+# The flags live in a separate tracked file so that the setup script and the
 # uretme deneyi birbirinden sapmasin.
 CCWRAP="$ROOT/tools/agbcc_host_cc.sh"
 
@@ -47,7 +47,7 @@ elif [ "$(git -C "$WORK" rev-parse HEAD)" != "$AGBCC_COMMIT" ]; then
     exit 1
 fi
 
-echo "agbcc derleniyor (birkac dakika surebilir)..."
+echo "building agbcc (this may take a few minutes)..."
 ( cd "$WORK" && CC="$CCWRAP" CXX=clang++ ./build.sh )
 
 echo "Projeye kuruluyor..."

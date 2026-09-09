@@ -95,7 +95,7 @@ def main() -> None:
     if fragments:
         print(f"{len(fragments)} candidates rejected: they do not start with `push` "
               f"yet contain `pop`/`add sp`, i.e. they are tails of larger functions "
-              f"(Ghidra atlama tablosunda kesmis). Ornek: "
+              f"(Ghidra cut them at a jump table). Example: "
               + ", ".join(r["address"] for r in fragments[:5]))
 
 

@@ -91,7 +91,7 @@ def main() -> None:
             continue
         size = int(row["size"])
         points = splits[address] + [address + size]
-        # Ilk parca eski kaydin adini korur, kisalir.
+        # The first fragment keeps the old record's name and shrinks.
         row["size"] = str(points[0] - address)
         note = row["notes"].strip('"')
         row["notes"] = (note + "; kuyruk cagrisiyla birlesmisti, "

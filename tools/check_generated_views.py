@@ -36,9 +36,9 @@ def main() -> int:
 
     for function in functions.values():
         if function["sourceType"] == "none" and function["sourcePath"]:
-            problems.append(f"kaynaksiz kayitta yol var: {function['name']}")
+            problems.append(f"a record without source has a path: {function['name']}")
         if function["sourceType"] == "asm" and function["status"] != "matching":
-            problems.append(f"kayitsiz assembly iddiasi: {function['name']}")
+            problems.append(f"assembly claimed without a record: {function['name']}")
 
     summary = payload["summary"]
     if summary["cSourceCount"] != len(c_sources):
@@ -49,7 +49,7 @@ def main() -> int:
         problems.append("dashboard is kuyrugu work_queue.csv ile uyusmuyor")
 
     if problems:
-        print("URETILMIS GORUNUM HATALI:", file=sys.stderr)
+        print("GENERATED VIEW INVALID:", file=sys.stderr)
         for problem in problems[:30]:
             print(f"  - {problem}", file=sys.stderr)
         return 1

@@ -32,10 +32,10 @@ def main() -> None:
         try:
             blob, layout, _ = compile_and_link(source, DEFAULT_CC)
         except SystemExit as error:
-            # Derlenemeyen kaynagi ATLAMAK, o dosyanin fonksiyonlarini
+            # SKIPPING a source that fails to compile silently showed that
             # c_sources.csv'den sessizce silip komutu yine de basarili
-            # gostermek demekti: bozuk bir C dosyasi varken `make check`
-            # yesil kaliyordu. Artik toplayip sonunda basarisiz cikiyoruz
+            # file's functions as before: with a broken C file `make check`
+            # stayed green. Now they are collected and reported as a failure
             # ve CSV'nin USTUNE YAZMIYORUZ.
             failures.append((source, error))
             continue
@@ -44,7 +44,7 @@ def main() -> None:
             address = int(rows[name]["address"], 16)
             mapped_size = int(rows[name]["size"], 0)
             start = address - ROM_BASE
-            # Yalnizca derleyicinin urettigi kisa bir prefix'in tutmasi tam
+            # A short prefix produced by the compiler happening to agree is not
             # is not a function match. The symbol must cover at least the body
             # kapsamiyorsa matching terfisi yasaktir.
             complete = size >= mapped_size

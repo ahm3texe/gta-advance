@@ -70,7 +70,7 @@ def main(argv):
     if not events:
         print("no change records in this session.")
         for l in sess:
-            if "ERROR" in l or "warning" in l or "STARTED" in l or "error" in l:
+            if "ERROR" in l or "warning" in l or "WORKED" in l or "error" in l:
                 print(" ", l)
         return 1
 

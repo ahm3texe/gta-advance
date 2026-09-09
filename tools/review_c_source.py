@@ -24,7 +24,7 @@ GHIDRA_NAMES = re.compile(
 INLINE_ASM = re.compile(r"\b(__asm__|asm\s*\(|__attribute__\s*\(\s*\(\s*naked)")
 # register T *p asm("r4") -- byte'lari tutturur ama nedenini gizler.
 REGISTER_PIN = re.compile(r"\bregister\b[^;\n]*\basm\s*\(")
-# Yorum veya #define disinda gecen ciplak donanim/RAM adresi
+# A bare hardware/RAM address outside a comment or #define
 BARE_ADDRESS = re.compile(r"0x0[2-8][0-9A-Fa-f]{6}")
 
 
@@ -34,7 +34,7 @@ def strip_comments(text: str) -> str:
 
 
 def renamed_symbols() -> dict[str, str]:
-    """Artik FUN_ olmayan adresler: eski adi kaynakta kalirsa build sessizce bozulur."""
+    """Addresses that are no longer FUN_: if the old name stays in the source, the build breaks silently."""
     path = ROOT / "data/functions.csv"
     if not path.exists():
         return {}
@@ -63,7 +63,7 @@ def review(path: Path) -> list[str]:
         problems.append("acik register baglamasi (register ... asm(\"rN\")) -- "
                         "eslesmeyi zorlar ama nedenini gizler; docs/WORKFLOW.md 6")
     elif INLINE_ASM.search(code):
-        problems.append("inline assembly iceriyor -- C'ye tasima amacini bozar")
+        problems.append("contains inline assembly -- defeats the purpose of moving to C")
 
     define_lines = {
         line for line in code.splitlines() if line.lstrip().startswith("#define")

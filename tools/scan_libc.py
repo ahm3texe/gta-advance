@@ -22,7 +22,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-# agbcc iki kutuphane ile geliyor. Onceki surum yalnizca libc.a'ya bakiyordu;
+# agbcc ships two libraries. The previous version looked only at libc.a;
 # libgcc.a HIC taranmamisti, oysa ROM'un bolme/mod yardimcilari oradan geliyor.
 LIBS = [
     ("libc", ROOT / "tools/agbcc/lib/libc.a"),
@@ -36,7 +36,7 @@ MIN_FIXED = 12      # maskeleme sonrasi en az bu kadar sabit byte kalmali
 
 
 def relocation_offsets(obj: Path) -> list[tuple[int, int]]:
-    """(.text icindeki ofset, uzunluk) ciftleri."""
+    """(offset within .text, length) pairs."""
     out = subprocess.run(["arm-none-eabi-objdump", "-r", str(obj)],
                          capture_output=True, text=True).stdout
     spans, in_text = [], False
@@ -60,7 +60,7 @@ def relocation_offsets(obj: Path) -> list[tuple[int, int]]:
 
 def masked_find(rom: bytes, body: bytes, spans: list[tuple[int, int]],
                 start: int) -> int:
-    """Joker byte'lar iceren govdeyi ROM'da arar; bulunan mutlak ofseti doner."""
+    """Search the ROM for a body containing wildcard bytes; return the absolute offset found."""
     mask = bytearray(b"\xff" * len(body))
     for offset, length in spans:
         for i in range(offset - start, offset - start + length):
@@ -100,7 +100,7 @@ SCAN_STATS = {"checked": 0, "masked": 0}
 
 def scan_archive(rom: bytes, work: Path, binary: Path, found: list,
                  lib_name: str) -> None:
-    """Bir arsivdeki .o'lari tarayip bulunanlari `found` icine ekler."""
+    """Scan the .o members of an archive and add what is found into `found`."""
     for obj in sorted(work.glob("*.o")):
         nm = subprocess.run(["arm-none-eabi-nm", "-S", str(obj)],
                             capture_output=True, text=True).stdout

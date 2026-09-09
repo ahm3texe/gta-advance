@@ -47,7 +47,7 @@ def variants(source: str) -> dict[str, str]:
             f"                      (gRam02000E80[{index} & RING_MASK] << 8)\n"
             f"                    |  gRam020003C0[{index} & RING_MASK];",
         )
-    return {"onceki dogrudan ifade": direct,
+    return {"previous direct expression": direct,
             "tek adimli isaretci": collapsed,
             "korunan iki adim": source}
 
@@ -60,7 +60,7 @@ def main() -> None:
     calls = []
 
     with tempfile.TemporaryDirectory(prefix="sio-tx-") as work:
-        # Ortak build/cmatch dosyalari dahil hicbir kalici artifakta yazma.
+        # Write to no persistent artifact, including the shared build/cmatch files.
         build.BUILD = diff.BUILD = Path(work) / "build"
         print(f"{TARGET} @ 0x{address:08X}; ROM {rom_size} bytes")
         print(f"{'candidate':26} {'size':>6} {'same/total insns':>19}")

@@ -65,7 +65,7 @@ def main() -> None:
     for name in _undefined(Path(f"{stem}.probe.o")):
         # The `__thumb` suffix resolves to the symbol address | 1. Stored
         # function pointers must have the Thumb bit set; in a `bl` target
-        # ise bit eklemek dal ofsetini bozar, o yuzden AYRI bir ad kullanilir.
+        # adding the bit would break the branch offset, so a SEPARATE name is used.
         thumb = name.endswith("__thumb")
         key = name[: -len("__thumb")] if thumb else name
         row = rows.get(key) or ram.get(key)

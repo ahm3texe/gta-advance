@@ -39,7 +39,7 @@ def scan(path):
     lines = [normalize(l) for l in path.read_text(errors="replace").splitlines()]
     lines = [l for l in lines if l and not l.startswith(("/*", "*", "//"))]
 
-    # 6 satirlik pencerelerin tekrarini say
+    # Count repetitions of 6-line windows
     W = 6
     windows = Counter()
     for i in range(len(lines) - W):
@@ -49,7 +49,7 @@ def scan(path):
     text = path.read_text(errors="replace")
     locals_ = len(set(re.findall(r"\blocal_[0-9a-f]+\b", text)))
     chain = len(re.findall(r"\bif\s*\(|\belse if\s*\(", text))
-    # Ghidra ciktisinin YARIM oldugunu soyleyen her uyari.  "Removing
+    # Every warning saying Ghidra's output is INCOMPLETE. "Removing
     # unreachable block" ozellikle sinsi: cikti derli toplu gorunur ama
     # block(s) have been dropped, and source cannot be written from it.
     incomplete = any(w in text for w in (

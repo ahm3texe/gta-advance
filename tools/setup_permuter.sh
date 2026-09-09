@@ -23,7 +23,8 @@ if [ ! -d "$EXT/permuter/.git" ]; then
 fi
 git -C "$EXT/permuter" checkout --quiet "$REV"
 
-# 2. Izole ortam. Sistem Python 3.14'te ensurepip bozuk, pyenv 3.12 kullaniliyor.
+# 2. An isolated environment. ensurepip is broken on the system Python 3.14, so
+#    pyenv 3.12 is used.
 [ -x "$PY312" ] || { echo "pyenv 3.12.3 missing: pyenv install 3.12.3"; exit 1; }
 [ -d "$EXT/venv" ] || "$PY312" -m venv "$EXT/venv"
 # pycparser 3.x removed plyparser; the tool expects 2.x.
@@ -47,16 +48,16 @@ echo
 echo "To take on a function:"
 echo "  1) build the target .o from the ROM bytes -- see build/permuter/target.s."
 echo "     THE MAPPING SYMBOLS ARE CRITICAL: code body \$t, literal pool \$d."
-echo "     Havuzu \$t icinde birakmak objdump'a onu KOMUT cozumletir; hedef"
-echo "     66 komut gorunur (gercek 61) ve permuter YANLIS hedefe calisir."
-echo "     Havuzun nerede basladigi build/cmatch/<ad>.s icinde: son `bx`"
+echo "     Leaving the pool inside \$t makes objdump decode it as CODE; the target"
+echo "     then shows 66 instructions (really 61) and the permuter chases the WRONG target."
+echo "     Where the pool starts is in build/cmatch/<name>.s: after the last `bx`"
 echo "     komutundan sonraki .align + .word blogu."
 echo "  2) cd tools/external/permuter && ../venv/bin/python import.py \\"
 echo "       <source.c> <target.o> <FunctionName>"
-echo "  3) ICE AKTARIMDAN SONRA iki elle duzeltme gerekiyor:"
+echo "  3) AFTER THE IMPORT two manual fixes are needed:"
 echo "     - nonmatchings/<Ad>/base.c icinde __inline__ -> inline"
 echo "       (pycparser GCC anahtar sozcugunu tanimiyor)"
-echo "     - nonmatchings/<Ad>/compile.sh icindeki realpath \"\$3\" satiri"
+echo "     - the realpath \"\$3\" line in nonmatchings/<Name>/compile.sh"
 echo "       (BSD realpath var OLMAYAN yolda basarisiz; cikti yolu bos kaliyor)"
 echo "  4) ../venv/bin/python permuter.py nonmatchings/<Ad> --stop-on-zero -j 4"
 echo

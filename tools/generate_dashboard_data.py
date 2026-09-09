@@ -127,9 +127,9 @@ def main() -> None:
             matching_code_bytes += size
         # IKI AYRI KAVRAM, karistirilmamali:
         #
-        #   verified  -- fonksiyonun HIBRIT ROM derlemesine yerlestirilen
+        #   verified  -- the bytes of the function placed into the HYBRID ROM
         #                bolgelerle kesisimi (data/matching_regions.csv).
-        #                Yalnizca assembly'den kurulan bolgeler orada.
+        #                build. Only regions built from assembly are there.
         #   matched   -- is the function byte-matching (the functions.csv status).
         #
         # The panel used to show `verified` as "Byte match"; that is why 68
@@ -187,7 +187,7 @@ def main() -> None:
             }
         )
 
-    # agbcc libc.a'ya karsi dogrulanmis standart kutuphane bolgeleri.
+    # Standard library regions verified against agbcc's libc.a.
     libc_region_bytes = sum(
         int(row["end"], 16) - int(row["address"], 16)
         for row in (read_csv(LIBC_REGIONS) if LIBC_REGIONS.exists() else [])

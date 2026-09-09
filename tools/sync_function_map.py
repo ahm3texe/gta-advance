@@ -53,13 +53,13 @@ def main() -> None:
         merged.append(row)
         overrides.pop(address.lower(), None)
 
-    # Ghidra'nin kacirdigi ama baska yolla dogrulanan fonksiyonlar
-    # (ornegin libc taramasi) yalnizca override dosyasinda bulunur.
+    # Functions Ghidra missed but that were verified another way
+    # (for example the libc scan) exist only in the override file.
     added = 0
     for override in overrides.values():
         if not override.get("size", "").strip():
             print(f"WARNING: {override['address']} is not in the Ghidra map and "
-                  f"override'da size verilmemis; atlaniyor.")
+                  f"no size given in the override; skipping.")
             continue
         merged.append({
             "address": f"0x{int(override['address'], 16):08X}",
@@ -73,7 +73,7 @@ def main() -> None:
 
     # --- KAYIP KAPISI ---------------------------------------------------
     # The map to be produced is compared against the current one; records, human
-    # verilmis ad veya `matching` durumu kaybi varsa yazma yapilmaz.
+    # a human-given name or a `matching` state would be lost, nothing is written.
     if TRACKED.exists() and "--force" not in sys.argv:
         current = {r["address"].upper(): r for r in read_rows(TRACKED)}
         produced = {r["address"].upper(): r for r in merged}
@@ -88,7 +88,7 @@ def main() -> None:
         if lost_rows or lost_names or lost_match:
             print("STOPPED: this run would lose data from the function map.")
             print(f"  {len(lost_rows):4d} records would be deleted "
-                  f"(mevcut {len(current)} -> uretilen {len(produced)})")
+                  f"(current {len(current)} -> produced {len(produced)})")
             print(f"  {len(lost_names):4d} insan-verilmis ad FUN_xxxx'e donerdi")
             print(f"  {len(lost_match):4d} `matching` durumu dusurulurdu")
             for address in (lost_names or lost_rows or lost_match)[:5]:

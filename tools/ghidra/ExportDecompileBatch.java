@@ -64,11 +64,11 @@ public class ExportDecompileBatch extends GhidraScript {
                         Address address = toAddr(Long.decode(addrText));
                         String want = parts.length > 1 ? parts[1] : null;
 
-                        // Boyut verilmisse THUMB ONARIMI kosulsuz yapilir.
-                        // Ghidra bazi girisleri ARM kipinde cozup "bad
+                        // If a size is given, the THUMB REPAIR is unconditional.
+                        // Ghidra decodes some entries in ARM mode and leaves them
                         // instruction data" ile birakiyor; boyle bir
                         // because the function may be left over from a PREVIOUS run
-                        // "yoksa olustur" yetmez, VARSA DA yeniden kurulur.
+                        // "create if absent" is not enough; it is rebuilt EVEN IF PRESENT.
                         if (parts.length > 2) {
                             int span = Integer.decode(parts[2]);
                             Address end = address.add(span - 1);

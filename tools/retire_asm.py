@@ -38,7 +38,7 @@ def main() -> None:
         re.S,
     )
     replacement = (
-        f"# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.\n"
+        f"# Built from the C source: the assembly equivalent was retired.\n"
         f"build/{module}/{name}.bin: src/{module}/{name}.c "
         f"data/functions.csv data/ram_map.csv\n"
         f"\t@mkdir -p build/{module}\n"
@@ -51,7 +51,7 @@ def main() -> None:
     for path in (ROOT / f"src/{module}/{name}.s", ROOT / f"config/{name}.ld"):
         if path.exists():
             path.unlink()
-    print(f"{key}: {len(region)} byte C'den eslesiyor, assembly emekli edildi.")
+    print(f"{key}: {len(region)} bytes match from C, the assembly was retired.")
 
 
 if __name__ == "__main__":

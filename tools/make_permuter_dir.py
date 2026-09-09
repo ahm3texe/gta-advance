@@ -62,7 +62,7 @@ def main():
                          capture_output=True, text=True, check=True).stdout
     m = re.search(rf"\b{re.escape(name)}\s*\([^)]*\)\s*\{{", pre)
     if not m:
-        sys.exit(f"{name} govdesi bulunamadi")
+        sys.exit(f"the body of {name} was not found")
     open_brace = m.end() - 1
     depth, i = 0, open_brace
     while True:
@@ -72,7 +72,7 @@ def main():
             if depth == 0: break
         i += 1
     base = pre[:open_brace+1] + "\nPERM_RANDOMIZE(\n" + pre[open_brace+1:i] + "\n)\n" + pre[i:]
-    # pycparser GCC'nin __inline__ anahtar sozcugunu tanimiyor (recete, adim 3).
+    # pycparser does not know GCC's __inline__ keyword (recipe, step 3).
     base = base.replace("__inline__", "inline")
     (work / "base.c").write_text(base)
 

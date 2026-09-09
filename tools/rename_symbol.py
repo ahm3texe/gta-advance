@@ -55,7 +55,7 @@ def main():
     new_name = args.new_name
 
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", new_name):
-        sys.exit(f"gecersiz ad: {new_name!r}")
+        sys.exit(f"invalid name: {new_name!r}")
 
     old_name = None
     for table in TABLES:
@@ -70,12 +70,12 @@ def main():
     if old_name == new_name:
         sys.exit(f"{address} zaten {new_name}")
 
-    # Yeni ad baska bir adreste kullaniliyorsa dur: sessiz cakisma en kotusu.
+    # Stop if the new name is used at another address: a silent clash is the worst case.
     for table in TABLES:
         for row in load(table):
             if (row["name"] == new_name
                     and row["address"].upper().replace("X", "x") != address):
-                sys.exit(f"{new_name} zaten {row['address']} tarafindan kullaniliyor")
+                sys.exit(f"{new_name} is already used by {row['address']}")
 
     pattern = re.compile(rf"\b{re.escape(old_name)}\b")
     touched = []
