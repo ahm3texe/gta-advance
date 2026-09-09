@@ -66,7 +66,7 @@ matching veya kanıtlı park sonucuna bağlandı; veri görünümü CI kapısın
 **2. Giriş / link / istatistik bölgesini al.** 0x08065000–0x08067400 arası 54
 fonksiyonun 34'ü yazılmamış (~8,6 KB). Bu bölge artık **ne iş yaptığı bilinen**
 bir alt sistem: giriş okuma (KEYINPUT), seri iletişim (SIOCNT) ve istatistik
-sayaçları. Ayrıntı [HARICI_BELGELER.md](HARICI_BELGELER.md).
+sayaçları. Ayrıntı [EXTERNAL_FINDINGS.md](EXTERNAL_FINDINGS.md).
 
 **3. Script yorumlayıcısını bul.** Görevler ROM'da derlenmiş bayt kodu; onları
 yürüten yorumlayıcı büyük olasılıkla ≥560 bayt bandındaki fonksiyonlardan biri.

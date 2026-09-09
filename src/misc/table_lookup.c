@@ -9,9 +9,9 @@
  *   2. Okuyucudaki carpan 0x9A8 = 2472 = 618 * 4     -> dil basina 618 dize
  *   3. Tablo boyutu 3090 giris = 618 * 5             -> bes dil
  *   4. Izleme logu: acilis dil ekraninda bes secenek
- *      (gActiveMenuItemCount 0->5, docs/OYUN_AKISI.md)
+ *      (gActiveMenuItemCount 0->5, docs/GAME_FLOW.md)
  * Ayrica her dil bloğunun ilk isaretcisi, o dilin adinin hemen ardina
- * dusuyor (DEUTSCH / FRANCAIS / ITALIANO).  Ayrinti: docs/METIN_HARITASI.md
+ * dusuyor (DEUTSCH / FRANCAIS / ITALIANO).  Ayrinti: docs/TEXT_MAP.md
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/misc/table_lookup.c

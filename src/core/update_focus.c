@@ -8,7 +8,7 @@
  * CoordBlock tanimi src/misc/coord_accessors.c ile BIREBIR AYNI olmali;
  * +0x04 ve +0x08 hedef isaretcisi olarak cast ediliyor.
  *
- * Izleme logu (docs/OYUN_AKISI.md) gFocusPoint'in iki adet 16.16 sabit
+ * Izleme logu (docs/GAME_FLOW.md) gFocusPoint'in iki adet 16.16 sabit
  * nokta s32 oldugunu OLCTU (baslangic 3360.000 / 9568.000; bazi farklar
  * tam 65536 ve 262144). Buradaki `Vec2 {s32 x; s32 y;}` tanimini
  * DOGRULADI.

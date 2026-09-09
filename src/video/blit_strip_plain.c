@@ -18,7 +18,7 @@
 /* ---- 0x08031684 — yuvanin alt nesnesini birakir ---------------------
  *
  * gRam02025810'daki 24 x 180 baytlik yuva dizisi (bkz.
- * docs/GRAM02025810_YERLESIM.md ve src/world/release_slot.c). Eleman ici
+ * docs/GRAM02025810_LAYOUT.md ve src/world/release_slot.c). Eleman ici
  * +0xB1 bayragi kuruluysa eleman ici +0x64'teki alt nesne birakilip
  * bayrak sifirlaniyor.
  *

@@ -5,7 +5,7 @@
  * gRam02000008/0A ile ayniysa cikilir; degilse kaydedilip iki ucer
  * basamak (18,10) ve (22,10) konumlarina DrawCounterDigits3 ile yazilir.
  *
- * Bu, docs/BAND_A_ACIK.md'de "sembol yok" diye park edilen uc fonksiyondan
+ * Bu, docs/BAND_A_OPEN_ISSUES.md'de "sembol yok" diye park edilen uc fonksiyondan
  * biriydi; semboller kaydedilince ilk denemede eslesti.
  *
  * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

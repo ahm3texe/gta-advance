@@ -16,7 +16,7 @@ oldugu, nasil duzenlendigi ve nasil okunacagi kayitli.
 
 3090 giris, hepsi metin govdesine isaret ediyor ve **tam olarak 5'e
 bolunuyor: 618 x 5**.  Oyunun acilistaki dil ekraninda BES secenek var
-(izleme logu: `gActiveMenuItemCount` 0->5, bkz. docs/OYUN_AKISI.md), yani
+(izleme logu: `gActiveMenuItemCount` 0->5, bkz. docs/GAME_FLOW.md), yani
 618 metin dizesi x 5 dil.
 
 Dilim -> dil eslemesi DOGRULANDI (oturum 7): **dilim k = dil k**, dogrudan.

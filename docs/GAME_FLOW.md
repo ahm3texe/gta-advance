@@ -230,7 +230,7 @@ geri.  Menu sirasiyla birlestirince: **0=ingilizce, 1=ispanyolca,
 **Davranis:** `SetLanguage` ONAYDA DEGIL, IMLEC HAREKETINDE cagriliyor --
 menu canli onizleme yapiyor.
 
-Ayrinti ve dilim eslemesinin dogrulanmasi: docs/METIN_HARITASI.md.
+Ayrinti ve dilim eslemesinin dogrulanmasi: docs/TEXT_MAP.md.
 
 ## Oturum 8 — tutuklanma ve aranma sistemi
 
