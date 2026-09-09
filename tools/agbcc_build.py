@@ -125,15 +125,15 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
         key = name[: -len("__thumb")] if thumb else name
         row = rows.get(key) or ram.get(key)
         if row is None:
-            sys.exit(f"'{name}' data/functions.csv veya data/ram_map.csv'de yok; "
-                     f"adresi cozulemiyor")
+            sys.exit(f"'{name}' is in neither data/functions.csv nor "
+                     f"data/ram_map.csv; its address cannot be resolved")
         value = int(row["address"], 16) | (1 if thumb else 0)
         externs.append(f"    .equ {name}, {value:#x}\n")
     source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
-    # Section-end padding: `as` pads Thumb sections with NOP (0x46C0) by default
-    # ile doldurur, ROM ise sifirla dolduruyor. Acik hizalama bunu duzeltir.
-    # ARM instructions are 4 bytes, Thumb 2. Wrong alignment at the section end
-    # fazladan dolgu birakip boyutu kaydiriyor.
+    # Section-end padding: `as` pads Thumb sections with NOP (0x46C0) by
+    # default, while the ROM pads with zero. Explicit alignment fixes this.
+    # ARM instructions are 4 bytes, Thumb 2. Wrong alignment leaves extra
+    # padding at the section end and shifts the size.
     align = "4" if is_arm else "2"
     Path(f"{stem}.s").write_text(
         "".join(externs) + source_text + f"\n    .align {align}, 0\n",

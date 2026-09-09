@@ -3,7 +3,7 @@
   "source": {
     "repository": "https://github.com/pret/agbcc.git",
     "compatibleRevision": "da598c1d918402c42c0c0d7128ba14567f3175e9",
-    "provenance": "Bu revizyonun old_agbcc ciktisi sabit 23-fonksiyonluk temsil corpus'u ile birebir ayni. Kurulu referans ikilinin tarihsel kaynak revizyonu bilinmiyor."
+    "provenance": "The old_agbcc output of this revision is byte-identical to the fixed 23-function representative corpus. The historical source revision of the installed reference binary is unknown."
   },
   "compiler": {
     "name": "old_agbcc",
