@@ -430,7 +430,7 @@ address,name,size,status,module,notes
 0x0801D8A0,FUN_0801d8a0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801D8B0,GetField100,10,matching,world,byte-matching from C (small function harvest)
 0x0801D8BC,FUN_0801d8bc,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801D920,FUN_0801d920,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801D920,FUN_0801d920,26,matching,world,"Answers 1 for a null object, a null record at +0x18 or a record of kind 6; decompiled in src/world/kind_six_or_empty.c"
 0x0801D93C,FUN_0801d93c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801D990,FUN_0801d990,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801D9BC,FUN_0801d9bc,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -720,7 +720,7 @@ address,name,size,status,module,notes
 0x08031F18,FUN_08031f18,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08031F48,FUN_08031f48,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08031FB4,FUN_08031fb4,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08031FF0,FUN_08031ff0,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08031FF0,FUN_08031ff0,22,matching,world,"Turns the one-based +0x16 handle into a 0..127 index, -1 when absent; decompiled in src/world/entry_index_or_none.c"
 0x08032008,FUN_08032008,80,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08032058,IsEntityFlagSet,56,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified size measured including the tail pool (byte-matching evidence)"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
@@ -1042,7 +1042,7 @@ address,name,size,status,module,notes
 0x0803F9CC,FUN_0803f9cc,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803FA38,FUN_0803fa38,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803FA80,FUN_0803fa80,74,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803FACC,FUN_0803facc,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0803FACC,FUN_0803facc,26,matching,world,Tests flag 0x400 in the +0x1E halfword of the record at +0x2C; decompiled in src/world/record_flag_test.c
 0x0803FAE8,FUN_0803fae8,266,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803FBF4,FUN_0803fbf4,284,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803FD10,FUN_0803fd10,132,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -1845,7 +1845,7 @@ address,name,size,status,module,notes
 0x0806DB0C,__make_dp,38,discovered,libgcc,"__make_dp from agbcc's libgcc.a. DIAGNOSIS (NOT a match): 36 of the 38 bytes are identical to the ROM; the 2 differing bytes are the relocation of the __div0 call at the end of the function. these regions CANNOT be added there, because the libc_regions mechanism only verifies bodies without relocation. regenerated with tools/scan_libc.py --csv."
 0x0806DB34,FUN_0806db34,72,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0806DB7C,FUN_0806db7c,54,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806DBB4,FUN_0806dbb4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806DBB4,FUN_0806dbb4,26,documented,libgcc,"libgcc __negdi2 (64-bit negation). 20 of its 26 bytes are identical to _negdi2.o in tools/agbcc/lib/libgcc.a; only the epilogue differs, `pop {r4,pc}` there against the interwork `pop {r4} / pop {r2} / bx r2` here, because the ROM's copy was built with -mthumb-interwork. The identification is certain, but it is not byte-exact, so it does not enter libc_regions.csv."
 0x0806DBD0,FUN_0806dbd0,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DC34,FUN_0806dc34,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0806DCC0,Memset,86,documented,sdk,"Standard memset(dest, value, count); builds a 4-byte pattern and writes 16-byte blocks with stmia, byte tail loop, returns dest"
@@ -1913,7 +1913,7 @@ address,name,size,status,module,notes
 0x080717EC,findslot,30,documented,libc,"newlib syscalls.o; MASKED match against libc.a (86% and 78% fixed bytes respectively). It contains relocation, so it cannot be verified byte-for-byte and does not enter libc_regions.csv -- the identification is certain, but it does not count towards coverage."
 0x0807180C,remap_handle,76,documented,libc,"newlib syscalls.o; MASKED match against libc.a (86% and 78% fixed bytes respectively). It contains relocation, so it cannot be verified byte-for-byte and does not enter libc_regions.csv -- the identification is certain, but it does not count towards coverage.; boundary verified by the 2026-09-04 ROM flow review; boundary corrected against the ROM (audit_boundaries.py)"
 0x08071858,FUN_08071858,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x080718CC,FUN_080718cc,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080718CC,FUN_080718cc,22,documented,libc,"newlib syscalls.o: do_AngelSWI(AngelSWI_Reason_Errno, 0) -- `svc 0xAB` with r0 = 0x13. Sits directly after remap_handle from the same object. ARM semihosting, inert on a real GBA."
 0x080718E4,FUN_080718e4,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080718FC,FUN_080718fc,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08071918,FUN_08071918,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional

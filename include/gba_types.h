@@ -16,6 +16,12 @@ typedef signed char    s8;
 typedef signed short   s16;
 typedef signed int     s32;
 
+/* 64-bit types are spelled `long long` rather than `long`: agbcc's `long` is
+ * 32 bits, and only `long long` produces the register pair the ROM's 64-bit
+ * routines operate on. */
+typedef unsigned long long u64;
+typedef signed long long   s64;
+
 typedef volatile unsigned char  vu8;
 typedef volatile unsigned short vu16;
 typedef volatile unsigned int   vu32;

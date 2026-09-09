@@ -182,6 +182,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801D7FC,StoreRam0201AEE8,src/world/window_config.c,12,12,yes
 0x0801D848,InitAndMirror,src/world/init_and_mirror.c,34,34,yes
 0x0801D8B0,GetField100,src/world/get_field_100.c,10,10,yes
+0x0801D920,FUN_0801d920,src/world/kind_six_or_empty.c,26,26,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
 0x08023778,FUN_08023778,src/world/p1_23778.c,26,26,yes
 0x08023794,FUN_08023794,src/world/p1_23794.c,26,26,yes
@@ -290,6 +291,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
 0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
+0x08031FF0,FUN_08031ff0,src/world/entry_index_or_none.c,22,22,yes
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,56,56,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,20,20,yes
 0x080320A4,GetEntityUnk0C,src/world/entity_accessors.c,4,4,yes
@@ -396,6 +398,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803F85C,FUN_0803f85c,src/world/p1_3f85c.c,36,36,yes
 0x0803F8DC,FUN_0803f8dc,src/world/p1_3f8dc.c,50,50,yes
 0x0803F910,FUN_0803f910,src/world/p1_3f910.c,50,50,yes
+0x0803FACC,FUN_0803facc,src/world/record_flag_test.c,26,26,yes
 0x08041EE0,NoOp08041EE0,src/misc/empty_stubs.c,2,2,yes
 0x08041EF0,NoOp08041EF0,src/misc/empty_stubs.c,2,2,yes
 0x08041EF4,NoOp08041EF4,src/misc/empty_stubs.c,2,2,yes

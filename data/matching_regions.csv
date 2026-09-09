@@ -83,6 +83,7 @@ start,end,binary,module,notes
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Window settings
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,complex harvest
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,small function harvest
+0x0801D920,0x0801D93C,build/world/kind_six_or_empty.bin,world,"Null object, null record or kind 6 -> 1; single shared answer body (rule 49)"
 0x08023778,0x08023794,build/world/p1_23778.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023794,0x080237B0,build/world/p1_23794.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023868,0x0802392C,build/world/project_actor_offset.bin,world,0x08023868 ProjectActorOffset
@@ -146,6 +147,7 @@ start,end,binary,module,notes
 0x08031C98,0x08031D24,build/world/push_slot_queue_entry.bin,world,0x08031C98 PushSlotQueueEntry
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Scanning two flag arrays + block clear
 0x08031DB8,0x08031DDC,build/world/step_then_check.bin,world,stepping and testing a flag
+0x08031FF0,0x08032008,build/world/entry_index_or_none.bin,world,"One-based +0x16 handle to a 0..127 index, -1 otherwise"
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,Copies the +8 byte of 0x02000D50 to +9
@@ -204,6 +206,7 @@ start,end,binary,module,notes
 0x0803F85C,0x0803F880,build/world/p1_3f85c.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F8DC,0x0803F910,build/world/p1_3f8dc.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F910,0x0803F944,build/world/p1_3f910.bin,world,Phase 1: natural C matching the ROM exactly
+0x0803FACC,0x0803FAE8,build/world/record_flag_test.bin,world,Flag 0x400 test on the record at +0x2C; mask built first (rule 33)
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Tile field getters (bits 7-9, kind)"
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Map tile kind query: tile index (y<<shift)+x, kinds 1..4 with the obstacle bits clear"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Tile field (2. value) + map dimensions
