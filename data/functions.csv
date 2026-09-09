@@ -646,20 +646,20 @@ address,name,size,status,module,notes
 0x080308A0,ReleaseAllSlots,10,matching,world,Slot free; src/world/slot_release.c
 0x080308AC,ReleaseSlot,64,matching,world,Slot release with two bases; src/world/release_slot.c size measured including the tail pool (byte-matching evidence)
 0x080308EC,FUN_080308ec,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08030934,FUN_08030934,38,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
+0x08030934,FUN_08030934,38,matching,progress,"Index of the slot whose +0x18 word equals the argument, -1 otherwise; walks the 24 x 180-byte array at +0x3C; decompiled in src/progress/find_slot_by_word18.c"
 0x0803095C,FUN_0803095c,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x080309A8,FUN_080309a8,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080309A8,FUN_080309a8,42,matching,progress,"Index of the slot whose +0x10 pointer equals the argument, skipping null elements, -1 otherwise; decompiled in src/progress/find_slot_by_word10.c"
 0x080309D4,FUN_080309d4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08030A3C,FUN_08030a3c,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08030A3C,FUN_08030a3c,36,matching,progress,"Clamps a signed value to 0..450 and stores it at +0x02, then calls FUN_0802A480; decompiled in src/progress/set_clamped_word02.c"
 0x08030A60,FUN_08030a60,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08030A9C,FUN_08030a9c,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08030AE4,FUN_08030ae4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08030B1C,FUN_08030b1c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08030B1C,FUN_08030b1c,24,matching,progress,Adds the argument to the +0x14 word and hands the sum to FUN_08030AE4; decompiled in src/progress/add_to_word14.c
 0x08030B34,SendTextMode1,12,matching,world,verified from a byte-matching C source; SendTextMode1; submits the resolved text with mode 1
 0x08030B40,SendTextById,16,matching,ui,verified from a byte-matching C source; SendTextById; resolves the text id and submits it with mode 1
 0x08030B50,FUN_08030b50,16,matching,world,Forwards a text string to a two-argument call; src/world/band_a_30b50.c
 0x08030B60,SetHudTime,40,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x08030B88,FUN_08030b88,20,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08030B88,FUN_08030b88,20,matching,progress,Reads the SIGNED +0x04 and +0x05 bytes into two s32 outputs; the ldrsb register-offset form is what proves they are signed; decompiled in src/progress/read_signed_pair.c
 0x08030BE8,HalvesEqual,36,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
 0x08030C0C,LookupThenCall,24,matching,world,byte-matching from a C source (MATCH-014 batch group 4)
 0x08030C28,ZeroTwoBlocks,36,matching,world,byte-matching from a C source (MATCH-014 batch group 2)
@@ -669,8 +669,8 @@ address,name,size,status,module,notes
 0x08030CB4,CleanupAreaTiles,88,matching,world,"Area flags; src/world/area_flags.c including the tail literal pool (62->88, measured)"
 0x08030D0C,FUN_08030d0c,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08030D4C,FUN_08030d4c,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08030D84,FUN_08030d84,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08030DB4,FUN_08030db4,36,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
+0x08030D84,FUN_08030d84,48,matching,progress,Hands the +0x1358 and +0x1360 handles to FUN_0802E048 and FUN_0802EAD4 when they are set; decompiled in src/progress/release_two_handles.c
+0x08030DB4,FUN_08030db4,36,matching,progress,1 when either the +0x1360 or the +0x1358 handle is set; the ROM derives the second offset from the first with subs (rule 65); decompiled in src/progress/either_handle_set.c
 0x08030DD8,FUN_08030dd8,56,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08030E10,CaptureSessionSnapshot,104,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08030E78,ClearHudFieldA,40,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
@@ -681,8 +681,8 @@ address,name,size,status,module,notes
 0x08030F78,FUN_08030f78,12,matching,world,Clears the session block's active flag; src/world/band_a_30f78.c
 0x08030F84,TriggerEvent39,12,matching,world,verified from a byte-matching C source; TriggerEvent39; FUN_0802eb50(39)
 0x08030F90,ResetMapView,116,matching,world,verified from a byte-matching C source; ResetMapView; zeroes the map window and the gRam02025810 view fields
-0x08031004,FUN_08031004,24,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x08031034,FUN_08031034,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08031004,FUN_08031004,24,matching,progress,"Hands the +0x0A byte to FUN_080504B4 sign-extended; the ldrb plus lsls/asrs pair marks it a u8 field cast to s8, not a signed field; decompiled in src/progress/call_signed_byte0a.c"
+0x08031034,FUN_08031034,32,matching,progress,"Calls FUN_0802EB50 with the one-based +0x1128 index minus one, when it is set; decompiled in src/progress/notify_index_1128.c"
 0x08031054,FUN_08031054,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080310C0,FUN_080310c0,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08031134,FUN_08031134,168,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
@@ -692,7 +692,7 @@ address,name,size,status,module,notes
 0x08031318,GetRecordNodeById,14,matching,world,verified from a byte-matching C source; GetRecordNodeById; record node from a u16 id
 0x08031328,ClearMapWindowDma,96,matching,ui,verified from a byte-matching C source; ClearMapWindowDma; two DMA3 fills
 0x08031388,InitSessionAttr,88,matching,world,verified from a byte-matching C source; InitSessionAttr; gRam02026DA0 attribute setup
-0x080313F0,FUN_080313f0,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080313F0,FUN_080313f0,36,matching,progress,"Top six bits of a map cell; the +0x30 word points at a header with the row width at +0x00 and the cells at +0x04, indexed by two coordinates shifted right by 22 (signed); decompiled in src/progress/read_map_cell.c"
 0x08031414,ScaleMagnitude,132,matching,world,verified from a byte-matching C source; ScaleMagnitude; 5-band piecewise linear curve
 0x08031498,DrawTwoDigits,156,matching,ui,verified from a byte-matching C source; DrawTwoDigits; writes a two-digit number with two-row tiles
 0x08031534,FUN_08031534,68,matching,world,Converts the position into a cell and tests whether it is empty; src/world/band_a_31534.c
