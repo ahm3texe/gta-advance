@@ -50,7 +50,7 @@ def scan(path):
     locals_ = len(set(re.findall(r"\blocal_[0-9a-f]+\b", text)))
     chain = len(re.findall(r"\bif\s*\(|\belse if\s*\(", text))
     # Every warning saying Ghidra's output is INCOMPLETE. "Removing
-    # unreachable block" ozellikle sinsi: cikti derli toplu gorunur ama
+    # unreachable block" is especially insidious: the output looks tidy, but
     # block(s) have been dropped, and source cannot be written from it.
     incomplete = any(w in text for w in (
         "Could not recover jumptable",

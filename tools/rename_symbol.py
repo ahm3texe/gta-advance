@@ -46,7 +46,7 @@ def save(path, rows):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("address", help="0x08066A54 gibi")
+    parser.add_argument("address", help="e.g. 0x08066A54")
     parser.add_argument("new_name")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

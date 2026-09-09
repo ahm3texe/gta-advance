@@ -63,7 +63,7 @@ def chains(buf):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--min", type=int, default=5, help="en az kac halka")
+    ap.add_argument("--min", type=int, default=5, help="minimum number of links in the chain")
     ap.add_argument("--size", type=int, default=512, help="minimum function size")
     ap.add_argument("--distinct", type=int, default=5,
                     help="minimum number of DISTINCT non-zero values in the chain")

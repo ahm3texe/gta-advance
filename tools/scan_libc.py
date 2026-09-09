@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 # agbcc ships two libraries. The previous version looked only at libc.a;
-# libgcc.a HIC taranmamisti, oysa ROM'un bolme/mod yardimcilari oradan geliyor.
+# libgcc.a was NEVER scanned, yet the ROM's division/modulo helpers come from there.
 LIBS = [
     ("libc", ROOT / "tools/agbcc/lib/libc.a"),
     ("libgcc", ROOT / "tools/agbcc/lib/libgcc.a"),
@@ -32,7 +32,7 @@ ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 ROM_BASE = 0x08000000
 MIN_SIZE = 16       # short bodies produce coincidental matches
-MIN_FIXED = 12      # maskeleme sonrasi en az bu kadar sabit byte kalmali
+MIN_FIXED = 12      # at least this many fixed bytes must remain after masking
 
 
 def relocation_offsets(obj: Path) -> list[tuple[int, int]]:

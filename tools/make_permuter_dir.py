@@ -6,9 +6,8 @@ Output: build/permuter/<FunctionName>/{base.c,target.o,settings.toml,compile.sh}
 
 MAPPING SYMBOLS: the code body is `$t`, the literal pool `$d`. If the pool stays
 inside `$t`, objdump decodes it as instructions and the permuter chases the wrong
-target
-(ClearTextArea'da olculdu: 66 gorunen komut, gercek 61).  Kod sonu
-tools/dump_cfg.py'nin blok araliklarindan aliniyor.
+target (measured on ClearTextArea: 66 apparent instructions, 61 real). The end
+of the code is taken from tools/dump_cfg.py's block ranges.
 """
 import re, subprocess, sys
 from pathlib import Path

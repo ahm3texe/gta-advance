@@ -30,7 +30,7 @@ git -C "$EXT/permuter" checkout --quiet "$REV"
 # pycparser 3.x removed plyparser; the tool expects 2.x.
 "$EXT/venv/bin/pip" install --quiet "pycparser<3" toml
 
-# 3. macOS yamasi: ust akis homebrew'un GNU `cpp-*` ikilisini ariyor. Bizde o
+# 3. macOS patch: upstream looks for homebrew's GNU `cpp-*` binary. Here it
 #    is absent; the target chain's preprocessor is already the right choice
 #    (the same ARM EABI definitions as agbcc). gmake is not installed either,
 #    and the system make is sufficient.
@@ -55,16 +55,16 @@ echo "     komutundan sonraki .align + .word blogu."
 echo "  2) cd tools/external/permuter && ../venv/bin/python import.py \\"
 echo "       <source.c> <target.o> <FunctionName>"
 echo "  3) AFTER THE IMPORT two manual fixes are needed:"
-echo "     - nonmatchings/<Ad>/base.c icinde __inline__ -> inline"
-echo "       (pycparser GCC anahtar sozcugunu tanimiyor)"
+echo "     - __inline__ -> inline inside nonmatchings/<Name>/base.c"
+echo "       (pycparser does not know the GCC keyword)"
 echo "     - the realpath \"\$3\" line in nonmatchings/<Name>/compile.sh"
-echo "       (BSD realpath var OLMAYAN yolda basarisiz; cikti yolu bos kaliyor)"
-echo "  4) ../venv/bin/python permuter.py nonmatchings/<Ad> --stop-on-zero -j 4"
+echo "       (BSD realpath fails on a path that does not exist; the output path stays empty)"
+echo "  4) ../venv/bin/python permuter.py nonmatchings/<Name> --stop-on-zero -j 4"
 echo
-echo "UYARI -- ARA SKORLARA GUVENME. Permuter'in skoru KOMUT AGIRLIKLI bir"
-echo "is heuristic, NOT our criterion (exact byte equality). Measured:"
+echo "WARNING -- DO NOT TRUST INTERMEDIATE SCORES. The permuter's score is an"
+echo "instruction-weighted heuristic, NOT our criterion (exact byte equality). Measured:"
 echo "in CleanupAreaTiles a score of 50 -> 45 was called a 'new best', but the"
-echo "farki 7'de KALDI; yalnizca farkin yeri kaydi (0x1a -> 0x1c)."
+echo "byte difference STAYED at 7; only its position moved (0x1a -> 0x1c)."
 echo "The ONLY meaningful value is a score of 0; that means an exact match."
 echo "Every candidate must be verified with our own measurement before acceptance:"
 echo "  make c-match FILE=<source.c>"

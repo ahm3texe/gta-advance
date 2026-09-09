@@ -10,7 +10,7 @@ Usage:
     python3 tools/make_trace_script.py
     -> tools/trace.lua
 
-Sonra mGBA'da:  Tools > Scripting... > Load script > tools/trace.lua
+Then in mGBA:   Tools > Scripting... > Load script > tools/trace.lua
 Log dosyasi:    build/trace.log
 """
 import csv
@@ -21,31 +21,31 @@ RAM_MAP = ROOT / "data" / "ram_map.csv"
 OUT = ROOT / "tools" / "trace.lua"
 LOG = ROOT / "build" / "trace.log"
 
-# Sadece EWRAM (0x02......) ve IWRAM (0x03......).  MMIO (0x04......) her
+# EWRAM (0x02......) and IWRAM (0x03......) only. MMIO registers (0x04......)
 # change every frame and flood the log; ROM addresses are constant anyway.
 WATCH_PREFIXES = (0x02, 0x03)
 
 # Structures up to this size are traced COMPLETELY; larger ones are sampled
-# izlenmeyen kismi raporlaniyor.
+# and the untraced part is reported.
 STRUCT_FULL_LIMIT = 64
 SAMPLE_WORDS = 4
 
 
-LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
+LUA_TEMPLATE = r"""-- AUTOMATICALLY GENERATED: tools/make_trace_script.py
 -- Do not edit by hand; update ram_map.csv and re-run the generator.
 --
 -- RAM change tracer for mGBA 0.10.5.
--- Yukleme: Tools > Scripting... > Load script
+-- Load:    Tools > Scripting... > Load script
 -- Log:     __LOG_PATH__
 
--- CIFT YUKLEME KORUMASI.  Script birden fazla kez yuklenirse mGBA her
+-- DOUBLE-LOAD GUARD.  If the script is loaded more than once, mGBA
 -- keeps each frame callback SEPARATELY REGISTERED, so every change is
 -- logged more than once with different frame counters (this happened to us:
--- the same transition appeared twice, as f32645 and f620). The previous
--- ornegi burada etkisizlestiriyoruz.
+-- the same transition appeared twice, as f32645 and f620). Here we
+-- neutralise the previous instance.
 -- A boolean flag is NOT ENOUGH: the second load writes the same value, so the
--- old instance passes the "is it different" test and keeps running. Each
--- yuklemede ARTAN bir sayac gerekiyor.
+-- old instance passes the "is it different" test and keeps running. What is
+-- needed is a counter that INCREASES on every load.
 _G.__TRACE_EPOCH = (_G.__TRACE_EPOCH or 0) + 1
 local MY_EPOCH = _G.__TRACE_EPOCH
 if MY_EPOCH > 1 then
@@ -65,7 +65,7 @@ local fh      = nil
 local keys_ok = true
 
 -- Counters/RNG that change every frame flood the log. Once a symbol exceeds
--- gecerse susturulup bir kez rapor ediliyor.
+-- this limit it is suppressed and reported once.
 local NOISE_LIMIT = 30
 
 local KEY_NAMES = {
@@ -243,7 +243,7 @@ def main() -> int:
         # A multi-byte structure/array. It used to be silently truncated to
         # 1 byte, leaving 19049 of 37 symbols' 19086 bytes BLIND. Now it is
         # expanded word by word; large arrays are SAMPLED and the untraced part
-        # raporlaniyor (her kareyi 19 KB okumak emulatoru boguyor).
+        # is reported (reading 19 KB every frame chokes the emulator).
         words = (size + 3) // 4
         take = words if size <= STRUCT_FULL_LIMIT else SAMPLE_WORDS
         for w in range(take):
@@ -256,9 +256,9 @@ def main() -> int:
         f'  {{0x{a:08X}, {s}, "{n}"}}' for a, s, n in watched
     )
 
-    # Template HAM (raw) string ve yer tutuculu: f-string kullanilirsa
-    # Lua's \n escapes must not be turned into real line breaks by Python and
-    # string literalleri ikiye boluyor (bir kez basimiza geldi).
+    # The template is a RAW string with placeholders: with an f-string, Python
+    # would turn Lua's \n escapes into real line breaks and split the string
+    # literals in two (this bit us once).
     lua = LUA_TEMPLATE.replace("__LOG_PATH__", str(LOG))\
                       .replace("__ENTRIES__", entries)
 

@@ -80,7 +80,7 @@ def main() -> None:
         unresolved = [t for t in targets if t not in known]
         results.append((len(targets), len(unresolved), size, row, sorted(targets)))
 
-    # Once yapraklar, sonra cozulebilir cagrilar, sonra boyut
+    # Leaves first, then resolvable calls, then size
     results.sort(key=lambda r: (r[0] > 0, r[1], r[2]))
 
     print(f"{'address':12} {'size':>5} {'calls':>6} {'unresolved':>11}  module")

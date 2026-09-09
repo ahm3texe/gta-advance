@@ -93,10 +93,10 @@ def main() -> None:
             print(f"  {len(lost_match):4d} `matching` durumu dusurulurdu")
             for address in (lost_names or lost_rows or lost_match)[:5]:
                 name = current[address]["name"]
-                print(f"    ornek {address} {name}")
+                print(f"    example {address} {name}")
             print("\nThe primary source is data/functions.csv; this tool rebuilds it "
-                  "Ghidra dokumunden yeniden kurar.\nGercekten istiyorsan: "
-                  "--force (once `git add data/functions.csv` yapmani oneririm).")
+                  "from the Ghidra dump.\nIf you really want that: "
+                  "--force (I suggest `git add data/functions.csv` first).")
             sys.exit(1)
 
     fieldnames = ["address", "name", "size", "status", "module", "notes"]

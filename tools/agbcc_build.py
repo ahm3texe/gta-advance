@@ -90,7 +90,7 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     if not agbcc.exists():
         sys.exit(f"{compiler} is not installed. First run: make agbcc")
     if not ROM_PATH.exists():
-        sys.exit("baserom.gba yok. Once: make prepare-rom ROM_ZIP=...")
+        sys.exit("baserom.gba is missing. First run: make prepare-rom ROM_ZIP=...")
 
     BUILD.mkdir(parents=True, exist_ok=True)
     stem = BUILD / source.stem
@@ -111,10 +111,10 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
          "-o", f"{stem}.probe.o", f"{stem}.s"])
 
     rows = function_rows()
-    # External symbols are given to the assembler with .equ, so that `bl`
-    # kodlanir ve linker'a hic gitmez. Linker'a birakilirsa, mutlak sembolu
-    # Because it is not recognized as a Thumb function, an interworking veneer
-    # inserts a veneer and the `bl` target comes out wrong.
+    # External symbols are given to the assembler with .equ, so that `bl` is
+    # encoded here and never reaches the linker. Left to the linker, the
+    # absolute symbol is not recognised as a Thumb function, an interworking
+    # veneer is inserted, and the `bl` target comes out wrong.
     ram = ram_rows()
     externs = []
     for name in _undefined(Path(f"{stem}.probe.o")):

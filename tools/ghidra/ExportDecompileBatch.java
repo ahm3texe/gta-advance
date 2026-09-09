@@ -66,9 +66,9 @@ public class ExportDecompileBatch extends GhidraScript {
 
                         // If a size is given, the THUMB REPAIR is unconditional.
                         // Ghidra decodes some entries in ARM mode and leaves them
-                        // instruction data" ile birakiyor; boyle bir
-                        // because the function may be left over from a PREVIOUS run
-                        // "create if absent" is not enough; it is rebuilt EVEN IF PRESENT.
+                        // as "instruction data"; such a function may also be left
+                        // over from a PREVIOUS run, so "create if absent" is not
+                        // enough -- it is rebuilt EVEN IF PRESENT.
                         if (parts.length > 2) {
                             int span = Integer.decode(parts[2]);
                             Address end = address.add(span - 1);

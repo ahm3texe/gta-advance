@@ -61,7 +61,7 @@ c-match: verify-rom
 	@python3 tools/verify_c_function.py $(FILE)
 
 # Compile every C source under src/, compare them against the ROM, and
-# data/c_sources.csv'yi uretir. progress ve dashboard bunu okur.
+# produce data/c_sources.csv. progress and the dashboard read it.
 c-status: verify-rom
 	@python3 tools/scan_c_sources.py
 
@@ -112,8 +112,8 @@ rom: matching
 libc-verify: verify-rom
 	@python3 tools/verify_libc_regions.py
 
-# Bir libc nesnesini bilinen capadan hizalayip fonksiyon fonksiyon karsilastirir.
-# Ornek: make libc-align FUNC=remap_handle ADDR=0x0807180C
+# Align a libc object from a known anchor and compare it function by function.
+# Example: make libc-align FUNC=remap_handle ADDR=0x0807180C
 libc-align: verify-rom
 	@python3 tools/locate_libc_objects.py $(FUNC) $(ADDR)
 

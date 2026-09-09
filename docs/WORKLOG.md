@@ -532,7 +532,7 @@ loop. Rule 8 was thereby confirmed by measurement.
 
 `diff_function.py` was truncating the ROM side using the size in `functions.csv`.
 That size is Ghidra's body estimate and can leave the literal pool out; as a
-result, spurious "ROM da YOK" lines appeared **even for a fully matching
+result, spurious "NOT IN ROM" lines appeared **even for a fully matching
 function**. This had misled me too. Now the larger of the two sides is used.
 
 ### The rule set grew to 19

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Select functions with matching neighbors whose C has NOT BEEN WRITTEN yet.
 
-NEDEN
------
+WHY
+---
 If the functions around one are already matching, that region's type vocabulary
 (struct layouts, RAM symbols, call signatures) is ready; such candidates
 typically close in one or two attempts. This selection used to be made by hand

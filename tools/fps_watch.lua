@@ -31,9 +31,9 @@ local LOG_PATH = os.getenv("FPS_WATCH_LOG") or (SCRIPT_DIR .. "../build/fps_watc
 local ADDR_FRAME_DELAY   = 0x03000000
 local ADDR_IWRAM_COUNTER = 0x03000004
 local ADDR_GAME_STATE    = 0x02000CE0   -- +12 = player count / mode flag
-local REPORT_EVERY       = 60           -- donanim karesi
+local REPORT_EVERY       = 60           -- hardware frames
 
--- Cift yukleme korumasi: mGBA her yuklemede yeni bir geri cagri kaydeder
+-- Double-load guard: mGBA registers a new callback on every load
 -- and the old one keeps running, doubling the numbers.
 _G.__FPS_EPOCH = (_G.__FPS_EPOCH or 0) + 1
 local MY_EPOCH = _G.__FPS_EPOCH
@@ -49,7 +49,7 @@ end
 
 out(string.format("=== measurement started (load %d) ===", MY_EPOCH))
 
-local frames        = 0        -- bu pencerede gecen donanim karesi
+local frames        = 0        -- hardware frames elapsed in this window
 local logicFrames   = 0        -- the moment the counter resets = one logic frame
 local prevCounter   = -1
 local hist          = {}       -- gozlenen adim -> kac kez
@@ -98,6 +98,6 @@ callbacks:add("frame", function()
   end
 end)
 
-out("Oyunu oynat; her saniye bir satir dusecek.")
+out("Play the game; one line will drop every second.")
 out("a step distribution of 1:60 means it runs every frame (60 fps).")
 out("2:30 means every other frame (30 fps) - that is the 'stutter' feel.")

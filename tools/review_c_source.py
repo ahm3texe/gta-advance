@@ -22,7 +22,7 @@ GHIDRA_NAMES = re.compile(
     r"|param_\d+|local_[0-9a-f]+|DAT_[0-9a-f]+|unaff_\w+|in_\w+)\b"
 )
 INLINE_ASM = re.compile(r"\b(__asm__|asm\s*\(|__attribute__\s*\(\s*\(\s*naked)")
-# register T *p asm("r4") -- byte'lari tutturur ama nedenini gizler.
+# register T *p asm("r4") -- pins the bytes but hides the reason.
 REGISTER_PIN = re.compile(r"\bregister\b[^;\n]*\basm\s*\(")
 # A bare hardware/RAM address outside a comment or #define
 BARE_ADDRESS = re.compile(r"0x0[2-8][0-9A-Fa-f]{6}")
@@ -57,11 +57,11 @@ def review(path: Path) -> list[str]:
         problems.append("no header comment")
 
     for match in sorted(set(GHIDRA_NAMES.findall(code))):
-        problems.append(f"Ghidra kalintisi degisken adi: {match}")
+        problems.append(f"leftover Ghidra variable name: {match}")
 
     if REGISTER_PIN.search(code):
-        problems.append("acik register baglamasi (register ... asm(\"rN\")) -- "
-                        "eslesmeyi zorlar ama nedenini gizler; docs/WORKFLOW.md 6")
+        problems.append("explicit register binding (register ... asm(\"rN\")) -- "
+                        "forces the match but hides the reason; docs/WORKFLOW.md 6")
     elif INLINE_ASM.search(code):
         problems.append("contains inline assembly -- defeats the purpose of moving to C")
 
@@ -81,7 +81,7 @@ def review(path: Path) -> list[str]:
     comment_chars = len(text) - len(code)
     if len(code) and comment_chars / len(text) < 0.05:
         problems.append(
-            f"yorum orani cok dusuk (%{100 * comment_chars / len(text):.1f})"
+            f"comment ratio too low ({100 * comment_chars / len(text):.1f}%)"
         )
     return problems
 
@@ -103,7 +103,7 @@ def main() -> None:
         for problem in problems[:8]:
             print(f"         - {problem}")
         if len(problems) > 8:
-            print(f"         ... ve {len(problems) - 8} uyari daha")
+            print(f"         ... and {len(problems) - 8} more warnings")
     sys.exit(worst)
 
 

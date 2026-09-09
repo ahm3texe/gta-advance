@@ -84,7 +84,7 @@ def main() -> None:
     for row in functions:
         if row["name"] in names and not row["name"].lower().startswith("fun_"):
             bad("functions", f"'{row['name']}' at two addresses: "
-                             f"{names[row['name']]} ve {row['address']}")
+                             f"{names[row['name']]} and {row['address']}")
         names[row["name"]] = row["address"]
 
     # Manually rejected false entries must not re-enter the function map.
@@ -142,7 +142,7 @@ def main() -> None:
         address = int(row["address"], 16)
         if address in seen_ram:
             bad("ram_map", f"{row['address']} under two names: "
-                           f"{seen_ram[address]} ve {row['name']}")
+                           f"{seen_ram[address]} and {row['name']}")
         seen_ram[address] = row["name"]
         size = int(row["size"] or 0)
         for lo, hi, label in RAM_REGIONS:

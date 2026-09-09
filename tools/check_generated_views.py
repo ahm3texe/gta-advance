@@ -44,9 +44,9 @@ def main() -> int:
     if summary["cSourceCount"] != len(c_sources):
         problems.append("the dashboard C source count does not agree with c_sources.csv")
     if summary["cMatchingCount"] != sum(row["matching"] == "yes" for row in c_sources):
-        problems.append("dashboard C matching sayisi c_sources.csv ile uyusmuyor")
+        problems.append("the dashboard C matching count does not agree with c_sources.csv")
     if payload["workQueue"] != csv_rows(ROOT / "data/work_queue.csv"):
-        problems.append("dashboard is kuyrugu work_queue.csv ile uyusmuyor")
+        problems.append("the dashboard work queue does not agree with work_queue.csv")
 
     if problems:
         print("GENERATED VIEW INVALID:", file=sys.stderr)

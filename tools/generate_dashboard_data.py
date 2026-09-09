@@ -125,11 +125,12 @@ def main() -> None:
         total_code_bytes += size
         if row["status"] == "matching":
             matching_code_bytes += size
-        # IKI AYRI KAVRAM, karistirilmamali:
+        # TWO SEPARATE CONCEPTS, not to be confused:
         #
-        #   verified  -- the bytes of the function placed into the HYBRID ROM
-        #                bolgelerle kesisimi (data/matching_regions.csv).
-        #                build. Only regions built from assembly are there.
+        #   verified  -- the intersection of the function's bytes with the
+        #                regions placed into the HYBRID ROM build
+        #                (data/matching_regions.csv). Only regions built from
+        #                assembly are there.
         #   matched   -- is the function byte-matching (the functions.csv status).
         #
         # The panel used to show `verified` as "Byte match"; that is why 68
