@@ -48,6 +48,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
 0x08008108,ZeroHistory,src/core/zero_history.c,20,20,yes
+0x08008190,IsWhitespace,src/core/is_whitespace.c,28,30,no
 0x0800A8A8,BindActorToCoordSlot,src/core/clip_bounds_b1.c,136,136,yes
 0x0800A930,ReadTriple,src/core/read_triple.c,28,28,yes
 0x0800A94C,SetCoordUnk48,src/misc/coord_accessors.c,12,12,yes

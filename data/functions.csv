@@ -107,7 +107,7 @@ address,name,size,status,module,notes
 0x080080A4,FUN_080080a4,100,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08008108,ZeroHistory,20,matching,core,byte-matching from a C source (MATCH-014 batch group 4)
 0x0800811C,FUN_0800811c,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x08008190,FUN_08008190,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08008190,IsWhitespace,30,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080081D4,FUN_080081d4,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08008250,FUN_08008250,114,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080082C4,FUN_080082c4,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
