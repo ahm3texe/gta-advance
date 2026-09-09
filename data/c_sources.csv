@@ -572,6 +572,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08059D7C,ForwardToGetAnchorUnk30,src/world/wrap_08059d7c.c,10,10,yes
 0x08059D88,FUN_08059d88,src/script/cmd_call_and_succeed.c,12,12,yes
 0x08059D94,FUN_08059d94,src/script/cmd_owner_link_matches.c,88,88,yes
+0x08059DEC,FUN_08059dec,src/script/cmd_spawn_at_offset.c,92,92,yes
 0x08059E48,FUN_08059e48,src/script/cmd_forward_three_not.c,32,32,yes
 0x08059E68,FUN_08059e68,src/script/cmd_forward_three.c,22,22,yes
 0x08059E80,FUN_08059e80,src/script/cmd_owner_chain_flag.c,44,44,yes
@@ -594,6 +595,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805A274,FUN_0805a274,src/script/cmd_owner_call.c,34,34,yes
 0x0805A2F4,FUN_0805a2f4,src/script/cmd_area_reset.c,36,36,yes
 0x0805A318,FUN_0805a318,src/script/cmd_area_ready.c,34,34,yes
+0x0805A450,FUN_0805a450,src/script/cmd_set_timer.c,68,68,yes
+0x0805A494,FUN_0805a494,src/script/cmd_set_timer.c,96,96,yes
 0x0805A4F4,ForwardToHalvesEqual,src/world/wrap_0805a4f4.c,10,10,yes
 0x0805A500,FUN_0805a500,src/script/cmd_call_08030dd8.c,12,12,yes
 0x0805A78C,FUN_0805a78c,src/script/cmd_call_minus_one.c,20,20,yes

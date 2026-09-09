@@ -315,6 +315,7 @@ start,end,binary,module,notes
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,wrapper/accessor harvest
 0x08059D88,0x08059D94,build/script/cmd_call_and_succeed.bin,script,Handler: calls FUN_0805063C and always answers 1
 0x08059D94,0x08059DEC,build/script/cmd_owner_link_matches.bin,script,Does the first owner's +0x100 link reach the second owner
+0x08059DEC,0x08059E48,build/script/cmd_spawn_at_offset.bin,script,Spawns at the node's point nudged by the signed +0x20/+0x21 bytes
 0x08059E48,0x08059E68,build/script/cmd_forward_three_not.bin,script,Handler: FUN_0805669C inverted; result variable born after the call
 0x08059E68,0x08059E80,build/script/cmd_forward_three.bin,script,Handler: forwards three u16 operands to FUN_0805669C
 0x08059E80,0x08059EAC,build/script/cmd_owner_chain_flag.bin,script,Handler: flag 0x100 two links down the +0x28 chain
@@ -337,6 +338,7 @@ start,end,binary,module,notes
 0x0805A274,0x0805A298,build/script/cmd_owner_call.bin,script,Handler: owner into FUN_080362E4
 0x0805A2F4,0x0805A318,build/script/cmd_area_reset.bin,script,"Handler: resets the area node, writes 5 at +0x16 and clears slot 0"
 0x0805A318,0x0805A33C,build/script/cmd_area_ready.bin,script,"Handler: IsEntityFlagSet, falling back to the node's +0x17 byte"
+0x0805A450,0x0805A4F4,build/script/cmd_set_timer.bin,script,"Sets the timer from an operand, and from the clock plus an operand"
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,forwarding wrapper
 0x0805A500,0x0805A50C,build/script/cmd_call_08030dd8.bin,script,Handler: calls FUN_08030DD8 and always answers 1
 0x0805A78C,0x0805A7A0,build/script/cmd_call_minus_one.bin,script,Handler: operand into FUN_08041EF8 with a constant -1

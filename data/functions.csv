@@ -1418,7 +1418,7 @@ address,name,size,status,module,notes
 0x08059D7C,ForwardToGetAnchorUnk30,10,matching,world,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists
 0x08059D88,FUN_08059d88,12,matching,script,Script handler: calls FUN_0805063C and always answers 1; decompiled in src/script/cmd_call_and_succeed.c
 0x08059D94,FUN_08059d94,88,matching,script,"Script handler: whether the first owner's +0x100 link equals the second operand's owner, taken only when the +0x114 byte is above 3; decompiled in src/script/cmd_owner_link_matches.c"
-0x08059DEC,FUN_08059dec,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08059DEC,FUN_08059dec,92,matching,script,"Script handler: builds a point from the node's record, nudges it by the signed +0x20 and +0x21 bytes shifted up 16, and hands it to FUN_08038944 with 0x800000; a non-zero answer raises gRam0201627C; decompiled in src/script/cmd_spawn_at_offset.c"
 0x08059E48,FUN_08059e48,32,matching,script,Script handler: FUN_0805669C with its answer inverted; decompiled in src/script/cmd_forward_three_not.c
 0x08059E68,FUN_08059e68,22,matching,script,Script handler: forwards three u16 operands to FUN_0805669C; decompiled in src/script/cmd_forward_three.c
 0x08059E80,FUN_08059e80,44,matching,script,Script handler: flag 0x100 two links down the +0x28 chain; decompiled in src/script/cmd_owner_chain_flag.c
@@ -1444,8 +1444,8 @@ address,name,size,status,module,notes
 0x0805A298,FUN_0805a298,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A2F4,FUN_0805a2f4,36,matching,script,"Script handler: resets the area node, writes 5 into its +0x16 byte and clears slot 0; decompiled in src/script/cmd_area_reset.c"
 0x0805A318,FUN_0805a318,34,matching,script,"Script handler: IsEntityFlagSet on the node's +0x18 entry, falling back to its +0x17 byte; decompiled in src/script/cmd_area_ready.c"
-0x0805A450,FUN_0805a450,68,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805A494,FUN_0805a494,96,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0805A450,FUN_0805a450,68,matching,script,"Script handler: turns the operand into minutes and seconds and sets the timer, then clears the HUD time and notifies the active slot with id 355; decompiled in src/script/cmd_set_timer.c"
+0x0805A494,FUN_0805a494,96,matching,script,Script handler: the same as 0x0805A450 but with the operand added to the current clock first; decompiled in src/script/cmd_set_timer.c
 0x0805A4F4,ForwardToHalvesEqual,10,matching,world,"forwarding wrapper; found with tools/find_wrappers.py, byte-matching from C"
 0x0805A500,FUN_0805a500,12,matching,script,Script handler: calls FUN_08030DD8 and always answers 1; decompiled in src/script/cmd_call_08030dd8.c
 0x0805A50C,FUN_0805a50c,82,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
