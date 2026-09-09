@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Kural 45'in gecerli oldugu fonksiyonlari Ghidra ciktisindan tespit eder.
+"""Detect functions where rule 45 applies, from Ghidra's output.
 
-Kural 45 (docs/COMPILER.md): uzun if/else zincirlerinde birden cok dalin
-govdesi ayniysa agbcc onlari capraz atlamayla birlestirir ve bir dalin kodu
-tumuyle kaybolur.  ROM'da o dallar ayri fiziksel kopyalarsa, orijinal
-kaynakta her dalin KENDI yerel degiskenleri vardir.
+Rule 45 (docs/COMPILER.md): in long if/else chains, when several branches have
+identical bodies agbcc merges them by cross-jumping and one branch's code
+disappears entirely. If those branches are separate physical copies in the ROM,
+then in the original source each branch had ITS OWN local variables.
 
-Bu arac iki isareti sayar:
+This tool counts two signals:
 
-  tekrar   Ghidra ciktisinda birbirinin ayni olan (adlar disinda) ard arda
-           gelen ifade bloklari.  Yuksekse birlesme riski yuksektir.
-  yerel    Ghidra'nin urettigi ayri `local_XX` sayisi.  Ghidra bunlari
-           dogru gosteriyor; cok sayida yerel, dallarin ayri yerel
-           kullandiginin gostergesidir.
+  repeats  consecutive expression blocks in Ghidra's output that are identical
+           apart from names. A high count means a high merging risk.
+  locals   the number of distinct `local_XX` variables Ghidra produced. Ghidra
+           shows these correctly; many locals indicate that the branches use
+           separate locals.
 
-Kullanim:
+Usage:
     python3 tools/scan_rule45.py                 # build/ghidra_out/*.c
-    python3 tools/scan_rule45.py <dizin>
+    python3 tools/scan_rule45.py <directory>
 """
 import re
 import sys
@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def normalize(line):
-    """Degisken adlarini soyutla ki ayni sekilli bloklar esitlensin."""
+    """Abstract away variable names so identically shaped blocks compare equal."""
     s = line.strip()
     s = re.sub(r"\blocal_[0-9a-f]+\b", "L", s)
     s = re.sub(r"\b[iup]?[A-Za-z]*Var\d+\b", "V", s)
@@ -51,7 +51,7 @@ def scan(path):
     chain = len(re.findall(r"\bif\s*\(|\belse if\s*\(", text))
     # Ghidra ciktisinin YARIM oldugunu soyleyen her uyari.  "Removing
     # unreachable block" ozellikle sinsi: cikti derli toplu gorunur ama
-    # blok(lar) dusmustur, kaynak ondan yazilamaz.
+    # block(s) have been dropped, and source cannot be written from it.
     incomplete = any(w in text for w in (
         "Could not recover jumptable",
         "Removing unreachable block",
@@ -64,7 +64,7 @@ def scan(path):
 def main():
     d = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "build/ghidra_out"
     if not d.is_dir():
-        sys.exit(f"{d} yok. Once toplu cikarimi calistir (bkz. docs/COMPILER.md).")
+        sys.exit(f"{d} is missing. Run the batch export first (see docs/COMPILER.md).")
 
     rows = []
     for f in sorted(d.glob("*.c")):
@@ -72,13 +72,13 @@ def main():
         rows.append((rep, loc, chain, jt, f.stem))
     rows.sort(reverse=True)
 
-    print(f"{'fonksiyon':<20}{'tekrar':>7}{'yerel':>7}{'dal':>5}  durum")
+    print(f"{'function':<20}{'repeats':>8}{'locals':>7}{'chain':>6}  status")
     print("-" * 56)
     for rep, loc, chain, jt, name in rows:
-        durum = "Ghidra YARIM" if jt else ("KURAL 45 ADAYI" if rep >= 3 and loc >= 6 else "-")
-        print(f"{name:<20}{rep:>7}{loc:>7}{chain:>5}  {durum}")
+        status = "Ghidra INCOMPLETE" if jt else ("RULE 45 CANDIDATE" if rep >= 3 and loc >= 6 else "-")
+        print(f"{name:<20}{rep:>8}{loc:>7}{chain:>6}  {status}")
     n = sum(1 for r in rows if not r[3] and r[0] >= 3 and r[1] >= 6)
-    print(f"\n{n} aday (Ghidra ciktisi tam olanlar arasinda)")
+    print(f"\n{n} candidates (among those whose Ghidra output is complete)")
     return 0
 
 

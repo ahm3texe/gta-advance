@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Bir C kaynagini agbcc ile derleyip ROM adresine linkler ve .bin uretir.
+"""Compile a C source with agbcc, link it at its ROM address, and produce a .bin.
 
-Kullanim:  python3 tools/build_c.py src/save/save_wrappers.c build/save/save_wrappers.bin
+Usage:  python3 tools/build_c.py src/save/save_wrappers.c build/save/save_wrappers.bin
 """
 import sys
 from pathlib import Path

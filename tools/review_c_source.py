@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""C kaynaklarini okunabilirlik acisindan denetler.
+"""Check C sources for readability.
 
-Byte eslesmesi tek basina yetmez: amac okunabilir kaynak uretmek. Bu arac
-"eslesiyor ama okunamiyor" durumunu yakalar -- inline assembly, Ghidra
-ciktisindan kalan degisken adlari, cikplak adres sabitleri, eksik baslik.
+A byte match is not enough on its own: the goal is readable source. This tool
+catches the "matches but unreadable" case -- inline assembly, variable names left
+over from Ghidra's output, bare address constants, a missing header comment.
 
-Kullanim:  python3 tools/review_c_source.py [dosya.c ...]
-           (argumansiz calisirsa src/ altindaki tum .c dosyalarina bakar)
+Usage:  python3 tools/review_c_source.py [file.c ...]
+        (with no arguments it looks at every .c file under src/)
 """
 import csv
 import re
@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RED, YELLOW, GREEN, RESET = "\033[31m", "\033[33m", "\033[32m", "\033[0m"
 
-# Ghidra decompiler ciktisina ozgu adlandirmalar
+# Naming specific to Ghidra decompiler output
 GHIDRA_NAMES = re.compile(
     r"\b(uVar\d+|iVar\d+|bVar\d+|cVar\d+|fVar\d+|puVar\d+|piVar\d+"
     r"|param_\d+|local_[0-9a-f]+|DAT_[0-9a-f]+|unaff_\w+|in_\w+)\b"
@@ -54,7 +54,7 @@ def review(path: Path) -> list[str]:
     problems = []
 
     if not text.lstrip().startswith("/*"):
-        problems.append("baslik yorumu yok")
+        problems.append("no header comment")
 
     for match in sorted(set(GHIDRA_NAMES.findall(code))):
         problems.append(f"Ghidra kalintisi degisken adi: {match}")
@@ -72,11 +72,11 @@ def review(path: Path) -> list[str]:
         if line in define_lines:
             continue
         for addr in BARE_ADDRESS.findall(line):
-            problems.append(f"#define disinda ciplak adres {addr}: {line.strip()[:60]}")
+            problems.append(f"bare address outside a #define {addr}: {line.strip()[:60]}")
 
     for legacy, current in renamed_symbols().items():
         if legacy in code:
-            problems.append(f"bayat sembol adi {legacy}; artik {current}")
+            problems.append(f"stale symbol name {legacy}; it is now {current}")
 
     comment_chars = len(text) - len(code)
     if len(code) and comment_chars / len(text) < 0.05:

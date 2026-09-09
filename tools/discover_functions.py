@@ -1,37 +1,37 @@
 #!/usr/bin/env python3
-"""Ghidra'nin kacirdigi fonksiyonlari fonksiyon haritasindaki bosluklarda arar.
+"""Search the gaps in the function map for functions Ghidra missed.
 
-data/functions.csv Ghidra'nin otomatik analizinden geliyor ve bu ROM'da
-eksik oldugu kanitlandi: havuzdaki isleyici isaretcilerini cozerken elle
-bes fonksiyon bulundu (0x0803DEA8, 0x0803E280, 0x0803F0E8, 0x080397EC...).
-Bu arac ayni isi sistematik yapar.
+data/functions.csv comes from Ghidra's automatic analysis and was proven
+incomplete for this ROM: five functions were found by hand while resolving
+handler pointers in the pools (0x0803DEA8, 0x0803E280, 0x0803F0E8,
+0x080397EC...). This tool does the same job systematically.
 
-IKI YONTEM:
+THREE METHODS:
 
-A) CAGRI HEDEFI (kesin). Bilinen kodun icindeki her `bl` komutunun
-   hedefi tanim geregi bir fonksiyon girisidir. Yanlis pozitif olamaz.
-   Prolog desenine bakmaya gerek yok -- yaprak fonksiyonlar da bulunur.
+A) CALL TARGET (certain). The target of every `bl` instruction inside known
+   code is by definition a function entry. There can be no false positive.
+   No prologue pattern is needed -- leaf functions are found too.
 
-B) FONKSIYON ISARETCISI (guclu). ROM verisindeki atlama tablolari ve
-   isleyici dizileri Thumb isaretcisi tutar: 0x08xxxxxx, TEK sayi.
-   Ham tarama cok yanlis pozitif verir (grafik verisi icinde rastlanti),
-   bu yuzden hedefin GERCEK bir prologu olmasi sarti aranir.
+B) FUNCTION POINTER (strong). Jump tables and handler arrays in the ROM data
+   hold Thumb pointers: 0x08xxxxxx, ODD. A raw scan gives many false positives
+   (coincidences inside graphics data), so the target is required to have a
+   REAL prologue.
 
-C) PROLOG DESENI (olasi). Bosluklarda Thumb prologu
-   (`push {..., lr}`) arar, sonra audit_boundaries yurutucusuyle govdeyi
-cikarir. Dort siki kosul:
-  1. govde 8-4096 bayt ve cozulemeyen dolayli atlama yok
-  2. govde bosluktan tasmiyor (bilinen fonksiyona girmiyor)
-  3. onunde bir bitirici (`bx lr` / `pop {..,pc}` / `bx rN`) ya da
-     hizalama dolgusu var -- yani gercekten bir fonksiyon sinirinda
-  4. birbirini kapsayan adaylardan yalnizca disi alinir
+C) PROLOGUE PATTERN (probable). Searches the gaps for a Thumb prologue
+   (`push {..., lr}`), then extracts the body with the audit_boundaries walker.
+   Four strict conditions:
+  1. the body is 8-4096 bytes with no unresolved indirect jump
+  2. the body does not overflow the gap (does not enter a known function)
+  3. it is preceded by a terminator (`bx lr` / `pop {..,pc}` / `bx rN`) or by
+     alignment padding -- i.e. it really is at a function boundary
+  4. of candidates containing one another, only the outer one is taken
 
-Bulunanlar `discovered` durumuyla eklenir: adres ve sinir otomatiktir,
-govdeleri henuz incelenmedi.
+What is found is added with the `discovered` status: the address and boundary
+are automatic, and the bodies have not been reviewed yet.
 
-Kullanim:
-    python3 tools/discover_functions.py            # yalnizca rapor
-    python3 tools/discover_functions.py --apply    # functions.csv'ye ekle
+Usage:
+    python3 tools/discover_functions.py            # report only
+    python3 tools/discover_functions.py --apply    # add to functions.csv
 """
 import csv
 import sys
@@ -76,7 +76,7 @@ def main() -> None:
         covered.update(range(address, address + size))
     known_starts = {address for address, _ in known}
 
-    # A) Cagri hedefleri: kesin fonksiyon girisleri.
+    # A) Call targets: certain function entries.
     call_targets = set()
     for address, size in known:
         base = address - ROM_BASE
@@ -99,7 +99,7 @@ def main() -> None:
         if target in known_starts:
             continue
         if target in covered:
-            inside_known.append(target)      # sinir hatasi isareti
+            inside_known.append(target)      # a sign of a boundary error
             continue
         if in_arm_range(target) or target in ARM_FUNCTIONS:
             continue
@@ -109,7 +109,7 @@ def main() -> None:
         if MIN_SIZE <= size <= MAX_SIZE and not walker.unresolved:
             from_calls.append((target, size))
 
-    # B) Fonksiyon isaretcileri: yalnizca hedefte gercek prolog varsa.
+    # B) Function pointers: only when the target has a real prologue.
     limit = max(address + size for address, size in known)
     from_pointers = []
     seen_ptr = set()
@@ -125,7 +125,7 @@ def main() -> None:
             continue
         head = int.from_bytes(rom[target - ROM_BASE:target - ROM_BASE + 2], "little")
         if not ((head & 0xFF00) == 0xB500 or (head & 0xFE00) == 0xB400):
-            continue                     # gercek prolog yoksa rastlanti say
+            continue                     # without a real prologue, treat as coincidence
         seen_ptr.add(target)
         walker = Walker(rom, target)
         walker.run()
@@ -154,8 +154,8 @@ def main() -> None:
                         found.append((addr, size))
             addr += 2
 
-    # Kapsayanlari ele: bir fonksiyonun govdesi icindeki prolog deseni
-    # ayri bir fonksiyon degildir.
+    # Filter out containment: a prologue pattern inside a function's body is
+    # not a separate function.
     found.sort()
     unique, last_end = [], 0
     for addr, size in found:
@@ -165,45 +165,45 @@ def main() -> None:
         last_end = addr + size
 
     total = sum(size for _, size in unique)
-    print(f"Bosluk: {len(gaps)} adet")
-    print(f"A) Cagri hedefinden kesin:   {len(from_calls)} fonksiyon")
-    print(f"B) Isaretciden (prologlu):   {len(from_pointers)} fonksiyon")
-    print(f"C) Prolog deseninden olasi:  "
-          f"{len(unique) - len(from_calls) - len(from_pointers)} fonksiyon")
-    print(f"Toplam: {len(unique)} fonksiyon, {total} bayt")
+    print(f"Gaps: {len(gaps)}")
+    print(f"A) Certain, from call targets:  {len(from_calls)} functions")
+    print(f"B) From pointers (with prologue): {len(from_pointers)} functions")
+    print(f"C) Probable, from prologue pattern: "
+          f"{len(unique) - len(from_calls) - len(from_pointers)} functions")
+    print(f"Total: {len(unique)} functions, {total} bytes")
     if rejected:
-        print(f"Elle reddedilmis sahte giris: {len(rejected)} "
+        print(f"Manually rejected false entries: {len(rejected)} "
               "(data/non_function_entries.csv)")
     if inside_known:
-        print(f"\nUYARI: {len(inside_known)} `bl` hedefi bilinen bir fonksiyonun "
-              f"ICINE dusuyor -- o fonksiyonlarin siniri yanlis olabilir.")
-        print("  Ornek: " + ", ".join(f"0x{t:08X}" for t in inside_known[:6]))
+        print(f"\nWARNING: {len(inside_known)} `bl` targets fall INSIDE a known "
+              f"function -- those functions' boundaries may be wrong.")
+        print("  Example: " + ", ".join(f"0x{t:08X}" for t in inside_known[:6]))
     print()
-    print(f"{'adres':12} {'bayt':>6}")
+    print(f"{'address':12} {'bytes':>6}")
     print("-" * 20)
     for addr, size in sorted(unique, key=lambda f: -f[1])[:15]:
         print(f"0x{addr:08X} {size:>6}")
 
     if not apply:
-        print("\n(yalnizca rapor; eklemek icin --apply)")
+        print("\n(report only; use --apply to add them)")
         return
 
     for addr, size in unique:
         rows.append({
             "address": f"0x{addr:08X}", "name": f"FUN_{addr:08x}",
             "size": str(size), "status": "discovered", "module": "unknown",
-            "notes": ("Ghidra kacirmisti; tools/discover_functions.py "
-                      + ("cagri hedefi (kesin)" if (addr, size) in from_calls
-                         else "fonksiyon isaretcisi" if (addr, size) in from_pointers
-                         else "prolog deseni (olasi)")
-                      + ", govdesi henuz incelenmedi"),
+            "notes": ("missed by Ghidra; tools/discover_functions.py "
+                      + ("call target (certain)" if (addr, size) in from_calls
+                         else "function pointer" if (addr, size) in from_pointers
+                         else "prologue pattern (probable)")
+                      + ", body not yet reviewed"),
         })
     rows.sort(key=lambda r: int(r["address"], 16))
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    print(f"\nfunctions.csv: {len(unique)} yeni fonksiyon eklendi.")
+    print(f"\nfunctions.csv: {len(unique)} new functions added.")
 
 
 if __name__ == "__main__":

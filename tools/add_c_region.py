@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Yeni bir C kaynagini dogrulanmis ROM bolgesi olarak kaydeder.
+"""Record a new C source as a verified ROM region.
 
-Once bolgenin tamaminin C'den eslestigini dogrular; eslesmezse hicbir sey
-yazmaz. Sonra data/matching_regions.csv'ye giris ve Makefile'a build kurali
-ekler, boylece `make matching` bundan sonra bolgeyi denetler.
+First it verifies that the whole region matches from C; if it does not, nothing
+is written. Then it adds an entry to data/matching_regions.csv and a build rule
+to the Makefile, so that `make matching` audits the region from then on.
 
-retire_asm.py mevcut bir assembly bolgesini C'ye cevirir; bu arac ise ONCEDEN
-HIC DOGRULANMAMIS bir ROM alanini kapsama katar -- yani gercek buyume budur.
+retire_asm.py converts an existing assembly region to C; this tool adds a ROM
+area that was NEVER VERIFIED BEFORE to the coverage -- that is the real growth.
 
-Kullanim:  python3 tools/add_c_region.py <module/name> <start_hex> <end_hex> "<not>"
+Usage:  python3 tools/add_c_region.py <module/name> <start_hex> <end_hex> "<note>"
 """
 import csv
 import sys
@@ -32,13 +32,13 @@ def main() -> None:
     blob, _, _ = compile_and_link(source)
     region = rom_bytes()[start:end]
     if blob != region:
-        sys.exit(f"HATA: bolge eslesmiyor ({len(blob)} vs {len(region)} byte). "
-                 f"Hicbir sey yazilmadi.")
+        sys.exit(f"ERROR: the region does not match ({len(blob)} vs {len(region)} bytes). "
+                 f"Nothing was written.")
 
     binary = f"build/{module}/{name}.bin"
     rows = list(csv.DictReader(REGIONS.open(newline="", encoding="utf-8")))
     if any(r["binary"] == binary for r in rows):
-        sys.exit(f"HATA: {binary} zaten matching_regions.csv icinde.")
+        sys.exit(f"ERROR: {binary} is already in matching_regions.csv.")
     rows.append({
         "start": f"0x{0x08000000 + start:08X}",
         "end": f"0x{0x08000000 + end:08X}",
@@ -65,17 +65,17 @@ def main() -> None:
     )
     marker = "\nmatching: libc-verify"
     if marker not in text:
-        sys.exit("HATA: Makefile'da 'matching:' hedefi bulunamadi.")
+        sys.exit("ERROR: the 'matching:' target was not found in the Makefile.")
     text = text.replace(marker, rule + marker, 1)
     text = text.replace(marker, f"{marker[:-1]} {target}", 1) if False else text
-    # matching hedefinin bagimlilik listesine ekle
+    # add it to the matching target's dependency list
     lines = text.splitlines(keepends=True)
     for i, line in enumerate(lines):
         if line.startswith("matching: libc-verify"):
             lines[i] = line.rstrip("\n") + f" {target}\n"
             break
     MAKEFILE.write_text("".join(lines))
-    print(f"{key}: {len(region)} byte yeni dogrulanmis bolge olarak eklendi ({target}).")
+    print(f"{key}: added as a new verified region of {len(region)} bytes ({target}).")
 
 
 if __name__ == "__main__":

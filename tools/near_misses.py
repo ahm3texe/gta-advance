@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""Eslesmeyen her C kaynagini ROM ile karsilastirip YAKINLIK raporu verir.
+"""Compare every non-matching C source against the ROM and report CLOSENESS.
 
-Neden var
----------
-`make progress` yalnizca eslesti/eslesmedi soyluyor; hangi fonksiyonun bir
-bayt, hangisinin yuzlerce bayt uzakta oldugu hicbir yerde tutulmuyordu.
-Sirada ne oldugunu secmek icin gereken sey tam olarak bu.
+Why it exists
+-------------
+`make progress` only says matched/not matched; nowhere was it recorded which
+function is one byte away and which is hundreds. That is exactly what is needed
+to choose what comes next.
 
-Olculen degerler
-----------------
-  boyut     derlenmis boyut / haritadaki boyut
-  fark      ayni ofsette farkli bayt sayisi + boyut farkinin mutlak degeri
-  yakinlik  1 - fark/haritadaki boyut  (boyut tutmuyorsa da anlamli kalir)
+Measured values
+---------------
+  size       compiled size / size in the map
+  difference bytes differing at the same offset + the absolute size difference
+  closeness  1 - difference/mapped size (stays meaningful even when sizes differ)
 
-DIKKAT: yakinlik yuzdesi KABA bir siralama olcutudur, ilerleme olcusu
-degil.  Tek bir yazmac farki tum fonksiyonu kaydirabilir ve yuzde aniden
-duser; tersine yuksek yuzde son baytin kolay kapanacagi anlamina gelmez.
-Gercek sinyal fark SAYISININ kucuklugudur.
+CAUTION: the closeness percentage is a ROUGH ordering criterion, not a measure of
+progress. A single register difference can shift the whole function and the
+percentage drops abruptly; conversely a high percentage does not mean the last
+byte will close easily. The real signal is how SMALL the difference COUNT is.
 
-Kullanim:
+Usage:
     python3 tools/near_misses.py
     python3 tools/near_misses.py --csv build/near_misses.csv
 """
@@ -36,7 +36,7 @@ from verify_c_function import rom_bytes, ROM_BASE      # noqa: E402
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", help="sonucu bu dosyaya da yaz")
+    ap.add_argument("--csv", help="also write the result to this file")
     a = ap.parse_args()
 
     rom = rom_bytes()
@@ -61,7 +61,7 @@ def main():
         for e in entries:
             name = e["name"]
             if name not in layout:
-                rows.append((None, name, e["address"], 0, 0, "linkte yok", src))
+                rows.append((None, name, e["address"], 0, 0, "not in the link", src))
                 continue
             off, n = layout[name]
             size = int(fmap[name]["size"] or 0)
@@ -75,7 +75,7 @@ def main():
     bad = [r for r in rows if r[0] is None]
     ok.sort(key=lambda r: -r[0])
 
-    print(f"{'fonksiyon':<20}{'adres':<12}{'boyut':>12}{'fark':>7}{'yakinlik':>10}  kaynak")
+    print(f"{'function':<20}{'address':<12}{'size':>12}{'diff':>7}{'closeness':>11}  source")
     print("-" * 104)
     for near, name, addr, n, size, diff, src in ok:
         print(f"{name:<20}{addr:<12}{n:>5}/{size:<6}{diff:>7}{near*100:>9.1f}%  "
@@ -84,7 +84,7 @@ def main():
         print(f"{name:<20}{addr:<12}{'-':>12}{'-':>7}{'-':>10}  {src} ({why})")
 
     if ok:
-        print(f"\n{len(ok)} eslesmeyen fonksiyon, toplam {sum(r[4] for r in ok)} bayt")
+        print(f"\n{len(ok)} non-matching functions, {sum(r[4] for r in ok)} bytes in total")
         print(f"fark <= 16 olan: {sum(1 for r in ok if r[5] <= 16)}")
 
     if a.csv:

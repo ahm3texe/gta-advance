@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""data/work_queue.csv semasini ve odak kurallarini denetler."""
+"""Check the schema and focus rules of data/work_queue.csv."""
 
 import csv
 import re
@@ -17,7 +17,7 @@ def main() -> int:
     with QUEUE.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames != FIELDS:
-            print(f"HATA: work_queue basligi {FIELDS} olmali", file=sys.stderr)
+            print(f"ERROR: the work_queue header must be {FIELDS}", file=sys.stderr)
             return 1
         rows = list(reader)
 
@@ -27,31 +27,31 @@ def main() -> int:
     for line, row in enumerate(rows, start=2):
         task_id = row["id"]
         if not re.fullmatch(r"[A-Z][A-Z0-9-]*-\d{3}", task_id):
-            errors.append(f"satir {line}: gecersiz id {task_id!r}")
+            errors.append(f"line {line}: invalid id {task_id!r}")
         if task_id in ids:
-            errors.append(f"satir {line}: yinelenen id {task_id}")
+            errors.append(f"line {line}: duplicate id {task_id}")
         ids.add(task_id)
         if row["priority"] not in PRIORITIES:
-            errors.append(f"satir {line}: gecersiz oncelik {row['priority']!r}")
+            errors.append(f"line {line}: invalid priority {row['priority']!r}")
         if row["status"] not in STATUSES:
-            errors.append(f"satir {line}: gecersiz durum {row['status']!r}")
+            errors.append(f"line {line}: invalid status {row['status']!r}")
         if not row["title"].strip() or not row["acceptance"].strip():
-            errors.append(f"satir {line}: baslik ve kabul olcutu zorunlu")
+            errors.append(f"line {line}: title and acceptance criteria are required")
         if row["status"] == "done" and not row["evidence"].strip():
-            errors.append(f"satir {line}: tamamlanan isin kaniti zorunlu")
+            errors.append(f"line {line}: evidence is required for a completed task")
         if row["status"] == "in_progress":
             active.append(task_id)
 
     if len(active) > 1:
-        errors.append(f"ayni anda yalniz bir is aktif olabilir: {', '.join(active)}")
+        errors.append(f"only one task may be active at a time: {', '.join(active)}")
 
     if errors:
-        print("IS KUYRUGU HATALI:", file=sys.stderr)
+        print("WORK QUEUE INVALID:", file=sys.stderr)
         for error in errors:
             print(f"  - {error}", file=sys.stderr)
         return 1
-    active_label = active[0] if active else "yok"
-    print(f"is kuyrugu: TEMIZ ({len(rows)} is, aktif: {active_label})")
+    active_label = active[0] if active else "none"
+    print(f"work queue: CLEAN ({len(rows)} tasks, active: {active_label})")
     return 0
 
 

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Verilen ROM adresinin libc.a'daki hangi fonksiyon oldugunu bulur.
+"""Identify which libc.a function sits at a given ROM address.
 
-scan_libc.py kor arama yapar: govdeyi ROM'un TAMAMINDA arar. Yer
-degistirmenin dokundugu byte'lar joker sayildigi icin, cok fazla
-maskelenen kisa fonksiyonlar (orn. newlib'in `_xxx_r` reentrant
-sarmalayicilari) o aramada ya bulunmaz ya da ayirt edilemez.
+scan_libc.py searches blindly: it looks for the body across the WHOLE ROM.
+Because the bytes touched by relocation are treated as wildcards, short
+functions with heavy masking (e.g. newlib's `_xxx_r` reentrant wrappers) are
+either not found or cannot be told apart in that search.
 
-Bu arac tersini yapar: adres BILINIYOR, soru hangi fonksiyon oldugu.
-Tek bir noktada karsilastirdigi icin maskelenmis govdeler de ayirt
-edilebilir hale gelir.
+This tool does the reverse: the address is KNOWN, and the question is which
+function it is. Because it compares at a single point, even heavily masked
+bodies become distinguishable.
 
-Kullanim:
+Usage:
     python3 tools/identify_libc_at.py 0x08071D20 [0x08071D5C ...]
 """
 import subprocess
@@ -25,16 +25,16 @@ ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.gba"
 LIBC = ROOT / "tools/agbcc/lib/libc.a"
 ROM_BASE = 0x08000000
-# Zayif eslesmeler yanlis pozitif uretiyor: 12 baytlik bir govdenin 8 sabit
-# bayti, ayni bicimdeki HER fonksiyona uyar. Bu depoda 0x08071D50 boyle
-# yanlislikla `__errno` sanildi; havuz degerinin bir ROM adresi oldugu
-# gorulunce elendi. Bu yuzden hem mutlak hem oransal alt sinir var.
+# Weak matches produce false positives: the 8 fixed bytes of a 12-byte body fit
+# EVERY function of the same shape. In this repository 0x08071D50 was mistaken
+# for `__errno` that way; it was eliminated once the pool value turned out to be
+# a ROM address. Hence both an absolute and a proportional lower bound.
 MIN_FIXED = 12
 MIN_FIXED_RATIO = 0.6
 
 
 def text_symbols(obj: Path) -> list[tuple[str, int, int]]:
-    """(ad, .text icindeki ofset, boyut) — yalnizca .text'teki fonksiyonlar."""
+    """(name, offset within .text, size) -- only functions in .text."""
     out = subprocess.run(["arm-none-eabi-nm", "-S", "--defined-only", str(obj)],
                          capture_output=True, text=True).stdout
     syms = []
@@ -81,7 +81,7 @@ def main() -> None:
             fixed = [i for i, m in enumerate(mask) if m]
             candidates.append((name, sym, body, fixed))
 
-    print(f"libc.a: {len(candidates)} fonksiyon govdesi hazirlandi\n")
+    print(f"libc.a: {len(candidates)} function bodies prepared\n")
     for address in targets:
         off = address - ROM_BASE
         hits = []
@@ -95,10 +95,10 @@ def main() -> None:
                 hits.append((sym, name, len(body), len(fixed)))
         print(f"0x{address:08X}:")
         if not hits:
-            print("  eslesme yok")
+            print("  no match")
         for sym, name, size, nfixed in sorted(hits, key=lambda h: -h[3]):
             print(f"  {sym:24s} {name:20s} {size:4d}B  "
-                  f"{nfixed}/{size} sabit byte "
+                  f"{nfixed}/{size} fixed bytes "
                   f"({100 * nfixed // size}%)")
 
 

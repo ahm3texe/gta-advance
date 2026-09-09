@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Bir fonksiyon veya RAM sembolunu TUM depoda tek islemde yeniden adlandirir.
+"""Rename a function or RAM symbol across the WHOLE repository in one operation.
 
-NEDEN VAR
----------
-Adlandirma uc kez ayni sekilde kirildi: `data/functions.csv`'deki ad
-degistirildi ama eski adi kullanan C kaynaklari guncellenmedi.  Sonuc her
-seferinde ayni oldu -- `agbcc_build.py` sembolu cozemedi ve hata ancak
-dakikalar sonra `make check` sirasinda, baska islerin ustune yigilmis
-halde ciktı.
+WHY IT EXISTS
+-------------
+Naming broke the same way three times: the name in `data/functions.csv` was
+changed but the C sources using the old name were not updated. The result was
+the same every time -- `agbcc_build.py` could not resolve the symbol, and the
+error only surfaced minutes later during `make check`, piled on top of other
+work.
 
-Bu arac ismi tek yerde degil, ismin gectigi HER yerde degistirir:
-veri tablolari, C kaynaklari, basliklar ve belgeler.  Once adresin
-gercekten o adi tasidigini dogrular, sonra yeni adin baskasinda kullanilmadigini
-kontrol eder; ikisi de tutmazsa hicbir sey yazmaz.
+This tool changes the name not in one place but EVERYWHERE it occurs: data
+tables, C sources, headers and documents. It first verifies that the address
+really carries that name, then checks that the new name is not already used by
+something else; if either fails, nothing is written.
 
-KULLANIM
---------
+USAGE
+-----
   python3 tools/rename_symbol.py 0x0803C400 GetOwnerSlot
   python3 tools/rename_symbol.py --dry-run 0x08066A54 ResetLinkHardware
 """
@@ -66,7 +66,7 @@ def main():
         if old_name:
             break
     if old_name is None:
-        sys.exit(f"{address} hicbir veri tablosunda yok")
+        sys.exit(f"{address} is in no data table")
     if old_name == new_name:
         sys.exit(f"{address} zaten {new_name}")
 
@@ -108,7 +108,7 @@ def main():
                 path.write_text(pattern.sub(new_name, text), encoding="utf-8")
 
     prefix = "[deneme] " if args.dry_run else ""
-    print(f"{prefix}{address}: {old_name} -> {new_name}  ({len(touched)} dosya)")
+    print(f"{prefix}{address}: {old_name} -> {new_name}  ({len(touched)} files)")
     for rel in touched:
         print(f"  {rel}")
 

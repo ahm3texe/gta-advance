@@ -26,16 +26,16 @@ def main() -> int:
         offset = start - ROM_BASE
 
         if expected_size <= 0:
-            print(f"Hata: geçersiz bölge {row['start']}–{row['end']}", file=sys.stderr)
+            print(f"Error: invalid region {row['start']}-{row['end']}", file=sys.stderr)
             return 1
         if len(generated) != expected_size:
             print(
-                f"Hata: {binary_path} {len(generated)} byte; beklenen {expected_size}",
+                f"Error: {binary_path} is {len(generated)} bytes; expected {expected_size}",
                 file=sys.stderr,
             )
             return 1
         if generated != rom[offset:offset + expected_size]:
-            print(f"Hata: {binary_path} ROM ile eşleşmiyor", file=sys.stderr)
+            print(f"Error: {binary_path} does not match the ROM", file=sys.stderr)
             return 1
         intervals.append((start, end))
 
@@ -47,7 +47,7 @@ def main() -> int:
             merged.append([start, end])
 
     total = sum(end - start for start, end in merged)
-    print(f"MATCHING REGION: {len(rows)} parça, {total} benzersiz ROM byte")
+    print(f"MATCHING REGIONS: {len(rows)} fragments, {total} unique ROM bytes")
     for start, end in merged:
         print(f"  0x{start:08X}–0x{end - 1:08X}: {end - start} byte")
     return 0

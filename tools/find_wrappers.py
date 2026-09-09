@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""ROM'daki saf iletme sarmalayicilarini bulur.
+"""Find pure forwarding wrappers in the ROM.
 
-Kalip (10 bayt): push {lr} / bl HEDEF / pop {rX} / bx rX
-Govde tek cagridan ibaret oldugu icin C karsiligi mekanik:
-    void  f(void) { HEDEF(); }        <- pop {r0}; bx r0
-    u32   f(void) { return HEDEF(); } <- pop {r1}; bx r1  (r0 donus tasiyor)
+The pattern (10 bytes): push {lr} / bl TARGET / pop {rX} / bx rX
+Since the body is a single call, the C equivalent is mechanical:
+    void  f(void) { TARGET(); }        <- pop {r0}; bx r0
+    u32   f(void) { return TARGET(); } <- pop {r1}; bx r1  (r0 carries the return)
 
-Kullanim: python3 tools/find_wrappers.py [--all]
-  varsayilan: yalnizca HENUZ ESLESMEYEN kayitlar
+Usage: python3 tools/find_wrappers.py [--all]
+  default: only records that are NOT YET MATCHING
 """
 import csv
 import sys
@@ -50,12 +50,13 @@ def main() -> None:
         off = ((w1 & 0x7FF) << 12) | ((w2 & 0x7FF) << 1)
         if off & 0x400000:
             off -= 0x800000
-        # `bl` komutu addr+2'de (push {lr} 2 bayt), Thumb'da PC =
-        # komut adresi + 4, yani taban addr+6. addr+4 yazmak hedefi tam
-        # iki bayt geriye kaydiriyordu (objdump ile karsilastirip yakalandi).
+        # The `bl` instruction is at addr+2 (push {lr} is 2 bytes), and in Thumb
+        # PC = instruction address + 4, so the base is addr+6. Writing addr+4
+        # shifted the target exactly two bytes back (caught by comparing with
+        # objdump).
         found.append((addr, addr + 6 + off, returns, row["name"], size))
 
-    print(f"{len(found)} iletme sarmalayicisi")
+    print(f"{len(found)} forwarding wrappers")
     for addr, target, returns, name, size in found:
         kind = "u32" if returns else "void"
         print(f"0x{addr:08X} {size:>3}B {kind:4} -> 0x{target:08X}  {name}")

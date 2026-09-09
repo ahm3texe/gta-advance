@@ -1,26 +1,27 @@
--- Kare hizi ve mantik adimi olcumu — GTA Advance
+-- Frame rate and logic step measurement - GTA Advance
 --
--- Yukleme: mGBA > Tools > Scripting... > File > Load script
--- Cikti:   Scripting penceresindeki konsol (ve build/fps_watch.log)
+-- Loading: mGBA > Tools > Scripting... > File > Load script
+-- Output:  the console in the Scripting window (and build/fps_watch.log)
 --
--- NE OLCUYOR
--- ----------
--- mGBA'nin baslik cubugundaki FPS *emulatorun* hizidir; oyunun mantik
--- adimini gostermez. Oyun degisken zaman adimi kullaniyor (bkz.
--- src/interrupt/vblank_intr.c, 0x08000220 byte-matching):
+-- WHAT IT MEASURES
+-- ----------------
+-- The FPS in mGBA's title bar is the *emulator's* speed; it does not show the
+-- game's logic step. The game uses a variable time step (see
+-- src/interrupt/vblank_intr.c, 0x08000220, byte-matching):
 --
---   gIwramFrameCounter (0x03000004) her donanim VBlank'inde artiyor
---   Mantik karesi bitince: gFrameDelay = gIwramFrameCounter, 5'te kirpiliyor
---   sonra gIwramFrameCounter sifirlaniyor
+--   gIwramFrameCounter (0x03000004) increments on every hardware VBlank
+--   When a logic frame ends: gFrameDelay = gIwramFrameCounter, clamped at 5
+--   then gIwramFrameCounter is zeroed
 --
--- Yani gFrameDelay = "son mantik karesinden bu yana kac donanim karesi
--- gecti". 1 ise oyun her karede calisiyor (60 fps). 2 ise bir kare
--- atliyor (30 fps). 3+ ise daha kotu.
+-- So gFrameDelay = "how many hardware frames have passed since the last logic
+-- frame". 1 means the game runs every frame (60 fps). 2 means it skips a frame
+-- (30 fps). 3+ is worse.
 --
--- DIKKAT: gGameState[12] degeri 1 ya da 2 iken (baglanti/iki oyunculu
--- kip) VBlank isleyicisi gFrameDelay'i gercek gecen kareye BAKMAKSIZIN
--- 5'e sabitliyor. O kipte bu olcum mantik hizini vermez; asagida ayrica
--- ham gIwramFrameCounter dagilimi da basiliyor, gercek deger odur.
+-- CAUTION: while gGameState[12] is 1 or 2 (link/two-player mode) the VBlank
+-- handler fixes gFrameDelay at 5 REGARDLESS of the frames actually elapsed. In
+-- that mode this measurement does not give the logic rate; the raw
+-- gIwramFrameCounter distribution is also printed below, and that is the real
+-- value.
 
 -- Resolved from this script's own location so the path is not machine-specific.
 -- Override with FPS_WATCH_LOG if mGBA is run from elsewhere.
@@ -29,7 +30,7 @@ local LOG_PATH = os.getenv("FPS_WATCH_LOG") or (SCRIPT_DIR .. "../build/fps_watc
 
 local ADDR_FRAME_DELAY   = 0x03000000
 local ADDR_IWRAM_COUNTER = 0x03000004
-local ADDR_GAME_STATE    = 0x02000CE0   -- +12 = oyuncu sayisi / kip bayragi
+local ADDR_GAME_STATE    = 0x02000CE0   -- +12 = player count / mode flag
 local REPORT_EVERY       = 60           -- donanim karesi
 
 -- Cift yukleme korumasi: mGBA her yuklemede yeni bir geri cagri kaydeder
@@ -37,7 +38,7 @@ local REPORT_EVERY       = 60           -- donanim karesi
 _G.__FPS_EPOCH = (_G.__FPS_EPOCH or 0) + 1
 local MY_EPOCH = _G.__FPS_EPOCH
 if MY_EPOCH > 1 then
-  console:log(string.format("[bilgi] %d. yukleme; onceki olcum susturuldu", MY_EPOCH))
+  console:log(string.format("[info] load %d; the previous measurement was silenced", MY_EPOCH))
 end
 
 local log = io.open(LOG_PATH, "a")
@@ -46,7 +47,7 @@ local function out(line)
   if log then log:write(line .. "\n"); log:flush() end
 end
 
-out(string.format("=== olcum basladi (yukleme %d) ===", MY_EPOCH))
+out(string.format("=== measurement started (load %d) ===", MY_EPOCH))
 
 local frames        = 0        -- bu pencerede gecen donanim karesi
 local logicFrames   = 0        -- sayacin sifirlandigi an = bir mantik karesi
@@ -59,8 +60,8 @@ callbacks:add("frame", function()
 
   frames = frames + 1
 
-  -- Sayac sifira dondugu an bir mantik karesi tamamlanmistir; sifirlanmadan
-  -- ONCEKI deger, o mantik karesinin kac donanim karesi surdugudur.
+  -- The moment the counter returns to zero a logic frame has completed; the
+  -- value BEFORE the reset is how many hardware frames that logic frame took.
   local counter = emu:read32(ADDR_IWRAM_COUNTER)
   if prevCounter >= 0 and counter < prevCounter then
     logicFrames = logicFrames + 1
@@ -84,7 +85,7 @@ callbacks:add("frame", function()
 
     -- Mantik fps'i = 60 donanim karesinde kac mantik karesi tamamlandi
     out(string.format(
-      "pencere %-3d  mantik %2d/60 kare  (~%2d fps)  gFrameDelay=%d  kip=%d  adim dagilimi[%s]",
+      "window %-3d  logic %2d/60 frames  (~%2d fps)  gFrameDelay=%d  mode=%d  step distribution[%s]",
       windows, logicFrames, logicFrames, delay, mode,
       table.concat(parts, " ")))
 

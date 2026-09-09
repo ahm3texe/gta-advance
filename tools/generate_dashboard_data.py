@@ -16,19 +16,19 @@ BOUNDARY_BASELINE = ROOT / "data/boundary_baseline.json"
 OUTPUT = ROOT / "dashboard/app/decomp-data.json"
 DECOMPILER = ROOT / "analysis/decompiler"
 
-# Ard arda gelen fonksiyonlar büyük olasılıkla aynı çeviri biriminden derlendi.
-# Bu eşikten büyük boşluklar yeni bir küme başlatır.
+# Consecutive functions were most likely compiled from the same translation unit.
+# Gaps larger than this threshold start a new cluster.
 CLUSTER_GAP = 512
 
 MODULE_LABELS = {
-    "bootstrap": "Başlangıç",
-    "interrupt": "Kesme sistemi",
-    "save": "Kayıt sistemi",
+    "bootstrap": "Startup",
+    "interrupt": "Interrupt system",
+    "save": "Save system",
     "sdk": "GBA SDK",
-    "serialization": "Serileştirme",
-    "ui": "Arayüz",
-    "libc": "C kitaplığı",
-    "unknown": "Sınıflandırılmamış",
+    "serialization": "Serialization",
+    "ui": "User interface",
+    "libc": "C library",
+    "unknown": "Unclassified",
 }
 
 
@@ -51,7 +51,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 
 def matched_bytes(start: int, size: int, regions: list[tuple[int, int]]) -> int:
-    """Fonksiyon aralığının doğrulanmış ROM bölgeleriyle kesişen byte sayısı."""
+    """Bytes of the function range that intersect verified ROM regions."""
     end = start + size
     total = 0
     for region_start, region_end in regions:
@@ -62,10 +62,11 @@ def matched_bytes(start: int, size: int, regions: list[tuple[int, int]]) -> int:
 
 
 def build_clusters(rows: list[dict]) -> None:
-    """Sınıflandırılmamış fonksiyonları bitişiklik kümelerine ayır.
+    """Split unclassified functions into adjacency clusters.
 
-    Sınıflandırılmış fonksiyonlar kendi modül grubunda kalır; kümeleme yalnızca
-    yapısı henüz bilinmeyen bölgeye sanal çeviri birimi sınırları getirir.
+    Classified functions stay in their own module group; the clustering only
+    imposes virtual translation-unit boundaries on the region whose structure is
+    not yet known.
     """
     for row in rows:
         if row["module"] != "unknown":
@@ -98,8 +99,8 @@ def build_clusters(rows: list[dict]) -> None:
 def main() -> None:
     function_rows = read_csv(FUNCTIONS)
     region_rows = read_csv(REGIONS)
-    # Kaynak turu ile eslesme durumu ayri eksenlerdir. Eslesmeyen C de C'dir;
-    # kaynagi olmayan aday ise assembly degildir.
+    # Source kind and matching state are separate axes. Non-matching C is still C;
+    # a candidate without source is not assembly.
     c_source_rows = read_csv(C_SOURCES) if C_SOURCES.exists() else []
     c_sources = {row["address"].upper(): row for row in c_source_rows}
     c_matched = {
@@ -129,12 +130,12 @@ def main() -> None:
         #   verified  -- fonksiyonun HIBRIT ROM derlemesine yerlestirilen
         #                bolgelerle kesisimi (data/matching_regions.csv).
         #                Yalnizca assembly'den kurulan bolgeler orada.
-        #   matched   -- fonksiyon byte-matching mi (functions.csv durumu).
+        #   matched   -- is the function byte-matching (the functions.csv status).
         #
-        # Panel eskiden "Byte eslesmesi" olarak `verified`i gosteriyordu; bu
-        # yuzden C'den eslesen 68 fonksiyon %0.00 gorunuyordu -- FUN_0800AB88
-        # 960/960 eslestigi halde sifir yaziyordu. Eslesme durumu artik
-        # dogru alandan geliyor, bolge kesisimi ayrica korunuyor.
+        # The panel used to show `verified` as "Byte match"; that is why 68
+        # functions matching from C appeared as 0.00% -- FUN_0800AB88 read zero
+        # even though it matched 960/960. The matching state now comes from the
+        # right field, and the region intersection is kept separately.
         verified = matched_bytes(start, size, verified_regions)
         matched = size if row["status"] == "matching" else verified
         c_source = c_sources.get(row["address"].upper())
@@ -157,7 +158,7 @@ def main() -> None:
         export = decompiler_exports.get(start)
         if export:
             function["analysisPath"], function["analysisCode"] = export
-        # Kendi yazdigimiz kaynak: Ghidra ciktisindan farkli ve asil olan bu.
+        # Our own source: different from Ghidra's output, and this is the real one.
         source_path = function["sourcePath"]
         if source_path:
             function["sourceCode"] = source_texts.setdefault(
@@ -228,7 +229,7 @@ def main() -> None:
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"Dashboard verisi: {len(functions)} fonksiyon, {cluster_count} küme, {OUTPUT}")
+    print(f"Dashboard data: {len(functions)} functions, {cluster_count} clusters, {OUTPUT}")
 
 
 if __name__ == "__main__":

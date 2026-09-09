@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""SIO TX isaretci-ilerletme deneyini ROM'a karsi yeniden uretir.
+"""Reproduce the SIO TX pointer-advance experiment against the ROM.
 
-Kaynak degismez; uc aday ve derleme artifaktlari gecici dizinde tutulur.
-Skor tools/diff_function.py ile ayni disassembly/hizalama hesabidir.
-Bu deney tam byte-matching veya butun surucunun semantik testi degildir.
+The source is not modified; the three candidates and the build artifacts are kept
+in a temporary directory. The score uses the same disassembly/alignment
+computation as tools/diff_function.py. This experiment is neither a full
+byte-match nor a semantic test of the whole driver.
 """
 import difflib
 import re
@@ -61,8 +62,8 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="sio-tx-") as work:
         # Ortak build/cmatch dosyalari dahil hicbir kalici artifakta yazma.
         build.BUILD = diff.BUILD = Path(work) / "build"
-        print(f"{TARGET} @ 0x{address:08X}; ROM {rom_size} bayt")
-        print(f"{'aday':26} {'boyut':>6} {'ayni/toplam komut':>19}")
+        print(f"{TARGET} @ 0x{address:08X}; ROM {rom_size} bytes")
+        print(f"{'candidate':26} {'size':>6} {'same/total insns':>19}")
         for i, (label, source) in enumerate(variants(SOURCE.read_text()).items()):
             path = Path(work) / f"variant_{i}.c"
             path.write_text(source)
@@ -81,8 +82,8 @@ def main() -> None:
             calls.append(Counter(re.findall(r"^\s*bl\s+(\w+)", assembly, re.M)))
 
     if not all(c == calls[0] for c in calls[1:]) or HELPER in calls[-1]:
-        raise SystemExit("HATA: Dis cagri hedefleri/adetleri degisti")
-    print("Dis cagri hedefleri ve adetleri uc adayda ayni; yardimci inline edildi.")
+        raise SystemExit("ERROR: external call targets/counts changed")
+    print("External call targets and counts are identical in all three candidates; the helper was inlined.")
     print("Komut skoru kismi olcumdur; tam kabul olcutu make c-match'tir.")
 
 

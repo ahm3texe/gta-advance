@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""libc.a nesnelerini bilinen bir capadan hizalayip fonksiyon fonksiyon karsilastirir.
+"""Align libc.a objects from a known anchor and compare them function by function.
 
-AMACI TANI KOYMAKTIR, eslestirme degil. Nesne duzeyinde yerlestirme denendi ve
-CALISMADI: ROM'un newlib'i ayni kaynaktan geliyor ama farkli yapilandirmayla
-derlenmis. Ornegin syscalls.o'da `findslot` ve `remap_handle` birebir tutuyor,
-`initialise_monitor_handles` kismen tutuyor, ondan sonraki her sey kayiyor -
-cunku sistem cagrisi saplamalari oyuna ozel yazilmis ve boyutlari farkli.
+ITS PURPOSE IS DIAGNOSIS, not matching. Object-level placement was attempted and
+DID NOT WORK: the ROM's newlib comes from the same source but was built with a
+different configuration. In syscalls.o, for example, `findslot` and
+`remap_handle` match exactly, `initialise_monitor_handles` matches partially, and
+everything after that drifts -- because the system call stubs were written for
+the game and their sizes differ.
 
-Bu arac o ayrismayi gosterir: bir nesnenin hangi kismi ortak, hangi kismi
-oyuna ozel. Gercek eslestirme icin tools/scan_libc.py (fonksiyon duzeyinde
-maskeli arama) kullanilir.
+This tool shows that divergence: which part of an object is shared and which is
+game-specific. For real matching, use tools/scan_libc.py (function-level masked
+search).
 
-Kullanim:  python3 tools/locate_libc_objects.py <capa_fonksiyonu> <rom_adresi>
-Ornek:     python3 tools/locate_libc_objects.py remap_handle 0x0807180C
+Usage:    python3 tools/locate_libc_objects.py <anchor_function> <rom_address>
+Example:  python3 tools/locate_libc_objects.py remap_handle 0x0807180C
 """
 import csv
 import subprocess
@@ -25,8 +26,8 @@ LIBC = ROOT / "tools/agbcc/lib/libc.a"
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 ROM_BASE = 0x08000000
-MIN_ANCHOR = 24      # capa olarak kullanilacak en kucuk sabit dizi
-MIN_VERIFY = 64      # nesne dogrulamasi icin gereken en az sabit byte
+MIN_ANCHOR = 24      # the smallest fixed run usable as an anchor
+MIN_VERIFY = 64      # minimum fixed bytes needed to verify an object
 
 
 def run(cmd: list[str]) -> str:
@@ -73,7 +74,7 @@ def build_mask(length: int, relocs: list[int]) -> bytearray:
 
 
 def runs_of(mask: bytearray) -> list[tuple[int, int]]:
-    """Maskedeki kesintisiz sabit bolgeler: (baslangic, uzunluk)."""
+    """Contiguous fixed regions in the mask: (start, length)."""
     out, start = [], None
     for i, m in enumerate(mask):
         if m and start is None:
@@ -87,7 +88,7 @@ def runs_of(mask: bytearray) -> list[tuple[int, int]]:
 
 
 def locate(rom: bytes, text: bytes, mask: bytearray) -> int | None:
-    """Nesnenin ROM'daki taban ofsetini bulur; belirsizse None."""
+    """Find the object's base offset in the ROM; None if ambiguous."""
     spans = [r for r in runs_of(mask) if r[1] >= MIN_ANCHOR]
     if not spans or sum(l for _, l in runs_of(mask)) < MIN_VERIFY:
         return None
@@ -104,7 +105,7 @@ def locate(rom: bytes, text: bytes, mask: bytearray) -> int | None:
 
 
 def decode_thumb_bl(rom: bytes, offset: int) -> int | None:
-    """ROM'daki Thumb BL'i cozup hedef adresi dondurur."""
+    """Decode a Thumb BL in the ROM and return the target address."""
     if offset + 4 > len(rom):
         return None
     h1 = rom[offset] | (rom[offset + 1] << 8)
@@ -119,7 +120,7 @@ def decode_thumb_bl(rom: bytes, offset: int) -> int | None:
 
 def main() -> None:
     if not LIBC.exists():
-        sys.exit("tools/agbcc/lib/libc.a yok. Once: make agbcc")
+        sys.exit("tools/agbcc/lib/libc.a is missing. First run: make agbcc")
     if len(sys.argv) != 3:
         sys.exit(__doc__)
     anchor_name, anchor_address = sys.argv[1], int(sys.argv[2], 16)
@@ -142,9 +143,9 @@ def main() -> None:
         mask = build_mask(len(text), reloc_offsets(obj))
         base = (anchor_address - ROM_BASE) - match[1]
 
-        print(f"{obj.name}  ({len(text)} byte)  capa: {anchor_name} @ "
+        print(f"{obj.name}  ({len(text)} bytes)  anchor: {anchor_name} @ "
               f"0x{anchor_address:08X}  ->  taban 0x{ROM_BASE + base:08X}\n")
-        print(f"{'fonksiyon':28} {'ROM adresi':>12} {'boyut':>6}  sabit byte uyumu")
+        print(f"{'function':28} {'ROM address':>12} {'size':>6}  fixed-byte agreement")
         print("-" * 74)
         exact = 0
         for name, offset, size in sorted(syms, key=lambda s: s[1]):
@@ -154,19 +155,19 @@ def main() -> None:
             if not fixed:
                 continue
             agree = sum(1 for i in fixed if rom[base + i] == text[i])
-            verdict = "TAM" if agree == len(fixed) else ""
+            verdict = "EXACT" if agree == len(fixed) else ""
             if verdict:
                 exact += 1
-            flag = "" if ROM_BASE + base + offset in known else " (haritada yok)"
+            flag = "" if ROM_BASE + base + offset in known else " (not in the map)"
             print(f"{name:28} 0x{ROM_BASE + base + offset:08X} {size:>6}  "
                   f"{agree}/{len(fixed)} {verdict}{flag}")
         print("-" * 74)
-        print(f"{exact} fonksiyon bu hizalamada birebir tutuyor.")
-        print("Kayma basladiktan sonraki satirlar anlamsizdir: bir fonksiyonun "
-              "boyutu farkliysa sonraki her sey oteler.")
+        print(f"{exact} functions match exactly at this alignment.")
+        print("Lines after the drift begins are meaningless: if one function's "
+              "size differs, everything after it shifts.")
         return
 
-    sys.exit(f"'{anchor_name}' libc.a icinde bulunamadi")
+    sys.exit(f"'{anchor_name}' was not found in libc.a")
 
 
 if __name__ == "__main__":

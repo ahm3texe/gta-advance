@@ -29,7 +29,7 @@ def matching_region_summary(csv_path: Path) -> tuple[int, list[tuple[int, int]]]
 
 
 def c_source_summary(csv_path: Path) -> tuple[int, int, set[str]]:
-    """(C kaynagi olan fonksiyon, C'den byte-matching olan, adresleri)."""
+    """(functions with a C source, those byte-matching from C, their addresses)."""
     if not csv_path.exists():
         return 0, 0, set()
     with csv_path.open(newline="", encoding="utf-8") as handle:
@@ -45,7 +45,7 @@ def main() -> int:
 
     invalid = [row for row in rows if row["status"] not in VALID_STATUSES]
     if invalid:
-        print(f"Hata: {len(invalid)} satırda geçersiz durum var.", file=sys.stderr)
+        print(f"Error: {len(invalid)} rows have an invalid status.", file=sys.stderr)
         return 1
 
     counts = Counter(row["status"] for row in rows)
@@ -67,15 +67,15 @@ def main() -> int:
         if row["status"] == "matching":
             matching_bytes += size
 
-    print(f"Fonksiyon haritası:       {total}")
-    print(f"İncelenmiş fonksiyon:   {documented}/{total} ({percent(documented)})")
+    print(f"Function map:             {total}")
+    print(f"Reviewed functions:     {documented}/{total} ({percent(documented)})")
     print(f"Belgelenen:           {documented}/{total} ({percent(documented)})")
-    print(f"Kaynaklaştırılan:     {decompiled}/{total} ({percent(decompiled)})")
+    print(f"With source:          {decompiled}/{total} ({percent(decompiled)})")
     print(f"Byte-matching:        {counts['matching']}/{total} ({percent(counts['matching'])})")
     if known_bytes:
         print(f"Matching kod byte:    {matching_bytes}/{known_bytes} ({100 * matching_bytes / known_bytes:.2f}%)")
     else:
-        print("Matching kod byte:    n/a (fonksiyon boyutları henüz bilinmiyor)")
+        print("Matching code bytes:  n/a (function sizes are not known yet)")
 
     c_total, c_matched, c_addresses = c_source_summary(csv_path.parent / "c_sources.csv")
     if c_total:
@@ -84,7 +84,7 @@ def main() -> int:
             for row in rows
             if row["address"].upper() in c_addresses and row["size"].strip()
         )
-        print(f"C kaynagi olan:       {c_total} fonksiyon, {c_matched} tanesi byte-matching")
+        print(f"With C source:        {c_total} functions, {c_matched} byte-matching")
         print(f"C'den matching byte:  {c_bytes}/{matching_bytes} "
               f"({100 * c_bytes / matching_bytes:.2f}% of matching)")
 
@@ -99,9 +99,9 @@ def main() -> int:
 
     region_bytes, regions = matching_region_summary(csv_path.parent / "matching_regions.csv")
     if regions:
-        print(f"Matching ROM bölgesi: {region_bytes} benzersiz byte")
+        print(f"Matching ROM region:  {region_bytes} unique bytes")
         start, end = max(regions, key=lambda interval: interval[1] - interval[0])
-        print(f"En büyük kesintisiz:   0x{start:08X}–0x{end - 1:08X} ({end - start} byte)")
+        print(f"Largest contiguous:   0x{start:08X}-0x{end - 1:08X} ({end - start} bytes)")
     return 0
 
 

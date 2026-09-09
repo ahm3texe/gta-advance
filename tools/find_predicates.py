@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""ROM'daki "kosullu sabit donus" yaprak fonksiyonlarini bulur.
+"""Find "conditional constant return" leaf functions in the ROM.
 
-Kalip (12 baytlik cekirdek, ardindan havuz + ikinci sabit):
-    ldr  rN, [pc, #imm]              <- havuzdan taban adres
-    ldr|ldrb|ldrh rD, [rN, #ofs]     <- alani oku
-    cmp  rD, #sabit
-    b<kosul> ILERI
-    movs r0, #sabit1                 <- dusme yolu
+The pattern (a 12-byte core, followed by the pool + a second constant):
+    ldr  rN, [pc, #imm]              <- base address from the pool
+    ldr|ldrb|ldrh rD, [rN, #ofs]     <- read the field
+    cmp  rD, #constant
+    b<cond> FORWARD
+    movs r0, #constant1              <- the fall-through path
     b    SON
-    ...havuz...
-    movs r0, #sabit2                 <- dal yolu
+    ...pool...
+    movs r0, #constant2              <- the branch path
     bx   lr
 
-C karsiligi mekanik:
-    u32 f(void) { if (sembol.alan == SABIT) return sabit2; return sabit1; }
+The C equivalent is mechanical:
+    u32 f(void) { if (symbol.field == CONST) return const2; return const1; }
 
-Kullanim: python3 tools/find_predicates.py [--all]
+Usage: python3 tools/find_predicates.py [--all]
 """
 import csv
 import sys
@@ -77,15 +77,15 @@ def main() -> None:
         offset = ((h[1] >> 6) & 0x1F) * scale
         want = h[2] & 0xFF
         fall = h[4] & 0xFF
-        # dal hedefindeki ikinci sabit
+        # the second constant at the branch target
         target = addr + 6 + 4 + ((h[3] & 0xFF) * 2)
         taken = hw(target) & 0xFF if (hw(target) & 0xFF00) == 0x2000 else None
         found.append((addr, sym, offset, kind, CONDS[cond], want, fall, taken,
                       ram.get(sym), row["name"]))
 
-    print(f"{len(found)} kosullu sabit donus")
+    print(f"{len(found)} conditional constant returns")
     for addr, sym, off, kind, cond, want, fall, taken, name, fname in found:
-        label = name or "(ram_map'te yok)"
+        label = name or "(not in ram_map)"
         t = taken if taken is not None else "?"
         print(f"0x{addr:08X}  {kind:3} 0x{sym:08X}+0x{off:02X} {cond} {want:<3} "
               f"-> {t}/{fall}  {label:22} {fname}")

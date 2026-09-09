@@ -1,10 +1,10 @@
 #!/bin/sh
-# agbcc (Nintendo'nun GBA icin yamalanmis GCC 2.8.1) derleyicisini kurar.
+# Install the agbcc compiler (Nintendo's GCC 2.8.1 patched for the GBA).
 #
 # ROM'un bu derleyiciyle uretildigi src/save/save_helpers.c uzerinde
 # byte duzeyinde dogrulandi; ayrinti docs/COMPILER.md icinde.
 #
-# Ikili dosyalar depoya girmez (8.8 MB); bu betik onlari yeniden uretir.
+# The binaries do not enter the repository (8.8 MB); this script rebuilds them.
 set -e
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -15,12 +15,12 @@ AGBCC_COMMIT=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["
 if [ -x "$ROOT/tools/agbcc/bin/agbcc" ] && [ "$1" != "--force" ]; then
     echo "agbcc zaten kurulu: tools/agbcc/bin/agbcc"
     python3 "$ROOT/tools/verify_toolchain.py"
-    echo "Yeniden kurmak icin: $0 --force"
+    echo "To reinstall: $0 --force"
     exit 0
 fi
 
 if ! command -v arm-none-eabi-as >/dev/null 2>&1 || ! command -v arm-none-eabi-ar >/dev/null 2>&1; then
-    echo "HATA: arm-none-eabi binutils bulunamadi." >&2
+    echo "ERROR: arm-none-eabi binutils not found." >&2
     echo "  brew install arm-none-eabi-binutils" >&2
     exit 1
 fi
@@ -37,13 +37,13 @@ if [ ! -d "$WORK" ]; then
     git -C "$WORK" fetch --depth 1 origin "$AGBCC_COMMIT"
     git -C "$WORK" checkout --detach FETCH_HEAD
 elif [ ! -d "$WORK/.git" ]; then
-    echo "HATA: $WORK var ama bir Git checkout'u degil." >&2
+    echo "ERROR: $WORK exists but is not a Git checkout." >&2
     exit 1
 elif [ "$(git -C "$WORK" rev-parse HEAD)" != "$AGBCC_COMMIT" ]; then
-    echo "HATA: $WORK beklenen agbcc revizyonunda degil." >&2
+    echo "ERROR: $WORK is not at the expected agbcc revision." >&2
     echo "  beklenen: $AGBCC_COMMIT" >&2
     echo "  bulunan:  $(git -C "$WORK" rev-parse HEAD)" >&2
-    echo "Farkli bos bir AGBCC_WORK dizini kullanin." >&2
+    echo "Use a different, empty AGBCC_WORK directory." >&2
     exit 1
 fi
 

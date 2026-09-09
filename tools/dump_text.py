@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Metin tablosunu YERELDE kendi ROM'undan okur.
+"""Read the text table LOCALLY from your own ROM.
 
-Cikti build/ altina yazilir ve depoya girmez (docs/ROADMAP.md: ROM'dan
-cikarilan varliklar paylasilmaz).
+The output is written under build/ and does not enter the repository
+(docs/ROADMAP.md: assets extracted from the ROM are not shared).
 
-Kullanim:
+Usage:
     python3 tools/dump_text.py            # ozet
-    python3 tools/dump_text.py --lang 4   # bir dilin dizelerini yaz
+    python3 tools/dump_text.py --lang 4   # write one language's strings
 """
 import argparse
 import pathlib
@@ -20,7 +20,7 @@ TABLE_START = 0x0EC46D4
 TABLE_END = 0x0EC771C
 ROM_BASE = 0x08000000
 LANG_COUNT = 5
-LANG_NAMES = ["ingilizce", "ispanyolca", "fransizca", "italyanca", "almanca"]
+LANG_NAMES = ["English", "Spanish", "French", "Italian", "German"]
 
 
 def read_cstr(rom, off, limit=1024):
@@ -34,19 +34,19 @@ def main():
     args = ap.parse_args()
 
     if not ROM.exists():
-        print(f"ROM yok: {ROM}")
+        print(f"no ROM: {ROM}")
         return 1
     rom = ROM.read_bytes()
     ptrs = [struct.unpack_from("<I", rom, o)[0] - ROM_BASE
             for o in range(TABLE_START, TABLE_END, 4)]
     per = len(ptrs) // LANG_COUNT
-    print(f"{len(ptrs)} giris, {LANG_COUNT} dil x {per} dize")
+    print(f"{len(ptrs)} entries, {LANG_COUNT} languages x {per} strings")
 
     if args.lang is None:
         for k in range(LANG_COUNT):
             seg = ptrs[k * per:(k + 1) * per]
-            print(f"  dil {k} ({LANG_NAMES[k]}): {min(seg):#09x} .. {max(seg):#09x}")
-        print("\nBir dili yazmak icin: --lang N  (cikti build/ altina)")
+            print(f"  language {k} ({LANG_NAMES[k]}): {min(seg):#09x} .. {max(seg):#09x}")
+        print("\nTo write one language: --lang N  (output under build/)")
         return 0
 
     seg = ptrs[args.lang * per:(args.lang + 1) * per]
@@ -54,11 +54,12 @@ def main():
     dest = OUT / f"text_lang{args.lang}.txt"
     with dest.open("w", encoding="utf-8") as fh:
         for i, p in enumerate(seg):
-            # Kodlama LATIN-1 (ISO-8859-1), ASCII DEGIL: 0xC9=E-akut, 0xD1=N-tilde,
-            # 0xC1=A-akut.  ASCII varsayimi aksanli dilleri okunamaz yapiyordu.
+            # The encoding is LATIN-1 (ISO-8859-1), NOT ASCII: 0xC9=E-acute,
+            # 0xD1=N-tilde, 0xC1=A-acute. Assuming ASCII made the accented
+            # languages unreadable.
             s = read_cstr(rom, p).decode("latin-1")
             fh.write(f"{i:04d}\t{p:#09x}\t{s}\n")
-    print(f"yazildi: {dest.relative_to(ROOT)} ({len(seg)} dize)")
+    print(f"written: {dest.relative_to(ROOT)} ({len(seg)} strings)")
     return 0
 
 

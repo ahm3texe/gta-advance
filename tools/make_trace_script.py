@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""ram_map.csv'den mGBA Lua izleme scripti uretir.
+"""Generate an mGBA Lua tracing script from ram_map.csv.
 
-mGBA 0.10.5'in Lua API'sinde kesme noktasi (setBreakpoint) YOK; elimizde
-read8/16/32 ve kare geri cagrisi var.  Bu yuzden yaklasim: her karede
-bilinen RAM sembollerini tarayip DEGISENLERI, o andaki tus durumuyla
-birlikte loglamak.
+mGBA 0.10.5's Lua API has NO breakpoints (setBreakpoint); what we have is
+read8/16/32 and a frame callback. Hence the approach: scan the known RAM symbols
+every frame and log the ONES THAT CHANGED, together with the key state at that
+moment.
 
-Kullanim:
+Usage:
     python3 tools/make_trace_script.py
     -> tools/trace.lua
 
@@ -34,17 +34,17 @@ SAMPLE_WORDS = 4
 LUA_TEMPLATE = r"""-- OTOMATIK URETILDI: tools/make_trace_script.py
 -- Elle duzenleme; ram_map.csv'yi guncelleyip ureteci tekrar calistir.
 --
--- mGBA 0.10.5 icin RAM degisim izleyicisi.
+-- RAM change tracer for mGBA 0.10.5.
 -- Yukleme: Tools > Scripting... > Load script
 -- Log:     __LOG_PATH__
 
 -- CIFT YUKLEME KORUMASI.  Script birden fazla kez yuklenirse mGBA her
 -- ornegin kare geri cagrisini AYRI KAYITLI tutuyor ve her degisiklik
--- birden fazla kez, farkli kare sayaclariyla loglaniyor (bir kez basimiza
--- geldi: ayni gecis f32645 ve f620 olarak iki kez gorundu).  Onceki
+-- logged more than once with different frame counters (this happened to us:
+-- the same transition appeared twice, as f32645 and f620). The previous
 -- ornegi burada etkisizlestiriyoruz.
--- Boolean bayrak YETMEZ: ikinci yukleme de ayni degeri yazar ve eski
--- ornek "farkli mi" sinamasindan gecip calismaya devam eder.  Her
+-- A boolean flag is NOT ENOUGH: the second load writes the same value, so the
+-- old instance passes the "is it different" test and keeps running. Each
 -- yuklemede ARTAN bir sayac gerekiyor.
 _G.__TRACE_EPOCH = (_G.__TRACE_EPOCH or 0) + 1
 local MY_EPOCH = _G.__TRACE_EPOCH
@@ -58,13 +58,13 @@ __ENTRIES__
 }
 
 local prev    = {}
-local nchg    = {}   -- sembol basina degisim sayisi
+local nchg    = {}   -- number of changes per symbol
 local noisy   = {}   -- gurultulu diye susturulanlar
 local frame   = 0
 local fh      = nil
 local keys_ok = true
 
--- Her karede degisen sayaclar/RNG logu bogar.  Bir sembol bu esigi
+-- Counters/RNG that change every frame flood the log. Once a symbol exceeds
 -- gecerse susturulup bir kez rapor ediliyor.
 local NOISE_LIMIT = 30
 
@@ -91,7 +91,7 @@ local function keyString()
   local ok, mask = pcall(function() return emu:getKeys() end)
   if not ok or type(mask) ~= "number" then
     keys_ok = false
-    out("[uyari] emu:getKeys() yok; tus sutunu kapatildi")
+    out("[warning] emu:getKeys() is unavailable; the key column is disabled")
     return ""
   end
   local held = {}
@@ -102,14 +102,14 @@ local function keyString()
   return " [" .. table.concat(held, "+") .. "]"
 end
 
--- Dogrulama ILK KAREDE yapiliyor, script yuklenirken DEGIL: `emu`
+-- Validation happens ON THE FIRST FRAME, NOT while the script loads: `emu`
 -- nesnesi yukleme aninda henuz hazir olmuyor ve acilista dogrulamak
 -- tum listeyi bosaltip oturumu sifir veriyle bitiriyordu.
 local validated = false
 
 -- "hepsi basarisiz" belirtisi iki ayri sebepten olabilir: `emu` hazir
--- degil, YA DA metot adlari bu surumde farkli.  Ikisi ayni gorunuyor,
--- o yuzden once API bicimini yoklayip HATA METNINI yaziyoruz; boylece
+-- ready, OR the method names differ in this version. The two look the same,
+-- so we probe the API form first and print the ERROR TEXT; that way
 -- tek bir oturum hangisi oldugunu kesin soyluyor.
 local function probeApi()
   local probe = 0x02000000
@@ -128,11 +128,11 @@ local function probeApi()
       out(string.format("  CALISTI  %-26s -> %s", name, tostring(res)))
       if winner == nil then winner = name end
     else
-      out(string.format("  hata     %-26s -> %s", name, tostring(res)))
+      out(string.format("  error    %-26s -> %s", name, tostring(res)))
     end
   end
   if winner == nil then
-    out("[HATA] hicbir okuma bicimi calismadi. Yukaridaki hata metinlerini")
+    out("[ERROR] no read form worked. Report the error texts above")
     out("       Claude'a gonder; dogru API bicimi oradan cikar.")
   else
     out("kullanilan bicim: " .. winner)
@@ -156,7 +156,7 @@ local function validateOnce()
       bad = bad + 1
     end
   end
-  out(string.format("izleme aktif: %d sembol (%d atlandi), gurultu esigi %d",
+  out(string.format("tracing active: %d symbols (%d skipped), noise threshold %d",
         #WATCH, bad, NOISE_LIMIT))
 end
 
@@ -169,7 +169,7 @@ local function onFrame()
   for i = 1, #WATCH do
     if not noisy[i] then
       local e = WATCH[i]
-      -- pcall YOK: adresler acilista bir kez dogrulandi, sicak dongude
+      -- NO pcall: the addresses were validated once at startup, and in the hot loop
       -- kare basina 135 pcall emulatoru gereksiz yavaslatiyordu.
       local val = readN(e[1], e[2])
       local old = prev[i]
@@ -199,7 +199,7 @@ else
   console:log("[uyari] log dosyasi acilamadi: " .. LOG_PATH)
 end
 
-out(string.format("script yuklendi: %d sembol; dogrulama ilk karede", #WATCH))
+out(string.format("script loaded: %d symbols; validation on the first frame", #WATCH))
 callbacks:add("frame", onFrame)
 """
 
@@ -208,7 +208,7 @@ def validate_lua(text: str):
     """Kapanmamis string literali olan satirlari dondur.
 
     Lua'da string literalleri satir sonunu gecemez.  Kacis hatasi tam
-    olarak bunu uretiyordu, o yuzden uretim bunun uzerinde durur.
+    produced this form, so generation builds on it.
     """
     bad = []
     for i, line in enumerate(text.splitlines(), 1):
@@ -265,17 +265,17 @@ def main() -> int:
     problems = validate_lua(lua)
     if problems:
         for line_no, text in problems:
-            print(f"HATA: satir {line_no}: kapanmamis string -> {text.strip()[:60]}")
+            print(f"ERROR: line {line_no}: unterminated string -> {text.strip()[:60]}")
         return 1
 
     OUT.write_text(lua)
 
     print(f"yazildi: {OUT.relative_to(ROOT)}")
-    print(f"  izlenen: {len(watched)} sembol")
+    print(f"  traced: {len(watched)} symbols")
     print(f"  atlanan: {len(skipped)} (MMIO/ROM) -> {', '.join(skipped)}")
     if sampled:
         blind = sum(size - seen for _, size, seen in sampled)
-        print(f"  ORNEKLENEN: {len(sampled)} buyuk dizi, {blind} bayt izlenmiyor")
+        print(f"  SAMPLED: {len(sampled)} large arrays, {blind} bytes not traced")
         for name, size, seen in sorted(sampled, key=lambda x: -x[1])[:6]:
             print(f"    {name:<22} {size:>6} bayttan ilk {seen}")
     print(f"  log:     {LOG.relative_to(ROOT)}")

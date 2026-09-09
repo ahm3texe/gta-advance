@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""C kaynagini agbcc ile derleyip ROM adresine linkleyen ortak katman.
+"""Shared layer that compiles a C source with agbcc and links it at its ROM address.
 
-Linkleme sart: `bl` komutlari hedef adres cozulmeden dogru byte uretmez, bu
-yuzden yaprak olmayan hicbir fonksiyon linklenmeden dogrulanamaz. Dis semboller
-data/functions.csv'deki ROM adreslerinden cozulur.
+Linking is required: `bl` instructions do not produce the correct bytes until
+the target address is resolved, so no non-leaf function can be verified without
+it. External symbols are resolved from the ROM addresses in data/functions.csv.
 """
 import csv
 import subprocess
@@ -20,19 +20,19 @@ BUILD = ROOT / "build/cmatch"
 DEFAULT_CC = "old_agbcc"
 CC1FLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
 
-# ARM kipi.  ROM'un 0x0806xxxx bolgesindeki 18 fonksiyon ARM kipinde ve
-# bunlar simdiye kadar DERLENEMIYORDU: zincir yalnizca Thumb'a bagliydi.
-# Araç zincirinde `agbcc_arm` bastan beri duruyordu.
-# Kaynak dosyada ARM_MARKER satiri varsa bu yol kullanilir.
+# ARM mode. The 18 functions in the ROM's 0x0806xxxx region are in ARM mode and
+# until now COULD NOT BE COMPILED: the chain was tied to Thumb only.
+# `agbcc_arm` had been sitting in the toolchain from the start.
+# This path is used when the source file contains an ARM_MARKER line.
 ARM_MARKER = "MODE: ARM"
 ARM_CC = "agbcc_arm"
-# `-fhex-asm` agbcc_arm tarafindan TANINMIYOR (olculdu); digerleri kabul.
-# -fomit-frame-pointer OLCULDU: onsuz agbcc_arm APCS cercevesi kuruyor
-# (mov ip,sp / stmfd {fp,ip,lr,pc} / sub fp,ip,#4) ve cikti ~48 bayt
-# uzuyor; ROM duz push kullaniyor.
-# -fno-schedule-insns / -fno-schedule-insns2 OLCULDU: bunlar olmadan
-# agbcc_arm yigin cercevesi kurup ara sonuclari tasiriyordu.  Ilk ARM
-# adayinda etkisi 240 -> 216 -> 188 bayt (ROM 196).  Kalici olarak eklendi.
+# `-fhex-asm` is NOT RECOGNIZED by agbcc_arm (measured); the others are accepted.
+# -fomit-frame-pointer MEASURED: without it agbcc_arm builds an APCS frame
+# (mov ip,sp / stmfd {fp,ip,lr,pc} / sub fp,ip,#4) and the output grows by
+# about 48 bytes; the ROM uses a plain push.
+# -fno-schedule-insns / -fno-schedule-insns2 MEASURED: without them agbcc_arm
+# built a stack frame and spilled intermediates. On the first ARM candidate the
+# effect was 240 -> 216 -> 188 bytes (ROM 196). Added permanently.
 ARM_CC1FLAGS = [
     "-mthumb-interwork", "-O2", "-fomit-frame-pointer",
     "-fno-schedule-insns", "-fno-schedule-insns2",
@@ -43,7 +43,7 @@ ROM_BASE = 0x08000000
 def run(cmd: list[str], stdout: Path | None = None) -> str:
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        sys.exit(f"HATA: {' '.join(cmd)}\n{result.stderr.strip()}")
+        sys.exit(f"ERROR: {' '.join(cmd)}\n{result.stderr.strip()}")
     if stdout is not None:
         stdout.write_text(result.stdout, encoding="utf-8")
     return result.stdout
@@ -55,7 +55,7 @@ def function_rows() -> dict[str, dict[str, str]]:
 
 
 def ram_rows() -> dict[str, dict[str, str]]:
-    """RAM sembolleri: kod adresi olmayan dis semboller buradan cozulur."""
+    """RAM symbols: external symbols without a code address resolve from here."""
     if not RAM_MAP.exists():
         return {}
     with RAM_MAP.open(newline="", encoding="utf-8") as handle:
@@ -83,12 +83,12 @@ def _undefined(obj: Path) -> list[str]:
 def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     """C dosyasini derler, ROM adresine linkler ve sonuclari dondurur.
 
-    Donen deger: (linklenmis ikili, {fonksiyon: (ofset, boyut)}, taban adres)
+    Returns: (linked binary, {function: (offset, size)}, base address)
     Ofsetler ikilinin basina goredir.
     """
     agbcc = AGBCC_DIR / compiler
     if not agbcc.exists():
-        sys.exit(f"{compiler} kurulu degil. Once: make agbcc")
+        sys.exit(f"{compiler} is not installed. First run: make agbcc")
     if not ROM_PATH.exists():
         sys.exit("baserom.gba yok. Once: make prepare-rom ROM_ZIP=...")
 
@@ -99,7 +99,7 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     if is_arm:
         agbcc = AGBCC_DIR / ARM_CC
         if not agbcc.exists():
-            sys.exit(f"{ARM_CC} kurulu degil. Once: make agbcc")
+            sys.exit(f"{ARM_CC} is not installed. First run: make agbcc")
         flags = ARM_CC1FLAGS
     else:
         flags = CC1FLAGS
@@ -113,13 +113,13 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     rows = function_rows()
     # Dis semboller assembler'a .equ ile verilir: `bl` boylece dogrudan
     # kodlanir ve linker'a hic gitmez. Linker'a birakilirsa, mutlak sembolu
-    # Thumb fonksiyonu olarak tanimadigi icin araya interworking veneer'i
+    # Because it is not recognized as a Thumb function, an interworking veneer
     # sokar ve `bl` hedefi yanlis cikar.
     ram = ram_rows()
     externs = []
     for name in _undefined(Path(f"{stem}.probe.o")):
-        # `__thumb` soneki: sembol adresi | 1 olarak cozumlenir. Saklanan
-        # fonksiyon isaretcilerinde Thumb biti kurulu olmali; `bl` hedefinde
+        # The `__thumb` suffix resolves to the symbol address | 1. Stored
+        # function pointers must have the Thumb bit set; in a `bl` target
         # ise bit eklemek dal ofsetini bozar, o yuzden AYRI bir ad kullanilir.
         thumb = name.endswith("__thumb")
         key = name[: -len("__thumb")] if thumb else name
@@ -130,9 +130,9 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
         value = int(row["address"], 16) | (1 if thumb else 0)
         externs.append(f"    .equ {name}, {value:#x}\n")
     source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
-    # Bolum sonu dolgusu: `as` Thumb bolumlerini varsayilan olarak NOP (0x46C0)
+    # Section-end padding: `as` pads Thumb sections with NOP (0x46C0) by default
     # ile doldurur, ROM ise sifirla dolduruyor. Acik hizalama bunu duzeltir.
-    # ARM komutlari 4 bayt; Thumb 2.  Yanlis hizalama bolum sonunda
+    # ARM instructions are 4 bytes, Thumb 2. Wrong alignment at the section end
     # fazladan dolgu birakip boyutu kaydiriyor.
     align = "4" if is_arm else "2"
     Path(f"{stem}.s").write_text(
@@ -147,10 +147,10 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
 
     known = [rows[name] for name in defined if name in rows]
     if not known:
-        sys.exit(f"{source} icindeki hicbir fonksiyon data/functions.csv'de yok")
+        sys.exit(f"no function in {source} is in data/functions.csv")
     base = min(int(row["address"], 16) for row in known)
 
-    # Bolum adresi acikca verilir: agbcc .text'i 8'e hizaliyor ve taban adres
+    # The section address is set explicitly: agbcc aligns .text to 8, and if the
     # 8'in kati degilse linker bolumu ileri iterek tum olcumleri kaydiriyor.
     script = Path(f"{stem}.ld")
     script.write_text(

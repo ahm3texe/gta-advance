@@ -1,18 +1,19 @@
 // Export many functions' initial Ghidra C output in ONE headless run.
 //
-// Neden var: her analyzeHeadless cagrisi JVM + proje acilisi yuzunden
-// yaklasik bir dakika harciyor.  Tek tek cagirmak 30 fonksiyon icin yarim
-// saat demek; bu betik ayni acilista hepsini cikariyor.
+// Why it exists: each analyzeHeadless invocation spends about a minute on the
+// JVM plus opening the project. Invoking it one function at a time would mean
+// half an hour for 30 functions; this script exports them all in one startup.
 //
-// Kullanim (tools/ghidra_headless.sh uzerinden):
-//   -postScript ExportDecompileBatch.java <adres_listesi> <cikti_dizini>
-// Adres listesi satir basina "0xADRES ad [boyut]" bicimindedir; ad
-// verilmezse Ghidra'nin kendi adi kullanilir.
+// Usage (through tools/ghidra_headless.sh):
+//   -postScript ExportDecompileBatch.java <address_list> <output_directory>
+// The address list has the form "0xADDRESS name [size]" per line; without a
+// name, Ghidra's own name is used.
 //
-// Boyut verilirse ve o adreste fonksiyon yoksa, once THUMB KIPI kuruluyor:
-// Ghidra'nin otomatik analizi bazi girisleri ARM kipinde cozmeye calisip
-// "bad instruction data" ile birakiyor (7 kacirilan giristen 5'i boyleydi).
-// TMode yazmacini 1 yapip bolgeyi temizleyip yeniden sokmek gerekiyor.
+// If a size is given and there is no function at that address, THUMB MODE is
+// set first: Ghidra's automatic analysis tries to decode some entries in ARM
+// mode and gives up with "bad instruction data" (5 of 7 missed entries were
+// like this). The TMode register must be set to 1, the region cleared and
+// re-disassembled.
 //
 //@category GTAAdvance
 
@@ -66,7 +67,7 @@ public class ExportDecompileBatch extends GhidraScript {
                         // Boyut verilmisse THUMB ONARIMI kosulsuz yapilir.
                         // Ghidra bazi girisleri ARM kipinde cozup "bad
                         // instruction data" ile birakiyor; boyle bir
-                        // fonksiyon ONCEKI kosudan kalmis olabilecegi icin
+                        // because the function may be left over from a PREVIOUS run
                         // "yoksa olustur" yetmez, VARSA DA yeniden kurulur.
                         if (parts.length > 2) {
                             int span = Integer.decode(parts[2]);
@@ -89,7 +90,7 @@ public class ExportDecompileBatch extends GhidraScript {
                         if (function == null) {
                             function = createFunction(address, want);
                             if (function == null) {
-                                println("ATLANDI (fonksiyon kurulamadi): " + addrText);
+                                println("SKIPPED (could not create function): " + addrText);
                                 fail++;
                                 continue;
                             }
@@ -117,7 +118,7 @@ public class ExportDecompileBatch extends GhidraScript {
                         println("OK " + addrText + " -> " + output.getName());
                         ok++;
                     } catch (Exception e) {
-                        println("HATA " + addrText + ": " + e.getMessage());
+                        println("ERROR " + addrText + ": " + e.getMessage());
                         fail++;
                     }
                 }

@@ -1,7 +1,7 @@
 #!/bin/sh
-# pret/agbcc'nin eski GCC kaynaklarini modern macOS Clang ile derleyen
-# tekrarlanabilir host-compiler sarmalayicisi. setup_agbcc.sh ve toolchain
-# yeniden-uretme deneyi ayni bayraklari bu tek dosyadan kullanir.
+# A reproducible host-compiler wrapper that builds pret/agbcc's old GCC sources
+# with modern macOS Clang. setup_agbcc.sh and the toolchain reproduction
+# experiment take the same flags from this single file.
 exec "${AGBCC_HOST_CC:-clang}" -std=gnu89 -fcommon \
   -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion \
   -Wno-return-type -Wno-incompatible-pointer-types \

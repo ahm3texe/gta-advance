@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""Bir fonksiyonun temel blok (basic block) grafigini cikarir.
+"""Extract a function's basic block graph.
 
-Dallarin hedeflerini OZYINELEMELI izler; yalnizca giristen ULASILABILIR
-adresleri komut olarak cozer, boylece literal havuzu asla komut sanmaz
-(bu oturumda ayni hata iki arac tarafindan yapildi).
+Branch targets are followed RECURSIVELY; only addresses REACHABLE from the
+entry are decoded as instructions, so a literal pool is never mistaken for
+code (two tools made that same mistake in this session).
 
-Cikti: her blok icin baslangic/bitis, sonlandirici komut, ardillari ve
-kac oncelinin oldugu. Birden fazla oncele sahip bloklar BIRLESME NOKTASI
-olarak isaretlenir -- kaynakta genellikle ortak kuyruk ya da etiket
-demektir.
+Output: for each block, its start/end, terminating instruction, successors and
+how many predecessors it has. Blocks with more than one predecessor are marked
+as a JOIN POINT -- in the source that usually means a shared tail or a label.
 
-Kullanim: python3 tools/dump_cfg.py <adres|ad>
+Usage: python3 tools/dump_cfg.py <address|name>
 """
 import csv
 import sys
@@ -30,7 +29,7 @@ def resolve(target: str) -> tuple:
     for row in rows:
         if row["name"] == target or row["address"].lower() == want:
             return int(row["address"], 16), int(row["size"] or 0), row["name"]
-    sys.exit(f"{target} data/functions.csv icinde yok")
+    sys.exit(f"{target} is not in data/functions.csv")
 
 
 def main() -> None:
@@ -45,7 +44,7 @@ def main() -> None:
 
     end = addr + size
     leaders = {addr}
-    edges = {}          # blok sonlandiricisi -> (tur, ardillar)
+    edges = {}          # block terminator -> (kind, successors)
     seen = set()
     pending = [addr]
 
@@ -54,7 +53,7 @@ def main() -> None:
         while addr <= pc < end and pc not in seen:
             seen.add(pc)
             h = hw(pc)
-            if (h & 0xF800) == 0xF000:              # 32 bit bl
+            if (h & 0xF800) == 0xF000:              # 32-bit bl
                 seen.add(pc + 2)
                 pc += 4
                 continue
@@ -67,7 +66,7 @@ def main() -> None:
                 leaders.update({tgt, nxt})
                 pending.extend([tgt, nxt])
                 break
-            if (h & 0xF800) == 0xE000:              # kosulsuz dal
+            if (h & 0xF800) == 0xE000:              # unconditional branch
                 off = h & 0x7FF
                 off = off - 2048 if off > 1023 else off
                 tgt = pc + 4 + off * 2
@@ -90,13 +89,13 @@ def main() -> None:
             if s in preds:
                 preds[s] += 1
 
-    print(f"\n{name} @ 0x{addr:08X}  {size} bayt  {len(blocks)} blok\n")
+    print(f"\n{name} @ 0x{addr:08X}  {size} bytes  {len(blocks)} blocks\n")
     for i, b in enumerate(blocks):
         stop = blocks[i + 1] if i + 1 < len(blocks) else end
         term = next((t for t in sorted(edges) if b <= t < stop), None)
-        kind, succs = edges.get(term, ("(dusme)", [stop]))
-        tag = "  <- BIRLESME" if preds.get(b, 0) > 1 else ""
-        arrow = " ".join(f"0x{s:08X}" for s in succs) or "(donus)"
+        kind, succs = edges.get(term, ("(fall)", [stop]))
+        tag = "  <- JOIN" if preds.get(b, 0) > 1 else ""
+        arrow = " ".join(f"0x{s:08X}" for s in succs) or "(return)"
         print(f"  B{i:<2} 0x{b:08X}..0x{stop:08X}  {kind:<6} -> {arrow}"
               f"   onceller={preds.get(b, 0)}{tag}")
 

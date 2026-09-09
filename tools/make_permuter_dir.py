@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Bir fonksiyon icin decomp-permuter calisma dizini kurar.
+"""Set up a decomp-permuter working directory for a function.
 
-Kullanim: python3 tools/make_permuter_dir.py <kaynak.c> <FonksiyonAdi> <adres> <boyut>
-Cikti:    build/permuter/<FonksiyonAdi>/{base.c,target.o,settings.toml,compile.sh}
+Usage:  python3 tools/make_permuter_dir.py <source.c> <FunctionName> <address> <size>
+Output: build/permuter/<FunctionName>/{base.c,target.o,settings.toml,compile.sh}
 
-ESLEME SEMBOLLERI: kod govdesi `$t`, literal havuz `$d`.  Havuz `$t` icinde
-kalirsa objdump onu komut diye cozer ve permuter yanlis hedefe kosar
+MAPPING SYMBOLS: the code body is `$t`, the literal pool `$d`. If the pool stays
+inside `$t`, objdump decodes it as instructions and the permuter chases the wrong
+target
 (ClearTextArea'da olculdu: 66 gorunen komut, gercek 61).  Kod sonu
 tools/dump_cfg.py'nin blok araliklarindan aliniyor.
 """
@@ -20,8 +21,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 from audit_boundaries import Walker  # noqa: E402
 
 def regions(rom: bytes, addr: int, size: int):
-    """(tur, bayt) listesi: tur 't' (komut) ya da 'd' (havuz). Ozyinelemeli
-    inisle cozulur; havuz fonksiyon ORTASINDA olsa bile dogru ayrilir."""
+    """A list of (kind, bytes): kind is 't' (code) or 'd' (pool). Resolved by
+    recursive descent; the pool is separated correctly even MID-function."""
     w = Walker(rom, addr); w.run()
     out = []
     for a in range(addr, addr + size, 2):
@@ -51,12 +52,12 @@ def main():
             for i in range(0, len(chunk), 2):
                 lines.append(f"    .short {int.from_bytes(chunk[i:i+2], 'little'):#06x}")
             npool += len(chunk)
-    code = b"\0" * ncode; pool = b"\0" * npool   # yalnizca ozet icin
+    code = b"\0" * ncode; pool = b"\0" * npool   # for the summary only
     (work / "target.s").write_text("\n".join(lines) + "\n")
     subprocess.run(["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork",
                     "-o", str(work / "target.o"), str(work / "target.s")], check=True)
 
-    # base.c: onislemciden gecmis, kendi kendine yeten, govde PERM_RANDOMIZE icinde
+    # base.c: preprocessed, self-contained, with the body inside PERM_RANDOMIZE
     pre = subprocess.run(["cpp", "-nostdinc", "-undef", "-P", f"-I{ROOT/'include'}", str(src)],
                          capture_output=True, text=True, check=True).stdout
     m = re.search(rf"\b{re.escape(name)}\s*\([^)]*\)\s*\{{", pre)
@@ -79,7 +80,7 @@ def main():
     (work / "compile.sh").write_text(
         "#!/bin/sh\n" f'exec python3 "{ROOT}/tools/permuter_compile.py" "$@"\n')
     (work / "compile.sh").chmod(0o755)
-    print(f"{name}: kod {len(code)} B ({len(code)//2} komut) + havuz {len(pool)} B -> {work.relative_to(ROOT)}")
+    print(f"{name}: code {len(code)} B ({len(code)//2} insns) + pool {len(pool)} B -> {work.relative_to(ROOT)}")
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""build/trace.log'u ozetler: sembol basina degisim, deger gecisleri, isaretci cozumu.
+"""Summarize build/trace.log: changes per symbol, value transitions, pointer resolution.
 
-Kullanim:
-    python3 tools/analyze_trace.py                 # son oturumun ozeti
-    python3 tools/analyze_trace.py --list          # logdaki tum oturumlar
-    python3 tools/analyze_trace.py --session 2     # 2. oturumu incele
-    python3 tools/analyze_trace.py gSessionPtr     # tek sembolun gecisleri
+Usage:
+    python3 tools/analyze_trace.py                 # summary of the last session
+    python3 tools/analyze_trace.py --list          # all sessions in the log
+    python3 tools/analyze_trace.py --session 2     # examine session 2
+    python3 tools/analyze_trace.py gSessionPtr     # transitions of one symbol
 """
 import csv
 import pathlib
@@ -27,16 +27,16 @@ def ram_symbols():
 
 
 def classify(value, syms):
-    """Bir degeri adres olarak yorumlamayi dene."""
+    """Try to interpret a value as an address."""
     if value in syms:
-        return f"= {syms[value]} (BILINEN SEMBOL)"
+        return f"= {syms[value]} (KNOWN SYMBOL)"
     region = REGIONS.get(value >> 24)
     return f"-> {region}" if region else ""
 
 
 def sessions(lines):
-    """Log birden cok oturum tutar; her biri ayri dondurulur."""
-    marks = [i for i, l in enumerate(lines) if "yeni oturum" in l]
+    """The log holds several sessions; each is returned separately."""
+    marks = [i for i, l in enumerate(lines) if "new session" in l]
     if not marks:
         return [lines]
     bounds = marks + [len(lines)]
@@ -44,18 +44,18 @@ def sessions(lines):
 
 
 def pick_session(lines, index):
-    """index: None -> sonuncu, 1-tabanli sayi -> o oturum."""
+    """index: None -> the last one, a 1-based number -> that session."""
     blocks = sessions(lines)
     if index is None:
         return blocks[-1], len(blocks), len(blocks)
     if not 1 <= index <= len(blocks):
-        raise SystemExit(f"oturum {index} yok; logda {len(blocks)} oturum var")
+        raise SystemExit(f"no session {index}; the log holds {len(blocks)} sessions")
     return blocks[index - 1], index, len(blocks)
 
 
 def main(argv):
     if not LOG.exists():
-        print(f"log yok: {LOG}")
+        print(f"no log: {LOG}")
         return 1
     lines = LOG.read_text(errors="replace").splitlines()
     idx = None
@@ -64,13 +64,13 @@ def main(argv):
         argv = [a for i, a in enumerate(argv)
                 if i not in (argv.index("--session"), argv.index("--session") + 1)]
     sess, used, total = pick_session(lines, idx)
-    print(f"[oturum {used}/{total}]")
+    print(f"[session {used}/{total}]")
     events = [(int(m.group(1)), m.group(2), m.group(3))
               for m in (LINE.match(l) for l in sess) if m]
     if not events:
-        print("bu oturumda degisim kaydi yok.")
+        print("no change records in this session.")
         for l in sess:
-            if "HATA" in l or "uyari" in l or "CALISTI" in l or "hata" in l:
+            if "ERROR" in l or "warning" in l or "STARTED" in l or "error" in l:
                 print(" ", l)
         return 1
 
@@ -78,20 +78,20 @@ def main(argv):
 
     if len(argv) > 1 and argv[1] == "--list":
         blocks = sessions(lines)
-        print(f"logda {len(blocks)} oturum:")
+        print(f"{len(blocks)} sessions in the log:")
         for i, b in enumerate(blocks, 1):
             ev = [l for l in b if LINE.match(l)]
             frames = [int(LINE.match(l).group(1)) for l in ev] or [0]
-            print(f"  oturum {i}: {len(ev):>5} olay, kare {min(frames)}-{max(frames)}")
+            print(f"  session {i}: {len(ev):>5} events, frames {min(frames)}-{max(frames)}")
         return 0
 
     if len(argv) > 1:
         name = argv[1]
         rows = [(f, r) for f, n, r in events if n == name]
         if not rows:
-            print(f"{name}: bu oturumda degisim yok")
+            print(f"{name}: no changes in this session")
             return 0
-        print(f"=== {name} ({len(rows)} degisim) ===")
+        print(f"=== {name} ({len(rows)} changes) ===")
         for frame, raw in rows:
             note = ""
             m = re.match(r"^(\S+) -> (\S+)$", raw)
@@ -100,22 +100,22 @@ def main(argv):
             print(f"  f{frame:<7} {raw} {note}")
         return 0
 
-    suppressed = [(f, n) for f, n, r in events if "SUSTURULDU" in r]
+    suppressed = [(f, n) for f, n, r in events if "SUPPRESSED" in r]
     counts, first = defaultdict(int), {}
     for f, n, r in events:
-        if "SUSTURULDU" in r:
+        if "SUPPRESSED" in r:
             continue
         counts[n] += 1
         first.setdefault(n, f)
 
     frames = [f for f, _, _ in events]
-    print(f"olay {len(events)}, kare {frames[0]}-{frames[-1]}, "
-          f"sembol {len(counts)}, susturulan {len(suppressed)}\n")
-    print("--- sembol basina degisim (cok -> az) ---")
+    print(f"{len(events)} events, frames {frames[0]}-{frames[-1]}, "
+          f"{len(counts)} symbols, {len(suppressed)} suppressed\n")
+    print("--- changes per symbol (most -> least) ---")
     for n, c in sorted(counts.items(), key=lambda x: (-x[1], first[x[0]])):
-        print(f"  {c:>4}x  ilk f{first[n]:<7} {n}")
+        print(f"  {c:>4}x  first f{first[n]:<7} {n}")
     if suppressed:
-        print("\n--- gurultu esigini asip susturulanlar ---")
+        print("\n--- suppressed for exceeding the noise threshold ---")
         for f, n in suppressed:
             print(f"  f{f:<7} {n}")
     return 0

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kardes fonksiyon bandinin sabit hedefini ve sonuclarini dogrula."""
+"""Validate the sibling function band's fixed target set and its outcomes."""
 
 import csv
 import io
@@ -29,7 +29,7 @@ def baseline_functions():
         capture_output=True,
     )
     if result.returncode:
-        sys.exit(f"kardes bandi baseline'i okunamadi: {BASE_REVISION}")
+        sys.exit(f"could not read the sibling band baseline: {BASE_REVISION}")
     return list(csv.DictReader(io.StringIO(result.stdout)))
 
 
@@ -56,15 +56,15 @@ def select_band(rows):
 
 
 def main():
-    # Hedef kumesi baseline'da donduruldu: adres + boyut kimliktir. Ad kolonu
-    # kimlik degil; fonksiyon tanimlandikca FUN_ yer tutucusundan gercek ada
-    # gecer, bu yuzden karsilastirmaya girmez.
+    # The target set is frozen in the baseline: address + size is the identity.
+    # The name column is not identity; as a function is identified it moves from
+    # the FUN_ placeholder to a real name, so it is excluded from the comparison.
     expected = select_band(baseline_functions())
     manifest = load_csv(ROOT / "data/sibling_band.csv")
     actual = [(row["address"], int(row["size"])) for row in manifest]
     errors = []
     if actual != expected:
-        errors.append("data/sibling_band.csv hedefleri baseline secimiyle uyusmuyor")
+        errors.append("the targets in data/sibling_band.csv do not match the baseline selection")
 
     current = {row["address"].lower(): row
                for row in load_csv(ROOT / "data/functions.csv")}
@@ -73,27 +73,27 @@ def main():
         outcome = row["outcome"]
         function = current.get(address)
         if function is None:
-            errors.append(f"{row['address']}: data/functions.csv kaydi yok")
+            errors.append(f"{row['address']}: no record in data/functions.csv")
             continue
         if not row["evidence"].strip():
-            errors.append(f"{row['address']}: kanit bos")
+            errors.append(f"{row['address']}: evidence is empty")
         if outcome == "matching":
             if function["status"] != "matching":
-                errors.append(f"{row['address']}: manifest matching ama fonksiyon matching degil")
+                errors.append(f"{row['address']}: the manifest says matching but the function is not")
             if not row["source"]:
-                errors.append(f"{row['address']}: matching kaynak yolu bos")
+                errors.append(f"{row['address']}: the matching source path is empty")
         elif outcome == "parked":
             if function["status"] == "matching":
-                errors.append(f"{row['address']}: artik matching; manifest guncellenmeli")
+                errors.append(f"{row['address']}: it is matching now; the manifest must be updated")
             if not row["source"] and not row["evidence"].startswith("ROM statik triyaj:"):
-                errors.append(f"{row['address']}: kaynaksiz park icin ROM triyaj kaniti yok")
+                errors.append(f"{row['address']}: no ROM triage evidence for a park without source")
         else:
-            errors.append(f"{row['address']}: gecersiz sonuc {outcome!r}")
+            errors.append(f"{row['address']}: invalid outcome {outcome!r}")
         if row["source"] and not (ROOT / row["source"]).is_file():
-            errors.append(f"{row['address']}: kaynak bulunamadi: {row['source']}")
+            errors.append(f"{row['address']}: source not found: {row['source']}")
 
     if errors:
-        print("KARDES BANDI: HATA")
+        print("SIBLING BAND: ERROR")
         for error in errors:
             print(f"  - {error}")
         raise SystemExit(1)
@@ -103,9 +103,9 @@ def main():
                          if row["outcome"] == "matching")
     total_bytes = sum(int(row["size"]) for row in manifest)
     print(
-        f"KARDES BANDI: TEMIZ — {len(manifest)} hedef / {total_bytes} bayt; "
-        f"{counts['matching']} matching ({matching_bytes} bayt), "
-        f"{counts['parked']} kanitli park"
+        f"SIBLING BAND: CLEAN - {len(manifest)} targets / {total_bytes} bytes; "
+        f"{counts['matching']} matching ({matching_bytes} bytes), "
+        f"{counts['parked']} evidenced parks"
     )
 
 

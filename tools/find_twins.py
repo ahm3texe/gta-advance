@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
-"""Yapisal olarak AYNI olan fonksiyon ciftlerini bulur.
+"""Find pairs of functions that are STRUCTURALLY IDENTICAL.
 
-NEDEN
------
-0x08031844 (472 bayt) bir ajanin 341 bin jetonunu yedi ve "yazmac dagitimi,
-kaynak duzeyinde kaldirac yok" diye kapatildi. Oysa eslesen kardesi
-0x08031A1C ROM'da duruyordu ve iki govdenin TEK farki bir karsilastirmanin
-kutbuydu (`blt` <-> `bge`). Eslesen kardesin kaynagini kopyalayip o testi
-cevirmek ilk denemede tam eslesme verdi (docs/WORKFLOW.md §10).
+Why
+---
+0x08031844 (472 bytes) consumed 341 thousand agent tokens and was closed as
+"register allocation, no source-level lever". Yet its matching sibling
+0x08031A1C was sitting in the ROM, and the ONLY difference between the two
+bodies was the polarity of one comparison (`blt` <-> `bge`). Copying the
+matching sibling's source and flipping that test gave a full match on the
+first attempt (docs/WORKFLOW.md §10).
 
-Bu arac o aramayi elle yapmayi birakip tarama haline getiriyor.
+This tool turns that search from a manual step into a sweep.
 
-NASIL
------
-Her fonksiyonun govdesi 16 bitlik yarim sozlere bolunup NORMALLESTIRILIYOR:
-konuma bagli alanlar (dal uzakligi, havuz uzakligi) sifirlaniyor, komutun
-kimligi ve YAZMACLARI korunuyor. Iki fonksiyon ayni C'den gelmisse
-normallestirilmis diziler birbirine cok yakin olur; ROM'daki yerleri farkli
-oldugu icin ham baytlar tutmaz.
+HOW
+---
+Each function's body is split into 16-bit half-words and NORMALIZED:
+position-dependent fields (branch distance, pool distance) are zeroed, while
+the instruction's identity and its REGISTERS are preserved. If two functions
+came from the same C, their normalized sequences are very close; the raw bytes
+do not agree because their positions in the ROM differ.
 
-Bu bir TESHIS aracidir, kanit degil. Cikan cift `tools/diff_function.py` ile
-dogrulanmadan hicbir sey kaydedilmez.
+This is a DIAGNOSTIC tool, not evidence. Nothing is recorded until the reported
+pair is verified with `tools/diff_function.py`.
 
-Kullanim:
-    python3 tools/find_twins.py                # eslesmeyen -> eslesen
-    python3 tools/find_twins.py --unmatched    # eslesmeyen -> eslesmeyen (kumeler)
-    python3 tools/find_twins.py --min 0.90     # esik (varsayilan 0.85)
+Usage:
+    python3 tools/find_twins.py                # unmatched -> matching
+    python3 tools/find_twins.py --unmatched    # unmatched -> unmatched (clusters)
+    python3 tools/find_twins.py --min 0.90     # threshold (default 0.85)
 """
 import argparse
 import csv
@@ -38,10 +39,10 @@ ROM_BASE = 0x08000000
 
 
 def normalize(body: bytes) -> tuple[int, ...]:
-    """Yarim sozleri konumdan bagimsiz hale getir.
+    """Make the half-words position-independent.
 
-    Sifirlanan alanlar yalnizca ADRESE bagli olanlardir; yazmac numaralari
-    ve komut kimligi dokunulmadan kalir, cunku ayirt edici olan onlar.
+    Only ADDRESS-dependent fields are zeroed; register numbers and instruction
+    identity are left untouched, because those are what discriminate.
     """
     out = []
     for i in range(0, len(body) - 1, 2):
@@ -49,11 +50,11 @@ def normalize(body: bytes) -> tuple[int, ...]:
         top5 = hw >> 11
         if top5 == 0b11100:            # B <imm11>
             hw &= 0xF800
-        elif (hw >> 12) == 0b1101:     # B<cond> <imm8> — kosul korunur
+        elif (hw >> 12) == 0b1101:     # B<cond> <imm8> - the condition is kept
             hw &= 0xFF00
-        elif top5 in (0b11110, 0b11111):  # BL cifti
+        elif top5 in (0b11110, 0b11111):  # the BL pair
             hw &= 0xF800
-        elif (hw >> 11) == 0b01001:    # LDR Rd,[PC,#imm8] — havuz uzakligi
+        elif (hw >> 11) == 0b01001:    # LDR Rd,[PC,#imm8] - pool distance
             hw &= 0xF800 | 0x0700
         elif (hw >> 11) == 0b10101:    # ADD Rd,PC,#imm8
             hw &= 0xF800 | 0x0700
@@ -62,7 +63,7 @@ def normalize(body: bytes) -> tuple[int, ...]:
 
 
 def similarity(a: tuple[int, ...], b: tuple[int, ...]) -> float:
-    """Ayni uzunluktaki iki dizide birebir ayni konum orani."""
+    """The fraction of positions that are identical in two equal-length sequences."""
     n = min(len(a), len(b))
     if n == 0:
         return 0.0
@@ -76,7 +77,7 @@ def load():
     out = []
     for r in rows:
         size = int(r["size"] or 0)
-        if size < 24:                  # kucuk saplamalarda benzerlik anlamsiz
+        if size < 24:                  # similarity is meaningless for small stubs
             continue
         if "ARM" in r["notes"].upper().split():
             continue
@@ -95,7 +96,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--min", type=float, default=0.85)
     ap.add_argument("--unmatched", action="store_true",
-                    help="eslesmeyenleri birbiriyle karsilastir (kume bulur)")
+                    help="compare unmatched against each other (finds clusters)")
     ap.add_argument("--limit", type=int, default=40)
     args = ap.parse_args()
 
@@ -103,7 +104,7 @@ def main() -> None:
     left = [f for f in funcs if f["status"] != "matching"]
     right = left if args.unmatched else [f for f in funcs if f["status"] == "matching"]
 
-    # Uzunluga gore kovala: yalnizca +-%10 uzunluktakiler karsilastirilir.
+    # Bucket by length: only bodies within +-10% in length are compared.
     by_len: dict[int, list] = {}
     for f in right:
         by_len.setdefault(len(f["norm"]), []).append(f)
@@ -129,9 +130,9 @@ def main() -> None:
             hits.append((best[0], a, best[1]))
 
     hits.sort(key=lambda t: (-t[0] * t[1]["size"], -t[0]))
-    kind = "eslesmeyen" if args.unmatched else "ESLESEN"
-    print(f"{len(hits)} aday ({args.min:.0%} ve uzeri, hedef: {kind} kardes)\n")
-    print(f"{'benzerlik':>9} {'bayt':>6}  {'eslesmeyen':<34} {'kardes':<34}")
+    kind = "unmatched" if args.unmatched else "MATCHING"
+    print(f"{len(hits)} candidates ({args.min:.0%} and above, target: {kind} sibling)\n")
+    print(f"{'similarity':>10} {'bytes':>6}  {'unmatched':<34} {'sibling':<34}")
     print("-" * 90)
     total = 0
     for s, a, b in hits[:args.limit]:
@@ -139,8 +140,8 @@ def main() -> None:
         print(f"{s:>8.1%} {a['size']:>6}  {a['address']} {a['name'][:22]:<22} "
               f"{b['address']} {b['name'][:22]:<22}")
     print("-" * 90)
-    print(f"listelenen {min(len(hits), args.limit)} adayin toplami: {total} bayt")
-    print(f"tum adaylarin toplami: {sum(a['size'] for _, a, _ in hits)} bayt")
+    print(f"total of the {min(len(hits), args.limit)} listed candidates: {total} bytes")
+    print(f"total of all candidates: {sum(a['size'] for _, a, _ in hits)} bytes")
 
 
 if __name__ == "__main__":

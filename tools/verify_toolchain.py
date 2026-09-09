@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Kurulu agbcc arac zincirini kilitli kimlik veya C-corpus ile dogrular.
+"""Verify the installed agbcc toolchain against the locked identity or the C corpus.
 
-Varsayilan hizli kip referans artifact SHA-256 degerlerini denetler.
-`--corpus`, ikili hash'i host/build yoluna gore degisse bile derleyicinin sabit
-temsil C corpus'u icin ayni baytlari urettigini kanitlar.
+The default fast mode checks the reference artifact SHA-256 values.
+`--corpus` proves that the compiler produces the same bytes for the fixed
+representative C corpus even when the binary hash differs by host/build path.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ def artifact_check(lock: dict) -> bool:
     failures = []
     for relative, expected in lock["referenceArtifacts"].items():
         path = ROOT / relative
-        actual = sha256(path) if path.exists() else "YOK"
+        actual = sha256(path) if path.exists() else "MISSING"
         if actual != expected:
             failures.append((relative, expected, actual))
 
@@ -54,7 +54,7 @@ def corpus_fingerprint(compiler: str) -> tuple[int, str]:
     for relative in lock["compiler"]["corpusSources"]:
         source = ROOT / relative
         if not source.exists():
-            sys.exit(f"toolchain corpus kaynagi yok: {relative}")
+            sys.exit(f"toolchain corpus source is missing: {relative}")
         blob, layout, _ = compile_and_link(source, compiler)
         for name, (offset, size) in sorted(layout.items()):
             digest.update(name.encode("utf-8"))
@@ -70,7 +70,7 @@ def main() -> int:
     parser.add_argument(
         "--corpus",
         action="store_true",
-        help="artifact hash'i yerine tum C ciktisinin parmak izini dogrula",
+        help="verify the fingerprint of the whole C output instead of the artifact hash",
     )
     args = parser.parse_args()
     lock = json.loads(LOCK.read_text(encoding="utf-8"))
@@ -85,12 +85,12 @@ def main() -> int:
     expected = compiler["corpusSha256"]
     if count != expected_count or actual != expected:
         print("toolchain C-corpus parmak izi TUTMUYOR:", file=sys.stderr)
-        print(f"  fonksiyon: {count} (beklenen {expected_count})", file=sys.stderr)
+        print(f"  functions: {count} (expected {expected_count})", file=sys.stderr)
         print(f"  parmak izi: {actual}\n  beklenen:   {expected}", file=sys.stderr)
         return 1
-    print(f"toolchain C-corpus: TEMIZ ({count} fonksiyon, {actual[:12]}…)")
+    print(f"toolchain C-corpus: CLEAN ({count} functions, {actual[:12]}...)")
     if not identity_ok:
-        print("Not: artifact hash'leri farkli, fakat uretilen C corpus birebir uyumlu.")
+        print("Note: the artifact hashes differ, but the generated C corpus is identical.")
     return 0
 
 

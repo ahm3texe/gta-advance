@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-"""Ghidra dokumunu function_overrides.csv ile birlestirip functions.csv uretir.
+"""Merge the Ghidra dump with function_overrides.csv to produce functions.csv.
 
-DIKKAT — bu arac ARTIK BIRINCIL KAYNAK DEGIL. Fonksiyon haritasinin
-gercegi data/functions.csv'nin KENDISIDIR; onu audit_boundaries.py,
-discover_functions.py ve add_c_region.py yeriden
-guncelliyor. Bu arac ise haritayi bayat Ghidra dokumunden (2 Eylul)
-yeniden kuruyor.
+WARNING -- this tool is NO LONGER THE PRIMARY SOURCE. The truth of the function
+map is data/functions.csv ITSELF; audit_boundaries.py, discover_functions.py and
+add_c_region.py update it in place. This tool instead rebuilds the map from a
+stale Ghidra dump (2 September).
 
-Bu oturumda arac kazara calistirildi ve 479 kaydi sildi: kesfedilen
-fonksiyonlar, elle verilen 148 ad ve 133 `matching` durumu kayboldu;
-make c-match/rom/check zinciri kirildi. Bu yuzden artik KAYIP KAPISI var:
-uretilecek harita mevcut haritadan kayit, ad veya `matching` durumu
-kaybediyorsa arac calismayi REDDEDER. Gercekten yeniden kurmak
-istiyorsan --force ver.
+In one session this tool was run by accident and deleted 479 records: discovered
+functions, 148 hand-given names and 133 `matching` states were lost, and the
+make c-match/rom/check chain broke. So there is now a LOSS GATE: if the map it
+would produce loses records, names or `matching` states relative to the current
+map, the tool REFUSES to run. If you really want to rebuild, pass --force.
 
-Kullanim:
-    python3 tools/sync_function_map.py            # guvenli, kayip varsa durur
-    python3 tools/sync_function_map.py --force    # kaybi kabul et
+Usage:
+    python3 tools/sync_function_map.py            # safe, stops on any loss
+    python3 tools/sync_function_map.py --force    # accept the loss
 """
 import csv
 import sys
@@ -60,7 +58,7 @@ def main() -> None:
     added = 0
     for override in overrides.values():
         if not override.get("size", "").strip():
-            print(f"UYARI: {override['address']} Ghidra haritasinda yok ve "
+            print(f"WARNING: {override['address']} is not in the Ghidra map and "
                   f"override'da size verilmemis; atlaniyor.")
             continue
         merged.append({
@@ -74,7 +72,7 @@ def main() -> None:
         added += 1
 
     # --- KAYIP KAPISI ---------------------------------------------------
-    # Uretilecek harita mevcut haritayla karsilastirilir; kayit, insan
+    # The map to be produced is compared against the current one; records, human
     # verilmis ad veya `matching` durumu kaybi varsa yazma yapilmaz.
     if TRACKED.exists() and "--force" not in sys.argv:
         current = {r["address"].upper(): r for r in read_rows(TRACKED)}
@@ -88,15 +86,15 @@ def main() -> None:
                       if r["status"] == "matching"
                       and produced.get(a, {}).get("status") != "matching"]
         if lost_rows or lost_names or lost_match:
-            print("DURDU: bu calistirma fonksiyon haritasindan veri kaybederdi.")
-            print(f"  {len(lost_rows):4d} kayit silinirdi "
+            print("STOPPED: this run would lose data from the function map.")
+            print(f"  {len(lost_rows):4d} records would be deleted "
                   f"(mevcut {len(current)} -> uretilen {len(produced)})")
             print(f"  {len(lost_names):4d} insan-verilmis ad FUN_xxxx'e donerdi")
             print(f"  {len(lost_match):4d} `matching` durumu dusurulurdu")
             for address in (lost_names or lost_rows or lost_match)[:5]:
                 name = current[address]["name"]
                 print(f"    ornek {address} {name}")
-            print("\nBirincil kaynak data/functions.csv'dir; bu arac onu bayat "
+            print("\nThe primary source is data/functions.csv; this tool rebuilds it "
                   "Ghidra dokumunden yeniden kurar.\nGercekten istiyorsan: "
                   "--force (once `git add data/functions.csv` yapmani oneririm).")
             sys.exit(1)

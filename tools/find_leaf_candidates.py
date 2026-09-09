@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Henuz eslesmemis fonksiyonlar arasindan en kolay hedefleri bulur.
+"""Find the easiest targets among the functions that do not match yet.
 
-Bir fonksiyon "yaprak" ise (hic `bl` icermiyorsa) hicbir dis sembole
-bagimli degildir ve tek basina yazilip dogrulanabilir. Yaprak olmayanlar
-icin cagirdigi her hedefin data/functions.csv'de adres karsiligi olmali.
+If a function is a "leaf" (it contains no `bl`), it depends on no external
+symbol and can be written and verified on its own. For non-leaves, every target
+it calls must have an address in data/functions.csv.
 
-Siralama: once yapraklar, sonra boyuta gore. Kucuk yapraklar en ucuz
-kazanclardir.
+Ordering: leaves first, then by size. Small leaves are the cheapest wins.
 
-Kullanim:  python3 tools/find_leaf_candidates.py [--limit N] [--max-size N]
+Usage:  python3 tools/find_leaf_candidates.py [--limit N] [--max-size N]
 """
 import csv
 import re
@@ -27,12 +26,12 @@ EPILOGUE = re.compile(r"\b(pop|add\s+sp)\b")
 
 
 def is_fragment(out: str) -> bool:
-    """Aday gercek bir fonksiyon mu, yoksa buyuk bir fonksiyonun kuyrugu mu.
+    """Is the candidate a real function, or the tail of a larger one?
 
-    Ghidra atlama tablolarinda cozumleyemeyip fonksiyonlari ortadan
-    kesiyor; ortaya cikan parcalar `push` ile baslamadiklari halde `pop`
-    veya `add sp` iceriyor. Bunlar tek baslarina yazilamaz: prologlari
-    baska bir adreste.
+    Ghidra fails to resolve jump tables and cuts functions in half; the
+    resulting fragments do not start with `push` yet contain `pop` or
+    `add sp`. These cannot be written on their own: their prologue is at
+    another address.
     """
     body = [l for l in out.splitlines() if re.match(r"\s*[0-9a-f]+:\s", l)]
     if not body:
@@ -84,18 +83,18 @@ def main() -> None:
     # Once yapraklar, sonra cozulebilir cagrilar, sonra boyut
     results.sort(key=lambda r: (r[0] > 0, r[1], r[2]))
 
-    print(f"{'adres':12} {'boyut':>5} {'cagri':>5} {'cozulemez':>9}  modul")
+    print(f"{'address':12} {'size':>5} {'calls':>6} {'unresolved':>11}  module")
     print("-" * 62)
     for calls, unresolved, size, row, targets in results[:limit]:
         tag = "YAPRAK" if calls == 0 else f"{calls} cagri"
         print(f"{row['address']} {size:>5} {tag:>10} {unresolved:>7}   {row['module']}")
     leaves = sum(1 for r in results if r[0] == 0)
     print("-" * 62)
-    print(f"{len(results)} aday incelendi (8-{max_size} byte): "
+    print(f"{len(results)} candidates examined (8-{max_size} bytes): "
           f"{leaves} yaprak, {len(results) - leaves} cagri iceren")
     if fragments:
-        print(f"{len(fragments)} aday elendi: `push` ile baslamadiklari halde "
-              f"`pop`/`add sp` iceriyorlar, yani buyuk fonksiyonlarin kuyruklari "
+        print(f"{len(fragments)} candidates rejected: they do not start with `push` "
+              f"yet contain `pop`/`add sp`, i.e. they are tails of larger functions "
               f"(Ghidra atlama tablosunda kesmis). Ornek: "
               + ", ".join(r["address"] for r in fragments[:5]))
 

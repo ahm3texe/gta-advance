@@ -20,13 +20,13 @@ fi
 
 archive=${1-}
 test -n "$archive" && test -f "$archive" || {
-    echo "Kullanım: $0 /tam/yol/oyun.zip" >&2
+    echo "Usage: $0 /full/path/game.zip" >&2
     exit 2
 }
 
 entry=$(unzip -Z1 "$archive" | awk 'tolower($0) ~ /\.gba$/ { print; exit }')
 test -n "$entry" || {
-    echo "Arşivde .gba dosyası bulunamadı." >&2
+    echo "No .gba file found in the archive." >&2
     exit 1
 }
 
@@ -37,5 +37,5 @@ mv "$tmp_path" "$rom_path"
 trap - EXIT HUP INT TERM
 
 verify_rom
-echo "Hazır: $rom_path (Git tarafından yok sayılıyor)"
+echo "Ready: $rom_path (ignored by Git)"
 

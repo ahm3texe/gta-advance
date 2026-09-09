@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Bir bolgeyi C build'ine cevirir ve assembly kaynagini emekli eder.
+"""Switch a region to the C build and retire its assembly source.
 
-Once bolgenin tamaminin C'den eslestigini dogrular; eslesmezse hicbir sey
-silmez. Sonra Makefile kuralini degistirir ve .s/.ld dosyalarini siler.
+First it verifies that the whole region matches from C; if it does not, nothing
+is deleted. Then it changes the Makefile rule and removes the .s/.ld files.
 
-Kullanim:  python3 tools/retire_asm.py <module/name> <start_hex> <end_hex>
-Ornek:     python3 tools/retire_asm.py ui/menu_graphics 0x1E30 0x1F04
+Usage:    python3 tools/retire_asm.py <module/name> <start_hex> <end_hex>
+Example:  python3 tools/retire_asm.py ui/menu_graphics 0x1E30 0x1F04
 """
 import re
 import sys
@@ -27,7 +27,7 @@ def main() -> None:
     blob, _, _ = compile_and_link(source)
     region = rom_bytes()[start:end]
     if blob != region:
-        sys.exit(f"HATA: bolge eslesmiyor ({len(blob)} vs {len(region)} byte). "
+        sys.exit(f"ERROR: the region does not match ({len(blob)} vs {len(region)} bytes). "
                  f"Hicbir sey silinmedi.")
 
     makefile = ROOT / "Makefile"
@@ -45,7 +45,7 @@ def main() -> None:
         f"\t@python3 tools/build_c.py $< $@\n"
     )
     if not pattern.search(text):
-        sys.exit(f"HATA: Makefile'da build/{module}/{name} kurali bulunamadi.")
+        sys.exit(f"ERROR: the build/{module}/{name} rule was not found in the Makefile.")
     makefile.write_text(pattern.sub(replacement, text, count=1))
 
     for path in (ROOT / f"src/{module}/{name}.s", ROOT / f"config/{name}.ld"):

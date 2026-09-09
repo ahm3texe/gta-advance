@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dashboard'un kanonik CSV'lerin yalnizca bir gorunumu oldugunu denetler."""
+"""Check that the dashboard is only a view of the canonical CSVs."""
 
 import csv
 import json
@@ -25,10 +25,10 @@ def main() -> int:
     for source in c_sources:
         function = functions.get(source["address"].upper())
         if function is None:
-            problems.append(f"dashboard'da yok: {source['address']} {source['name']}")
+            problems.append(f"not in the dashboard: {source['address']} {source['name']}")
             continue
         if function["sourceType"] != "c":
-            problems.append(f"C kaynagi {source['name']} {function['sourceType']} gosteriliyor")
+            problems.append(f"C source {source['name']} is shown as {function['sourceType']}")
         if function["sourcePath"] != source["source"]:
             problems.append(f"C yolu uyusmuyor: {source['name']}")
         if function["cMatching"] != (source["matching"] == "yes"):
@@ -42,7 +42,7 @@ def main() -> int:
 
     summary = payload["summary"]
     if summary["cSourceCount"] != len(c_sources):
-        problems.append("dashboard C kaynak sayisi c_sources.csv ile uyusmuyor")
+        problems.append("the dashboard C source count does not agree with c_sources.csv")
     if summary["cMatchingCount"] != sum(row["matching"] == "yes" for row in c_sources):
         problems.append("dashboard C matching sayisi c_sources.csv ile uyusmuyor")
     if payload["workQueue"] != csv_rows(ROOT / "data/work_queue.csv"):
@@ -53,7 +53,7 @@ def main() -> int:
         for problem in problems[:30]:
             print(f"  - {problem}", file=sys.stderr)
         return 1
-    print(f"üretilmiş görünümler: TEMIZ ({len(functions)} fonksiyon, {len(c_sources)} C kaynağı)")
+    print(f"generated views: CLEAN ({len(functions)} functions, {len(c_sources)} C sources)")
     return 0
 
 

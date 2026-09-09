@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Permuter icin tek bir C kaynagini .o'ya derler.
+"""Compile a single C source to a .o for the permuter.
 
-Neden ayri arac: permuter'in bekledigi "cc -c girdi.c -o cikti.o" bicimi bizim
-boru hattimizi TAM olarak temsil etmiyor. Bizde dis semboller `.equ` ile
-mutlak adrese cevriliyor (agbcc_build.py'deki gerekce: linker aksi halde
-interworking veneer'i sokup `bl` hedefini bozuyor). Permuter mutasyonlu
-kaynaklari gecici dizinlerde derledigi icin bu adim orada da calismali.
+Why a separate tool: the "cc -c input.c -o output.o" form the permuter expects
+does not represent our pipeline EXACTLY. Here external symbols are turned into
+absolute addresses with `.equ` (the rationale is in agbcc_build.py: otherwise the
+linker inserts an interworking veneer and breaks the `bl` target). Because the
+permuter compiles mutated sources in temporary directories, this step must work
+there too.
 
-Kullanim: python3 tools/permuter_compile.py [-o <cikti.o>] <girdi.c>
+Usage: python3 tools/permuter_compile.py [-o <output.o>] <input.c>
 
-`-o` bayragi ZORUNLU ama SIRASI serbest. Permuter, derleme komutunu bir
-DERLEYICI cagrisi olarak tanimak icin `-o` ariyor (bulamazsa adayi eliyor);
-uretttigi compile.sh ise betigi `<girdi> -o <cikti>` sirasiyla cagiriyor.
-Iki sira da desteklenmeli.
+The `-o` flag is REQUIRED but its POSITION is free. The permuter looks for `-o`
+to recognize the build command as a COMPILER invocation (without it the candidate
+is discarded); the compile.sh it generates calls the script in the order
+`<input> -o <output>`. Both orders must be supported.
 """
 import shutil
 import subprocess
@@ -62,14 +63,14 @@ def main() -> None:
     rows, ram = function_rows(), ram_rows()
     externs = []
     for name in _undefined(Path(f"{stem}.probe.o")):
-        # `__thumb` soneki: sembol adresi | 1 olarak cozumlenir. Saklanan
-        # fonksiyon isaretcilerinde Thumb biti kurulu olmali; `bl` hedefinde
+        # The `__thumb` suffix resolves to the symbol address | 1. Stored
+        # function pointers must have the Thumb bit set; in a `bl` target
         # ise bit eklemek dal ofsetini bozar, o yuzden AYRI bir ad kullanilir.
         thumb = name.endswith("__thumb")
         key = name[: -len("__thumb")] if thumb else name
         row = rows.get(key) or ram.get(key)
         if row is None:
-            sys.exit(f"'{name}' data/functions.csv veya data/ram_map.csv'de yok")
+            sys.exit(f"'{name}' is in neither data/functions.csv nor data/ram_map.csv")
         value = int(row["address"], 16) | (1 if thumb else 0)
         externs.append(f"    .equ {name}, {value:#x}\n")
     text = Path(f"{stem}.s").read_text(encoding="utf-8")

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Veri dosyalarini izler ve degistiginde dashboard JSON'unu yeniden uretir.
+"""Watch the data files and regenerate the dashboard JSON when they change.
 
-Dashboard JSON'u statik olarak import ediyor, bu yuzden dosya degisince Vite
-HMR sayfayi kendiliginden yeniliyor. Yani `make dashboard-dev` ile birlikte
-calistirildiginde harita, calisma ilerledikce anlik guncellenir.
+The dashboard imports the JSON statically, so when the file changes Vite HMR
+refreshes the page by itself. Run together with `make dashboard-dev`, the map
+updates live as work progresses.
 
-Kullanim:  python3 tools/watch_dashboard.py [--interval 1.0]
+Usage:  python3 tools/watch_dashboard.py [--interval 1.0]
 """
 import subprocess
 import sys
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 GENERATOR = ROOT / "tools/generate_dashboard_data.py"
 WATCHED = [
-    GENERATOR,  # etiket/kumeleme mantigi degisince de yenile
+    GENERATOR,  # also refresh when the labelling/clustering logic changes
     ROOT / "data/functions.csv",
     ROOT / "data/function_overrides.csv",
     ROOT / "data/matching_regions.csv",
@@ -44,7 +44,7 @@ def regenerate() -> None:
     if result.returncode == 0:
         print(f"[{stamp}] {result.stdout.strip()}", flush=True)
     else:
-        print(f"[{stamp}] HATA: {result.stderr.strip()}", flush=True)
+        print(f"[{stamp}] ERROR: {result.stderr.strip()}", flush=True)
 
 
 def main() -> None:
@@ -53,7 +53,7 @@ def main() -> None:
         if arg.startswith("--interval"):
             interval = float(arg.split("=", 1)[1] if "=" in arg else 1.0)
 
-    print(f"Dashboard izleyici basladi ({len(WATCHED)} dosya + decompiler ciktisi).",
+    print(f"Dashboard watcher started ({len(WATCHED)} files + decompiler output).",
           flush=True)
     regenerate()
     previous = fingerprint()

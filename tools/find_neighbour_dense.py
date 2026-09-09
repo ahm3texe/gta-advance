@@ -1,33 +1,34 @@
 #!/usr/bin/env python3
-"""Komsulugu eslesen, henuz C'si YAZILMAMIS fonksiyonlari secer.
+"""Select functions with matching neighbors whose C has NOT BEEN WRITTEN yet.
 
 NEDEN
 -----
-Bir fonksiyonun etrafindaki fonksiyonlar zaten eslesmisse, o bolgenin tip
-sozlugu (struct yerlesimleri, RAM sembolleri, cagri imzalari) hazir demektir;
-bu adaylar tipik olarak 1-2 denemede kapaniyor.  Bu secim daha once elle
-(tek seferlik python parcaciklariyla) yapiliyordu ve DEPODA KAYITLI DEGILDI,
-yani plandaki sayilar yeniden uretilemiyordu.  Bu arac o bosluğu kapatiyor.
+If the functions around one are already matching, that region's type vocabulary
+(struct layouts, RAM symbols, call signatures) is ready; such candidates
+typically close in one or two attempts. This selection used to be made by hand
+(with one-off python snippets) and was NOT RECORDED IN THE REPOSITORY, so the
+numbers in the plan could not be reproduced. This tool closes that gap.
 
-Bu bir TESHIS aracidir: sirf komsulugu yogun diye bir fonksiyon kolay
-degildir.  Cikan liste `tools/diff_function.py` ile dogrulanmadan hicbir sey
-kaydedilmez.
+This is a DIAGNOSTIC tool: a function is not easy merely because its
+neighborhood is dense. Nothing is recorded until the resulting list is verified
+with `tools/diff_function.py`.
 
-OLCUT (hepsi degistirilebilir)
+CRITERIA (all adjustable)
 ------------------------------
   - status != matching
-  - ARM DEGIL (notlarda ayri sozcuk olarak "ARM" gecmiyor) -- agbcc_arm
-    8 yazmac tavani yuzunden ARM kapali (docs/STATUS.md)
-  - src/ altinda AYNI ADLA bir tanim YOK, yani taslagi bile yazilmamis
-    (--include-drafts ile bu eleme kapatilir; yakin iskalar da listelenir)
-  - boyut [--min-size, --max-size] araliginda
-  - adres sirasinda 9'luk pencerede (i-4 .. i+4) en az --neighbours tane
-    eslesen fonksiyon var
+  - NOT ARM (the notes do not contain "ARM" as a separate word) -- ARM is
+    closed because of agbcc_arm's 8-register ceiling (docs/STATUS.md)
+  - there is NO definition with the SAME NAME under src/, i.e. not even a draft
+    has been written (--include-drafts disables this filter and also lists near
+    misses)
+  - the size is within [--min-size, --max-size]
+  - in address order, at least --neighbours matching functions lie in the
+    9-wide window (i-4 .. i+4)
 
-Kullanim:
-    python3 tools/find_neighbour_dense.py                 # varsayilan secim
+Usage:
+    python3 tools/find_neighbour_dense.py                 # the default selection
     python3 tools/find_neighbour_dense.py --neighbours 4 --min-size 48 \
-        --max-size 512 --include-drafts                   # ilk analizdeki secim
+        --max-size 512 --include-drafts                   # the initial analysis's selection
     python3 tools/find_neighbour_dense.py --out data/neighbour_dense.csv
 """
 import argparse
@@ -38,13 +39,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 FUNCTIONS = ROOT / "data/functions.csv"
 
-# `int foo(...) {` / `static void *bar(...)\n{` gibi TANIMLARI yakalar;
-# bildirimleri (`;` ile biten) disarida birakir.
+# Matches DEFINITIONS such as `int foo(...) {` / `static void *bar(...)\n{`;
+# declarations (ending in `;`) are excluded.
 DEFINITION = re.compile(r"^\w[\w\s\*]*?\b(\w+)\s*\([^;]*\)\s*\{", re.M)
 
 
 def defined_in_sources() -> set[str]:
-    """src/ altinda govdesi yazilmis fonksiyon adlari."""
+    """Names of functions whose body is written under src/."""
     names: set[str] = set()
     for path in sorted((ROOT / "src").glob("*/*.c")):
         text = path.read_text(encoding="utf-8", errors="ignore")
@@ -59,14 +60,14 @@ def is_arm(row: dict) -> bool:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--neighbours", type=int, default=3,
-                    help="9'luk pencerede gereken en az eslesen sayisi (varsayilan 3)")
+                    help="minimum matching functions in the 9-wide window (default 3)")
     ap.add_argument("--min-size", type=int, default=40)
     ap.add_argument("--max-size", type=int, default=520)
     ap.add_argument("--include-drafts", action="store_true",
-                    help="C taslagi olanlari da listele (yakin iskalar)")
+                    help="also list those with a C draft (near misses)")
     ap.add_argument("--include-arm", action="store_true")
     ap.add_argument("--limit", type=int, default=30)
-    ap.add_argument("--out", help="secimi CSV olarak yaz (depoda kayit birakir)")
+    ap.add_argument("--out", help="write the selection as CSV (leaves a record in the repo)")
     args = ap.parse_args()
 
     rows = list(csv.DictReader(FUNCTIONS.open(newline="", encoding="utf-8")))
@@ -93,17 +94,17 @@ def main() -> None:
     picks.sort(key=lambda t: (-t[0], -t[1]))
     bytes_total = sum(size for _, size, _ in picks)
 
-    print(f"olcut: boyut {args.min_size}-{args.max_size}, komsu >= {args.neighbours}, "
-          f"taslagi olanlar {'DAHIL' if args.include_drafts else 'HARIC'}, "
-          f"ARM {'DAHIL' if args.include_arm else 'HARIC'}")
-    print(f"{len(picks)} aday / {bytes_total} bayt "
+    print(f"criteria: size {args.min_size}-{args.max_size}, neighbours >= {args.neighbours}, "
+          f"drafts {'INCLUDED' if args.include_drafts else 'EXCLUDED'}, "
+          f"ARM {'INCLUDED' if args.include_arm else 'EXCLUDED'}")
+    print(f"{len(picks)} candidates / {bytes_total} bytes "
           f"({100 * bytes_total / 454258:.2f}% ROM kodu)\n")
-    print(f"{'adres':<12} {'bayt':>5} {'komsu':>6}  ad")
+    print(f"{'address':<12} {'bytes':>5} {'neigh':>6}  name")
     print("-" * 62)
     for near, size, row in picks[:args.limit]:
         print(f"{row['address']:<12} {size:>5} {near:>6}  {row['name']}")
     if len(picks) > args.limit:
-        print(f"... {len(picks) - args.limit} aday daha (--limit ile arttir)")
+        print(f"... {len(picks) - args.limit} more candidates (raise --limit)")
 
     if args.out:
         out = ROOT / args.out
@@ -112,7 +113,7 @@ def main() -> None:
             writer.writerow(["address", "name", "size", "neighbours", "status"])
             for near, size, row in picks:
                 writer.writerow([row["address"], row["name"], size, near, row["status"]])
-        print(f"\n-> {args.out} ({len(picks)} satir)")
+        print(f"\n-> {args.out} ({len(picks)} rows)")
 
 
 if __name__ == "__main__":

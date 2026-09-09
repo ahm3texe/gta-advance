@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
-"""Veri dosyalarinin kendi icinde, birbiriyle ve kaynakla tutarliligini denetler.
+"""Check the data files for internal, mutual and source consistency.
 
-Bu arac bir denetimden sonra yazildi: yeniden adlandirma bu projede YEDI kez
-baska bir dosyayi kirdi ve her seferinde ancak `make rom` zincirinin sonunda
-fark edildi. Ayrica functions.csv'de yinelenen kayit, ust uste binen aralik
-ve Thumb'da imkansiz TEK sayili boyut birikmisti; hicbir denetim yakalamiyordu.
+This tool was written after an audit: renaming broke another file SEVEN times
+in this project, and each time it was only noticed at the end of the `make rom`
+chain. Duplicate records, overlapping ranges and ODD sizes impossible in Thumb
+had also accumulated in functions.csv, and no check caught them.
 
 Denetlenenler:
-  functions.csv   yinelenen adres, ust uste binen aralik, tek sayili boyut,
-                  gecersiz status, tek adrese cok isim
-  c_sources.csv   adres functions.csv'de var mi, ad tutuyor mu, dosya diskte
-                  mi, matching bayragi status ile celisiyor mu
-  matching_regions.csv  ust uste binen bolge, hizasiz sinir
-  ram_map.csv     yinelenen adres, ayni adrese cok isim, EWRAM/IWRAM tasmasi
-  src/**/*.c      her `extern` sembolu functions.csv veya ram_map.csv'de
-                  cozuluyor mu; ayni gRam sembolu celiskili C extern turleri
-                  tasiyor mu  <-- yeniden adlandirma/tur kirilmasini yakalar
-  bicim           CSV'lerde KARISIK satir sonu
+  functions.csv   duplicate address, overlapping range, odd size,
+                  invalid status, several names for one address
+  c_sources.csv   is the address in functions.csv, does the name agree, is the
+                  file on disk, does the matching flag contradict the status
+  matching_regions.csv  overlapping region, misaligned boundary
+  ram_map.csv     duplicate address, several names for one address, EWRAM/IWRAM
+                  overflow
+  src/**/*.c      does every `extern` symbol resolve in functions.csv or
+                  ram_map.csv; does the same gRam symbol carry conflicting C
+                  extern types  <-- catches rename/type breakage
+  format          MIXED line endings in the CSVs
 
-Cikis kodu: sorun varsa 1, temizse 0. `make check` bunu cagirir.
+Exit code: 1 if there are problems, 0 if clean. `make check` invokes this.
 """
 import csv
 import re
@@ -41,8 +42,8 @@ def main() -> None:
     def bad(section: str, message: str) -> None:
         problems.append(f"[{section}] {message}")
 
-    # --- bicim: KARISIK satir sonu (arac disi bir seyin yazdiginin isareti).
-    # Tek basina LF veya CRLF kabul edilir; ikisinin karisimi edilmez.
+    # --- format: MIXED line endings (a sign something outside the tools wrote).
+    # LF alone or CRLF alone is accepted; a mixture is not.
     for name in ("functions.csv", "c_sources.csv", "matching_regions.csv",
                  "ram_map.csv", "function_overrides.csv"):
         path = ROOT / "data" / name
@@ -52,8 +53,8 @@ def main() -> None:
         crlf = data.count(b"\r\n")
         bare_lf = data.count(b"\n") - crlf
         if crlf and bare_lf:
-            bad("bicim", f"{name} KARISIK satir sonu ({crlf} CRLF, "
-                         f"{bare_lf} yalin LF) — arac disi bir sey yazmis")
+            bad("bicim", f"{name} MIXED line endings ({crlf} CRLF, "
+                         f"{bare_lf} bare LF) - something outside the tools wrote it")
 
     # --- functions.csv ---
     functions = read(ROOT / "data/functions.csv")
@@ -61,69 +62,69 @@ def main() -> None:
     for row in functions:
         address = int(row["address"], 16)
         if address in by_address:
-            bad("functions", f"yinelenen adres {row['address']} "
+            bad("functions", f"duplicate address {row['address']} "
                              f"({by_address[address]['name']} / {row['name']})")
         by_address[address] = row
         if row["status"] not in VALID_STATUS:
-            bad("functions", f"{row['address']} gecersiz status '{row['status']}'")
+            bad("functions", f"{row['address']} invalid status '{row['status']}'")
         if row["size"].strip():
             size = int(row["size"])
             if size % 2:
-                bad("functions", f"{row['address']} {row['name']} boyut {size} "
-                                 f"TEK — Thumb'da imkansiz")
+                bad("functions", f"{row['address']} {row['name']} size {size} "
+                                 f"is ODD - impossible in Thumb")
 
     sized = sorted((int(r["address"], 16), int(r["size"] or 0), r["name"])
                    for r in functions if r["size"].strip())
     for (a, s, n), (b, _, n2) in zip(sized, sized[1:]):
         if a + s > b:
-            bad("functions", f"0x{a:08X} ({n}, {s}B) 0x{b:08X} ({n2}) icine "
-                             f"{a + s - b} bayt tasiyor")
+            bad("functions", f"0x{a:08X} ({n}, {s}B) runs into 0x{b:08X} ({n2}) by "
+                             f"{a + s - b} bytes")
 
     names: dict[str, str] = {}
     for row in functions:
         if row["name"] in names and not row["name"].lower().startswith("fun_"):
-            bad("functions", f"'{row['name']}' iki adreste: "
+            bad("functions", f"'{row['name']}' at two addresses: "
                              f"{names[row['name']]} ve {row['address']}")
         names[row["name"]] = row["address"]
 
-    # Elle reddedilen sahte girişler tekrar fonksiyon haritasına giremez.
+    # Manually rejected false entries must not re-enter the function map.
     non_function_path = ROOT / "data/non_function_entries.csv"
     if non_function_path.exists():
         rejected: set[int] = set()
         for row in read(non_function_path):
             address = int(row["address"], 16)
             if address in rejected:
-                bad("non-functions", f"yinelenen adres {row['address']}")
+                bad("non-functions", f"duplicate address {row['address']}")
             rejected.add(address)
             if address in by_address:
-                bad("non-functions", f"{row['address']} hem reddedilmiş giriş hem "
-                    f"fonksiyon ({by_address[address]['name']})")
+                bad("non-functions", f"{row['address']} is both a rejected entry and a "
+                    f"function ({by_address[address]['name']})")
 
     # --- c_sources.csv <-> functions.csv <-> disk ---
     for row in read(ROOT / "data/c_sources.csv"):
         address = int(row["address"], 16)
         target = by_address.get(address)
         if target is None:
-            bad("c_sources", f"{row['address']} ({row['name']}) functions.csv'de yok")
+            bad("c_sources", f"{row['address']} ({row['name']}) is not in functions.csv")
             continue
         if target["name"] != row["name"]:
             bad("c_sources", f"{row['address']} ad uyusmuyor: c_sources "
                              f"'{row['name']}' vs functions '{target['name']}'")
         if not (ROOT / row["source"]).exists():
-            bad("c_sources", f"{row['source']} diskte yok ({row['name']})")
+            bad("c_sources", f"{row['source']} is not on disk ({row['name']})")
         if row["matching"] == "yes" and target["status"] != "matching":
-            bad("c_sources", f"{row['name']} matching=yes ama functions'ta "
+            bad("c_sources", f"{row['name']} matching=yes but functions says "
                              f"'{target['status']}'")
         if row["matching"] == "no" and target["status"] == "matching":
-            bad("c_sources", f"{row['name']} matching=no ama functions'ta 'matching'")
+            bad("c_sources", f"{row['name']} matching=no but functions says 'matching'")
         compiled_size = int(row["compiled_size"], 0)
         mapped_size = int(row["mapped_size"], 0)
         function_size = int(target["size"], 0)
         if mapped_size != function_size:
             bad("c_sources", f"{row['name']} mapped_size={mapped_size}, "
-                             f"functions size={function_size}; c-status bayat")
+                             f"functions size={function_size}; c-status is stale")
         if row["matching"] == "yes" and compiled_size < mapped_size:
-            bad("c_sources", f"{row['name']} kisa C prefix'i matching sayilmis: "
+            bad("c_sources", f"{row['name']} a short C prefix was counted as matching: "
                              f"{compiled_size} < {mapped_size}")
 
     # --- matching_regions.csv ---
@@ -131,7 +132,7 @@ def main() -> None:
                      for r in read(ROOT / "data/matching_regions.csv"))
     for (s1, e1, b1), (s2, _, b2) in zip(regions, regions[1:]):
         if e1 > s2:
-            bad("regions", f"{b1} ve {b2} ust uste biniyor "
+            bad("regions", f"{b1} and {b2} overlap "
                            f"(0x{s1:08X}-0x{e1:08X} vs 0x{s2:08X})")
 
     # --- ram_map.csv ---
@@ -140,16 +141,16 @@ def main() -> None:
     for row in ram:
         address = int(row["address"], 16)
         if address in seen_ram:
-            bad("ram_map", f"{row['address']} iki isimde: "
+            bad("ram_map", f"{row['address']} under two names: "
                            f"{seen_ram[address]} ve {row['name']}")
         seen_ram[address] = row["name"]
         size = int(row["size"] or 0)
         for lo, hi, label in RAM_REGIONS:
             if lo <= address < hi and address + size > hi:
                 bad("ram_map", f"{row['name']} {label} sonunu "
-                               f"{address + size - hi} bayt asiyor")
+                               f"overflows by {address + size - hi} bytes")
 
-    # --- ARM inceleme tablosu: bütün overlay aralığını boşluksuz kaplar ---
+    # --- ARM review table: covers the whole overlay range without gaps ---
     arm_review_path = ROOT / "data/arm_boundary_review.csv"
     if arm_review_path.exists():
         arm_ranges = []
@@ -158,48 +159,49 @@ def main() -> None:
             address = int(row["address"], 16)
             size = int(row["corrected_size"])
             if address in arm_seen:
-                bad("arm-review", f"yinelenen adres {row['address']}")
+                bad("arm-review", f"duplicate address {row['address']}")
             arm_seen.add(address)
             target = by_address.get(address)
             if target is None:
-                bad("arm-review", f"{row['address']} functions.csv'de yok")
+                bad("arm-review", f"{row['address']} is not in functions.csv")
             else:
                 if int(target["size"]) != size:
-                    bad("arm-review", f"{row['address']} boyut uyusmuyor: "
+                    bad("arm-review", f"{row['address']} size mismatch: "
                         f"review {size}, functions {target['size']}")
                 if target["module"] != "arm" or target["status"] in {
                     "candidate", "discovered"
                 }:
-                    bad("arm-review", f"{row['address']} incelenmis ARM kaydi "
-                        f"olarak isaretlenmemis")
+                    bad("arm-review", f"{row['address']} is not marked as a "
+                        f"reviewed ARM record")
             arm_ranges.append((address, address + size))
         arm_ranges.sort()
         if arm_ranges:
             if arm_ranges[0][0] != 0x08067E04 or arm_ranges[-1][1] != 0x0806B84C:
-                bad("arm-review", "overlay uçları 0x08067E04-0x0806B84C değil")
+                bad("arm-review", "overlay ends are not 0x08067E04-0x0806B84C")
             for (_, end), (start, _) in zip(arm_ranges, arm_ranges[1:]):
                 if end != start:
-                    bad("arm-review", f"0x{end:08X}-0x{start:08X} arasında "
-                        "boşluk veya örtüşme var")
+                    bad("arm-review", f"0x{end:08X}-0x{start:08X} has "
+                        "a gap or overlap")
 
-    # --- kaynak: her extern sembolu cozuluyor mu (RENAME KIRILMASI) ---
+    # --- source: does every extern symbol resolve (RENAME BREAKAGE) ---
     symbols = set(names) | {r["name"] for r in ram}
     extern = re.compile(r"^\s*extern\s+.*?\b(\w+)\s*(?:\[|\(|;|=)", re.M)
     for source in sorted(ROOT.glob("src/**/*.c")):
         text = source.read_text(encoding="utf-8")
         for name in set(extern.findall(text)):
-            # `__thumb` soneki bir SEMBOL DEGIL, cozumleme talimati: aynı
-            # adresin Thumb biti kurulu hali demek (tools/agbcc_build.py).
-            # Aranirken sonek atilir, yoksa her saklanan fonksiyon isaretcisi
-            # sahte "yeniden adlandirma kirilmasi" olarak bildirilir.
+            # The `__thumb` suffix is NOT A SYMBOL but a resolution
+            # instruction: the same address with the Thumb bit set
+            # (tools/agbcc_build.py). The suffix is dropped when looking up,
+            # otherwise every stored function pointer is reported as a false
+            # "rename breakage".
             if name.endswith("__thumb"):
                 name = name[: -len("__thumb")]
             if name not in symbols:
-                bad("kaynak", f"{source.relative_to(ROOT)}: extern '{name}' "
-                              f"ne functions.csv ne ram_map.csv'de — "
-                              f"yeniden adlandirma kirilmasi olabilir")
+                bad("source", f"{source.relative_to(ROOT)}: extern '{name}' "
+                              f"is in neither functions.csv nor ram_map.csv - "
+                              f"possible rename breakage")
 
-    # --- kaynak/header: ayni fiziksel RAM sembolune tek extern turu ---
+    # --- source/header: one extern type per physical RAM symbol ---
     ram_extern = re.compile(
         r"^\s*extern\s+(.+?)\s+(\*?)(gRam[0-9A-Fa-f]+)"
         r"(\s*\[[^;]*\])?\s*;",
@@ -223,18 +225,19 @@ def main() -> None:
             detail = "; ".join(
                 f"{kind} ({', '.join(paths)})" for kind, paths in declarations.items()
             )
-            bad("ram-extern", f"{symbol} celiskili extern turlerinde: {detail}")
+            bad("ram-extern", f"{symbol} has conflicting extern types: {detail}")
 
-    # Ayni SEMBOLU, ayni struct ADIYLA ama FARKLI GOVDEYLE gormek sessiz bir
-    # tehlike: extern turu ayni yazildigi icin yukaridaki kontrol yakalamiyor.
-    # `Anchor` dort dosyada ayni adla iki farkli govdeyle duruyordu (biri
-    # tamamen acilmis, otekiler dolgulu). Yerlesimler uyumlu oldugu icin hata
-    # vermiyordu ama birini degistirmek otekini sessizce yanlis yapardi.
+    # Seeing the same SYMBOL under the same struct NAME but with a DIFFERENT
+    # BODY is a silent hazard: because the extern type is written identically,
+    # the check above does not catch it. `Anchor` stood in four files under the
+    # same name with two different bodies (one fully expanded, the others
+    # padded). Since the layouts were compatible it raised no error, but
+    # changing one would have silently made the other wrong.
     #
-    # Kontrol BILEREK dar tutuldu: farkli sembolleri tarif eden ayni adli
-    # struct'lar bu projede NORMAL (her ceviri birimi kendi yerel gorunumunu
-    # kurar, bkz. include/ram_symbols.h). Yalnizca AYNI sembol uzerinde
-    # celisen govdeler bildirilir.
+    # The check is DELIBERATELY narrow: identically named structs describing
+    # different symbols are NORMAL in this project (each translation unit builds
+    # its own local view, see include/ram_symbols.h). Only bodies that conflict
+    # on the SAME symbol are reported.
     struct_def = re.compile(
         r"typedef\s+struct\s*(?:\w+)?\s*\{(.*?)\}\s*(\w+)\s*;", re.S
     )
@@ -260,18 +263,18 @@ def main() -> None:
             if len(seen) > 1:
                 detail = "; ".join(f"({', '.join(v)})" for v in seen.values())
                 bad(
-                    "struct-govde",
-                    f"{symbol} icin {name} farkli govdelerle tanimli: {detail}",
+                    "struct-body",
+                    f"{symbol}: {name} is defined with different bodies: {detail}",
                 )
-    # --- Eslesen fonksiyonlarin adi ve notu -------------------------------
+    # --- Names and notes of matching functions ----------------------------
     #
-    # Bu iki denetim, gercek bir birikme yasandigi icin eklendi (2026-09-06):
-    # eslesme akisinda `status` guncelleniyor ama Ghidra'nin YER TUTUCU adina
-    # ve notuna donulmuyordu.  365 eslesen fonksiyonun 88'i hala `FUN_` adi
-    # tasiyordu ve 60'inin notu "boundary and ARM/Thumb mode are provisional"
-    # diyordu -- byte-matching tam olarak bunun tersini kanitlarken.  Mevcut
-    # denetimler adlarin dosyalar arasinda TUTARLI olmasina bakiyordu, yer
-    # tutucu olup olmadigina degil; bu yuzden hicbir kapi calmadi.
+    # These two checks were added because a real backlog had accumulated
+    # (2026-09-06): the matching flow updates `status` but never returned to
+    # Ghidra's PLACEHOLDER name and note. 88 of 365 matching functions still
+    # carried a `FUN_` name, and 60 of them had the note "boundary and ARM/Thumb
+    # mode are provisional" -- while byte-matching proves exactly the opposite.
+    # The existing checks looked at whether names were CONSISTENT across files,
+    # not at whether they were placeholders; so no gate ever rang.
     STALE_NOTE = "boundary and ARM/Thumb mode are provisional"
     placeholder = []
     for row in functions:
@@ -280,26 +283,26 @@ def main() -> None:
         if STALE_NOTE in (row.get("notes") or ""):
             bad(
                 "bayat-not",
-                f"{row['name']} byte-matching ama notu hala sinirin/kipin "
-                f"'gecici' oldugunu soyluyor",
+                f"{row['name']} is byte-matching but its note still says the "
+                f"boundary/mode is 'provisional'",
             )
         if row["name"].startswith("FUN_"):
             placeholder.append(row["name"])
 
     if problems:
-        print(f"TUTARSIZLIK: {len(problems)} sorun\n")
+        print(f"INCONSISTENCY: {len(problems)} problems\n")
         for problem in problems:
             print(f"  {problem}")
         sys.exit(1)
-    print(f"tutarlilik: TEMIZ  ({len(functions)} fonksiyon, {len(ram)} RAM sembolu, "
-          f"{len(regions)} bolge)")
-    # Hata degil, GORUNURLUK: bos saplamalar ve kor iletme sarmalayicilari
-    # bilerek adlandirilmiyor (ne yaptiklari bilinmiyor, ad uydurmak olurdu).
-    # Sayinin her kosuda yazilmasi, adlandirilabilir olanlarin sessizce
-    # birikmesini engelliyor.
+    print(f"consistency: CLEAN  ({len(functions)} functions, {len(ram)} RAM symbols, "
+          f"{len(regions)} regions)")
+    # Not an error but VISIBILITY: empty stubs and blind forwarding wrappers
+    # are deliberately left unnamed (what they do is unknown, and naming them
+    # would be invention). Printing the count on every run prevents the
+    # nameable ones from accumulating silently.
     if placeholder:
-        print(f"  not: {len(placeholder)} eslesen fonksiyon hala yer tutucu "
-              f"`FUN_` adi tasiyor (bos saplama / kor sarmalayici bekleniyor)")
+        print(f"  note: {len(placeholder)} matching functions still carry a "
+              f"placeholder `FUN_` name (empty stubs / blind wrappers expected)")
 
 
 if __name__ == "__main__":

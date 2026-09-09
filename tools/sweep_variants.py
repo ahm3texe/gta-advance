@@ -1,45 +1,45 @@
 #!/usr/bin/env python3
-"""Bir C kaynagi uzerinde YAPISAL VARYANTLARI tarayip ROM ile karsilastirir.
+"""Sweep STRUCTURAL VARIANTS over a C source and compare against the ROM.
 
-Neden var
----------
-Yakin iskalarda elle deneme ve decomp-permuter'in ikisi de tikaniyor ama
-SISTEMATIK tarama cozüyor.  Olculdu (2026-09-05, EitherInRange 8/44):
+Why
+---
+On near misses, both manual attempts and decomp-permuter stall, but a
+SYSTEMATIC sweep solves it. Measured (2026-09-05, EitherInRange 8/44):
 
-  - elle 5040 bildirim sirasi denendi -> hicbiri 8'in altina inmedi
-  - decomp-permuter 20000 iterasyon kostu -> skor 205'te plato
-  - bu aractaki "karsilastirma sabitini yerele al" taramasi -> 0/44
+  - 5040 declaration orders tried by hand -> none got below 8
+  - decomp-permuter ran 20000 iterations -> plateaued at score 205
+  - this tool's "hoist the comparison constant into a local" sweep -> 0/44
 
-Permuter RASTGELE yerel mutasyon yapar; bu arac BELIRLI mekanizmalarin
-TUM alt kumelerini dener.  Ikisi farkli seyler icin iyi: permuter genis ve
-kor, bu arac dar ve tuketici.
+The permuter makes RANDOM local mutations; this tool tries ALL subsets of
+SPECIFIC mechanisms. The two are good for different things: the permuter is
+broad and blind, this tool is narrow and exhaustive.
 
-KAPSAM SINIRI -- OLCULDU, ABARTMA
----------------------------------
-Bu arac YALNIZCA tanidigi mekanizmalari tarar.  Mevcut uc yakin iskada
-(2026-09-05) hicbir sey bulamadi:
+SCOPE LIMIT -- MEASURED, DO NOT OVERSTATE
+-----------------------------------------
+This tool sweeps ONLY the mechanisms it knows. On the three current near
+misses (2026-09-05) it found nothing:
 
-    ClearTextArea    1/132   -> 17 varyant, sonuc yok
-    CleanupAreaTiles 7/88    ->  2 varyant, sonuc yok
-    FUN_08045AA4    12/540   ->  2 varyant, sonuc yok
+    ClearTextArea    1/132   -> 17 variants, no result
+    CleanupAreaTiles 7/88    ->  2 variants, no result
+    FUN_08045AA4    12/540   ->  2 variants, no result
 
-Sebep: ucunun de tikanmasi YUKLEME/SAKLAMA YAZMAC ATAMASI, karsilastirma
-kanonikleştirmesi degil.  Bu sinif icin bilinen bir kaynak-duzeyi kaldirac
-YOK.  Akla gelen ilk fikir olan BILDIRIM SIRASI taramasi da bos: onceki
-model ClearTextArea icin 5040 sıralamayi tuketmis, hicbiri iyilesme
-vermemis.  Bilinmeyen mekanizmaya tarama yazilamaz.
+The reason: all three are blocked by LOAD/STORE REGISTER ASSIGNMENT, not by
+comparison canonicalization. For that class there is NO known source-level
+lever. The obvious first idea, a DECLARATION ORDER sweep, is also empty: an
+earlier model exhausted 5040 orderings for ClearTextArea and none improved
+anything. A sweep cannot be written for an unknown mechanism.
 
-Yani bu arac, kural 44 tipi (karsilastirma sabiti) iskalar icin dogru ve
-hizli; yazmac dagitimi iskalari icin CARE DEGIL.  Yeni bir mekanizma
-kesfedilirse TRANSFORMS sozlugune eklenmeli.
+So this tool is right and fast for rule 44 type (comparison constant) misses;
+for register allocation misses it is NO CURE. If a new mechanism is
+discovered, it should be added to the TRANSFORMS dictionary.
 
-Kullanim
---------
-    python3 tools/sweep_variants.py <kaynak.c> <FonksiyonAdi>
-    python3 tools/sweep_variants.py <kaynak.c> <Ad> --only hoist_cmp
-    python3 tools/sweep_variants.py <kaynak.c> <Ad> --max-sites 8 --keep
+Usage
+-----
+    python3 tools/sweep_variants.py <source.c> <FunctionName>
+    python3 tools/sweep_variants.py <source.c> <Name> --only hoist_cmp
+    python3 tools/sweep_variants.py <source.c> <Name> --max-sites 8 --keep
 
-Kaynak dosya DEGISTIRILMEZ; en iyi varyant --keep verilirse yazilir.
+The source file is NOT MODIFIED; the best variant is written only with --keep.
 """
 import argparse
 import itertools
@@ -56,18 +56,18 @@ from verify_c_function import (  # noqa: E402
     compile_and_link, DEFAULT_CC, rom_bytes, ROM_BASE,
 )
 
-# ---------------------------------------------------------------- yardimcilar
+# ------------------------------------------------------------------- helpers
 
 def function_row(name):
     import csv
     for r in csv.DictReader((ROOT / "data/functions.csv").open()):
         if r["name"] == name:
             return int(r["address"], 16), int(r["size"] or 0)
-    sys.exit(f"{name} data/functions.csv icinde yok")
+    sys.exit(f"{name} is not in data/functions.csv")
 
 
 def body_span(text, name):
-    """Fonksiyon govdesinin (acilis susu dahil) [start, end) araligi."""
+    """The [start, end) span of the function body, including the opening brace."""
     m = re.search(rf"\b{re.escape(name)}\s*\([^;{{]*\)\s*\{{", text)
     if not m:
         return None
@@ -84,18 +84,19 @@ def body_span(text, name):
 
 
 # ------------------------------------------------------------ donusturuculer
-# Her donusturucu: (ad, govde) -> [(site_aciklama, uygula_fn), ...]
-# uygula_fn(govde) -> yeni govde.  Uygulamalar ARKADAN ONE dogru yapilir ki
-# ofsetler kaymasin.
+# Each transform: (name, body) -> [(site_description, apply_fn), ...]
+# apply_fn(body) -> new body. Applications run BACK TO FRONT so that offsets
+# do not shift.
 
 CMP_LITERAL = re.compile(r"(\b[A-Za-z_]\w*(?:->|\.)?\w*)\s*(<=|>=|<|>|==|!=)\s*(\d+)\b")
 
 
 def sites_hoist_cmp(body, decl_anchor):
-    """Kural 44: karsilastirma sabitini yerel degiskene al.
+    """Rule 44: hoist the comparison constant into a local variable.
 
-    agbcc `x < 15`i `x <= 14`e kanonikleştiriyor; sabit degiskende olunca
-    kanonikleştirme atlaniyor ve sabit yine immediate olarak yayiliyor.
+    agbcc canonicalizes `x < 15` to `x <= 14`; with the constant in a variable,
+    canonicalization is skipped and the constant is still emitted as an
+    immediate.
     """
     out = []
     for k, m in enumerate(CMP_LITERAL.finditer(body)):
@@ -112,8 +113,8 @@ def sites_hoist_cmp(body, decl_anchor):
 
 
 def sites_flip_cmp(body, decl_anchor):
-    """Karsilastirma operandlarini takas et (a<b -> b>a).  Yayilma sirasini
-    ve dolayisiyla havuz/yazmac atamasini degistirebiliyor."""
+    """Swap the comparison operands (a<b -> b>a). This can change the emission
+    order and therefore the pool/register assignment."""
     FLIP = {"<": ">", ">": "<", "<=": ">=", ">=": "<=", "==": "==", "!=": "!="}
     out = []
     for k, m in enumerate(CMP_LITERAL.finditer(body)):
@@ -131,8 +132,8 @@ ASSIGN_EXPR = re.compile(r"^(\s+)([A-Za-z_]\w*)\s*=\s*([^;=][^;]*);\s*$", re.M)
 
 
 def sites_split_assign(body, decl_anchor):
-    """`a = X op Y;` -> ara degiskene bol.  Canli deger sayisini ve
-    dolayisiyla dagitimi degistirir."""
+    """`a = X op Y;` -> split into an intermediate variable. Changes the number
+    of live values and therefore the allocation."""
     out = []
     for k, m in enumerate(ASSIGN_EXPR.finditer(body)):
         indent, lhs, rhs = m.group(1), m.group(2), m.group(3).strip()
@@ -160,7 +161,7 @@ TRANSFORMS = {
 }
 
 
-# ------------------------------------------------------------------- tarama
+# --------------------------------------------------------------------- sweep
 
 def score(path, name, addr, size, rom):
     try:
@@ -180,11 +181,11 @@ def main():
     ap.add_argument("source")
     ap.add_argument("function")
     ap.add_argument("--only", action="append",
-                    help=f"yalnizca bu donusum ({', '.join(TRANSFORMS)})")
+                    help=f"only this transform ({', '.join(TRANSFORMS)})")
     ap.add_argument("--max-sites", type=int, default=10,
-                    help="bir donusumde en fazla kac site (2^n kombinasyon)")
+                    help="max sites per transform (2^n combinations)")
     ap.add_argument("--keep", action="store_true",
-                    help="en iyi varyanti kaynak dosyaya YAZ")
+                    help="WRITE the best variant back to the source file")
     a = ap.parse_args()
 
     src = Path(a.source)
@@ -193,17 +194,17 @@ def main():
     original = src.read_text()
     span = body_span(original, a.function)
     if not span:
-        sys.exit(f"{a.function} govdesi {src} icinde bulunamadi")
+        sys.exit(f"the body of {a.function} was not found in {src}")
     bstart, bend = span
     head, body, tail = original[:bstart], original[bstart:bend], original[bend:]
-    decl_anchor = body.index("\n") + 1   # acilis susundan sonraki satir
+    decl_anchor = body.index("\n") + 1   # the line after the opening brace
 
     base_score, base_size = score(src, a.function, addr, size, rom)
     if base_score is None:
-        sys.exit("taban surum derlenmedi")
-    print(f"taban: {base_size}/{size} bayt, fark {base_score}")
+        sys.exit("the base version did not compile")
+    print(f"base: {base_size}/{size} bytes, difference {base_score}")
     if base_score == 0:
-        print("zaten eslesiyor"); return 0
+        print("already matching"); return 0
 
     names = a.only or list(TRANSFORMS)
     best = (base_score, None, "taban")
@@ -213,18 +214,18 @@ def main():
     for tname in names:
         sites = TRANSFORMS[tname](body, decl_anchor)
         if not sites:
-            print(f"  {tname}: site yok"); continue
+            print(f"  {tname}: no sites"); continue
         if len(sites) > a.max_sites:
-            print(f"  {tname}: {len(sites)} site -> ilk {a.max_sites} ile sinirlandi "
+            print(f"  {tname}: {len(sites)} sites -> limited to the first {a.max_sites} "
                   f"(KAPSAM DUSURULDU)")
             sites = sites[:a.max_sites]
         n = len(sites)
-        print(f"  {tname}: {n} site, {2**n} kombinasyon")
+        print(f"  {tname}: {n} sites, {2**n} combinations")
         for r in range(1, n + 1):
             for combo in itertools.combinations(range(n), r):
                 b = body
                 decls = ""
-                for k in sorted(combo, reverse=True):   # arkadan one
+                for k in sorted(combo, reverse=True):   # back to front
                     b, d = sites[k][1](b)
                     decls += d
                 if decls:
@@ -236,9 +237,9 @@ def main():
                     continue
                 if sc < best[0]:
                     best = (sc, head + b + tail, f"{tname}{combo}")
-                    print(f"    yeni en iyi: fark {sc} boyut {sz} <- {tname}{list(combo)}")
+                    print(f"    new best: difference {sc} size {sz} <- {tname}{list(combo)}")
                 if sc == 0:
-                    print(f"\n*** ESLESTI *** {tname}{list(combo)}  ({tried} varyant denendi)")
+                    print(f"\n*** MATCHED *** {tname}{list(combo)}  ({tried} variants tried)")
                     if a.keep:
                         src.write_text(best[1]); print(f"    yazildi: {src}")
                     else:
@@ -246,12 +247,12 @@ def main():
                         out.write_text(best[1]); print(f"    kaydedildi: {out}")
                     return 0
 
-    print(f"\n{tried} varyant denendi; en iyi fark {best[0]} ({best[2]})")
+    print(f"\n{tried} variants tried; best difference {best[0]} ({best[2]})")
     if best[1] and best[0] < base_score:
         out = src.with_suffix(".best.c")
-        out.write_text(best[1]); print(f"en iyi varyant: {out}")
+        out.write_text(best[1]); print(f"best variant: {out}")
         if a.keep:
-            src.write_text(best[1]); print(f"kaynak guncellendi: {src}")
+            src.write_text(best[1]); print(f"source updated: {src}")
     return 1
 
 

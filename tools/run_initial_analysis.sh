@@ -20,5 +20,5 @@ mkdir -p "$project_dir" "$repo_dir/analysis"
     -postScript ExportFunctionMap.java "$report_path" \
     -analysisTimeoutPerFile 900
 
-echo "Fonksiyon raporu: $report_path"
+echo "Function report: $report_path"
 

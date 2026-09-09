@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""Eski dogrusal BL-hedefi deneyini adli inceleme icin saklar.
+"""Keep the old linear BL-target experiment for forensic reference.
 
-audit_boundaries.py'nin yurutucusu kosulsuz `b` komutunu fonksiyon ICI
-akis sayiyor. Ama GCC `b`'yi KUYRUK CAGRISI icin de kullanir: bir
-fonksiyon isini bitirip komsusuna atlar. Bu yuzden Faz 0'da ardisik
-fonksiyonlar tek kayda birlestirildi.
+The walker in audit_boundaries.py treats an unconditional `b` as intra-function
+flow. But GCC also uses `b` for a TAIL CALL: a function finishes its work and
+jumps to its neighbor. That is why consecutive functions were merged into one
+record in Phase 0.
 
-Bu varsayim bu ROM icin YANLISTIR: literal havuzlari BL gibi gorunebilir ve
-oyun ortak fonksiyon-ici bloklara BL ile girebilir. 2026-09-04 incelemesinde
-aracin olusturdugu 52 bolmenin tamami geri alindi. Yazma kipi kalici olarak
-devre disidir.
+That assumption is WRONG for this ROM: literal pools can look like a BL, and the
+game can enter shared intra-function blocks with a BL. In the 2026-09-04 review
+all 52 splits this tool produced were reverted. Write mode is permanently
+disabled.
 
-Kullanim:
-    python3 tools/split_at_calls.py                 # neden devre disi oldugunu yaz
-    python3 tools/split_at_calls.py --unsafe-report # tarihsel ham rapor
+Usage:
+    python3 tools/split_at_calls.py                 # explain why it is disabled
+    python3 tools/split_at_calls.py --unsafe-report # the historical raw report
 """
 import csv
 import sys
@@ -43,11 +43,11 @@ def call_targets(rom: bytes, rows: list[tuple[int, int]]) -> set[int]:
 def main() -> None:
     apply = "--apply" in sys.argv
     if apply:
-        sys.exit("DURDU: --apply kalici olarak devre disi; dogrusal BL "
-                 "taramasi 52 sahte sinir uretmisti")
+        sys.exit("STOPPED: --apply is permanently disabled; the linear BL scan "
+                 "produced 52 false boundaries")
     if "--unsafe-report" not in sys.argv:
-        print("DEVRE DISI: dogrusal BL taramasi literal/ortak bloklari "
-              "fonksiyon sanabiliyor. Ayrinti: docs/WORKLOG.md (2026-09-04).")
+        print("DISABLED: the linear BL scan can mistake literal/shared blocks "
+              "for functions. Details: docs/WORKLOG.md (2026-09-04).")
         return
     rom = ROM.read_bytes()
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
@@ -59,7 +59,7 @@ def main() -> None:
     targets = call_targets(rom, sized)
     starts = {a for a, _ in sized}
 
-    # Her kayit icin, govdesinin icine dusen cagri hedefleri = bolme noktalari
+    # For each record, call targets falling inside its body = split points
     splits: dict[int, list[int]] = {}
     for address, size in sized:
         inner = sorted(t for t in targets
@@ -68,8 +68,8 @@ def main() -> None:
             splits[address] = inner
 
     total_new = sum(len(v) for v in splits.values())
-    print(f"{len(splits)} kayit bolunecek, {total_new} yeni fonksiyon sinniri\n")
-    print(f"{'kayit':12} {'boyut':>6}  bolme noktalari")
+    print(f"{len(splits)} records would be split, {total_new} new function boundaries\n")
+    print(f"{'record':12} {'size':>6}  split points")
     print("-" * 60)
     for address in sorted(splits)[:15]:
         points = " ".join(f"0x{t:08X}" for t in splits[address][:4])
@@ -78,11 +78,11 @@ def main() -> None:
         print(f"0x{address:08X} {size:>6}  {points}{more}")
 
     if not apply:
-        print("\n(yalnizca rapor; bolmek icin --apply)")
+        print("\n(report only; use --apply to split)")
         return
 
     out = []
-    added: set[int] = set()      # ayni cagri hedefi iki ebeveynin icinde
+    added: set[int] = set()      # the same call target inside two parents
                                  # kalabilir; cocugu yalnizca BIR kez ekle
     for row in rows:
         address = int(row["address"], 16)
@@ -106,15 +106,15 @@ def main() -> None:
                 "size": str(points[i + 1] - start), "status": "discovered",
                 "module": row["module"],
                 "notes": f"0x{address:08X} kaydinin icinde saklaniyordu; "
-                         f"cagri hedefi oldugu icin ayri fonksiyon",
+                         f"a separate function because it is a call target",
             })
     out.sort(key=lambda r: int(r["address"], 16))
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
         writer.writerows(out)
-    print(f"\nfunctions.csv: {len(splits)} kayit bolundu, "
-          f"{total_new} yeni fonksiyon.")
+    print(f"\nfunctions.csv: {len(splits)} records split, "
+          f"{total_new} new functions.")
 
 
 if __name__ == "__main__":

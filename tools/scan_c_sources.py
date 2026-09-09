@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""src/ altindaki C kaynaklarini derleyip ROM ile karsilastirir ve
-data/c_sources.csv dosyasini uretir.
+"""Compile the C sources under src/, compare them against the ROM, and produce
+data/c_sources.csv.
 
-Bu, "assembly'den byte-matching" ile "C'den byte-matching" arasindaki ayrimi
-olculebilir yapar. Assembly transkripsiyonu ROM'u uretir ama okunabilir kaynak
-uretmez; projenin asil hedefi ikincisidir.
+This makes the distinction between "byte-matching from assembly" and
+"byte-matching from C" measurable. An assembly transcription reproduces the ROM
+but not readable source; the project's real goal is the latter.
 
-Kullanim:  python3 tools/scan_c_sources.py
+Usage:  python3 tools/scan_c_sources.py
 """
 import csv
 import sys
@@ -45,7 +45,7 @@ def main() -> None:
             mapped_size = int(rows[name]["size"], 0)
             start = address - ROM_BASE
             # Yalnizca derleyicinin urettigi kisa bir prefix'in tutmasi tam
-            # fonksiyon eslesmesi degildir. Symbol en az haritadaki govdeyi
+            # is not a function match. The symbol must cover at least the body
             # kapsamiyorsa matching terfisi yasaktir.
             complete = size >= mapped_size
             matched = complete and blob[offset:offset + size] == rom[start:start + size]
@@ -59,7 +59,7 @@ def main() -> None:
             })
 
     if failures:
-        print(f"\nDURDU: {len(failures)} kaynak derlenemedi; "
+        print(f"\nSTOPPED: {len(failures)} sources failed to compile; "
               f"{OUTPUT.relative_to(ROOT)} DEGISTIRILMEDI.", file=sys.stderr)
         for source, error in failures:
             print(f"  {source.relative_to(ROOT)}: {error}", file=sys.stderr)
@@ -79,7 +79,7 @@ def main() -> None:
         writer.writerows(records)
 
     matched = sum(1 for r in records if r["matching"] == "yes")
-    print(f"C kaynagi: {len(records)} fonksiyon, {matched} tanesi byte-matching "
+    print(f"C sources: {len(records)} functions, {matched} byte-matching "
           f"-> {OUTPUT.relative_to(ROOT)}")
 
 

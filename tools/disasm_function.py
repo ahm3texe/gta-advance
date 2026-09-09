@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""ROM'daki bir fonksiyonun disassembly'sini uretir.
+"""Produce the disassembly of a function in the ROM.
 
-Kullanim:
+Usage:
     python3 tools/disasm_function.py EraseSaveSlot
 
-Kaynak ROM'un kendisidir, depodaki bir dosya degil. Bu yuzden cikti her zaman
-dogrudur ve bakim gerektirmez: bir fonksiyon C'ye tasindiktan sonra assembly
-kaynagini silsen bile orijinal kodu istedigin an buradan geri alirsin.
+The source is the ROM itself, not a file in the repository. The output is
+therefore always correct and needs no maintenance: even after a function moves
+to C and its assembly source is deleted, the original code can be recovered
+from here at any time.
 """
 import csv
 import re
@@ -22,7 +23,7 @@ ROM_BASE = 0x08000000
 
 
 def describe(value: int, names: dict[int, str]) -> str:
-    """Bir literal havuzu kelimesinin ne oldugunu tahmin et."""
+    """Guess what a literal pool word is."""
     if value in names:
         return f"{value:#010x}  {names[value]}"
     if 0x08000000 <= value < 0x0A000000:
@@ -45,7 +46,7 @@ def main() -> None:
 
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
         rows = {r["name"]: r for r in csv.DictReader(handle)}
-    # Ad ya da adres kabul edilir; adres yazimi buyuk/kucuk harf farketmez.
+    # A name or an address is accepted; address case does not matter.
     if target not in rows:
         want = target.lower()
         if want.startswith("0x"):
@@ -53,20 +54,20 @@ def main() -> None:
             if want in byaddr:
                 target = byaddr[want]["name"]
     if target not in rows:
-        sys.exit(f"{target} data/functions.csv icinde yok")
+        sys.exit(f"{target} is not in data/functions.csv")
 
     row = rows[target]
     address = int(row["address"], 16)
     size = int(row["size"] or 0)
     if not size:
-        sys.exit(f"{target} icin boyut bilinmiyor")
+        sys.exit(f"the size of {target} is unknown")
 
     BUILD.mkdir(parents=True, exist_ok=True)
     start = address - ROM_BASE
     slice_path = BUILD / f"{target}.bin"
     slice_path.write_bytes(ROM.read_bytes()[start:start + size])
 
-    # ARM/Thumb ayrimi: notlarda ARM diye isaretlenmemisse Thumb varsayilir.
+    # ARM/Thumb distinction: Thumb is assumed unless the notes mark it as ARM.
     thumb = "ARM" not in row["notes"].upper().split()
     out = subprocess.run([
         "arm-none-eabi-objdump", "-b", "binary", "-m", "arm7tdmi",
@@ -82,8 +83,8 @@ def main() -> None:
             return int.from_bytes(rom_bytes[off:off + 4], "little")
         return None
 
-    # Bilinen fonksiyon adlari: hem `bl` hedeflerini hem de havuzdaki
-    # fonksiyon isaretcilerini isimlendirmek icin.
+    # Known function names: used to name both `bl` targets and function
+    # pointers in the pool.
     names = {}
     for r in rows.values():
         addr = int(r["address"], 16)
@@ -91,7 +92,7 @@ def main() -> None:
         names[addr | 1] = f"{r['name']}+Thumb"
 
     print(f"{target}  @ 0x{address:08X}  {size} byte  "
-          f"[{'Thumb' if thumb else 'ARM'}]  — kaynak: baserom.gba")
+          f"[{'Thumb' if thumb else 'ARM'}]  - source: baserom.gba")
     if row["notes"]:
         print(f"# {row['notes']}")
     print()

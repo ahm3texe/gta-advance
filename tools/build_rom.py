@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Dogrulanmis kaynaklari hibrit ROM'a yerlestirip SHA-1'i karsilastirir.
+"""Place the verified sources into a hybrid ROM and compare the SHA-1.
 
-Dogrulanmis her bolge KENDI KAYNAGIMIZDAN uretilir; kalan alanlar
-baserom.gba'dan oldugu gibi kopyalanir. Sonucun hash'i orijinalle ayni
-cikmalidir.
+Every verified region is produced FROM OUR OWN SOURCE; the remaining areas are
+copied from baserom.gba as they are. The result's hash must come out identical
+to the original's.
 
-Bu bir butunlestirme sinamasidir: kaynak bolgelerinin dogru ofsete oturdugunu
-denetler. Kopyalanan alanlar icin kaynaktan yeniden uretim iddiasi tasimaz.
+This is an integration test: it checks that the source regions land at the right
+offset. It makes no claim of reproducing the copied areas from source.
 
-Kullanim:  python3 tools/build_rom.py [--out out/gtaadvance.gba]
+Usage:  python3 tools/build_rom.py [--out out/gtaadvance.gba]
 """
 import csv
 import hashlib
@@ -35,7 +35,7 @@ def libc_slice(work: Path, obj: str, symbol: str) -> bytes:
         None,
     )
     if entry is None:
-        sys.exit(f"HATA: {symbol} {obj} icinde yok")
+        sys.exit(f"ERROR: {symbol} is not in {obj}")
     offset, size = int(entry[0], 16), int(entry[1], 16)
     binary = work / "slice.bin"
     subprocess.run(["arm-none-eabi-objcopy", "-O", "binary", "--only-section=.text",
@@ -49,7 +49,7 @@ def main() -> None:
         if arg.startswith("--out="):
             out = Path(arg.split("=", 1)[1])
     if not ROM.exists():
-        sys.exit("baserom.gba yok. Once: make prepare-rom ROM_ZIP=...")
+        sys.exit("no baserom.gba. First run: make prepare-rom ROM_ZIP=...")
 
     original = ROM.read_bytes()
     image = bytearray(original)
@@ -59,12 +59,12 @@ def main() -> None:
     for row in csv.DictReader(REGIONS.open(newline="", encoding="utf-8")):
         binary = ROOT / row["binary"]
         if not binary.exists():
-            sys.exit(f"HATA: {row['binary']} uretilmemis. Once: make matching")
+            sys.exit(f"ERROR: {row['binary']} has not been built. First run: make matching")
         start = int(row["start"], 16) - ROM_BASE
         end = int(row["end"], 16) - ROM_BASE
         body = binary.read_bytes()
         if len(body) != end - start:
-            sys.exit(f"HATA: {row['binary']} {len(body)} byte, bolge {end - start} byte")
+            sys.exit(f"ERROR: {row['binary']} is {len(body)} bytes, the region is {end - start}")
         image[start:end] = body
         placed += 1
         covered += end - start
@@ -79,7 +79,7 @@ def main() -> None:
             end = int(row["end"], 16) - ROM_BASE
             body = libc_slice(work, row["object"], row["symbol"])
             if len(body) != end - start:
-                sys.exit(f"HATA: {row['symbol']} {len(body)} byte, bolge {end - start} byte")
+                sys.exit(f"ERROR: {row['symbol']} is {len(body)} bytes, the region is {end - start}")
             image[start:end] = body
             placed += 1
             covered += end - start
@@ -89,15 +89,15 @@ def main() -> None:
 
     built = hashlib.sha1(image).hexdigest()
     expected = hashlib.sha1(original).hexdigest()
-    print(f"{placed} bolge kendi kaynagimizdan yerlestirildi ({covered} byte).")
-    print(f"Geri kalan {len(original) - covered} byte baserom.gba'dan kopyalandi.")
-    print(f"beklenen SHA-1: {expected}")
-    print(f"uretilen SHA-1: {built}")
+    print(f"{placed} regions placed from our own source ({covered} bytes).")
+    print(f"The remaining {len(original) - covered} bytes were copied from baserom.gba.")
+    print(f"expected SHA-1: {expected}")
+    print(f"produced SHA-1: {built}")
     if built == expected:
-        print(f"{GREEN}HASH BIREBIR AYNI{RESET} — dogrulanmis {covered} byte kendi\n  kaynagimizdan doğru yere oturuyor. Kalan {len(original) - covered} byte\n  baserom.gba'dan kopyalandi, yani bu TAM ROM'un kaynaktan uretildigi\n  anlamina GELMEZ; hibrit butunlestirme sinamasidir.  -> {out}")
+        print(f"{GREEN}HASH IS EXACT{RESET} - the verified {covered} bytes land in the\n  right place from our own source. The remaining {len(original) - covered} bytes\n  were copied from baserom.gba, so this does NOT mean the FULL ROM was built\n  from source; it is a hybrid integration test.  -> {out}")
         return
     diff = sum(1 for a, b in zip(image, original) if a != b)
-    print(f"{RED}HASH TUTMUYOR: {diff} byte farkli.{RESET}")
+    print(f"{RED}HASH MISMATCH: {diff} bytes differ.{RESET}")
     sys.exit(1)
 
 

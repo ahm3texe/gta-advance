@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""agbcc'nin libc.a'sindaki fonksiyonlari ROM icinde arar.
+"""Search the ROM for functions from agbcc's libc.a.
 
-ROM, agbcc ile birlikte gelen newlib'e linkleniyor: "bug in vfprintf: bad base",
-"_sbrk: Heap and stack collision" ve "Infinity" dizeleri hem ROM'da hem
-tools/agbcc/lib/libc.a icinde birebir var. Yani kod bolgesinin kuyrugu tersine
-muhendislik gerektirmeyen standart kutuphane kodudur; kaynagi zaten elimizde.
+The ROM links against the newlib shipped with agbcc: the strings
+"bug in vfprintf: bad base", "_sbrk: Heap and stack collision" and "Infinity"
+appear verbatim both in the ROM and in tools/agbcc/lib/libc.a. So the tail of the
+code region is standard library code that needs no reverse engineering; we
+already have its source.
 
-Dis cagri iceren fonksiyonlar linklenmeden ROM byte'lariyla eslesmez: `bl`
-hedefi ve literal havuzdaki adresler baglama gore degisir. Bu yuzden tarama
-MASKELI yapilir - yer degistirmenin dokundugu byte'lar joker sayilir, geri
-kalan govde birebir aranir. Boylece adresi bilmeden de fonksiyon bulunur.
+Functions containing external calls do not match the ROM bytes until they are
+linked: the `bl` target and the addresses in the literal pool depend on the
+binding. The scan is therefore MASKED - the bytes touched by relocation are
+treated as wildcards and the rest of the body is searched verbatim. That way a
+function can be found without knowing its address.
 
-Kullanim:  python3 tools/scan_libc.py [--csv]
+Usage:  python3 tools/scan_libc.py [--csv]
 """
 import csv
 import subprocess
@@ -29,7 +31,7 @@ LIBS = [
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data/functions.csv"
 ROM_BASE = 0x08000000
-MIN_SIZE = 16       # kisa govdeler tesaduf eslesme uretir
+MIN_SIZE = 16       # short bodies produce coincidental matches
 MIN_FIXED = 12      # maskeleme sonrasi en az bu kadar sabit byte kalmali
 
 
@@ -67,7 +69,7 @@ def masked_find(rom: bytes, body: bytes, spans: list[tuple[int, int]],
     fixed = [i for i, m in enumerate(mask) if m]
     if len(fixed) < MIN_FIXED:
         return -1
-    # En uzun sabit parcayi kaba filtre olarak kullan.
+    # Use the longest fixed run as a coarse filter.
     runs, run = [], []
     for i in fixed:
         if run and i == run[-1] + 1:
@@ -134,9 +136,9 @@ def scan_archive(rom: bytes, work: Path, binary: Path, found: list,
 def main() -> None:
     missing = [str(path) for _, path in LIBS if not path.exists()]
     if missing:
-        sys.exit(f"{', '.join(missing)} yok. Once: make agbcc")
+        sys.exit(f"{', '.join(missing)} missing. First run: make agbcc")
     if not ROM.exists():
-        sys.exit("baserom.gba yok.")
+        sys.exit("baserom.gba is missing.")
 
     rom = ROM.read_bytes()
     with FUNCTIONS.open(newline="", encoding="utf-8") as handle:
@@ -185,9 +187,9 @@ def main() -> None:
             if index >= 0:
                 found.append((ROM_BASE + index, name, size, bool(local)))
 
-    # Ayni govdeye sahip semboller (ornegin toupper/_toupper) ayni adresi bulur.
-    # Hangisinin o adreste durdugu byte'lardan anlasilamaz; uydurmak yerine
-    # belirsiz olarak isaretlenir.
+    # Symbols with identical bodies (e.g. toupper/_toupper) find the same address.
+    # The bytes cannot tell which one sits at that address; rather than invent
+    # they are marked as ambiguous.
     grouped: dict[int, list] = {}
     for address, name, size, was_masked, lib_name in found:
         grouped.setdefault(address, []).append((name, size, was_masked, lib_name))
@@ -214,7 +216,7 @@ def main() -> None:
         return
 
     detail = ", ".join(f"{k}: {v}" for k, v in per_lib.items())
-    print(f"{checked} fonksiyon arandi ({masked} tanesi maskeli)")
+    print(f"{checked} functions searched ({masked} of them masked)")
     print(f"ROM'da bulunan: {len(found)}  ({detail})\n")
     for address, name, size, was_masked, aliases, lib_name in found:
         flags = []

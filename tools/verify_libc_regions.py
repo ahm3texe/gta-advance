@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""ROM'daki standart kutuphane bolgelerini agbcc'nin libc.a'sina karsi dogrular.
+"""Verify the standard library regions in the ROM against agbcc's libc.a.
 
-ROM, agbcc ile birlikte gelen newlib'e linkleniyor (docs/ROM_ARTIFACTS.md).
-Bu bolgeler tersine muhendislik gerektirmez: kaynagi zaten elimizde ve
-dogrulama, kutuphane govdesinin ROM'daki byte'larla birebir ayni oldugunu
-gostermektir.
+The ROM links against the newlib shipped with agbcc (docs/ROM_ARTIFACTS.md).
+These regions require no reverse engineering: we already have the source, and
+verification means showing that the library body is byte-identical to what is in
+the ROM.
 
-Yalnizca YER DEGISTIRMESIZ fonksiyonlar dogrulanabilir; dis cagri iceren
-govdeler linklenmeden ROM byte'lariyla eslesmez.
+Only functions WITHOUT RELOCATION can be verified; bodies containing external
+calls do not match the ROM bytes until they are linked.
 
-Kullanim:  python3 tools/verify_libc_regions.py
+Usage:  python3 tools/verify_libc_regions.py
 """
 import csv
 import subprocess
@@ -28,9 +28,9 @@ GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
 def main() -> None:
     if not LIBC.exists():
-        sys.exit("tools/agbcc/lib/libc.a yok. Once: make agbcc")
+        sys.exit("tools/agbcc/lib/libc.a is missing. First run: make agbcc")
     if not REGIONS.exists():
-        sys.exit(f"{REGIONS} yok.")
+        sys.exit(f"{REGIONS} is missing.")
 
     rom = ROM.read_bytes()
     work = Path(tempfile.mkdtemp())
@@ -52,7 +52,7 @@ def main() -> None:
             None,
         )
         if entry is None:
-            print(f"{RED}EKSIK{RESET}: {name} {row['object']} icinde yok")
+            print(f"{RED}MISSING{RESET}: {name} is not in {row['object']}")
             continue
         offset, size = int(entry[0], 16), int(entry[1], 16)
 

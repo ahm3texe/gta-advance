@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""ROM'daki basit yaprak erisimcileri bulur (okuma VE yazma).
+"""Find simple leaf accessors in the ROM (both reads AND writes).
 
-Kalip (6 baytlik cekirdek, ardindan hizalama + havuz):
-    ldr rN, [pc, #imm]      <- havuzdan taban adres
-    ldr|ldrb|ldrh rD, [rN, #ofs]      (getirici)
+The pattern (a 6-byte core, followed by alignment + pool):
+    ldr rN, [pc, #imm]      <- base address from the pool
+    ldr|ldrb|ldrh rD, [rN, #ofs]      (getter)
       ya da
-    str|strb|strh rD, [rN, #ofs]      (koyucu; deger r0'da gelir, taban r1'e
-                                       yuklenir cunku r0 dolu)
+    str|strb|strh rD, [rN, #ofs]      (setter; the value arrives in r0, so the
+                                       base is loaded into r1 because r0 is taken)
     bx lr
 
-C karsiligi mekanik:
-    u32  f(void)      { return sembol.alan; }
-    void f(u32 value) { sembol.alan = value; }
+The C equivalent is mechanical:
+    u32  f(void)      { return symbol.field; }
+    void f(u32 value) { symbol.field = value; }
 
-Kullanim: python3 tools/find_accessors.py [--all]
-  varsayilan: yalnizca HENUZ ESLESMEYEN kayitlar
-  --all: dogrulama icin eslesenleri de gosterir
+Usage: python3 tools/find_accessors.py [--all]
+  default: only records that are NOT YET MATCHING
+  --all: also shows matching ones, for verification
 """
 import csv
 import sys
@@ -24,9 +24,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ROM_BASE = 0x08000000
 
-# (maske, deger, tur, olcek) -- ofset olceklemesi Thumb kodlamasindan gelir
+# (mask, value, kind, scale) -- offset scaling comes from the Thumb encoding
 ACCESS = [
-    # (maske, deger, tur, olcek, yon)
+    # (mask, value, kind, scale, direction)
     (0xF800, 0x6800, "u32", 4, "get"),
     (0xF800, 0x7800, "u8", 1, "get"),
     (0xF800, 0x8800, "u16", 2, "get"),
@@ -81,9 +81,9 @@ def main() -> None:
         found.append((addr, sym, offset, kind, direction, ram.get(sym), row["name"]))
 
     gets = sum(1 for f in found if f[4] == "get")
-    print(f"{len(found)} yaprak erisimci ({gets} getirici, {len(found) - gets} koyucu)")
+    print(f"{len(found)} leaf accessors ({gets} getters, {len(found) - gets} setters)")
     for addr, sym, off, kind, direction, name, fname in found:
-        label = name or "(ram_map'te yok)"
+        label = name or "(not in ram_map)"
         print(f"0x{addr:08X}  {direction:3} {kind:3} 0x{sym:08X}+0x{off:02X}  "
               f"{label:22} {fname}")
 
