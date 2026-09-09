@@ -200,11 +200,20 @@ start,end,binary,module,notes
 0x08038000,0x08038020,build/world/clear_flag_notify.bin,world,clearing the flag and reporting when empty
 0x08038020,0x0803802C,build/world/forward_zero_arg4.bin,world,forwarding with the fourth argument zeroed
 0x08038044,0x08038060,build/world/slot_range_or_field.bin,world,complex harvest
+0x08038060,0x08038084,build/entity/set_target_or_slot.bin,entity,Kind 2 routes the target with the owner's slot; others store it at +0x08
+0x08038084,0x0803809C,build/entity/get_range_by_kind.bin,entity,Kind 2 takes the default range; others read the record's +0x04
+0x0803809C,0x080380B4,build/entity/is_active_slot_value.bin,entity,1 when the argument equals GetActiveSlotValue (rule 72)
+0x080380B4,0x080380CC,build/entity/is_lookup_nonnegative.bin,entity,1 when FUN_0805CFCC answers non-negative for the +0x09 byte
 0x080381F8,0x08038234,build/world/object_query.bin,world,ProbeObject; object test with default parameters
 0x08038234,0x0803824C,build/world/submit_object.bin,world,Object submit wrapper
 0x0803824C,0x08038260,build/world/get_inner_id.bin,world,GetInnerId; inner object id through two links
 0x08038260,0x08038298,build/world/object_value.bin,world,"Object value resolution: test, indirect slot, direct detail"
 0x08038358,0x080383B8,build/world/object_helpers.bin,world,"Four object helpers: delegation, flag query, update chain, id with a default"
+0x080383B8,0x080383E8,build/entity/draw_with_model_value.bin,entity,"Draws with the +0x38 value, or 0 for kind 4, a null record or the sentinel"
+0x08038420,0x08038440,build/entity/notify_unless_masked.bin,entity,Notifies the actor unless mask 0x440 is set or the record is missing
+0x08038440,0x0803846C,build/entity/flag_owner_and_step.bin,entity,"Sets bit 23 on the owner, then runs three steps"
+0x08038584,0x0803859C,build/entity/step_all_entities.bin,entity,Runs FUN_08037B50 over gUnk0202F2C0; Thumb function pointer
+0x08038680,0x080386A8,build/entity/find_model_by_id.bin,entity,"Index of the model whose +0x04 id matches, over 120 x 80-byte entries"
 0x0803AFBC,0x0803B19C,build/world/band_0803afbc.bin,world,"Scene/state transition step; five-way gate, threshold selection, state dispatch."
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Slot configuration and two readers
 0x0803C0E4,0x0803C178,build/world/apply_two_levels.bin,world,clamping and applying two levels

@@ -369,6 +369,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038000,ClearFlagNotify,src/world/clear_flag_notify.c,32,32,yes
 0x08038020,ForwardZeroArg4,src/world/forward_zero_arg4.c,12,12,yes
 0x08038044,SlotRangeOrField,src/world/slot_range_or_field.c,26,26,yes
+0x08038060,FUN_08038060,src/entity/set_target_or_slot.c,34,34,yes
+0x08038084,FUN_08038084,src/entity/get_range_by_kind.c,22,22,yes
+0x0803809C,FUN_0803809c,src/entity/is_active_slot_value.c,24,24,yes
+0x080380B4,FUN_080380b4,src/entity/is_lookup_nonnegative.c,22,22,yes
 0x080381F8,ProbeObject,src/world/object_query.c,58,58,yes
 0x08038234,SubmitObject,src/world/submit_object.c,22,22,yes
 0x0803824C,GetInnerId,src/world/get_inner_id.c,20,20,yes
@@ -377,8 +381,13 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038364,IsObjectActive,src/world/object_helpers.c,28,28,yes
 0x08038380,UpdateObject,src/world/object_helpers.c,32,32,yes
 0x080383A0,GetObjectLinkId,src/world/object_helpers.c,24,24,yes
+0x080383B8,FUN_080383b8,src/entity/draw_with_model_value.c,48,48,yes
+0x08038420,FUN_08038420,src/entity/notify_unless_masked.c,30,30,yes
+0x08038440,FUN_08038440,src/entity/flag_owner_and_step.c,44,44,yes
+0x08038584,FUN_08038584,src/entity/step_all_entities.c,24,24,yes
 0x08038608,FUN_08038608,src/world/p1_38608.c,60,60,yes
 0x08038644,FUN_08038644,src/world/p1_38644.c,60,60,yes
+0x08038680,FUN_08038680,src/entity/find_model_by_id.c,38,38,yes
 0x0803AFBC,FUN_0803afbc,src/world/band_0803afbc.c,480,480,yes
 0x0803B19C,NoOp0803B19C,src/misc/empty_stubs.c,2,2,yes
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes

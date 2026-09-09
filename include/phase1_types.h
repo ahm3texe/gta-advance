@@ -25,11 +25,13 @@ typedef struct Phase1Resource {
     u8 data[1];
 } Phase1Resource;
 typedef struct Phase1Model {
-    u8 pad00[22];
-    u16 value;
-    u8 pad18[54];
-    u16 alternate;
-} Phase1Model;
+    u8  pad00[4];
+    u32 id;                     /* +0x04, searched by FUN_08038680 */
+    u8  pad08[14];
+    u16 value;                  /* +0x16 */
+    u8  pad18[54];
+    u16 alternate;              /* +0x4E */
+} Phase1Model;                  /* 80 bytes; FUN_08038680 walks 120 of them */
 typedef struct Phase1ActorDesc {
     u8 pad00[6]; u16 kind; u8 pad08[32]; u32 id;
 } Phase1ActorDesc;

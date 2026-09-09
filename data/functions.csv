@@ -895,10 +895,10 @@ address,name,size,status,module,notes
 0x08038000,ClearFlagNotify,32,matching,world,byte-matching from a C source (MATCH-014 batch group 2)
 0x08038020,ForwardZeroArg4,12,matching,world,byte-matching from a C source (MATCH-014 batch group 4)
 0x08038044,SlotRangeOrField,26,matching,world,byte-matching from a C source; complex harvest
-0x08038060,FUN_08038060,34,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08038084,FUN_08038084,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803809C,FUN_0803809c,24,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x080380B4,FUN_080380b4,22,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08038060,FUN_08038060,34,matching,entity,Kind 2 routes the target through FUN_080387E8 with the owner's slot; every other kind writes it into +0x08 of the record at +0x30; decompiled in src/entity/set_target_or_slot.c
+0x08038084,FUN_08038084,22,matching,entity,Kind 2 takes GetDefaultRange; every other kind reads +0x04 of the record at +0x30; decompiled in src/entity/get_range_by_kind.c
+0x0803809C,FUN_0803809c,24,matching,entity,1 when the argument equals GetActiveSlotValue; decompiled in src/entity/is_active_slot_value.c
+0x080380B4,FUN_080380b4,22,matching,entity,1 when FUN_0805CFCC answers non-negative for the +0x09 byte; the blt says the callee's answer is signed; decompiled in src/entity/is_lookup_nonnegative.c
 0x08038108,FUN_08038108,154,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080381A4,FUN_080381a4,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080381F8,ProbeObject,58,matching,world,Object test with default parameters; src/world/object_query.c
@@ -909,18 +909,18 @@ address,name,size,status,module,notes
 0x08038364,IsObjectActive,28,matching,world,Object helper; src/world/object_helpers.c
 0x08038380,UpdateObject,32,matching,world,Object helper; src/world/object_helpers.c
 0x080383A0,GetObjectLinkId,24,matching,world,Object helper; src/world/object_helpers.c size measured including the tail pool (byte-matching evidence)
-0x080383B8,FUN_080383b8,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080383B8,FUN_080383b8,48,matching,entity,"Draws with the value behind +0x38 of the record at +0x1C; kind 4, a null record and the 0x7FFF sentinel all pass 0 instead; decompiled in src/entity/draw_with_model_value.c"
 0x080383E8,FUN_080383e8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08038420,FUN_08038420,30,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08038440,FUN_08038440,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08038420,FUN_08038420,30,matching,entity,Notifies the actor unless mask 0x440 is set in the +0x0C flags or the +0x1C record is missing; decompiled in src/entity/notify_unless_masked.c
+0x08038440,FUN_08038440,44,matching,entity,"Sets bit 23 in the +0x18 flags of the owner at +0x2C when there is one, then runs FUN_08036BA0, FUN_080367CC and FUN_0803685C; decompiled in src/entity/flag_owner_and_step.c"
 0x0803846C,FUN_0803846c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080384F0,FUN_080384f0,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08038530,FUN_08038530,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x08038584,FUN_08038584,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08038584,FUN_08038584,24,matching,entity,Runs FUN_08037B50 over the list at gUnk0202F2C0 through ListForEach; the pool word carries the Thumb bit; decompiled in src/entity/step_all_entities.c
 0x080385C4,FUN_080385c4,68,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08038608,FUN_08038608,60,matching,world,60-byte body and literal pool reproduce ROM bytes 0x38608-0x38643 exactly; the tail lookup must not route the table base through a local (docs/COMPILER.md rule 70)
 0x08038644,FUN_08038644,60,matching,world,"60-byte body and literal pool reproduce ROM bytes 0x38644-0x3867F exactly; twin of 0x08038608, and the field read must use the pointer form (docs/COMPILER.md rule 70)"
-0x08038680,FUN_08038680,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08038680,FUN_08038680,38,matching,entity,"Index of the model whose +0x04 id matches, over the 120 80-byte entries at 0x08CA7E64, -1 otherwise; decompiled in src/entity/find_model_by_id.c"
 0x080386A8,FUN_080386a8,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080387E8,FUN_080387e8,160,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08038888,FUN_08038888,188,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
