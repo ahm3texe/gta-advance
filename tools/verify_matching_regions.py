@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Rebuild every region in data/matching_regions.csv and verify it against the ROM."""
+
 import csv
 import sys
 from pathlib import Path

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Print the decompilation progress figures: matching functions, bytes and regions."""
+
 import csv
 import sys
 from collections import Counter

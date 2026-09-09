@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Compare a built .bin against a slice of the ROM and report the first difference."""
+
 import sys
 from pathlib import Path
 

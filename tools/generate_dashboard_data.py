@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Build dashboard/app/decomp-data.json from the function map and the C sources."""
+
 import csv
 import json
 import re
