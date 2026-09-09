@@ -84,7 +84,7 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
     """Compile a C file, link it at its ROM address and return the results.
 
     Returns: (linked binary, {function: (offset, size)}, base address)
-    Ofsetler ikilinin basina goredir.
+    Offsets are relative to the start of the binary.
     """
     agbcc = AGBCC_DIR / compiler
     if not agbcc.exists():

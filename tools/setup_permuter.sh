@@ -12,7 +12,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXT="$ROOT/tools/external"
-REV=1f7ef872b12f54db7678ff00e0346abc015410ae   # sabit revizyon
+REV=1f7ef872b12f54db7678ff00e0346abc015410ae   # pinned revision
 PY312="$HOME/.pyenv/versions/3.12.3/bin/python3.12"
 
 mkdir -p "$EXT"
@@ -43,7 +43,7 @@ if old in s:
     p.write_text(s.replace(old, new, 1)); print("  import.py yamalandi")
 PY
 
-echo "Kurulum tamam."
+echo "Setup complete."
 echo
 echo "To take on a function:"
 echo "  1) build the target .o from the ROM bytes -- see build/permuter/target.s."

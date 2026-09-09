@@ -52,7 +52,7 @@ out(string.format("=== measurement started (load %d) ===", MY_EPOCH))
 local frames        = 0        -- hardware frames elapsed in this window
 local logicFrames   = 0        -- the moment the counter resets = one logic frame
 local prevCounter   = -1
-local hist          = {}       -- gozlenen adim -> kac kez
+local hist          = {}       -- observed step -> occurrence count
 local windows       = 0
 
 callbacks:add("frame", function()
@@ -75,7 +75,7 @@ callbacks:add("frame", function()
     local delay = emu:read32(ADDR_FRAME_DELAY)
     local mode  = emu:read8(ADDR_GAME_STATE + 12)
 
-    -- Dagilimi okunur bicimde topla
+    -- Format the distribution for readability
     local parts, keys = {}, {}
     for k in pairs(hist) do keys[#keys + 1] = k end
     table.sort(keys)
@@ -83,7 +83,7 @@ callbacks:add("frame", function()
       parts[#parts + 1] = string.format("%d:%d", k, hist[k])
     end
 
-    -- Mantik fps'i = 60 donanim karesinde kac mantik karesi tamamlandi
+    -- Logic fps = logic frames completed in 60 hardware frames
     out(string.format(
       "window %-3d  logic %2d/60 frames  (~%2d fps)  gFrameDelay=%d  mode=%d  step distribution[%s]",
       windows, logicFrames, logicFrames, delay, mode,

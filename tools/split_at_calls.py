@@ -105,7 +105,7 @@ def main() -> None:
                 "address": f"0x{start:08X}", "name": f"FUN_{start:08x}",
                 "size": str(points[i + 1] - start), "status": "discovered",
                 "module": row["module"],
-                "notes": f"0x{address:08X} kaydinin icinde saklaniyordu; "
+                "notes": f"0x{address:08X} was embedded within the record; "
                          f"a separate function because it is a call target",
             })
     out.sort(key=lambda r: int(r["address"], 16))

@@ -11,7 +11,7 @@ C_BUILD_DEPS := $(wildcard include/*.h) tools/build_c.py tools/agbcc_build.py co
 $(MATCHING_C_BINS): $(C_BUILD_DEPS)
 
 prepare-rom:
-	@test -n "$(ROM_ZIP)" || (echo 'ROM_ZIP yolunu belirtin.' >&2; exit 2)
+	@test -n "$(ROM_ZIP)" || (echo 'Specify the ROM_ZIP path.' >&2; exit 2)
 	@./tools/prepare_rom.sh "$(ROM_ZIP)"
 
 verify-rom:
@@ -83,7 +83,7 @@ disasm: verify-rom
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
 
-# Commit oncesi kapilar: bilinen borca izin verir, yeni regresyonu reddeder.
+# Pre-commit checks: allow known debt, reject new regressions.
 check: toolchain-check rom
 	@python3 tools/scan_c_sources.py
 	@python3 tools/check_consistency.py

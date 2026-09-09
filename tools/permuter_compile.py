@@ -29,7 +29,7 @@ from agbcc_build import (  # noqa: E402
 def run(cmd, out=None):
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        sys.exit(f"{cmd[0]} basarisiz:\n{result.stderr.strip()[:800]}")
+        sys.exit(f"{cmd[0]} failed:\n{result.stderr.strip()[:800]}")
     if out is not None:
         out.write_text(result.stdout, encoding="utf-8")
 

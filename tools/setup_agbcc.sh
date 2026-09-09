@@ -31,7 +31,7 @@ fi
 CCWRAP="$ROOT/tools/agbcc_host_cc.sh"
 
 if [ ! -d "$WORK" ]; then
-    echo "agbcc kaynagi aliniyor..."
+    echo "Fetching agbcc source..."
     git init "$WORK"
     git -C "$WORK" remote add origin "$AGBCC_REPO"
     git -C "$WORK" fetch --depth 1 origin "$AGBCC_COMMIT"

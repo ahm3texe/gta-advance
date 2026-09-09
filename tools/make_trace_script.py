@@ -11,7 +11,7 @@ Usage:
     -> tools/trace.lua
 
 Then in mGBA:   Tools > Scripting... > Load script > tools/trace.lua
-Log dosyasi:    build/trace.log
+Log file:    build/trace.log
 """
 import csv
 import pathlib
@@ -119,7 +119,7 @@ local function probeApi()
     {"emu.memory.wram:read32()",function() return emu.memory.wram:read32(probe) end},
     {"emu:readRange(addr,4)",   function() return emu:readRange(probe, 4) end},
   }
-  out("--- API yoklamasi ---")
+  out("--- API probe ---")
   local winner = nil
   for i = 1, #attempts do
     local name, fn = attempts[i][1], attempts[i][2]
@@ -135,7 +135,7 @@ local function probeApi()
     out("[ERROR] no read form worked. Report the error texts above")
     out("       Claude'a gonder; dogru API bicimi oradan cikar.")
   else
-    out("kullanilan bicim: " .. winner)
+    out("selected API form: " .. winner)
   end
   out("--- yoklama sonu ---")
   return winner ~= nil
@@ -170,7 +170,7 @@ local function onFrame()
     if not noisy[i] then
       local e = WATCH[i]
       -- NO pcall: the addresses were validated once at startup, and in the hot loop
-      -- kare basina 135 pcall emulatoru gereksiz yavaslatiyordu.
+      -- 135 pcall invocations per frame unnecessarily slowed down the emulator.
       local val = readN(e[1], e[2])
       local old = prev[i]
       if old ~= nil and old ~= val then
@@ -207,8 +207,8 @@ callbacks:add("frame", onFrame)
 def validate_lua(text: str):
     """Return the lines that contain an unterminated string literal.
 
-    In Lua a string literal cannot cross a line break. An escaping bug is
-    produced this form, so generation builds on it.
+    In Lua a quoted string literal cannot span lines. An escaping bug once
+    produced this invalid form, so generation stops if this check finds it.
     """
     bad = []
     for i, line in enumerate(text.splitlines(), 1):

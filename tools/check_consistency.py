@@ -108,7 +108,7 @@ def main() -> None:
             bad("c_sources", f"{row['address']} ({row['name']}) is not in functions.csv")
             continue
         if target["name"] != row["name"]:
-            bad("c_sources", f"{row['address']} ad uyusmuyor: c_sources "
+            bad("c_sources", f"{row['address']} name mismatch: c_sources "
                              f"'{row['name']}' vs functions '{target['name']}'")
         if not (ROOT / row["source"]).exists():
             bad("c_sources", f"{row['source']} is not on disk ({row['name']})")

@@ -96,7 +96,7 @@ def main():
                         "diff", "nearness", "source"])
             for near, name, addr, n, size, diff, src in ok:
                 w.writerow([name, addr, n, size, diff, f"{near:.4f}", src])
-        print(f"yazildi: {out}")
+        print(f"written: {out}")
     return 0
 
 

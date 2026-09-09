@@ -89,8 +89,8 @@ def main() -> None:
             print("STOPPED: this run would lose data from the function map.")
             print(f"  {len(lost_rows):4d} records would be deleted "
                   f"(current {len(current)} -> produced {len(produced)})")
-            print(f"  {len(lost_names):4d} insan-verilmis ad FUN_xxxx'e donerdi")
-            print(f"  {len(lost_match):4d} `matching` durumu dusurulurdu")
+            print(f"  {len(lost_names):4d} manually assigned names would revert to FUN_xxxx")
+            print(f"  {len(lost_match):4d} `matching` statuses would be downgraded")
             for address in (lost_names or lost_rows or lost_match)[:5]:
                 name = current[address]["name"]
                 print(f"    example {address} {name}")

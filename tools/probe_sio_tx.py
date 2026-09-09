@@ -23,7 +23,7 @@ HELPER = "PackLocalLinkTag"
 
 def replace_once(source: str, old: str, new: str) -> str:
     if source.count(old) != 1:
-        raise ValueError(f"Deney capasi degisti: {old!r}")
+        raise ValueError(f"Experiment anchor changed: {old!r}")
     return source.replace(old, new, 1)
 
 
@@ -38,7 +38,7 @@ def variants(source: str) -> dict[str, str]:
         "", source, count=1, flags=re.S,
     )
     if removed != 1:
-        raise ValueError("Etiket yardimcisinin tanimi bulunamadi")
+        raise ValueError("Tag helper definition not found")
     for field, index in [("tag", "gRam0200048C"), ("endTag", "k")]:
         direct = replace_once(
             direct,
@@ -48,8 +48,8 @@ def variants(source: str) -> dict[str, str]:
             f"                    |  gRam020003C0[{index} & RING_MASK];",
         )
     return {"previous direct expression": direct,
-            "tek adimli isaretci": collapsed,
-            "korunan iki adim": source}
+            "single-step pointer": collapsed,
+            "preserved two-step pointer": source}
 
 
 def main() -> None:
@@ -84,7 +84,7 @@ def main() -> None:
     if not all(c == calls[0] for c in calls[1:]) or HELPER in calls[-1]:
         raise SystemExit("ERROR: external call targets/counts changed")
     print("External call targets and counts are identical in all three candidates; the helper was inlined.")
-    print("Komut skoru kismi olcumdur; tam kabul olcutu make c-match'tir.")
+    print("The instruction score is a partial measurement; full acceptance requires make c-match.")
 
 
 if __name__ == "__main__":

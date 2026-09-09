@@ -144,7 +144,7 @@ def main() -> None:
         base = (anchor_address - ROM_BASE) - match[1]
 
         print(f"{obj.name}  ({len(text)} bytes)  anchor: {anchor_name} @ "
-              f"0x{anchor_address:08X}  ->  taban 0x{ROM_BASE + base:08X}\n")
+              f"0x{anchor_address:08X}  ->  base 0x{ROM_BASE + base:08X}\n")
         print(f"{'function':28} {'ROM address':>12} {'size':>6}  fixed-byte agreement")
         print("-" * 74)
         exact = 0

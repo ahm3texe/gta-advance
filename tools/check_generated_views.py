@@ -30,9 +30,9 @@ def main() -> int:
         if function["sourceType"] != "c":
             problems.append(f"C source {source['name']} is shown as {function['sourceType']}")
         if function["sourcePath"] != source["source"]:
-            problems.append(f"C yolu uyusmuyor: {source['name']}")
+            problems.append(f"C source path mismatch: {source['name']}")
         if function["cMatching"] != (source["matching"] == "yes"):
-            problems.append(f"C matching bayragi uyusmuyor: {source['name']}")
+            problems.append(f"C matching flag mismatch: {source['name']}")
 
     for function in functions.values():
         if function["sourceType"] == "none" and function["sourcePath"]:

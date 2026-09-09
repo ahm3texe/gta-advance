@@ -83,7 +83,7 @@ def body_span(text, name):
     return None
 
 
-# ------------------------------------------------------------ donusturuculer
+# ------------------------------------------------------------ transformations
 # Each transform: (name, body) -> [(site_description, apply_fn), ...]
 # apply_fn(body) -> new body. Applications run BACK TO FRONT so that offsets
 # do not shift.
@@ -207,7 +207,7 @@ def main():
         print("already matching"); return 0
 
     names = a.only or list(TRANSFORMS)
-    best = (base_score, None, "taban")
+    best = (base_score, None, "baseline")
     tried = 0
     work = Path(tempfile.mkdtemp(prefix="sweep_")) / src.name
 
@@ -241,10 +241,10 @@ def main():
                 if sc == 0:
                     print(f"\n*** MATCHED *** {tname}{list(combo)}  ({tried} variants tried)")
                     if a.keep:
-                        src.write_text(best[1]); print(f"    yazildi: {src}")
+                        src.write_text(best[1]); print(f"    written: {src}")
                     else:
                         out = src.with_suffix(".match.c")
-                        out.write_text(best[1]); print(f"    kaydedildi: {out}")
+                        out.write_text(best[1]); print(f"    saved: {out}")
                     return 0
 
     print(f"\n{tried} variants tried; best difference {best[0]} ({best[2]})")

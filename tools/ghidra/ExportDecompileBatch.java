@@ -126,6 +126,6 @@ public class ExportDecompileBatch extends GhidraScript {
         } finally {
             decompiler.dispose();
         }
-        println("TOPLU CIKARIM BITTI: " + ok + " basarili, " + fail + " basarisiz");
+        println("BATCH EXPORT COMPLETE: " + ok + " succeeded, " + fail + " failed");
     }
 }
