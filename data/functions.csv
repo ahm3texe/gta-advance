@@ -1487,7 +1487,7 @@ address,name,size,status,module,notes
 0x0805B060,FUN_0805b060,100,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805B0C4,FUN_0805b0c4,20,matching,script,Script handler: the operand into FUN_0803ABC4 with kind 1; decompiled in src/script/cmd_call_kind.c
 0x0805B0D8,FUN_0805b0d8,20,matching,script,Script handler: the operand into FUN_0803ABC4 with kind 2; decompiled in src/script/cmd_call_kind.c
-0x0805B0EC,FUN_0805b0ec,38,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B0EC,FUN_0805b0ec,38,matching,script,"Script handler: stores the argument in gRam02030328 and calls FUN_08057A04, but only once gFrameCounterEwram is running; decompiled in src/script/cmd_publish_and_call.c"
 0x0805B11C,FUN_0805b11c,12,matching,script,Script handler: calls BumpCount70 and answers 1; decompiled in src/script/cmd_bump_counts.c
 0x0805B128,FUN_0805b128,12,matching,script,Script handler: calls BumpCount80 and answers 1; decompiled in src/script/cmd_bump_counts.c
 0x0805B1AC,FUN_0805b1ac,20,matching,script,Script handler: 1 when GetAnchorUnk34 is zero; decompiled in src/script/cmd_anchor_unk34_zero.c
@@ -1495,29 +1495,29 @@ address,name,size,status,module,notes
 0x0805B214,FUN_0805b214,16,matching,script,"Reads gRam02035AD0[index]. Not a script handler: no prologue, returns through bx lr; decompiled in src/script/read_stat_word.c"
 0x0805B224,FUN_0805b224,126,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
 0x0805B2A4,FUN_0805b2a4,24,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805B2BC,FUN_0805b2bc,42,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B2BC,FUN_0805b2bc,42,matching,script,"Script handler: sets bit 7 in the record's +0x1E state, and only when it was clear; decompiled in src/script/cmd_set_state_bit7.c"
 0x0805B30C,FUN_0805b30c,122,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805B388,FUN_0805b388,130,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805B40C,FUN_0805b40c,118,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805B484,FUN_0805b484,130,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805B53C,FUN_0805b53c,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B53C,FindNthClearBit,44,matching,script,"Index of the n-th CLEAR bit of a 32-bit mask, answering 32 when there are fewer than n+1 of them. Not a script handler; decompiled in src/script/find_nth_clear_bit.c"
 0x0805B578,FUN_0805b578,108,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805B60C,FUN_0805b60c,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805B644,FUN_0805b644,128,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805B6C4,FUN_0805b6c4,48,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
+0x0805B6C4,FUN_0805b6c4,48,decompiled,script,"Script handler: calls FUN_08059244 unless FUN_08055720 answers the 0x7FFF sentinel. NOT BYTE-MATCHING at 14/22: agbcc folds the 16-bit narrowing into the compared constant instead of emitting the ROM's separate lsrs. Six spellings measured, all fold the same way; rule 44 class. src/script/cmd_call_unless_sentinel.c"
 0x0805B6F4,FUN_0805b6f4,60,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805B760,FUN_0805b760,16,matching,script,Script handler: the operand into FUN_0803C840; decompiled in src/script/cmd_call_0803c840.c
 0x0805B770,FUN_0805b770,14,matching,script,Script handler: FUN_0803AB0C(3); decompiled in src/script/cmd_select_mode.c
 0x0805B780,FUN_0805b780,14,matching,script,Script handler: FUN_0803AB0C(1); decompiled in src/script/cmd_select_mode.c
 0x0805B790,FUN_0805b790,14,matching,script,Script handler: FUN_0803AB0C(2); decompiled in src/script/cmd_select_mode.c
-0x0805B7B4,FUN_0805b7b4,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
+0x0805B7B4,FUN_0805b7b4,48,matching,script,"Script handler: captures the session snapshot once, latched by gRam02010F4C, and only once gFrameCounterEwram is running; decompiled in src/script/cmd_capture_once.c"
 0x0805B7E4,FUN_0805b7e4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0805B854,FUN_0805b854,24,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0805B86C,FUN_0805b86c,100,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805B908,FUN_0805b908,12,matching,script,Script handler: calls BumpCount82 and answers 1; decompiled in src/script/cmd_bump_count82.c
-0x0805B920,FUN_0805b920,42,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
+0x0805B920,FUN_0805b920,42,matching,script,"Script handler: writes the operand into gRam02027EE0 when it differs, then calls FUN_0803493C for zero or FUN_080348C0 otherwise; decompiled in src/script/cmd_switch_mode_byte.c"
 0x0805B94C,FUN_0805b94c,58,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0805B9BC,FUN_0805b9bc,38,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805B9BC,FUN_0805b9bc,38,matching,script,Script handler: byte 55 of the slot gRam02000F00 selects; decompiled in src/script/cmd_slot_byte55_set.c
 0x0805B9E4,FUN_0805b9e4,18,matching,script,"Script handler: clears the +0x4C word of the slot SelectSlotAB(1) returns, with no null check; decompiled in src/script/cmd_clear_slot_word.c"
 0x0805B9F8,FUN_0805b9f8,12,matching,script,Script handler: calls ResetAreaIds and answers 1; decompiled in src/script/cmd_reset_area_ids.c
 0x0805BA10,FUN_0805ba10,112,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
