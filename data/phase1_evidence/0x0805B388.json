@@ -3,39 +3,39 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_5b388.c",
-      "sha256": "c2daa67d07ab6cda468f59d882fcabcb7aeaa043dd31c46dbb73dfc5761f8a79",
+      "sha256": "f85bff2eef6562cf82cd080f9fc9eb02a64e5d8ccc441884171757ad305da868",
       "compiled_size": 130,
       "mapped_size": 130,
       "same": 45,
       "total": 60,
       "matching": false,
-      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nstatic inline Phase1GroupedActor *NextMember(Phase1GroupedActor *actor,s32 *cursor)\n{\n    Phase1RecordGroup *group = actor->group;\n    Phase1GroupedActor *next;\n    if (!(actor->flags & 256)) {\n        if (*cursor != 0) return 0;\n        *cursor = 1;\n        next = actor;\n    } else if (*cursor < group->count) {\n        next = GetOrCreateRecordNode(group->ids[*cursor]);\n        (*cursor)++;\n    } else next = 0;\n    return next;\n}\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *actor = FindFreeNode(id);\n    Phase1GroupedActor *member;\n    s32 cursor;\n    if (!actor) return 0;\n    actor->flags &= 0xfeffffff;\n    if (actor->flags & 256) {\n        cursor = 0;\n        if (!FUN_08056508(actor)) return 0;\n        while ((member = NextMember(actor,&cursor)) != 0)\n            member->flags &= 0xfeffffff;\n    }\n    return 1;\n}\n"
+      "code": "/* Update the state bit on the group objects — 0x0805B388.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nstatic inline Phase1GroupedActor *NextMember(Phase1GroupedActor *actor,s32 *cursor)\n{\n    Phase1RecordGroup *group = actor->group;\n    Phase1GroupedActor *next;\n    if (!(actor->flags & 256)) {\n        if (*cursor != 0) return 0;\n        *cursor = 1;\n        next = actor;\n    } else if (*cursor < group->count) {\n        next = GetOrCreateRecordNode(group->ids[*cursor]);\n        (*cursor)++;\n    } else next = 0;\n    return next;\n}\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *actor = FindFreeNode(id);\n    Phase1GroupedActor *member;\n    s32 cursor;\n    if (!actor) return 0;\n    actor->flags &= 0xfeffffff;\n    if (actor->flags & 256) {\n        cursor = 0;\n        if (!FUN_08056508(actor)) return 0;\n        while ((member = NextMember(actor,&cursor)) != 0)\n            member->flags &= 0xfeffffff;\n    }\n    return 1;\n}\n"
     },
     {
       "number": 2,
-      "note": "Dongudeki sahip ile son uyeyi ayir; iteratoru govdede ifade et",
+      "note": "separate the owner in the loop from the final member; express the iterator in the body",
       "source": "src/world/p1_5b388.c",
-      "sha256": "0cdae11e61de450223fce71806748885bfc2b3134d3da465f6a9aebb235e89b0",
+      "sha256": "4adbaf0d2d33f81ebc0231ccf30b801f9ed615d5c6d148c86d2f77891bb881ce",
       "compiled_size": 130,
       "mapped_size": 130,
       "same": 55,
       "total": 60,
       "matching": false,
-      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                member = GetOrCreateRecordNode(group->ids[cursor]);\n                cursor++;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
+      "code": "/* Update the state bit on the group objects — 0x0805B388.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                member = GetOrCreateRecordNode(group->ids[cursor]);\n                cursor++;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
     },
     {
       "number": 3,
-      "note": "Sonucu ve kimligi ayri yerellerde tut; sayac artisi sonrasinda uye atamasi",
+      "note": "keep the result and the id in separate locals; assign the member after the counter increment",
       "source": "src/world/p1_5b388.c",
-      "sha256": "416a23514280a62da32d217bcb058aae96916823939bacf538e3143a13426cf2",
+      "sha256": "943106f541b806870155763cbddde59a162443bb040d908a09ba0715873f3a82",
       "compiled_size": 130,
       "mapped_size": 130,
       "same": 60,
       "total": 60,
       "matching": true,
-      "code": "/* Grup nesnelerinde durum bitini guncelle — 0x0805B388.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                u16 id = group->ids[cursor];\n                Phase1GroupedActor *resolved = GetOrCreateRecordNode(id);\n                cursor++;\n                member = resolved;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
+      "code": "/* Update the state bit on the group objects — 0x0805B388.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805B388.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *FindFreeNode(u16);\nextern u32 FUN_08056508(Phase1GroupedActor *);\nextern Phase1GroupedActor *GetOrCreateRecordNode(u16);\nu32 FUN_0805b388(void *unused,u16 id)\n{\n    Phase1GroupedActor *member = FindFreeNode(id);\n    Phase1GroupedActor *actor;\n    s32 cursor;\n    if (!member) return 0;\n    member->flags &= 0xfeffffff;\n    if (member->flags & 256) {\n        cursor = 0;\n        actor = member;\n        if (!FUN_08056508(actor)) return 0;\n        for (;;) {\n            Phase1RecordGroup *group = actor->group;\n            if (!(actor->flags & 256)) {\n                if (cursor != 0) break;\n                cursor = 1;\n                member = actor;\n            } else if (cursor < group->count) {\n                u16 id = group->ids[cursor];\n                Phase1GroupedActor *resolved = GetOrCreateRecordNode(id);\n                cursor++;\n                member = resolved;\n            } else member = 0;\n            if (!member) break;\n            member->flags &= 0xfeffffff;\n        }\n    }\n    return 1;\n}\n"
     }
   ]
 }

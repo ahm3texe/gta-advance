@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_6d900.c",
-      "sha256": "db7002298cadcb73ae68c967e424706c3e286a61f23f5afba8f41b6c29dc5880",
+      "sha256": "be3677bc0cd9dd823509b15710b91bd0a50a11375c2ac60d2d575a1ed094b8e2",
       "compiled_size": 80,
       "mapped_size": 80,
       "same": 37,
       "total": 37,
       "matching": true,
-      "code": "/* Soft-float karsilastirma; NaN durumunu ayri isle — 0x0806D900.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0806D900.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern void FUN_0806cee8(double *,Phase1DoubleParts *);\nextern s32 FUN_0806d6dc(Phase1DoubleParts *,Phase1DoubleParts *);\nstatic inline u32 IsUnordered(Phase1DoubleParts *parts) { return parts->kind <= 1; }\ns32 FUN_0806d900(double a,double b)\n{\n    Phase1DoubleParts left,right;\n    FUN_0806cee8(&a,&left);\n    FUN_0806cee8(&b,&right);\n    if (IsUnordered(&left) || IsUnordered(&right)) return -1;\n    return FUN_0806d6dc(&left,&right);\n}\n"
+      "code": "/* Soft-float comparison; handle the NaN case separately — 0x0806D900.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0806D900.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern void FUN_0806cee8(double *,Phase1DoubleParts *);\nextern s32 FUN_0806d6dc(Phase1DoubleParts *,Phase1DoubleParts *);\nstatic inline u32 IsUnordered(Phase1DoubleParts *parts) { return parts->kind <= 1; }\ns32 FUN_0806d900(double a,double b)\n{\n    Phase1DoubleParts left,right;\n    FUN_0806cee8(&a,&left);\n    FUN_0806cee8(&b,&right);\n    if (IsUnordered(&left) || IsUnordered(&right)) return -1;\n    return FUN_0806d6dc(&left,&right);\n}\n"
     }
   ]
 }

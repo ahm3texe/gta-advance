@@ -1,5 +1,5 @@
-/* Kesmeleri saklayarak DMA32 sifir dolgusu — 0x0800DD50.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0800DD50.json. */
+/* DMA32 zero fill with interrupts preserved — 0x0800DD50.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0800DD50.json. */
 #include "gba_types.h"
 #include "gba_io.h"
 

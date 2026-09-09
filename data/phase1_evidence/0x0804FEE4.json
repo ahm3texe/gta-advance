@@ -3,27 +3,27 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM ikiz gövdesinden ilk doğal C",
+      "note": "first natural C from the ROM twin body",
       "source": "src/world/p1_4fee4.c",
-      "sha256": "af94049016a834c1295715a0abbda194e6a0a71455afd76e70f1341306d1485c",
+      "sha256": "5349f6062382e3069c7a75bf7731ab12864edb0e00d88a807dad93e7398a4120",
       "compiled_size": 28,
       "mapped_size": 28,
       "same": 9,
       "total": 12,
       "matching": false,
-      "code": "/* Faz 1 ikiz: 0x0804FEE4 ve 0x080500DC.\n * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetBaseAlt(void);\nextern u32 FUN_08044804(void *actor);\nu32 FUN_0804fee4(void *actor)\n{\n    if (GetBaseAlt()) return FUN_08044804(actor);\n    return 1;\n}\n"
+      "code": "/* Phase 1 twin: 0x0804FEE4 and 0x080500DC.\n * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetBaseAlt(void);\nextern u32 FUN_08044804(void *actor);\nu32 FUN_0804fee4(void *actor)\n{\n    if (GetBaseAlt()) return FUN_08044804(actor);\n    return 1;\n}\n"
     },
     {
       "number": 2,
-      "note": "Dal sonucu yerelde; ortak dönüş kuyruğu",
+      "note": "branch result in a local; shared return tail",
       "source": "src/world/p1_4fee4.c",
-      "sha256": "8427240809a456a77dbeed06b2cb08b69c0edab9ba2bb9a5a387cfecb755bd08",
+      "sha256": "7fd1941a0dc6331984f2713f7f4a6231ef7980fffbc95218281bdab8284d7be4",
       "compiled_size": 28,
       "mapped_size": 28,
       "same": 12,
       "total": 12,
       "matching": true,
-      "code": "/* Faz 1 ikiz: 0x0804FEE4 ve 0x080500DC.\n * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetBaseAlt(void);\nextern u32 FUN_08044804(void *actor);\nu32 FUN_0804fee4(void *actor)\n{\n    u32 result;\n    if (GetBaseAlt()) result = FUN_08044804(actor);\n    else result = 1;\n    return result;\n}\n"
+      "code": "/* Phase 1 twin: 0x0804FEE4 and 0x080500DC.\n * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetBaseAlt(void);\nextern u32 FUN_08044804(void *actor);\nu32 FUN_0804fee4(void *actor)\n{\n    u32 result;\n    if (GetBaseAlt()) result = FUN_08044804(actor);\n    else result = 1;\n    return result;\n}\n"
     }
   ]
 }

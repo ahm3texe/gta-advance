@@ -1,5 +1,5 @@
-/* Iki tablo imlecini ilerletip 16-bit soz uret — 0x0803258C.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803258C.json. */
+/* Advance two table cursors and produce a 16-bit word — 0x0803258C.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803258C.json. */
 #include "gba_types.h"
 
 extern u32 gRam020272F0;

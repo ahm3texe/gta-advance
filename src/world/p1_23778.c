@@ -1,5 +1,5 @@
-/* Faz 1 ikiz: 0x08023778 ve 0x08023794.
- * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */
+/* Phase 1 twin: 0x08023778 and 0x08023794.
+ * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */
 #include "gba_types.h"
 
 extern u32 GetOwnerSlot(void *owner);

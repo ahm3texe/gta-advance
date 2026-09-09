@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM ikiz gövdesinden ilk doğal C",
+      "note": "first natural C from the ROM twin body",
       "source": "src/world/p1_5b2a4.c",
-      "sha256": "10703e24ce9d7a8f41dac909a6fd04f16ce3f47f05bb2fd80002d25366f6e849",
+      "sha256": "038d3afe57adcb99404979f86eba02829e3a934574fda413f0add76d381384c9",
       "compiled_size": 24,
       "mapped_size": 24,
       "same": 11,
       "total": 11,
       "matching": true,
-      "code": "/* Faz 1 ikiz: 0x0805B2A4 ve 0x0805B854.\n * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern void FUN_08041ef8(u16 a, s16 b);\nu32 FUN_0805b2a4(void *unused, u32 a, u32 b)\n{\n    FUN_08041ef8((u16)a, (s16)b);\n    return 1;\n}\n"
+      "code": "/* Phase 1 twin: 0x0805B2A4 and 0x0805B854.\n * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern void FUN_08041ef8(u16 a, s16 b);\nu32 FUN_0805b2a4(void *unused, u32 a, u32 b)\n{\n    FUN_08041ef8((u16)a, (s16)b);\n    return 1;\n}\n"
     }
   ]
 }

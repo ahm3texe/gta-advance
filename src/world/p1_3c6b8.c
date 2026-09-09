@@ -1,5 +1,5 @@
-/* Oyuncu girdisi veya bagli nesne bayragini denetle — 0x0803C6B8.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C6B8.json. */
+/* Check the player entry or the linked object's flag — 0x0803C6B8.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803C6B8.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

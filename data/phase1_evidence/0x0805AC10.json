@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_5ac10.c",
-      "sha256": "d8a50fd6fdda43d4231c8194ef00eae7efc40ab74d85eae7568a4b32e3b52730",
+      "sha256": "c7c05f50e3416c18efde1ac175e44976879cdb0d86c5f02c8194a9adedb03720",
       "compiled_size": 52,
       "mapped_size": 52,
       "same": 24,
       "total": 24,
       "matching": true,
-      "code": "/* On iki tik aralikli ses olayi — 0x0805AC10.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AC10.json. */\n#include \"gba_types.h\"\n\nextern u32 gRam02000224,gRam020302E4;\nextern void FUN_08035058(void *,u32);\nvoid FUN_0805ac10(void *actor)\n{\n    if (gRam02000224 < gRam020302E4 || gRam02000224 >= gRam020302E4 + 12) {\n        FUN_08035058(actor,267);\n        gRam020302E4 = gRam02000224;\n    }\n}\n"
+      "code": "/* Audio event on a twelve-tick interval — 0x0805AC10.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AC10.json. */\n#include \"gba_types.h\"\n\nextern u32 gRam02000224,gRam020302E4;\nextern void FUN_08035058(void *,u32);\nvoid FUN_0805ac10(void *actor)\n{\n    if (gRam02000224 < gRam020302E4 || gRam02000224 >= gRam020302E4 + 12) {\n        FUN_08035058(actor,267);\n        gRam020302E4 = gRam02000224;\n    }\n}\n"
     }
   ]
 }

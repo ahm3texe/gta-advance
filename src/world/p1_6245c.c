@@ -1,5 +1,5 @@
-/* Kimlikli sayaci bul ve esikle karsilastir — 0x0806245C.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0806245C.json. */
+/* Find the counter by id and compare it against the threshold — 0x0806245C.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0806245C.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

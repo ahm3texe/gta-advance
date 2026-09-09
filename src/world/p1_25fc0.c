@@ -1,5 +1,5 @@
-/* Gecersiz veya anahtari degismis girdiyi birak — 0x08025FC0.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08025FC0.json. */
+/* Release an entry that is invalid or whose key has changed — 0x08025FC0.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08025FC0.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

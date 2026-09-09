@@ -1,5 +1,5 @@
-/* Sistem cagrisinin hata kodunu cagiran baglama tasi — 0x08071DE8.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08071DE8.json. */
+/* Veneer that forwards the system call's error code — 0x08071DE8.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08071DE8.json. */
 #include "gba_types.h"
 
 extern s32 gRam020363C4;

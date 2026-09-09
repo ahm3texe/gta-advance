@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_5ab90.c",
-      "sha256": "552377874829607aaaf7582d953df74b8acf41331465644c5ae8853946cf6609",
+      "sha256": "cb4ec421200484a64663cfb3cc524274dd66b0833e2f346ce20ac97c1ba12612",
       "compiled_size": 76,
       "mapped_size": 76,
       "same": 37,
       "total": 37,
       "matching": true,
-      "code": "/* Sahibe gore nesne turu eslesmesini denetle — 0x0805AB90.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AB90.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 GetOwnerSlot(void *);\nu32 FUN_0805ab90(Phase1Actor *actor)\n{\n    if (actor && actor->desc && (actor->kind == 8 || actor->kind == 2)) {\n        if (actor->desc->id == 0x4009) return 1;\n        if (GetOwnerSlot(actor)) {\n            if (actor->desc->kind == 14) return 1;\n        } else if (actor->desc->kind == 0x4009) return 1;\n    }\n    return 0;\n}\n"
+      "code": "/* Check the object kind match against the owner — 0x0805AB90.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AB90.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 GetOwnerSlot(void *);\nu32 FUN_0805ab90(Phase1Actor *actor)\n{\n    if (actor && actor->desc && (actor->kind == 8 || actor->kind == 2)) {\n        if (actor->desc->id == 0x4009) return 1;\n        if (GetOwnerSlot(actor)) {\n            if (actor->desc->kind == 14) return 1;\n        } else if (actor->desc->kind == 0x4009) return 1;\n    }\n    return 0;\n}\n"
     }
   ]
 }

@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_3c708.c",
-      "sha256": "55a6da5078f2741b7d4340de982a247485eb60759a2c001eeed8fdd934be512a",
+      "sha256": "a3ead737595d706194749584cc701b9156d3be7bf001eaf94cb7bd8ce3ef8bec",
       "compiled_size": 52,
       "mapped_size": 52,
       "same": 25,
       "total": 25,
       "matching": true,
-      "code": "/* Yuva hazirligina gore denetim turunu ver — 0x0803C708.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C708.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1ReadinessActor **SelectSlotAB(u32);\nextern u8 gUnk02010C60[];\nu32 FUN_0803c708(u32 slot)\n{\n    Phase1ReadinessActor **selected = SelectSlotAB(slot);\n    if (!selected || !(*selected)->state || (*selected)->state->value <= 0) return 0;\n    return gUnk02010C60[26] ? 1 : 2;\n}\n"
+      "code": "/* Return the check kind according to slot readiness — 0x0803C708.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803C708.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1ReadinessActor **SelectSlotAB(u32);\nextern u8 gUnk02010C60[];\nu32 FUN_0803c708(u32 slot)\n{\n    Phase1ReadinessActor **selected = SelectSlotAB(slot);\n    if (!selected || !(*selected)->state || (*selected)->state->value <= 0) return 0;\n    return gUnk02010C60[26] ? 1 : 2;\n}\n"
     }
   ]
 }

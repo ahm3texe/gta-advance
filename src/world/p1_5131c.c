@@ -1,5 +1,5 @@
-/* Oyun nesne havuzlarini sirayla baslat — 0x0805131C.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805131C.json. */
+/* Initialize the game object pools in order — 0x0805131C.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805131C.json. */
 #include "gba_types.h"
 
 extern void InitSpritePool(void);

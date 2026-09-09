@@ -1,5 +1,5 @@
-/* Metin durumunu ilerlet ve bosalinca kapat — 0x08031204.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08031204.json. */
+/* Advance the text state and close it once empty — 0x08031204.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08031204.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 #include "ram_symbols.h"

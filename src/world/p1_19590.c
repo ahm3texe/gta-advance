@@ -1,5 +1,5 @@
-/* Bilesik sprite parcalarindan genislik ve yukseklik bul — 0x08019590.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08019590.json. */
+/* Derive the width and height from the composite sprite parts — 0x08019590.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08019590.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

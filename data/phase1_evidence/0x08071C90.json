@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_71c90.c",
-      "sha256": "5b45406958621c77057f684eaeaa2450eea26cf190e802d8634d21dc5b8aef91",
+      "sha256": "1795a082e934a3312a77fc8259895ec640369ae64bd347409c514261d4d9919c",
       "compiled_size": 52,
       "mapped_size": 52,
       "same": 25,
       "total": 25,
       "matching": true,
-      "code": "/* Sistem cagrisinin hata kodunu cagiran baglama tasi — 0x08071C90.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08071C90.json. */\n#include \"gba_types.h\"\n\nextern s32 gRam020363C4;\nextern s32 FUN_08071a4c(u32,u32,u32);\ns32 FUN_08071c90(s32 *error,u32 arg0,u32 arg1,u32 arg2)\n{\n    s32 result;\n    gRam020363C4 = 0;\n    result = FUN_08071a4c(arg0,arg1,arg2);\n    if (result == -1 && gRam020363C4 != 0) *error = gRam020363C4;\n    return result;\n}\n"
+      "code": "/* Veneer that forwards the system call's error code — 0x08071C90.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08071C90.json. */\n#include \"gba_types.h\"\n\nextern s32 gRam020363C4;\nextern s32 FUN_08071a4c(u32,u32,u32);\ns32 FUN_08071c90(s32 *error,u32 arg0,u32 arg1,u32 arg2)\n{\n    s32 result;\n    gRam020363C4 = 0;\n    result = FUN_08071a4c(arg0,arg1,arg2);\n    if (result == -1 && gRam020363C4 != 0) *error = gRam020363C4;\n    return result;\n}\n"
     }
   ]
 }

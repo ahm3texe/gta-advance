@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM ikiz gövdesinden ilk doğal C",
+      "note": "first natural C from the ROM twin body",
       "source": "src/world/p1_23794.c",
-      "sha256": "1feb8ebc79e3255f6b442ac01c33b7916aca8a0a67eb881754053e9e5c6b9ca4",
+      "sha256": "3949ec7cddd417cf608c2c0692712a16cf8d5e4f60453663c136e44872ff6955",
       "compiled_size": 26,
       "mapped_size": 26,
       "same": 11,
       "total": 11,
       "matching": true,
-      "code": "/* Faz 1 ikiz: 0x08023794 ve 0x08023778.\n * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetOwnerSlot(void *owner);\nextern u8 *SelectSlotAB(u32 slot);\nvoid FUN_08023794(void *owner)\n{\n    u8 *slot = SelectSlotAB(GetOwnerSlot(owner));\n    if (slot) slot[63] = 0;\n}\n"
+      "code": "/* Phase 1 twin: 0x08023794 and 0x08023778.\n * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 GetOwnerSlot(void *owner);\nextern u8 *SelectSlotAB(u32 slot);\nvoid FUN_08023794(void *owner)\n{\n    u8 *slot = SelectSlotAB(GetOwnerSlot(owner));\n    if (slot) slot[63] = 0;\n}\n"
     }
   ]
 }

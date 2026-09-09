@@ -1,5 +1,5 @@
-/* Grup uyelerini veya tek nesneyi sirayla ver — 0x0805AD68.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AD68.json. */
+/* Yield the group members, or the single object, in order — 0x0805AD68.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AD68.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

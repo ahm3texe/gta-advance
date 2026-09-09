@@ -1,5 +1,5 @@
-/* Eylemin hedefini ve adim isaretcisini kur — 0x0803F7F8.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F7F8.json. */
+/* Set up the action's target and step pointer — 0x0803F7F8.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803F7F8.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

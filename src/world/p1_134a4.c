@@ -1,5 +1,5 @@
-/* Cift bagli 31 bos dugumun listesini kur — 0x080134A4.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080134A4.json. */
+/* Build the list of 31 free doubly linked nodes — 0x080134A4.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080134A4.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

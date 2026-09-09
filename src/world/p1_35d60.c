@@ -1,5 +1,5 @@
-/* Etkin iki nesneyi serbest birak ve cift kaydini sifirla — 0x08035D60.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035D60.json. */
+/* Release the two active objects and clear the pair record — 0x08035D60.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08035D60.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

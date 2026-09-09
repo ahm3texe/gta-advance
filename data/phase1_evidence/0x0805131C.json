@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_5131c.c",
-      "sha256": "3a8e1c112f1ffcf0fcaf7f8dddac52356f2859e448324eb07bc8a3c2cd3b1289",
+      "sha256": "4ae57166d666d13c56394c519435e79f23a9f2abf197eeada325cc0eab097e73",
       "compiled_size": 62,
       "mapped_size": 62,
       "same": 17,
       "total": 17,
       "matching": true,
-      "code": "/* Oyun nesne havuzlarini sirayla baslat — 0x0805131C.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805131C.json. */\n#include \"gba_types.h\"\n\nextern void InitSpritePool(void);\nextern void NoOp080130F0(void);\nextern void FUN_080138f4(void);\nextern void FUN_080134a4(void);\nextern void FUN_08014fb8(void);\nextern void FUN_08037824(void);\nextern void NoOp080427BC(void);\nextern void ResetAnchorPartial(void);\nextern void NoOp08051048(void);\nextern void FUN_08041ed4(void);\nextern void NoOp080519B8(void);\nextern void FUN_08011d14(void);\nextern void NoOp08035844(void);\nextern void NoOp08030848(void);\nvoid FUN_0805131c(void)\n{\n    InitSpritePool();\n    NoOp080130F0();\n    FUN_080138f4();\n    FUN_080134a4();\n    FUN_08014fb8();\n    FUN_08037824();\n    NoOp080427BC();\n    ResetAnchorPartial();\n    NoOp08051048();\n    FUN_08041ed4();\n    NoOp080519B8();\n    FUN_08011d14();\n    NoOp08035844();\n    NoOp08030848();\n}\n"
+      "code": "/* Initialize the game object pools in order — 0x0805131C.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805131C.json. */\n#include \"gba_types.h\"\n\nextern void InitSpritePool(void);\nextern void NoOp080130F0(void);\nextern void FUN_080138f4(void);\nextern void FUN_080134a4(void);\nextern void FUN_08014fb8(void);\nextern void FUN_08037824(void);\nextern void NoOp080427BC(void);\nextern void ResetAnchorPartial(void);\nextern void NoOp08051048(void);\nextern void FUN_08041ed4(void);\nextern void NoOp080519B8(void);\nextern void FUN_08011d14(void);\nextern void NoOp08035844(void);\nextern void NoOp08030848(void);\nvoid FUN_0805131c(void)\n{\n    InitSpritePool();\n    NoOp080130F0();\n    FUN_080138f4();\n    FUN_080134a4();\n    FUN_08014fb8();\n    FUN_08037824();\n    NoOp080427BC();\n    ResetAnchorPartial();\n    NoOp08051048();\n    FUN_08041ed4();\n    NoOp080519B8();\n    FUN_08011d14();\n    NoOp08035844();\n    NoOp08030848();\n}\n"
     }
   ]
 }

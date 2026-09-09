@@ -1,5 +1,5 @@
-/* Grup nesnelerinde durum bitini guncelle — 0x0805B484.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805B484.json. */
+/* Update the state bit on the group objects — 0x0805B484.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805B484.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

@@ -1,5 +1,5 @@
-/* HUD dakika ve saniye karolarini ciz; kardes DrawTwoDigits sozlugu — 0x0802AB18.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0802AB18.json. */
+/* Draw the HUD minute and second tiles; the sibling DrawTwoDigits idiom — 0x0802AB18.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0802AB18.json. */
 #include "gba_types.h"
 #include "ram_symbols.h"
 

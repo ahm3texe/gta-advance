@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM literalinden eksik durum sembolü kaydedildi",
+      "note": "the missing state symbol was recorded from the ROM literal",
       "source": "src/world/p1_63d3c.c",
-      "sha256": "89284b8f66afd4879a41a3ddf9cdb8a5bf7864d22f808d25dcb05e749440fe61",
+      "sha256": "d58bf8d0629a162c897a2492c6210d2e2f137df92070fbf1c3377deb63bfc36a",
       "compiled_size": 28,
       "mapped_size": 28,
       "same": 13,
       "total": 13,
       "matching": true,
-      "code": "/* Faz 1 ikiz: 0x08063D3C ve 0x08063C88.\n * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 gRam02036110;\nextern void FUN_08062a0c(void);\nvoid FUN_08063d3c(void)\n{\n    if (gRam02036110 != 0) {\n        FUN_08062a0c();\n        gRam02036110 = 0;\n    }\n}\n"
+      "code": "/* Phase 1 twin: 0x08063D3C and 0x08063C88.\n * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */\n#include \"gba_types.h\"\n\nextern u32 gRam02036110;\nextern void FUN_08062a0c(void);\nvoid FUN_08063d3c(void)\n{\n    if (gRam02036110 != 0) {\n        FUN_08062a0c();\n        gRam02036110 = 0;\n    }\n}\n"
     }
   ]
 }

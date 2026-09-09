@@ -1,5 +1,5 @@
-/* Iki nesneyi ROM tanimlariyla kur — 0x08035DE4.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035DE4.json. */
+/* Set up the two objects from their ROM definitions — 0x08035DE4.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08035DE4.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

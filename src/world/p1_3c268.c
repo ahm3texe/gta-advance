@@ -1,5 +1,5 @@
-/* Etkin yuvanin sonraki veya onceki girdisini sec — 0x0803C268.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C268.json. */
+/* Select the next or previous entry of the active slot — 0x0803C268.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803C268.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 #include "ram_symbols.h"

@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_624b8.c",
-      "sha256": "ef7c8b53314463812d8120d9e71a215f73254512467f5c21bbdd350b5df9a91b",
+      "sha256": "c51083c75acb5530ac946ad237c5b628c136f329a13c5a88ba5aaac88cfd9be0",
       "compiled_size": 92,
       "mapped_size": 92,
       "same": 46,
       "total": 46,
       "matching": true,
-      "code": "/* Kimlikli sayaci bul ve esikle karsilastir — 0x080624B8.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080624B8.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 gRam02035AD0[];\nextern Phase1StatTable gRam02035ED0;\nstatic inline u32 LookupStat(u16 id)\n{\n    s32 i;\n    if (id == 114) return gRam02035AD0[0];\n    if (id == 115) return gRam02035AD0[1];\n    for (i = 0; i < 12; i++)\n        if (gRam02035ED0.ids[i] == id) return gRam02035ED0.values[i];\n    return 0;\n}\nu32 FUN_080624b8(void *unused,u16 id,u16 threshold)\n{\n    if (LookupStat(id) <= threshold) return 1;\n    return 0;\n}\n"
+      "code": "/* Find the counter by id and compare it against the threshold — 0x080624B8.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080624B8.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 gRam02035AD0[];\nextern Phase1StatTable gRam02035ED0;\nstatic inline u32 LookupStat(u16 id)\n{\n    s32 i;\n    if (id == 114) return gRam02035AD0[0];\n    if (id == 115) return gRam02035AD0[1];\n    for (i = 0; i < 12; i++)\n        if (gRam02035ED0.ids[i] == id) return gRam02035ED0.values[i];\n    return 0;\n}\nu32 FUN_080624b8(void *unused,u16 id,u16 threshold)\n{\n    if (LookupStat(id) <= threshold) return 1;\n    return 0;\n}\n"
     }
   ]
 }

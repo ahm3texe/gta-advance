@@ -1,5 +1,5 @@
-/* On iki tik aralikli ses olayi — 0x0805ABDC.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805ABDC.json. */
+/* Audio event on a twelve-tick interval — 0x0805ABDC.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805ABDC.json. */
 #include "gba_types.h"
 
 extern u32 gRam02000224,gRam02035B40;

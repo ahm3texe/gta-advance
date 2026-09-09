@@ -3,51 +3,51 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_38644.c",
-      "sha256": "0797514f0ba575a8e99c8cbf44de0293671db845c6b1c4b9c0de5cef51186a52",
+      "sha256": "2438f58dac45ae43f410bf0efd6630acfff637098402423491fd88ed21e7ab82",
       "compiled_size": 60,
       "mapped_size": 60,
       "same": 17,
       "total": 29,
       "matching": false,
-      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = &gRom08CA7E64[index];\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
+      "code": "/* Pick the alternative model with a one-in-four chance — 0x08038644.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = &gRom08CA7E64[index];\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
     },
     {
       "number": 2,
-      "note": "Tablo tabanini indis hesabindan once ayri ifade olarak al",
+      "note": "take the table base as a separate expression before the index computation",
       "source": "src/world/p1_38644.c",
-      "sha256": "82963a9112a3d7e30b4db6e41e73df0f6f2998d2071b4a133819c15b02ffef28",
+      "sha256": "f8abb553df0ecb8d15831fd1dad0bef75404a6c878abb10f698ae09b948ec117",
       "compiled_size": 60,
       "mapped_size": 60,
       "same": 21,
       "total": 29,
       "matching": false,
-      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = gRom08CA7E64;\n    model += index;\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
+      "code": "/* Pick the alternative model with a one-in-four chance — 0x08038644.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = gRom08CA7E64;\n    model += index;\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return gRom08CA7E64[index].value;\n}\n"
     },
     {
       "number": 3,
-      "note": "Model tablo erisimini dogal inline yardimciyla ifade et",
+      "note": "express the model table access through a natural inline helper",
       "source": "src/world/p1_38644.c",
-      "sha256": "b402ecf5ad16569a301d5af3eceecf5c0aff255950880e3f8da81e166dca2c00",
+      "sha256": "6cec1a0f0658c9c124c6542b1d3ed2b8a6c8505c1eb38edd8a7fd36208fa5641",
       "compiled_size": 60,
       "mapped_size": 60,
       "same": 23,
       "total": 29,
       "matching": false,
-      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{ return &gRom08CA7E64[index]; }\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
+      "code": "/* Pick the alternative model with a one-in-four chance — 0x08038644.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{ return &gRom08CA7E64[index]; }\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
     },
     {
       "number": 4,
-      "note": "Inline tablo tabanini ayri yerele al; son deneme",
+      "note": "move the inline table base into a separate local; final attempt",
       "source": "src/world/p1_38644.c",
-      "sha256": "83afd51790ce7e7cef4b1b63693bbcce9750b6b40619272781ba37e714b363ce",
+      "sha256": "fec629264c97622f4191a3b7fd271326586222af0c856e62bff2db83f9604fc7",
       "compiled_size": 60,
       "mapped_size": 60,
       "same": 23,
       "total": 29,
       "matching": false,
-      "code": "/* Dortte bir olasilikla alternatif model sec — 0x08038644.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{\n    const Phase1Model *table = gRom08CA7E64;\n    return table + index;\n}\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
+      "code": "/* Pick the alternative model with a one-in-four chance — 0x08038644.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08038644.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern const Phase1Model gRom08CA7E64[];\nextern u32 FUN_08032548(void);\nstatic inline const Phase1Model *LookupModel(u32 index)\n{\n    const Phase1Model *table = gRom08CA7E64;\n    return table + index;\n}\n\nu16 FUN_08038644(u32 index)\n{\n    const Phase1Model *model = LookupModel(index);\n    if (model->alternate != 0 && (FUN_08032548() & 3) == 0)\n        index = model->alternate;\n    return LookupModel(index)->value;\n}\n"
     }
   ]
 }

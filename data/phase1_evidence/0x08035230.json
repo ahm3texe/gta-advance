@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_35230.c",
-      "sha256": "4aa5ed4b981c890cd66426a9c4c14a72c8fcb712a4490065082df054d7ff469d",
+      "sha256": "11551703e00da0a8465e244fd6bc9481ce0efc76b01cd439e9d9421c2bf28a83",
       "compiled_size": 88,
       "mapped_size": 88,
       "same": 41,
       "total": 41,
       "matching": true,
-      "code": "/* Nesneye ses kaynagi bagla ve seviyesini kur — 0x08035230.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035230.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1Resource *gRom08CA788C[];\nextern u32 FUN_08033ad8(u32);\nextern u32 FUN_08032d74(void *,u32,u32,u32);\nextern void FUN_08032fc4(u32,u32);\nvoid FUN_08035230(Phase1SoundActor *actor,u32 id)\n{\n    u32 index;\n    Phase1Resource *resource;\n    u32 handle;\n    if (actor && actor->sound && !FUN_08033ad8(0)) {\n        index = id - 201;\n        if (index <= 271) {\n            resource = gRom08CA788C[index];\n            if (resource) {\n                handle = FUN_08032d74(resource->data,resource->length,0,14);\n                actor->sound->handle = handle;\n                FUN_08032fc4(handle,32768);\n            }\n        }\n    }\n}\n"
+      "code": "/* Attach an audio source to the object and set its level — 0x08035230.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08035230.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1Resource *gRom08CA788C[];\nextern u32 FUN_08033ad8(u32);\nextern u32 FUN_08032d74(void *,u32,u32,u32);\nextern void FUN_08032fc4(u32,u32);\nvoid FUN_08035230(Phase1SoundActor *actor,u32 id)\n{\n    u32 index;\n    Phase1Resource *resource;\n    u32 handle;\n    if (actor && actor->sound && !FUN_08033ad8(0)) {\n        index = id - 201;\n        if (index <= 271) {\n            resource = gRom08CA788C[index];\n            if (resource) {\n                handle = FUN_08032d74(resource->data,resource->length,0,14);\n                actor->sound->handle = handle;\n                FUN_08032fc4(handle,32768);\n            }\n        }\n    }\n}\n"
     }
   ]
 }

@@ -1,5 +1,5 @@
-/* Secilen hedefe yonel ve yakinlik bildirimlerini gonder — 0x080480F4.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080480F4.json. */
+/* Face the selected target and send the proximity notifications — 0x080480F4.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080480F4.json. */
 #include "gba_types.h"
 #include "target_common.h"
 #include "phase1_types.h"

@@ -1,5 +1,5 @@
-/* Kart kaynagi tablosundaki ses kaydini isleme ver — 0x08035168.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08035168.json. */
+/* Submit the audio record from the cartridge resource table — 0x08035168.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08035168.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

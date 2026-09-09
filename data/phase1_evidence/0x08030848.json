@@ -3,15 +3,15 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_30848.c",
-      "sha256": "0abc2d72e04b61b909b179708ea854229009763f0d1eabed78e1e38c56e7fb43",
+      "sha256": "cac1dd5a222dc21c77b9f86952737c635886b10bbc738aada344fb2535e8b08f",
       "compiled_size": 2,
       "mapped_size": 2,
       "same": 1,
       "total": 1,
       "matching": true,
-      "code": "/* Dogrudan cagrilan bos kurulum kancasi — 0x08030848.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08030848.json. */\n#include \"gba_types.h\"\n\nvoid NoOp08030848(void) {}\n"
+      "code": "/* Empty setup hook called directly — 0x08030848.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08030848.json. */\n#include \"gba_types.h\"\n\nvoid NoOp08030848(void) {}\n"
     }
   ]
 }

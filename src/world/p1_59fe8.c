@@ -1,5 +1,5 @@
-/* Iki slot seviyesini yuzde kadar ayarla — 0x08059FE8.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08059FE8.json. */
+/* Adjust the two slot levels by a percentage — 0x08059FE8.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08059FE8.json. */
 #include "gba_types.h"
 
 extern s32 GetSlotField(u32 slot);

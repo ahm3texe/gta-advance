@@ -1,5 +1,5 @@
-/* Hedefli eylem sonucunu kaydet ve bitis bayragini kur — 0x0803F910.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F910.json. */
+/* Record the targeted action's result and set the finish flag — 0x0803F910.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803F910.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

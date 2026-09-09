@@ -1,5 +1,5 @@
-/* Faz 1 ikiz: 0x08063C88 ve 0x08063D3C.
- * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */
+/* Phase 1 twin: 0x08063C88 and 0x08063D3C.
+ * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */
 #include "gba_types.h"
 
 extern u32 gRam02036110;

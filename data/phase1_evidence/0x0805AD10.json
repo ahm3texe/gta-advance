@@ -3,27 +3,27 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_5ad10.c",
-      "sha256": "d3fbb2bce89a4b7ce4ade88e07c557dd9b8d50a5f762f532473db627efd92906",
+      "sha256": "f18a13b0dae5f82b63eb3567baf8da2385796442ab7c8a279abc636166bbd2d5",
       "compiled_size": 86,
       "mapped_size": 86,
       "same": 38,
       "total": 42,
       "matching": false,
-      "code": "/* Grup uyelerini veya tek nesneyi sirayla ver — 0x0805AD10.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AD10.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *ResolveRecordNodeChain(u16 id);\nu32 FUN_0805ad10(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        return 0;\n    }\n    *out = ResolveRecordNodeChain(group->ids[*cursor]);\n    (*cursor)++;\n    return 1;\n}\n"
+      "code": "/* Yield the group members, or the single object, in order — 0x0805AD10.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AD10.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *ResolveRecordNodeChain(u16 id);\nu32 FUN_0805ad10(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        return 0;\n    }\n    *out = ResolveRecordNodeChain(group->ids[*cursor]);\n    (*cursor)++;\n    return 1;\n}\n"
     },
     {
       "number": 2,
-      "note": "Son dali tek cikisli if/else yap; kardesin cagri hedefini koru",
+      "note": "make the last branch a single-exit if/else; keep the sibling's call target",
       "source": "src/world/p1_5ad10.c",
-      "sha256": "bd3627e30ed20fa98f2f4b7f92d0dba18a694a07961b8f03810ae06b29e9405a",
+      "sha256": "ff2246061a8be131889b21b2060db95537954cedd99d28724190ac58c88f8d61",
       "compiled_size": 86,
       "mapped_size": 86,
       "same": 42,
       "total": 42,
       "matching": true,
-      "code": "/* Grup uyelerini veya tek nesneyi sirayla ver — 0x0805AD10.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AD10.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *ResolveRecordNodeChain(u16 id);\nu32 FUN_0805ad10(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    u32 result;\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        result = 0;\n    } else {\n        *out = ResolveRecordNodeChain(group->ids[*cursor]);\n        (*cursor)++;\n        result = 1;\n    }\n    return result;\n}\n"
+      "code": "/* Yield the group members, or the single object, in order — 0x0805AD10.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AD10.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern Phase1GroupedActor *ResolveRecordNodeChain(u16 id);\nu32 FUN_0805ad10(Phase1GroupedActor *actor,s32 *cursor,Phase1GroupedActor **out)\n{\n    u32 result;\n    Phase1RecordGroup *group = actor->group;\n    if (actor == 0) return 0;\n    if (group->count == 0) {\n        if (*cursor == 0) {\n            *cursor = 1;\n            *out = actor;\n            return 1;\n        }\n        *out = 0;\n        return 0;\n    }\n    if (*cursor >= group->count) {\n        *out = 0;\n        result = 0;\n    } else {\n        *out = ResolveRecordNodeChain(group->ids[*cursor]);\n        (*cursor)++;\n        result = 1;\n    }\n    return result;\n}\n"
     }
   ]
 }

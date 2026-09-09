@@ -1,5 +1,5 @@
-/* Kesmeleri saklayarak DMA32 sifir dolgusu — 0x080357CC.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080357CC.json. */
+/* DMA32 zero fill with interrupts preserved — 0x080357CC.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080357CC.json. */
 #include "gba_types.h"
 #include "gba_io.h"
 

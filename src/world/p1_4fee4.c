@@ -1,5 +1,5 @@
-/* Faz 1 ikiz: 0x0804FEE4 ve 0x080500DC.
- * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */
+/* Phase 1 twin: 0x0804FEE4 and 0x080500DC.
+ * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */
 #include "gba_types.h"
 
 extern u32 GetBaseAlt(void);

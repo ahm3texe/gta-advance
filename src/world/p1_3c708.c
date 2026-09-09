@@ -1,5 +1,5 @@
-/* Yuva hazirligina gore denetim turunu ver — 0x0803C708.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803C708.json. */
+/* Return the check kind according to slot readiness — 0x0803C708.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803C708.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

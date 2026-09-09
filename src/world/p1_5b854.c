@@ -1,5 +1,5 @@
-/* Faz 1 ikiz: 0x0805B854 ve 0x0805B2A4.
- * ROM govdeleri karsilastirildi; deneme kaniti data/phase1_evidence/. */
+/* Phase 1 twin: 0x0805B854 and 0x0805B2A4.
+ * Compared against the ROM bodies; attempt evidence in data/phase1_evidence/. */
 #include "gba_types.h"
 
 extern void FUN_0803378c(u16 a, u16 b);

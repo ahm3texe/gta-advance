@@ -1,5 +1,5 @@
-/* Sahibe gore nesne turu eslesmesini denetle — 0x0805AB90.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0805AB90.json. */
+/* Check the object kind match against the owner — 0x0805AB90.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0805AB90.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

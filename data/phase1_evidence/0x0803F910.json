@@ -3,27 +3,27 @@
   "attempts": [
     {
       "number": 1,
-      "note": "ROM gövdesinden doğal C; ilk deneme",
+      "note": "natural C from the ROM body; first attempt",
       "source": "src/world/p1_3f910.c",
-      "sha256": "0efeb5468baae00e580ba68bd4b204127a469f7077876ad545a49280d163b5ef",
+      "sha256": "0858d7dbb3b9b06756f2b42f7498a282c6d504cfaf08fff511e75f83a1f32272",
       "compiled_size": 50,
       "mapped_size": 50,
       "same": 20,
       "total": 23,
       "matching": false,
-      "code": "/* Hedefli eylem sonucunu kaydet ve bitis bayragini kur — 0x0803F910.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F910.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023654(void *owner,u32 value);\nu32 FUN_0803f910(Phase1Action *action)\n{\n    void *owner = action->owner;\n    action->result = FUN_08023654(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) return 0;\n    action->done = 1;\n    return 1;\n}\n"
+      "code": "/* Record the targeted action's result and set the finish flag — 0x0803F910.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803F910.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023654(void *owner,u32 value);\nu32 FUN_0803f910(Phase1Action *action)\n{\n    void *owner = action->owner;\n    action->result = FUN_08023654(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) return 0;\n    action->done = 1;\n    return 1;\n}\n"
     },
     {
       "number": 2,
-      "note": "Tek cikisli sonuc degiskeni ile dal yonu",
+      "note": "branch direction with a single-exit result variable",
       "source": "src/world/p1_3f910.c",
-      "sha256": "d8d31164e2966f147a4ed80cb4490b984518741e52bafb96acec0a7e9dce853d",
+      "sha256": "1b68e7a38f2697b7851ad72196ff48c61b12bae347ba67586322e3649917ffcc",
       "compiled_size": 50,
       "mapped_size": 50,
       "same": 23,
       "total": 23,
       "matching": true,
-      "code": "/* Hedefli eylem sonucunu kaydet ve bitis bayragini kur — 0x0803F910.\n * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x0803F910.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023654(void *owner,u32 value);\nu32 FUN_0803f910(Phase1Action *action)\n{\n    u32 result;\n    void *owner = action->owner;\n    action->result = FUN_08023654(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) result = 0;\n    else { action->done = 1; result = 1; }\n    return result;\n}\n"
+      "code": "/* Record the targeted action's result and set the finish flag — 0x0803F910.\n * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x0803F910.json. */\n#include \"gba_types.h\"\n#include \"phase1_types.h\"\n\nextern u32 FUN_0804fc48(void *target,void *owner);\nextern u16 FUN_08023654(void *owner,u32 value);\nu32 FUN_0803f910(Phase1Action *action)\n{\n    u32 result;\n    void *owner = action->owner;\n    action->result = FUN_08023654(owner,FUN_0804fc48(action->target,owner));\n    if (action->result == 1) result = 0;\n    else { action->done = 1; result = 1; }\n    return result;\n}\n"
     }
   ]
 }

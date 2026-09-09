@@ -1,5 +1,5 @@
-/* Nesneye ses kaynagi bagla ve seviyesini kur — 0x080350A8.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080350A8.json. */
+/* Attach an audio source to the object and set its level — 0x080350A8.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080350A8.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

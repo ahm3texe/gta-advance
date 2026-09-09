@@ -1,5 +1,5 @@
-/* Dortte bir olasilikla alternatif model sec — 0x08038608.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x08038608.json. */
+/* Pick the alternative model with a one-in-four chance — 0x08038608.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x08038608.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 

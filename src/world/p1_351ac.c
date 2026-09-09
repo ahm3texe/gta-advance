@@ -1,5 +1,5 @@
-/* Kart kaynagi tablosundaki ses kaydini isleme ver — 0x080351AC.
- * Faz 1; ROM ikizleri karsilastirildi. Olcum: data/phase1_evidence/0x080351AC.json. */
+/* Submit the audio record from the cartridge resource table — 0x080351AC.
+ * Phase 1; compared against the ROM twins. Measurement: data/phase1_evidence/0x080351AC.json. */
 #include "gba_types.h"
 #include "phase1_types.h"
 
