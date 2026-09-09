@@ -9,7 +9,8 @@
  * access produces the `ldr r0,=base / adds r0,#N` form.
  *
  * The fourth function of the same set (CleanupAreaTiles, 0x08030CB4) is in a
- * separate file because it does not match yet: src/world/area_cleanup.c
+ * separate file, src/world/area_cleanup.c; it was open long after these three
+ * and now matches as well.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/area_flags.c
