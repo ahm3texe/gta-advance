@@ -1,22 +1,26 @@
-# VBlank interrupt analizi
+# VBlank interrupt analysis
 
 ## `VBlankIntr` — `0x08000220`
 
-Bu Thumb fonksiyonu her dikey boşluk interrupt'ında çalışır. Ghidra'nın fonksiyon gövdesi ölçümü 312 byte; aralara yerleşmiş literal havuzlarıyla birlikte yeniden üretilen sürekli ROM aralığı 364 byte'tır.
+This Thumb function runs on each vertical blank interrupt. Ghidra measured its
+body as 312 bytes; the reconstructed continuous ROM range is 364 bytes including
+interleaved literal pools.
 
-Doğrulanan yüksek seviyeli akış:
+Verified high-level flow:
 
-1. `0x02035CA8` ve IWRAM `0x03000004` kare sayaçlarını artırır.
-2. `0x02000EB8` interrupt derinlik/yeniden giriş sayacını artırır.
-3. Sayaç `1` değilse ağır güncellemeleri atlayarak çıkış yoluna gider.
-4. En az iki sabit kare-başı alt sistemi çağırır; `0x02000D08` etkinse üçüncü isteğe bağlı alt sistemi çalıştırır.
-5. `REG_VCOUNT` (`0x04000006`) ve `0x02000130` durum bayrağına göre grafik/aktarımı yöneten iki güncelleme yolundan birini seçer.
-6. IWRAM'deki kare/gecikme değerini belirli koşullarda `5` ile sınırlar.
-7. Ortak bitiş fonksiyonunu çağırır, yeniden giriş sayacını azaltır ve BIOS IRQ bayrağında VBlank bitini `0x03007FF8` üzerinden işaretler.
+1. Increments the frame counters at `0x02035CA8` and IWRAM `0x03000004`.
+2. Increments the interrupt-depth/reentrancy counter at `0x02000EB8`.
+3. Skips expensive updates and takes the exit path unless the counter is `1`.
+4. Calls at least two fixed per-frame subsystems and a third optional subsystem when `0x02000D08` is enabled.
+5. Selects one of two graphics/transfer update paths based on `REG_VCOUNT` (`0x04000006`) and the state flag at `0x02000130`.
+6. Caps the IWRAM frame/delay value at `5` under certain conditions.
+7. Calls the shared finalization function, decrements the reentrancy counter, and sets the BIOS VBlank IRQ flag through `0x03007FF8`.
 
-Fonksiyon içindeki 10 benzersiz alt çağrının gerçek isimleri henüz bilinmiyor; donanım register erişimleri ve mGBA gözlemleriyle isimlendirilecek.
+The original names of its 10 distinct callees are unknown. Functional names can
+be assigned using hardware-register accesses and mGBA observations.
 
-## Matching durumu
+## Matching status
 
-Okunabilir Thumb kaynağı `src/interrupt/vblank_intr.s` içindedir. `make vblank-match` komutu ROM'daki `0x000220–0x00038B` aralığıyla **364/364 byte MATCH** sonucu verir.
-
+The current readable C source is `src/interrupt/vblank_intr.c`, replacing the
+earlier Thumb assembly source `src/interrupt/vblank_intr.s`. `make vblank-match`
+verifies **364/364 matching bytes** at ROM offsets `0x000220–0x00038B`.

@@ -1,132 +1,142 @@
-# Proje çalışma sistemi
+# Project working conventions
 
-Bu belge projenin süreç sözleşmesidir. Güncel rakamlar [STATUS.md](STATUS.md),
-aktif ve sıradaki işler `data/work_queue.csv`, fonksiyon çalışma tekniği
-[WORKFLOW.md](WORKFLOW.md), derleyici davranışı [COMPILER.md](COMPILER.md)
-içindedir. Aynı bilgi ikinci bir yerde elle tutulmaz.
+This document defines the project's process contract. Current figures live in
+[STATUS.md](STATUS.md), active and queued work in `data/work_queue.csv`, function
+techniques in [WORKFLOW.md](WORKFLOW.md), and compiler behavior in
+[COMPILER.md](COMPILER.md). Do not maintain a second manual copy of the same facts.
 
-## 1. Bilgi sahipliği
+## 1. Data ownership
 
-| Bilgi | Tek doğruluk kaynağı | Türemiş görünüm |
+| Information | Source of truth | Derived view |
 |---|---|---|
-| Fonksiyon adresi, boyutu, durum ve modül | `data/functions.csv` | Dashboard, `make status` |
-| İnsan tarafından verilen ad/durum | `data/function_overrides.csv` | `functions.csv` |
-| C kaynağı ve eşleşme sonucu | `src/**/*.c` + `data/c_sources.csv` | Dashboard |
-| Doğrulanmış kaynak bölgeleri | `data/matching_regions.csv` | Hibrit ROM, dashboard |
-| RAM/ROM veri sembolleri | `data/ram_map.csv` | Link betikleri |
-| Açık teknik işler | `data/work_queue.csv` | `docs/STATUS.md`, dashboard |
-| Kabul edilmiş sınır borcu | `data/boundary_baseline.json` | `make boundary-check` |
-| Reddedilmiş sahte girişler | `data/non_function_entries.csv` | `make consistency` |
-| ARM overlay sınırları | `data/arm_boundary_review.csv` | `make consistency` |
-| Araç zinciri kimliği | `config/toolchain.lock.json` | `make toolchain-check` |
-| Güncel proje özeti | Yukarıdaki veriler | Üretilmiş `docs/STATUS.md` |
+| Function address, size, state, and module | `data/functions.csv` | Dashboard, `make status` |
+| Reviewed name/state overrides | `data/function_overrides.csv` | `functions.csv` |
+| C implementation and matching result | `src/**/*.c` + `data/c_sources.csv` | Dashboard |
+| Verified source regions | `data/matching_regions.csv` | Hybrid ROM, dashboard |
+| RAM/ROM data symbols | `data/ram_map.csv` | Linker scripts |
+| Open technical work | `data/work_queue.csv` | `docs/STATUS.md`, dashboard |
+| Accepted boundary debt | `data/boundary_baseline.json` | `make boundary-check` |
+| Rejected false entries | `data/non_function_entries.csv` | `make consistency` |
+| ARM overlay boundaries | `data/arm_boundary_review.csv` | `make consistency` |
+| Toolchain identity | `config/toolchain.lock.json` | `make toolchain-check` |
+| Current project summary | The data above | Generated `docs/STATUS.md` |
 
-`README.md`, `PLAN.md` ve `WORKLOG.md` güncel sayaç kaynağı değildir. README
-giriş noktası, PLAN karar/yol haritası, WORKLOG tarihsel kayıttır.
+`README.md`, `PLAN.md`, and `WORKLOG.md` are not sources of current counters.
+README is the entry point, PLAN records decisions/direction, and WORKLOG is history.
 
-## 2. Her çalışma oturumunun protokolü
+## 2. Session protocol
 
-Başlangıç:
+At the start:
 
-1. `git status --short` ile başkasının değişikliğini ayır.
-2. `make status` ile gerçek durumu ve tek aktif işi gör.
-3. `data/work_queue.csv` içinde en fazla bir işi `in_progress` tut.
-4. O işin kabul ölçütü bu oturumun sınırıdır; yan işler yeni kayıt olur.
+1. Use `git status --short` to identify existing changes made by others.
+2. Use `make status` to inspect the recorded state and the single active task.
+3. Keep at most one task `in_progress` in `data/work_queue.csv`.
+4. Its acceptance criteria define the session's scope; additional work gets a new record.
 
-Bitiş:
+At the end:
 
-1. İşin kanıtını üret; yalnızca yorum veya ajan raporu kanıt değildir.
-2. Kuyruk durumunu ve `evidence` alanını güncelle.
-3. `make status-update` çalıştır.
-4. Günlük değişiklikte `make check`, kilometre taşında `make check-full` çalıştır.
-5. Kontroller geçmeden `done`, `matching` veya “tamamlandı” denmez.
+1. Produce evidence; a comment or agent report alone is not proof.
+2. Update the task state and `evidence` field when task progress changes.
+3. Run `make status-update` when source or progress data needs refreshing.
+4. For implementation changes, run `make check`; use `make check-full` for milestones. Documentation-only changes follow the focused checks below.
+5. Do not claim `done`, `matching`, or completion before the applicable checks pass.
 
-## 3. Doğrulama kademeleri
+## 3. Validation levels
 
-### `make check` — her commit
+### Documentation-only changes
 
-- Kurulu toolchain artifact kimliğini kontrol eder.
-- Bütün kayıtlı matching bölgeleri ROM'a karşı doğrular.
-- Hibrit ROM içinde kaynak bölgelerinin doğru konuma oturduğunu denetler.
-- CSV/kaynak tutarlılığını ve iş kuyruğu şemasını kontrol eder.
-- Sınır denetimini baseline'a karşı çalıştırır; yeni veya değişen borcu reddeder.
-- Bütün C kaynaklarını tarar; tek derleme hatasında başarısız olur ve eski
-  `c_sources.csv` dosyasını korur.
-- Yasaklı inline assembly/register sabitlemelerini denetler.
-- Dashboard verisini üretir ve `docs/STATUS.md` güncelliğini kontrol eder.
+For prose translations, document renames, and corresponding path references,
+check technical meaning, Markdown, links/anchors, old-name references, and the
+scope of the diff. Confirm that executable code and measurement values remain
+unchanged. Do not rebuild the game or dashboard solely for documentation changes.
 
-### `make check-full` — kilometre taşı ve birleştirme
+Generated-document text must be changed in its producer. Check that producer's
+syntax and generated output with the existing recorded data. A change to build
+behavior, executable code, data schema, or matching results is outside this
+exception and requires the implementation checks below.
 
-`make check` içindeki her şeyi build cache kullanmadan yeniden üretir. Ayrıca
-23 fonksiyonluk sabit temsil corpus'unun parmak izini, dashboard ürün lint'ini ve production
-build'i doğrular.
+### `make check` — implementation commits
 
-### Borç baseline'ı kuralı
+- Checks installed toolchain artifact identities.
+- Verifies all registered matching regions against the ROM.
+- Checks source-region placement in the hybrid ROM.
+- Checks CSV/source consistency and the work-queue schema.
+- Audits boundaries against the baseline and rejects new or changed debt.
+- Scans every C source; any compilation failure fails the check and preserves the old `c_sources.csv`.
+- Checks for prohibited inline assembly and fixed-register bindings.
+- Generates dashboard data and checks that `docs/STATUS.md` is up to date.
 
-Baseline bir “sorun yok” belgesi değildir. Kısa sınır listesi 2026-09-04'te
-53 kaydın ayrı ayrı incelenmesiyle sıfıra indirildi; yeni bulgu, değişen
-erişilebilir boyut veya kapanmış bulgunun geri gelmesi `make check`i kırar.
-İnceleme kararları `data/boundary_review.csv` içinde saklanır.
+### `make check-full` — implementation milestones and merges
 
-`make boundary-baseline` yalnızca bütün farklar tek tek incelendikten sonra
-çalıştırılır. Sayıyı susturmak için baseline yenilenmez.
+Reproduces everything in `make check` without using the build cache. Also checks
+the fixed 23-function reference corpus fingerprint, dashboard lint, and the
+production build.
 
-## 4. İş kuyruğu
+### Boundary baseline policy
 
-Her işin kalıcı ID, P0–P3 önceliği, durum, teslimat, ölçülebilir kabul ölçütü
-ve tamamlandıysa kanıtı olmak zorundadır. Geçerli durumlar `todo`,
-`in_progress`, `blocked` ve `done`dur.
+The baseline is not a declaration that everything is correct. The short-boundary
+list was reduced to zero on 2026-09-04 by reviewing 53 records individually. A new
+finding, changed reachable size, or reopened finding fails `make check`.
+Review decisions are stored in `data/boundary_review.csv`.
 
-Aynı anda yalnızca bir iş `in_progress` olabilir. Bir çalışma sırasında yeni
-bir sorun bulunursa mevcut hedef genişletilmez; kuyruğa yeni kayıt eklenir.
+Run `make boundary-baseline` only after reviewing every difference. Never refresh
+the baseline merely to silence a counter.
 
-- **P0:** doğruluğu veya yeniden üretilebilirliği koruyan kapı
-- **P1:** sıradaki teknik ilerlemeyi engelleyen iş
-- **P2:** ölçek büyüyünce maliyeti artacak mimari/kalite borcu
-- **P3:** kozmetik veya isteğe bağlı iyileştirme
+## 4. Work queue
 
-## 5. Durumlar ve kanıt
+Every task needs a stable ID, P0–P3 priority, state, deliverable, measurable
+acceptance criteria, and evidence when completed. Valid states are `todo`,
+`in_progress`, `blocked`, and `done`.
 
-| Durum | Asgari kanıt |
+Only one task may be `in_progress` at a time in the current queue. If another
+problem is discovered, add a task rather than expanding the active objective.
+
+- **P0:** a check protecting correctness or reproducibility.
+- **P1:** work blocking the next technical step.
+- **P2:** architectural/quality debt whose cost grows with scale.
+- **P3:** cosmetic or optional improvements.
+
+## 5. States and evidence
+
+| State | Minimum evidence |
 |---|---|
-| `candidate` | Otomatik harita kaydı; doğruluk iddiası yok |
-| `discovered` | Giriş adresi için BL hedefi, işaretçi, prolog veya bölme kanıtı; gövde incelenmiş sayılmaz |
-| `documented` | Disassembly okunmuş, davranış/çağrılar yazılmış, isim kanıtlı |
-| `decompiled` | Okunabilir doğal C var; henüz byte eşleşmiyor |
-| `matching` | Kayıtlı kaynak bölgesi temiz build'de ROM ile birebir |
+| `candidate` | An automatically mapped entry; no correctness claim |
+| `discovered` | BL target, pointer, prologue, or split evidence for the entry; this does not mean the body has been reviewed |
+| `documented` | Disassembly read, behavior/calls documented, name supported by evidence |
+| `decompiled` | Readable, natural C exists but is not yet byte-matching |
+| `matching` | A registered source region reproduces the ROM exactly in a clean build |
 
-“İncelenmiş” metriği yalnızca `documented + decompiled + matching` toplamıdır.
-Fonksiyon sayısı yardımcı metriktir; ana ilerleme metriği matching kod baytıdır.
+The reviewed metric is only `documented + decompiled + matching`. Function count
+is a secondary metric; matching code bytes are the main progress metric.
 
-Kaynak türü durumdan bağımsızdır: `c`, `asm` veya `none`. Eşleşmeyen C yine
-C'dir; kaynaksız aday assembly sayılmaz.
+Source kind is independent of state: `c`, `asm`, or `none`. Non-matching C is still
+C; a candidate without source is not assembly.
 
-## 6. Dürüstlük kuralları
+## 6. Evidence standards
 
-- ROM içinde özgün C adları ve yorumları yoktur; kanıtsız isim uydurulmaz.
-- Kısmi veya davranışsal eşdeğerlik byte-matching diye sunulmaz.
-- Hibrit ROM, tam ROM'un kaynaktan üretildiği anlamına gelmez: bilinmeyen
-  baytlar `baserom.gba`dan kopyalanır.
-- Bir iddia sayı, hash, disassembly veya temiz build ile desteklenir.
-- Denenip tutmayan yollar kaynak başında veya WORKLOG'da kaydedilir.
-- Bayat yorum ve sayaç aynı değişiklikte düzeltilir.
-- `register ... asm(...)` ve inline assembly ile C eşleşmesi zorlanmaz.
-- Bir fonksiyon direniyorsa matching komşuları bekletmez; ayrı translation
-  unit'e alınır.
+- Original C names and comments are not recovered from this ROM; do not invent unsupported names.
+- Do not present partial or behavioral equivalence as byte matching.
+- A hybrid ROM is not a complete source build: unknown bytes are copied from `baserom.gba`.
+- Support a claim with numbers, hashes, disassembly, or a clean build.
+- Record unsuccessful approaches at the source-file header or in WORKLOG.
+- Correct stale comments and counters in the same relevant change.
+- Do not force C matching with `register ... asm(...)` or inline assembly.
+- An unresolved function must not hold up matching neighbors; isolate it in its own translation unit.
 
-## 7. Sınıflandırma stratejisi
+## 7. Classification strategy
 
-1.988 fonksiyon önceden topluca isimlendirilmez. Ana döngü, input, UI, entity,
-dünya/collision, rasterizer, görev/script, ses ve save kümeleri çağrı grafiğiyle
-açıldıkça sınıflandırılır. Kanıt yoksa `FUN_...` adı korunur.
+The strategy originally covered 1,988 functions; that is a historical count.
+Do not assign all names in advance. Classify main loop, input, UI, entity,
+world/collision, rasterizer, mission/script, audio, and save clusters as the call
+graph reveals them. Keep `FUN_...` when evidence is insufficient.
 
-Öncelik sırası bitişik yaprak blokları, çağrıları bilinen kümeler, kesintisiz
-doğrulanmış alanı büyüten bloklar ve bir alt sistemi açan büyük fonksiyonlardır.
+Prioritize adjacent leaf blocks, clusters with known calls, blocks extending a
+continuous verified range, and large functions that reveal a subsystem.
 
-## 8. Çoklu ajan ve yayın
+## 8. Multiple agents and publication
 
-- Her ajan aktif iş ID'sini bilir; `data/*.csv` aynı anda tek yerden yazılır.
-- Ortak `build/` dizini silinmez; bölge/baseline kararı ana süreçte kalır.
-- Ajan raporu doğrulama yerine geçmez; ana süreç ROM'a karşı yeniden ölçer.
-- ROM, save, Ghidra projesi, decompiler dökümleri ve üretilmiş ROM Git'e girmez.
-- Uzak depo varsayılan olarak özeldir; kullanıcı hedef seçmeden dışarı gönderim yapılmaz.
+- Each agent must know the active task ID; only one writer updates `data/*.csv` at a time.
+- Do not delete the shared `build/` directory. Region/baseline decisions remain with the coordinating process.
+- An agent report is not validation; the coordinating process measures the result against the ROM again.
+- ROMs, saves, Ghidra projects, decompiler dumps, and generated ROMs stay out of Git.
+- Remote repositories default to private; do not send work externally before the user selects a destination.

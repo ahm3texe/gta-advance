@@ -1,186 +1,176 @@
-# Fonksiyon çalışma tekniği
+# Function matching workflow
 
-Projenin bağlayıcı süreç sözleşmesi [PROJECT_SYSTEM.md](PROJECT_SYSTEM.md),
-güncel durum [STATUS.md](STATUS.md), derleyici davranışı
-[COMPILER.md](COMPILER.md) içindedir. Bu belge tek fonksiyon/blok üzerindeki
-tersine mühendislik tekniğini açıklar. Çelişkide PROJECT_SYSTEM geçerlidir.
+The binding process contract is [PROJECT_SYSTEM.md](PROJECT_SYSTEM.md), current
+state is [STATUS.md](STATUS.md), and compiler behavior is [COMPILER.md](COMPILER.md).
+This document describes reverse engineering one function/block. PROJECT_SYSTEM
+prevails if the documents conflict.
 
-## 1. Doğrulama komutları
+## 1. Verification commands
 
-Commit öncesi tek komut:
+Before an implementation commit:
 
 ```sh
 make check
 ```
 
-Bu günlük kapıdır: matching kaynakları, toolchain kimliğini, veri/kaynak
-tutarlılığını, sınır baseline'ını, bütün C kaynaklarını, iş kuyruğunu ve
-üretilmiş durum belgesini denetler. Kilometre taşı öncesinde build cache'i
-yok sayan corpus ve dashboard doğrulaması için `make check-full` kullanılır.
+This daily check covers matching sources, toolchain identity, data/source
+consistency, the boundary baseline, every C source, the work queue, and the
+generated status document. Use `make check-full` before an implementation
+milestone to bypass the build cache and validate the corpus and dashboard.
+Documentation-only changes use the focused checks in PROJECT_SYSTEM instead.
 
-**Kural:** `make check` geçmeden commit atılmaz. Hibrit ROM hash'i yalnızca
-doğrulanmış kaynak bölgelerinin doğru konuma oturduğunu kanıtlar; tam ROM'un
-kaynaktan üretildiğini kanıtlamaz.
+**Rule:** implementation commits require a passing `make check`. A hybrid ROM
+hash proves only the placement of verified source regions, not that the entire
+ROM has been rebuilt from source.
 
-## 2. Hedef seçimi
+## 2. Target selection
 
 ```sh
 python3 tools/find_leaf_candidates.py --limit=20 --max-size=200
 ```
 
-Yaprak (`bl` içermeyen) fonksiyonlar en ucuzudur. Ama **bir C dosyası bitişik
-bir ROM bölgesi üretir** — bu yüzden hedef tek fonksiyon değil, *bitişik
-adayların oluşturduğu blok*tur.
+Leaf functions (without `bl`) are the least expensive targets. However, **one C
+file produces a contiguous ROM region**, so the unit of work is a *block of
+adjacent candidates*, not just an isolated function.
 
-Öncelik sırası:
+Priority order:
 
-1. Bitişik yaprak blokları — en öngörülebilir
-2. Çağırdığı her şey artık bilinen fonksiyonlar — ağaç yukarı açılır
-3. Kesintisiz aralığı büyüten bloklar — kapsam yüzdesinden daha iyi bir
-   sağlık göstergesidir
-4. Büyük fonksiyonlar — bayt yüzdesini asıl hareket ettiren bunlar
+1. Adjacent leaf blocks — the most predictable.
+2. Functions whose callees are known — work upward through the call tree.
+3. Blocks extending a continuous range — a better health indicator than a coverage percentage alone.
+4. Large functions — these move the byte percentage most.
 
-### Aday seçimi ELLE YAPILMAZ, araçla yapılır
+### Select candidates with tools, not ad hoc lists
 
-Hedef listesi üreten iki araç var; ikisi de salt okunurdur ve çıktısı
-`--out` ile CSV'ye yazılabilir:
+Two read-only tools generate candidate lists and can write CSV output with `--out`:
 
-- `tools/find_neighbour_dense.py` — komşuluğu eşleşmiş, henüz C'si
-  yazılmamış fonksiyonlar (bölgenin tip sözlüğü hazır demektir)
-- `tools/find_twins.py` — yapısal olarak aynı fonksiyon çiftleri/kümeleri
-  (bkz. §10)
+- `tools/find_neighbour_dense.py` — functions with matching neighbors but no C source yet; nearby types are already understood.
+- `tools/find_twins.py` — structurally identical function pairs/clusters (see section 10).
 
-**Bir sayı raporlanacaksa, onu üreten komut da yazılır.** Tek seferlik
-python parçacığıyla seçim yapmak yasak: 2026-09-07'de plana "123 taze
-komşu-yoğun aday" diye bir sayı girdi ve depoda onu yeniden üretecek
-hiçbir şey yoktu. Sayılar ayrıca ANLIK FOTOĞRAFTIR — her yeni eşleşme
-komşularının sayacını yukarı ittiği için aday sayısı *artabilir*. Bir
-sayıyı doğrulamak için ölçüldüğü commit'te koşturun:
+**Every reported count must include its generating command.** Do not select
+candidates using one-off Python fragments: on 2026-09-07, a plan claimed “123 fresh
+neighbor-dense candidates,” but nothing in the repository could reproduce it.
+Counts are also snapshots: each new match increases its neighbors' counters, so
+the candidate count can *increase*. Validate a count at the commit where it was
+measured. For example, with `<commit>` replaced and the temporary directories prepared:
 
-```
+```sh
+mkdir -p /tmp/at/tools
 git archive <commit> data/functions.csv src | tar -x -C /tmp/at
 cp tools/find_neighbour_dense.py /tmp/at/tools/ && cd /tmp/at
 python3 tools/find_neighbour_dense.py
 ```
 
-## 3. Fonksiyon döngüsü
+## 3. Function iteration
 
-1. `tools/disasm_function.py <ad>` ile ROM'u oku, davranışı **anla**
-2. Temiz C yaz — Ghidra çıktısı kopyalanmaz
-3. `make c-match FILE=...` ile ölç
-4. Eşleşmiyorsa `make diff FILE=... FUNC=...` ile nerede saptığını gör
-5. **Assembly'yi değil C'yi** değiştir; [COMPILER.md](COMPILER.md) kurallarına bak
-6. Eşleşince bölgeyi kaydet, `make check` çalıştır, commit at
+1. Read the ROM with `tools/disasm_function.py <name>` and **understand** the behavior.
+2. Write clean C; do not copy Ghidra output.
+3. Measure with `make c-match FILE=...`.
+4. If it does not match, inspect differences with `make diff FILE=... FUNC=...`.
+5. Change the **C**, not the assembly; consult [COMPILER.md](COMPILER.md).
+6. Once matching, register the region, run `make check`, and commit.
 
-## 4. Dosya ve sembol düzeni
+## 4. Files and symbols
 
-| Ne | Nereye |
+| Information | Location |
 |---|---|
-| Tipler (`u8`, `s16`, `vu32`) | `include/gba_types.h` |
-| Donanım yazmaçları, `DmaChannel`, bellek tabanları | `include/gba_io.h` |
-| RAM/ROM veri sembolleri | `data/ram_map.csv` |
-| Fonksiyon adı, durum, modül | `data/function_overrides.csv` |
-| Doğrulanmış kaynak bölgeleri | `data/matching_regions.csv` (araçla) |
-| libc bölgeleri | `data/libc_regions.csv` |
+| Base types (`u8`, `s16`, `vu32`) | `include/gba_types.h` |
+| Hardware registers, `DmaChannel`, memory bases | `include/gba_io.h` |
+| RAM/ROM data symbols | `data/ram_map.csv` |
+| Reviewed function name, state, and module overrides | `data/function_overrides.csv` |
+| Verified source regions | `data/matching_regions.csv` (through tools) |
+| libc regions | `data/libc_regions.csv` |
 
-**Kaynak dosyalarında `typedef` veya `#define REG_...` tanımlanmaz.** Yeni bir
-yazmaç gerekiyorsa `gba_io.h`'ye eklenir.
+The existing convention keeps shared type definitions and `REG_...` definitions
+in headers. Add new hardware registers to `gba_io.h`.
 
-`data/*.csv` dosyaları elle değil araçlarla değiştirilir:
-`add_c_region.py`, `retire_asm.py`, `audit_boundaries.py` ve
-`discover_functions.py`. Eski `split_at_calls.py` doğrusal taraması 52 sahte
-sınır ürettiği için yazma kipinde kalıcı olarak devre dışıdır.
+Use the data-update tools rather than manually rewriting `data/*.csv`:
+`add_c_region.py`, `retire_asm.py`, `audit_boundaries.py`, and
+`discover_functions.py`. The old linear scan in `split_at_calls.py` is permanently
+disabled in write mode because it produced 52 false boundaries.
 
-**Birincil kaynak `data/functions.csv`'nin kendisidir.**
-`sync_function_map.py` haritayı bayat Ghidra dökümünden *yeniden kurar* —
-bu oturumda kazara çalıştı ve 479 kaydı, 148 adı, 133 `matching` durumunu
-sildi. Artık kayıp kapısı var ve reddediyor; yine de yalnızca sıfırdan
-yeniden kurmak istendiğinde kullanılır.
+**The primary source is `data/functions.csv` itself.** `sync_function_map.py`
+*rebuilds* the map from an outdated Ghidra export. An accidental run deleted
+479 records, 148 names, and 133 `matching` states. A loss-prevention check now
+rejects such changes; use the tool only for an intentional reconstruction.
 
-### Yeniden adlandırma
+### Renaming symbols
 
-Bir fonksiyonu `functions.csv`'de yeniden adlandırmak, o adı `extern` ile
-kullanan **her kaynağı kırar**. Bu projede yedi kez oldu ve her seferinde
-ancak `make rom` zincirinin sonunda fark edildi.
+Renaming a function in `functions.csv` breaks **every source** still declaring
+its previous name with `extern`. This happened seven times in this project and
+was only detected at the end of `make rom` each time.
 
-**Kural:** yeniden adlandırdıktan sonra `make consistency` çalıştır — hangi
-dosyanın kırıldığını anında söyler. Referansları güncellemeden commit atma.
+**Rule:** run `make consistency` after a symbol rename. It identifies broken
+references immediately. Update all references before committing.
 
-## 5. Dürüstlük kuralları
+## 5. Evidence standards
 
-Bunlar üslup değil, doğruluk meselesi. Her biri bu projede en az bir kez
-yanlış yola sapmamıza yol açtı.
+These are correctness requirements. Each addresses a mistake already encountered
+in this project.
 
-- **İsim uydurma.** Bir fonksiyonun ne yaptığını kanıtlayamıyorsan `FUN_...`
-  adında bırak. Assembly kaynaklarındaki `.equ` etiketleri önceki çalışmanın
-  *tahminleriydi* ve birçoğu yanlış çıktı.
-- **Belirsizliği belirsiz işaretle.** İki sembolün gövdesi aynıysa hangisinin
-  nerede olduğunu uydurma; `discovered` yaz ve alternatifi nota geç.
-- **Provisional olan provisional kalır.** `ram_map.csv`'de doğrulanmamış her
-  şey `provisional` statüsündedir.
-- **Eşleşmeyeni "eşleşti" sayma.** Kısmi sonuç değerlidir; uydurma değildir.
-- **Denenip tutmayanları yaz.** Kaynak dosyanın başına. Aynı yolu iki kez
-  yürümek pahalıdır.
-- **Bayat notu düzelt.** Bir yorum "çözülemedi" diyorsa ve artık çözüldüyse,
-  o yorum yanlış bilgidir.
+- **Do not invent names.** If behavior cannot be established, retain `FUN_...`. The `.equ` labels in earlier assembly were hypotheses, and many were wrong.
+- **Mark uncertainty.** When two symbols have identical bodies, do not guess which belongs where. Record `discovered` and note the alternative.
+- **Provisional stays provisional.** Unverified `ram_map.csv` entries keep the `provisional` state.
+- **Do not call a non-match a match.** Partial results are useful; unsupported success claims are not.
+- **Record failed approaches** at the top of the source file. Repeating the same dead end is expensive.
+- **Correct stale notes.** A comment saying “unresolved” after the issue has been solved is misinformation.
 
-## 6. Register sabitleme yasak
+## 6. Fixed-register bindings are prohibited
 
-`register T *p asm("r4")` gibi acik register baglamalari, inline assembly ile
-ayni kategoridedir: byte'lari tutturur ama **neden** tuttugunu gizler.
+Explicit bindings such as `register T *p asm("r4")` are in the same category as
+inline assembly: they may reproduce bytes while hiding **why** the natural C
+would generate those instructions.
 
-Bu bir cekic: her register uyusmazligi boyle "cozulebilir". Kabul edilirse
-kural setinin (docs/COMPILER.md) kesfi anlamsizlasir ve proje byte-matching
-tiyatrosuna doner. Ozgun 2004 kaynaginin register sabitledigine dair hicbir
-kanit da yok.
+Almost any register mismatch could be forced this way. Allowing it would remove
+the purpose of discovering the compiler rules in `docs/COMPILER.md` and reduce
+matching to an artificial exercise. There is also no evidence that the original
+2004 source fixed these registers explicitly.
 
-Bir fonksiyon ancak DOGAL C ile eslesirse eslesmis sayilir.
-`tools/review_c_source.py` bunu yakalar ve `make check` basarisiz olur.
+A C function counts as matching only when it matches using **natural C**.
+`tools/review_c_source.py` detects prohibited bindings and fails `make check`.
+The same restriction applies to inline assembly.
 
-Ayni sey inline assembly icin de gecerli.
+## 7. Isolate incomplete work
 
-## 7. Yarım işi ayır
+If one function in a block resists matching, move the matching portion into a
+separate file and register its region. Keep the unresolved function in its own
+file with attempted approaches documented in comments.
 
-Bir blokta bir fonksiyon direniyorsa, eşleşen kısmı ayrı dosyaya alıp bölge
-olarak kaydet. Yarım iş tamamı bekletmez. Direnen fonksiyon kendi dosyasında,
-denenenler yorumda.
+## 8. Negative results are evidence too
 
-## 8. Negatif sonuçlar da kayıttır
+Document exhausted hypotheses. However, **a change that has no effect alone may
+be decisive in combination with another**; this has happened in the project.
+A failed experiment is not proof that the approach can never help.
 
-Bir hipotez tükendiğinde belgeye yazılır. Ama **tek başına etkisiz çıkan bir
-değişiklik, başkasıyla birleştiğinde belirleyici olabilir** — bu projede tam
-olarak böyle oldu. "Denendi, tutmadı" kaydını mutlak kabul etme.
+## 9. Parallel work
 
-## 9. Paralel çalışma
+When multiple agents are working:
 
-Birden fazla ajan çalışıyorsa:
+- Do not disrupt shared directories such as `build/`; never run `rm -rf build`.
+- Keep one writer for `data/*.csv`.
+- Each agent edits only its assigned source files.
+- Assembly retirement and region-registration decisions stay with the coordinating process.
+- Agent reports are not verification; measure results against the ROM again.
 
-- Ortak dizinlere (`build/`) dokunulmaz; `rm -rf build` çalıştırılmaz
-- `data/*.csv` tek bir yerden yazılır
-- Her ajan yalnızca kendi kaynak dosyasına yazar
-- Emeklilik ve bölge kaydı kararı ana süreçte kalır
-- Ajan raporu doğrulama yerine geçmez; sonuç ROM'a karşı yeniden ölçülür
+## 10. Compare the sibling's ROM body first
 
-## 10. Önce kardeşin ROM gövdesiyle diff'le
+If a function does not match and a **similarly sized sibling already matches**,
+compare their ROM bodies before investigating register allocation:
 
-Bir fonksiyon eşleşmiyorsa ve ROM'da **boyutu yakın bir kardeşi zaten
-eşleşiyorsa**, yazmaç dağıtımı kovalamadan önce iki ROM gövdesini
-birbiriyle karşılaştır:
-
-```
+```sh
 python3 tools/disasm_function.py 0x08031844 | sed -E 's/^ *[0-9a-f]+:\t[0-9a-f ]+\t//' > a
 python3 tools/disasm_function.py 0x08031A1C | sed -E 's/^ *[0-9a-f]+:\t[0-9a-f ]+\t//' > b
 diff a b
 ```
 
-Ölçülen örnek: `0x08031844` (472 bayt) bir ajanın 341 bin jetonunu yedi ve
-226/235 komutta takıldı; rapor "üç yazmaçlı döngüsel yer değiştirme, kaynak
-düzeyinde kaldıraç yok" diyordu. Kardeşi `0x08031A1C` zaten eşleşiyordu.
-İki gövdenin diff'i **235 komutun 235'inin aynı** olduğunu, farkın yalnızca
-dal hedefleri ve sutun testinin kutbu (`blt` ↔ `bge`) olduğunu gösterdi.
-Kaynakta karşılığı tek bir karakterdi: `if (col++ >= 0)` → `if (col++ < 0)`.
-Eşleşen kardeşin kaynağını kopyalayıp o testi çevirmek ilk denemede tam
-eşleşme verdi.
+Measured example: `0x08031844` (472 bytes) consumed 341,000 agent tokens and stalled
+at 226/235 instructions. The report claimed a cyclic permutation of three
+registers with no source-level way to change it. Its sibling `0x08031A1C` already
+matched. Comparing the bodies showed **235/235 corresponding instructions**, with
+only branch targets and the polarity of a column test differing (`blt` ↔ `bge`).
+In C, the change was `if (col++ >= 0)` → `if (col++ < 0)`. Copying the matching
+sibling and reversing that test produced a full match on the first attempt.
 
-Aynı yöntem `0x080316B0`'de de ilk denemede tuttu (aile aynı, sütun kırpması
-yok). Kural: **kardeş varsa diff ilk adımdır**, `dump_alloc.py` son adım.
+The same approach matched `0x080316B0` on its first attempt: the same family,
+without column clipping. **If a sibling exists, diff it first; use `dump_alloc.py`
+last.**

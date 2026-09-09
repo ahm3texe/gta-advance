@@ -1,30 +1,47 @@
-# İlk kullanıcı arayüzü haritası
+# Initial user interface map
 
-Save/serileştirme katmanından hemen sonra `0x0800114C` adresinde menü öğelerini süzen ve yerleştiren bir fonksiyon başlıyor.
+This note records the initial UI analysis. Matching states and provisional names
+below describe that research stage; see [STATUS.md](STATUS.md) and the function
+map for current results.
+
+Immediately after the save/serialization layer, a function at `0x0800114C`
+filters and positions menu items.
 
 ## `BuildActiveMenuItems` — `0x0800114C`
 
-- Girdi yapısındaki `+0x14` öğe sayısını okur.
-- `+0x18` konumundan başlayan 32-byte öğe kayıtlarını gezer.
-- İsteğe bağlı görünürlük maskesiyle etkin öğeleri süzer.
-- Etkin öğe işaretçilerini `0x020011B0` dizisine, sayıyı `0x020011A0` adresine yazar.
-- Menü genişliğini en fazla sekiz öğe üzerinden hesaplayıp yatay konumu `0x02001414` adresine yazar.
-- Son yerleşim adımını `0x08001E1C` fonksiyonuna devreder.
+- Reads the item count at `+0x14` in the input structure.
+- Iterates over 32-byte item records starting at `+0x18`.
+- Filters active items using an optional visibility mask.
+- Writes active item pointers to the array at `0x020011B0` and their count to `0x020011A0`.
+- Computes menu width from at most eight items and writes the horizontal position to `0x02001414`.
+- Delegates the final layout step to function `0x08001E1C`.
 
-İsim davranışa göre verilmiş geçici bir semboldür. Fonksiyon ve literal havuzu `0x0800114C–0x080011EB` boyunca 160/160 byte matching'dir.
+The name is provisional and behavior-based. The function and literal pool match
+160/160 bytes across `0x0800114C–0x080011EB`.
 
 ## `DrawMenuItems` — `0x080011EC`
 
-Etkin öğe listesini çizer, seçili öğe için farklı stil kullanır ve sayısal değerleri ondalık basamaklara ayırıp `$` önekli metne dönüştürür. Fonksiyon ve literal havuzları `0x080011EC–0x080013AB` boyunca 448/448 byte matching'dir.
+Draws the active item list with a different style for the selected item, splits
+numeric values into decimal digits, and converts them to text prefixed by `$`.
+The function and literal pools match 448/448 bytes across `0x080011EC–0x080013AB`.
 
 ## `InitMenuScreen` — `0x080013AC`
 
-Blend register'larını ayarlar, palette verisini DMA3 ile palette RAM'e yollar, VRAM'i temizler ve menüyle ilişkili alt sistemleri başlatır. Fonksiyon ve literal havuzu `0x080013AC–0x08001457` boyunca 172/172 byte matching'dir.
+Configures blend registers, transfers palette data to palette RAM using DMA3,
+clears VRAM, and initializes menu-related subsystems. The function and literal
+pool match 172/172 bytes across `0x080013AC–0x08001457`.
 
 ## `RunMenuScreen` — `0x08001458`
 
-İlk Ghidra analizi bu büyük fonksiyonun menü kimliğine göre menü ağacını kurduğunu, giriş bitlerini işlediğini, alt menülere girip çıktığını ve seçim değişince `DrawMenuItems` çağırdığını gösteriyor. İsim ve ayrıntılı sınırlar geçicidir; fonksiyon henüz matching değildir.
+Initial Ghidra analysis indicates that this large function builds the menu tree
+according to the menu ID, processes input bits, enters and leaves submenus, and
+calls `DrawMenuItems` when the selection changes. At that stage, the name and
+precise boundaries were provisional and the function was not yet matching.
 
-`ResetMenuState`, `IsMenuFlagSet` ve `FinalizeMenuLayout` yardımcıları `0x08001DC0–0x08001E2F` aralığında 112/112 byte matching'dir.
+The `ResetMenuState`, `IsMenuFlagSet`, and `FinalizeMenuLayout` helpers match
+112/112 bytes across `0x08001DC0–0x08001E2F`.
 
-`LoadMenuGraphics`, `ClearMenuVram` ve iki küçük display-control sarmalayıcısı `0x08001E30–0x08001F03` aralığında 212/212 byte matching'dir. Bu blok menü grafik kaynağını açar, iki palette aralığını DMA3 ile yükler, VRAM'i doldurur ve `DISPCNT=0x0101` ayarını uygular.
+`LoadMenuGraphics`, `ClearMenuVram`, and two small display-control wrappers match
+212/212 bytes across `0x08001E30–0x08001F03`. This block decompresses the menu
+graphics resource, loads two palette ranges with DMA3, fills VRAM, and applies
+`DISPCNT=0x0101`.

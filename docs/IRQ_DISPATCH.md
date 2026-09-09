@@ -1,23 +1,24 @@
-# Interrupt dispatcher haritası
+# Interrupt dispatcher map
 
 ## `IntrMain` — `0x08000104`
 
-`AgbMain`, bu ARM fonksiyonunun adresini BIOS kullanıcı IRQ vektörü `0x03007FFC` konumuna yazar. Dispatcher toplam 276 byte kod ve 8 byte literal havuzundan oluşur.
+`AgbMain` writes this ARM function's address to the BIOS user IRQ vector at
+`0x03007FFC`. The dispatcher contains 276 bytes of code and an 8-byte literal pool.
 
-İşlem sırası:
+Execution order:
 
-1. `REG_IE` ve `REG_IF` değerlerini `0x04000200` üzerinden birlikte okur.
-2. `REG_IME` (`0x04000208`) değerini saklayıp interrupt işlemeyi geçici olarak sınırlar.
-3. Etkin ve bekleyen interrupt maskesini `IE & IF` olarak hesaplar.
-4. Aşağıdaki öncelik sırasındaki ilk kaynağı seçer.
-5. Seçilen IF bitini acknowledge eder.
-6. Handler ofsetini `0x02000284` adresine kaydeder.
-7. `0x02000170 + handler_offset` tablosundaki ARM/Thumb handler işaretçisini çağırır.
-8. CPU, IE/IF/IME, register ve SPSR durumunu geri yükler.
+1. Reads `REG_IE` and `REG_IF` together through `0x04000200`.
+2. Saves `REG_IME` (`0x04000208`) and temporarily restricts interrupt processing.
+3. Computes enabled, pending interrupts as `IE & IF`.
+4. Selects the first source in the priority order below.
+5. Acknowledges the selected IF bit.
+6. Records the handler offset at `0x02000284`.
+7. Calls the ARM/Thumb handler pointer in the table at `0x02000170 + handler_offset`.
+8. Restores CPU, IE/IF/IME, register, and SPSR state.
 
-## Öncelik ve tablo ofsetleri
+## Priority and table offsets
 
-| Öncelik | IF biti | Kaynak | Handler ofseti |
+| Priority | IF bit | Source | Handler offset |
 |---:|---:|---|---:|
 | 1 | `0x0001` | VBlank | `0x04` |
 | 2 | `0x0004` | VCount | `0x0C` |
@@ -28,39 +29,49 @@
 | 7 | `0x0400` | DMA 2 | `0x20` |
 | 8 | `0x0800` | DMA 3 | `0x24` |
 | 9 | `0x1000` | Keypad | `0x28` |
-| 10 | `0x2000` | GamePak | `0x2C`; özel durum |
+| 10 | `0x2000` | GamePak | `0x2C`; special case |
 
-GamePak interrupt algılanırsa `SOUNDCNT_X` (`0x04000084`) sıfırlanır ve kod sonsuz döngüye girer; normal handler çağrısı yapılmaz.
+A GamePak interrupt clears `SOUNDCNT_X` (`0x04000084`) and enters an infinite loop;
+no normal handler is called.
 
-Timer 1–3 ve Serial bitleri bu tarama zincirinde doğrudan seçilmiyor. `0x20C0` maskesinin IE geri-yazımındaki etkisi sonraki handler tablosu analiziyle netleştirilecek.
+Timer 1–3 and Serial bits are not selected directly by this scan chain. The effect
+of mask `0x20C0` on IE writeback needs further handler-table analysis.
 
 ## `InitInterrupts` — `0x0800038C`
 
-Başlangıçta handler tablosunu ve donanımı şu şekilde kurar:
+Initializes the handler table and hardware as follows:
 
-- `REG_IME` kapatılır.
-- `0x02000170` adresindeki 13 girişlik tablo varsayılan `0x08000735` Thumb handler'ıyla doldurulur.
-- VBlank slotuna `VBlankIntr` (`0x08000221`) yazılır.
-- Timer 0 slotuna `0x0800079D` Thumb handler'ı yazılır.
-- DMA3, `IntrMain`in ROM'daki `0x08000104` adresinden EWRAM `0x020004D0` adresine kopyalanması için kullanılır.
-- BIOS IRQ vektörü `0x03007FFC`, EWRAM kopyasına yönlendirilir.
-- `REG_DISPSTAT = 0x3228`, `REG_IE = 0x0005` ve son olarak `REG_IME = 1` ayarlanır.
+- Disables `REG_IME`.
+- Fills the 13-entry table at `0x02000170` with the default Thumb handler `0x08000735`.
+- Installs `VBlankIntr` (`0x08000221`) in the VBlank slot.
+- Installs Thumb handler `0x0800079D` in the Timer 0 slot.
+- Uses DMA3 to copy `IntrMain` from ROM address `0x08000104` to EWRAM address `0x020004D0`.
+- Points the BIOS IRQ vector at `0x03007FFC` to the EWRAM copy.
+- Sets `REG_DISPSTAT = 0x3228`, `REG_IE = 0x0005`, and finally `REG_IME = 1`.
 
-Okunabilir kaynak `src/bootstrap/init_interrupts.s` içindedir. `make init-interrupts-match` komutu ROM'daki `0x00038C–0x00042F` aralığıyla **164/164 byte MATCH** sonucunu verir.
+The current source is `src/bootstrap/init_interrupts.c` (formerly
+`src/bootstrap/init_interrupts.s`). `make init-interrupts-match` verifies
+**164/164 matching bytes** at ROM offsets `0x00038C–0x00042F`.
 
-## Yardımcı handler'lar — `0x08000730–0x080007B3`
+## Helper handlers — `0x08000730–0x080007B3`
 
-- `NoOpVBlankFinalize` ve `DummyIntr`: iki byte'lık dönüş fonksiyonları.
-- `RunVBlankTransfers`: VBlank içinde görülen grafik/aktarım alt çağrılarını ortak bir yoldan çalıştırır; IWRAM kare/gecikme sayacını sınırlar.
-- `NoOpInterruptHelper`: iki byte'lık ikinci boş yardımcı.
-- `VCountIntr`: `0x080327C8` alt rutinini çağırır ve `REG_IF` üzerindeki VCount bitini acknowledge eder.
+- `NoOpVBlankFinalize` and `DummyIntr`: two-byte return functions.
+- `RunVBlankTransfers`: runs the graphics/transfer callees seen during VBlank through a shared path and caps the IWRAM frame/delay counter.
+- `NoOpInterruptHelper`: a second two-byte empty helper.
+- `VCountIntr`: calls subroutine `0x080327C8` and acknowledges the VCount bit in `REG_IF`.
 
-Bu blok `src/interrupt/irq_helpers.s` ile **132/132 byte MATCH**.
+This block matches **132/132 bytes**. Its current source is
+`src/interrupt/irq_helpers.c`, replacing the earlier `.s` implementation.
 
 ## `ResetDisplayAndInterrupts` — `0x080007B4`
 
-DMA3 ile VRAM ve OAM'i sıfırlar, VBlank/display durumunu hazırlar, BIOS IRQ bayrağını günceller ve `InitInterrupts`i yeniden çağırır. `src/bootstrap/reset_display_interrupts.s` ile gövde ve literal havuzu dahil **120/120 byte MATCH**.
+Clears VRAM and OAM with DMA3, prepares VBlank/display state, updates the BIOS IRQ
+flag, and calls `InitInterrupts` again. `src/bootstrap/reset_display_interrupts.c`
+replaces the earlier `.s` implementation and matches **120/120 bytes**, including
+the body and literal pool.
 
-## Matching durumu
+## Matching status
 
-Okunabilir kaynak `src/bootstrap/intr_main.s` içindedir. `make intr-match` komutu fonksiyon gövdesi ve literal havuzunu ROM'daki `0x000104–0x00021F` aralığıyla karşılaştırır; sonuç **284/284 byte MATCH**.
+The readable assembly source is `src/bootstrap/intr_main.s`. `make intr-match`
+compares the body and literal pool against ROM offsets `0x000104–0x00021F`:
+**284/284 matching bytes**.

@@ -1,731 +1,780 @@
-# Çalışma günlüğü
+# Work log
 
-## 2026-09-04 — 53 sınır bulgusunun kapatılması
+## 2026-09-04 — Closing the 53 boundary findings
 
-- Her bulgu özyinelemeli Thumb akışı ve ROM disassembly'siyle incelendi;
-  karar kanıtları `data/boundary_review.csv` içine yazıldı.
-- 52 bulgu, `split_at_calls.py` aracının literal havuzları ve fonksiyon içi
-  ortak blokları doğrusal `bl` hedefi sanarak oluşturduğu sahte bölmelerdi.
-- `0x08053FF2`, `0x1C03FFFF` literalinin üst yarısındaki sahte başlangıçtı;
-  üç gerçek `bl` çağrısı ve `push {r4-r7,lr}` prologu bulunan
-  `0x08053FF4` ayrı fonksiyon olarak korundu.
-- Kısa sınır borcu 53'ten 0'a indi. ARM aralığındaki 18 kayıt ve 4096 bayt
-  eşiğini aşan 4 kayıt farklı inceleme sınıfları olarak açık tutuldu.
-- `ScanAllEntries`, ROM'un yalnız 0 numaralı girdiyi işleyen gerçek davranışını
-  yansıtacak biçimde `ProcessFirstEntry` olarak yeniden adlandırıldı.
-- `gRam02000F10`, `gRam02001140` ve `gRam02025810` için çelişkili extern
-  türleri ortak ham depolama bildirimlerinde birleştirildi. Dokuz matching
-  fonksiyonun bayt çıktısı değişmedi; tutarlılık kapısı yeni tür çelişkilerini
-  artık otomatik reddediyor.
-- Dashboard'daki kullanılmayan 57 UI scaffold/hook dosyası ve sekiz gereksiz
-  çalışma zamanı bağımlılığı kaldırıldı. Tam depo dashboard lint'i ve production
-  build artık geçiyor; kilometre taşı kapısı daraltılmış lint yerine tam lint
-  çalıştırıyor.
-- Dört aşırı büyüme kaydı ARM/Thumb disassembly ile kapatıldı. Üç büyük
-  fonksiyonun eksik kuyrukları uzatıldı; `0x0802BDF0`–`0x0802DE70` arası
-  8.320 baytın tek stack frame olduğu doğrulandı. Sahte girişlerin yeniden
-  keşfedilmesini önleyen 57 adreslik negatif bilgi tablosu eklendi.
-- ARM overlay'deki 18 kaydın tamamı incelendi: 14 stack-frame fonksiyonu ve
-  ebeveyn register/frame durumunu kullanan 4 yerel BL rutini. Dört eksik boyut
-  düzeltildi; `0x08067E04–0x0806B84C` aralığı boşluksuz doğrulandı. Sınır
-  baseline'ındaki açık/atlanan bütün sınıflar sıfıra indi.
+- Each finding was examined with recursive Thumb flow and ROM disassembly; the
+  decision evidence was written into `data/boundary_review.csv`.
+- 52 of the findings were false splits created by the `split_at_calls.py` tool
+  mistaking literal pools and intra-function shared blocks for linear `bl`
+  targets.
+- `0x08053FF2` was a false start inside the upper half of the literal
+  `0x1C03FFFF`; `0x08053FF4`, which has three real `bl` calls and a
+  `push {r4-r7,lr}` prologue, was kept as a separate function.
+- The short-boundary debt went from 53 to 0. The 18 records in the ARM range and
+  the 4 records exceeding the 4096-byte threshold were kept open as separate
+  review classes.
+- `ScanAllEntries` was renamed `ProcessFirstEntry` to reflect the ROM's real
+  behavior of processing only entry 0.
+- Conflicting extern types for `gRam02000F10`, `gRam02001140`, and
+  `gRam02025810` were unified into shared raw-storage declarations. The byte
+  output of nine matching functions did not change; the consistency gate now
+  rejects new type conflicts automatically.
+- 57 unused UI scaffold/hook files and eight unnecessary runtime dependencies
+  were removed from the dashboard. The full-repository dashboard lint and
+  production build now pass; the milestone gate runs the full lint instead of a
+  narrowed one.
+- Four excessive-growth records were closed with ARM/Thumb disassembly. The
+  missing tails of three large functions were extended; the 8,320 bytes between
+  `0x0802BDF0` and `0x0802DE70` were verified as a single stack frame. A
+  negative-knowledge table of 57 addresses was added to prevent false entries
+  from being rediscovered.
+- All 18 records in the ARM overlay were reviewed: 14 stack-frame functions and 4
+  local BL routines that use the parent's register/frame state. Four missing
+  sizes were corrected; the `0x08067E04–0x0806B84C` range was verified gap-free.
+  Every open/skipped class in the boundary baseline went to zero.
 
-## 2026-09-02 — İlk büyük tersine mühendislik geçişi
+## 2026-09-02 — First major reverse-engineering pass
 
-### Ortam ve koruma
+### Environment and protections
 
-- Avrupa ROM'u SHA-1 ile doğrulandı; ROM ve save/state çıktıları Git dışında tutuldu.
-- Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5 ve ARM GNU 16.2 araç zinciri hazırlandı.
-- Ghidra ARMv4T projesi, otomatik fonksiyon haritası, decompile dışa aktarımı ve CSV senkronizasyonu kuruldu.
+- The Europe ROM was verified by SHA-1; the ROM and save/state outputs were kept
+  out of Git.
+- Ghidra 12.1.3, OpenJDK 21, mGBA 0.10.5, and the ARM GNU 16.2 toolchain were
+  prepared.
+- A Ghidra ARMv4T project, an automatic function map, decompile export, and CSV
+  synchronization were set up.
 
-### Haritalanan modüller
+### Modules mapped
 
-- ARM giriş, IRQ dispatcher, VBlank/VCount ve interrupt tablosu.
-- `GameInit` başlangıç/ana döngü iskeleti.
-- `CRAWSAVE` metadata katmanı ve Nintendo `EEPROM_V124` kullanan düşük/yüksek seviyeli save fonksiyonları.
-- Üç oyun kayıt slotu, marker/tümleyen checksum düzeni ve little-endian serileştirme yardımcıları.
-- İlk UI menü öğesi süzme, çizim, ekran başlatma ve grafik yükleme yardımcıları.
-- Büyük `RunMenuScreen` giriş/alt menü akışı ilk kez belgelendi; henüz matching değil.
+- The ARM entry point, IRQ dispatcher, VBlank/VCount, and the interrupt table.
+- The `GameInit` startup / main loop skeleton.
+- The `CRAWSAVE` metadata layer and the low-/high-level save functions using
+  Nintendo's `EEPROM_V124`.
+- Three game save slots, the marker/complement checksum scheme, and the
+  little-endian serialization helpers.
+- The initial UI menu item filtering, drawing, screen initialization, and
+  graphics loading helpers.
+- The large `RunMenuScreen` entry/submenu flow was documented for the first time;
+  not yet matching.
 
-### Doğrulanmış ölçüm
+### Verified measurements
 
-- Ghidra fonksiyon adayı: 1497.
-- Byte-matching fonksiyon: 42.
-- Matching fonksiyon gövdesi: 4660 / 290837 byte (`1,60%`).
-- Literal/padding dahil matching ROM alanı: 5340 benzersiz byte.
-- En büyük kesintisiz matching aralık: `0x080000C0–0x08001457`, 5016 byte.
-- İkinci matching UI aralığı: `0x08001DC0–0x08001F03`, 324 byte.
+- Ghidra function candidates: 1497.
+- Byte-matching functions: 42.
+- Matching function bodies: 4660 / 290837 bytes (`1.60%`).
+- Matching ROM area including literals/padding: 5340 unique bytes.
+- Largest contiguous matching range: `0x080000C0–0x08001457`, 5016 bytes.
+- Second matching UI range: `0x08001DC0–0x08001F03`, 324 bytes.
 
-### Otomatik doğrulama
+### Automated verification
 
-- `make progress`: fonksiyon ve ROM-bölgesi metriklerini gösterir.
-- `make matching`: 21 ikili parçayı yeniden derler, her parçayı ROM ile karşılaştırır ve birleşik aralık raporu üretir.
-- `make doctor`: ROM hash'ini ve gerekli araçların kurulu olduğunu denetler.
-- `make dashboard-dev`: 1497 fonksiyonun büyüklük, durum ve modül bilgilerini etkileşimli treemap üzerinde gösterir; arama, filtreleme ve ayrıntı paneli sağlar.
-- `make dashboard-build`: güncel CSV verisini üretip dashboard'un dağıtım derlemesini doğrular.
+- `make progress`: shows the function and ROM-region metrics.
+- `make matching`: rebuilds 21 binary fragments, compares each against the ROM,
+  and produces a merged range report.
+- `make doctor`: checks the ROM hash and that the required tools are installed.
+- `make dashboard-dev`: shows the size, state, and module of 1497 functions on an
+  interactive treemap, with search, filtering, and a detail panel.
+- `make dashboard-build`: generates the current CSV data and validates the
+  dashboard's distribution build.
 
-### Sıradaki teknik hedef
+### Next technical goal
 
-1. `RunMenuScreen` (`0x08001458`) kontrol akışını ve input/action tablolarını kesinleştirmek.
-2. `0x08001F04` sonrası UI yardımcılarını sınıflandırmak.
-3. mGBA breakpoint/watchpoint oturumuyla menü değişkenlerini dinamik olarak doğrulamak.
-4. Compiler parmak izini belirleyip uygun matching assembly parçalarını okunabilir C'ye taşımak.
+1. Pin down `RunMenuScreen`'s (`0x08001458`) control flow and its input/action
+   tables.
+2. Classify the UI helpers after `0x08001F04`.
+3. Dynamically verify the menu variables with an mGBA breakpoint/watchpoint
+   session.
+4. Determine the compiler fingerprint and move suitable matching assembly
+   fragments to readable C.
 
-## 2026-09-03 — Derleyici kimliği çözüldü, C'ye geçiş başladı
+## 2026-09-03 — Compiler identity resolved, the move to C begins
 
-### Bulgu
+### Finding
 
-ROM'un **`old_agbcc`** ile derlendiği byte düzeyinde kanıtlandı. Bu, projenin
-semantik yeniden inşaya mecbur olmadığı, C'den byte-matching hedefleyebileceği
-anlamına gelir.
+It was proven at byte level that the ROM was compiled with **`old_agbcc`**. This
+means the project is not forced into semantic reconstruction and can target
+byte-matching from C.
 
-Kanıt zinciri:
+The evidence chain:
 
-1. **Kod kalıpları.** Doğrulanmış 42 fonksiyonda register kopyalama 84 kez
-   `adds rX, rY, #0` (agbcc kalıbı), 0 kez `movs rX, rY` (modern kalıp);
-   fonksiyondan dönüş 28 kez `pop {rN}` + `bx rN`, 0 kez `pop {..., pc}`.
-2. **Byte doğrulaması.** `src/save/save_helpers.c` yazıldı; 6 fonksiyonun 5'i
-   ROM ile birebir eşleşti. `WriteU32LE`'nin 28 byte'ı, maskeyi literal
-   havuzdan okumak yerine iki kez `mov`+`lsl` ile kurma gibi ayırt edici bir
-   tercihle birlikte tam eşleşti.
-3. **Varyant ayrımı.** Altı kombinasyon denendi: `agbcc -O2/-O1` 3/6,
-   **`old_agbcc -O2/-O1` 5/6**, her ikisi `-O0` 0/6. Aynı C kaynağı, tek satır
-   değişiklik olmadan.
+1. **Code patterns.** Across the 42 verified functions, register copying appears
+   84 times as `adds rX, rY, #0` (the agbcc pattern) and 0 times as
+   `movs rX, rY` (the modern pattern); function returns appear 28 times as
+   `pop {rN}` + `bx rN` and 0 times as `pop {..., pc}`.
+2. **Byte verification.** `src/save/save_helpers.c` was written; 5 of its 6
+   functions matched the ROM exactly. All 28 bytes of `WriteU32LE` matched,
+   including a distinctive choice: building the mask with two `mov`+`lsl`
+   instructions rather than reading it from the literal pool.
+3. **Variant discrimination.** Six combinations were tried: `agbcc -O2/-O1` 3/6,
+   **`old_agbcc -O2/-O1` 5/6**, both at `-O0` 0/6. Same C source, without a
+   single line changed.
 
-Bayraklar: `old_agbcc -mthumb-interwork -O2 -fhex-asm`.
+Flags: `old_agbcc -mthumb-interwork -O2 -fhex-asm`.
 
-### Açık kalan
+### Left open
 
-`WriteU16LE` (0x08001124): ROM girişte anlamsal olarak gereksiz bir 16-bit
-kırpma yapıyor, `old_agbcc` bunu eliyor. Dokuz farklı C biçimi denendi,
-hiçbiri tutmadı; denenenler kaynak dosyada listeli. Assembly kaynağı geçerli
-kalıyor.
+`WriteU16LE` (0x08001124): on entry the ROM performs a semantically unnecessary
+16-bit truncation that `old_agbcc` eliminates. Nine different C forms were tried,
+none held; the attempts are listed in the source file. The assembly source
+remains valid.
 
-### Eklenen araçlar
+### Tools added
 
-- `make agbcc` — derleyiciyi yerelde üretir (`tools/setup_agbcc.sh`).
-  agbcc 1998 dönemi C kaynağı olduğu için modern clang uyumluluk sarmalayıcısı
-  gerekiyor; betik bunu kuruyor.
-- `make c-match FILE=...` — C dosyasındaki her fonksiyonu ROM ile karşılaştırır.
-- `make diff FILE=... FUNC=...` — tek fonksiyonun ROM halini derlenmiş haliyle
-  yan yana, komut komut gösterir. Eşleşmeyen fonksiyonu düzeltirken "nerede
-  sapıyor" sorusunun cevabı.
-- `make doctor` artık derleyiciyi de denetliyor.
+- `make agbcc` — builds the compiler locally (`tools/setup_agbcc.sh`). Because
+  agbcc is 1998-era C source, a modern clang compatibility wrapper is needed; the
+  script sets it up.
+- `make c-match FILE=...` — compares every function in a C file against the ROM.
+- `make diff FILE=... FUNC=...` — shows a single function's ROM form beside its
+  compiled form, instruction by instruction. The answer to "where does it
+  diverge" when fixing a non-matching function.
+- `make doctor` now also checks the compiler.
 
-objdiff değerlendirildi ama kurulmadı: iki *nesne dosyası* karşılaştırıyor,
-yani ROM tarafında da hedef `.o` üreten bir splat/dtk boru hattı gerektiriyor.
-Bu kurulana kadar `make diff` aynı işi bizim veri modelimizle yapıyor.
+objdiff was evaluated but not installed: it compares two *object files*, which
+would require a splat/dtk pipeline producing target `.o` files on the ROM side as
+well. Until that is set up, `make diff` does the same job within our data model.
 
-### Depo hijyeni
+### Repository hygiene
 
-İlk commit atıldı (154 dosya). Git dışında tutulanlar: ROM, Ghidra projesi,
-Ghidra decompiler çıktısı (`analysis/decompiler/`), üretilen dashboard verisi
-ve agbcc ikilileri. Decompiler çıktısı ROM'dan türetilmiş materyal olduğu için
-deponun kendi yayın politikasına uygun biçimde yerelde bırakıldı.
+The first commit was made (154 files). Kept out of Git: the ROM, the Ghidra
+project, the Ghidra decompiler output (`analysis/decompiler/`), the generated
+dashboard data, and the agbcc binaries. Because the decompiler output is material
+derived from the ROM, it was left local in line with the repository's own
+publication policy.
 
-### Sıradaki teknik hedef
+### Next technical goal
 
-1. `save_helpers` bloğundaki kalan `EraseSaveSlot`, `GetSaveSlotHeader` ve
-   `WriteU16LE`'yi C'ye taşımak; blok tamamlanınca `matching_regions.csv`'yi
-   `.c` build'ine çevirip `save_helpers.s`'i kaldırmak.
-2. Yaprak fonksiyonlardan devam ederek save ve ui modüllerini C'ye taşımak.
-3. mGBA yamalama/çalıştırma döngüsü — byte-matching olmayan fonksiyonlar için
-   davranışsal doğrulama.
-4. `RunMenuScreen` kontrol akışı.
+1. Move the remaining `EraseSaveSlot`, `GetSaveSlotHeader`, and `WriteU16LE` in
+   the `save_helpers` block to C; once the block is complete, switch
+   `matching_regions.csv` to the `.c` build and remove `save_helpers.s`.
+2. Continue from the leaf functions and move the save and ui modules to C.
+3. An mGBA patch/run loop — behavioral verification for non-byte-matching
+   functions.
+4. `RunMenuScreen`'s control flow.
 
-## 2026-09-03 (devam) — Linkleme boru hatti ve save_helpers bloğu
+## 2026-09-03 (continued) — The linking pipeline and the save_helpers block
 
-### Kritik altyapı: linkleme
+### Critical infrastructure: linking
 
-Yaprak olmayan hiçbir fonksiyon linklenmeden doğrulanamaz — `bl` komutları
-hedef adres çözülmeden doğru byte üretmez. `tools/agbcc_build.py` eklendi:
-C kaynağını derler, blokun ROM taban adresine linkler, dış sembolleri
-`data/functions.csv`'den çözer. `verify_c_function.py` ve `diff_function.py`
-artık bu ortak katmanı kullanıyor.
+No non-leaf function can be verified without linking — `bl` instructions do not
+produce the correct bytes until the target address is resolved.
+`tools/agbcc_build.py` was added: it compiles the C source, links it at the
+block's ROM base address, and resolves external symbols from
+`data/functions.csv`. `verify_c_function.py` and `diff_function.py` now use this
+shared layer.
 
-**Yakalanan tuzak:** agbcc `.text` bölümünü 8'e hizalıyor. Taban adres 8'in
-katı değilse (0x08001094 gibi) linker bölümü 4 byte ileri itiyor ve *önceden
-eşleşen fonksiyonlar dahil her ölçüm kayıyor*. Link betiğinde bölüm adresi
-artık açıkça sabitleniyor (`SUBALIGN(1)`). Bu hata sessiz: her şey "eşleşmiyor"
-görünür ve sebep kodda sanılır.
+**A trap caught:** agbcc aligns the `.text` section to 8. If the base address is
+not a multiple of 8 (like 0x08001094), the linker pushes the section 4 bytes
+forward and *every measurement shifts, including previously matching functions*.
+The section address is now explicitly fixed in the link script (`SUBALIGN(1)`).
+This failure is silent: everything appears "not matching" and the cause is
+assumed to be in the code.
 
-### save_helpers bloğu: 8 fonksiyonun 5'i C'den byte-matching
+### The save_helpers block: 5 of 8 functions byte-matching from C
 
-Eklenenler: `EraseSaveSlot`, `GetSaveSlotHeader`. İkisi de eşleşmedi ama
-yapıları doğru — tüm komutlar var, fark sıralamada.
+Added: `EraseSaveSlot`, `GetSaveSlotHeader`. Neither matched, but their structure
+is correct — all the instructions are there, the difference is in the ordering.
 
-Her ikisinde de **aynı sistematik fark**: ROM taban adresini indeks
-hesabından önce yüklüyor, agbcc sonra. `GetSaveSlotHeader` için beş farklı
-yerel değişken dizilimi, işaretçi aritmetiği, ters koşul, `void*` dönüş,
-extern dizi sembolü ve iki derleyici varyantı denendi — **beşi de byte-byte
-aynı çıktıyı verdi.** agbcc bu fonksiyonda C biçimine duyarsız, dolayısıyla
-C'yi kurcalayarak çözülecek bir sorun değil. Kalan olasılıklar: pret/agbcc'nin
-yeniden kurulmuş sürümü ile orijinal SDK sürümü arasındaki fark, veya henüz
-bulunmamış bir derleyici bayrağı.
+Both show the **same systematic difference**: the ROM loads the base address
+before the index computation, agbcc after. For `GetSaveSlotHeader`, five
+different local variable arrangements, pointer arithmetic, an inverted condition,
+a `void*` return, an extern array symbol, and two compiler variants were tried —
+**all five produced byte-for-byte identical output.** agbcc is insensitive to the
+C form in this function, so it is not a problem that can be solved by tinkering
+with the C. The remaining possibilities: a difference between pret/agbcc's
+rebuilt version and the original SDK version, or a compiler flag not yet found.
 
-`WriteU16LE` de açık (dokuz C biçimi denendi, kayıtlı).
+`WriteU16LE` is also open (nine C forms tried, recorded).
 
-### Memset adlandırıldı
+### Memset named
 
-`FUN_0806dcc0` incelendi ve `Memset` olarak doğrulandı: (dest, value, count)
-alıyor, baytı 4 byte'lık desene yayıp `stmia` ile 16'şar byte yazıyor, kalanı
-bayt bayt bitiriyor, `dest` döndürüyor. `function_overrides.csv`'ye
-`documented`/`sdk` olarak işlendi.
+`FUN_0806dcc0` was examined and confirmed as `Memset`: it takes (dest, value,
+count), spreads the byte into a 4-byte pattern, writes 16 bytes at a time with
+`stmia`, finishes the remainder byte by byte, and returns `dest`. Recorded in
+`function_overrides.csv` as `documented`/`sdk`.
 
-### Eklenen: make disasm
+### Added: make disasm
 
-`make disasm FUNC=...` bir fonksiyonun disassembly'sini doğrudan ROM'dan
-üretir. Assembly kaynakları C'ye taşındıkça silinecek; orijinal koda erişim
-bu araçla korunuyor, bakım gerektirmeyen ve eskiyemeyen biçimde.
+`make disasm FUNC=...` produces a function's disassembly directly from the ROM.
+It will be deleted as assembly sources move to C; access to the original code is
+preserved by this tool instead, in a form that needs no maintenance and cannot go
+stale.
 
-### Durum
+### Status
 
-`make matching` 21/21 bozulmadı. `save_helpers.s` hâlâ geçerli build kaynağı;
-blok 8/8 olana kadar öyle kalacak.
+`make matching` 21/21, unbroken. `save_helpers.s` is still a valid build source;
+it stays that way until the block is 8/8.
 
-## 2026-09-03 (devam 2) — İlk assembly dosyası emekli oldu
+## 2026-09-03 (continued 2) — The first assembly file retired
 
-### Asıl bulgu: RAM adresleri extern sembol olmalı
+### The real finding: RAM addresses must be extern symbols
 
-`EraseSaveSlot` ve `GetSaveSlotHeader`'ın eşleşmemesinin sebebinin derleyici
-sürümü olduğunu düşünmüştüm. **Yanlıştı.** Sebep C tarafındaydı:
+I had assumed the reason `EraseSaveSlot` and `GetSaveSlotHeader` did not match
+was the compiler version. **That was wrong.** The cause was on the C side:
 
 ```c
-#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* katlaniyor */
-extern SaveSlotHeader gSaveSlotHeaders[3];                /* dogru      */
+#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* gets folded */
+extern SaveSlotHeader gSaveSlotHeaders[3];                /* correct     */
 ```
 
-Adres derleme-zamanı sabiti olunca agbcc `base + 16`'yı ayrı bir literal
-hâline getiriyor ve tabanı register'da tutmuyor; ROM ise tabanı bir kez
-yükleyip saklıyor. Extern sembole çevrilince `EraseSaveSlot` anında eşleşti,
-`GetSaveSlotHeader` da doğrudan üye erişimine geçirilince eşleşti.
+When the address is a compile-time constant, agbcc turns `base + 16` into a
+separate literal and does not keep the base in a register; the ROM, however,
+loads the base once and keeps it. Converted to an extern symbol, `EraseSaveSlot`
+matched instantly, and `GetSaveSlotHeader` matched once it was switched to direct
+member access.
 
-Önceki oturumda "derleyici hipotezi tükendi, bu üç fonksiyon kapanmıyor"
-diye kaydedilen sonuç bu yüzden hatalıydı; `docs/COMPILER.md` düzeltildi.
-Bayrak taraması ve `release` sürümü ölçümleri kayıt olarak duruyor — ikisi de
-gerçekten etkisizdi, ama asıl değişken başka yerdeydi.
+The conclusion recorded in the previous session — "the compiler hypothesis is
+exhausted, these three functions will not close" — was therefore mistaken;
+`docs/COMPILER.md` was corrected. The flag sweep and the `release` version
+measurements remain on record — both really were ineffective, but the decisive
+variable was elsewhere.
 
-### save_wrappers: ilk tam blok
+### save_wrappers: the first complete block
 
 `IsSaveSlotValid`, `ReadSaveMetadata`, `WriteSaveMetadata` — 3/3 byte-matching,
-ve 68 byte'lık bölgenin tamamı birebir. `src/save/save_wrappers.s` ve
-`config/save_wrappers.ld` silindi; bölge artık C'den üretiliyor.
-`make matching` 21/21 bozulmadan geçiyor.
+and the whole 68-byte region exact. `src/save/save_wrappers.s` and
+`config/save_wrappers.ld` were deleted; the region is now produced from C.
+`make matching` still passes 21/21.
 
-save_helpers 7/8: yalnızca `WriteU16LE` açık.
+save_helpers is at 7/8: only `WriteU16LE` is open.
 
-### Yol boyunca düzeltilen üç tuzak
+### Three traps fixed along the way
 
-1. **Dış semboller `.equ` ile verilir.** Linker'a bırakılınca mutlak sembolü
-   Thumb fonksiyonu saymıyor ve araya interworking veneer'i sokuyor;
-   `bl` hedefi yanlış çıkıyor.
-2. **Bölüm sonu dolgusu.** `as` Thumb bölümlerini NOP (`0x46C0`) ile
-   dolduruyor, ROM sıfırla. Üretilen assembly'nin sonuna `.align 2, 0` eklendi.
-3. **Bölüm hizalaması** (önceki oturumdan): agbcc `.text`'i 8'e hizalıyor,
-   taban 8'in katı değilse her ölçüm kayıyor.
+1. **External symbols are supplied with `.equ`.** Left to the linker, an absolute
+   symbol is not treated as a Thumb function and an interworking veneer is
+   inserted, giving the wrong `bl` target.
+2. **Section-end padding.** `as` pads Thumb sections with NOP (`0x46C0`), the ROM
+   with zero. `.align 2, 0` was added at the end of the generated assembly.
+3. **Section alignment** (from the previous session): agbcc aligns `.text` to 8,
+   and if the base is not a multiple of 8 every measurement shifts.
 
-### Eklenenler
+### Additions
 
-- `tools/build_c.py` — C kaynağından ROM adresine linklenmiş `.bin` üretir;
-  Makefile bölge kuralları artık bunu kullanabiliyor.
-- `data/ram_map.csv` artık `agbcc_build` tarafından okunuyor; `gSaveMetadata`
-  (`0x02000ED0`) ve `gSaveSlotHeaders` (`0x02000460`) doğrulanmış olarak eklendi.
+- `tools/build_c.py` — produces a `.bin` linked at a ROM address from a C source;
+  the Makefile region rules can now use it.
+- `data/ram_map.csv` is now read by `agbcc_build`; `gSaveMetadata` (`0x02000ED0`)
+  and `gSaveSlotHeaders` (`0x02000460`) were added as verified.
 
-### Sıradaki
+### Next
 
-`WriteU16LE`; ardından `menu_helpers` (112 byte) ve
-`reset_display_interrupts` (63 satır) gibi küçük blokları C'ye taşımak.
-`agb_main.s` ve `intr_main.s` kalıcı olarak assembly kalır.
+`WriteU16LE`; then moving small blocks such as `menu_helpers` (112 bytes) and
+`reset_display_interrupts` (63 lines) to C. `agb_main.s` and `intr_main.s` remain
+permanently assembly.
 
-## 2026-09-03 (devam 3) — İkinci blok C'ye taşındı
+## 2026-09-03 (continued 3) — The second block moved to C
 
-`ResetDisplayAndInterrupts` (`0x080007B4`, 120 byte bölge) C'den byte-matching.
-`src/bootstrap/reset_display_interrupts.s` ve link betiği silindi.
-`make matching` 21/21; iki bölge artık C'den üretiliyor.
+`ResetDisplayAndInterrupts` (`0x080007B4`, a 120-byte region) is byte-matching
+from C. `src/bootstrap/reset_display_interrupts.s` and its link script were
+deleted. `make matching` 21/21; two regions are now produced from C.
 
-### İki yeni kural
+### Two new rules
 
-**Yığındaki geçici tampon `volatile` olmalı.** DMA kaynağı olarak kullanılan
-yığın değişkeni `volatile` yapılmadan agbcc `mov r0, sp` ile `movs r2, #0`'ı
-ters sırada üretiyordu. Fark 57 bayttan 7 bayta düştü.
+**A temporary buffer on the stack must be `volatile`.** Without making the stack
+variable used as a DMA source `volatile`, agbcc emitted `mov r0, sp` and
+`movs r2, #0` in the reverse order. The difference dropped from 57 bytes to 7.
 
-**Donanım/BIOS değişkeni `volatile` OLMAMALI.** Kalan 7 bayt `gBiosIrqFlags`
-erişimindeydi; `volatile` kaldırılınca tam eşleşti. İkisi zıt görünüyor ama
-`volatile` burada semantik değil, sıralama düğmesi.
+**A hardware/BIOS variable must NOT be `volatile`.** The remaining 7 bytes were
+in the `gBiosIrqFlags` access; removing `volatile` produced an exact match. The
+two look contradictory, but here `volatile` is not a semantic switch — it is an
+ordering knob.
 
-Tüm kurallar `docs/COMPILER.md` içinde tablo hâlinde.
+All rules are tabulated in `docs/COMPILER.md`.
 
-### Doğrulanmamış isimler benimsenmedi
+### Unverified names were not adopted
 
-Assembly kaynağı üç dış fonksiyonu `WaitForDma3`, `InitSubsystem`,
-`WaitForVBlank` diye etiketlemişti. Disassembly bunları desteklemiyor:
-`FUN_08063b74` DMA döngüsü değil, dört donanım register'ına sabit yazıyor;
-`FUN_0800cae4` VBlank beklemiyor, iki fonksiyon çağırıyor. C dosyasında
-Ghidra adları kullanıldı ve gerekçe yorumda yazıldı.
+The assembly source had labelled three external functions `WaitForDma3`,
+`InitSubsystem`, and `WaitForVBlank`. The disassembly does not support these:
+`FUN_08063b74` is not a DMA loop but writes constants to four hardware registers;
+`FUN_0800cae4` does not wait for VBlank but calls two functions. The Ghidra names
+were used in the C file and the rationale written in a comment.
 
-### RAM haritası
+### RAM map
 
-`gVBlankState` (0x02000130), `gDisplayState` (0x020004BC, provisional),
-`gBiosIrqFlags` (0x03007FF8) eklendi.
+`gVBlankState` (0x02000130), `gDisplayState` (0x020004BC, provisional), and
+`gBiosIrqFlags` (0x03007FF8) were added.
 
-## 2026-09-03 (devam 4) — C metriği ve üçüncü blok
+## 2026-09-03 (continued 4) — The C metric and the third block
 
-### Ölçüm ayrıldı
+### The measurement was separated
 
-Assembly transkripsiyonu ile C'den byte-matching aynı metrikte görünüyordu.
-`make c-status` (`tools/scan_c_sources.py`) artık `src/` altındaki C
-kaynaklarını derleyip ROM ile karşılaştırıyor ve `data/c_sources.csv`
-üretiyor. `make progress` iki yeni satır veriyor; dashboard'da ayrı bir
-gösterim durumu (**C'den eşleşiyor**, daha parlak yeşil), özet kartında sayaç,
-durum filtresinde seçenek ve detay panelinde kaynak dosya yolu var.
+Assembly transcription and byte-matching from C were appearing in the same
+metric. `make c-status` (`tools/scan_c_sources.py`) now compiles the C sources
+under `src/`, compares them against the ROM, and produces `data/c_sources.csv`.
+`make progress` reports two new lines; the dashboard gained a separate display
+state (**matching from C**, in a brighter green), a counter on the summary card,
+an option in the status filter, and the source file path in the detail panel.
 
-### menu_helpers C'ye taşındı
+### menu_helpers moved to C
 
-`ResetMenuState`, `IsMenuFlagSet`, `FinalizeMenuLayout` — 3/3, 112 baytlık
-bölgenin tamamı. `src/ui/menu_helpers.s` ve link betiği silindi.
-Üçüncü emekli assembly dosyası.
+`ResetMenuState`, `IsMenuFlagSet`, `FinalizeMenuLayout` — 3/3, the whole 112-byte
+region. `src/ui/menu_helpers.s` and its link script were deleted. The third
+retired assembly file.
 
-**İki yeni kural:** dizi temizleme döngüsü *ileriye* yazılmalı (agbcc onu
-geriye giden işaretçi yürüyüşüne çeviriyor; elle geriye yazmak farklı kod
-üretiyor) ve döngü indeksi *işaretli* olmalı (işaretçi karşılaştırması
-işaretsiz dal üretiyor, ROM işaretli kullanıyor).
+**Two new rules:** an array-clearing loop must be written *forward* (agbcc turns
+it into a backward pointer walk; writing it backward by hand produces different
+code), and the loop index must be *signed* (a pointer comparison generates an
+unsigned branch, whereas the ROM uses a signed one).
 
-### Durum
+### Status
 
-- `make matching` 21/21; üç bölge C'den üretiliyor
-- C kaynağı: 15 fonksiyon, 14'ü byte-matching
-- Matching byte'ların %8.45'i artık C'den geliyor (394/4660)
-- RAM haritası: menü sembolleri eklendi
+- `make matching` 21/21; three regions produced from C
+- C source: 15 functions, 14 byte-matching
+- 8.45% of the matching bytes now come from C (394/4660)
+- RAM map: menu symbols added
 
-`FUN_080512b0` ve `FUN_08004280` adlandırılmadı; doğrulanmadan isim verilmiyor.
+`FUN_080512b0` and `FUN_08004280` were not named; no name is given without
+verification.
 
-## 2026-09-03 (devam 5) — irq_helpers C'ye taşındı
+## 2026-09-03 (continued 5) — irq_helpers moved to C
 
-Dördüncü emekli assembly dosyası. `NoOpVBlankFinalize`, `DummyIntr`,
-`RunVBlankTransfers`, `NoOpInterruptHelper`, `VCountIntr` — 5/5, 132 baytlık
-bölgenin tamamı.
+The fourth retired assembly file. `NoOpVBlankFinalize`, `DummyIntr`,
+`RunVBlankTransfers`, `NoOpInterruptHelper`, `VCountIntr` — 5/5, the whole
+132-byte region.
 
-### İki kural düzeltildi
+### Two rules corrected
 
-**Kural 1 evrensel değil.** RAM sembolleri `extern` olmalı, ama agbcc'nin
-kaydırmayla üretebildiği adresler ROM'da sabit cast olarak yazılmış:
-`0x03000000` ROM'da `movs #0xc0` + `lsls #18` ile hesaplanıyor, literal
-havuzdan okunmuyor. Extern sembol yapınca 55 bayt sapma; sabit cast yapınca
-8'e düştü. Diff hangi biçimin doğru olduğunu söylüyor.
+**Rule 1 is not universal.** RAM symbols must be `extern`, but addresses that
+agbcc can produce by shifting are written in the ROM as constant casts:
+`0x03000000` is computed in the ROM with `movs #0xc0` + `lsls #18`, not read from
+a literal pool. Making it an extern symbol gave a 55-byte divergence; as a
+constant cast it dropped to 8. The diff tells you which form is correct.
 
-**Kural 4 fazla genellenmişti.** Önceki oturumda "donanım değişkeni volatile
-olmamalı" diye yazmıştım — tek örnekten. `REG_IF` (`0x04000202`) tam tersini
-istiyor: `volatile` olmadan 7 bayt sapma, `volatile` ile tam eşleşme. Aynı
-`x |= sabit` deyimi, zıt gereksinimler. Kural "her erişim için ayrı denenir"
-olarak düzeltildi.
+**Rule 4 was over-generalized.** In the previous session I wrote "a hardware
+variable must not be volatile" — from a single example. `REG_IF` (`0x04000202`)
+demands exactly the opposite: a 7-byte divergence without `volatile`, an exact
+match with it. The same `x |= constant` idiom, with opposite requirements. The
+rule was corrected to "tried separately for each access."
 
-### Üçüncü bulgu
+### A third finding
 
-`gFrameDelay = counter = gIwramFrameCounter;` — zincirleme atama. Ayrı iki
-satır yazınca agbcc adres hesabını ters sıraya koyuyordu (8 bayt fark);
-zincirleme yazınca tam eşleşme.
+`gFrameDelay = counter = gIwramFrameCounter;` — a chained assignment. Written as
+two separate lines, agbcc put the address computation in the reverse order (an
+8-byte difference); written chained, it matched exactly.
 
-### Durum
+### Status
 
-- `make matching` 21/21; dört bölge C'den üretiliyor
-- C kaynağı: 20 fonksiyon, 19'u byte-matching
-- Matching byte'ların **%10.73**'ü C'den (500/4660)
+- `make matching` 21/21; four regions produced from C
+- C source: 20 functions, 19 byte-matching
+- **10.73%** of the matching bytes come from C (500/4660)
 
-`FUN_08012b9c`, `FUN_080133a8`, `FUN_080130f4`, `FUN_08013900`,
-`FUN_080101d8`, `FUN_080327c8` adlandırılmadı.
+`FUN_08012b9c`, `FUN_080133a8`, `FUN_080130f4`, `FUN_08013900`, `FUN_080101d8`,
+and `FUN_080327c8` were not named.
 
-## 2026-09-03 (devam 6) — init_menu_screen C'ye taşındı
+## 2026-09-03 (continued 6) — init_menu_screen moved to C
 
-Beşinci emekli assembly dosyası. 172 baytlık bölgenin tamamı byte-matching.
-Şimdiye kadarki en karmaşık blok: iki DMA aktarımı, iki IME kritik bölümü,
-altı ardışık çağrı ve koşullu kuyruk.
+The fifth retired assembly file. The whole 172-byte region is byte-matching. The
+most complex block so far: two DMA transfers, two IME critical sections, six
+consecutive calls, and a conditional tail.
 
-### Üç yeni kural
+### Three new rules
 
-**Kaydet/geri-yükle çifti olan register `volatile` olmalı.** `REG_IME`
-`volatile` değilken agbcc iki kritik bölümün kaydetmelerini birleştirip
-sıralamayı tamamen bozuyordu (136 bayt sapma). DMA3 ile birlikte `volatile`
-yapılınca 46'ya düştü.
+**A register with a save/restore pair must be `volatile`.** With `REG_IME` not
+`volatile`, agbcc merged the two critical sections' saves and destroyed the
+ordering entirely (a 136-byte divergence). Making it `volatile` together with
+DMA3 brought it down to 46.
 
-**Çağrılar boyunca yaşayan adres başta yerel değişkene alınır.** ROM palette
-kaynağını fonksiyonun ilk komutunda `r5`'e yükleyip altı çağrı boyunca orada
-tutuyor. Kullanıldığı yerde okununca derleyici hoist etmiyor:
+**An address that lives across calls is taken into a local at the top.** The ROM
+loads the palette source into `r5` in the function's first instruction and keeps
+it there across six calls. Read at the point of use, the compiler does not hoist
+it:
 
 ```c
-const u8 *palette = gMenuPaletteSource;   /* basta */
+const u8 *palette = gMenuPaletteSource;   /* at the top */
 ...
-REG_DMA3.src = palette;                   /* sonra */
+REG_DMA3.src = palette;                   /* later      */
 ```
 
-Bu tek değişiklik 46 bayt sapmayı sıfıra indirdi.
+That single change took a 46-byte divergence to zero.
 
-**Zincirleme atama** (önceki bloktan): `a = b = c` ayrı satırlardan farklı
-kod üretiyor.
+**Chained assignment** (from the previous block): `a = b = c` produces different
+code from separate lines.
 
-Kural sayısı 12'ye çıktı.
+The rule count rose to 12.
 
-### Durum
+### Status
 
-- `make matching` 21/21; beş bölge C'den üretiliyor
-- C kaynağı: 21 fonksiyon, 20'si byte-matching
-- Matching byte'ların **%13.69**'u C'den (638/4660)
-- Kalan assembly dosyası 16, ikisi kalıcı
+- `make matching` 21/21; five regions produced from C
+- C source: 21 functions, 20 byte-matching
+- **13.69%** of the matching bytes come from C (638/4660)
+- 16 assembly files remain, two of them permanent
 
-## 2026-09-03 (devam 7) — Dört blok denendi, üçü bitti
+## 2026-09-03 (continued 7) — Four blocks attempted, three finished
 
-`make matching` 21/21 bozulmadan duruyor.
+`make matching` still holds at 21/21.
 
-### Biten üç blok
+### The three finished blocks
 
-**menu_graphics** (212 B, 4 fonksiyon) — **ilk denemede 4/4**. Birikmiş
-kurallar (IME `volatile`, DMA3 `volatile`, sabit cast) doğrudan işe yaradı.
+**menu_graphics** (212 B, 4 functions) — **4/4 on the first attempt.** The
+accumulated rules (IME `volatile`, DMA3 `volatile`, constant cast) worked
+directly.
 
-**save_slots** (228 B, 2 fonksiyon) — ilk denemede 120/120 baytın 119'u
-tuttu. Tek fark `ble` ↔ `bls`: `length` parametresi `u32` olunca eşleşti.
+**save_slots** (228 B, 2 functions) — 119 of 120 bytes held on the first attempt.
+The only difference was `ble` ↔ `bls`: it matched once the `length` parameter was
+made `u32`.
 
-**read_eeprom_bytes** (208 B) — ROM'un açılmış sekizli byte kopyası
-`-funroll-loops` ile üretilemedi (136B/127 fark → 256B/239, daha kötü).
-Sekiz kopya `COPY_EEPROM_BYTE` makrosuyla açık yazılınca tam eşleşme.
+**read_eeprom_bytes** (208 B) — the ROM's unrolled eight-byte copy could not be
+produced with `-funroll-loops` (136B/127 differences → 256B/239, worse). Writing
+the eight copies out explicitly with a `COPY_EEPROM_BYTE` macro produced an exact
+match.
 
-### Yarım kalan: init_save_system
+### Left unfinished: init_save_system
 
-240 baytın 197'si tutuyor, yapı doğru. İki küme fark direniyor:
+197 of 240 bytes hold and the structure is correct. Two clusters of differences
+resist:
 
-1. Slot bayrağı temizleme döngüsünde ROM işaretçiyi +31'den aşağı yürütüyor,
-   bizimki +16'dan yukarı. Sayaç aynı. Altı farklı döngü biçimi denendi;
-   en iyisi 41 bayt fark.
-2. ROM `&gSavePayloadSize`'ı bölme çağrısından önce callee-saved register'a
-   alıyor. Yerel işaretçi denendi: fonksiyon başında 220, kullanım yerinde 80.
+1. In the slot flag clearing loop, the ROM walks the pointer downward from +31,
+   ours upward from +16. The counter is the same. Six different loop forms were
+   tried; the best gives a 41-byte difference.
+2. The ROM takes `&gSavePayloadSize` into a callee-saved register before the
+   division call. A local pointer was tried: 220 at the top of the function, 80
+   at the point of use.
 
-Denenenler kaynak dosyanın başındaki yoruma yazıldı. `init_save_system.s`
-geçerli build kaynağı olarak kalıyor.
+The attempts were written into the comment at the top of the source file.
+`init_save_system.s` remains a valid build source.
 
-### Durum
+### Status
 
-- Emekli assembly dosyası: 8
-- C kaynağı: 28 fonksiyon, 27'si byte-matching
-- Matching byte'ların **%29.06**'sı C'den
+- Retired assembly files: 8
+- C source: 28 functions, 27 byte-matching
+- **29.06%** of the matching bytes come from C
 
-## 2026-09-03 (gece) — Doğrulanmış ROM alanı büyüdü
+## 2026-09-03 (night) — Verified ROM area grew
 
-Bu oturumda ilk kez **yeni ROM alanı doğrulandı** — şimdiye kadarki iş zaten
-eşleşen bölgeleri assembly'den C'ye taşımaktı; kapsam artmıyordu.
+For the first time this session, **new ROM area was verified** — until now the
+work had been moving already-matching regions from assembly to C, without
+increasing coverage.
 
-### libc bölgeleri build'e bağlandı
+### libc regions wired into the build
 
-ROM'un agbcc newlib'ine linklendiği daha önce tespit edilmişti ama bu yalnızca
-bir tarama sonucuydu. Artık `data/libc_regions.csv` + `make libc-verify` ile
-her giriş `libc.a`'dan çıkarılıp ROM ile karşılaştırılıyor ve `make matching`
-bunu otomatik çalıştırıyor.
+That the ROM links against agbcc's newlib had been established earlier, but that
+was only a scan result. Now, with `data/libc_regions.csv` + `make libc-verify`,
+each entry is extracted from `libc.a` and compared against the ROM, and
+`make matching` runs it automatically.
 
-**9/9 parça, 448 byte.** Doğrulanmış toplam ROM alanı 5340 → **5788 byte**.
+**9/9 fragments, 448 bytes.** Total verified ROM area went from 5340 to
+**5788 bytes**.
 
-Bunlar tersine mühendislik ürünü değil; kaynağı elimizde olan kütüphane
-kodunun ROM'daki byte'larla aynı olduğunun kanıtı.
+These are not a reverse-engineering result; they are proof that library code
+whose source we have is identical to the bytes in the ROM.
 
-### Yerleşim argümanı
+### The layout argument
 
-`_exit` ve `_kill` gövdeleri birebir aynı olduğu için byte karşılaştırması
-hangisinin nerede olduğunu söyleyemiyordu. Çözüm byte'larda değil yerleşimde:
-bu gövdeden ROM'da **tam iki adet** var ve araları 32 byte — `syscalls.o`
-içindeki mesafenin aynısı (`_exit` ofset 892, `_kill` 924). İkili ancak bu
-sırayla yerleşebilir.
+Because the bodies of `_exit` and `_kill` are identical, byte comparison could
+not say which was where. The solution was not in the bytes but in the layout:
+that body occurs **exactly twice** in the ROM, 32 bytes apart — the same distance
+as in `syscalls.o` (`_exit` at offset 892, `_kill` at 924). The pair can only be
+laid out in that order.
 
-Aynı gövdeli sembol çiftleri için genellenebilir bir yöntem. `toupper` /
-`_toupper` çiftine uygulanamadı: ikisi de yer değiştirme içeriyor, bu yüzden
-ROM'da düz byte araması sıfır sonuç veriyor. O çift belirsiz kalıyor.
+A generalizable method for symbol pairs with identical bodies. It could not be
+applied to the `toupper` / `_toupper` pair: both contain relocations, so a plain
+byte search in the ROM returns nothing. That pair remains ambiguous.
 
-### game_init taslağı
+### The game_init draft
 
-En büyük blok (768 byte). Kontrol akışı tam çıkarıldı ve fonksiyonun baş kısmı
-birebir eşleşiyor; 772 baytın ~508'i tutuyor.
+The largest block (768 bytes). The control flow was fully extracted and the head
+of the function matches exactly; about 508 of 772 bytes hold.
 
-Ölçülen: yığın değişkeni tipi büyük fark yaratıyor — `u16` kaynaklar 673 fark,
-`volatile u16` 590, **`u32` 264**, `u16` dizi 304, union `.half` 739,
-`u32` yuva + cast yazım 739. ROM'un 16 baytlık yığın çerçevesi `u32`'lerle
-yakalandı.
+Measured: the stack variable type makes a large difference — `u16` sources give
+673 differences, `volatile u16` 590, **`u32` 264**, a `u16` array 304, a union
+`.half` 739, and a `u32` slot with cast spelling 739. The ROM's 16-byte stack
+frame was captured with `u32`s.
 
-Kalan bilinen sapma: ROM DMA kaynağına halfword yazıyor (`strh`), bizimki
-word (`str`). Yuva 4 byte aralıklı olmalı ama yazım 16 bit — denenen beş biçim
-bu ikisini aynı anda vermedi.
+Known remaining divergence: the ROM writes a halfword (`strh`) to the DMA source,
+ours a word (`str`). The slots must be 4 bytes apart while the write is 16 bits —
+none of the five forms tried gave both at once.
 
-### Paralel çalışma altyapısı
+### Parallel work infrastructure
 
-Ultracode ile 12 ajanlık workflow başlatıldı. Öncesinde üç yarış koşulu
-kapatıldı: `diff_function.py`'nin paylaşılan geçici dosyası çağrıya özel
-yapıldı, kalan assembly'de geçen 20 RAM adresi `ram_map.csv`'ye tek seferde
-eklendi (ajanlar o dosyaya yazmıyor), ve ajanlara `make` tamamen yasaklandı.
-Emeklilik kararı ve son doğrulama ana süreçte kalıyor.
+A 12-agent workflow was launched with Ultracode. Beforehand, three race
+conditions were closed: `diff_function.py`'s shared temporary file was made
+call-specific, the 20 RAM addresses appearing in the remaining assembly were
+added to `ram_map.csv` in one pass (the agents do not write to that file), and
+`make` was forbidden to the agents entirely. Retirement decisions and final
+verification stay in the main process.
 
-## 2026-09-03 (gece, workflow) — On blok birden C'ye taşındı
+## 2026-09-03 (night, workflow) — Ten blocks moved to C at once
 
-12 ajanlık paralel workflow tamamlandı (0 hata, ~33 dakika). Her sonuç ana
-süreçte bağımsız olarak ROM'a karşı yeniden doğrulandı; ajan raporuna
-güvenilmedi.
+The 12-agent parallel workflow completed (0 errors, ~33 minutes). Every result
+was independently re-verified against the ROM in the main process; the agent
+reports were not trusted.
 
-### Sonuç
+### Result
 
-**Kalan taşınabilir assembly bitti.** `src/` altında yalnızca üç `.s` kaldı:
-`agb_main.s` ve `intr_main.s` (ARM modunda, kalıcı olarak assembly) ve
-`game_init.s` (henüz eşleşmeyen taslağın yedeği).
+**The remaining portable assembly is done.** Only three `.s` files remain under
+`src/`: `agb_main.s` and `intr_main.s` (in ARM mode, permanently assembly) and
+`game_init.s` (a backup of the not-yet-matching draft).
 
 - `make matching` 21/21 + libc 9/9
-- C kaynağı: 40 fonksiyon, **39'u byte-matching**
-- Matching byte'ların **%78.97**'si artık okunabilir C'den (oturum başı: %0)
-- 19/19 C dosyası okunabilirlik denetiminden geçiyor
+- C source: 40 functions, **39 byte-matching**
+- **78.97%** of the matching bytes now come from readable C (at the start of the
+  session: 0%)
+- 19/19 C files pass the readability check
 
-### İki direnen fonksiyon da çözüldü
+### Both resisting functions were also solved
 
-**`WriteU16LE`** — cevap parametrenin **işaretli dar tip** olmasıydı (`s16`).
-Bütün oturum boyunca daha *geniş* tipler denemiştim; yön tersmiş. ROM'daki
-`lsls #16`/`lsrs #16` çifti semantik olarak gereksiz, bu yüzden `u16` ile hiç
-üretilmiyor: işaretsiz HImode parametre çağırandan zaten sıfır-genişletilmiş
-gelir. `s16` yazılınca değer işaret-genişletilmiş kabul edilir ve agbcc üst
-yarıyı temizlemek zorunda kalır. **Yani o dört bayt, özgün kaynakta
-parametrenin işaretli olduğunun kanıtıdır.**
+**`WriteU16LE`** — the answer was that the parameter is a **signed narrow type**
+(`s16`). Throughout the session I had been trying *wider* types; the direction was
+backwards. The `lsls #16`/`lsrs #16` pair in the ROM is semantically unnecessary,
+so it is never generated with `u16`: an unsigned HImode parameter already arrives
+zero-extended from the caller. Written as `s16`, the value is treated as
+sign-extended and agbcc is forced to clear the upper half. **So those four bytes
+are proof that the parameter was signed in the original source.**
 
-**`InitSaveSystem`** — iki ajan bağımsız olarak 240/240 buldu. Kuyruk bölümü
-üç yazım tercihinin *birlikte* uygulanmasıyla tuttu; hiçbiri tek başına
-yetmiyor (kurallar 16, 17, 18).
+**`InitSaveSystem`** — two agents independently found 240/240. The tail section
+held only when three spelling choices were applied *together*; none is sufficient
+alone (rules 16, 17, 18).
 
-Ayrıca ajanlardan biri kaynak dosyadaki yorumumun bayat olduğunu bayt kanıtıyla
-gösterdi: "çözülemeyen döngü" olarak işaretlediğim birinci küme aslında zaten
-eşleşiyordu — ilk farklı bayt döngünün *sonrasındaydı*. Kural 8 böylece
-ölçülerek teyit edildi.
+One of the agents also demonstrated with byte evidence that my comment in the
+source file was stale: the first cluster, which I had marked as an "unsolvable
+loop", was in fact already matching — the first differing byte was *after* the
+loop. Rule 8 was thereby confirmed by measurement.
 
-### Araç hatası düzeltildi
+### A tool bug fixed
 
-`diff_function.py` ROM tarafını `functions.csv`'deki boyutla kırpıyordu. O
-boyut Ghidra'nın gövde tahmini ve literal havuzu dışarıda bırakabiliyor;
-sonuç olarak **tam eşleşen bir fonksiyonda bile** sahte "ROM da YOK" satırları
-çıkıyordu. Bu beni de yanıltmıştı. Artık iki taraftan büyüğü alınıyor.
+`diff_function.py` was truncating the ROM side using the size in `functions.csv`.
+That size is Ghidra's body estimate and can leave the literal pool out; as a
+result, spurious "ROM da YOK" lines appeared **even for a fully matching
+function**. This had misled me too. Now the larger of the two sides is used.
 
-### Kural seti 19'a çıktı
+### The rule set grew to 19
 
-Beş yeni kural (15-19) ve önemli bir üst-kural: **kurallar birbirine bağlı.**
-18. kural tek başına etkisizdi ama 16 ve 17 uygulandıktan sonra belirleyici
-oldu. "Denendi, tutmadı" kaydı tek başına değerlendirilmemeli.
+Five new rules (15-19) and one important meta-rule: **the rules are
+interdependent.** Rule 18 was ineffective on its own but became decisive once 16
+and 17 were applied. A "tried, did not hold" record must not be evaluated in
+isolation.
 
-### Süreç notu
+### Process note
 
-Ajanlar çalışırken `rm -rf build` çalıştırdım ve `build/variants/` altındaki
-dört varyant dosyası silindi. Bir ajan bunu fark edip yedek bırakmıştı;
-`InitSaveSystem` çözümü oradan kurtarıldı, `WriteU16LE` çözümü ise ajanın
-rapor metninden geri yazıldı. Paralel çalışmada ortak dizinlere dokunmamak
-gerekiyor.
+While the agents were working I ran `rm -rf build` and deleted four variant files
+under `build/variants/`. One agent had noticed and left a backup; the
+`InitSaveSystem` solution was recovered from there, and the `WriteU16LE` solution
+was rewritten from the agent's report text. In parallel work, shared directories
+must not be touched.
 
-## 2026-09-03 (gece, 2. workflow) — GameInit eşleşti: taşınabilir assembly bitti
+## 2026-09-03 (night, 2nd workflow) — GameInit matched: portable assembly is done
 
-Son blok. Altı ajan, altı farklı açı. **Dokuzu bağımsız olarak 0 farka ulaştı**
-(bazı ajanlar birden fazla çözüm üretti) — güçlü çapraz doğrulama. En açıklamalı
-olanı seçildi: ROM'dan sıfırdan yazılmış, %39 yorum oranı, 768/768 byte.
+The last block. Six agents, six different angles. **Nine independently reached 0
+differences** (some agents produced more than one solution) — strong
+cross-validation. The most explanatory one was chosen: written from scratch from
+the ROM, 39% comment ratio, 768/768 bytes.
 
-### Asıl düğümün çözümü
+### Solving the real knot
 
-Oturum boyunca takıldığım nokta şuydu: ROM 16 baytlık yığın çerçevesi kullanıyor,
-yuvalar 4 bayt aralıklı, ama sp+4 ve sp+8'e **halfword** yazıyor. `u16` skaler
-çerçeveyi 12 bayta düşürüyordu (673 fark), `u32` yazımı word yapıyordu (264).
+The point I had been stuck on all session was this: the ROM uses a 16-byte stack
+frame with slots 4 bytes apart, yet writes a **halfword** to sp+4 and sp+8. A
+`u16` scalar dropped the frame to 12 bytes (673 differences); `u32` made the
+write a word (264).
 
-Cevap: yuvaları **`u16 x[2]` dizisi** yapmak. Dizi BLKmode olduğu için agbcc onu
-bildirim sırasında ve 4 bayta hizalı yerleştiriyor; `x[0] = 0` yine `strh`
-üretiyor ve `(u32)x` adresi tek komutta veriyor. Word yuvası da dizi olmalı —
-skaler bırakılırsa dizilerden sonra yerleşip `sp+0`'ı kaybediyor.
+The answer: making the slots a **`u16 x[2]` array**. Because an array is BLKmode,
+agbcc places it in declaration order and aligned to 4; `x[0] = 0` still generates
+`strh`, and the `(u32)x` address comes out in a single instruction. The word slot
+must be an array too — left as a scalar, it is placed after the arrays and loses
+`sp+0`.
 
-Denenip tutmayanlar: `struct{u16 h; u16 pad;}` (agbcc SImode sayıp `ldr`/`and`/
-`str` üretiyor), tek büyük struct, union, cast'lar.
+Tried and did not hold: `struct{u16 h; u16 pad;}` (agbcc treats it as SImode and
+generates `ldr`/`and`/`str`), a single large struct, a union, and casts.
 
-### Üç yeni kural (20-22)
+### Three new rules (20-22)
 
-Ayrıca ölçülmüş bir mekanizma açıklaması: **yığın yerleşimini belirleyen şey
-bildirim sırası değil, tipin BLKmode olup olmadığıdır.** Bir ajan 24 bildirim
-sırası permütasyonu deneyip yerleşimin hiç değişmediğini gösterdi — bu, daha
-önce "bildirim sırası etkisiz" diye kaydettiğim gözlemin *nedenini* veriyor.
+Plus a measured mechanism explanation: **what determines stack layout is not
+declaration order but whether the type is BLKmode.** One agent tried 24
+declaration-order permutations and showed that the layout never changed — which
+supplies the *reason* for the observation I had previously recorded as
+"declaration order has no effect".
 
-### Nihai durum
+### Final status
 
 ```
 make matching        21/21 + libc 9/9
-C kaynağı            40 fonksiyon, 40'ı byte-matching
-C'den matching byte  4332/4660  (%92.96)
-kalan assembly       agb_main.s (52 B) + intr_main.s (276 B) = 328 B
+C source             40 functions, 40 byte-matching
+matching bytes from C  4332/4660  (92.96%)
+remaining assembly   agb_main.s (52 B) + intr_main.s (276 B) = 328 B
 ```
 
-**Kalan %7.04 tam olarak o iki dosyadır** (4660 - 4332 = 328). Yani taşınabilir
-her şey taşındı: geriye yalnızca ARM modundaki başlangıç kodu ve IRQ dispatcher
-kaldı, ki bunlar özgün kaynakta da assembly'ydi ve öyle kalacak.
+**The remaining 7.04% is exactly those two files** (4660 - 4332 = 328). So
+everything portable has been moved: what remains is only the ARM-mode startup
+code and the IRQ dispatcher, which were assembly in the original source too and
+will stay that way.
 
-19/19 C dosyası okunabilirlik denetiminden geçiyor.
+19/19 C files pass the readability check.
 
 ---
 
-## 2026-09-03 — Harita revizyonu, hasat, 32 kural
+## 2026-09-03 — Map revision, harvest, 32 rules
 
-### Harita: 1.466 → 1.978 fonksiyon (+%35)
+### The map: 1,466 → 1,978 functions (+35%)
 
-Uc is birlikte fonksiyon haritasini bastan kurdu:
+Three pieces of work together rebuilt the function map from scratch:
 
-1. **Sinir denetimi** (`audit_boundaries.py`): ozyinelemeli inisle 647
-   sinir duzeltildi, 43 sahte kayit silindi. Ilk yaklasim (dogrusal
-   disassembly) 998 fonksiyonu 8 KB'a "buyutuyordu" — yalniz-rapor
-   kipinde yakalandi.
-2. **Eksik fonksiyon kesfi** (`discover_functions.py`, uc yontem):
-   `bl` cagri hedefi (kesin, 51+49+3), ROM verisindeki fonksiyon
-   isaretcileri (prolog sartiyla 46; ham tarama 1.538 aday veriyordu,
-   cogu grafik verisinde rastlanti), prolog deseni (358). Yakinsayana
-   kadar tekrarlandi.
-3. **Kuyruk cagrisi bolmesi** (`split_at_calls.py`): yurutucu kosulsuz
-   `b`yi fonksiyon ici akis sayiyordu; GCC bunu kuyruk cagrisi icin de
-   kullaniyor. 52 `bl` hedefi bilinen kayitlarin ICINE dusuyordu —
-   32 kayit bolundu, 54 fonksiyon ayrildi. Sonrasinda kesif 0 veriyor.
+1. **Boundary audit** (`audit_boundaries.py`): 647 boundaries were corrected with
+   recursive descent, and 43 false records deleted. The first approach (linear
+   disassembly) was "growing" 998 functions to 8 KB — caught in report-only mode.
+2. **Missing function discovery** (`discover_functions.py`, three methods):
+   `bl` call targets (certain, 51+49+3), function pointers in ROM data (46 with a
+   prologue requirement; the raw scan gave 1,538 candidates, most of them
+   coincidences in graphics data), and prologue patterns (358). Repeated until it
+   converged.
+3. **Tail call splitting** (`split_at_calls.py`): the walker was treating an
+   unconditional `b` as intra-function flow, but GCC also uses it for tail calls.
+   52 `bl` targets fell INSIDE known records — 32 records were split, separating
+   54 functions. Discovery yields 0 afterwards.
 
-**Olcut uc kez asagi duzeltildi** (payda 291K → 338K → 414K → 433K;
-oran %2.34 → %2.28 gorunumu). Kapsama hic dusmedi; payda gercege
-yaklasti. Ders: harita isi kapsama isinden ONCE bitmeliydi.
+**The metric was revised downward three times** (denominator 291K → 338K → 414K →
+433K; the ratio's appearance 2.34% → 2.28%). Coverage never fell; the denominator
+moved closer to reality. The lesson: the mapping work should have finished BEFORE
+the coverage work.
 
-### Hasat: 7.268 → 11.264 dogrulanmis ROM bayti
+### Harvest: 7,268 → 11,264 verified ROM bytes
 
-~30 yeni bolge, cogu 2-6 fonksiyonluk yaprak kumeleri. Kanitlanmis
-deyimlerin (tasma korumali sayac, cift bagli liste, DMA blogu, karo
-isaretci aritmetigi, 148/180 baytlik tablo girisleri) tekrar kullanimi
-cogu kumede ILK denemede tam eslesme verdi.
+About 30 new regions, mostly leaf clusters of 2-6 functions. Reusing the proven
+idioms (the overflow-guarded counter, the doubly linked list, the DMA block, tile
+pointer arithmetic, and the 148/180-byte table entries) gave an exact match on the
+FIRST attempt in most clusters.
 
-### Kurallar: 27 → 32
+### Rules: 27 → 32
 
-- 28: isaretci aritmetigi != dizi indeksi (olcekleme sirasi)
-- 29: iki ayni dal → erken return + ortak kuyruk (cross-jump engeli)
-- 30: seyrek case → `||` zinciri (atlama tablosu felaketi: 64 B yerine 212)
-- 31: dongu sayacinin isaretliligi `bls`/`ble` secimini belirler
-- 32: ardisik kelime kopyasi struct atamayla (`ldmia/stmia` tetigi)
-- Register dagitim onceligi mekanizma bolumu olarak belgelendi
-  (`oncelik = floor_log2(ref) × ref / omur`).
+- 28: pointer arithmetic != array indexing (scaling order)
+- 29: two identical branches → early return + shared tail (blocking cross-jump)
+- 30: sparse cases → an `||` chain (the jump table disaster: 212 bytes instead of
+  64)
+- 31: the loop counter's signedness determines the `bls`/`ble` choice
+- 32: consecutive word copies via struct assignment (the `ldmia/stmia` trigger)
+- Register allocation priority was documented as a mechanism section
+  (`priority = floor_log2(refs) × refs / lifetime`).
 
-### Park korpusu: 16 dosya
+### The parked corpus: 16 files
 
-Yedisi ≤5 bayt uzaklikta (ClearTextArea 1, MaybeAdvance 1, QueryEntity 2,
-ProcessFirstEntry 2, GetInnerId 4, IsRamModeWanted 4, ProbeObject 5).
-Engel siniflari tanimlandi: register dagitim sirasi, dal yonu
-normalizasyonu, taban kopyalama/iki-taban, havuz yerlesimi, -O0 sinifi,
-carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
+Seven are within ≤5 bytes (ClearTextArea 1, MaybeAdvance 1, QueryEntity 2,
+ProcessFirstEntry 2, GetInnerId 4, IsRamModeWanted 4, ProbeObject 5). The
+obstacle classes were defined: register allocation order, branch direction
+normalization, base copying / two bases, pool placement, the -O0 class, and
+product factorization. These form Phase 2's test corpus.
 
-### Diger
+### Other
 
-- BIOS yuzeyi kapandi: oyunun tum `swi` temasi 10 thunk, hepsi eslesti.
-- libc: `findslot`/`remap_handle` maskeli eslesme ile kimliklendirildi
-  (bayt-birebir olmadigi icin bolge sayilmadi); `identify_libc_at.py`.
-- Dashboard: bayat JSON (make check artik yeniliyor), palet ton ayrimi,
-  panel artik Ghidra yerine bizim kaynagi gosteriyor.
-- Yeniden adlandirma YEDI kez baska dosyayi kirdi → rename araci gerek.
+- The BIOS surface is closed: the game's entire `swi` contact is 10 thunks, all
+  matched.
+- libc: `findslot`/`remap_handle` were identified by masked matching (not counted
+  as regions because they are not byte-exact); `identify_libc_at.py`.
+- Dashboard: stale JSON (make check now refreshes it), palette tone separation,
+  and the panel now shows our source rather than Ghidra's.
+- Renaming broke another file SEVEN times → a rename tool is needed.
 
-## 2026-09-04 — ProcessFirstEntry byte eşleşmesi
+## 2026-09-04 — ProcessFirstEntry byte match
 
-- `src/world/scan_all.c` içindeki son iki baytlık fark kapatıldı. İşaretçi
-  hesabını `(u32)i * sizeof(Entry) + (u32)tbl` sırasıyla ifade etmek,
-  old_agbcc'nin ROM'daki `adds r1, r0, r5` kodlamasını üretmesini sağladı.
-- Fonksiyon 62/62 bayt eşleşiyor; iki baytlık hizalama dolgusu ile birlikte
-  `0x08029014–0x08029054` aralığı kalıcı matching zincirine eklendi.
-- Park korpusundaki `scan_all` engeli kapandı; bu ifade sırası benzer
-  register-dağıtımı farkları için yeniden kullanılabilir bir adaydır.
+- The last two-byte difference in `src/world/scan_all.c` was closed. Expressing
+  the pointer computation in the order `(u32)i * sizeof(Entry) + (u32)tbl` made
+  old_agbcc produce the ROM's `adds r1, r0, r5` encoding.
+- The function matches 62/62 bytes; together with the two bytes of alignment
+  padding, the range `0x08029014–0x08029054` was added to the permanent matching
+  chain.
+- The `scan_all` obstacle in the parked corpus is closed; this expression order is
+  a reusable candidate for similar register-allocation differences.
 
-## 2026-09-04 — MaybeAdvance semantik düzeltmesi
+## 2026-09-04 — MaybeAdvance semantic correction
 
-- Tek baytlık `bls`/`bhi` farkının derleyici tercihi olmadığı kanıtlandı:
-  önceki C ve yorum ROM dal hedefini ters okuyordu.
-- Gerçek davranış: yalnız `gVBlankEnabled == 2` ve sayaç `> 1` iken 0;
-  diğer tüm durumlarda 1 döndürür.
-- Düzeltilen doğal C 42/42 bayt eşleşti. İki bayt hizalamayla
-  `0x080664F0–0x0806651C` bölgesi kalıcı matching zincirine eklendi.
+- The single-byte `bls`/`bhi` difference was proven not to be a compiler
+  preference: the previous C and its comment were reading the ROM's branch target
+  backwards.
+- The real behavior: 0 only when `gVBlankEnabled == 2` and the counter is `> 1`;
+  1 in every other case.
+- The corrected natural C matched 42/42 bytes. With two bytes of alignment, the
+  region `0x080664F0–0x0806651C` was added to the permanent matching chain.
 
-## 2026-09-04 — QueryEntity byte eşleşmesi
+## 2026-09-04 — QueryEntity byte match
 
-- `flags & 3` ifadesindeki iki operand aynı değeri verse de agbcc sonucu
-  ROM'dan farklı register'da tutuyordu.
-- `mask = 3; mask &= flags` biçimi sonucu sabitin register'ında tuttu ve
-  kalan iki opcode baytını kapattı. Fonksiyon 60/60 bayt eşleşiyor.
-- `0x08055AF8–0x08055B34` kalıcı matching zincirine eklendi; derleyici
-  davranışı `COMPILER.md` kural 33 olarak kaydedildi.
+- Although both operands of the `flags & 3` expression give the same value, agbcc
+  was holding the result in a different register from the ROM.
+- The form `mask = 3; mask &= flags` kept the result in the constant's register
+  and closed the remaining two opcode bytes. The function matches 60/60 bytes.
+- `0x08055AF8–0x08055B34` was added to the permanent matching chain; the compiler
+  behavior was recorded as `COMPILER.md` rule 33.
 
-## 2026-09-04 — Object query ikilisi byte eşleşmesi
+## 2026-09-04 — The object query pair byte-matched
 
-- `ProbeObject` (58/58) ve `GetInnerId` (20/20), iç içe null kontrollerini
-  açık erken `return 0` kontrollerine çevirince ROM blok sırasına oturdu.
-- Aralarında başka bir doğrulanmış fonksiyon bulunduğundan dosya iki gerçek
-  ROM bölgesine ayrıldı: `object_query.c` ve `get_inner_id.c`.
-- `0x080381F8–0x08038234` ile `0x0803824C–0x08038260` kalıcı matching
-  zincirine eklendi; desen `COMPILER.md` kural 34 olarak kaydedildi.
+- `ProbeObject` (58/58) and `GetInnerId` (20/20) fell into the ROM's block order
+  once the nested null checks were turned into explicit early `return 0` checks.
+- Because another verified function sits between them, the file was split into two
+  real ROM regions: `object_query.c` and `get_inner_id.c`.
+- `0x080381F8–0x08038234` and `0x0803824C–0x08038260` were added to the permanent
+  matching chain; the pattern was recorded as `COMPILER.md` rule 34.
 
-## 2026-09-04 — IsRamModeWanted byte eşleşmesi
+## 2026-09-04 — IsRamModeWanted byte match
 
-- İç içe ilk koşul açık `if (!active) return 0;` biçimine çevrildi.
-  Bu, ortak sıfır bloğunu literal havuzundan önce yerleştirerek kalan dört
-  baytlık kontrol-akışı farkını kapattı.
-- Fonksiyon 28/28 bayt eşleşti ve `0x08062530–0x0806254C` kalıcı matching
-  zincirine eklendi. Kural 34 böylece üçüncü fonksiyonda doğrulandı.
+- The nested first condition was turned into an explicit `if (!active) return 0;`.
+  That placed the shared zero block before the literal pool and closed the
+  remaining four-byte control-flow difference.
+- The function matched 28/28 bytes and `0x08062530–0x0806254C` was added to the
+  permanent matching chain. Rule 34 was thereby confirmed in a third function.
 
-## 2026-09-04 — CallWithOffset imza düzeltmesi
+## 2026-09-04 — CallWithOffset signature correction
 
-- ROM epilogu çağrı sonucundaki r0'ı `pop {r0}` ile eziyordu; bu kanıt
-  sarmalayıcının önceki `u32` imzasının yanlış olduğunu gösterdi.
-- Dönüş tipi `void` yapılınca register dağıtımı ve epilog dahil fonksiyon
-  24/24 bayt eşleşti. `0x080509C4–0x080509DC` kalıcı matching zincirine
-  eklendi; çıkarım `COMPILER.md` kural 35 olarak kaydedildi.
+- The ROM's epilogue was clobbering the call result's r0 with `pop {r0}`; that
+  evidence showed the wrapper's previous `u32` signature was wrong.
+- With the return type changed to `void`, the function matched 24/24 bytes,
+  including register allocation and the epilogue. `0x080509C4–0x080509DC` was
+  added to the permanent matching chain; the inference was recorded as
+  `COMPILER.md` rule 35.
 
-## 2026-09-04 — InitActor byte eşleşmesi
+## 2026-09-04 — InitActor byte match
 
-- Döngü sayacını son kuyruk sıfır yazımlarında yeniden kullanmak farkı
-  14 bayttan tek taşınmış komuta indirdi.
-- `tail = &actor->unk90` adresini sıfır atamasından önce açıkça hesaplamak
-  ROM'un komut sırasını üretti; fonksiyon 192/192 bayt eşleşti.
-- `0x080154D8–0x08015598` kalıcı matching zincirine eklendi ve desen
-  `COMPILER.md` kural 36 olarak kaydedildi.
+- Reusing the loop counter in the final tail zero writes reduced the difference
+  from 14 bytes to a single moved instruction.
+- Explicitly computing the address `tail = &actor->unk90` before the zero
+  assignment produced the ROM's instruction order; the function matched 192/192
+  bytes.
+- `0x080154D8–0x08015598` was added to the permanent matching chain and the
+  pattern recorded as `COMPILER.md` rule 36.
 
-## 2026-09-04 — HasWantedEntry byte eşleşmesi
+## 2026-09-04 — HasWantedEntry byte match
 
-- `base`, `kind` ve `cur` işaretçilerini ayrı yaşam aralıkları olarak ifade
-  etmek ROM'daki r0/r1/r2 register dağıtımını geri getirdi.
-- Eksik kopya komutu geri gelince literal havuzu ve döngü hedefi de doğru
-  konuma oturdu; fonksiyon 48/48 bayt eşleşti.
-- `0x08028E3C–0x08028E6C` kalıcı matching zincirine eklendi; desen
-  `COMPILER.md` kural 37 olarak kaydedildi.
+- Expressing the `base`, `kind`, and `cur` pointers as separate lifetimes restored
+  the ROM's r0/r1/r2 register allocation.
+- Once the missing copy instruction returned, the literal pool and the loop target
+  also fell into the right positions; the function matched 48/48 bytes.
+- `0x08028E3C–0x08028E6C` was added to the permanent matching chain; the pattern
+  was recorded as `COMPILER.md` rule 37.
 
-## 2026-09-04 — PushHistory byte eşleşmesi
+## 2026-09-04 — PushHistory byte match
 
-- Genel taban, okunan `current` değeri ve yazım tabanı karşılaştırmadan önce
-  ayrı yaşam aralıklarına ayrıldı.
-- Bu biçim agbcc'nin eşitlik yolunu sondaki store ile birleştirmesini önledi;
-  register dağıtımı ve döngü hedefiyle birlikte fonksiyon 48/48 eşleşti.
-- `0x08008064–0x08008094` kalıcı matching zincirine eklendi; desen
-  `COMPILER.md` kural 38 olarak kaydedildi.
+- The global base, the `current` value read, and the write base were split into
+  separate lifetimes before the comparison.
+- This form prevented agbcc from merging the equality path with the final store;
+  together with the register allocation and the loop target, the function matched
+  48/48.
+- `0x08008064–0x08008094` was added to the permanent matching chain; the pattern
+  was recorded as `COMPILER.md` rule 38.
 
-## 2026-09-04 — AddDistance byte eşleşmesi
+## 2026-09-04 — AddDistance byte match
 
-- `gDistanceAccum` adresi ayrı işaretçiye alınarak ROM'daki erken r4 taban
-  yüklemesi ve tek taban kullanımı üretildi.
-- Yalnız son karşılaştırmadaki `distance` okumasına dar volatile görünümü
-  verilerek ROM'un store sonrası `ldrh` yeniden okuması korundu.
-- Fonksiyon 68/68 bayt eşleşti; `0x08067274–0x080672B8` kalıcı matching
-  zincirine eklendi ve desen `COMPILER.md` kural 39 olarak kaydedildi.
+- Taking the `gDistanceAccum` address into a separate pointer produced the ROM's
+  early r4 base load and its single-base usage.
+- Giving only the `distance` read in the final comparison a narrow volatile view
+  preserved the ROM's post-store `ldrh` re-read.
+- The function matched 68/68 bytes; `0x08067274–0x080672B8` was added to the
+  permanent matching chain and the pattern recorded as `COMPILER.md` rule 39.
 
-## 2026-09-04 — BumpOrReset byte eşleşmesi
+## 2026-09-04 — BumpOrReset byte match
 
-- Yapısal `if/else` yerine ROM'un üç bloğu `reset`, `increment` ve ortak
-  `store` C etiketleriyle açıkça ifade edildi.
-- agbcc böylece iki dalda ayrı sayaç adresi yükleyip tek `strb` paylaştı;
-  fonksiyon 56/56 bayt eşleşti.
-- `0x0805AC50–0x0805AC88` kalıcı matching zincirine eklendi ve desen
-  `COMPILER.md` kural 40 olarak kaydedildi.
+- Instead of a structured `if/else`, the ROM's three blocks were expressed
+  explicitly with the C labels `reset`, `increment`, and a shared `store`.
+- agbcc then loaded a separate counter address in the two branches and shared a
+  single `strb`; the function matched 56/56 bytes.
+- `0x0805AC50–0x0805AC88` was added to the permanent matching chain and the
+  pattern recorded as `COMPILER.md` rule 40.
 
-## 2026-09-04 — ReleaseSlot byte eşleşmesi
+## 2026-09-04 — ReleaseSlot byte match
 
-- Struct indekslemesi kaldırılıp bir kez hesaplanan `scaled` ofset ile
-  `heldBase` ve `extraBase` alan tabanları ayrı yerellerde kuruldu.
-- Çarpımı iki deyimden tek `scaled = index * 180` atamasına indirmek son
-  r3/r4 takasını düzeltti; fonksiyon 64/64 bayt eşleşti.
-- `0x080308AC–0x080308EC` kalıcı matching zincirine eklendi ve desen
-  `COMPILER.md` kural 41 olarak kaydedildi.
+- Struct indexing was removed and the `heldBase` and `extraBase` field bases were
+  set up in separate locals from a `scaled` offset computed once.
+- Reducing the multiplication from two statements to a single
+  `scaled = index * 180` assignment fixed the last r3/r4 swap; the function
+  matched 64/64 bytes.
+- `0x080308AC–0x080308EC` was added to the permanent matching chain and the
+  pattern recorded as `COMPILER.md` rule 41.
 
-## 2026-09-05 — Sprite havuzu: beş ek C eşleşmesi
+## 2026-09-05 — The sprite pool: five additional C matches
 
-| Fonksiyon | Adres | Eşleşen fonksiyon baytı |
+| Function | Address | Matching function bytes |
 |---|---|---:|
 | SortSpriteList | 0x08012A00 | 152 |
 | InitSpritePool | 0x08012B20 | 124 |
@@ -733,163 +782,175 @@ carpim faktorizasyonu. Bunlar Faz 2'nin test korpusu.
 | SortActiveSprites | 0x08012C54 | 32 |
 | InsertSpriteSorted | 0x08012C74 | 98 |
 
-- `FlushSpriteList`in 9 baytlık zamanlama farkını ileri sayan
-  `for (i = count; i < left; i++)` kapattı. agbcc'nin ürettiği azalan
-  sayaç, çıkarma işlemini sabit kurulumlarından sonra yerleştiriyor.
-  `InitSpritePool`da `i++, node++` sırası da kalan 4 baytlık farkı kapattı.
-  İki deney `COMPILER.md` kuralları 42–43 olarak kaydedildi.
-- Sıralı eklemenin aynı doğal C gövdesi hem bağımsız fonksiyonda hem
-  `SortSpriteList` döngüsüne inline açıldığında ROM'u birebir üretiyor.
-  Ortak gövde `include/sprite_sort.h` içinde. Etiketli döngü ve ayrı
-  maskelenen yereller 30/98 fark bırakıyordu; yapısal `for` ile doğrudan
-  maskeler birlikte eşleşmeyi sağladı.
-- `include/sprite_pool.h`, 128 × 16 baytlık düğümleri ve üç havuz alanını
-  tek türde topluyor. `+6` baytı sıralamanın ikincil anahtarı;
-  `+7` henüz bilinmiyor. Başlatıcı OAM'in 1024 baytını DMA3 ile sıfırlıyor.
-- Önceki oturumda zaten eşleşmiş `AllocNode` (72 bayt) kayıtlı ROM
-  bölgelerinde yoktu. O da kalıcı build zincirine alındı. Altı yeni bölge
-  toplam **592 bayt**: bu oturumda eşleşen 518 fonksiyon baytı, 2 bayt
-  hizalama ve `AllocNode`un 72 baytı. Yeni kesintisiz sprite aralığı
-  `0x08012B20–0x08012CD8` (bitiş hariç), 440 bayt.
-- `UnlinkToFree` aynı ortak türe taşındı; 53/150 farkı değişmedi.
-  İki dalın `prev` yerelini ayırmak etkisiz, serbest liste için ayrı
-  `next` kullanmak daha kötü çıktı. Fonksiyon matching sayılmadı.
-- C'den eşleşen fonksiyon sayısı 279 → 284; kayıtlı matching kod
-  13.848 → 14.366 bayt (%3,05 → %3,16). Fonksiyon sınırları değiştirilmedi;
-  yeni giriş/sınır eklenmeden mevcut kayıtların kaynakları ve adları açıldı.
-- Doğrulama: `make check-full` geçti. Cache'siz matching build, 23
-  fonksiyonluk toolchain corpus, sınır denetimi, dashboard lint ve production
-  build temiz. Hibrit ROM SHA-1'i değişmedi:
+- `FlushSpriteList`'s 9-byte timing difference was closed by the forward-counting
+  `for (i = count; i < left; i++)`. The decreasing counter agbcc generates places
+  the subtraction after the constant setups. In `InitSpritePool`, the
+  `i++, node++` order also closed the remaining 4-byte difference. Both
+  experiments were recorded as `COMPILER.md` rules 42–43.
+- The same natural C body for sorted insertion reproduces the ROM exactly both as
+  a standalone function and when inlined into the `SortSpriteList` loop. The
+  shared body lives in `include/sprite_sort.h`. A labelled loop with separately
+  masked locals left a 30/98 difference; a structured `for` with direct masks
+  together produced the match.
+- `include/sprite_pool.h` collects the 128 × 16-byte nodes and the three pool
+  fields into one type. The `+6` byte is the sort's secondary key; `+7` is not yet
+  known. The initializer zeroes OAM's 1024 bytes with DMA3.
+- `AllocNode` (72 bytes), which had already matched in the previous session, was
+  not in the recorded ROM regions. It too was taken into the permanent build
+  chain. Six new regions total **592 bytes**: the 518 function bytes matched this
+  session, 2 bytes of alignment, and `AllocNode`'s 72 bytes. The new contiguous
+  sprite range is `0x08012B20–0x08012CD8` (end exclusive), 440 bytes.
+- `UnlinkToFree` was moved to the same shared type; its 53/150 difference did not
+  change. Splitting the two branches' `prev` local had no effect, and using a
+  separate `next` for the free list came out worse. The function was not counted
+  as matching.
+- The number of functions matching from C went 279 → 284; recorded matching code
+  went 13,848 → 14,366 bytes (3.05% → 3.16%). No function boundaries were
+  changed; the sources and names of existing records were opened up without
+  adding new entries or boundaries.
+- Verification: `make check-full` passed. The cacheless matching build, the
+  23-function toolchain corpus, the boundary audit, the dashboard lint, and the
+  production build are all clean. The hybrid ROM's SHA-1 did not change:
   `06230842626da504f92396074f7c655e100f5d44`.
 
-## 2026-09-05 — Calisma zamani izleme, dil sistemi, ARM kipi
+## 2026-09-05 — Runtime tracing, the language system, ARM mode
 
-Uzun oturum; uc ayri is kolu.  Sonuc: 298 -> 356 fonksiyon, %3.21 -> %4.27.
+A long session with three separate work streams. Result: 298 → 356 functions,
+3.21% → 4.27%.
 
-### 1. mGBA izleyici ve oyun oturumlari
-`tools/make_trace_script.py` -> `tools/trace.lua`: her karede 322 RAM
-sembolunu okuyup degisenleri tus durumuyla logluyor.  Kullanici sekiz
-oturum oynadi (acilis, araba, hareketsiz, hasar/olum, dil ekrani, gorev,
-tutuklanma).  Cozumleme: `tools/analyze_trace.py --list / --session N`.
+### 1. The mGBA tracer and game sessions
+`tools/make_trace_script.py` -> `tools/trace.lua`: reads 322 RAM symbols every
+frame and logs the changes along with the key state. The user played eight
+sessions (startup, driving, standing still, damage/death, the language screen, a
+mission, arrest). Analysis: `tools/analyze_trace.py --list / --session N`.
 
-Kesin sonuclar (hepsi ram_map.csv'de `verified`):
-- `gSessionPtr` -> `gRam02000F10`; `+0x10` alani CANIN 16.16 hali
-  (yeni oyunda 100.0, yumrukta -4.0, olumde 0).  `player_health` kopyasi.
-- `gLanguage`: 0=ing, 1=isp, 2=fra, 3=ita, 4=alm.  `SetLanguage` imlec
-  hareketinde cagriliyor (canli onizleme).
-- `gRam02030330` = aranma/polis blogu, alan haritasi cikti;
-  `wanted_level_true` onun +0x10 alani (cakisma degil, kayit hatasiydi).
-- `mission_timer` gercekten zamanlayici -- "mesafe" iddiam CURUTULDU.
-- Metin tablosu: 618 dize x 5 dil, dilim k = dil k, kodlama LATIN-1.
+Firm conclusions (all `verified` in ram_map.csv):
+- `gSessionPtr` -> `gRam02000F10`; its `+0x10` field is health in 16.16 form
+  (100.0 on a new game, -4.0 per punch, 0 on death). `player_health` is its copy.
+- `gLanguage`: 0=English, 1=Spanish, 2=French, 3=Italian, 4=German. `SetLanguage`
+  is called on cursor movement (live preview).
+- `gRam02030330` = the wanted/police block, with its field map extracted;
+  `wanted_level_true` is its +0x10 field (not an overlap — it was a recording
+  error).
+- `mission_timer` really is a timer — my "distance" claim was REFUTED.
+- The text table: 618 strings x 5 languages, slice k = language k, encoding
+  LATIN-1.
 
-Aracin iki kusuru bulunup duzeltildi: acilista dogrulama (`emu` hazir
-degilken tum liste bosaliyordu) ve cift yukleme (iki ornek ayni loga
-yaziyordu; artan sayacli koruma eklendi).
+Two defects in the tool were found and fixed: startup validation (with `emu` not
+ready, the whole list was being emptied) and double loading (two instances were
+writing to the same log; an incrementing-counter guard was added).
 
-### 2. Hasat
-Iki workflow turu (10 + 13 ajan): 21 eslesme.  Solo: 12 eslesme.
-Birlestirmede ajan raporlarinda gorunmeyen dort sorun yakalandi:
-`asm(".equ")` kacamagi, tip cakismasi (ortak baslik `node_list.h` ile
-cozuldu), ciplak adres, durum kaymasi.  `tools/rename_symbol.py` yazildi
-(adlandirma bir oturumda dort kez extern kirmisti).
+### 2. Harvest
+Two workflow rounds (10 + 13 agents): 21 matches. Solo: 12 matches. During the
+merge, four problems invisible in the agent reports were caught: an
+`asm(".equ")` workaround, a type conflict (solved with the shared header
+`node_list.h`), a bare address, and a status drift. `tools/rename_symbol.py` was
+written (naming had broken externs four times in one session).
 
-Olcum: park edilmis "zor sinif" 14 fonksiyon / 3708 bayt / %0.82 --
-darbogaz DEGIL.  512+ bandindaki 220 fonksiyon ROM'un %54'unu tutuyor;
-yuzde oradan gelecek.
+Measurement: the parked "hard class" is 14 functions / 3708 bytes / 0.82% — NOT
+the bottleneck. The 220 functions in the 512+ band hold 54% of the ROM; the
+percentage will come from there.
 
-### 3. ARM kipi
-Derleme zinciri yalnizca Thumb'a bagliydi; `agbcc_arm` bastan beri
-duruyordu.  Baglandi (`KIP: ARM` isareti, `.align 4`).  Bayrak kesfi:
-`-fomit-frame-pointer -fno-schedule-insns -fno-schedule-insns2` ilk
-adayda 244 -> 188 bayt.  Barrel-shifter kaynasmalari C'den uretiliyor
-(olculdu), bolge ulasilabilir.
+### 3. ARM mode
+The build chain was tied to Thumb only; `agbcc_arm` had been sitting idle from the
+start. It was wired in (the `KIP: ARM` marker, `.align 4`). A flag discovery:
+`-fomit-frame-pointer -fno-schedule-insns -fno-schedule-insns2` took the first
+candidate from 244 to 188 bytes. Barrel-shifter fusions are generated from C
+(measured), so the region is reachable.
 
-YAPISAL SINIR: agbcc_arm her zaman 8 yazmac ({r4-r9,sl,lr}) itiyor,
-fp/ip'yi dagitima sokmuyor; ROM 11 itiyor.  Dokuz bayrak denendi,
-hicbiri kumeyi genisletmedi.  Ilk aday 0x0806A77C: 171/196, park.
-ARM bolgesi (14920 bayt) bu yapilandirmayla eslesmeye kapali gorunuyor.
+A STRUCTURAL LIMIT: agbcc_arm always pushes 8 registers ({r4-r9,sl,lr}) and never
+brings fp/ip into allocation; the ROM pushes 11. Nine flags were tried, none
+widened the set. First candidate 0x0806A77C: 171/196, parked. The ARM region
+(14,920 bytes) appears closed to matching with this configuration.
 
-### Pano
-Unit (kaynak dosyasi) gruplamasi eklendi; bilinmeyen bolgeler adres
-araligiyla gosteriliyor.  Bitisiklikle modul cikarimi denendi ve GERI
-ALINDI: decomp yakinsaminda modul tahmin edilmez, decomp edilen dosyadir.
+### Dashboard
+Unit (source file) grouping was added; unknown regions are shown with their
+address range. Inferring the module from adjacency was tried and RETRACTED: in a
+decomp, the module is not guessed — it is the file that was decompiled.
 
-## 2026-09-06 — Kardeş fonksiyon bandı kapatıldı
+## 2026-09-06 — The sibling function band closed
 
-- Yol haritasındaki 84 hedef ilk kez sabit ve yeniden üretilebilir bir veri
-  görünümüne bağlandı: `data/sibling_band.csv`. `make sibling-check`, hedefleri
-  `9cbaf27` baseline'ından 120–560 bayt, en çok 200 bayt aralık ve Thumb oyun
-  modülü kurallarıyla tekrar seçiyor. Gerçek toplam 19.794 bayt; eski 1,6 KB ve
-  18.818 bayt ifadeleri aynı listeyi üretmiyordu ve düzeltildi.
-- 9 fonksiyon / 1.262 fonksiyon baytı ROM'a birebir eşleşti: tampon kurulumu,
-  palet lerp'i, nibble değiştirme, nesne bağlama, çalışma globallerini sıfırlama,
-  alan geçiş konumu, iki kare-dispatch zinciri ve dört yönlü konum sınaması.
-- Altı ek fonksiyon temiz C'ye çevrilip ROM'a karşı ölçüldü ve dosya içi kanıtla
-  park edildi. En yakını `FUN_080515d0`: 164/164 boyut, yalnız 20 bayt fark;
-  kalan engel iki global literalinin yükleme sırası. Diğer hedefler kesin ROM
-  çağrı/dal/literal sayımları ve bağımlılık sınıfıyla statik park edildi.
-- Eşleşmiş bölgeler hibrit ROM zincirine eklendi. Genel matching ölçümü
-  419/33.554 bayttan 428/34.816 bayta (%7,67) çıktı.
-- Dokuz yeni eşleşme, adlandırma borcunu büyütmeden gerçek adlara bağlandı
+- For the first time, the roadmap's 84 targets were tied to a fixed, reproducible
+  data view: `data/sibling_band.csv`. `make sibling-check` re-selects the targets
+  from the `9cbaf27` baseline using the rules 120–560 bytes, at most a 200-byte
+  gap, and a Thumb game module. The real total is 19,794 bytes; the old "1.6 KB"
+  and "18,818 bytes" figures did not produce the same list and were corrected.
+- 9 functions / 1,262 function bytes matched the ROM exactly: buffer setup,
+  palette lerp, nibble replacement, object linking, zeroing the runtime globals,
+  area transition position, two frame-dispatch chains, and a four-way position
+  test.
+- Six additional functions were converted to clean C, measured against the ROM,
+  and parked with in-file evidence. The closest is `FUN_080515d0`: 164/164 in
+  size with only a 20-byte difference; the remaining obstacle is the load order of
+  two global literals. The other targets were statically parked with exact ROM
+  call/branch/literal counts and a dependency class.
+- The matched regions were added to the hybrid ROM chain. The overall matching
+  measurement rose from 419/33,554 bytes to 428/34,816 bytes (7.67%).
+- The nine new matches were bound to real names without increasing the naming debt
   (`InitWorkBuffers`, `BlendPaletteBlock`, `ReplaceNibbleField`, `LinkObjectPair`,
   `ResetRuntimeGlobals`, `AdjustAreaPosition`, `ProbeNearbyPosition`,
-  `RunFrameStageOne/Two`). Yer tutucu `FUN_` adı taşıyan eşleşmiş fonksiyon
-  sayısı 109'dan 100'e indi.
-- `make sibling-check` ilk sürümü hedefleri baseline'daki **adlarla**
-  karşılaştırıyordu ve bu adlandırma yapılır yapılmaz patladı. Dondurulması
-  gereken şey hedef kümesi olduğu için karşılaştırma adres + boyuta indirildi;
-  ad kolonu kimlik değil, güncel bilgidir.
+  `RunFrameStageOne/Two`). The number of matching functions carrying a placeholder
+  `FUN_` name fell from 109 to 100.
+- The first version of `make sibling-check` compared targets against the
+  **names** in the baseline, and it broke as soon as the naming was done. Because
+  what needs to be frozen is the target set, the comparison was reduced to address
+  + size; the name column is current information, not identity.
 
 
-## 2026-09-07 — SIO TX yazmaç çakışması giderildi (MATCH-018)
+## 2026-09-07 — The SIO TX register conflict resolved (MATCH-018)
 
-- `FUN_080657d8` başlangıç ölçümü 575/1174 komut, 2356 bayt; korunan
-  kaynak 669/1174 komut, 2352 bayt. **Tam byte-matching yok**; 505 komut
-  farkı MATCH-019'da açık. Matching yüzdesi bu değişiklikle artmadı.
-- `PackLocalLinkTag` iki paralel halkadaki kaydın etiketini paketler.
-  Halka işaretçisini iki adımda ilerletmek, yerel dağıtıcının bir taban
-  sabitini TX boyunca r4'te tutmasını engelledi. k=r4, tx2=r5, cur=r6 ve
-  tuş halkası tabanı=r7 dağılımı ROM ile hizalandı. Girişteki 0x08065834
-  üçlüsü de eşleşti. Yeni dış çağrı veya volatile erişim eklenmedi.
-- Devir notundaki r4 sembolü düzeltildi: eski derlemede r4'te
-  `gRam020003C0` vardı; `gRam02000E80` r3'teydi. Çakışmanın giderilmesi
-  kalan farkların çoğunu kapatmadı; bu beklenti doğrulanmış sonuç olarak
-  sunulmuyor. RX adres ilişkisi ve başka blok farkları sürüyor.
-- `tools/probe_sio_tx.py` üç kontrollü adayı geçici dizinde yeniden
-  derler: doğrudan ifadeler 575, tek adımlı yardımcı 573, korunan iki
-  adımlı yardımcı 669. Ölçüm COMPILER kural 64'te. Saf taban takma adıyla
-  677 veren tanısal aday kaynak kabul ölçütü nedeniyle alınmadı.
-- `make c-match FILE=src/world/sio_driver.c` beklenen biçimde kısa çıktı
-  bildiriyor (2352/2374); kaynak matching olarak işaretlenmedi. `make
-  check` geçti: toolchain, kayıtlı bölgeler, hibrit ROM hash'i, C taraması,
-  tutarlılık, iş kuyruğu, sınır denetimi ve üretilmiş görünümler temiz.
-  `c_sources.csv` içindeki bayat 2372 bayt ölçümü de taramayla yenilendi.
+- `FUN_080657d8` started at 575/1174 instructions, 2356 bytes; the retained source
+  is at 669/1174 instructions, 2352 bytes. **There is no full byte match**; the
+  505-instruction difference is open under MATCH-019. The matching percentage did
+  not increase with this change.
+- `PackLocalLinkTag` packs the tag of a record from two parallel rings. Advancing
+  the ring pointer in two steps prevented the local allocator from keeping a base
+  constant in r4 throughout TX. The allocation k=r4, tx2=r5, cur=r6, and key ring
+  base=r7 is aligned with the ROM. The 0x08065834 triple at the entry also
+  matched. No new external call or volatile access was introduced.
+- The r4 symbol in the handover note was corrected: in the old build, r4 held
+  `gRam020003C0`; `gRam02000E80` was in r3. Resolving the conflict did not close
+  most of the remaining differences; that expectation is not presented as a
+  confirmed result. The RX address relation and other block differences persist.
+- `tools/probe_sio_tx.py` rebuilds three controlled candidates in a temporary
+  directory: direct expressions 575, the one-step helper 573, and the retained
+  two-step helper 669. The measurement is in COMPILER rule 64. A diagnostic
+  candidate giving 677 with a pure base alias was not taken, because of the source
+  acceptance criterion.
+- `make c-match FILE=src/world/sio_driver.c` reports a short output as expected
+  (2352/2374); the source was not marked as matching. `make check` passed:
+  toolchain, recorded regions, hybrid ROM hash, C scan, consistency, work queue,
+  boundary audit, and generated views are all clean. The stale 2372-byte
+  measurement in `c_sources.csv` was also refreshed by the scan.
 
-## 2026-09-07 — Oyunun gerçek kare hızı ölçüldü: ~15 fps
+## 2026-09-07 — The game's real frame rate measured: ~15 fps
 
-- Soru koddan cevaplandı, sonra oynanışla doğrulandı. `vblank_intr.c`
-  (0x08000220, byte-matching) her VBlank'te `gIwramFrameCounter`'ı artırıyor;
-  mantık karesi bitince değeri `gFrameDelay`'e (0x03000000) kopyalayıp 5'te
-  kırpıyor ve sayacı sıfırlıyor.
-- `gFrameDelay` bir **zaman adımı çarpanı**, ölçüm değil kullanım: `nodelist_c8.c`
-  notuna göre 0x08053AD8 sayaçları her karede `gFrameDelay` kadar azaltıyor.
-- **Oynanış ölçümü: ~15 fps**, yani mantık karesi başına 4 donanım karesi,
-  `gFrameDelay ≈ 4`. Ara sahnelerde çok daha kötü (0-1 fps gözlendi).
-- Bunu bağımsız doğrulayan kod kanıtı: **`FRAME_DELAY_MAX = 5`**. 60 fps'te
-  koşan bir oyunda telafi değeri 1'i geçmez; 5'te kırpmak, 4-5 değerlerinin
-  normal işletim sayıldığını gösterir. Yani düşük kare hızı bir performans
-  kazası değil, tasarımın kabul ettiği aralık.
-- Kırpmanın ikinci sonucu: mantık karesi 5 donanım karesinden uzun sürerse
-  telafi tavana çarpıyor ve **simülasyon ağır çekime giriyor** (hareket
-  gerçek zamanın altında ilerliyor). Ara sahnelerdeki "donmuş" his muhtemelen
-  budur — kare hızı düşüşü değil, zamanın yavaşlaması.
-- Bağlantı/iki oyunculu kipte (`gGameState[12]` 1 veya 2) `gFrameDelay` gerçek
-  geçen kareye BAKMAKSIZIN 5'e sabitleniyor. Sebebi kodda yazmıyor; makul
-  tahmin iki cihazın deterministik kalması, ama bu çıkarım.
-- `tools/fps_watch.lua` eklendi: mGBA'da sayacın sıfırlandığı anı yakalayıp
-  adım dağılımını basıyor. mGBA'nın başlık çubuğundaki FPS emülatörün hızıdır,
-  oyunun mantık adımını göstermez.
+- The question was answered from the code, then confirmed by play.
+  `vblank_intr.c` (0x08000220, byte-matching) increments `gIwramFrameCounter` on
+  every VBlank; when a logic frame finishes, it copies the value to `gFrameDelay`
+  (0x03000000), clamps it at 5, and zeroes the counter.
+- `gFrameDelay` is a **time step multiplier**, a usage rather than a measurement:
+  per the note in `nodelist_c8.c`, the counters at 0x08053AD8 decrease by
+  `gFrameDelay` every frame.
+- **Play measurement: ~15 fps**, i.e. four hardware frames per logic frame,
+  `gFrameDelay ≈ 4`. Much worse in cutscenes (0-1 fps observed).
+- Code evidence that independently confirms this: **`FRAME_DELAY_MAX = 5`**. In a
+  game running at 60 fps the compensation value would never exceed 1; clamping at
+  5 shows that values of 4-5 were considered normal operation. So the low frame
+  rate is not a performance accident but a range the design accepted.
+- A second consequence of the clamp: if a logic frame takes longer than 5 hardware
+  frames, the compensation hits the ceiling and **the simulation goes into slow
+  motion** (movement advances slower than real time). The "frozen" feel in
+  cutscenes is probably this — not a frame rate drop but time slowing down.
+- In link/two-player mode (`gGameState[12]` being 1 or 2), `gFrameDelay` is fixed
+  at 5 REGARDLESS of the frames actually elapsed. The reason is not written in the
+  code; the plausible guess is keeping the two devices deterministic, but that is
+  an inference.
+- `tools/fps_watch.lua` was added: it catches the moment the counter is zeroed in
+  mGBA and prints the step distribution. The FPS in mGBA's title bar is the
+  emulator's speed and does not show the game's logic step.
 
-DÜZELTME: Bu bulgudan önce "oyun sabit FPS'e kilitlenmiyor, değişken zaman
-adımı kullanıyor" demiştim. Mekanizma doğruydu ama sonucu varsaymıştım;
-oyunun 60 fps'e yakın koştuğu izlenimini verdi. Ölçüm bunu çürüttü.
+CORRECTION: before this finding I had said "the game does not lock to a fixed FPS,
+it uses a variable time step." The mechanism was right, but I had assumed its
+consequence; it gave the impression that the game ran close to 60 fps. The
+measurement refuted that.

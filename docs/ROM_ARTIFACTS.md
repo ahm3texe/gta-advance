@@ -1,8 +1,8 @@
-# ROM içi izler ve dış kaynaklar
+# In-ROM traces and external sources
 
-## Standart kütüphane: ROM agbcc'nin newlib'ine linkleniyor
+## Standard library: the ROM links against agbcc's newlib
 
-`0x00BD3450` civarında bir kütüphane imza bloğu var:
+There is a library signature block around `0x00BD3450`:
 
 ```
 0x0BD3450  MultiSioSync020820
@@ -16,48 +16,48 @@
 0x0BD3810  _sbrk: Heap and stack collision
 ```
 
-Son üç dize **`tools/agbcc/lib/libc.a` içinde birebir mevcut.** Yani ROM'un
-kod kuyruğu tersine mühendislik gerektirmeyen standart kütüphane kodudur ve
-kaynağı zaten elimizde.
+The last three strings are **present verbatim in `tools/agbcc/lib/libc.a`.** So
+the ROM's code tail is standard library code that requires no reverse
+engineering, and we already have its source.
 
-`MultiSioSync020820` Nintendo'nun seri iletişim kütüphanesinin sürüm damgası
-(20 Ağustos 2002). `EEPROM_V124` zaten biliniyordu.
+`MultiSioSync020820` is the version stamp of Nintendo's serial communication
+library (20 August 2002). `EEPROM_V124` was already known.
 
-### Doğrulanan eşleşmeler
+### Verified matches
 
 ```sh
 make scan-libc
 ```
 
-libc.a'daki fonksiyon gövdelerini ROM içinde arar:
+This searches the ROM for function bodies from libc.a:
 
-| Adres | Fonksiyon | Boyut | Not |
+| Address | Function | Size | Note |
 |---|---|---|---|
-| `0x0806DE84` | `_toupper` | 28 B | maskeli; `toupper` ile belirsiz |
+| `0x0806DE84` | `_toupper` | 28 B | masked; ambiguous with `toupper` |
 | `0x08070CE4` | `_mbtowc_r` | 42 B | |
 | `0x08070DF8` | `_Bfree` | 24 B | |
 | `0x08070F34` | `_hi0bits` | 88 B | |
 | `0x08070F8C` | `_lo0bits` | 130 B | |
-| `0x080716A4` | `isinf` | 36 B | **Ghidra kaçırmış** |
-| `0x080716C8` | `isnan` | 32 B | **Ghidra kaçırmış** |
-| `0x080717EC` | `findslot` | 30 B | maskeli |
-| `0x0807180C` | `remap_handle` | 76 B | maskeli |
-| `0x08071B9C` | `_exit` | 32 B | **Ghidra kaçırmış**; `_kill` ile belirsiz |
+| `0x080716A4` | `isinf` | 36 B | **missed by Ghidra** |
+| `0x080716C8` | `isnan` | 32 B | **missed by Ghidra** |
+| `0x080717EC` | `findslot` | 30 B | masked |
+| `0x0807180C` | `remap_handle` | 76 B | masked |
+| `0x08071B9C` | `_exit` | 32 B | **missed by Ghidra**; ambiguous with `_kill` |
 | `0x08071D8C` | `abort` | 32 B | |
 
-### Doğrulanmış libc bölgeleri
+### Verified libc regions
 
-Yer değiştirmesiz eşleşen fonksiyonlar artık build'e bağlı:
+Functions that match without relocation are now wired into the build:
 
 ```sh
 make libc-verify
 ```
 
-`data/libc_regions.csv`'deki her giriş için `tools/agbcc/lib/libc.a` içinden
-fonksiyon gövdesi çıkarılır ve ROM ile karşılaştırılır. `make matching` bunu
-otomatik çalıştırır.
+For each entry in `data/libc_regions.csv`, the function body is extracted from
+`tools/agbcc/lib/libc.a` and compared against the ROM. `make matching` runs this
+automatically.
 
-| Adres | Fonksiyon | Boyut |
+| Address | Function | Size |
 |---|---|---|
 | `0x08070CE4` | `_mbtowc_r` | 42 B |
 | `0x08070DF8` | `_Bfree` | 24 B |
@@ -69,45 +69,46 @@ otomatik çalıştırır.
 | `0x08071BBC` | `_kill` | 32 B |
 | `0x08071D8C` | `abort` | 32 B |
 
-Toplam **448 byte**. Bunlar tersine mühendislik ürünü değil: kaynağı zaten
-elimizde olan standart kütüphane kodunun ROM'daki byte'larla birebir aynı
-olduğunun kanıtı. Doğrulanmış toplam ROM alanı 5340 → **5788 byte**.
+**448 bytes** in total. These are not a reverse-engineering result: they are
+proof that standard library code whose source we already have is byte-identical
+to what is in the ROM. Total verified ROM area went from 5340 to **5788 bytes**.
 
-`_exit` / `_kill` belirsizliği çözüldü. Gövdeleri birebir aynı, ama bu gövdeden
-ROM'da **tam iki adet** var ve aralarındaki mesafe 32 byte — `syscalls.o`
-içindeki yerleşimin aynısı (`_exit` nesne ofseti 892, `_kill` 924). İkili
-ancak bu sırayla yerleşebilir, dolayısıyla `_exit = 0x08071B9C` ve
-`_kill = 0x08071BBC` kesindir.
+The `_exit` / `_kill` ambiguity is resolved. Their bodies are identical, but this
+body occurs **exactly twice** in the ROM, 32 bytes apart — the same layout as in
+`syscalls.o` (`_exit` at object offset 892, `_kill` at 924). The pair can only be
+laid out in that order, so `_exit = 0x08071B9C` and `_kill = 0x08071BBC` are
+certain.
 
-Bu, tek başına byte karşılaştırmasının çözemediği bir belirsizliğin *yerleşim
-argümanıyla* çözülebileceğini gösteriyor: aynı gövdeli sembol çiftleri için
-kullanılabilir bir yöntem.
+This shows that an ambiguity byte comparison alone cannot settle can be resolved
+by a *layout argument*: a usable method for symbol pairs with identical bodies.
 
-### Maskeli arama
+### Masked search
 
-Dış çağrı içeren fonksiyonlar linklenmeden ROM byte'larıyla eşleşmez: `bl`
-hedefi ve literal havuzdaki adresler bağlamaya göre değişir. Tarama bu yüzden
-**maskeli** yapılıyor — yer değiştirmenin dokunduğu byte'lar joker sayılıp
-geri kalan gövde birebir aranıyor. Böylece adres bilinmeden fonksiyon bulunur.
+Functions containing external calls do not match the ROM bytes until they are
+linked: the `bl` target and the addresses in the literal pool depend on the
+binding. The scan is therefore **masked** — the bytes touched by relocation are
+treated as wildcards and the rest of the body is searched verbatim. This finds a
+function without knowing its address.
 
-Yöntem `remap_handle` (`0x0807180C`, 76 B) üzerinde gözle doğrulandı: 37
-komutun tamamı birebir aynı, farklı görünen tek şey literal havuz sözcükleri —
-yani tam olarak maskelenen byte'lar.
+The method was visually verified on `remap_handle` (`0x0807180C`, 76 B): all 37
+instructions are identical, and the only apparent differences are literal pool
+words — exactly the bytes that are masked.
 
-Belirsizlik dürüstçe işaretleniyor: `toupper`/`_toupper` ve `_exit`/`_kill`
-çiftlerinin gövdeleri birbirinin aynısı olduğu için hangisinin o adreste
-durduğu byte'lardan anlaşılamıyor. Bunlar `documented` değil `discovered`
-olarak kaydediliyor ve alternatif isim nota yazılıyor.
+Ambiguity is flagged honestly: because the bodies of the `toupper`/`_toupper` and
+`_exit`/`_kill` pairs are identical to each other, the bytes cannot tell which
+one sits at a given address. These are recorded as `discovered` rather than
+`documented`, with the alternative name written into the note.
 
-`isinf` ve `isnan` Ghidra'nın fonksiyon haritasında hiç yok — yani bu yöntem
-yalnızca isim vermiyor, **kaçırılmış fonksiyonları da keşfediyor.**
+`isinf` and `isnan` are absent from Ghidra's function map entirely — so this
+method does not only supply names, it **also discovers missed functions.**
 
-### Nesne düzeyinde yerleştirme denendi — çalışmıyor
+### Object-level placement was attempted — it does not work
 
-Bir fonksiyonun yerini bilince nesnesinin tabanı hesaplanabilir, oradan da
-nesnedeki bütün fonksiyonlar tek seferde çıkabilirdi. Denendi, olmadı.
+Once a function's location is known, its object's base could be computed, and
+from there every function in the object could fall out at once. This was
+attempted; it did not work.
 
-`make libc-align FUNC=remap_handle ADDR=0x0807180C` bunu gösteriyor:
+`make libc-align FUNC=remap_handle ADDR=0x0807180C` demonstrates it:
 
 ```
 findslot                     0x080717EC     30  26/26 TAM
@@ -118,65 +119,67 @@ wrap                         0x080718F0     24  0/24
 ...
 ```
 
-İlk iki fonksiyon birebir, üçüncüsü kısmen, sonrası tamamen kayıyor. Sebep:
-**ROM'un newlib'i aynı kaynaktan ama farklı yapılandırmayla derlenmiş.**
-`findslot`/`remap_handle` gibi yapılandırmadan bağımsız yardımcılar birebir
-aynı çıkıyor; sistem çağrısı saplamaları (`_read`, `_write`, `_open`, `_sbrk`)
-ise GBA'da işletim sistemi olmadığı için oyuna özel yazılmış ve boyutları
-farklı. Bir fonksiyonun boyutu değişince sonraki her şey öteleniyor.
+The first two functions match exactly, the third partially, and everything after
+that drifts completely. The reason: **the ROM's newlib was built from the same
+source but with a different configuration.** Configuration-independent helpers
+such as `findslot`/`remap_handle` come out identical, while the system call stubs
+(`_read`, `_write`, `_open`, `_sbrk`) were written specifically for the game
+because the GBA has no operating system, and their sizes differ. Once one
+function's size changes, everything after it shifts.
 
-Dolayısıyla **fonksiyon düzeyinde maskeli arama tavandır**; nesne düzeyi
-yerleştirme bu ROM için mümkün değil. `make libc-align` tanı aracı olarak
-kaldı: bir nesnenin hangi kısmının ortak, hangi kısmının oyuna özel olduğunu
-gösterir.
+So **function-level masked search is the ceiling**; object-level placement is not
+possible for this ROM. `make libc-align` remains as a diagnostic tool: it shows
+which part of an object is shared and which part is game-specific.
 
-Kod kuyruğu (`0x08070000` sonrası) 69 fonksiyon / 6870 byte, toplam kod
-gövdesinin %2.4'ü. `0x0806F000-0x08071E00` bandında 74 fonksiyon / 10478 byte.
+The code tail (after `0x08070000`) is 69 functions / 6870 bytes, 2.4% of the
+total code body. The `0x0806F000-0x08071E00` band holds 74 functions / 10478
+bytes.
 
-## Geliştirici tanımlayıcı tablosu
+## Developer identifier table
 
-`0x03CEF38–0x03E30A4` arasında **5032 tanımlayıcı** var — geliştiricinin kendi
-isimleri, oyun metni değil:
+Between `0x03CEF38` and `0x03E30A4` there are **5032 identifiers** — the
+developers' own names, not game text:
 
 ```
 brief_multi3_5c    g_manana4_port1    start_asuka7
 e_wantedlevel_last3    l_vehicletest3_rn1    grptrafficpolicelevel2
 ```
 
-Önek dağılımı: `e_` 1119, `l_` 661, `brief_` 321, `grp` 12, `loc` 6, diğer 2913.
-`brief_` bölgesinde kayıtlar 16 byte aralıklı — sabit boyutlu bir dizi.
+Prefix distribution: `e_` 1119, `l_` 661, `brief_` 321, `grp` 12, `loc` 6, other
+2913. In the `brief_` region the records are 16 bytes apart — a fixed-size array.
 
-Bu tablo görev/varlık arama sistemini adlandırmaya ve ona başvuran kod
-tablolarını tanımaya yarar.
+This table helps name the mission/entity lookup system and recognize the code
+tables that reference it.
 
-## Crawfish soy bağı — retail ROM devralınmış bir kod tabanı
+## The Crawfish lineage — the retail ROM is an inherited codebase
 
-Retail oyunu **Digital Eclipse** yaptı, ama ROM iki ayrı **Crawfish Interactive**
-izi taşıyor:
+The retail game was made by **Digital Eclipse**, but the ROM carries two separate
+**Crawfish Interactive** traces:
 
-1. **`CRAWSAVE` imzası.** `InitSaveSystem` (`0x0800082C`) EEPROM metadata'sının
-   ilk 8 byte'ını karakter karakter `'C' 'R' 'A' 'W' 'S' 'A' 'V' 'E'` ile
-   karşılaştırıyor. Dize ROM'da bitişik olarak *saklanmıyor* — karşılaştırma
-   komutlarında gömülü sabitler hâlinde. (Bu yüzden düz metin araması bulamaz.)
-2. **Araç fizik debug menüsü.** TCRF'in Crawfish prototipi için belgelediği
-   "Press A and B to toggle car physics test" özelliği retail ROM'da hâlâ
-   duruyor (aşağıdaki tablo).
+1. **The `CRAWSAVE` signature.** `InitSaveSystem` (`0x0800082C`) compares the
+   first 8 bytes of the EEPROM metadata character by character against
+   `'C' 'R' 'A' 'W' 'S' 'A' 'V' 'E'`. The string is *not* stored contiguously in
+   the ROM — it exists as constants embedded in the comparison instructions.
+   (That is why a plain text search does not find it.)
+2. **The vehicle physics debug menu.** The "Press A and B to toggle car physics
+   test" feature that TCRF documented for the Crawfish prototype is still present
+   in the retail ROM (see the table below).
 
-TCRF'e göre proje Crawfish'ten devralındı; Crawfish Kasım 2002'de kapandı.
-Bu iki iz, Digital Eclipse'in sıfırdan başlamak yerine **Crawfish'in kod
-tabanını devraldığını** gösteriyor. Yani 16 Nisan 2002 tarihli prototip,
-"farklı bir oyun" olsa da aynı motor soyundan geliyor olabilir.
+According to TCRF the project was inherited from Crawfish, and Crawfish closed in
+November 2002. These two traces indicate that Digital Eclipse **took over
+Crawfish's codebase** rather than starting from scratch. So the prototype dated
+16 April 2002, though "a different game," may come from the same engine lineage.
 
-## Debug izleri
+## Debug traces
 
-`0x03E3554`: `!!! ASSERT cam(0x%x 0x%x 0x%x) %s : %d` — kamera debug'ı.
+`0x03E3554`: `!!! ASSERT cam(0x%x 0x%x 0x%x) %s : %d` — camera debugging.
 
-**TCRF'in adresleri ABD sürümüne ait; Avrupa ROM'unda kaymış hâlde.**
-Avrupa karşılıkları:
+**TCRF's addresses are for the US version; they are shifted in the European
+ROM.** The European equivalents:
 
-| İçerik | TCRF (ABD) | Avrupa (bizim) |
+| Content | TCRF (US) | Europe (ours) |
 |---|---|---|
-| Debug menü başlangıcı | `0x3E31A8` | `0x3E40BC` |
+| Debug menu start | `0x3E31A8` | `0x3E40BC` |
 | `CAR PHYSICS TEST` | — | `0x3E4184` |
 | `PLACEHOLDER` | `0x7C9624` | `0x7C99D4` |
 | `FLAKEY CHECK ON` | `0x7C76DC` | `0x7C7A8C` |
@@ -184,61 +187,65 @@ Avrupa karşılıkları:
 | `KILL FRENZY` | `0x7C7CA4` | `0x7C8054` |
 | `MULTI PLAYER` | `0x7C93AC` | `0x7C975C` |
 
-### Araç fizik alan adları — struct için hazır isimler
+### Vehicle physics field names — ready-made names for the struct
 
-`0x03E4198`'den itibaren **8 byte aralıklı sabit dizi**. Bunlar geliştiricinin
-araç yapısı için kullandığı kendi alan adları; araç alt sistemine gelindiğinde
-`unk_14` yerine gerçek isimler kullanılabilir:
+Starting at `0x03E4198` there is a **fixed array with an 8-byte stride**. These
+are the developers' own field names for the vehicle structure; when the vehicle
+subsystem is reached, real names can be used instead of `unk_14`:
 
-| Adres | Etiket | Adres | Etiket |
+| Address | Label | Address | Label |
 |---|---|---|---|
 | `0x03E4198` | `SPEED` | `0x03E41D8` | `ROLL` |
 | `0x03E41A0` | `ACCEL` | `0x03E41E0` | `TILT` |
 | `0x03E41A8` | `FACE` | `0x03E41E8` | `VEL` |
 | `0x03E41B0` | `DIR` | `0x03E41F0` | `POS` |
 | `0x03E41B8` | `ROTSP` | `0x03E41F8` | `HBRAKE` |
-| `0x03E41C0` | `RADIUS` | `0x03E4200` | *(boş)* |
+| `0x03E41C0` | `RADIUS` | `0x03E4200` | *(empty)* |
 | `0x03E41C8` | `FCOLL` | `0x03E4208` | `HORN` |
 | `0x03E41D0` | `ACOLL` | | |
 
-`0x03E40BC`'de ayrıca `CUSTOM 0` – `CUSTOM 10`, 15 byte aralıklı.
+At `0x03E40BC` there are also `CUSTOM 0` – `CUSTOM 10`, with a 15-byte stride.
 
-Oyunda erişilebilir debug özellikleri de var (TCRF):
+There are also debug features reachable in-game (TCRF):
 
-- **Cheat Mode:** oyun sırasında A + B + Start → "CHEAT MODE ON" ve ekranda
-  karakter koordinatları. Koordinat göstergesi dinamik doğrulama için kullanışlı.
-- **Level Select:** ana menüde Sol, Sağ, Yukarı, Aşağı, L, R, sonra Start basılı
-  tutup A. Üçüncü menü seçeneğinin altında ok belirir.
+- **Cheat Mode:** during play, A + B + Start → "CHEAT MODE ON" and the
+  character's coordinates on screen. The coordinate display is useful for dynamic
+  verification.
+- **Level Select:** at the main menu, Left, Right, Up, Down, L, R, then hold
+  Start and press A. An arrow appears under the third menu option.
 
-## Kaynak dosya adları: yok
+## Source file names: none
 
-`FILE=[%s]` biçimi `__FILE__` geçirildiğini gösteriyor, ama ROM'da hiçbir
-kaynak dosya yolu veya uzantısı yok. Assert'ler yayın derlemesinde muhtemelen
-devre dışı bırakılmış ve dize argümanları elenmiş. Çeviri birimi adları bu
-yoldan kurtarılamıyor.
+The `FILE=[%s]` format shows that `__FILE__` was passed, but the ROM contains no
+source file path or extension. The asserts were most likely disabled in the
+release build and the string arguments eliminated. Translation unit names cannot
+be recovered this way.
 
-## Diğer veri adresleri (TCRF)
+## Other data addresses (TCRF)
 
-| Adres | İçerik |
+| Address | Content |
 |---|---|
-| `0x349104` | Kullanılmayan görev metni |
+| `0x349104` | Unused mission text |
 | `0x3BC6B5` | "SAY HELLO TO MR PAGER" |
-| `0x3CDB9C` | Kesilen çok oyunculu mod metni |
-| `0x7C7490` | Araç adları (kesilenler dahil) |
-| `0x7C7D48` | Kesilen görev metni |
-| `0x7C88E4` | Çok oyunculu görev adları |
-| `0x7C949C` | Acil durum araç adları |
+| `0x3CDB9C` | Cut multiplayer mode text |
+| `0x7C7490` | Vehicle names (including cut ones) |
+| `0x7C7D48` | Cut mission text |
+| `0x7C88E4` | Multiplayer mission names |
+| `0x7C949C` | Emergency vehicle names |
 
-## Prototip — sınırlı değer
+## The prototype — limited value
 
-TCRF'in belgelediği prototip **16 Nisan 2002 tarihli, Crawfish Interactive'in
-teknoloji demosu**: tek küçük alan, tek taksi, tuning ekranı ve araç fizik testi.
-GTA III portu olarak planlanan ilk aşamadan geliyor; retail oyunu Digital Eclipse
-yaptı ve oyun içeriği tamamen farklı.
+The prototype documented by TCRF is **Crawfish Interactive's technology demo
+dated 16 April 2002**: a single small area, one taxi, a tuning screen, and the
+vehicle physics test. It comes from the initial phase planned as a GTA III port;
+the retail game was made by Digital Eclipse and its game content is entirely
+different.
 
-Yine de yukarıdaki soy bağı nedeniyle motor kodu ortak olabilir. Prototipin
-sembol tablosu taşıyıp taşımadığı bilinmiyor — Hidden Palace'ta dump'lanmış
-durumda. İncelenirse öncelik sırası: sembol/debug bölümü var mı, `CRAWSAVE`
-imzası ve araç fizik menüsü aynı mı, ortak fonksiyon gövdeleri var mı.
+Even so, because of the lineage above, the engine code may be shared. Whether the
+prototype carries a symbol table is unknown — it is dumped on Hidden Palace. If
+it is examined, the priority order is: does it have a symbol/debug section, are
+the `CRAWSAVE` signature and vehicle physics menu the same, and are there shared
+function bodies.
 
-Not: prototip ROM'u bu depoya girmez ve yasal edinim kullanıcının sorumluluğundadır.
+Note: the prototype ROM does not enter this repository, and legal acquisition is
+the user's responsibility.

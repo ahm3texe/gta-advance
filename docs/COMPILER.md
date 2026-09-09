@@ -1,238 +1,245 @@
-# Derleyici kimliği: agbcc
+# Compiler identity: agbcc
 
-## Sonuç
+## Conclusion
 
-GTA Advance (Avrupa), **`old_agbcc`** ile derlenmiştir — Nintendo'nun resmî GBA
-SDK'sıyla dağıttığı GCC 2.8.1 tabanlı derleyicinin *eski* varyantı. Aynı
-derleyici ailesi pokeruby ve pokeemerald decomp'larında da kullanılıyor.
+GTA Advance (Europe) was compiled with **`old_agbcc`** — the *old* variant of the
+GCC 2.8.1-based compiler that Nintendo shipped with the official GBA SDK. The
+same compiler family is used by the pokeruby and pokeemerald decompilations.
 
-Bunun anlamı: **C'den byte-matching üretmek mümkün.** Proje semantik yeniden
-inşaya mecbur değil.
+What this means: **byte-matching output from C is possible.** The project is not
+forced into semantic reconstruction.
 
-## Kanıt 1 — kod kalıpları
+## Evidence 1 — code patterns
 
-Derleyiciler aynı işi yapmanın birden fazla yolundan hep aynısını seçer.
-İlk 42 doğrulanmış fonksiyonda (o aşamada 2874 satır assembly):
+Compilers consistently pick the same one of several ways to do the same job.
+Across the first 42 verified functions (2874 lines of assembly at that stage):
 
-| Kalıp | agbcc | modern GCC/Clang | ROM'da |
+| Pattern | agbcc | modern GCC/Clang | In the ROM |
 |---|---|---|---|
-| Register kopyalama | `adds rX, rY, #0` | `movs rX, rY` | **84 / 0** |
-| Fonksiyondan dönüş | `pop {rN}` + `bx rN` | `pop {..., pc}` | **28 / 0** |
+| Register copy | `adds rX, rY, #0` | `movs rX, rY` | **84 / 0** |
+| Function return | `pop {rN}` + `bx rN` | `pop {..., pc}` | **28 / 0** |
 
-Dönüş kalıbının sebebi: ARMv4T'de `pop {pc}` Thumb/ARM modu geçişi yapmaz,
-`bx` yapar. Eski derleyiciler her zaman güvenli uzun yolu kullanırdı.
+The reason for the return pattern: on ARMv4T, `pop {pc}` does not switch between
+Thumb and ARM mode, whereas `bx` does. Older compilers always took the safe long
+route.
 
-## Kanıt 2 — byte düzeyinde doğrulama
+## Evidence 2 — byte-level verification
 
-`src/save/save_helpers.c` içindeki C, agbcc ile derlenip ROM'la karşılaştırıldı:
+The C in `src/save/save_helpers.c` was compiled with agbcc and compared against
+the ROM:
 
 ```
-ReadU8        4 byte   BYTE-MATCHING  (0x080010F8)
-ReadU16LE    12 byte   BYTE-MATCHING  (0x080010FC)
-ReadU32LE    24 byte   BYTE-MATCHING  (0x08001108)
-WriteU8       4 byte   BYTE-MATCHING  (0x08001120)
-WriteU16LE   12 byte   BYTE-MATCHING  (0x08001124)
-WriteU32LE   28 byte   BYTE-MATCHING  (0x08001130)
+ReadU8        4 bytes   BYTE-MATCHING  (0x080010F8)
+ReadU16LE    12 bytes   BYTE-MATCHING  (0x080010FC)
+ReadU32LE    24 bytes   BYTE-MATCHING  (0x08001108)
+WriteU8       4 bytes   BYTE-MATCHING  (0x08001120)
+WriteU16LE   12 bytes   BYTE-MATCHING  (0x08001124)
+WriteU32LE   28 bytes   BYTE-MATCHING  (0x08001130)
 ```
 
-**Sekiz fonksiyonun tamamı byte-matching** (`WriteU16LE` sonradan
-çözüldü; aşağıdaki "Açık kalan" bölümü kaldırıldı).
+**All eight functions are byte-matching** (`WriteU16LE` was solved later; the
+"Left open" section below was removed).
 
-`WriteU32LE` belirleyici olan: 28 byte'ın tamamı birebir, üstelik maskeyi
-literal havuzdan okumak yerine iki kez `mov #0xff` + `lsl` ile yeniden kurma
-gibi ayırt edici bir tercihle. Yanlış derleyici bunu üretemez.
+`WriteU32LE` is the decisive one: all 28 bytes exact, and with a distinctive
+choice — rebuilding the mask with two `mov #0xff` + `lsl` instructions rather
+than reading it from the literal pool. The wrong compiler cannot produce that.
 
-## Kanıt 3 — derleyici varyantı ayrımı
+## Evidence 3 — discriminating the compiler variant
 
-Aynı C kaynağı, altı derleyici/optimizasyon kombinasyonuyla denendi:
+The same C source was tried with six compiler/optimization combinations:
 
-| Derleyici | `-O2` | `-O1` | `-O0` |
+| Compiler | `-O2` | `-O1` | `-O0` |
 |---|---|---|---|
 | `agbcc` | 3/6 | 3/6 | 0/6 |
 | **`old_agbcc`** | **5/6** | 5/6 | 0/6 |
 
-`old_agbcc -O2`, C'yi hiç değiştirmeden `ReadU16LE` ve `ReadU32LE`'yi de
-tutturuyor. `agbcc`'nin bu ikisinde ürettiği fazladan işaretçi kopyası farkı,
-iki varyant arasındaki register dağıtımı değişikliğinden geliyor.
+`old_agbcc -O2` also gets `ReadU16LE` and `ReadU32LE` right without any change to
+the C. The extra pointer copy `agbcc` generates in those two comes from the
+register allocation difference between the two variants.
 
-`-O0` her ikisinde de sıfır veriyor (yığın çerçevesi ekliyor), yani ROM
-optimize edilmiş derlenmiş.
+`-O0` gives zero with both (it adds a stack frame), so the ROM was compiled
+optimized.
 
-## Bayraklar
+## Flags
 
 ```
 old_agbcc -mthumb-interwork -O2 -fhex-asm
 ```
 
-Bazı çeviri birimleri farklı derleyici veya seviye kullanıyor olabilir;
-`make c-match FILE=... --cc=agbcc` ile diğer varyant denenebilir.
+Some translation units may use a different compiler or level; the other variant
+can be tried with `make c-match FILE=... --cc=agbcc`.
 
-## C yazım kuralları (ölçülerek bulundu)
+## C writing rules (found by measurement)
 
-Her biri en az bir fonksiyonu eşleşmeden eşleşir hâle getirdi:
+Each of these turned at least one function from non-matching to matching:
 
-| # | Kural | Neden |
+| # | Rule | Why |
 |---|---|---|
-| 1 | **RAM adresleri `extern` sembol olmalı**, `#define ((T*)0xADDR)` değil | Sabit olunca agbcc `taban+ofset`'i ayrı literale katlıyor; ROM tabanı register'da tutuyor |
-| 2 | Dizi elemanının üyesine erişimde **iki biçim de farklı kod üretir**; ROM'a bakıp seçilir | `dizi[i].alan` agbcc'ye alan ofsetini taban literaline katlatabilir (`.word taban+0x3c`); `p = &dizi[i]; p->alan` ofseti yükleme komutunda bırakır. Hangisinin doğru olduğu fonksiyona göre değişir — `entity_flags.c` ikinciyi, başka ölçümler birinciyi gerektirdi. Kural 23 bu kuralın ikinci yarısıydı, birleştirildi |
-| 3 | **Yığındaki geçici tampon `volatile` olmalı** | Değilse agbcc adres alma ile sabit yüklemeyi yeniden sıralıyor |
-| 4 | **`volatile` her erişim için ayrı denenir** | Sıralama düğmesidir, semantik değil: `gBiosIrqFlags` için kaldırmak, `REG_IF` için eklemek gerekti — aynı `x \|= sabit` biçiminde |
-| 5 | Dış semboller `.equ` ile assembler'a verilir | Linker'a bırakılınca interworking veneer'i sokuluyor |
-| 6 | Bölüm adresi link betiğinde sabitlenir (`SUBALIGN(1)`) | agbcc `.text`'i 8'e hizalıyor, taban 8'in katı değilse her ölçüm kayıyor |
-| 7 | Üretilen assembly'nin sonuna `.align 2, 0` eklenir | `as` Thumb bölümünü NOP ile dolduruyor, ROM sıfırla |
-| 8 | Dizi temizleme döngüsü **ileriye** yazılır (`i = 0; i < N; i++`) | agbcc bunu geriye giden işaretçi yürüyüşüne çeviriyor; ROM'daki biçim odur. Elle geriye yazmak farklı kod üretir |
-| 9 | Döngü indeksi **işaretli** (`int`) olmalı | İşaretçi karşılaştırması işaretsiz dal (`bcs`) üretir; ROM işaretli (`bge`) kullanıyor |
-| 10 | Zincirleme atama (`a = b = c`) ayrı satırlardan farklı kod üretir | ROM'daki biçim zincirleme; ayrı yazınca adres hesabı ters sıraya geçiyor |
-| 11 | Çağrılar boyunca yaşayan adres **başta yerel değişkene** alınır | ROM onu callee-saved register'da tutuyor; kullanıldığı yerde okunursa derleyici hoist etmiyor |
-| 12 | Kaydet/geri-yükle çifti olan register (`REG_IME`) `volatile` olmalı | Değilse derleyici iki kritik bölümün kaydetmelerini birleştiriyor |
-| 13 | Uzunluk/boyut parametreleri **işaretsiz** olabilir | `save_slots`'ta tek fark `ble` ↔ `bls` idi: `length` `u32` olunca eşleşti |
-| 14 | Tekrar eden byte kopyaları **açık yazılır**, döngüye sarılmaz | `-funroll-loops` ROM'unkinden farklı kod üretiyor (136B/127 fark → 256B/239); sekiz kopya elle yazılınca tam eşleşme |
-| 15 | Dar parametrenin **işaretliliği** giriş normalizasyonunu belirler | `s16` parametre `lsls #16`/`lsrs #16` çifti üretir, `u16` üretmez. `WriteU16LE` bunun kanıtı |
-| 16 | Kural 11'de **atama yeri** önemli, bildirim yeri değil | `payload = &g...` başta ilklendirilirse ömür fazla uzuyor ve dağıtım kayıyor (220/240 fark); atama kullanımın hemen önüne alınınca eşleşiyor |
-| 17 | Tek adres için **her biri tek kullanımlı iki ayrı yerel** gerekebilir | Tek işaretçiyi iki yerde kullanmak agbcc'ye hesabı fonksiyon başına kaldırtıyor; ROM'daki `adds r3, r4, #0` ancak iki değişkenle çıkıyor |
-| 18 | Argümanı **ayrı deyimde** yerele okumak argüman kurma sırasını çevirir | `f(480, gSlotCount)` sabiti önce kuruyor; `count = gSlotCount;` ara satırı ROM'un sırasını veriyor |
-| 19 | Döngü öncesi atamaların **kaynak sırası** korunur | agbcc kaynak atamalarını kaynak sırasında, kendi ürettiği sayaç ilklendirmelerini döngü başına bitişik yayıyor; sırayı değiştirmek 13-14 bayt fark bırakıyor |
-| 20 | 4 bayt hizalı ama halfword yazılan yığın yuvası için **`u16 x[2]` dizisi** | Dizi BLKmode olduğu için bildirim sırasında ve 4 bayta hizalı yerleşiyor; `x[0]=0` yine `strh` üretiyor, `(u32)x` adresi tek komutta veriyor. Skaler `u16` çerçeveyi 12 bayta düşürüyor, `u32` yazımı word yapıyor |
-| 21 | Döngü içinde kullanılan **sabit atamaları döngünün içine** yazılır | Döngü önüne yazılırsa agbcc onu kaynak deyimi olarak preheader kopyalarından *önce* yayıyor; içine alınınca döngü-değişmezi taşıyıcısı preheader'ın sonuna koyuyor ve sıra ROM'unkine oturuyor |
-| 22 | Aynı tabanın kopyası değil, **sabitten yeniden atama** yazılır | `b = a;` yazılırsa agbcc iki değişkeni birleştirip tek işaretçiye dönüyor; `b = (T *)ADRES;` ayrı ömür veriyor |
-| 24 | Yedi bitlik alan için **bitfield** yazılır, maske değil | `x & 0x7F` yerine `u8 f : 7` — ROM `lsls #25`/`lsrs #25` çifti üretiyor |
-| 25 | Genel değişken okuması, kullanıldığı yerde değil **ayrı deyimde** yapılabilir | `if (g[26] != 0)` ile `v = g[26]; if (v != 0)` farklı sıralama üretiyor |
-| 26 | Dar **struct alanının** işaretliliği maskenin genişliğini belirler | `s8 flags` ile `flags &= ~4` maskeyi 32 bit tutuyor (`movs #5`/`negs`); `u8` ile bayta daraltıyor (`movs #251`). Kural 15'in alan hâli. İkinci ölçüm: `InitActor`'da 0x8A/0xA8 alanlarını `s8` yapmak farkı 40 → 14 bayta indirdi |
-| 27 | Ham değer ve türevi **tek değişkende** tutulabilir | `index = id; index = (u16)(index - 1);` ayrı iki değişkenden farklı register dağıtımı veriyor |
-| 30 | Seyrek `case` değerleri geniş bir aralığa yayılıyorsa **`||` karşılaştırma zinciri** yazılır, `switch` değil | `switch` (case 21..57 arasında 6 değer) agbcc'ye 37 girişli atlama tablosu ürettiriyor: 64 bayt yerine 212. ROM'un `cmp`/`beq` zinciri ancak `if (k == 57 \|\| k == 25 \|\| ...)` ile çıkıyor, **kaynak sırası ROM'un karşılaştırma sırasıyla aynı olmalı**. Kural 19'un (yoğun `switch` → atlama tablosu) tersi |
-| 32 | Ardışık kelime kopyası için **struct atama** yazılır, `*dest++ = *src++;` değil | agbcc `*p++ = *q++;` üçlüsünü üç ayrı `ldr/str` üretir (12 komut). `typedef struct { u32 a,b,c; } Triple;` bildirip `*(Triple*)dest = *(Triple*)src;` yazmak `ldmia/stmia {r0,r1,r2}` çiftini tetikler (2 komut). `0x08031FB4`'te 54 → 27 bayt fark (ölçüm yapıldı; dosya sonradan parktan çıkarılıp silindi). `memcpy` çağrısı yaptırmaz — struct atama gerekiyor |
-| 31 | Döngü sayacının işaretliliği `bls` (unsigned) vs `ble` (signed) dallanma seçimini belirler | `for (u32 i = 0; i <= N; i++)` → `bls`; `for (s32 i = 0; i <= N; i++)` → `ble`. ROM her ikisini de kullanır — hangisinin çıktığını sayaç tipi belirler. `slot_scan.c`'de tek başına 1 bayt farkı 0'a indirdi. `MaybeAdvance`'in park nedeni buydu; oradaki `u16 counter` yerine `int counter` denenebilir |
-| 29 | İki dal aynı işi yapıyorsa **erken `return` + ortak kuyruk** yazılır, ortak değişkene atama değil | `if (k) { p->h = A; return; } ... p->h = B;` ROM'daki gibi iki ayrı kopya üretiyor; `handler = A else B; p->h = handler;` agbcc'ye dalları birleştirtiyor (cross-jumping) ve 39 bayt fark veriyor |
-| 28 | Ölçekli tabana iki terim eklenirken **işaretçi aritmetiği** ile **dizi indeksi** farklı kod üretir | `*(t + x + (y << s))` her terimi ayrı ölçekliyor (`lsl` + `lsl` + iki toplama); `t[x + (y << s)]` önce toplayıp bir kez ölçekliyor. `IsTileTypeInRange`'de dizi biçimi 33 bayt fark **ve** gereksiz bir `push {r4,lr}` veriyordu, işaretçi biçimi 3'e indirip fonksiyonu yaprak yaptı |
-| 33 | Değişkeni sabitle maskelemek için sabiti **ayrı sonuç yereline** koyup yerinde `&=` kullan | `return (flags & 3) << 8` sonucu `flags` register'ında tutarken; `mask = 3; mask &= flags; return mask << 8` sonucu sabitin register'ında tutar. `QueryEntity` 2 bayt farktan birebir eşleşmeye geçti |
-| 34 | Aynı sıfır dönüşüne giden null kontrollerini gerekirse **açık erken dönüşler** olarak yaz | İç içe `if` eşdeğer semantiğe rağmen ortak sıfır bloğunu değer bloğundan sonra kurdu. `if (!p) return 0;` zinciri `ProbeObject` ve `GetInnerId`de ROM blok sırasını ve literal havuzu yerleşimini üretti |
-| 35 | Çağrıdan sonra `pop {r0}; bx r0` varsa sarmalayıcının dönüş tipi büyük olasılıkla **`void`** | `u32` dönüşte r0 canlı kaldığı için agbcc dönüş adresini r1'e alır. `CallWithOffset` imzasını `void` yapmak 10 baytlık register/epilog farkını tamamen kapattı |
-| 36 | Bellek adresi sabit yazımdan önce kurulacaksa hedef alanın **işaretçisini önce ayrı yerele al** | `tail = &actor->unk90; i = 0; *tail = i` sırası agbcc'ye önce adresi, sonra sıfır sabitini kurdurdu. `InitActor`ın son komut-sırası farkını kapattı |
-| 37 | Aynı tabandan türeyen paralel yürüyüşlerde **tabanı da ayrı yerel olarak koru** | Doğrudan `cur = g; kind = cur + 100` tabanı `cur` ile birleştirdi. `base = g; kind = base + 100; cur = base` ROM'daki ayrı r0/r1/r2 yaşamlarını ve literal havuzu yerleşimini üretti; `HasWantedEntry` 25 bayt farktan eşleşmeye geçti |
-| 38 | Erken karşılaştırma ile sondaki store aynı değeri taşısa bile ROM ayrı dal istiyorsa değeri ve **taban kopyasını karşılaştırmadan önce** ayır | `current = h->current; h2 = h; if (value == current) return;` biçimi agbcc'nin eşitlik yolunu sondaki store ile birleştirmesini engelledi ve `PushHistory`de 31 bayt farkı kapattı |
-| 39 | ROM yalnız belirli bir yazımdan sonra belleği yeniden okuyorsa `volatile`ı **tüm alana değil o erişime** uygula | `*(volatile u16 *)&gSaveBuffer.distance` yalnız taşma kontrolündeki ikinci `ldrh`yi zorladı. Alanı bütünüyle volatile yapmak register baskısını artırıp `AddDistance`ı 53 bayt bozarken dar kullanım fonksiyonu eşleştirdi |
-| 40 | ROM iki dalda ayrı taban yükleyip tek store paylaşıyorsa kontrol akışını **etiketlerle açık kur** | Yapısal `if/else` agbcc tarafından ters çevrilip tabanlar birleştirildi. `reset:`, `increment:` ve `store:` etiketleri `BumpOrReset`ın iki `ldr` + ortak `strb` düzenini üretti; bu, temiz C içinde kabul edilebilir düşük seviye CFG ifadesidir |
-| 41 | Ölçekli ofset birden çok tabanda kullanılacaksa çarpımı **tek atamada**, alan tabanlarını ayrı yerellerde kur | `scaled = index; scaled *= 180` pseudo önceliğini artırıp r3/r4'ü ters çevirdi. `scaled = index * 180` ile `heldBase`/`extraBase` ayrımı `ReleaseSlot`ta ROM'un tek r3 ofset + iki taban desenini üretti |
-| 42 | ROM azalan bir döngü sayacı kullansa da C'de **artan indeksli `for`** denenmeli | `FlushSpriteList`te `for (i = count; i < left; i++)`, agbcc tarafından `left - count` kadar azalan döngüye çevrilir. Derleyicinin ürettiği çıkarma sabit kurulumlarından sonra gelir; elle yazılmış `left -= count` önce geliyordu. Kalan 9 bayt fark kapandı: 112/112 |
-| 43 | Sayaç ve işaretçi birlikte ilerliyorsa **ikisini `for` artırımında, ROM sırasıyla** ifade et | `InitSpritePool`da gövdedeki `node++`, sayaç azaltımından önce geliyordu. `for (...; ...; i++, node++)` biçimi ROM'un sayaç-önce sırasını üretti: 4 bayt fark kapandı, 124/124 |
-| 44 | Karşılaştırma sabitini **yerel değişkene al**: `hi = 15; if (x < hi)` | agbcc literal karşılaştırmayı kanonikleştiriyor (`< 15` → `<= 14`, `bls`); ROM'da `cmp #15 / bcc` görülüyorsa literal yazımın hiçbir çeşidi tutmaz. Sabit değişkene alınınca kanonikleştirme atlanır ve sabit yine immediate olarak yayılır. `EitherInRange`: 8/44 → 44/44. Permuter'ın bulduğu kaldırma + kalan sınırın elle kaldırılması. |
+| 1 | **RAM addresses must be `extern` symbols**, not `#define ((T*)0xADDR)` | As a constant, agbcc folds `base+offset` into a separate literal; the ROM keeps the base in a register |
+| 2 | When accessing a member of an array element, **both forms generate different code**; pick by looking at the ROM | `array[i].field` can make agbcc fold the field offset into the base literal (`.word base+0x3c`); `p = &array[i]; p->field` leaves the offset in the load instruction. Which is correct varies by function — `entity_flags.c` needed the second, other measurements the first. Rule 23 was the second half of this rule and was merged in |
+| 3 | **A temporary buffer on the stack must be `volatile`** | Otherwise agbcc reorders the address-taking against the constant load |
+| 4 | **`volatile` is tried separately for each access** | It is an ordering knob, not a semantic one: it had to be removed for `gBiosIrqFlags` and added for `REG_IF` — in the same `x \|= constant` form |
+| 5 | External symbols are given to the assembler with `.equ` | Left to the linker, an interworking veneer is inserted |
+| 6 | The section address is fixed in the link script (`SUBALIGN(1)`) | agbcc aligns `.text` to 8; if the base is not a multiple of 8 every measurement shifts |
+| 7 | `.align 2, 0` is added at the end of the generated assembly | `as` pads the Thumb section with NOP, the ROM with zero |
+| 8 | An array-clearing loop is written **forward** (`i = 0; i < N; i++`) | agbcc turns it into a backward pointer walk, which is the form in the ROM. Writing it backward by hand produces different code |
+| 9 | The loop index must be **signed** (`int`) | A pointer comparison generates an unsigned branch (`bcs`); the ROM uses a signed one (`bge`) |
+| 10 | A chained assignment (`a = b = c`) generates different code from separate lines | The ROM's form is chained; written separately, the address computation flips order |
+| 11 | An address that lives across calls is taken into a local **at the top** | The ROM keeps it in a callee-saved register; read at the point of use, the compiler does not hoist it |
+| 12 | A register with a save/restore pair (`REG_IME`) must be `volatile` | Otherwise the compiler merges the saves of the two critical sections |
+| 13 | Length/size parameters may be **unsigned** | In `save_slots` the only difference was `ble` ↔ `bls`: it matched once `length` became `u32` |
+| 14 | Repeated byte copies are **written out explicitly**, not wrapped in a loop | `-funroll-loops` produces different code from the ROM's (136B/127 differences → 256B/239); writing the eight copies by hand gave an exact match |
+| 15 | A narrow parameter's **signedness** determines the entry normalization | An `s16` parameter generates the `lsls #16`/`lsrs #16` pair, a `u16` does not. `WriteU16LE` is the proof |
+| 16 | In rule 11, the **assignment site** matters, not the declaration site | If `payload = &g...` is initialized at the top, the lifetime grows too long and the allocation shifts (220/240 difference); moving the assignment just before the use makes it match |
+| 17 | A single address may need **two separate locals, each used once** | Using one pointer in two places makes agbcc hoist the computation to the top of the function; the ROM's `adds r3, r4, #0` only appears with two variables |
+| 18 | Reading an argument into a local in a **separate statement** flips the argument setup order | `f(480, gSlotCount)` sets up the constant first; an intermediate `count = gSlotCount;` line gives the ROM's order |
+| 19 | The **source order** of pre-loop assignments is preserved | agbcc emits source assignments in source order and its own counter initializations adjacent to the loop head; changing the order leaves a 13-14 byte difference |
+| 20 | For a stack slot that is 4-byte aligned but written as a halfword, use a **`u16 x[2]` array** | Because an array is BLKmode it is placed in declaration order and aligned to 4; `x[0]=0` still generates `strh`, and `(u32)x` gives the address in one instruction. A scalar `u16` drops the frame to 12 bytes, and `u32` makes the write a word |
+| 21 | Constant assignments used inside a loop are written **inside the loop** | Written before the loop, agbcc emits it as a source statement *before* the preheader copies; taken inside, the loop-invariant hoister puts it at the end of the preheader and the order matches the ROM's |
+| 22 | Write a **reassignment from the constant**, not a copy of the same base | With `b = a;` agbcc merges the two variables into one pointer; `b = (T *)ADDRESS;` gives a separate lifetime |
+| 24 | For a seven-bit field write a **bitfield**, not a mask | Instead of `x & 0x7F`, use `u8 f : 7` — the ROM generates the `lsls #25`/`lsrs #25` pair |
+| 25 | A global read can be done in a **separate statement** rather than at the point of use | `if (g[26] != 0)` and `v = g[26]; if (v != 0)` produce different ordering |
+| 26 | A narrow **struct field's** signedness determines the mask width | With `s8 flags`, `flags &= ~4` keeps the mask at 32 bits (`movs #5`/`negs`); with `u8` it narrows to a byte (`movs #251`). The field version of rule 15. Second measurement: in `InitActor`, making the 0x8A/0xA8 fields `s8` reduced the difference from 40 to 14 bytes |
+| 27 | A raw value and its derivative can be held **in one variable** | `index = id; index = (u16)(index - 1);` gives a different register allocation from two separate variables |
+| 30 | If sparse `case` values are spread over a wide range, write an **`\|\|` comparison chain**, not a `switch` | A `switch` (6 values between case 21..57) makes agbcc generate a 37-entry jump table: 212 bytes instead of 64. The ROM's `cmp`/`beq` chain only appears with `if (k == 57 \|\| k == 25 \|\| ...)`, and **the source order must match the ROM's comparison order**. The inverse of rule 19 (a dense `switch` → a jump table) |
+| 32 | For consecutive word copies write a **struct assignment**, not `*dest++ = *src++;` | agbcc generates three separate `ldr/str` pairs for a `*p++ = *q++;` triple (12 instructions). Declaring `typedef struct { u32 a,b,c; } Triple;` and writing `*(Triple*)dest = *(Triple*)src;` triggers the `ldmia/stmia {r0,r1,r2}` pair (2 instructions). At `0x08031FB4` the difference went 54 → 27 bytes (measured; the file was later unparked and deleted). It will not produce a `memcpy` call — a struct assignment is required |
+| 31 | The loop counter's signedness determines the `bls` (unsigned) vs `ble` (signed) branch choice | `for (u32 i = 0; i <= N; i++)` → `bls`; `for (s32 i = 0; i <= N; i++)` → `ble`. The ROM uses both — the counter's type decides which appears. In `slot_scan.c` this alone took a 1-byte difference to 0. This was the reason `MaybeAdvance` was parked; `int counter` could be tried there instead of `u16 counter` |
+| 29 | If two branches do the same work, write an **early `return` + a shared tail**, not an assignment to a common variable | `if (k) { p->h = A; return; } ... p->h = B;` produces two separate copies as in the ROM; `handler = A else B; p->h = handler;` makes agbcc merge the branches (cross-jumping) and leaves a 39-byte difference |
+| 28 | When adding two terms to a scaled base, **pointer arithmetic** and **array indexing** produce different code | `*(t + x + (y << s))` scales each term separately (`lsl` + `lsl` + two additions); `t[x + (y << s)]` adds first and scales once. In `IsTileTypeInRange` the array form gave a 33-byte difference **and** an unnecessary `push {r4,lr}`; the pointer form reduced it to 3 and made the function a leaf |
+| 33 | To mask a variable with a constant, put the constant in a **separate result local** and use `&=` in place | `return (flags & 3) << 8` keeps the result in `flags`'s register; `mask = 3; mask &= flags; return mask << 8` keeps it in the constant's register. `QueryEntity` went from a 2-byte difference to an exact match |
+| 34 | Where necessary, write null checks that lead to the same zero return as **explicit early returns** | Despite equivalent semantics, nested `if`s placed the shared zero block after the value block. An `if (!p) return 0;` chain produced the ROM's block order and literal pool placement in `ProbeObject` and `GetInnerId` |
+| 35 | If `pop {r0}; bx r0` follows a call, the wrapper's return type is most likely **`void`** | With a `u32` return, r0 stays live, so agbcc takes the return address into r1. Making `CallWithOffset`'s signature `void` closed a 10-byte register/epilogue difference entirely |
+| 36 | If a memory address must be set up before a constant write, **take the target field's pointer into a separate local first** | The order `tail = &actor->unk90; i = 0; *tail = i` made agbcc set up the address first and the zero constant second. It closed `InitActor`'s last instruction-order difference |
+| 37 | In parallel walks derived from the same base, **keep the base as a separate local too** | Writing `cur = g; kind = cur + 100` directly merged the base with `cur`. `base = g; kind = base + 100; cur = base` produced the ROM's separate r0/r1/r2 lifetimes and literal pool placement; `HasWantedEntry` went from a 25-byte difference to a match |
+| 38 | Even if an early comparison and the final store carry the same value, if the ROM wants a separate branch, split the value and the **base copy before the comparison** | The form `current = h->current; h2 = h; if (value == current) return;` prevented agbcc from merging the equality path with the final store and closed a 31-byte difference in `PushHistory` |
+| 39 | If the ROM re-reads memory only after a particular write, apply `volatile` **to that access, not the whole field** | `*(volatile u16 *)&gSaveBuffer.distance` forced only the second `ldrh` in the overflow check. Making the field volatile in its entirety increased register pressure and broke `AddDistance` by 53 bytes, while the narrow use made the function match |
+| 40 | If the ROM loads a separate base in two branches and shares one store, **set up the control flow explicitly with labels** | agbcc inverted the structured `if/else` and merged the bases. The labels `reset:`, `increment:`, and `store:` produced `BumpOrReset`'s two `ldr` + shared `strb` layout; this is an acceptable low-level CFG expression within clean C |
+| 41 | If a scaled offset will be used with several bases, compute the product in a **single assignment** and set up the field bases in separate locals | `scaled = index; scaled *= 180` raised the pseudo's priority and inverted r3/r4. With `scaled = index * 180` plus a `heldBase`/`extraBase` split, `ReleaseSlot` produced the ROM's single-r3-offset + two-base pattern |
+| 42 | Even when the ROM uses a decreasing loop counter, an **increasing indexed `for`** should be tried in C | In `FlushSpriteList`, `for (i = count; i < left; i++)` is converted by agbcc into a loop decreasing by `left - count`. The subtraction the compiler generates comes after the constant setups; a hand-written `left -= count` came before. The remaining 9-byte difference closed: 112/112 |
+| 43 | If a counter and a pointer advance together, express **both in the `for` increment, in the ROM's order** | In `InitSpritePool`, the `node++` in the body came before the counter decrement. The form `for (...; ...; i++, node++)` produced the ROM's counter-first order: a 4-byte difference closed, 124/124 |
+| 44 | Take the comparison constant **into a local variable**: `hi = 15; if (x < hi)` | agbcc canonicalizes a literal comparison (`< 15` → `<= 14`, `bls`); if the ROM shows `cmp #15 / bcc`, no variation of the literal spelling will hold. With the constant in a variable, canonicalization is skipped and the constant is still emitted as an immediate. `EitherInRange`: 8/44 → 44/44. Found by the permuter's lifting, plus the remaining bound lifted by hand. |
 
-## Register dağıtımının mekanizması
+## The mechanism of register allocation
 
-Kuralların çoğu (11, 16, 17, 20, 23, 27) aynı tek mekanizmanın yüzleridir.
-agbcc'nin (GCC 2.8.1) global register dağıtıcısı sanal register'ları şu
-önceliğe göre sıralayıp sırayla ilk uygun donanım register'ını verir:
+Most of the rules (11, 16, 17, 20, 23, 27) are faces of the same single
+mechanism. agbcc's (GCC 2.8.1's) global register allocator sorts virtual
+registers by the following priority and gives each, in turn, the first suitable
+hardware register:
 
 ```
-öncelik = floor_log2(referans_sayısı) × referans_sayısı / ömür_uzunluğu
+priority = floor_log2(reference_count) × reference_count / lifetime_length
 ```
 
-Yani bir değişkene **referans eklemek veya çıkarmak**, onun hangi register'a
-düştüğünü ve dolayısıyla *tüm* dağıtımı çevirebilir. `ClearTextArea`'da
-ölçülen:
+So **adding or removing a reference** to a variable can change which register it
+lands in, and therefore flip the *entire* allocation. Measured in
+`ClearTextArea`:
 
-| Değişken | referans / ömür | öncelik |
+| Variable | references / lifetime | priority |
 |---|---|---|
 | `dma` | 9 / 52 | 5192 |
 | `control` | 5 / 21 | 4761 |
 
-Bu sırayla `dma` önce dağıtılıp `r3`'ü kapıyor, ROM'unkinin tersi. Blok 2'deki
-ölü okuma `control` değişkenine atanınca `control` 6 referansa çıkıyor
-(6/22 → 5454 > 5192), önce dağıtılıyor ve `r3`'ü alıyor — `dma` `r4`'e,
-`dest` `r5`'e, IME tabanı `r6`'ya, stride `r7`'ye oturuyor: **ROM'un tam
-dağılımı.** 13 bayt fark 1'e iniyor.
+In that order `dma` is allocated first and takes `r3`, the reverse of the ROM's.
+Once the dead read in block 2 is assigned to the `control` variable, `control`
+rises to 6 references (6/22 → 5454 > 5192), is allocated first, and takes `r3` —
+with `dma` landing in `r4`, `dest` in `r5`, the IME base in `r6`, and the stride
+in `r7`: **exactly the ROM's allocation.** A 13-byte difference drops to 1.
 
-Bu, kural 17'nin ("tek adres için iki ayrı yerel") *neden* çalıştığının da
-cevabıdır: ikinci yerel ömrü bölüp öncelikleri değiştirir.
+This is also the answer to *why* rule 17 ("two separate locals for one address")
+works: the second local splits the lifetime and changes the priorities.
 
-**Pratik sonuç:** register uyuşmazlığında C'yi rastgele kurcalamak yerine
-ilgili değişkenlerin referans sayısını ve ömrünü say; hangisinin önce
-dağıtılması gerektiğini hesapla; referans ekleyip çıkararak sırayı çevir.
+**Practical consequence:** on a register mismatch, instead of tinkering with the
+C at random, count the reference count and lifetime of the variables involved;
+compute which one needs to be allocated first; and flip the order by adding or
+removing references.
 
-Bir uyarı: fonksiyonun tamamı tek bir genişletilmiş temel blokken **bedava
-referans eklenemez**. Her reg-reg kopyası CSE tarafından yayılıp combine
-tarafından siliniyor; `x = x`, ölü `x = 0`, `x |= 0`, `x + 0`, `x ^ x` hepsi
-eleniyor. Referans kazandıran tek şey `volatile` bir erişimdir — o da bir
-operand register'ını değiştirir.
+One caveat: while the whole function is a single extended basic block, **you
+cannot add a free reference**. Every reg-reg copy is propagated by CSE and
+deleted by combine; `x = x`, a dead `x = 0`, `x |= 0`, `x + 0`, and `x ^ x` are
+all eliminated. The only thing that gains a reference is a `volatile` access —
+and that changes an operand's register.
 
-Ölçüm için `old_agbcc -dg` (global) ve `-dl` (yerel) dağıtım dökümü üretir;
-bu depodaki çağrımda dosyalar boş çıktı, formül dolaylı ölçümle doğrulandı.
+For measurement, `old_agbcc -dg` (global) and `-dl` (local) produce an allocation
+dump; in this repository's invocation the files came out empty, and the formula
+was confirmed by indirect measurement.
 
-Kural 20'nin arkasındaki mekanizma genellenebilir: **yığın yerleşimini belirleyen
-şey bildirim sırası değil, tipin BLKmode olup olmadığıdır.** Bir agent 24
-bildirim sırası permütasyonu deneyip yerleşimin hiç değişmediğini ölçtü.
+The mechanism behind rule 20 generalizes: **what determines stack layout is not
+declaration order but whether the type is BLKmode.** One agent tried 24
+declaration-order permutations and measured that the layout never changed.
 
-**Kuralların birbirine bağlı olduğunu unutma.** 18. kural tek başına
-denendiğinde hiçbir şeyi değiştirmiyordu; ancak 16 ve 17 uygulandıktan sonra
-belirleyici oldu — çünkü sıra farkı bağımsız bir düğme değil, register
-baskısının sonucuydu. Bu yüzden "denendi, tutmadı" kaydı tek başına
-değerlendirilmemeli: etkisiz çıkan bir değişiklik, başka bir değişiklikle
-birleştiğinde işe yarayabilir.
+**Do not forget that the rules are interdependent.** Rule 18 changed nothing when
+tried on its own; it only became decisive after 16 and 17 were applied — because
+the ordering difference was not an independent knob but a consequence of register
+pressure. So a "tried, did not hold" record must not be evaluated in isolation:
+a change that came out ineffective may work when combined with another.
 
-`volatile` agbcc'de bir **komut sıralama düğmesidir**, semantik bir işaret
-değil. Aynı `x |= sabit` deyimi için `gBiosIrqFlags`'te kaldırmak,
-`REG_IF`'te eklemek gerekti. Ezberlenmez — her erişim için iki yönü de dene.
+In agbcc, `volatile` is an **instruction ordering knob**, not a semantic marker.
+For the same `x |= constant` idiom it had to be removed for `gBiosIrqFlags` and
+added for `REG_IF`. It cannot be memorized — try both directions for each access.
 
-Aynı şey adres biçimi için de geçerli: **kural 1 evrensel değildir.** RAM
-sembolleri `extern` olmalı, ama agbcc'nin kaydırmayla üretebildiği adresler
-(`0x03000000` = `0xc0 << 18` gibi) ROM'da sabit cast olarak yazılmış. Adres
-ROM'da literal havuzdan mı okunuyor yoksa hesaplanıyor mu — diff bunu söyler.
+The same applies to address form: **rule 1 is not universal.** RAM symbols must
+be `extern`, but addresses agbcc can produce by shifting (such as
+`0x03000000` = `0xc0 << 18`) are written in the ROM as constant casts. Whether an
+address is read from a literal pool or computed in the ROM — the diff tells you.
 
-## RAM adresleri extern sembol olmalı — en önemli kural
+## RAM addresses must be extern symbols — the most important rule
 
-`EraseSaveSlot` ve `GetSaveSlotHeader` uzun süre eşleşmedi. Sebebin derleyici
-sürümü olduğu sanıldı; **değildi.** Gerçek sebep C tarafındaydı:
+`EraseSaveSlot` and `GetSaveSlotHeader` did not match for a long time. The cause
+was assumed to be the compiler version; **it was not.** The real cause was on the
+C side:
 
 ```c
-#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* YANLIS */
-extern SaveSlotHeader gSaveSlotHeaders[3];                /* DOGRU  */
+#define gSaveSlotHeaders ((SaveSlotHeader *)0x02000460)   /* WRONG   */
+extern SaveSlotHeader gSaveSlotHeaders[3];                /* CORRECT */
 ```
 
-Adres bir derleme-zamanı sabiti olduğunda agbcc onu katlıyor: `base + 16`
-ifadesini ayrı bir literal (`0x02000EE0`) hâline getiriyor ve tabanı register'da
-tutmuyor. ROM ise tabanı bir kez yükleyip register'da saklıyor. Adres extern
-sembol olunca derleyici katlayamıyor ve ROM'un ürettiği kodu üretiyor.
+When the address is a compile-time constant, agbcc folds it: it turns the
+expression `base + 16` into a separate literal (`0x02000EE0`) and does not keep
+the base in a register. The ROM, by contrast, loads the base once and keeps it in
+a register. With the address as an extern symbol the compiler cannot fold it, and
+it produces the code the ROM has.
 
-Bu tek değişiklikle `EraseSaveSlot` anında eşleşti; `GetSaveSlotHeader` ise
-doğrudan üye erişimine geçirilince eşleşti:
+With that single change `EraseSaveSlot` matched instantly; `GetSaveSlotHeader`
+matched once it was switched to direct member access:
 
 ```c
-if (gSaveSlotHeaders[slot].marker == 0)   /* ara isaretci degiskeni degil */
+if (gSaveSlotHeaders[slot].marker == 0)   /* not an intermediate pointer variable */
     return 0;
 return &gSaveSlotHeaders[slot];
 ```
 
-**Kural: her RAM adresi `data/ram_map.csv`'ye yazılır ve C'de `extern` olarak
-bildirilir.** `tools/agbcc_build.py` sembolü oradan çözer.
+**Rule: every RAM address is recorded in `data/ram_map.csv` and declared `extern`
+in C.** `tools/agbcc_build.py` resolves the symbol from there.
 
-## Ölçülen ama etkisiz çıkanlar
+## Measured but found ineffective
 
-Yukarıdaki sebep bulunmadan önce iki hipotez sonuna kadar test edildi. İkisi de
-etkisiz çıktı; kayıt olarak duruyorlar ki tekrar denenmesin:
+Before the cause above was found, two hypotheses were tested exhaustively. Both
+came out ineffective; they stand on record so that they are not retried:
 
-**Bayrak taraması** — 15 aday bayrak, iki derleyici üzerinde (`-fforce-addr`,
+**Flag sweep** — 15 candidate flags across two compilers (`-fforce-addr`,
 `-fforce-mem`, `-fno-strength-reduce`, `-fomit-frame-pointer`, `-fno-peephole`,
 `-fcaller-saves`, `-fno-cse-follow-jumps`, `-fno-expensive-optimizations`,
-`-fno-defer-pop`, `-fno-function-cse` ve diğerleri). Hiçbiri tek bayt
-değiştirmedi.
+`-fno-defer-pop`, `-fno-function-cse`, and others). Not one changed a single
+byte.
 
-**Derleyici sürümü** — pret/agbcc'nin `release` etiketi ayrıca derlendi.
-İkilileri `master`'dan farklı ama çıktısı birebir aynı.
+**Compiler version** — pret/agbcc's `release` tag was also built. Its binaries
+differ from `master`'s, but its output is byte-for-byte identical.
 
-Yani sorun hiçbir zaman derleyicide değildi. Bu, negatif sonuçların "yol
-kapalı" diye okunmasının nasıl yanıltabileceğinin örneğidir: asıl değişken
-başka yerdeydi.
+So the problem was never in the compiler. This is an example of how reading
+negative results as "that road is closed" can mislead: the real variable was
+elsewhere.
 
-## `agbcc` varyantı 18 park fonksiyonunda denendi — hiçbiri eşleşmedi
+## The `agbcc` variant was tried on 18 parked functions — none matched
 
-2026-09-05. Proje kurulduğundan beri ölçülen 44 kuralın tamamı `old_agbcc` ile
-türetilmişti; `tools/agbcc_build.py` içindeki `--cc=agbcc` seçeneği belgeliydi
-ama hiç kullanılmamıştı. Park listesindeki 18 fonksiyonun tamamı iki derleyiciyle
-yeniden ölçüldü.
+2026-09-05. All 44 rules measured since the project began had been derived with
+`old_agbcc`; the `--cc=agbcc` option in `tools/agbcc_build.py` was documented but
+had never been used. All 18 functions on the parked list were re-measured with
+both compilers.
 
-**`agbcc` hiçbirini eşleştirmedi.** Dördünde fark azaldı, üçünde arttı:
+**`agbcc` matched none of them.** The difference decreased in four and increased
+in three:
 
-| fonksiyon | old_agbcc | agbcc |
+| function | old_agbcc | agbcc |
 |---|---|---|
 | FUN_0800cb08 | 291 | 146 |
 | ClearHudFieldA | 34 | 14 |
@@ -242,163 +249,174 @@ yeniden ölçüldü.
 | RunMenuScreen | 949 | **955** |
 | StepEntryTimer | 55 | **64** |
 
-İki VRAM doldurucusundaki iyileşme **yanıltıcı**. `agbcc` boyutu 36 yerine 40
-tutturuyor, ama sebebi ROM'un yaptığı şey değil: gövde `old_agbcc` ile birebir
-aynı, üstüne gereksiz bir `push {lr}` / `pop {r0}; bx r0` sarmalı biniyor (+4
-bayt). ROM'daki +4 ise fazladan bir yazmaç kopyası artı hizalama dolgusu. Aynı
-boyuta başka yoldan varan bir tesadüf, ilerleme değil.
+The improvement in the two VRAM fillers is **misleading**. `agbcc` gets the size
+to 40 instead of 36, but not for the reason the ROM does: the body is identical
+to `old_agbcc`'s, with an unnecessary `push {lr}` / `pop {r0}; bx r0` wrapper on
+top (+4 bytes). The +4 in the ROM is an extra register copy plus alignment
+padding. A coincidence that arrives at the same size by another route, not
+progress.
 
-**Sonuç: `agbcc_build.py`'ye dosya başına derleyici seçim işaretçisi
-EKLENMEDİ.** `KIP: ARM` benzeri bir `DERLEYICI: agbcc` işaretçisi ancak bir
-eşleşme onunla mümkün olsaydı gerekliydi; öyle bir eşleşme yok. Eklemek, hiçbir
-şey kazandırmadan derleme katmanına bir dal daha sokardı.
+**Conclusion: a per-file compiler selection marker was NOT ADDED to
+`agbcc_build.py`.** A `DERLEYICI: agbcc` marker analogous to `KIP: ARM` would
+have been necessary only if a match were possible with it; there is no such
+match. Adding it would have introduced another branch into the build layer while
+gaining nothing.
 
-`FUN_0800cb08`'in 291'den 146'ya inmesi (348 bayt, hâlâ eşleşmiyor) tek başına
-tekrar bakılmaya değer olabilir; ötekiler için bu yol kapalı.
+`FUN_0800cb08` dropping from 291 to 146 (348 bytes, still not matching) may be
+worth another look on its own; for the others this road is closed.
 
-## Yazmaç kopyası: kaynak düzeyinden üretilemeyen sınıf
+## Register copies: a class that cannot be produced from source level
 
-`ClearHudFieldA` / `ClearHudFieldB` (ikisi de 36/40, dört bayt kısa) bu sınıfın
-temiz örneği. `old_agbcc` ROM'un gövdesini komut komut aynı üretiyor; tek eksik
-ROM'daki fazladan `adds r2, r0, #0`. ROM karo sabitini önce r0'a yükleyip r2'ye
-taşıyor çünkü dağıtıcı r0'ı döngü sayacına bırakıyor; bizimki sabiti doğrudan
-r3'e verip kopyadan kaçınıyor.
+`ClearHudFieldA` / `ClearHudFieldB` (both 36/40, four bytes short) are the clean
+example of this class. `old_agbcc` produces the ROM's body instruction for
+instruction; the only thing missing is the ROM's extra `adds r2, r0, #0`. The ROM
+loads the tile constant into r0 first and moves it into r2 because the allocator
+leaves r0 to the loop counter; ours gives the constant straight to r3 and avoids
+the copy.
 
-Bu kopyayı üretmek için taranan ve elenen her şey:
+Everything swept and eliminated in an attempt to produce that copy:
 
-- **144 bildirim/atama sırası** (4! bildirim × 3! atama) — hepsi 36 bayt
-- **13 bayrak kümesi** — `-O0/-O1/-O2/-O3/-Os`, `-fno-omit-frame-pointer`,
+- **144 declaration/assignment orders** (4! declarations × 3! assignments) — all
+  36 bytes
+- **13 flag sets** — `-O0/-O1/-O2/-O3/-Os`, `-fno-omit-frame-pointer`,
   `-fforce-mem`, `-fforce-addr`, `-fno-strength-reduce`, `-fno-defer-pop`,
-  `-fcaller-saves`, `-fno-cse-follow-jumps` — hiçbiri 36'yı değiştirmedi
-- **Yapısal aileler** — `for` / `while` / `do-while`, `*p++` ile `*p=t; p++`,
-  karo tipi `u16` / `s32` / `int` / `vu16`, ara kopya değişkeni, sayaç
-  değişkeni, `q = p + 32` — hepsi 36 bayt
+  `-fcaller-saves`, `-fno-cse-follow-jumps` — none changed the 36
+- **Structural families** — `for` / `while` / `do-while`, `*p++` vs `*p=t; p++`,
+  tile type `u16` / `s32` / `int` / `vu16`, an intermediate copy variable, a
+  counter variable, `q = p + 32` — all 36 bytes
 
-Yani bu, kural 44'ün (karşılaştırma kanonikleştirmesi) tersi bir durum: orada
-kaynakta bir kaldıraç vardı, burada yok. `tools/sweep_variants.py`'nin kapsam
-sınırı notunda yazan "yükleme/saklama yazmaç dağıtımı" sınıfı tam olarak budur.
-Yeni bir mekanizma bulunmadan bu fonksiyonlara dönmeyin.
+So this is the inverse of rule 44 (comparison canonicalization): there, a lever
+existed in the source; here there is none. The "load/store register allocation"
+class named in `tools/sweep_variants.py`'s scope-limit note is exactly this. Do
+not return to these functions until a new mechanism is found.
 
-## Kural 45 — dal başına ayrı yerel değişkenler blok birleşmesini engeller
+## Rule 45 — separate locals per branch prevent block merging
 
-Uzun `if/else if` zincirlerinde birden çok dalın gövdesi birbirinin aynıysa,
-agbcc onları çapraz atlamayla birleştirir ve bir dalın kodu tamamen kaybolur.
-ROM'da o dallar ayrı fiziksel kopyalar olarak duruyorsa, orijinal kaynakta
-**her dalın kendi yerel değişkenleri** vardır.
+In long `if/else if` chains, when several branches have identical bodies, agbcc
+merges them by cross-jumping and one branch's code disappears entirely. If those
+branches exist as separate physical copies in the ROM, then in the original
+source **each branch had its own local variables**.
 
-`FUN_080260a8`'de (1518 bayt, 12 dallı zincir) ölçüldü. Bütün dallara ortak bir
-`bias`/`shift` çifti verince `case 8`'in gövdesi tümüyle `0x1f`/`0x28` ile
-birleşti: bizde `cmp #8` ile `cmp #30` arası **4 bayt**, ROM'da **156**. Her dala
-üçer ayrı yerel açınca 1312 → 1428 bayt.
+Measured in `FUN_080260a8` (1518 bytes, a 12-branch chain). Giving all branches a
+shared `bias`/`shift` pair merged `case 8`'s body entirely with `0x1f`/`0x28`:
+**4 bytes** between `cmp #8` and `cmp #30` in ours, **156** in the ROM. Opening
+three separate locals per branch took it from 1312 to 1428 bytes.
 
-**Nasıl fark edilir:** ROM'un yığın gözlerine bakın. Aynı işi yapan iki dal
-farklı `sp` ofsetleri kullanıyorsa (burada `case 8` → `sp+8/12/16`,
-`case 0x1f` → `sp+32/36/40`) yereller ayrıdır. Ghidra bunu zaten doğru
-gösteriyor (`local_48/44/40` ve `local_30/2c/28` gibi ayrı adlar); çıktıdaki
-yerel adlarını "gürültü" diye atmayın, **yapısal bilgi taşıyorlar**.
+**How to spot it:** look at the ROM's stack slots. If two branches doing the same
+work use different `sp` offsets (here `case 8` → `sp+8/12/16`, `case 0x1f` →
+`sp+32/36/40`), the locals are separate. Ghidra already shows this correctly
+(separate names such as `local_48/44/40` and `local_30/2c/28`); do not dismiss
+the local names in its output as "noise" — **they carry structural information**.
 
-İkinci bir belirti: ROM'da tekrar eden bir havuz sabitinin kaç kez geçtiğini
-sayın. Burada `0x03FFFFFF` altı ayrı havuz kelimesinde duruyor, yani maskeyi
-kullanan altı fiziksel blok var. Bizim çıktımızda beş çıkması, bir bloğun
-birleştiğinin doğrudan kanıtıydı.
+A second indicator: count how many times a repeated pool constant occurs in the
+ROM. Here `0x03FFFFFF` sits in six separate pool words, meaning there are six
+physical blocks using the mask. Ours coming out at five was direct evidence that
+a block had merged.
 
-Bayraklarla çözülmez: `-fno-thread-jumps`, `-fno-cse-follow-jumps`,
-`-fno-expensive-optimizations` ve `-O1` denendi, hiçbiri birleşmeyi kaldırmadı.
-Kaldıraç kaynakta, yerel değişken ayrımında.
+It cannot be solved with flags: `-fno-thread-jumps`, `-fno-cse-follow-jumps`,
+`-fno-expensive-optimizations`, and `-O1` were tried, and none removed the
+merging. The lever is in the source, in the separation of local variables.
 
-**Nerede geçerli — `tools/scan_dispatch.py`.** Kural yalnızca bir durum
-değişkenine göre dallanan uzun `if/else` zincirlerinde işe yarar, o yüzden
-adayları ROM'dan doğrudan bu imzayla arıyoruz: aynı yazmaca karşı ard arda
-gelen `cmp rX,#imm` halkaları, içlerinde yeterince **farklı sıfırdan büyük**
-değer. `cmp rX,#0` halkaları boş kontroldür, elenir.
+**Where it applies — `tools/scan_dispatch.py`.** The rule only helps in long
+`if/else` chains branching on a state variable, so candidates are searched for
+directly in the ROM with that signature: consecutive `cmp rX,#imm` links against
+the same register, containing enough **distinct values greater than zero**.
+`cmp rX,#0` links are null checks and are filtered out.
 
-Araç kendini doğruluyor: `FUN_080260a8` listede tam da eşleştirilen değerlerle
-çıkıyor (35, 33, 8, 30, 31, 40, 50, 32, 7, 6). Eşiği 6 halka / 5 farklı değer
-alınca **13 aday, 18.788 bayt** kalıyor; en büyüğü `FUN_08017628` (1536 bayt,
-26 farklı değer, 35 halka).
+The tool validates itself: `FUN_080260a8` appears in the list with exactly the
+values that were matched (35, 33, 8, 30, 31, 40, 50, 32, 7, 6). With the
+threshold at 6 links / 5 distinct values, **13 candidates, 18,788 bytes** remain;
+the largest is `FUN_08017628` (1536 bytes, 26 distinct values, 35 links).
 
-**Bir yol denendi ve terk edildi:** aynı tarama önce Ghidra çıktısı üzerinden,
-"birbirinin aynı ard arda ifade blokları" sayılarak yapıldı. Yanlış pozitif
-veriyor — `FUN_080108f4`'te 139 tekrar saydı ama o fonksiyon tekrar eden dal
-gövdesi değil, tekrar eden küresel erişim kalıbı içeriyor (40 ayrı `DAT_`
-global, iç içe döngüler). Metin benzerliği yanlış ölçüt; imza makine kodunda.
+**One route was tried and abandoned:** the same scan was first done over Ghidra's
+output by counting "consecutive identical expression blocks". It gives false
+positives — in `FUN_080108f4` it counted 139 repetitions, but that function does
+not contain repeated branch bodies; it contains a repeated global access pattern
+(40 distinct `DAT_` globals, nested loops). Textual similarity is the wrong
+criterion; the signature is in the machine code.
 
-**Ghidra çıktısının yarım olduğunu gösteren uyarılar** aday elemede şart:
-`Could not recover jumptable` (33 çıktının 19'unda), `Removing unreachable
-block` (bu sinsi — çıktı derli toplu görünür ama bloklar düşmüştür,
-`FUN_0802e3fc` böyleydi), `Bad instruction`, `truncated`.
+**The warnings that indicate Ghidra's output is incomplete** are essential when
+filtering candidates: `Could not recover jumptable` (in 19 of 33 outputs),
+`Removing unreachable block` (this one is insidious — the output looks tidy but
+blocks have been dropped, as with `FUN_0802e3fc`), `Bad instruction`, and
+`truncated`.
 
-## Kural 46 — switch'in aralığı, ağaç ile atlama tablosu arasındaki seçimi belirler
+## Rule 46 — a switch's range determines the choice between a tree and a jump table
 
-agbcc bir `switch`i ya **karşılaştırma ağacına** ya da **atlama tablosuna**
-çevirir; kararı case kümesinin yoğunluğuna göre verir. ROM'da hiç `mov pc,rX`
-yoksa ağaç seçilmiştir ve bizim kaynağımız da ağaç üretmelidir, yoksa boyut
-tutmaz.
+agbcc turns a `switch` into either a **comparison tree** or a **jump table**, and
+decides based on the density of the case set. If there is no `mov pc,rX` in the
+ROM, a tree was chosen, and our source must produce a tree too, or the size will
+not hold.
 
-`FUN_08017628`'de (1536 bayt, ~40 case) ölçüldü. Case'leri 1..0x97 arasında
-yazınca küme yoğun kaldı ve agbcc atlama tablosu üretti: **1814 bayt** (296
-fazla), 45 karşılaştırma, bir `mov pc,r0`. Ghidra'nın havuz sabiti gibi
-gösterdiği dört büyük değeri (0x4005, 0x4026, 0x4027, 0x4028) case olarak
-ekleyince aralık 1..0x4028'e açıldı, gcc mecburen ağaç üretti: **1510 bayt**,
-92 karşılaştırma (ROM ile birebir), sıfır `mov pc`. Tek değişiklik, 304 bayt.
+Measured in `FUN_08017628` (1536 bytes, ~40 cases). Written with cases between 1
+and 0x97, the set stayed dense and agbcc generated a jump table: **1814 bytes**
+(296 too many), 45 comparisons, one `mov pc,r0`. Adding the four large values
+Ghidra had shown as pool constants (0x4005, 0x4026, 0x4027, 0x4028) as cases
+opened the range to 1..0x4028, forcing gcc to generate a tree: **1510 bytes**, 92
+comparisons (exactly matching the ROM), zero `mov pc`. One change, 304 bytes.
 
-**Teşhis:** ROM'da ve kendi çıktınızda `mov pc,rX` (0x4687/0x468F/0x4697)
-sayın, sonra `cmp rX,#imm` sayılarını karşılaştırın. Sayılar tutuyorsa ağaç
-şekli doğrudur; sizde `mov pc` varken ROM'da yoksa case kümeniz fazla yoğun,
-uzaktaki case'leri kaçırmışsınızdır.
+**Diagnosis:** count `mov pc,rX` (0x4687/0x468F/0x4697) in the ROM and in your
+own output, then compare the `cmp rX,#imm` counts. If the counts agree, the tree
+shape is correct; if you have a `mov pc` and the ROM does not, your case set is
+too dense and you have missed the distant cases.
 
-**Ağaç okunurken tuzak:** bir aralıkta tek case kaldığında gcc eşitlik yerine
-`<` ile ayırır, o yüzden o case ROM'da `cmp` olarak görünmez. `FUN_08017628`'de
-0x0E böyle: ROM'da `cmp #14` yok ama case var, (0x0D, 0x0F) aralığına tek
-değer kaldığı için `< 0x0F` ile ayrılmış. Eksik case sanıp çıkarmayın.
+**A trap when reading the tree:** when a range has one case left, gcc separates
+it with `<` rather than equality, so that case does not appear as a `cmp` in the
+ROM. In `FUN_08017628`, 0x0E is such a case: there is no `cmp #14` in the ROM but
+the case exists, separated by `< 0x0F` because it was the only value left in the
+(0x0D, 0x0F) range. Do not remove it thinking the case is missing.
 
-## Ghidra: ARM kipi tuzağı ve yanlış "atlama tablosu" etiketi
+## Ghidra: the ARM mode trap and a false "jump table" label
 
-Ghidra'nın otomatik analizi bazı Thumb girişlerini **ARM kipinde** çözmeye
-çalışıp `bad instruction data` ile bırakıyor ve o adreste fonksiyon bile
-tanımlamıyor. Bizim sınır tarayıcımızın bulduğu 7 girişten 5'i böyleydi
-(`FUN_08017628` dahil). Çözüm: `TMode` yazmacını 1 yapıp bölgeyi temizleyip
-yeniden sokmak — `tools/ghidra/ExportDecompileBatch.java` bunu boyut verilince
-koşulsuz yapıyor. **Koşulsuz olmalı:** bozuk bir fonksiyon önceki koşudan
-kalmış olabilir, "yoksa oluştur" yetmez. Bu onarım 8.586 baytlık beş
-fonksiyonu okunabilir hale getirdi.
+Ghidra's automatic analysis tries to decode some Thumb entry points **in ARM
+mode**, gives up with `bad instruction data`, and does not even define a function
+at that address. Five of the 7 entry points found by our boundary scanner were
+like this (including `FUN_08017628`). The fix: set the `TMode` register to 1,
+clear the region, and re-disassemble — `tools/ghidra/ExportDecompileBatch.java`
+does this unconditionally when a size is given. **It must be unconditional:** a
+broken function may be left over from a previous run, and "create if absent" is
+not enough. This repair made five functions totalling 8,586 bytes readable.
 
-Ayrıca Ghidra `pop {r4,r5,r6}; pop {r0}; bx r0` dizisinin sonundaki `bx r0`ı
-"çözülemeyen atlama tablosu" sanabiliyor. `FUN_08017628`'de öyle oldu; orada
-tablo yok, sadece void dönüşün interworking biçimi var.
+Ghidra can also mistake the `bx r0` at the end of the sequence
+`pop {r4,r5,r6}; pop {r0}; bx r0` for an "unrecoverable jump table". That is what
+happened in `FUN_08017628`; there is no table there, only the interworking form
+of a void return.
 
-## Kural 47 — bayt alanının işaretliliği maskenin nasıl kurulacağını belirler
+## Rule 47 — a byte field's signedness determines how the mask is built
 
-`x &= ~15` bir **`u8`** alan üzerinde yazılırsa agbcc sabiti `0xF0`'a indirger
-(`movs r1,#240`). Aynı satır **`s8`** alan üzerinde yazılırsa alan `int`'e
-yükselir ve maske `-16` olarak kurulur (`movs r1,#16 / negs r1,r1`) — bir komut
-daha, iki bayt.
+`x &= ~15` written on a **`u8`** field makes agbcc reduce the constant to `0xF0`
+(`movs r1,#240`). The same line on an **`s8`** field promotes the field to `int`
+and builds the mask as `-16` (`movs r1,#16 / negs r1,r1`) — one more instruction,
+two more bytes.
 
-`FUN_08016768`'de ölçüldü: alanları `u8` bırakınca fonksiyon iki bayt kısa
-kalıyor ve ayrıca komut sıralaması kayıyordu; `s8` yapınca ikisi birden düzeldi
-ve fonksiyon **eşleşti**.
+Measured in `FUN_08016768`: leaving the fields as `u8` left the function two
+bytes short and also shifted the instruction ordering; making them `s8` fixed
+both at once and the function **matched**.
 
-**Kural dar, genellemeyin (2026-09-06 düzeltmesi).** Belirleyici olan alanın
-işaretliliği değil, AND sonucunun hangi genişlikte tüketildiği. `FUN_080526b8`'de
-`node->kind &= ~12` bileşik ataması **`u8` alanda da** `-13` üretiyor ve eşleşiyor,
-çünkü işlem int genişliğinde yapılıyor. `FUN_08016768`'de sonuç dar tipe
-indirgenerek kullanıldığı için `u8` alanda sabit `0xF0`'a katlanıyordu. Yani
-ROM'da `negs` görmek "alan işaretli" demek değil; "sabit int genişliğinde
-kurulmuş" demek. Alan tipini ancak başka bir kanıt varken değiştirin.
+**The rule is narrow, do not generalize it (2026-09-06 correction).** What is
+decisive is not the field's signedness but the width at which the AND result is
+consumed. In `FUN_080526b8`, the compound assignment `node->kind &= ~12` produces
+`-13` **even on a `u8` field** and matches, because the operation is done at int
+width. In `FUN_08016768` the result was consumed narrowed to a narrow type, so on
+a `u8` field the constant was folded to `0xF0`. So seeing `negs` in the ROM does
+not mean "the field is signed"; it means "the constant was built at int width".
+Change the field type only when there is other evidence.
 
-**Ayrı bir tuzak — ara yerele almayın.** Aynı işi `s32 k = field & ~12;
-field = k;` diye yazmak agbcc'yi depolamadan önce `lsls #24 / asrs #24`
-normalleştirmesi sokmaya itiyor: iki fazla komut, ROM'da yok. Bileşik atamayı
-doğrudan yazın.
+**A separate trap — do not take it into an intermediate local.** Writing the same
+work as `s32 k = field & ~12; field = k;` pushes agbcc into inserting an
+`lsls #24 / asrs #24` normalization before the store: two extra instructions that
+are not in the ROM. Write the compound assignment directly.
 
-Maskeyi geniş tipte bir yerele almak (`s32 m = ~15; x &= m;`) `negs`i geri
-getiriyor ama sabiti ifadeden ÖNCE yaydığı için adres hesabıyla sırası ters
-düşüyor. Doğru çözüm alanın tipini düzeltmek, maskeyi taşımak değil.
+Taking the mask into a wide-typed local (`s32 m = ~15; x &= m;`) brings `negs`
+back, but because it emits the constant BEFORE the expression, its order clashes
+with the address computation. The correct solution is to fix the field's type,
+not to move the mask.
 
-## Kural 48 — koşulun sonucunu değişkende maddeleştirmek
+## Rule 48 — materializing a condition's result in a variable
 
-ROM'da `movs r0,#0 / ... / movs r0,#1 / cmp r0,#0 / beq` dizisi görüyorsanız
-kaynak koşulu doğrudan dallanmıyor, **sonucu bir değişkene yazıp onu sınıyor**:
+If you see the sequence `movs r0,#0 / ... / movs r0,#1 / cmp r0,#0 / beq` in the
+ROM, the source is not branching on the condition directly — it is **writing the
+result into a variable and testing that**:
 
 ```c
 ok = 0;
@@ -406,434 +424,449 @@ if (ent->kind == 4) ok = 1;
 if (ok) GetOwnerSlot(ent);
 ```
 
-Kısa devreli `if (ent != 0 && ent->kind == 4)` yazımı doğrudan dallanma üretir
-ve altı bayt eksiltir. Kalıp projede daha önce `target_follow.c`'de de görülmüştü.
+The short-circuiting form `if (ent != 0 && ent->kind == 4)` produces a direct
+branch and is six bytes shorter. The pattern had been seen before in the project,
+in `target_follow.c`.
 
-## DMA kurulumundan sonra denetim yazmacı geri okunuyor
+## The control register is read back after DMA setup
 
-ROM DMA3 denetim kelimesini yazdıktan sonra onu bir kez **geri okuyor**
-(`ldr rX,[rY,#8]`). İşlevsel görünmüyor ama atlanırsa her DMA bloğu iki bayt
-eksilir. `cutscene_frame.c` (eşleşti) ve `flush_palette_queue.c` ikisinde de var:
+After writing the DMA3 control word, the ROM **reads it back** once
+(`ldr rX,[rY,#8]`). It does not look functional, but omitting it makes every DMA
+block two bytes short. It is present in both `cutscene_frame.c` (matched) and
+`flush_palette_queue.c`:
 
 ```c
 REG_DMA3.control = TILE_CTRL;
-REG_DMA3.control;          /* geri okuma; atlanirsa iki bayt eksik */
+REG_DMA3.control;          /* read-back; two bytes short if omitted */
 REG_IME = ime;
 ```
 
-## Kural 49 — ROM seyrek gövdeleri fonksiyonun SONUNDA tutar
+## Rule 49 — the ROM keeps rare bodies at the END of the function
 
-agbcc `if` gövdelerini kaynak sırasında yayıyor. ROM'da bir dal **ileri**
-atlıyorsa (`beq` uzağa, `bne` uzağa) o gövde fonksiyonun sonundadır; aynı
-gövdeyi akışın içine yazmak bloğu öne alır ve dallanmayı tersine çevirir.
+agbcc emits `if` bodies in source order. If a branch in the ROM jumps **forward**
+(`beq` far, `bne` far), that body is at the end of the function; writing the same
+body inline moves the block forward and inverts the branch.
 
-`FUN_080543D0`'da (126 bayt) üç kez arka arkaya uygulandı ve her seferinde
-kazandırdı:
+Applied three times consecutively in `FUN_080543D0` (126 bytes), gaining each
+time:
 
-| taşınan | önce | sonra |
+| moved | before | after |
 |---|---|---|
-| "bulundu" gövdesi döngüden sona | 128 B | fark 87 |
-| `return 0` sona | fark 87 | **fark 56** |
+| the "found" body from the loop to the end | 128 B | difference 87 |
+| `return 0` to the end | difference 87 | **difference 56** |
 
-Yazım biçimi: erken dönüş yerine sona `goto`, gövdeyi `return`dan sonra
-etiketle. Proje bu biçimi zaten kullanıyor (`target_follow.c`, `menu_screen.c`).
+The form: a `goto` to the end instead of an early return, with the body labelled
+after the `return`. The project already uses this form (`target_follow.c`,
+`menu_screen.c`).
 
 ```c
-    if (spare->id != SPARE_ID) goto none;   /* `return 0;` DEGIL */
+    if (spare->id != SPARE_ID) goto none;   /* NOT `return 0;` */
     ...
     return spare;
-found:                                       /* seyrek govdeler sonda */
+found:                                       /* rare bodies at the end */
     ...
     return cur;
 none:
     return 0;
 ```
 
-**Nasıl fark edilir:** ROM'daki koşullu dallanmanın YÖNÜNE bakın. İleri
-atlıyorsa hedef gövde ileridedir; sizin çıktınızda aynı yerde `bne` varken
-ROM'da `beq` (ya da tersi) görüyorsanız blok sıranız terstir.
+**How to spot it:** look at the DIRECTION of the conditional branch in the ROM.
+If it jumps forward, the target body is ahead; if you have a `bne` where the ROM
+has a `beq` (or vice versa), your block order is inverted.
 
-**Yan bulgu — döngü döndürme.** Aynı fonksiyonda `break` kullanmak agbcc'yi
-döngüyü döndürmeye (`b` ile alttaki teste atlama) itti. ROM'un giriş
-koruması + alttan dönen biçimi için `break` yerine açık `goto` yazın.
+**A side finding — loop rotation.** Using `break` in the same function pushed
+agbcc into rotating the loop (jumping to the test at the bottom with a `b`). For
+the ROM's entry-guard + bottom-returning form, write an explicit `goto` instead
+of `break`.
 
-**AYNI AILEDEKI FONKSIYONLAR AYNI DONGU BICIMINI KULLANMAYABILIR.**
-`FUN_080543D0` ve `FindOrInitAreaNode` neredeyse ikiz (ikisi de sıralı listede
-kimlik arayıp yedek düğümü kuruyor) ama ROM'da farklı derlenmişler:
+**FUNCTIONS IN THE SAME FAMILY MAY NOT USE THE SAME LOOP FORM.** `FUN_080543D0`
+and `FindOrInitAreaNode` are near twins (both search a sorted list for an id and
+set up a spare node), yet they were compiled differently in the ROM:
 
-| | ROM'un biçimi | doğru yazım |
+| | the ROM's form | correct spelling |
 |---|---|---|
-| FUN_080543D0 | giriş koruması + alttan dönen do/while | `if (cur == 0) goto ...` + `goto scan` |
-| FindOrInitAreaNode | döndürülmüş `for` (`b` ile teste atlama) | `goto test;` + `step:` / `test:` |
+| FUN_080543D0 | entry guard + a do/while returning from the bottom | `if (cur == 0) goto ...` + `goto scan` |
+| FindOrInitAreaNode | a rotated `for` (jumping to the test with `b`) | `goto test;` + `step:` / `test:` |
 
-`FindOrInitAreaNode`'te düz `for` yazmak agbcc'ye ilk turu **soydurdu** (kimlik
-karşılaştırması çıktıda iki kez); 176/164 bayt, 12 fazla. Açık atlamalarla
-ROM'un biçimini yazınca boyut tuttu ve fark 162'den 107'ye indi.
+Writing a plain `for` in `FindOrInitAreaNode` made agbcc **peel** the first
+iteration (the id comparison appears twice in the output); 176/164 bytes, 12 too
+many. Writing the ROM's form with explicit jumps made the size hold and reduced
+the difference from 162 to 107.
 
-Ders: kardeş dosyanın döngü biçimini KOPYALAMAYIN, her fonksiyonun biçimini
-ROM'dan okuyun. Struct'lar ve çağrılan imzaları paylaşılabilir, kontrol
-akışı paylaşılamaz.
+The lesson: DO NOT COPY a sibling file's loop form; read each function's form
+from the ROM. Structs and called signatures can be shared, control flow cannot.
 
-## Kural 50 — yazmaç önceliğini kaynaktan çevirmenin tek yolu: değişkeni BÖL
+## Rule 50 — the only way to flip register priority from source: SPLIT the variable
 
-agbcc'nin dağıtım sırası ölçüldü ve doğrulandı (2026-09-06, üç fonksiyon, 39
-allocno elle yeniden türetildi):
+agbcc's allocation order was measured and confirmed (2026-09-06, three functions,
+39 allocnos re-derived by hand):
 
 ```
-öncelik = floor_log2(refs) * refs / ömür        (eşitlikte küçük pseudo önce)
+priority = floor_log2(refs) * refs / lifetime        (on a tie, the smaller pseudo first)
 ```
 
-Sıra geldiğinde `find_reg` çakışma çizgesindeki **en küçük boş** yazmacı verir;
-allocno bir çağrıyı aşıyorsa yalnızca callee-saved (r4+) adaylara bakar.
+When its turn comes, `find_reg` gives the **smallest free** register in the
+conflict graph; if the allocno crosses a call, it only considers callee-saved
+(r4+) candidates.
 
-**Kaldıraç `floor_log2`'nin basamak fonksiyonu olmasında.** Bir değişkeni ikiye
-bölmek refs'i ve ömrü kabaca yarıya indirir — oran hemen hemen aynı kalır ama
-`floor_log2(refs)` bir tam basamak düşer, öncelik ~1/3'e iner.
+**The lever is that `floor_log2` is a step function.** Splitting a variable in
+two roughly halves both refs and lifetime — the ratio stays about the same, but
+`floor_log2(refs)` drops a whole step and the priority falls to about a third.
 
-`FUN_08052DDC`'de ölçüldü: iki dış döngü tek `p` işaretçisini paylaşırken
-`3*14/29 = 1.448`, sayacın `1.185`'ini geçip r4'ü kapıyordu. İkinci döngüye
-ayrı işaretçi verilince `2*7/14 = 1.000`'e düştü, sayaç önce dağıtılıp r4'ü
-aldı: **fark 17 → 0, byte-matching.**
+Measured in `FUN_08052DDC`: with two outer loops sharing a single `p` pointer,
+`3*14/29 = 1.448` was beating the counter's `1.185` and taking r4. Given a
+separate pointer for the second loop it fell to `2*7/14 = 1.000`, the counter was
+allocated first and took r4: **difference 17 → 0, byte-matching.**
 
-**BÖLME YALNIZCA İKİ AYRI ÜRETİM YERİ VARSA İŞE YARAR.** Kopya tabanlı bölme
-(`lst = list;`) her zaman eleniyor — 16 yazım denendi, hiçbiri yeni allocno
-üretmedi. `p = entry->ids` / `p2 = entry->slots` gibi gerçekten iki ayrı
-kaynaktan doğan değerler bölünebilir.
+**SPLITTING ONLY WORKS IF THERE ARE TWO SEPARATE PRODUCTION SITES.** Copy-based
+splitting (`lst = list;`) is always eliminated — 16 spellings were tried and none
+produced a new allocno. Values genuinely born from two separate sources, such as
+`p = entry->ids` / `p2 = entry->slots`, can be split.
 
-**refs döngü derinliğiyle ağırlıklandırılmıyor** — döngü içindeki referanslar
-ekstra sayılmıyor, yani tabloyu kaynaktan elle saymak mümkün.
+**refs are not weighted by loop depth** — references inside a loop are not counted
+extra, so the table can be worked out by hand from the source.
 
-**Araç eksiği:** `tools/dump_alloc.py` `.greg` dökümünün yalnızca öncelik
-tablosunu okuyor. Asıl cevap altındaki **`Register dispositions`** bölümünde:
-pseudo → donanım yazmacı haritası. "Hangi değişkenim r4'ü kaptı" sorusunun tek
-satırlık cevabı orada; araç onu basmıyor.
+**A tooling gap:** `tools/dump_alloc.py` reads only the priority table from the
+`.greg` dump. The real answer is in the **`Register dispositions`** section below
+it: the pseudo → hardware register map. The one-line answer to "which of my
+variables took r4" is there; the tool does not print it.
 
-## Kural 47'ye karşı örnek — işaretlilik BAZEN fark ediyor
+## A counterexample to rule 47 — signedness SOMETIMES matters
 
-`FUN_080526B8`'de (nodelist_b6.c) `+0x0B` alanının `u8` mi `s8` mi olduğu fark
-etmemişti. `ReleaseAreaNode`'de **fark ediyor**: `u8` alanda `kind &= ~1` tek
-komuta katlanıyor (`movs r0,#254`), ROM ise `movs r0,#2 / negs r0,r0` ile −2
-kuruyor. Alan `s8` olmalı. Ters yönde bedel yok: `s8` iken de `kind & 1` ve
-`(kind & 0xF) | 0x10` hâlâ `ldrb` üretiyor, agbcc 0x100'den küçük maskede
-sign-extend eklemiyor.
+In `FUN_080526B8` (nodelist_b6.c) it made no difference whether the `+0x0B` field
+was `u8` or `s8`. In `ReleaseAreaNode` it **does**: on a `u8` field, `kind &= ~1`
+folds into a single instruction (`movs r0,#254`), whereas the ROM builds −2 with
+`movs r0,#2 / negs r0,r0`. The field must be `s8`. There is no cost in the other
+direction: even as `s8`, `kind & 1` and `(kind & 0xF) | 0x10` still generate
+`ldrb`, since agbcc does not add a sign-extend for masks below 0x100.
 
-Yani kural 47'nin kararı "AND sonucunun genişliği" değil, **her iki yönü de
-ölçmek**. İki satırlık deney, tahminden ucuz.
+So rule 47's decision procedure is not "the width of the AND result" but
+**measuring both directions**. A two-line experiment is cheaper than a guess.
 
-## Sorun gerçekten dağıtım mı? — `dump_alloc.py --rom` ile önce bunu ölç
+## Is the problem really allocation? — measure that first with `dump_alloc.py --rom`
 
-Kural 50'yi uygulamadan önce **sorunun dağıtım olup olmadığını** ölçün. Araç
-artık ROM'un `push` listesini ve yazmaç başına operand sayımlarını yan yana
-basıyor; ayrım tek bakışta görünüyor.
+Before applying rule 50, **measure whether the problem is allocation at all**.
+The tool now prints the ROM's `push` list and per-register operand counts side by
+side; the distinction is visible at a glance.
 
-**Ölçülen iki karşıt örnek (2026-09-06):**
+**Two opposing examples measured (2026-09-06):**
 
-`FUN_080543D0` — fark 41. Callee-saved trafiği ROM ile **birebir aynı**:
-r3 9/9, r4 11/11, r5 8/8, r6 7/7, r7 1/1. Fark yalnızca r0/r1/r2'de
-(23/28, 26/23, 7/5). Yani dağıtım **zaten doğru**; 41 bayt geçici yazmaç ve
-komut seçiminden geliyor. Buraya değişken bölme uygulamak **boş emek** —
-üç dosyanın körlemesine kurcalanmasının sebebi tam da bu ayrımın
-yapılmamasıydı.
+`FUN_080543D0` — difference 41. The callee-saved traffic is **identical** to the
+ROM's: r3 9/9, r4 11/11, r5 8/8, r6 7/7, r7 1/1. The difference is only in
+r0/r1/r2 (23/28, 26/23, 7/5). So the allocation is **already correct**; the 41
+bytes come from temporary registers and instruction selection. Applying variable
+splitting here is **wasted effort** — the reason three files were tinkered with
+blindly was precisely this distinction not being made.
 
-`FindOrInitAreaNode` — fark 80. Callee-saved trafiği **sapıyor**: r3 ROM 13 /
-bizde 6, r4 ROM 16 / bizde 13, r2 ROM 10 / bizde 16. ROM ağırlığı r3+r4'te
-tutuyor, biz r2'ye yıkıyoruz. Sorumlu ölçüldü: bir allocno 12 refs / 64
-ömürle en yoğun ikinci değer ama **hiç çağrı aşmıyor**, o yüzden `find_reg`
-ona en küçük boş yazmacı (r2) veriyor ve callee-saved adaylara hiç bakmıyor.
-Kural 50 kaldıracının anlamlı olduğu dosya bu.
+`FindOrInitAreaNode` — difference 80. The callee-saved traffic **does diverge**:
+r3 ROM 13 / ours 6, r4 ROM 16 / ours 13, r2 ROM 10 / ours 16. The ROM keeps the
+weight in r3+r4, we dump it into r2. The culprit was measured: one allocno is the
+second densest value at 12 refs / 64 lifetime but **never crosses a call**, so
+`find_reg` gives it the smallest free register (r2) and never looks at
+callee-saved candidates. This is the file where rule 50's lever is meaningful.
 
-`FUN_08052DDC` (eşleşen) kalibrasyon referansı: `push` listesi ve **tüm**
-operand sayımları ROM ile birebir. Aracın doğru okuduğunun kanıtı.
+`FUN_08052DDC` (matching) is the calibration reference: its `push` list and
+**all** operand counts are identical to the ROM's. Proof that the tool reads
+correctly.
 
-**Kural: önce `--rom` çalıştır.** Callee-saved sayımları tutuyorsa dağıtım
-doğrudur, başka yere bak.
+**Rule: run `--rom` first.** If the callee-saved counts agree, the allocation is
+correct — look elsewhere.
 
-## agbcc pseudo → C değişken adı: PARAMETRELER DIŞINDA İMKÂNSIZ
+## agbcc pseudo → C variable name: IMPOSSIBLE EXCEPT FOR PARAMETERS
 
-Denendi ve ölçüldü: agbcc'de `-g` yok, `-gstabs` "invalid debug option"
-veriyor, üretilen `.s`'te tek bir `.stab` satırı yok, RTL insn'lerinin satır
-numarası alanı −1. Derleyici bu dökümlere yerel değişken adı **hiç yazmıyor**.
+Tried and measured: agbcc has no `-g`, `-gstabs` gives "invalid debug option",
+the generated `.s` contains not a single `.stab` line, and the line number field
+of RTL insns is −1. The compiler **never writes** local variable names into these
+dumps.
 
-Parametreler çıkarılabiliyor: prologda `NOTE_INSN_FUNCTION_BEG`'den önceki
-`(set (reg/v N) (reg H rH))` kalıbı argüman sırasını veriyor, ad da kaynaktaki
-**tanım** imzasından okunuyor. Yerel değişkenler için ad sütunu boş kalır ve
-yerine ilk tanım ifadesi basılır (`mem[p22+40]` gibi) — ad uydurulmaz.
+Parameters can be extracted: in the prologue, the `(set (reg/v N) (reg H rH))`
+pattern before `NOTE_INSN_FUNCTION_BEG` gives the argument order, and the name is
+read from the source's **definition** signature. For locals the name column stays
+empty and the first defining expression is printed instead (such as
+`mem[p22+40]`) — a name is never invented.
 
-İki tuzak, ikisi de araç yazılırken yakalandı: `note` düğümleri taranmazsa
-`NOTE_INSN_FUNCTION_BEG` görülmez ve **çağrı dönüş değerleri parametre
-sanılır**; ayrıca parametre adı için dosyadaki ilk geçişe bakmak yanlıştır —
-başlık yorumundaki eski imza gerçek tanımla çelişebiliyor (`nodelist_a1.c`'de
-tam bu oldu).
+Two traps, both caught while writing the tool: if `note` nodes are not scanned,
+`NOTE_INSN_FUNCTION_BEG` is never seen and **call return values are mistaken for
+parameters**; and looking at the first occurrence in the file for a parameter's
+name is wrong — an old signature in the header comment can contradict the real
+definition (which is exactly what happened in `nodelist_a1.c`).
 
-## Diğer iki tuzak
+## Two other traps
 
-**Bölüm hizalaması.** agbcc `.text`'i 8'e hizalıyor. Taban adres 8'in katı
-değilse (`0x08001094` gibi) linker bölümü ileri itiyor ve *önceden eşleşen
-fonksiyonlar dahil* her ölçüm kayıyor. Link betiğinde bölüm adresi açıkça
-sabitlenir (`SUBALIGN(1)`).
+**Section alignment.** agbcc aligns `.text` to 8. If the base address is not a
+multiple of 8 (like `0x08001094`), the linker pushes the section forward and
+every measurement shifts, *including previously matching functions*. The section
+address is explicitly fixed in the link script (`SUBALIGN(1)`).
 
-**Bölüm sonu dolgusu.** `as` Thumb bölümlerini NOP (`0x46C0`) ile doldurur,
-ROM ise sıfırla. Üretilen assembly'nin sonuna `.align 2, 0` eklenir.
+**Section-end padding.** `as` pads Thumb sections with NOP (`0x46C0`), the ROM
+with zero. `.align 2, 0` is added at the end of the generated assembly.
 
-**Dış semboller `.equ` ile verilir, linker'a bırakılmaz.** Linker mutlak
-sembolü Thumb fonksiyonu olarak tanımadığı için araya interworking veneer'i
-sokar ve `bl` hedefi yanlış çıkar.
+**External symbols are given with `.equ`, not left to the linker.** Because the
+linker does not recognize an absolute symbol as a Thumb function, it inserts an
+interworking veneer and the `bl` target comes out wrong.
 
-## Kapanan: WriteU16LE
+## Closed: WriteU16LE
 
-Bir dönem açık kalmıştı: ROM girişte değeri 16 bite normalize ediyordu
-(`lsls #16` / `lsrs #16`) ve ürettiğimiz kod bu dört baytı atlıyordu.
-Kural 15 (dar parametrenin işaretliliği giriş normalizasyonunu belirler)
-bulunduktan sonra kapandı; `src/save/save_helpers.c` şimdi 8/8
-byte-matching.
+It was open for a while: the ROM normalized the value to 16 bits on entry
+(`lsls #16` / `lsrs #16`) and the code we generated skipped those four bytes. It
+closed once rule 15 was found (a narrow parameter's signedness determines the
+entry normalization); `src/save/save_helpers.c` is now 8/8 byte-matching.
 
-## Kurulum
+## Setup
 
-İkili dosyalar depoya girmez (8.8 MB). Yerelde üretmek için:
+The binaries do not enter the repository (8.8 MB). To build them locally:
 
 ```sh
 make agbcc
 ```
 
-`tools/setup_agbcc.sh`, pret/agbcc kaynağını
-`config/toolchain.lock.json` içindeki uyumlu revizyona sabitler ve derler.
-agbcc 1998 dönemi C kaynağı olduğu için modern clang'in varsayılanlarıyla
-derlenmiyor; izlenen `tools/agbcc_host_cc.sh` gerekli uyumluluk bayraklarını
-taşıyor. Kurulum sonunda 23 fonksiyonluk sabit temsil corpus'unun parmak izi
-doğrulanır; yeni kaynak eklenmesi bu kilidi kendiliğinden değiştirmez.
+`tools/setup_agbcc.sh` pins the pret/agbcc source to the compatible revision in
+`config/toolchain.lock.json` and builds it. Because agbcc is 1998-era C source it
+does not build with modern clang's defaults; the tracked `tools/agbcc_host_cc.sh`
+carries the necessary compatibility flags. At the end of setup, the fingerprint
+of the fixed 23-function representative corpus is verified; adding new sources
+does not change that lock by itself.
 
-## Doğrulama döngüsü
+## The verification loop
 
 ```sh
 make c-match FILE=src/save/save_helpers.c
 ```
 
-Her fonksiyonu ayrı ayrı derleyip `data/functions.csv`'deki adresinden ROM ile
-karşılaştırır. Eşleşen fonksiyonun assembly karşılığı artık gereksizdir.
-| 39 | Butun register'lar beklenenden **bir yukaridaysa**, kaynakta dokunulmadan **iletilen fazladan bir parametre** vardir | `SubmitPack`te ROM `{r4,r5,r6}` + r2/r3 kullanirken bizimki `{r3,r4,r5}` + r1/r2 uretiyordu; farkin tamami tek register kaymasiydi. r1'i KURAN komut yoktu, yani deger gelen parametreydi. Ikinci parametreyi imzaya ekleyip cagriya iletmek 8 bayt farki sifirladi. Once `FUN_08060db4(void)` -> arguman eklemek 16'dan 8'e indirmisti |
-| 40 | ROM kisa omurlu ara degerleri **scratch register**'da (r0-r3) tutuyorsa, kaynakta da **blok kapsamli ayri gecici** kullanilmali; tek bir yeniden kullanilan yerel onlari callee-saved'e itiyor | `ClipBounds`ta ROM `push {r4,r5,lr}` uretirken bizimki `push {r4,r5,r6,lr}` uretiyordu: tek `cand` degiskeni tum fonksiyon boyunca yasayip r2'yi tutuyor, ROM ise `pad` oldugunde onun register'ini yeniden kullaniyor. Her bileseni `{ s32 cand = ...; if (...) ...; }` bloguna almak alti bagimsiz kisa omurlu gecici uretti. Ayrica tekrarlanan bellek okumalari dar volatile gorunumden yapilmali; derleyici aksi halde ortak alt ifade olarak onbellege alip omru uzatiyor (96 bayt -> ROM'un 100 bayti). Ikisi birlikte 26 farki 0'a indirdi. UYARI: teknik ISLEVSEL DEGIL, YEREL -- ayni hamle CleanupAreaTiles'i 7'den 85'e kotulestirdi, SetBg1Enable'i degistirmedi |
+It compiles each function separately and compares it against the ROM at its
+address from `data/functions.csv`. The assembly equivalent of a matching function
+is then unnecessary.
 
-## Register dagitimi: kontrollu deneyle olculdu
+| 39 | If all the registers are **one higher** than expected, there is an **extra parameter being forwarded** untouched in the source | In `SubmitPack` the ROM used `{r4,r5,r6}` + r2/r3 while ours generated `{r3,r4,r5}` + r1/r2; the entire difference was a single register shift. There was no instruction SETTING r1, so the value was an incoming parameter. Adding the second parameter to the signature and forwarding it in the call took an 8-byte difference to zero. Earlier, adding an argument to `FUN_08060db4(void)` had already brought it from 16 to 8 |
+| 40 | If the ROM keeps short-lived intermediates in **scratch registers** (r0-r3), the source must also use **block-scoped separate temporaries**; a single reused local pushes them into callee-saved | In `ClipBounds` the ROM generated `push {r4,r5,lr}` while ours generated `push {r4,r5,r6,lr}`: a single `cand` variable lived across the whole function and held r2, whereas the ROM reuses that register once `pad` dies. Putting each component into a `{ s32 cand = ...; if (...) ...; }` block produced six independent short-lived temporaries. Repeated memory reads must also be done through a narrow volatile view; otherwise the compiler caches them as a common subexpression and extends the lifetime (96 bytes vs the ROM's 100). Together they took a difference of 26 to 0. WARNING: the technique is NOT FUNCTIONAL but LOCAL — the same move worsened CleanupAreaTiles from 7 to 85 and left SetBg1Enable unchanged |
 
-Bu tablo tahmin degil, kurulu `old_agbcc` ikilisi uzerinde yapilan
-kontrollu deneylerin sonucudur (probe: her varyant derlenip prolog `push`
-listesi okundu). Uc park dosyasinin ve 372 baytlik olceklendirme
-denemesinin ortak engeli buydu.
+## Register allocation: measured by controlled experiment
 
-### Yaprak fonksiyon (cagri YOK)
+This table is not a guess; it is the result of controlled experiments on the
+installed `old_agbcc` binary (probe: each variant was compiled and the prologue's
+`push` list read). It was the shared obstacle behind three parked files and a
+372-byte scaling attempt.
 
-| ayni anda canli deger | prolog |
+### Leaf function (NO calls)
+
+| values live simultaneously | prologue |
 |---|---|
-| 2 | push yok |
-| 3 | push yok |
-| 4 | push yok |
+| 2 | no push |
+| 3 | no push |
+| 4 | no push |
 | 5 | `push {r4, lr}` |
 | 6 | `push {r4, r5, lr}` |
 | 7 | `push {r4, r5, r6, lr}` |
 
-Yani **dorde kadar canli deger `r0`-`r3`'e sigar**; besinci `r4`, altinci
-`r5`, yedinci `r6`.
+So **up to four live values fit in `r0`-`r3`**; the fifth goes to `r4`, the sixth
+to `r5`, the seventh to `r6`.
 
-### Cagri varsa
+### With calls
 
-Cagri `r0`-`r3`'u ezdigi icin cagri boyunca yasayan HER deger
-callee-saved ister:
+Because a call clobbers `r0`-`r3`, EVERY value living across a call needs a
+callee-saved register:
 
-| cagri boyunca canli | prolog | not |
+| live across a call | prologue | note |
 |---|---|---|
 | 1 | `push {r4, lr}` | |
 | 2 | `push {r4, r5, lr}` | |
 | 3 | `push {r4, r5, r6, lr}` | |
-| 4+ | `push {r4, r5, r6, lr}` | liste BUYUMEZ, yigina tasar |
+| 4+ | `push {r4, r5, r6, lr}` | the list DOES NOT GROW, it spills to the stack |
 
-Dortte komut sayisi 13'ten 20'ye firliyor: r7'ye gecmek yerine spill
-ediyor. **`r7` ancak 7+ canli degerde geliyor.**
+At four, the instruction count jumps from 13 to 20: instead of moving to r7, it
+spills. **`r7` only appears at 7+ live values.**
 
-### Etkisi olmayanlar (olculdu)
+### Things with no effect (measured)
 
-- **Cagri SAYISI**: 3 canli deger, 1/2/3 cagri -> hepsi `{r4,r5,r6}`.
-- **Isaretci mi skaler mi**: 4 deger, ikisi de `{r4,r5,r6}`.
-- **Sabitin nerede kuruldugu**: dongu icinde/disinda/dogrudan -> ayni kod.
-  agbcc sabiti hoist ediyor.
-- **Kopya**: `w = v` HIC yasamiyor. Tek yerel, kopyali iki yerel ve
-  ikisi de sabitten kurulan iki yerel -> ucu de AYNI kod. Kural 37'nin
-  ("tabani ayri yerele al") sinirı budur: ayri isim vermek kopya
-  URETMEZ, ancak degerin iki farkli KULLANIM YERI varsa uretir.
+- **The NUMBER of calls**: 3 live values with 1/2/3 calls -> all `{r4,r5,r6}`.
+- **Pointer vs scalar**: 4 values, both give `{r4,r5,r6}`.
+- **Where a constant is set up**: inside/outside the loop/directly -> the same
+  code. agbcc hoists the constant.
+- **Copies**: `w = v` NEVER survives. One local, two locals with a copy, and two
+  locals both built from the constant -> all three give the SAME code. This is
+  rule 37's ("take the base into a separate local") limit: giving it a separate
+  name does NOT PRODUCE a copy — it only does when the value has two distinct USE
+  SITES.
 
-### Nasil kullanilir
+### How to use it
 
-ROM'un prologu kac callee-saved register istediginizi soyler; oradan
-ROM'un kac canli degeri oldugunu geri hesaplayin ve kaynagi o sayiya
-getirin. Fazladan bir `push` demek fazladan bir canli deger demektir.
+The ROM's prologue tells you how many callee-saved registers it wants; from that,
+work backwards to how many live values the ROM has and bring the source to that
+number. One extra `push` means one extra live value.
 
-UYARI 1: deger SAYISINI dusurmek gerekir, DEGISTIRMEK degil.
-CleanupAreaTiles'ta sayaci kaldirip yerine bitis isaretcisi koydum -- sayi
-altida kaldi, prolog degismedi ve fark 7'den 60'a cikti.
+WARNING 1: you must reduce the NUMBER of values, not CHANGE them. In
+CleanupAreaTiles I removed the counter and put an end pointer in its place — the
+number stayed at six, the prologue did not change, and the difference went from 7
+to 60.
 
-UYARI 2 -- KURALIN ASIL SINIRI: kaynaktaki yerel sayisi, dagiticinin
-canli kumesi DEGILDIR. CleanupAreaTiles'ta `block` yerelini iki ayri
-sekilde dongu disina cikardim (satir ici cagri; dongu sonrasi atama) ve
-prolog IKISINDE DE degismedi -- agbcc sabit adresi zaten hoist ettigi
-icin `block` hicbir zaman dongu boyunca canli degildi.
+WARNING 2 — THE RULE'S REAL LIMIT: the number of locals in the source is NOT the
+allocator's live set. In CleanupAreaTiles I hoisted the `block` local out of the
+loop in two different ways (an inline call; an assignment after the loop) and the
+prologue did NOT change in EITHER — because agbcc already hoists the constant
+address, so `block` was never live across the loop.
 
-Yani kural izole deneyde olculebiliyor ama gercek bir fonksiyona
-uygulamak icin dagiticinin canli kumesini GORMEK gerekiyor; kaynaktaki
-yerelleri saymak yaniltiyor.
+So the rule can be measured in an isolated experiment, but applying it to a real
+function requires SEEING the allocator's live set; counting locals in the source
+misleads.
 
-BU ADIM COZULDU: agbcc `-dg` bayragini kabul ediyor ve global dagitim
-dokumu (`.greg`) uretiyor. Dokumde dagiticinin KENDI oncelik listesi
-yazili -- her pseudo icin `refs` ve `live_length`. `tools/dump_alloc.py`
-bunu okuyup tabloyu basiyor.
+THIS STEP IS SOLVED: agbcc accepts the `-dg` flag and produces a global
+allocation dump (`.greg`). The dump contains the allocator's OWN priority list —
+`refs` and `live_length` for each pseudo. `tools/dump_alloc.py` reads it and
+prints the table.
 
-FORMUL DOKUME KARSI DOGRULANDI. Bir probe fonksiyonunda dokumun yazdigi
-sira:
-    R25 refs=7 omur=18 -> 0.778
-    R23 refs=7 omur=26 -> 0.538
-    R22 refs=7 omur=28 -> 0.500
-    R27 refs=4 omur=20 -> 0.400
-    R26 refs=3 omur=18 -> 0.167
-    R24 refs=2 omur=24 -> 0.083
-`floor_log2(refs) * refs / omur` ile hesaplanan sira BIREBIR ayni.
+THE FORMULA WAS CONFIRMED AGAINST THE DUMP. In one probe function the order the
+dump printed was:
+    R25 refs=7 lifetime=18 -> 0.778
+    R23 refs=7 lifetime=26 -> 0.538
+    R22 refs=7 lifetime=28 -> 0.500
+    R27 refs=4 lifetime=20 -> 0.400
+    R26 refs=3 lifetime=18 -> 0.167
+    R24 refs=2 lifetime=24 -> 0.083
+The order computed with `floor_log2(refs) * refs / lifetime` is EXACTLY the same.
 
-ILK OLCUM SASIRTICI: CleanupAreaTiles'ta 12 pseudo-register ve 5 spill
-var; ben alti canli deger sayiyordum. Kaynaktaki her yerel birden fazla
-pseudo'ya aciliyor, bu yuzden elle saymak yaniltiyordu.
+THE FIRST MEASUREMENT WAS SURPRISING: CleanupAreaTiles has 12 pseudo-registers
+and 5 spills; I had been counting six live values. Each local in the source
+expands into more than one pseudo, which is why counting by hand was misleading.
 
-SPILL SAYISI OLCUT DEGIL -- 285 fonksiyonda olculdu ve hipotez CURUDU:
+SPILL COUNT IS NOT A CRITERION — measured across 285 functions, and the
+hypothesis was REFUTED:
 
-    eslesen 277 fonksiyon : spill ort 3.85, MAX 170, %43'u sifir spill
-    eslesmeyen 8 fonksiyon: spill ort 19.75, max 99, %12'si sifir spill
+    277 matching functions   : spills mean 3.85, MAX 170, 43% with zero spills
+    8 non-matching functions : spills mean 19.75, max 99, 12% with zero spills
 
-Eslesen fonksiyonlarda 170 spill'e kadar ornek var; yani yuksek spill
-eslesmeyi ENGELLEMIYOR. Tersi de dogru: EitherInRange 3 pseudo ve SIFIR
-spill tasiyor ama hala 8 bayt farkli (onun engeli karsilastirma sabiti
-kanonikleştirmesi, dagitimla ilgisi yok). HalvesEqual 1 pseudo/2 spill,
-yine eslesmiyor.
+There are matching functions with up to 170 spills, so a high spill count does
+NOT PREVENT matching. The converse holds too: EitherInRange has 3 pseudos and
+ZERO spills yet is still 8 bytes off (its obstacle is comparison constant
+canonicalization, nothing to do with allocation). HalvesEqual has 1 pseudo / 2
+spills and also does not match.
 
-Yani `dump_alloc.py` bir fonksiyonun KENDI varyantlarini karsilastirmak
-icin gecerli bir olcut (A bicimi B bicimine gore kac pseudo/spill
-uretiyor), ama fonksiyonlar ARASI bir esik yok. "Spill'i su sayinin
-altina indir" diye bir hedef kurulamaz.
+So `dump_alloc.py` is a valid criterion for comparing a function's OWN variants
+(how many pseudos/spills form A produces versus form B), but there is no
+cross-function threshold. No goal of the form "get spills below N" can be set.
 
-Eslesmeyenlerin pseudo ortalamasi yuksek (34.4 vs 7.0) ama bu yaniltici:
-o sekiz fonksiyon zaten bilerek secilmis en zor ornekler.
+The non-matching set's pseudo average is high (34.4 vs 7.0), but that is
+misleading: those eight functions were deliberately chosen as the hardest
+examples.
 
-## Kural 51 — Adres yerelleri gereksiz gorunse de yazmac dagitimini belirler
+## Rule 51 — address locals look unnecessary but determine register allocation
 
-`ResetRuntimeGlobals` icindeki uc bagimsiz `u16` global dogrudan sifirlandiginda
-agbcc yaprak fonksiyon uretti ve ROM'dan 22 komut sasti. Ilk iki adresi yerel
-pointer'da tutmak `r4`/`r3` yasam araligini ve `{r4,lr}` prologunu geri getirdi;
-fonksiyon 204/204 byte-matching oldu. Ardarda global store'larda ROM callee-save
-yazmaci kullaniyorsa, adres yereli anlamsal olarak gereksiz diye silinmemeli.
+When the three independent `u16` globals in `ResetRuntimeGlobals` were zeroed
+directly, agbcc produced a leaf function and drifted 22 instructions from the
+ROM. Holding the first two addresses in local pointers restored the `r4`/`r3`
+lifetimes and the `{r4,lr}` prologue; the function became 204/204 byte-matching.
+If the ROM uses a callee-saved register in consecutive global stores, an address
+local must not be deleted merely because it is semantically unnecessary.
 
-## Kural 51 — Eşit öncelikli iki değişkende yazmacı akış şekli belirler
+## Rule 51 — with two equal-priority variables, the shape of the flow decides the register
 
-Aynı sayıda referansı ve aynı ömrü olan iki pseudo, kural 50'nin öncelik
-formülünde **tam eşitliğe** düşer (`floor_log2(refs) * refs / ömür`). Eşitlikte
-agbcc allocno numarasına göre sıralar, yani parametre sırası kazanır ve
-istediğin yazmaç eşlemesini sözcük düzeyinde yazım değişiklikleriyle (karşılaştırma
-operandını çevirmek, `(u32)` cast'i, yerel değişkene kopyalamak, bildirim
-sırasını değiştirmek) **kıramazsın** — 13 yazım denendi, dokuzu aynı tabloyu
-üretti.
+Two pseudos with the same reference count and the same lifetime fall into an
+**exact tie** in rule 50's priority formula (`floor_log2(refs) * refs /
+lifetime`). On a tie, agbcc orders by allocno number, so parameter order wins and
+you **cannot break** the register assignment you want with lexical spelling
+changes (flipping a comparison's operands, a `(u32)` cast, copying into a local,
+changing declaration order) — 13 spellings were tried, nine produced the same
+table.
 
-Eşitliği kıran şey **kontrol akışının şekli**: tek bir `&&` zinciri her iki
-değeri de aynı temel bloğa kadar canlı tutar, erken çıkışlı `if (...) return`
-zinciri ise önce sınanan değerin ömrünü bir komut uzatır ve önceliğini düşürür.
+What breaks the tie is **the shape of the control flow**: a single `&&` chain
+keeps both values live up to the same basic block, whereas an early-exit
+`if (...) return` chain extends the lifetime of the first-tested value by one
+instruction and lowers its priority.
 
-Ölçüm — `IsSlotValueInRange` @ 0x08065538:
+Measurement — `IsSlotValueInRange` @ 0x08065538:
 
-| yazım | low pseudo | high pseudo | sonuç |
+| spelling | low pseudo | high pseudo | result |
 |---|---|---|---|
-| `a && b && c && d` tek ifade | ömür 13, öncelik 0,154 | ömür 13, öncelik 0,154 | eşitlik; low r4 alıyor, **4 bayt fark** |
-| erken çıkışlı `if` zinciri | ömür 14, öncelik 0,143 | ömür 13, öncelik 0,154 | high r4 alıyor, **byte-matching** |
+| `a && b && c && d` as one expression | lifetime 13, priority 0.154 | lifetime 13, priority 0.154 | tie; low takes r4, **4-byte difference** |
+| an early-exit `if` chain | lifetime 14, priority 0.143 | lifetime 13, priority 0.154 | high takes r4, **byte-matching** |
 
-Teşhis tek komut: `dump_alloc.py --function <ad>`. İki pseudo'nun önceliği
-eşitse sorun yazım değil akış şeklidir; ifadeyi bölmeyi dene, sözcük
-varyantlarını tarama.
+The diagnosis is one command: `dump_alloc.py --function <name>`. If the two
+pseudos have equal priority, the problem is the shape of the flow, not the
+spelling; try splitting the expression rather than sweeping lexical variants.
 
-### Kural 49 eki — döngü rotasyonunu bayrağın nerede kurulduğu belirler
+### Addendum to rule 49 — loop rotation is determined by where the flag is set
 
-`WaitLinkSettle` @ 0x08066454 ölçümü. Aynı gövde iki yazımla:
+Measured on `WaitLinkSettle` @ 0x08066454. The same body with two spellings:
 
-| yazım | üretilen yerleşim |
+| spelling | layout produced |
 |---|---|
-| `for (;;) { kontrol; if (!again) break; bekleme; }` | kontrol bloğu başta, bekleme sonda; agbcc döngü değişmezi olarak ikinci global adresini **döngü dışına taşıyor** (fazladan yazmaç + push) |
-| `again = 1; while (again) { kontrol; ...; bekleme; }` | bekleme bloğu başta, girişte gövdeye atlayan `b`; adres blok **içinde** yükleniyor — **byte-matching** |
+| `for (;;) { check; if (!again) break; wait; }` | the check block first and the wait last; agbcc moves the second global's address **out of the loop** as a loop invariant (an extra register + push) |
+| `again = 1; while (again) { check; ...; wait; }` | the wait block first, with a `b` jumping into the body on entry; the address is loaded **inside** the block — **byte-matching** |
 
-Teşhis işareti: ROM bir global adresini döngünün içinde tekrar tekrar
-yüklüyorsa, o blok ROM'un kaynağında döngü gövdesinin *rotasyonlu*
-kısmındadır. Bayrağı döngüden önce kurup `while (bayrak)` yazmak
-rotasyonu ROM'unkine oturtuyor.
+The diagnostic sign: if the ROM loads a global's address repeatedly inside the
+loop, that block is in the *rotated* part of the loop body in the ROM's source.
+Setting the flag before the loop and writing `while (flag)` makes the rotation
+match the ROM's.
 
-## Kural 52 — Zincirli atama iki hedefi eş zamanlı canlı tutar
+## Rule 52 — a chained assignment keeps two targets live simultaneously
 
-Aynı değeri iki ayrı global'e yazarken yazım biçimi **yazmaç dağıtımını
-değiştiriyor**:
+When writing the same value into two separate globals, the spelling **changes the
+register allocation**:
 
 ```c
-a = 0;              /* iki ayri ifade */
+a = 0;              /* two separate expressions */
 b = 0;
 ```
-Yerel dağıtıcı her adresi kendi yazımının hemen öncesinde **aynı** yazmaca
-koyar ve sırayla kullanır:
+The local allocator puts each address into the **same** register immediately
+before its own store and uses them in turn:
 `ldr r0,=a / movs r1,#0 / strb r1,[r0] / ldr r0,=b / strb r1,[r0]`
 
 ```c
-b = (a = 0);        /* tek zincir */
+b = (a = 0);        /* one chain */
 ```
-Tek bir sıfır değeri üretilir, **iki adres eş zamanlı canlı** olur:
+A single zero value is produced and **both addresses are live simultaneously**:
 `ldr r2,=b / ldr r1,=a / movs r0,#0 / strb r0,[r1] / strb r0,[r2]`
 
-Ölçüm — `ResetLinkSession` @ 0x08066144: ayrı ifadelerle 8 bayt fark,
-zincirle **byte-matching**.
+Measurement — `ResetLinkSession` @ 0x08066144: an 8-byte difference with separate
+expressions, **byte-matching** with the chain.
 
-### Bu, daha önce yazdığım bir yargıyı çürütüyor
+### This refutes a judgement I recorded earlier
 
-`dump_alloc` iki adres sabitini ayrı pseudo olarak, ikisini de yerel
-dağıtıcıda ve ikisini de aynı yazmaçta gösterdiğinde "global yarışa
-girmiyorlar, kural 50'nin önceliği işlemiyor, kaynak kolu yok" diye park
-etmiştim. **Yanlıştı.** Kol var; teşhis aracı onu göstermiyor çünkü
-dağıtım tablosu *sonucu* gösteriyor, ifadenin RTL'de kaç değer ürettiğini
-değil. Yerel dağıtıcıda buluşan iki pseudo gördüğünde park etme; önce
-ifadeyi birleştirmeyi dene.
+When `dump_alloc` showed the two address constants as separate pseudos, both in
+the local allocator and both in the same register, I parked it saying "they are
+not competing globally, rule 50's priority does not apply, there is no source
+lever." **That was wrong.** The lever exists; the diagnostic tool does not show
+it, because the allocation table shows the *result*, not how many values the
+expression produces in RTL. When you see two pseudos meeting in the local
+allocator, do not park; first try merging the expression.
 
-### Nasıl bulundu
+### How it was found
 
-Permuter (`build/permuter/ResetLinkSession`, temel skor 230, ~560
-yinelemede skor 0). Kural 44'ün öngördüğü şey: elle taramanın kapatamadığı
-küçük farklarda permuter **mekanizmayı** buluyor. Buradaki mekanizma tek
-satırlık ve genellenebilir olduğu için ayrı bir kural oldu.
+The permuter (`build/permuter/ResetLinkSession`, base score 230, score 0 in about
+560 iterations). What rule 44 predicted: on small differences that a manual sweep
+cannot close, the permuter finds the **mechanism**. The mechanism here was one
+line long and generalizable, so it became a rule of its own.
 
-## Kural 53 — Çarpım operand sırası kaynakta terstir
+## Rule 53 — the multiplication operand order is reversed in the source
 
-agbcc `a * b` için **ikinci** operandı önce yükler. `LoadBitmapAsset`
-@ 0x08065574 ölçümü: ROM `ldrh [r4,#14]` (boy) sonra `ldrh [r4,#12]` (en)
-üretiyor; bunu veren kaynak `en * boy`, `boy * en` değil. Ters yazım
-4 bayt saptırıyor ve aynı fonksiyonda iki yerde birden.
+agbcc loads the **second** operand of `a * b` first. Measured on
+`LoadBitmapAsset` @ 0x08065574: the ROM generates `ldrh [r4,#14]` (height) then
+`ldrh [r4,#12]` (width); the source that gives this is `width * height`, not
+`height * width`. The reversed spelling drifts by 4 bytes, and in two places in
+the same function.
 
-Teşhis: ROM'un yükleme sırasına bak, kaynağa **tersini** yaz.
+Diagnosis: look at the ROM's load order and write **the reverse** in the source.
 
-## Kural 54 — Kayıt/geri-yükle değişkenini bloklara böl
+## Rule 54 — split a save/restore variable into blocks
 
-Aynı donanım yazmacını iki ayrı blokta kaydedip geri yüklerken **iki ayrı
-yerel** kullan. Tek değişken, canlı aralığı iki bloğu birden kapsatıp
-yazmaç baskısını artırıyor: `LoadBitmapAsset`'te bu, `dest`'i callee-saved
-yüksek yazmaca itip fazladan bir push/pop çifti ekledi — **12 bayt**.
-ROM ikinci kaydı `ip`'de tutuyor, yani ayrı ve kısa ömürlü bir değer.
+When saving and restoring the same hardware register in two separate blocks, use
+**two separate locals**. A single variable makes the live range span both blocks
+and increases register pressure: in `LoadBitmapAsset` this pushed `dest` into a
+callee-saved high register and added an extra push/pop pair — **12 bytes**. The
+ROM keeps the second save in `ip`, i.e. as a separate, short-lived value.
 
-## Kural 55 — Çok kullanılan `u8` alanını önce yerele al
+## Rule 55 — take a heavily used `u8` field into a local first
 
-Bir `u8` yapı alanını aynı bloktan birden fazla ifadede kullanırsan
-(örneğin hem `x >> 1` hem `x` ile karşılaştırma), doğrudan üye erişimi
-agbcc'ye gereksiz bir sıfır-genişletme çifti ürettiriyor:
+If you use a `u8` struct field in more than one expression in the same block (for
+instance both `x >> 1` and a comparison against `x`), direct member access makes
+agbcc generate an unnecessary zero-extension pair:
 
 ```c
 if (r->a >= r->b >> 1) ...      /* ldrb / lsls #24 / lsrs #24 / lsrs #25 */
 if (r->a >= r->b) ...
 ```
 
-Değeri önce yerele almak `ldrb`'nin zaten yaptığı genişletmeyi tekrar
-etmiyor ve ROM'un şeklini veriyor:
+Taking the value into a local first does not repeat the extension `ldrb` already
+performs and gives the ROM's shape:
 
 ```c
 altB = r->b;                    /* ldrb */
@@ -842,295 +875,296 @@ if (curA >= altB >> 1) ...      /* lsrs #1 */
 if (curA >= altB) ...
 ```
 
-Ölçüm: `FUN_08067014` @ 0x08067014, iki komut kazandı ve komut dizisi
-ROM'unkiyle hizalandı. Not: bu kolun tersi de var — ROM bazen aynı baytı
-her kullanımda **yeniden okuyor**; o durumda yerel KULLANMA, doğrudan üye
-erişimi yaz. Hangisi olduğunu ROM'un `ldrb` sayısından oku.
+Measurement: `FUN_08067014` @ 0x08067014 gained two instructions and its
+instruction sequence aligned with the ROM's. Note: the inverse branch also
+exists — the ROM sometimes **re-reads** the same byte at every use; in that case
+do NOT use a local, write direct member access. Read which case applies from the
+ROM's `ldrb` count.
 
-## Kural 56 — Bitfield karşılaştırması: eşitlik maskeli, doyum işaretsiz
+## Rule 56 — bitfield comparisons: masked for equality, unsigned for saturation
 
-`BumpStepCounter` @ 0x08066B40 ölçümü, iki ayrı tuzak:
+Measured on `BumpStepCounter` @ 0x08066B40, with two separate traps:
 
-**Eşitlik testi.** agbcc bir bitfield eşitlik testini asla maske
-karşılaştırmasına çevirmiyor; alan `int`'e yükseltildiği için
-`optimize_bit_field_compare` hiç çalışmıyor ve `x.f == 19` daima
-`lsl/lsr` çıkarımı + `cmp` üretiyor. ROM'da `ands r0,#MASK /
-cmp r0,#(DEGER<<KAYDIRMA)` görüyorsan **kaynağın kendisi** kaydırılmamış
-maskeli karşılaştırmayı yazmıştır — yani aynı adrese hem bitfield hem ham
-erişim veren bir `union`. Bitfield görünümü ile ham görünüm aynı taban
-yazmacını paylaşıyor, ROM'daki gibi.
+**The equality test.** agbcc never converts a bitfield equality test into a mask
+comparison; because the field is promoted to `int`,
+`optimize_bit_field_compare` never runs and `x.f == 19` always generates an
+`lsl/lsr` extraction + `cmp`. If you see `ands r0,#MASK / cmp r0,#(VALUE<<SHIFT)`
+in the ROM, then **the source itself** wrote the unshifted masked comparison —
+i.e. a `union` giving both a bitfield and a raw view of the same address. The
+bitfield view and the raw view share the same base register, as in the ROM.
 
-**Doyum testi.** `x.f > 20` işaretli `ble` üretiyor; ROM'da `bls` varsa
-sabit açıkça işaretsiz olmalı: `> (u32)20`. Alan zaten `unsigned`
-bildirildiği için gözden kaçması kolay.
+**The saturation test.** `x.f > 20` generates a signed `ble`; if the ROM has
+`bls`, the constant must be explicitly unsigned: `> (u32)20`. It is easy to miss
+because the field is already declared `unsigned`.
 
-Elenen yazımlar: yalnız bitfield'lı struct + `alan == 19` (316 bayt, 24
-eksik); `> 20` düz `int` sabitiyle (`ble`, `bls` değil).
+Eliminated spellings: a struct with only bitfields + `field == 19` (316 bytes, 24
+short); `> 20` with a plain `int` constant (`ble`, not `bls`).
 
-## Kural 57 — SIO yazmaçlarında `volatile` seçici kullanılır
+## Rule 57 — `volatile` is used selectively on SIO registers
 
-`SerialIrqHandler` @ 0x08066904 ölçümü. Aynı adres için üç ayrı görünüm
-gerekiyor ve hangisinin `volatile` olacağı ROM'dan okunur:
+Measured on `SerialIrqHandler` @ 0x08066904. Three separate views are needed for
+the same address, and which one is `volatile` is read from the ROM:
 
-| erişim | doğru biçim | yanlış biçimin bedeli |
+| access | correct form | cost of the wrong form |
 |---|---|---|
-| SIOMLT_SEND yazımı | **volatile değil** | volatile görünüm yazımdan önce ölü bir `ldrh` üretiyor |
-| İlk SIOCNT okuması | **volatile değil** | volatile fazladan `ldrh` + `adds` çifti, +4 bayt |
-| `gBiosIrqFlags` güncellemesi | **volatile** (`*(volatile u16 *)&gBiosIrqFlags`) | volatile olmayan extern sabiti bellekten önce yükleyip o bloğun yazmaç dağıtımını bozuyor |
-| REG_IME | **volatile** | volatile olmayan yazım eşleşmeyi kırıyor |
+| The SIOMLT_SEND write | **not volatile** | a volatile view generates a dead `ldrh` before the write |
+| The first SIOCNT read | **not volatile** | volatile adds an extra `ldrh` + `adds` pair, +4 bytes |
+| The `gBiosIrqFlags` update | **volatile** (`*(volatile u16 *)&gBiosIrqFlags`) | non-volatile loads the extern's constant from memory first and disrupts that block's register allocation |
+| REG_IME | **volatile** | the non-volatile spelling breaks the match |
 
-Ayrıca SIOMULTI kopyası **4 hizalı** olmalı: düz `u16 data[4]` 2 hizalı
-ve agbcc `memcpy` çağrısı üretiyor; `u32 word[2]` içeren bir `union`
-ROM'un `ldr/ldr/str/str` çiftini veriyor.
+The SIOMULTI copy must also be **4-aligned**: a plain `u16 data[4]` is 2-aligned
+and agbcc generates a `memcpy` call; a `union` containing `u32 word[2]` gives the
+ROM's `ldr/ldr/str/str` pair.
 
-Elenen yazımlar (etkisi yok): sayacı u16/u32/s32, önce bildirmek, iç içe
-`if`, tanımda ilklemek, `|=`, ters operand sırası, yerele almak, `(u16)`
-daraltma. Sabiti `+` ile eklemek ve IME'yi volatile'sız yazmak eşleşmeyi
-**bozuyor**.
+Eliminated spellings (no effect): making the counter u16/u32/s32, declaring it
+earlier, nested `if`s, initializing at the definition, `|=`, reversed operand
+order, taking into a local, `(u16)` narrowing. Adding the constant with `+` and
+writing IME without volatile **break** the match.
 
-## Kural 58 — Döngü ön-başlığındaki taşıma sırası ile blok yerleşimi çakışabilir
+## Rule 58 — the hoist order in a loop preheader can conflict with block layout
 
-`WaitForPartner` @ 0x0806620C ölçümü: 134/139 komut aynı, kalan 5 komut
-yalnızca döngü değişmezlerinin (sabitler ve global adresleri) ön-başlığa
-**hangi sırayla** taşındığı.
+Measured on `WaitForPartner` @ 0x0806620C: 134/139 instructions identical, the
+remaining 5 being only **the order in which** loop invariants (constants and
+global addresses) are hoisted into the preheader.
 
-Taşıma sırası kaynaktaki **kullanım** sırasını izliyor. Ama bu fonksiyonda
-iki gereksinim birbirini dışlıyor:
+The hoist order follows the **use** order in the source. But in this function two
+requirements are mutually exclusive:
 
-| yazım | sonuç |
+| spelling | result |
 |---|---|
-| `if (armed == 0) {B} else {A}` | ROM'un blok yerleşimi doğru, taşıma sırası ters → 12 bayt fark |
-| `if (armed != 0) {A} else {B}` | taşıma sırası doğru, ama derleyici B'yi döngünün üstüne çıkarıp giriş atlaması ekliyor → 316 bayt |
+| `if (armed == 0) {B} else {A}` | the ROM's block layout is correct, the hoist order reversed → 12-byte difference |
+| `if (armed != 0) {A} else {B}` | the hoist order is correct, but the compiler lifts B above the loop and adds an entry jump → 316 bytes |
 
-Elle taşıma (`bit1 = 2; irq = &gBiosIrqFlags;`) birinci döngüyü tam
-kapatıyor (8/320) — kaynak düzeyinde değişken ilklemesinin `loop.c`'nin
-taşımalarından ÖNCE üretildiğini kanıtlıyor — ama ikinci döngüde bir
-yazmaç boşaltıp sabitin de taşınmasına yol açıyor ve r8'e taşıyor
-(336/344). Ayrıca `bit1 = 2` savunulabilir kaynak değil, o yüzden
-alınmadı.
+Manual hoisting (`bit1 = 2; irq = &gBiosIrqFlags;`) fully closes the first loop
+(8/320) — proving that source-level variable initialization is emitted BEFORE
+`loop.c`'s hoists — but in the second loop it frees a register, causes the
+constant to be hoisted too, and moves it into r8 (336/344). Besides, `bit1 = 2`
+is not defensible source, so it was not taken.
 
-## Kural 59 — Maske sonucunu `u8` yerele almak birleştirmeyi engeller
+## Rule 59 — taking a mask result into a `u8` local prevents merging
 
-`StepLinkFrame` @ 0x0806660C ölçümü. Bir maske sonucunu `u32` yerele
-alırsan agbcc'nin `regmove` geçişi sabit pseudo'yu AND sonucuyla
-**birleştiriyor** ve tek komut çıkıyor:
+Measured on `StepLinkFrame` @ 0x0806660C. If you take a mask result into a `u32`
+local, agbcc's `regmove` pass **merges** the constant pseudo with the AND result
+and a single instruction comes out:
 
 ```c
 u32 m = cnt & 0x30;      /* movs r0,#0x30 / ands r0,r6 */
 u8  m = cnt & 0x30;      /* movs r1,#0x30 / adds r0,r6,#0 / ands r0,r1  <- ROM */
 ```
 
-`u8` yerel sabiti QImode pseudo yapıyor, birleştirme olmuyor ve ROM'un
-üç komutlu biçimi çıkıyor. Maske düşük bayttaysa fazladan daraltma da
-üretmiyor. (RTL dökümlerinde doğrulandı: `combine` ROM'un biçimini
-veriyor, adlandırma `regmove`'da bozuluyor.)
+A `u8` local makes the constant a QImode pseudo, merging does not happen, and the
+ROM's three-instruction form appears. If the mask is in the low byte, no extra
+narrowing is generated either. (Confirmed in the RTL dumps: `combine` gives the
+ROM's form, and the naming is broken in `regmove`.)
 
-Aynı fonksiyonda ölçülen üç ek nokta:
-- Donanım yazmacında **tek bir bit** temizlemek `bitfield` ataması
-  olmalı. `&= ~0x40` maskeyi 8 bite daraltıp `movs #0xBF` üretiyor;
-  bitfield ise ROM gibi 32 bitte kuruyor (`movs #65 / negs`).
-- If/else'in sonucunu ara bir değişkene alıp sonra atamak, ROM'un
-  birleşme noktasındaki `adds r3,r0,#0` kopyasını koruyor. Doğrudan
-  atarsan agbcc iki kolun ortak son `orr`'unu cross-jump ediyor.
-- Aynı struct'ın üç ayrı bölgesi için **üç ayrı yerel işaretçi** kullan;
-  tek paylaşılan değişken referans sayısını şişirip r4/r5 dağıtımını
-  ters çeviriyor.
+Three additional points measured in the same function:
+- Clearing **a single bit** in a hardware register must be a `bitfield`
+  assignment. `&= ~0x40` narrows the mask to 8 bits and generates `movs #0xBF`;
+  a bitfield builds it at 32 bits like the ROM (`movs #65 / negs`).
+- Taking an if/else's result into an intermediate variable and assigning
+  afterwards preserves the ROM's `adds r3,r0,#0` copy at the join point. Assigning
+  directly makes agbcc cross-jump the two arms' common final `orr`.
+- Use **three separate local pointers** for three separate regions of the same
+  struct; one shared variable inflates the reference count and inverts the r4/r5
+  allocation.
 
-## Kural 60 — Aralık koruması `||` ile değil, iki ayrı `if` ile yazılır
+## Rule 60 — a range guard is written as two separate `if`s, not with `||`
 
-`GetStepIconId` @ 0x08066ED0 ölçümü — projedeki **ilk atlama tablolu**
-eşleşme (36 durum, tablo 0x08066EF0'da).
+Measured on `GetStepIconId` @ 0x08066ED0 — the project's **first jump-table**
+match (36 states, table at 0x08066EF0).
 
 ```c
-if (n < 0 || n > 35) return X;      /* agbcc ikisini TEK isaretsiz
-                                       `cmp r0,#35 / bls`e katliyor ve
-                                       switch'in kendi aralik kontrolüyle
-                                       birlestiriyor -> 312 bayt, 12 eksik */
+if (n < 0 || n > 35) return X;      /* agbcc folds the two into ONE unsigned
+                                       `cmp r0,#35 / bls` and merges it with
+                                       the switch's own range check
+                                       -> 312 bytes, 12 short */
 
-if (n < 0)  return X;               /* isaretli `cmp #0 / blt` */
-if (n > 35) return X;               /* isaretli `cmp #35 / ble`; iki
-                                       `return` cross-jump ile tek gövdede
-                                       birlesiyor, switch kendi bagimsiz
-                                       `cmp #0x23 / bls`ini uretiyor
+if (n < 0)  return X;               /* signed `cmp #0 / blt` */
+if (n > 35) return X;               /* signed `cmp #35 / ble`; the two
+                                       `return`s merge into one body via
+                                       cross-jumping, and the switch generates
+                                       its own independent `cmp #0x23 / bls`
                                        -> 324/324 BYTE-MATCHING */
 ```
 
-Parametre **işaretli** olmalı (`s32`): korumadaki `blt`/`ble` bunu
-gerektiriyor. Switch'in kendi kontrolü ise agbcc'nin atlama tablolarında
-her zaman ürettiği gibi işaretsizdir (`bls`).
+The parameter must be **signed** (`s32`): the guard's `blt`/`ble` require it. The
+switch's own check, as agbcc always generates for jump tables, is unsigned
+(`bls`).
 
-Ayrıca doğrulandı: Ghidra'nın düşük satır yoğunluğu + "Could not recover
-jumptable" uyarısı bu ROM'da **atlama tablosu** demek. Tablo girişleri
-`ldr`/`lsrs` çöpü olarak sökülüyor; ROM'dan 4 bayt aralıklı kod adresleri
-okuyarak doğrula.
+Also confirmed: in this ROM, Ghidra's low line density plus a "Could not recover
+jumptable" warning means **a jump table**. The table entries are disassembled as
+`ldr`/`lsrs` garbage; verify by reading code addresses at 4-byte intervals from
+the ROM.
 
-## Kural 61 — Bitfield kabı, alanın SIĞDIĞI en dar erişimi belirler
+## Rule 61 — a bitfield's container determines the narrowest access that FITS the field
 
-`GetRecordField` @ 0x08066D54 ölçümü. Aynı bit dizisini `u16` ya da `u32`
-kap ile bildirmek farklı komutlar üretiyor, çünkü agbcc her alan için
-**onu tümüyle içeren en dar erişimi** seçiyor:
+Measured on `GetRecordField` @ 0x08066D54. Declaring the same bit sequence with a
+`u16` or a `u32` container generates different instructions, because agbcc picks,
+for each field, **the narrowest access that fully contains it**:
 
-- Alan bir bayt sınırını aşmıyorsa → `ldrb`
-- Yarım kelime içinde ama bayt sınırını aşıyorsa → `ldrh`
-- Yarım kelime sınırını da aşıyorsa → `ldr` (tam kelime)
+- If the field does not cross a byte boundary → `ldrb`
+- If it is within a halfword but crosses a byte boundary → `ldrh`
+- If it also crosses a halfword boundary → `ldr` (a full word)
 
-Bu yüzden kabın genişliği, *o kaptaki en geniş alan* tarafından
-belirlenir. `RecordData+0x2C`'de 11-16. bitleri kaplayan bir alan var;
-hiçbir yarım kelime onu kapsamadığı için kap **`u32` olmak zorunda**.
-Aynı kaptaki diğer alanlar yine kendi en dar erişimlerini alıyor
-(`ldrb` 0x2E, `ldrh` 0x2E, `ldrb` 0x2F).
+So the container's width is determined by *the widest field in that container*.
+At `RecordData+0x2C` there is a field spanning bits 11–16; because no halfword
+contains it, the container **must be `u32`**. The other fields in the same
+container still get their own narrowest accesses (`ldrb` 0x2E, `ldrh` 0x2E,
+`ldrb` 0x2F).
 
-Kardeş dosya `bump_rank_counter.c` aynı bitleri `u16` kapla tanımlıyor ve
-orada DOĞRU kalıyor — çünkü o fonksiyon 6 bitlik taşan alanı hiç okumuyor.
-Yani kap genişliği dosyaya göre değişebilir; ölçüt ROM'un o fonksiyondaki
-yükleme genişliğidir.
+The sibling file `bump_rank_counter.c` defines the same bits with a `u16`
+container and stays CORRECT there — because that function never reads the 6-bit
+overflowing field. So the container width can vary by file; the criterion is the
+ROM's load width in that function.
 
-Ek ölçüm: Thumb `ldrb` imm5 ofseti 31'de bitiyor, bu yüzden 0x20'den
-büyük ofsetteki her bayt alanı `adds r0,r2,#0 / adds r0,#N / ldrb`
-üçlüsünü gerektiriyor — bu bir kaynak tuhaflığı değil, komut seti sınırı.
-`ldrh` ofseti 2 ile ölçeklendiği için yarım kelimeler doğrudan yükleniyor.
+An additional measurement: the Thumb `ldrb` imm5 offset ends at 31, so every byte
+field at an offset above 0x20 requires the triple
+`adds r0,r2,#0 / adds r0,#N / ldrb` — this is not a source oddity but an
+instruction set limit. Because the `ldrh` offset is scaled by 2, halfwords are
+loaded directly.
 
-Ayrıca: switch gövdeleri ROM'da **kaynak sırasına** göre yerleşiyor, tablo
-sırasına göre değil. ROM'un blok sırasını yakalamak için `case`'leri
-ROM'daki gövde sırasına göre yaz.
+Also: switch bodies are laid out in the ROM in **source order**, not table order.
+To capture the ROM's block order, write the `case`s in the ROM's body order.
 
-## Kural 62 — Donanım yazmacına YAZARKEN volatile görünüm kullanma
+## Rule 62 — do not use a volatile view when WRITING to a hardware register
 
-`ShutdownAndReset` @ 0x08065650 ölçümü, kural 57'nin DMA denetimi için
-doğrulanmış hali:
+Measured on `ShutdownAndReset` @ 0x08065650, the confirmed form of rule 57 for
+DMA control:
 
 ```c
 REG_DMA0.control = REG_DMA0.control & MASK;   /* volatile DmaRegs:
-                                                 ldrh / and / ldrh(ölü) / strh */
+                                                 ldrh / and / ldrh(dead) / strh */
 ```
 
-Volatile bir görünüm üzerinden yazmak, `strh`'den önce **ölü bir `ldrh`**
-üretiyor. Adres için iki görünüm tanımla — okuma (ve bilinçli boş okuma)
-için volatile olan, yazma için volatile olmayan:
+Writing through a volatile view generates **a dead `ldrh`** before the `strh`.
+Define two views for the address — one volatile for reads (and deliberate empty
+reads), one non-volatile for writes:
 
 ```c
-#define DMA_W(n)  (*(DmaRegs *)(0x040000B0 + (n) * 12))          /* yazma */
-#define REG_DMA(n) (*(volatile DmaRegs *)(0x040000B0 + (n) * 12)) /* okuma */
+#define DMA_W(n)  (*(DmaRegs *)(0x040000B0 + (n) * 12))          /* write */
+#define REG_DMA(n) (*(volatile DmaRegs *)(0x040000B0 + (n) * 12)) /* read  */
 ```
 
-Dört kanalda 8 ölü yükleme = **16 bayt**; fark 139'dan 4 bayta indi.
+8 dead loads across four channels = **16 bytes**; the difference dropped from 139
+to 4 bytes.
 
-## Kural 63 — `a = b = 0` zinciri sabiti adresten SONRA üretir
+## Rule 63 — an `a = b = 0` chain produces the constant AFTER the address
 
-Aynı fonksiyonun son 4 baytı. ROM `ldr r0,=IME / movs r5,#0 / strh`
-üretiyor: önce adres, sonra sabit. Ayrı bir `zero = 0;` deyimi sabiti
-**önce** üretiyor.
+The last 4 bytes of the same function. The ROM generates
+`ldr r0,=IME / movs r5,#0 / strh`: the address first, then the constant. A
+separate `zero = 0;` statement produces the constant **first**.
 
 ```c
-zero = 0;  REG_IME = zero;    /* sabit once  -> ROM'dan sapiyor */
-REG_IME = zero = 0;           /* sabit dis atamanin RHS'i olarak
-                                 LHS adresinden SONRA -> ROM  */
+zero = 0;  REG_IME = zero;    /* constant first -> diverges from the ROM */
+REG_IME = zero = 0;           /* the constant as the outer assignment's RHS,
+                                 AFTER the LHS address -> the ROM's form */
 ```
 
-Kural 52'nin (`b = (a = 0)` iki adresi eş zamanlı canlı tutar) kardeşi:
-zincirleme atama yalnız canlılığı değil, **üretim sırasını** da
-belirliyor. Elenen: tüm sıfırları düz sabit yazmak (168 bayt, 137 fark —
-sıfır artık r5'te tutulmuyor).
+The sibling of rule 52 (`b = (a = 0)` keeps two addresses live simultaneously): a
+chained assignment determines not only liveness but also **production order**.
+Eliminated: writing all the zeros as plain constants (168 bytes, 137 differences —
+zero is no longer kept in r5).
 
-## Kural 64 — İşaretçiyi ilerletmek taban sabitinin ömrünü bölebilir
+## Rule 64 — advancing a pointer can split a base constant's lifetime
 
-`FUN_080657d8` TX etiketleri, 2026-09-07. İki paralel bayt halkasından
-aynı indeksteki değerleri paketleyen `PackLocalLinkTag` yardımcısında:
+`FUN_080657d8`'s TX tags, 2026-09-07. In the `PackLocalLinkTag` helper, which
+packs values at the same index from two parallel byte rings, writing:
 
 ```c
-entry = gRam020003C0 + index;  /* tek ifade */
+entry = gRam020003C0 + index;  /* a single expression */
 ```
 
-yerine:
+instead as:
 
 ```c
 entry = gRam020003C0;
-entry += index;               /* tabandan ilgili kayda ilerle */
+entry += index;               /* advance from the base to the relevant record */
 ```
 
-yazılması, her iki inline açılımda da taban yüklemesinin ayrı ve kısa
-ömürlü kalmasını sağlıyor. `entry` yalnız bir taban takma adı değil:
-değeri değişiyor ve ilerlediği kaydın baytı okunuyor. Yardımcı halka
-indeksini 31 ile maskeliyor ve iki baytı bir `u16` etikete dönüştürüyor.
-Yeni yan etkili çağrı veya `volatile` erişim eklenmiyor.
+keeps the base load separate and short-lived in both inline expansions. `entry` is
+not merely a base alias: its value changes and the byte of the record it advances
+to is read. The helper masks the ring index with 31 and turns two bytes into a
+`u16` tag. No new side-effecting call or `volatile` access is introduced.
 
-| kaynak biçimi | boyut | aynı komut |
+| source form | size | identical instructions |
 |---|---:|---:|
-| Önceki doğrudan iki paketleme ifadesi | 2356 | 575/1174 |
-| Yardımcı içinde tek adımlı işaretçi | 2356 | 573/1174 |
-| Yardımcı içinde iki adımlı ilerleme | 2352 | **669/1174** |
+| The earlier two direct packing expressions | 2356 | 575/1174 |
+| A one-step pointer inside the helper | 2356 | 573/1174 |
+| Two-step advancement inside the helper | 2352 | **669/1174** |
 
-Başlangıçtaki `.lreg/.greg` dökümlerinde TX bloğunun `gRam020003C0`
-tabanı p1012'dir: L79, 6 referans, 20 komut ömür, **r4**. Korunan
-yazımda onun yerini iki ayrı yerel pseudo alır: p1005 ve p1032,
-her biri 8 referans / 8 komut ömür, **r1**. `gRam02000E80` tabanı r3'te
-kalır. Böylece k'nin p44 dağıtımı r5'ten **r4**'e geçer; TX işaretçisi
-r5, cur r6 ve tuş halkasının taban kopyası r7 olur. Eski devir belgesinin
-r4'teki sembolü `gRam02000E80` diye tanımlaması yanlıştı.
+In the initial `.lreg/.greg` dumps, the TX block's `gRam020003C0` base is p1012:
+L79, 6 references, a 20-instruction lifetime, **r4**. In the retained spelling its
+place is taken by two separate local pseudos, p1005 and p1032, each with 8
+references / an 8-instruction lifetime, in **r1**. The `gRam02000E80` base stays
+in r3. As a result, k's p44 allocation moves from r5 to **r4**; the TX pointer
+becomes r5, cur r6, and the key ring's base copy r7. The old handover document's
+identification of the symbol in r4 as `gRam02000E80` was wrong.
 
-Bu sonuç **bütün fonksiyonun eşleştiğini göstermez**: 505 komut farkı
-sürüyor; TX'teki iki adres toplamı da hâlâ farklı yazmaç kullanıyor.
-ROM gibi k=r4 elde etmek gerekli bir ilerleme oldu, tek başına yeterli
-olmadı. Boyutun ROM'dan uzaklaşmasına rağmen net 94 komut kazancı var.
+This result **does not show that the whole function matches**: a 505-instruction
+difference persists, and the two address additions in TX still use different
+registers. Getting k=r4 like the ROM was necessary progress, but not sufficient on
+its own. Despite the size moving away from the ROM's, there is a net gain of 94
+instructions.
 
-Yeniden üretim: `python3 tools/probe_sio_tx.py`. Araç kaynak dosyasını
-değiştirmeden üç adayı geçici dizinde derler, `diff_function.py` ile aynı
-skoru hesaplar ve dış çağrı hedef/adetlerinin değişmediğini doğrular.
-Tam eşleşme kapısı hâlâ `make c-match FILE=src/world/sio_driver.c`.
+Reproduction: `python3 tools/probe_sio_tx.py`. The tool compiles three candidates
+in a temporary directory without modifying the source file, computes the same
+score with `diff_function.py`, and verifies that the external call targets and
+counts have not changed. The full-match gate is still
+`make c-match FILE=src/world/sio_driver.c`.
 
-## Kural 65 — Donanım adresi: mutlak makro CSE görmez, işaretçi değişkeni görür
+## Rule 65 — hardware addresses: an absolute macro is invisible to CSE, a pointer variable is not
 
-Aynı adres iki farklı biçimde yazıldığında agbcc'nin ürettiği kod
-farklıdır, çünkü **adres sabitinin sözde-yazmaç olup olmadığı**
-değişir:
+When the same address is written in two different forms, agbcc generates different
+code, because **whether the address constant becomes a pseudo-register** changes:
 
-* `#define R (*(vu16 *)0x04000008)` → adres bir MEM adresi olarak kalır,
-  ortak alt ifade eleme (CSE) onu görmez, kendi havuz girişini alır.
-* `vu16 *p = (vu16 *)0x04000008;` → adres bir sözde-yazmaça girer; yakın
-  bir başka sabit varsa CSE onu ondan türetir.
+* `#define R (*(vu16 *)0x04000008)` → the address stays a MEM address, common
+  subexpression elimination (CSE) does not see it, and it gets its own pool entry.
+* `vu16 *p = (vu16 *)0x04000008;` → the address enters a pseudo-register; if
+  another nearby constant exists, CSE derives it from that one.
 
-Ölçüm (`0x080127A8`, SetupBg0Bg1): fonksiyon önce `REG_DISPCNT`
-(0x04000000, `movs #128 / lsls #19` ile üretiliyor), sonra BG0CNT
-(0x04000008) yazıyor. İşaretçi değişkeni kullanıldığında agbcc ikincisini
-`adds r1,#8` diye türetti ve havuzdaki `0x04000008` girişi kayboldu
-(80 bayt, ROM 84). Mutlak makroyla fark sıfır.
+Measurement (`0x080127A8`, SetupBg0Bg1): the function first writes `REG_DISPCNT`
+(0x04000000, generated with `movs #128 / lsls #19`), then BG0CNT (0x04000008).
+With a pointer variable, agbcc derived the second as `adds r1,#8` and the
+`0x04000008` entry disappeared from the pool (80 bytes, ROM 84). With the absolute
+macro the difference is zero.
 
-Bu **CSE'yi kapatmak** demek değil: aynı ROM BG1CNT'yi (0x0400000A)
-kendiliğinden taban+2 olarak üretiyor. Belirleyici olan CSE'nin
-yapılıp yapılmaması değil, **nereden türetildiği**.
+This does not mean **turning CSE off**: the same ROM derives BG1CNT (0x0400000A)
+as base+2 by itself. What is decisive is not whether CSE happens but **where it
+derives from**.
 
-Tersi de geçerli — bkz. kural 66: ROM taban+uzaklık adreslemesi
-gösteriyorsa (`strh r0,[r1,#10]`) mutlak makro işe yaramaz, çünkü makro
-uzaklığı adres sabitine katlar ve havuza yanlış kelimeyi koyar.
+The converse also holds — see rule 66: if the ROM shows base+displacement
+addressing (`strh r0,[r1,#10]`), an absolute macro will not work, because the
+macro folds the displacement into the address constant and puts the wrong word in
+the pool.
 
-## Kural 66 — `volatile struct` üyesine yazmak fazladan bir okuma üretir
+## Rule 66 — writing to a `volatile struct` member generates an extra read
 
-`include/gba_io.h`'daki `REG_DMA1.control` biçimi (yani
-`(*(volatile DmaRegs *)ADDR).control = ...`) **her yazımdan önce
-fazladan bir volatile okuma** üretiyor. Aynı işi `vu16 *` taban +
-indisle yapmak üretmiyor.
+The `REG_DMA1.control` form in `include/gba_io.h` (i.e.
+`(*(volatile DmaRegs *)ADDR).control = ...`) generates **an extra volatile read
+before every write**. Doing the same job with a `vu16 *` base + index does not.
 
-Ölçüm (`0x080337A8`, StopAudioDmaOnCartFlag; kanal başına 2 yazım):
+Measurement (`0x080337A8`, StopAudioDmaOnCartFlag; 2 writes per channel):
 
-| yazım | okuma/yazma | aynı komut |
+| spelling | reads/writes | identical instructions |
 |---|---|---:|
-| `REG_DMA1.control = M & REG_DMA1.control;` | 5 okuma / 2 yazma | 48/63 |
-| `v = REG_DMA1.control; REG_DMA1.control = M & v;` | 5 okuma / 2 yazma | 48/63 |
-| `REG_DMA1.control &= M;` | 5 okuma / 2 yazma | 48/63 |
-| `p1[5] = M & p1[5];` (`vu16 *p1`) | **3 okuma / 2 yazma** | **eşleşme** |
+| `REG_DMA1.control = M & REG_DMA1.control;` | 5 reads / 2 writes | 48/63 |
+| `v = REG_DMA1.control; REG_DMA1.control = M & v;` | 5 reads / 2 writes | 48/63 |
+| `REG_DMA1.control &= M;` | 5 reads / 2 writes | 48/63 |
+| `p1[5] = M & p1[5];` (`vu16 *p1`) | **3 reads / 2 writes** | **match** |
 
-ROM'da 3 okuma / 2 yazma var. Üç struct yazımının da aynı skoru vermesi,
-farkın kaynak yazımından değil **görünüm tipinden** geldiğini gösteriyor.
+The ROM has 3 reads / 2 writes. That all three struct spellings give the same
+score shows the difference comes not from the source spelling but from **the view
+type**.
 
-`((vu16 *)0x040000BC)[5]` **makrosu** çözüm değil: makro `+10`'u adres
-sabitine katlayıp havuza `0x040000C6` koyuyor ve uzaklık 0 oluyor;
-ROM'da taban `0x040000BC`, uzaklık 10. Yani taban bir **işaretçi
-değişkeni** olmalı.
+The **macro** `((vu16 *)0x040000BC)[5]` is not the solution: the macro folds the
+`+10` into the address constant and puts `0x040000C6` in the pool, making the
+displacement 0; in the ROM the base is `0x040000BC` and the displacement is 10.
+So the base must be a **pointer variable**.
 
-İki kanal varken iki ayrı değişken gerekir ve **ikincisi kendi kullanım
-yerinde atanmalıdır**:
+With two channels, two separate variables are needed, and **the second must be
+assigned at its own point of use**:
 
-* ikisi de başta atanırsa iki havuz yüklemesi de fonksiyon başına
-  toplanıyor (ROM ikincisini kullanım yerinde yüklüyor),
-* tek değişkene iki kez atanırsa agbcc ikinciyi birincinin +12'si diye
-  türetiyor (`adds r4,#12`) — kural 65'in aynısı.
+* if both are assigned at the top, both pool loads are gathered at the top of the
+  function (the ROM loads the second at its point of use),
+* if a single variable is assigned twice, agbcc derives the second as the first's
+  +12 (`adds r4,#12`) — the same as rule 65.

@@ -1,43 +1,55 @@
-# GBA başlangıç zinciri
+# GBA boot sequence
 
-Bu belge ilk otomatik analizden çıkarılan, henüz büyüyen başlangıç haritasıdır.
+This evolving boot map was derived from the initial automated analysis. Early
+estimates and historical source paths are retained below; see [STATUS.md](STATUS.md)
+for current progress.
 
 ## `AgbMain` — `0x080000C0`
 
-ROM başlığındaki ARM dalı bu adrese gelir. Fonksiyon:
+The ARM branch in the ROM header targets this address. The function:
 
-1. CPU'yu IRQ moduna (`0x12`) geçirir ve IRQ stack pointer'ını `0x03007FA0` yapar.
-2. CPU'yu System moduna (`0x1F`) geçirir ve ana stack pointer'ını `0x03007E00` yapar.
-3. `IntrMain` adresini (`0x08000104`) GBA BIOS'unun kullanıcı IRQ işaretçisi olan `0x03007FFC` adresine yazar.
-4. `0x08000431` işaretçisi üzerinden Thumb modundaki `GameInit` (`0x08000430`) fonksiyonuna dallanır.
-5. `GameInit` geri dönerse başlangıca dönerek sistemi yeniden başlatır.
+1. Switches the CPU to IRQ mode (`0x12`) and sets the IRQ stack pointer to `0x03007FA0`.
+2. Switches the CPU to System mode (`0x1F`) and sets the main stack pointer to `0x03007E00`.
+3. Writes the address of `IntrMain` (`0x08000104`) to the GBA BIOS user IRQ pointer at `0x03007FFC`.
+4. Branches through pointer `0x08000431` to the Thumb function `GameInit` (`0x08000430`).
+5. Restarts from the entry point if `GameInit` returns.
 
-`src/bootstrap/agb_main.s` yeniden derlendiğinde fonksiyon gövdesi ve bitişik literal havuzu dahil ROM'daki `0x0000C0–0x000103` aralığıyla **68/68 byte eşleşir**. `make bootstrap-match` bu sonucu otomatik doğrular.
+Reassembling `src/bootstrap/agb_main.s` reproduces **68/68 bytes** at ROM offsets
+`0x0000C0–0x000103`, including the function body and adjacent literal pool.
+`make bootstrap-match` verifies this automatically.
 
 ## `IntrMain` — `0x08000104`
 
-ARM durumundaki kullanıcı interrupt dispatcher'ıdır. GBA interrupt bayraklarını okuyup uygun handler'a dallanır. Gövde ve literal havuzu byte-matching hale getirildi; ayrıntılı öncelik sırası [IRQ_DISPATCH.md](IRQ_DISPATCH.md) dosyasındadır.
+The ARM user interrupt dispatcher reads the GBA interrupt flags and branches to
+the appropriate handler. Its body and literal pool are byte-matching. See
+[IRQ_DISPATCH.md](IRQ_DISPATCH.md) for the detailed priority order.
 
 ## `GameInit` — `0x08000430`
 
-Thumb durumundaki yüksek seviyeli başlangıç fonksiyonudur. Ghidra'nın ilk sınır tahmini 652 byte'tır; bu sınır manuel olarak doğrulanacaktır.
+The high-level Thumb initialization function. Ghidra initially estimated a
+652-byte boundary, which required manual verification.
 
-İlk decompile çıktısına ve literal sabitlere göre:
+The initial decompilation and literal constants indicate that it:
 
-- `REG_WAITCNT` (`0x04000204`) yapılandırılıyor.
-- DMA3 register bloğu (`0x040000D4`) kullanılarak EWRAM (`0x02000000`), IWRAM (`0x03000000`), VRAM (`0x06000000`) ve OAM (`0x07000000`) başlangıçta dolduruluyor/temizleniyor.
-- BIOS VBlank interrupt bayrağı (`0x03007FF8`) etkinleştiriliyor.
-- Başlangıçtan sonra 44 farklı alt fonksiyona ulaşan yüksek seviyeli oyun döngüsü kuruluyor.
-- Döngü içinde giriş, grafik, ses, varlıklar ve oyun durumu olduğu düşünülen alt sistemler her karede çağrılıyor; kesin isimler dinamik test ve register erişimlerine göre verilecek.
+- Configures `REG_WAITCNT` (`0x04000204`).
+- Uses the DMA3 register block (`0x040000D4`) to fill/clear EWRAM (`0x02000000`), IWRAM (`0x03000000`), VRAM (`0x06000000`), and OAM (`0x07000000`) during initialization.
+- Sets the BIOS VBlank interrupt flag at `0x03007FF8`.
+- Establishes a high-level game loop reaching 44 distinct subfunctions.
+- Calls subsystems believed to handle input, graphics, audio, entities, and game state each frame. Precise names require dynamic testing and register-access analysis.
 
-İlk ham C-benzeri çıktı `analysis/decompiler/GameInit.c` dosyasındadır. Okunup adlandırılmış assembly karşılığı `src/bootstrap/game_init.s` içinde bulunur ve literal havuzlarıyla beraber `0x08000430–0x0800072F` aralığında **768/768 byte matching** durumundadır.
+The initial raw C-like output is stored locally as `analysis/decompiler/GameInit.c`.
+The reviewed, named assembly implementation was originally `src/bootstrap/game_init.s`;
+its current C implementation is `src/bootstrap/game_init.c`. The function and
+literal pools reproduce **768/768 bytes** at `0x08000430–0x0800072F`.
 
-Başlangıç, IRQ, ekran sıfırlama, kayıt, serileştirme ve ilk UI fonksiyonlarının birleşmesiyle ROM'un `0x080000C0–0x08001457` aralığı kesintisiz **5016/5016 byte** yeniden üretilmektedir.
+Together, the boot, IRQ, display reset, save, serialization, and initial UI
+functions reproduce a continuous **5016/5016-byte** region at
+`0x080000C0–0x08001457`.
 
-## Güven düzeyi
+## Confidence
 
-- Adresler ve ARM/Thumb modları: yüksek güven.
-- `AgbMain` davranışı: yüksek güven ve byte-matching.
-- `IntrMain` ve `GameInit` isimleri: işlevsel/geçici isimler; orijinal semboller değildir.
-- `IntrMain` sınırı ve davranışı: yüksek güven ve byte-matching.
-- `GameInit` sınırı ve makine kodu: yüksek güven ve byte-matching; içindeki henüz adlandırılmamış alt çağrıların rolleri geçicidir.
+- Addresses and ARM/Thumb modes: high confidence.
+- `AgbMain` behavior: high confidence, byte-matching.
+- `IntrMain` and `GameInit` names: functional/provisional names, not original symbols.
+- `IntrMain` boundary and behavior: high confidence, byte-matching.
+- `GameInit` boundary and machine code: high confidence, byte-matching; the roles of its unnamed callees remain provisional.
