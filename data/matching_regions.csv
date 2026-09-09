@@ -161,11 +161,19 @@ start,end,binary,module,notes
 0x08031C98,0x08031D24,build/world/push_slot_queue_entry.bin,world,0x08031C98 PushSlotQueueEntry
 0x08031D24,0x08031D88,build/world/flag_arrays.bin,world,Scanning two flag arrays + block clear
 0x08031DB8,0x08031DDC,build/world/step_then_check.bin,world,stepping and testing a flag
+0x08031E18,0x08031E40,build/progress/notify_when_handle_b.bin,progress,Notifies the active slot with id 355 when the +0x1360 handle is set
+0x08031EEC,0x08031F48,build/status/read_counter_pair.bin,status,Two counters chosen by kind; fallbacks 0 and 100
 0x08031FF0,0x08032008,build/world/entry_index_or_none.bin,world,"One-based +0x16 handle to a 0..127 index, -1 otherwise"
 0x08032058,0x08032090,build/world/entity_flags.bin,world,Entity save-flag lookup
 0x08032090,0x080320BC,build/world/entity_accessors.bin,world,Five small entity accessors
 0x080320C8,0x080320E0,build/world/copy_flag_byte.bin,world,Copies the +8 byte of 0x02000D50 to +9
 0x080320E0,0x0803214C,build/ui/init_menu_session.bin,ui,0x080320E0 InitMenuSession
+0x0803214C,0x08032168,build/progress/reset_then_call_byte0a.bin,progress,"Resets, then hands the +0x0A byte on sign-extended"
+0x080321BC,0x080321EC,build/status/read_limit_or_status.bin,status,A limit by kind; kind 2 only while gGameState[12] is clear
+0x080321EC,0x0803220C,build/status/str_cat.bin,status,"strcat, returning void rather than the destination"
+0x08032290,0x080322B0,build/status/record_offset.bin,status,"The record's base plus a one-based offset, -1 for zero"
+0x08032318,0x0803232C,build/progress/set_byte1377.bin,progress,Writes 20 into the +0x1377 byte
+0x080324FC,0x08032548,build/status/unpack_and_start.bin,status,Unpacks four 7-bit digits and writes the three start words
 0x08032548,0x0803258C,build/world/p1_32548.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803258C,0x080325D0,build/world/p1_3258c.bin,world,Phase 1: natural C matching the ROM exactly
 0x080336EC,0x0803376C,build/world/id_verify.bin,world,Id validation + trigger

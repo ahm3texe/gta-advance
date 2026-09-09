@@ -9,12 +9,12 @@ summary, run `make status`.
 | Measurement | Value |
 |---|---:|
 | Function map | 1941 functions / 454270 bytes |
-| Human review (`documented+`) | 756 / 1941 |
-| Byte-matching | 702 functions / 61406 bytes (13.52%) |
-| C sources | 734 total / 689 matching |
-| ROM verified from source | 42932 bytes |
+| Human review (`documented+`) | 766 / 1941 |
+| Byte-matching | 712 functions / 61774 bytes (13.60%) |
+| C sources | 744 total / 699 matching |
+| ROM verified from source | 43300 bytes |
 | libc verification | 448 bytes |
-| Total verified ROM area | 43380 bytes |
+| Total verified ROM area | 43748 bytes |
 | Open boundary debt | 0 short + 0 ARM review + 0 oversized |
 
 ## The single active task

@@ -35,7 +35,7 @@ address,size,name,source,status,notes
 0x02000D14,4,gGlobalState02000D14,decomp,provisional,state word zeroed by FUN_080100D0 at the end of buffer setup.
 0x02000D18,4,gRam02000D18,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x02000D40,2,gSlotSelector,decomp,provisional,"when 1 the secondary slot (0x02001140) is selected, otherwise the primary one (0x02000F10)"
-0x02000D50,10,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager; +8 and +9 are used by SaveBufferCopy8To9 (byte-matching evidence), so the size is at least 10"
+0x02000D50,52,gSaveBuffer,decomp,provisional,"Working buffer used by the save manager. +0 is an active flag; +8 and +9 are used by SaveBufferCopy8To9; +0x0C, +0x0E and +0x32 are u16 counters read by the status getters at 0x08031EEC, 0x08031F18 and 0x080321BC (byte-matching evidence). The +0x32 read makes the size at least 52; it was recorded as 10 before, from the fields known then. src/ui/init_menu_session.c reaches further still, to a head block at +0x88 and an item array after it, but no single access there fixes an upper bound, so 52 is what the evidence supports."
 0x02000E74,4,gAsyncState,decomp,provisional,Nonzero suppresses the fifth VBlank transfer step; role unconfirmed
 0x02000E80,32,gRam02000E80,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x02000EA8,4,gUnk02000EA8,decomp,provisional,"Two s16 read at +0 and +2 by FUN_08005F74, tested together with gUnk02000CD8. Size is the part that is read, not a verified extent."

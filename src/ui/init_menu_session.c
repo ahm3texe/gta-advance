@@ -17,7 +17,9 @@
 
 #include "gba_types.h"
 typedef struct Item { u8 pad00[20]; } Item;
-typedef struct MenuCtx { u8 active; u8 pad01[15]; u32 w10; u32 w14; u8 pad18[0x70]; u8 head[0x18]; u8 count; u8 pad; u8 pad2; u8 pad3; Item items[1]; } MenuCtx;
+typedef struct MenuCtx { u8 active; u8 pad01[11]; u16 w0C; u16 w0E; u32 w10; u32 w14;
+                         u8 pad18[26]; u16 w32; u8 pad34[84];
+                         u8 head[0x18]; u8 count; u8 pad; u8 pad2; u8 pad3; Item items[1]; } MenuCtx;
 extern u32 gRam02026F30;
 extern u32 gRam02026FD0;
 extern MenuCtx gSaveBuffer;

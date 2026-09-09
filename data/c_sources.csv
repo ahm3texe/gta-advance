@@ -305,6 +305,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
 0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
+0x08031E18,FUN_08031e18,src/progress/notify_when_handle_b.c,40,40,yes
+0x08031EEC,FUN_08031eec,src/status/read_counter_pair.c,44,44,yes
+0x08031F18,FUN_08031f18,src/status/read_counter_pair.c,48,48,yes
 0x08031FF0,FUN_08031ff0,src/world/entry_index_or_none.c,22,22,yes
 0x08032058,IsEntityFlagSet,src/world/entity_flags.c,56,56,yes
 0x08032090,GetEntityFixedFields,src/world/entity_accessors.c,20,20,yes
@@ -315,6 +318,13 @@ address,name,source,compiled_size,mapped_size,matching
 0x080320C8,SaveBufferCopy8To9,src/world/copy_flag_byte.c,12,12,yes
 0x080320D4,SaveBufferCopy9To8,src/world/copy_flag_byte.c,12,12,yes
 0x080320E0,InitMenuSession,src/ui/init_menu_session.c,108,108,yes
+0x0803214C,FUN_0803214c,src/progress/reset_then_call_byte0a.c,28,28,yes
+0x080321BC,FUN_080321bc,src/status/read_limit_or_status.c,48,48,yes
+0x080321EC,FUN_080321ec,src/status/str_cat.c,32,32,yes
+0x08032290,FUN_08032290,src/status/record_offset.c,32,32,yes
+0x08032318,FUN_08032318,src/progress/set_byte1377.c,20,20,yes
+0x080324FC,FUN_080324fc,src/status/unpack_and_start.c,32,32,yes
+0x0803251C,FUN_0803251c,src/status/unpack_and_start.c,44,44,yes
 0x08032548,FUN_08032548,src/world/p1_32548.c,68,68,yes
 0x0803258C,FUN_0803258c,src/world/p1_3258c.c,68,68,yes
 0x08033674,AllocPoolNode,src/world/alloc_pool_node.c,112,120,no
