@@ -1,105 +1,111 @@
-# Sozluk
+# Glossary
 
-Bu projede tekrar eden terimlerin karsiligi.
+Terminology used throughout the project. English documentation uses these terms
+consistently; historical command output may still contain Turkish labels.
 
-## Surec terimleri
+## Workflow terms
 
-**Park / park etmek**
-Cozulemeyen bir fonksiyonu silmeden, elimizdeki en iyi C kaynagi + kac bayt
-tuttugu + denenip ELENEN yollar ve eleme sebepleri dosya basina yorum olarak
-yazilarak birakmak. "Rafa kaldirdim ama notlariyla." Amaci ayni cikmaz yolun
-aylar sonra bastan denenmemesi. Kural: takilinca bir odakli deneme, sonra park.
+**Park / parked**
+Leave an unresolved function with its best available C implementation, matching
+byte count, rejected approaches, and reasons for rejection documented at the top
+of the file. This preserves the work without repeating the same dead ends months
+later. The default guidance is one focused attempt after getting stuck, then park;
+a task may define its own explicit attempt budget.
 
-**Aday**
-Uzerinde calisilmak icin secilen, henuz eslesmemis fonksiyon.
+**Candidate**
+A function selected for work that does not yet match.
 
-**Hasat**
-Sirayla aday secip eslestirmeye calisma turu. "Hasat turu" = bir oturumda
-birkac fonksiyon deneme.
+**Harvest / matching pass**
+A round of selecting and attempting candidates in sequence. A harvest session
+tries several functions.
 
-**Bant**
-Fonksiyonlari boyutuna gore gruplama. "60-127 bant" = 60 ile 127 bayt
-arasindaki fonksiyonlar. Kucuk bantlar kolay ve hizli, buyukler zor.
+**Band**
+A grouping by function size. The “60–127 band” contains functions of 60 through
+127 bytes. Smaller bands generally offer easier, faster targets than larger ones.
 
-## Eslestirme terimleri
+## Matching terms
 
-**Bayt eslesmesi (byte-matching)**
-Yazdigimiz C kodunun derlendiginde orijinal ROM'daki baytlarin BIREBIR
-AYNISINI uretmesi. Benzer degil, ayni. Projenin olcutu bu.
+**Byte matching / byte-matching**
+Compiled C reproduces exactly the original ROM bytes. This is the project's
+matching criterion, not merely similar behavior.
 
-**"farkli: 97/120"**
-Bizim derledigimiz 120 bayt cikti, bunun 97 bayti ROM'dakinden farkli.
-0 olursa eslesme tamam.
+**`farkli: 97/120` (97/120 bytes differ)**
+The compiled output contains 120 bytes, 97 of which differ from the ROM. Zero
+differences indicates a match only when the complete intended range is covered.
 
-**baserom.gba**
-Senin kendi ROM kopyan. Depoya girmiyor, sadece yerelde karsilastirma
-icin kullaniliyor.
+**`baserom.gba`**
+The user's own ROM copy, kept outside version control and used for local comparison.
 
-**Hibrit ROM**
-`make rom` ciktisi: dogruladigimiz bolgeler BIZIM kaynagimizdan derleniyor,
-geri kalani baserom'dan kopyalaniyor. SHA-1'i orijinalle ayni cikmasi,
-bizim urettigimiz baytlarin dogru oldugunu kanitliyor.
+**Hybrid ROM**
+The output of `make rom`: verified regions are built from project sources and
+remaining bytes are copied from the base ROM. Matching the original SHA-1 verifies
+the rebuilt bytes and their placement; it does not establish a full source build.
 
 **SHA-1**
-Dosyanin parmak izi. Tek bayt degisse tamamen baska cikar. Bizimki
-06230842626da504f92396074f7c655e100f5d44 olmali.
+A file fingerprint used for ROM identity checks. A byte change normally changes
+the digest. The expected ROM SHA-1 is
+`06230842626da504f92396074f7c655e100f5d44`.
 
-## Derleyici / assembly terimleri
+## Compiler and assembly terms
 
 **agbcc**
-Oyunun 2004'te derlendigi eski derleyici. Modern derleyici ayni baytlari
-uretmiyor, o yuzden aynisini kullanmak zorundayiz.
+The historical compiler family identified for this game. Modern compilers do not
+reproduce the same instructions. This project uses a compatible locked revision,
+with `old_agbcc` for matching Thumb code.
 
-**Yazmac (register)**
-Islemcinin icindeki cok hizli, cok az sayidaki (Thumb'da pratikte 8) depo.
-r0-r7 gibi.
+**Register**
+A small, fast storage location in the CPU, such as r0–r7. Most Thumb instructions
+operate on these eight low registers; high registers have more restricted uses.
 
-**Dagitim (register allocation)**
-Derleyicinin hangi degiskeni hangi yazmaca koyacagina karar vermesi.
-Eslesmeme sebeplerimizin cogu burada: kod mantiksal olarak dogru ama
-derleyici yazmaclari baska sirayla secmis.
+**Register allocation**
+The compiler's assignment of values to registers. Many mismatches arise here:
+the C logic is correct, but the compiler chooses different registers.
 
-**Spill (tasma)**
-Yazmac yetmeyince bir degeri gecici olarak yigina (RAM'e) yazmak.
-Yavas; derleyici mecbur kalmadikca yapmaz.
+**Spill**
+Temporarily storing a value on the stack when it cannot remain in a register.
+This adds memory accesses, so the compiler generally avoids it when possible.
 
-**Havuz (literal pool)**
-Fonksiyonun sonuna derleyicinin koydugu sabit degerler tablosu. Buyuk
-sabitler komutun icine sigmadigi icin oradan okunuyor. Bunlar KOD DEGIL,
-VERI -- disassembler'a komut diye okutursan sacmalar (bu tuzaga dustuk).
+**Literal pool**
+A table of constants emitted near code, often at the end of a function. Constants
+that cannot be encoded in instructions are loaded from it. Pools are **data**,
+not instructions; disassembling them as code produces misleading results, a trap
+encountered during this project.
 
-**Prolog / epilog**
-Fonksiyonun basindaki (`push`) ve sonundaki (`pop`) standart kaliplar.
+**Prologue / epilogue**
+Function-entry and function-exit sequences, often involving `push` and `pop`.
 
-**Dongu degismezi (loop invariant)**
-Dongu icinde her turda ayni kalan deger. Iyi derleyici bunu dongu ONCESINE
-tasiyip bir yazmacta tutar. Bizim eslesmeme sebeplerimizden biri.
+**Loop invariant**
+A value unchanged across loop iterations. A compiler may compute it before the
+loop and retain it in a register. Such transformations can affect matching.
 
-**MMIO**
-Donanimi kontrol eden ozel bellek adresleri. Ornegin 0x04000208'e yazmak
-kesmeleri aciyor/kapatiyor; normal bir degisken degil.
+**MMIO (memory-mapped I/O)**
+Special memory addresses controlling hardware. For example, writing to
+`0x04000208` enables/disables interrupt handling; it is not an ordinary variable.
 
-## Arac terimleri
+## Tooling terms
 
-**CFG (kontrol akis grafigi)**
-Fonksiyonun "blok" haritasi: nereden nereye dallaniyor. `tools/dump_cfg.py`
-cikariyor. Kodu yazmadan once seklini gormemizi sagliyor.
+**CFG (control-flow graph)**
+A map of a function's basic blocks and branches. `tools/dump_cfg.py` produces it,
+allowing the control-flow structure to be inspected before writing C.
 
-**Blok**
-Dallanmasiz duz komut dizisi. Ilk dallanmada biter.
+**Basic block**
+A straight-line instruction sequence with no internal branch; a branch ends it.
 
-**Birlesme noktasi (join point)**
-Birden fazla yerden gelinen blok. `if/else` sonrasi ya da dongu basi.
-Derleyicinin yazmac kararlarini en cok etkileyen yer.
+**Join point**
+A block reached from multiple paths, such as after `if/else` or at a loop header.
+Join points can strongly influence register allocation.
 
 **Extern**
-"Bu isim baska bir dosyada tanimli" bildirimi. Yanlis yazilirsa ya da
-yeniden adlandirmada guncellenmezse baglanti kirilir.
+A declaration of a symbol defined elsewhere. An incorrect declaration, or one
+left unchanged after a rename, can break linking or type consistency.
 
-**Tutarlilik denetleyicisi**
-`tools/check_consistency.py`. Uydurma isim, celisen tip, kirik extern gibi
-hatalari yakaliyor. Bu oturumda 3 gercek hatami yakaladi.
+**Consistency checker**
+`tools/check_consistency.py`, which detects issues such as conflicting types and
+broken extern references and reports unsupported placeholder naming. It caught
+three real mistakes in the session that originally introduced this glossary.
 
-**check-full**
-Tam dogrulama: tum kaynaklari derle, ROM'u kur, SHA-1'i karsilastir,
-tutarliligi denetle. Cikis kodu 0 = her sey temiz.
+**`check-full`**
+Full implementation validation: rebuild sources, construct the hybrid ROM,
+compare its SHA-1, check consistency, verify the compiler corpus, and validate the
+dashboard. Exit code 0 means all checks passed. Documentation-only changes use
+the focused checks in [PROJECT_SYSTEM.md](PROJECT_SYSTEM.md).

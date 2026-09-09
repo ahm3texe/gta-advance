@@ -1,73 +1,72 @@
-# Metin ve dil verisi haritasi
+# Text and language data map
 
-Yapisal bulgular.  Metnin KENDISI bu depoya girmiyor (bkz. docs/ROADMAP.md:
-ROM ve ondan cikarilan varliklar paylasilmaz).  Burada yalnizca nerede
-oldugu, nasil duzenlendigi ve nasil okunacagi kayitli.
+Structural findings. The text **itself** does not enter this repository (see
+docs/ROADMAP.md: the ROM and assets extracted from it are not shared). Recorded
+here is only where it lives, how it is organized, and how to read it.
 
-## Ozet
+## Summary
 
-| Ne | Nerede |
+| What | Where |
 |----|--------|
-| Metin govdesi | `0x07B0FE0 - 0x07D7FC8` (~62 KB yazdirilabilir) |
-| Isaretci tablosu | `0x0EC46D4 - 0x0EC771C` (**3090 giris**, hepsi gecerli) |
-| Seviye/varlik ad tablosu | `0x03D0000 - 0x03DFFEC` (~4000 ad) |
+| Text body | `0x07B0FE0 - 0x07D7FC8` (~62 KB printable) |
+| Pointer table | `0x0EC46D4 - 0x0EC771C` (**3090 entries**, all valid) |
+| Level/entity name table | `0x03D0000 - 0x03DFFEC` (~4000 names) |
 
-## Isaretci tablosu
+## Pointer table
 
-3090 giris, hepsi metin govdesine isaret ediyor ve **tam olarak 5'e
-bolunuyor: 618 x 5**.  Oyunun acilistaki dil ekraninda BES secenek var
-(izleme logu: `gActiveMenuItemCount` 0->5, bkz. docs/GAME_FLOW.md), yani
-618 metin dizesi x 5 dil.
+3090 entries, all pointing into the text body, and **exactly divisible by five:
+618 x 5**. The game's startup language screen offers FIVE options (trace log:
+`gActiveMenuItemCount` 0->5, see docs/GAME_FLOW.md), so 618 text strings x 5
+languages.
 
-Dilim -> dil eslemesi DOGRULANDI (oturum 7): **dilim k = dil k**, dogrudan.
-Ayni indeksin bes dilimdeki degeri okunarak sinandi:
+The slice -> language mapping is CONFIRMED (session 7): **slice k = language k**,
+directly. It was tested by reading the value at the same index across all five
+slices:
 
-| Dilim | Indeks 0 | Dil |
+| Slice | Index 0 | Language |
 |-------|----------|-----|
-| 0 | ENGLISH  | ingilizce |
-| 1 | *(dilim 0 ile AYNI adres)* | ispanyolca |
-| 2 | ANGLAIS  | fransizca |
-| 3 | INGLESE  | italyanca |
-| 4 | ENGLISCH | almanca |
+| 0 | ENGLISH  | English |
+| 1 | *(SAME address as slice 0)* | Spanish |
+| 2 | ANGLAIS  | French |
+| 3 | INGLESE  | Italian |
+| 4 | ENGLISCH | German |
 
-Sira, izleme logundaki `gLanguage` ile birebir ortusuyor: oyuncu imleci
-asagi gezdirdikce deger 0->1->2->3->4 ilerledi, menu sirasi da
-ingilizce/ispanyolca/fransizca/italyanca/almanca.
+The order matches `gLanguage` in the trace log exactly: as the player moved the
+cursor down, the value advanced 0->1->2->3->4, and the menu order was
+English/Spanish/French/Italian/German.
 
-GERI ALINAN CIKARIM: onceden "her dilimin en dusuk isaretcisi o dilin
-adinin ardina dusuyor" denip dilim 0 italyanca, dilim 1 fransizca, dilim 3
-almanca sanilmisti.  O bitisiklik TESADUFMUS; gercek esleme yukaridaki
-gibi dogrudan.
+RETRACTED INFERENCE: it was previously claimed that "each slice's lowest pointer
+falls just after that language's own name," leading to the belief that slice 0
+was Italian, slice 1 French, and slice 3 German. That adjacency was
+COINCIDENTAL; the real mapping is the direct one above.
 
-Ispanyolca dil adlari indeks 0'da degil 1, 2, 3 ve 5'te; dilim 1'in
-indeks 0'i dilim 0'inkiyle ayni adresi gosteriyor (kullanilmayan yuva).
+The Spanish language names are not at index 0 but at indices 1, 2, 3, and 5;
+slice 1's index 0 points at the same address as slice 0's (an unused slot).
 
-## Kodlama
+## Encoding
 
-Metin **LATIN-1 (ISO-8859-1)**, sifirla sonlandirilmis, sikistirilmamis.
-DUZELTME: once "duz ASCII" denmisti, YANLISTI.  Aksanli karakterler
-0x80-0xFF araliginda: 0xC9 = E-akut, 0xD1 = N-tilde, 0xC1 = A-akut.
-`ESPANOL` bulunamamasinin sebebi buydu; ROM'da ESPAN(0xD1)OL olarak duruyor.  Menu
-etiketleri dogrudan okunabiliyor (`PRESS START` @ `0x07C6E70`,
+The text is **LATIN-1 (ISO-8859-1)**, zero-terminated, uncompressed.
+CORRECTION: it was first described as "plain ASCII," which was WRONG. Accented
+characters occupy the 0x80-0xFF range: 0xC9 = E-acute, 0xD1 = N-tilde,
+0xC1 = A-acute. That is why `ESPANOL` could not be found; in the ROM it is stored
+as ESPAN(0xD1)OL. Menu labels are directly readable (`PRESS START` @ `0x07C6E70`,
 `NEW GAME` @ `0x07C9748`, `LOAD GAME`, `ERASE`).
 
-ROM'da 5046 aday LZ77 blogu var ama metin bolgesi bunlarin disinda;
-sikistirma grafik/harita verisi icin kullaniliyor gorunuyor.
+The ROM contains 5046 candidate LZ77 blocks, but the text region is not among
+them; compression appears to be used for graphics and map data.
 
-## ACIK SORULAR
+## OPEN QUESTIONS
 
-- Bazi dizeler diller arasinda PAYLASILIYOR: dilim 1'in indeks 0'i dilim
-  0'inkiyle ayni adresi gosteriyor.  Kac dizenin paylasildigi sayilmadi.
-- 618 dizenin hangisinin hangi ekrana ait oldugu bilinmiyor.  Izleme
-  scriptiyle (tools/trace.lua) diyalog acilirken hangi indeksin
-  okundugu yakalanabilir.
-- Seviye ad tablosundaki (`0x03D0000`) sonekler bolge kodu gibi duruyor
-  (`a1`-`a7`, `c1`-`c3`, `k4`, `v1`); onekler nesne turu (`brief`,
-  `briefing`, `pager`, `mafia`, `guard`, `ambush`, `playerstart`).
-  Hikayenin brifing ve cagri cihazi mesajlari olarak orgutlendigini
-  gosteriyor.
+- Some strings are SHARED across languages: slice 1's index 0 points at the same
+  address as slice 0's. The number of shared strings has not been counted.
+- Which of the 618 strings belongs to which screen is unknown. A trace script
+  (tools/trace.lua) could capture which index is read as a dialogue opens.
+- The suffixes in the level name table (`0x03D0000`) look like region codes
+  (`a1`-`a7`, `c1`-`c3`, `k4`, `v1`), and the prefixes look like object types
+  (`brief`, `briefing`, `pager`, `mafia`, `guard`, `ambush`, `playerstart`).
+  This suggests the story is organized as briefing and pager messages.
 
-## Okuma
+## Reading
 
-`tools/dump_text.py` yerelde calisir, ciktisi `build/` altina yazilir ve
-depoya GIRMEZ.
+`tools/dump_text.py` runs locally, writes its output under `build/`, and does
+NOT enter the repository.

@@ -1,109 +1,119 @@
-# Band B/C — kapanan is (tarihce)
+# Band B/C — closed work (history)
 
-**DURUM: HER IKI MADDE DE KAPANDI (2026-09-07).**
+**STATUS: BOTH ITEMS CLOSED (2026-09-07).**
 
 - `0x08031844` -> `src/video/blit_strip_clip_left.c`, BYTE-MATCHING.
-  Cozum: eslesen kardesi `0x08031A1C` ile ROM govdelerini diff'lemek.
-  235 komutun 235'i ayniydi; fark yalnizca sutun testinin kutbuydu
-  (`if (col++ >= 0)` -> `if (col++ < 0)`). Yontem docs/WORKFLOW.md §10.
-- `0x0803173E` sinir hatasi duzeltildi; yerine gelen `0x08031684` ve
-  `0x080316B0` -> `src/video/blit_strip_plain.c`, ikisi de BYTE-MATCHING.
+  The solution: diffing the ROM bodies against its matching sibling
+  `0x08031A1C`. 235 of 235 instructions were identical; the only difference was
+  the polarity of the column test (`if (col++ >= 0)` -> `if (col++ < 0)`).
+  Method in docs/WORKFLOW.md §10.
+- The `0x0803173E` boundary error was corrected; its replacements `0x08031684`
+  and `0x080316B0` -> `src/video/blit_strip_plain.c`, both BYTE-MATCHING.
 
-Asagisi, cozumden ONCEKI ajan notlaridir; yontem dersi icin birakildi:
-yazmac oncelikleri dogru olculmustu ama YANLIS SORU soruluyordu.
+What follows are the agent notes from BEFORE the solution; they are kept for the
+methodological lesson: the register priorities had been measured correctly, but
+the WRONG QUESTION was being asked.
 
 ---
 
-## 0x08031844 — 472 bayt, 8x48 4bpp serit cizici (ESLESMEDI)
+## 0x08031844 — 472 bytes, 8x48 4bpp strip blitter (NO MATCH)
 
-226/235 komut ayni. Kalan fark tek bir uc yazmacli dongusel yer
-degistirme (`{p0, under, mask}` -> r3/r4/r5) ve fazladan bir
-`mov ip,r6`. `tools/dump_alloc.py` olcumu: biriktiricinin onceligi
-2.263'un uzerinde olmali ama 1.751 (referans 62 / omur 177);
-gereken ya omur <= 136 ya da referans >= 67, ve KAYNAK DUZEYINDE
-bunu veren bir yazim bulunamadi (~40 yazim elendi).
+226/235 instructions identical. The remaining difference was a single
+three-register cyclic permutation (`{p0, under, mask}` -> r3/r4/r5) plus one
+extra `mov ip,r6`. The `tools/dump_alloc.py` measurement: the accumulator's
+priority needed to exceed 2,263 but was 1,751 (62 references / lifetime 177);
+what was needed was either lifetime <= 136 or references >= 67, and NO
+SOURCE-LEVEL spelling was found that produced either (~40 spellings eliminated).
 
-Ajanin dosya ici notu ve calisan govde asagida; yeni bir denemeye
-buradan baslanmali.
+The agent's in-file note and the working body are below; a new attempt should
+start from here.
 
 ```c
-/* ---- 0x08031844 — 470 bayt, ESLESMEDI ------------------------------------
+/* ---- 0x08031844 — 470 bytes, NO MATCH -------------------------------------
  *
- * 8 piksel genisliginde, 48 satirlik bir 4bpp seridi olusturuyor.  Her satir
- * icin: satir numarasi [0, height) disindaysa sekiz kaynak baytini oldugu gibi
- * aliyor; icindeyse her piksel icin sutun numarasi negatifse yine kaynagi,
- * degilse `(under[k] & mask[k]) | src[k]` harmanini aliyor.  Sekiz deger dort
- * bitlik alanlara paketlenip iki yarim soz olarak `out`a yaziliyor.  Satir
- * sonunda `mask` degisken adimla (stride), `under` ve `src` 40 bayt ilerliyor
- * (sekiz piksel zaten teker teker ilerletildigi icin satir adimi 48).
- * Parametre adlari ROLE TAHMINIDIR; kanit yalnizca ilerleme adimlari.
+ * Builds an 8-pixel-wide, 48-row 4bpp strip.  For each row: if the row number
+ * is outside [0, height), it takes the eight source bytes as they are; if it is
+ * inside, then for each pixel, a negative column number again takes the source,
+ * and otherwise the blend `(under[k] & mask[k]) | src[k]`.  The eight values are
+ * packed into four-bit fields and written to `out` as two half-words.  At the
+ * end of a row, `mask` advances by a variable stride, and `under` and `src`
+ * advance by 40 bytes (the row stride is 48, since the eight pixels have already
+ * been advanced one at a time).
+ * The parameter names are ROLE GUESSES; the only evidence is the advance steps.
  *
- * DURUM: YAZMAC ADLARI NORMALIZE EDILDIGINDE 235 KOMUTUN 226'SI BIREBIR AYNI.
- * Ham olcum 160/236 komut, 329/472 bayt; ham sayilar yaniltici cunku farkin
- * neredeyse tamami TEK bir yazmac permutasyonundan geliyor (ROM'un r3/r4/r5
- * uclusunu {p0, under, mask} olarak yeniden adlandirip karsilastirinca geriye
- * yalnizca asagidaki iki madde kaliyor).
+ * STATUS: WITH REGISTER NAMES NORMALIZED, 226 OF 235 INSTRUCTIONS ARE IDENTICAL.
+ * The raw measurement is 160/236 instructions, 329/472 bytes; the raw numbers are
+ * misleading, because nearly the whole difference comes from ONE register
+ * permutation (renaming the ROM's r3/r4/r5 triple to {p0, under, mask} and
+ * comparing again leaves only the two items below).
  *
- * KALAN FARK TAM OLARAK IKI SEY:
- *  1) UC YAZMACLIK DONGUSEL PERMUTASYON.
- *     ROM:  r3 = p0 (paket biriktiricisi), r4 = under (arg5), r5 = mask (arg4)
- *     Biz:  r5 = p0,                       r3 = under,        r4 = mask
- *     tools/dump_alloc.py ile olculen global dagitici oncelikleri:
- *         pseudo 27 (under) refs 89 omur 236 oncelik 2.263  -> r3
- *         pseudo 26 (mask)  refs 89 omur 237 oncelik 2.253  -> r4
- *         pseudo 33 (p0)    refs 62 omur 177 oncelik 1.751  -> r5
- *     ROM'un dagilimi icin p0'in onceligi 2.263'un USTUNE cikmali.  Oncelik
- *     `floor_log2(refs) * refs / omur` oldugu icin bunun iki yolu var:
- *         (a) refs 62 sabitken omur <= 136 (su an 177), ya da
- *         (b) omur 177 sabitken refs >= 67 (su an 62).
- *     Kaynak duzeyinde ikisini de saglayacak bir kaldirac BULUNAMADI.
- *  2) Atlanan satir yolunda fazladan bir `mov ip, r6` (2 bayt; 472 vs 470).
- *     p1'in global yazmaci ROM'da r6, bizde ip; bu da (1)'in yan urunu.
+ * THE REMAINING DIFFERENCE IS EXACTLY TWO THINGS:
+ *  1) A THREE-REGISTER CYCLIC PERMUTATION.
+ *     ROM:  r3 = p0 (pack accumulator), r4 = under (arg5), r5 = mask (arg4)
+ *     Ours: r5 = p0,                    r3 = under,        r4 = mask
+ *     Global allocator priorities measured with tools/dump_alloc.py:
+ *         pseudo 27 (under) refs 89 lifetime 236 priority 2,263  -> r3
+ *         pseudo 26 (mask)  refs 89 lifetime 237 priority 2,253  -> r4
+ *         pseudo 33 (p0)    refs 62 lifetime 177 priority 1,751  -> r5
+ *     For the ROM's allocation, p0's priority must rise ABOVE 2,263.  Since
+ *     priority is `floor_log2(refs) * refs / lifetime`, there are two ways:
+ *         (a) with refs fixed at 62, lifetime <= 136 (currently 177), or
+ *         (b) with lifetime fixed at 177, refs >= 67 (currently 62).
+ *     NO source-level lever was FOUND that achieves either.
+ *  2) One extra `mov ip, r6` on the skipped-row path (2 bytes; 472 vs 470).
+ *     p1's global register is r6 in the ROM and ip in ours; this is a
+ *     by-product of (1).
  *
- * OLCULUP ELENEN YAZIMLAR (tekrar denemeyin — hicbiri (1)'i degistirmedi):
- *   bildirim sirasi: p'lerin i/x/y'ye gore 10 permutasyonu -> hepsi ayni
- *   tipler: p0..p3 icin u8 / s32 / int / u16 -> hepsi ayni
- *   kapsam: p0..p3'u dongu govdesinde bildirmek -> ayni
- *   `register` anahtar sozcugu (p0'a ve dordune birden) -> ayni
- *   paketleme: ayri `w` degiskeni, `p0 |= ...` biriktirme, ters sirali OR,
- *     ikili gruplama, `p0 = PACK(...)` geri atama, `(a) | ((a) & 0)`
- *   omur no-op'lari (kural 50): `mask++; mask--;`, `under++; under--;`,
+ * SPELLINGS MEASURED AND ELIMINATED (do not retry — none changed (1)):
+ *   declaration order: 10 permutations of the p's relative to i/x/y -> all same
+ *   types: u8 / s32 / int / u16 for p0..p3 -> all same
+ *   scope: declaring p0..p3 inside the loop body -> same
+ *   the `register` keyword (on p0, and on all four) -> same
+ *   packing: a separate `w` variable, `p0 |= ...` accumulation, reversed-order
+ *     OR, pairwise grouping, `p0 = PACK(...)` write-back, `(a) | ((a) & 0)`
+ *   lifetime no-ops (rule 50): `mask++; mask--;`, `under++; under--;`,
  *     `src++; src--;`
- *   sekiz ayri deger degiskeni (ikinci grup icin q0..q3) -> 97/238, cok kotu
- *   son store'u iki dala da kopyalamak (cross-jump umuduyla) -> 476 bayt
- *   `out` icin yerel kopya, `out[0] = ...; out++;` -> ayni ya da kotu
- *   `x` icin `if (x < 0) ... x++;` (artirimi sona almak) -> ayni
- *   atlanan yolda `mask += 8; under += 8;` ciftini basa/ortaya almak: bayt
- *     sayisi 470'e iniyor ama komut SIRASI ROM'dan sapiyor (218-219/235);
- *     ROM'daki yer sekiz okumadan SONRA, asagidaki gibi.
- *   isaretci artirimlarini if/else'ten SONRA tek yere almak: agbcc onlari
- *     birlestiriyor, cikti 8 komut kisaliyor (117/235).  ROM ikiye kopyaladigi
- *     icin kaynakta da IKI dalda ayri ayri yazilmalari gerekiyor.
+ *   eight separate value variables (q0..q3 for the second group) -> 97/238,
+ *     much worse
+ *   copying the final store into both branches (hoping for a cross-jump)
+ *     -> 476 bytes
+ *   a local copy for `out`, `out[0] = ...; out++;` -> same or worse
+ *   `if (x < 0) ... x++;` for `x` (moving the increment to the end) -> same
+ *   moving the `mask += 8; under += 8;` pair on the skipped path to the start or
+ *     middle: the byte count drops to 470, but the instruction ORDER diverges
+ *     from the ROM (218-219/235); in the ROM their place is AFTER the eight
+ *     reads, as below.
+ *   collapsing the pointer increments into one place AFTER the if/else: agbcc
+ *     merges them and the output shrinks by 8 instructions (117/235).  Because
+ *     the ROM duplicates them, the source must also write them separately in
+ *     BOTH branches.
  *
- * COZULEN YAPISAL AYRINTILAR (bunlari degistirmeyin):
- *   - Dis dongu GERIYE sayan bir sayac olmali (`for (i = ROWS; i != 0; i--)`)
- *     ve satir numarasi `y0 + (ROWS - i)` olarak yazilmali.  Artan `for` +
- *     `y = y0 + i` yazimi ROM'un `ldr y0 / adds #48 / subs sayac` uclusunu
- *     vermiyor; parantezleme de onemli: `y0 + ROWS - i` ve `y0 - i + ROWS`
- *     baska komut sirasi uretiyor, yalnizca `y0 + (ROWS - i)` (ve esdegeri
- *     `y0 - (i - ROWS)`) ROM'unkini veriyor.
- *   - Sutun testi `if (x++ < 0)` bicimi: ROM `adds r0,r6,#0 / adds r6,#1 /
- *     cmp r0,#0` yani ONCE artirim.
- *   - Satir testi `||` ile tek ifade (kural 60): `if (y >= height || y < 0)`.
- *     Atlanan govde ONCE gelmeli.
- *   - Grup 1'in paketleme+store'u IKI dalda da ayri yazilmali; yalnizca grup
- *     2'ninki paylasilan kuyruk (agbcc cross-jump ile kendisi birlestiriyor).
- *   - `mask[0] & under[0]` sirasi: agbcc bunu ters cevirip once `under`i
- *     okuyor, ROM da once arg5'i okuyor.  Artirim siralari her dalda ayri
- *     olculdu (negatif dalda src/mask/under, harman dalinda under/mask/src).
+ * STRUCTURAL DETAILS ALREADY RESOLVED (do not change these):
+ *   - The outer loop must be a DOWN counter (`for (i = ROWS; i != 0; i--)`) and
+ *     the row number must be written as `y0 + (ROWS - i)`.  An increasing `for`
+ *     with `y = y0 + i` does not produce the ROM's `ldr y0 / adds #48 /
+ *     subs counter` triple; parenthesization matters too: `y0 + ROWS - i` and
+ *     `y0 - i + ROWS` produce a different instruction order, and only
+ *     `y0 + (ROWS - i)` (and its equivalent `y0 - (i - ROWS)`) reproduces the
+ *     ROM's.
+ *   - The column test takes the form `if (x++ < 0)`: the ROM has
+ *     `adds r0,r6,#0 / adds r6,#1 / cmp r0,#0`, i.e. increment FIRST.
+ *   - The row test is a single expression with `||` (rule 60):
+ *     `if (y >= height || y < 0)`.  The skipped body must come FIRST.
+ *   - Group 1's pack+store must be written separately in BOTH branches; only
+ *     group 2's is a shared tail (agbcc merges that one itself via cross-jump).
+ *   - The `mask[0] & under[0]` order: agbcc reverses it and reads `under` first,
+ *     and the ROM also reads arg5 first.  The increment orders were measured
+ *     separately per branch (src/mask/under on the negative branch,
+ *     under/mask/src on the blend branch).
  */
 
 #define ROWS       48
 #define ROW_STRIDE 48
 #define GROUP      8
 
-/* Tek piksel: sutun negatifse yalnizca kaynak, degilse harman.  Iki dal da
-   uc isaretciyi kendi icinde ilerletir (ROM ikisini de kopyalamis). */
+/* One pixel: source only if the column is negative, otherwise the blend.  Both
+   branches advance the three pointers themselves (the ROM duplicated both). */
 #define FETCH(v)                                    \
     if (x++ < 0) {                                  \
         v = src[0];                                 \
@@ -165,23 +175,23 @@ void BlitStripClipLeft4bpp(s32 y0, s32 x0, s32 height, s32 stride,
 }
 ```
 
-## 0x0803173E — SINIR YANLIS, FONKSIYON DEGIL
+## 0x0803173E — WRONG BOUNDARY, NOT A FUNCTION
 
-0x0803173E — SINIR YANLIS, FONKSIYON DEGIL (olculdu, C yazilmadi)
+0x0803173E — WRONG BOUNDARY, NOT A FUNCTION (measured, no C written)
 ---------------------------------------------------------------------
-Kanit:
-1. 0x0803173E'deki ilk komut `adds r4,#1`; prolog yok.
-2. 0x080317DC'deki `b.n 0x80316CE` GERIYE, kayitli baslangictan ONCEYE
-daliyor -- yani govde 0x0803173E'den once basliyor.
-3. 0x080317DE'deki epilog `pop {r3,r4,r5} / mov r8..sl / pop {r4-r7} /
-pop {r0} / bx r0`; buna karsilik gelen prolog 0x080316B0'da:
+Evidence:
+1. The first instruction at 0x0803173E is `adds r4,#1`; there is no prologue.
+2. The `b.n 0x80316CE` at 0x080317DC branches BACKWARD, to BEFORE the recorded
+start -- so the body begins before 0x0803173E.
+3. The epilogue at 0x080317DE is `pop {r3,r4,r5} / mov r8..sl / pop {r4-r7} /
+pop {r0} / bx r0`; the matching prologue is at 0x080316B0:
 `push {r4,r5,r6,r7,lr} / mov r7,sl / mov r6,r9 / mov r5,r8 /
 push {r5,r6,r7} / sub sp,#4`.
-4. 0x08031684-0x080316AF arasi AYRI ve tam bir fonksiyon
-(`push {r4,lr}` ... `bx r0`, 0x080316AC'de havuz kelimesi
-0x02025810) -- data/functions.csv'de hic kayitli degil.
-Sonuc: 186 baytlik "bosluk" aslinda iki fonksiyon; gercek sinir
-0x080316B0-0x080317EE (318 bayt) ve 0x0803173E onun govde ortasi.
-0x0803173E icin C yazilmadi.  (Gercek fonksiyon 0x08031A1C'nin
-kardesi: ayni sekiz-nibble maskeli serit cizici, tek fark satir
-sayisi ve parametre yerlesimi.)
+4. The range 0x08031684-0x080316AF is a SEPARATE, complete function
+(`push {r4,lr}` ... `bx r0`, with the pool word 0x02025810 at 0x080316AC) --
+and it is not recorded in data/functions.csv at all.
+Conclusion: the 186-byte "gap" is really two functions; the true boundary is
+0x080316B0-0x080317EE (318 bytes), and 0x0803173E is the middle of its body.
+No C was written for 0x0803173E.  (The real function is the sibling of
+0x08031A1C: the same eight-nibble masked strip blitter, differing only in row
+count and parameter layout.)

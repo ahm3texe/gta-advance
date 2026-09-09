@@ -1,111 +1,121 @@
-# Harici belgelerden türetilen bulgular
+# Findings derived from external documents
 
-## Bu dosya nedir, ne değildir
+## What this file is, and is not
 
-2003 tarihli iki geliştirme belgesi incelendi (bir tasarım/planlama dosyası ve
-bir bütçe/kilometre taşı dosyası). Bu dosya **belgelerin kendisi değil**, onlardan
-çıkardığımız ve mümkün olan yerde **ROM'a karşı doğruladığımız** sonuçları tutar.
+Two development documents from 2003 were examined (a design/planning file and a
+budget/milestone file). This file is **not the documents themselves**; it holds
+the conclusions we drew from them and, wherever possible, **verified against the
+ROM**.
 
-Belgeler üreticiye ait, dağıtılamaz materyaldir. `docs/ROADMAP.md`'deki
-hukuki sınır gereği belgeler, sayfa görüntüleri veya uzun alıntılar depoya
-**girmez**. Buradaki her madde kendi cümlelerimizle yazılmış çıkarımdır.
+The documents are producer-owned material that may not be redistributed. Under
+the legal boundary in `docs/ROADMAP.md`, the documents, page images, and lengthy
+quotations do **not** enter the repository. Every item here is an inference
+written in our own words.
 
-Belgelerdeki banka/imza/kişisel bilgiler hiçbir yere aktarılmadı.
+No banking, signature, or personal information from the documents was carried
+anywhere.
 
-## ROM'a karşı DOĞRULANAN
+## VERIFIED against the ROM
 
-**Kartuş 128 Mbit.** Belge böyle diyor, `baserom.gba` tam 16.777.216 bayt.
+**128 Mbit cartridge.** The document states this, and `baserom.gba` is exactly
+16,777,216 bytes.
 
-**Link kablosu kodu ROM'da var.** Belge 2 oyunculu link oyununu planlıyor.
-Seri yazmaç sabitleri havuzda bulundu: `SIOCNT` (0x04000128) altı yerde,
-`SIODATA32` (0x04000120) ve `RCNT` (0x04000134) birer yerde. Taşıyan
-fonksiyonlar: FUN_080657d8 (2374 B), SerialIrqHandler, StepLinkFrame,
-InitLinkBlock, ServiceLinkFrame, ResetLinkHardware. Toplam ~3,4 KB, hiçbiri yazılmamış.
+**Link-cable code exists in the ROM.** The document plans a 2-player link game.
+The serial register constants were found in the literal pools: `SIOCNT`
+(0x04000128) in six places, `SIODATA32` (0x04000120) and `RCNT` (0x04000134) in
+one each. The functions carrying them: FUN_080657d8 (2374 B), SerialIrqHandler,
+StepLinkFrame, InitLinkBlock, ServiceLinkFrame, ResetLinkHardware. About 3.4 KB
+in total, none of it written.
 
-**Giriş okuma iki fonksiyonda.** `KEYINPUT` (0x04000130) havuzda yedi kez;
-sahipleri PollInput (228 B) ve WaitForPartner (320 B). İkisi de yazılmamış.
+**Input polling lives in two functions.** `KEYINPUT` (0x04000130) appears seven
+times in the literal pools; its owners are PollInput (228 B) and WaitForPartner
+(320 B). Both are unwritten.
 
-## ÇIKARIM — kod tabanı iki ekipten geliyor
+## INFERENCE — the codebase comes from two teams
 
-Faturalar ve kilometre taşı formları, projenin 2002'de **Crawfish Interactive**
-tarafından başlatıldığını (dosyalarda proje adı önce "Gang Wars", sonra
-"GTA Advanced"), Aralık 2002'de **Digital Eclipse**'e devredildiğini gösteriyor.
-İkinci ekibin belgesi "final ürün için planlanan iyileştirmeler" başlığını
-taşıyor ve o tarihte oyunu %50 tamamlanmış sayıyor.
+The invoices and milestone forms show that the project was started in 2002 by
+**Crawfish Interactive** (the project name appears first as "Gang Wars", then as
+"GTA Advanced") and handed over to **Digital Eclipse** in December 2002. The
+second team's document is titled "planned improvements for the final product" and
+treats the game as 50% complete at that date.
 
-**Bizim için anlamı:** ROM tek bir ekibin tutarlı kod tabanı değil. Bu oturumda
-ölçtüğümüz bir bulmacaya makul açıklama veriyor — `FUN_080543D0` ile
-`FindOrInitAreaNode` neredeyse ikiz fonksiyonlar ama biri giriş korumalı `do/while`,
-öteki döndürülmüş `for` derlenmiş (bkz. COMPILER.md kural 49 yan bulgusu).
-Kuralı değiştirmez: **döngü biçimi her fonksiyon için ROM'dan okunmalı**,
-kardeşten kopyalanmamalı.
+**What this means for us:** the ROM is not one team's consistent codebase. That
+gives a plausible explanation for a puzzle we measured this session —
+`FUN_080543D0` and `FindOrInitAreaNode` are near-twin functions, yet one compiled
+as an entry-guarded `do/while` and the other as a rotated `for` (see the side
+finding under COMPILER.md rule 49). It does not change the rule: **the loop form
+must be read from the ROM for each function**, never copied from a sibling.
 
-Ayrıca ikinci ekibin kendi GBA kütüphane bileşenlerini projeye kattığı, bu
-bileşenlerin telifinin onlarda kaldığı ve teslim edilen kaynaktan çıkarılacağı
-yazılı. Yani ROM'un bir kısmı oyuna özgü değil, yeniden kullanılabilir kütüphane
-kodu olabilir — `libc` bölgesine benzer üçüncü bir sınıf. HENÜZ DOĞRULANMADI.
+The documents also state that the second team contributed its own GBA library
+components, that copyright in those components remained with them, and that they
+would be removed from the delivered source. So part of the ROM may not be
+game-specific but reusable library code — a third class resembling the `libc`
+region. NOT YET VERIFIED.
 
-## ÇIKARIM — istatistik sayaçları kümesi çözüldü
+## INFERENCE — the statistics counter cluster is explained
 
-Belge, duraklama menüsündeki istatistik ekranı için yaklaşık 35 istatistik
-öngörüldüğünü, kat edilen mesafe / gizli paket / cephane / can gibi değerlerin
-tutulacağını söylüyor.
+The document says roughly 35 statistics were planned for the pause-menu
+statistics screen, tracking values such as distance travelled, hidden packages,
+ammunition, and health.
 
-ROM'da 0x080671B8–0x080673E0 arasında zaten eşleştirdiğimiz bir küme var:
+The ROM already contains a cluster we matched between 0x080671B8 and 0x080673E0:
 `BumpCount64`, `BumpCount68`, `BumpCount6A`, `BumpCount70`, `BumpCount7A`,
 `BumpCount80`, `BumpCount84`, `BumpSaveCounter`, `AddDistance`,
-`AccumulateDistance`, `ResetDistanceAccum`. Bunları "bir sayacı artırıyor"
-diye adlandırmıştık; **ne sayacı olduğunu bilmiyorduk**.
+`AccumulateDistance`, `ResetDistanceAccum`. We had named these "increments a
+counter" — **without knowing which counter**.
 
-Belge kümenin ne olduğunu veriyor: istatistik ekranı sayaçları. Tek tek hangi
-ofsetin hangi istatistik olduğu HÂLÂ BİLİNMİYOR — onu oyun oturumu (mGBA
-izleme) çözer, belge değil.
+The document identifies the cluster: they are the statistics-screen counters.
+Which offset corresponds to which statistic is STILL UNKNOWN — that is resolved
+by a game session (mGBA tracing), not by the document.
 
-## ÇIKARIM — görevler derlenmiş bayt kodu
+## INFERENCE — missions are compiled bytecode
 
-Belge, ikinci ekibin görev script'lerini tersine mühendislikle çözüp bir
-derleyici yazdığını söylüyor. Yani görevler ROM'da **veri**, ve onları yürüten
-bir **yorumlayıcı** var.
+The document says the second team reverse-engineered the mission scripts and
+wrote a compiler for them. So the missions are **data** in the ROM, and there is
+an **interpreter** that executes them.
 
-Bu, 560 bayt üstü 183 fonksiyonluk duvarda somut bir hedef: yorumlayıcı büyük
-olasılıkla onlardan biri. HENÜZ ARANMADI.
+That is a concrete target within the 183-function wall above 560 bytes: the
+interpreter is most likely one of them. NOT YET SEARCHED FOR.
 
-## ÇIKARIM — ses sürücüsü hızlı RAM'de
+## INFERENCE — the audio driver lives in fast RAM
 
-Belge "ses belleği normalde hızlı RAM'e taşınır" diyor ve 3D işlemenin tüm
-hızlı RAM'i kullanıyor olabileceğinden endişe ediyor. GBA'de hızlı RAM = IWRAM
-(0x03000000). Ses sürücüsü aranacaksa bakılacak yer orası.
+The document says "audio memory is normally moved to fast RAM" and worries that
+3D processing may be consuming all of it. On the GBA, fast RAM is IWRAM
+(0x03000000). That is where to look when searching for the audio driver.
 
-## ÇIKARIM — 3D motor ve sabit nokta
+## INFERENCE — 3D engine and fixed point
 
-Belge tekrar tekrar "3d motor", "3d koordinatlar" ve sabit nokta aritmetiğindeki
-yuvarlama hatalarından söz ediyor. Bu, `BuildVolumePlanes` (0x0800AB88) için
-tahmin ettiğimiz kimliği destekliyor: sekiz köşeli hacimden altı yüzey düzlemi
-kuran fonksiyon 3D çarpışma tespitidir. Projede ölçtüğümüz 20.12 ve 16.16
-sabit nokta biçimleriyle tutarlı.
+The document repeatedly mentions a "3d engine", "3d coordinates", and rounding
+errors in fixed-point arithmetic. This supports the identity we assumed for
+`BuildVolumePlanes` (0x0800AB88): a function that builds six face planes from an
+eight-corner volume is 3D collision detection. It is consistent with the 20.12
+and 16.16 fixed-point formats measured in this project.
 
-Araç fiziği için de bir ipucu var: o tarihte arabaların dönüş ekseni aracın
-merkezindeymiş, ön tekerler arasına alınması planlanmış. Araç direksiyon kodu
-aranırken işaret bu. Çıkan oyunda hangisi olduğu BİLİNMİYOR.
+There is also a hint for vehicle physics: at that time the cars' turning axis was
+at the vehicle's center, and moving it between the front wheels was planned. That
+is the marker to look for when searching for vehicle steering code. Which of the
+two shipped is UNKNOWN.
 
-## Kontrol şeması — DİKKATLİ KULLAN
+## Control scheme — USE WITH CARE
 
-Belge yaya ve araç için tuş eşlemesi veriyor: yayada L araca binme, R zıplama,
-A vuruş/ateş, B koşma; araçta L inme, R ateş, A gaz, B fren/geri, A+B el freni,
-Select+Start araç görevi başlat/iptal.
+The document gives a button mapping for on-foot and in-vehicle play: on foot, L
+enters a vehicle, R jumps, A punches/fires, B runs; in a vehicle, L exits, R
+fires, A accelerates, B brakes/reverses, A+B is the handbrake, and Select+Start
+starts/cancels a vehicle mission.
 
-**UYARI:** bu Ocak 2003'ün "önerilen revize şeması". Belge yaya yön hareketinin
-değiştiğini ve strafe kipinin kaldırıldığını açıkça söylüyor, yani o an oyunda
-olan şema bu DEĞİL. Çıkan oyunla aynı olduğu varsayılmamalı; giriş fonksiyonları
-yazılırken maskeler ROM'dan okunmalı, bu tablo yalnızca ADLANDIRMA için ipucu.
+**WARNING:** this is January 2003's "proposed revised scheme". The document
+explicitly says that on-foot directional movement changed and that strafe mode
+was removed, so this is NOT the scheme that was in the game at that moment. It
+must not be assumed identical to the shipped game; when writing input functions,
+read the masks from the ROM and treat this table only as a NAMING hint.
 
-## BELGELERDE OLMAYAN — beklentiyi buraya kadar tut
+## NOT IN THE DOCUMENTS — keep expectations here
 
-Umulan ama bulunmayanlar:
-- struct yerleşimi, alan anlamı, sembol adı
-- durum kodu / sayı sabiti tabloları
-- **kartuş bellek haritası** — belgenin kendi kilometre taşı listesinde
-  Milestone 3 teslimatı olarak geçiyor ama o belge bunların içinde DEĞİL
+Hoped for but not found:
+- struct layouts, field meanings, symbol names
+- state-code or numeric-constant tables
+- **the cartridge memory map** — it appears as a Milestone 3 deliverable in the
+  document's own milestone list, but it is NOT among these documents
 
-Yani bu belgeler eşleşme yüzdesine doğrudan katkı vermiyor. Katkıları
-adlandırma ve alt sistem tanımlama tarafında.
+So these documents do not contribute directly to the matching percentage. Their
+contribution is on the naming and subsystem-identification side.
