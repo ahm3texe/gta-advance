@@ -307,10 +307,14 @@ start,end,binary,module,notes
 0x08058140,0x080581B4,build/world/p1_58140.bin,world,Phase 1: natural C matching the ROM exactly
 0x080581B4,0x08058228,build/world/p1_581b4.bin,world,Phase 1: natural C matching the ROM exactly
 0x08059AE4,0x08059AF8,build/script/cmd_call_four_arg.bin,script,Handler: forwards two u16 operands to FUN_0805669C with a constant 64
+0x08059AF8,0x08059B58,build/script/cmd_free_node_ready.bin,script,"Free node ready: FUN_08056C80, or a slot with gRam02035A9C at most 11"
+0x08059B58,0x08059B90,build/script/cmd_free_node_is_end.bin,script,Is the free node's +0x30 the chain end the second operand resolves to
 0x08059C84,0x08059CA4,build/script/cmd_node_flag_bit0.bin,script,Handler: bit 0 of the chain end's +0x1A flags (rule 33)
+0x08059D10,0x08059D4C,build/script/cmd_below_percent.bin,script,"100 * current < percent * total, both from the record at +0x30"
 0x08059D4C,0x08059D7C,build/script/cmd_flag18_unless_busy.bin,script,Handler: bit 18 of the node flags unless the owner is busy
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,wrapper/accessor harvest
 0x08059D88,0x08059D94,build/script/cmd_call_and_succeed.bin,script,Handler: calls FUN_0805063C and always answers 1
+0x08059D94,0x08059DEC,build/script/cmd_owner_link_matches.bin,script,Does the first owner's +0x100 link reach the second owner
 0x08059E48,0x08059E68,build/script/cmd_forward_three_not.bin,script,Handler: FUN_0805669C inverted; result variable born after the call
 0x08059E68,0x08059E80,build/script/cmd_forward_three.bin,script,Handler: forwards three u16 operands to FUN_0805669C
 0x08059E80,0x08059EAC,build/script/cmd_owner_chain_flag.bin,script,Handler: flag 0x100 two links down the +0x28 chain
@@ -321,6 +325,7 @@ start,end,binary,module,notes
 0x0805A024,0x0805A040,build/script/cmd_progress_minus.bin,script,"Handler: gRam02025810 +0x0C minus the operand, into FUN_08030AE4"
 0x0805A070,0x0805A0AC,build/world/p1_5a070.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805A0AC,0x0805A0C0,build/script/cmd_progress_set.bin,script,Handler: the operand straight into FUN_08030AE4
+0x0805A0C0,0x0805A0FC,build/script/cmd_offset_then_slot.bin,script,"Applies an offset when below the base or zero, then selects a slot"
 0x0805A0FC,0x0805A114,build/script/cmd_percent_to_fixed.bin,script,Handler: (operand << 16) / 100 into ApplyTwoLevels slot 3
 0x0805A114,0x0805A12C,build/script/cmd_anchor_unk34_unless_small.bin,script,Handler: GetAnchorUnk34 unless IsAnchorSmall
 0x0805A12C,0x0805A140,build/script/cmd_call_three_fixed.bin,script,Handler: operand into FUN_0803ABC4 with a constant 3 and 0

@@ -1339,3 +1339,26 @@ goes through. When the pointer is only address arithmetic and the load is a
 plain one, the fold happens before the pointer becomes a value and the qualifier
 changes nothing. `FUN_08063BA4` and `FUN_08061F34` are both parked on that, and
 both were tried with the base `volatile` and with the load `volatile` as well.
+
+## Rule 75 — a copy survives when the two locals have DIFFERENT types
+
+When the ROM keeps one value in two registers, a second local of the SAME type
+does not reproduce it: agbcc propagates the copy away, every time. What does
+reproduce it is a local whose type differs from the value's other use, so the
+copy is a conversion rather than a move.
+
+`FUN_0805A0C0` (`src/script/cmd_offset_then_slot.c`) keeps its first operand in
+r4 and r5, comparing one and passing the other:
+
+| source | result |
+|---|---|
+| `u32 limit = offset; u32 value = offset;` … compare `limit`, pass `value` | copy gone |
+| `u16 limit = offset;` … | copy gone |
+| **`u32 limit = offset;`** … compare `limit`, pass the `u16` **parameter** | **match** |
+
+This is a real lever, and it is narrow. It applies when the ROM narrows into one
+register and COPIES TO ANOTHER (`lsrs r4,r1,#16 / adds r5,r4,#0`). It does not
+apply when the ROM narrows IN PLACE and then copies (`lsrs r1,r1,#16 /
+adds r4,r1,#0`): `FUN_08059C48` and `FUN_080623E4` are both parked on that
+shape, and six spellings each, including both mixed-type forms, leave the copy
+propagated away. That second shape is still the rule 44 class.

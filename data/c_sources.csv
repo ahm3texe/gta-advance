@@ -563,10 +563,15 @@ address,name,source,compiled_size,mapped_size,matching
 0x08058140,FUN_08058140,src/world/p1_58140.c,116,116,yes
 0x080581B4,FUN_080581b4,src/world/p1_581b4.c,116,116,yes
 0x08059AE4,FUN_08059ae4,src/script/cmd_call_four_arg.c,20,20,yes
+0x08059AF8,FUN_08059af8,src/script/cmd_free_node_ready.c,96,96,yes
+0x08059B58,FUN_08059b58,src/script/cmd_free_node_is_end.c,56,56,yes
+0x08059C48,FUN_08059c48,src/script/cmd_chain_end_field1c.c,58,60,no
 0x08059C84,FUN_08059c84,src/script/cmd_node_flag_bit0.c,30,30,yes
+0x08059D10,FUN_08059d10,src/script/cmd_below_percent.c,58,58,yes
 0x08059D4C,FUN_08059d4c,src/script/cmd_flag18_unless_busy.c,48,48,yes
 0x08059D7C,ForwardToGetAnchorUnk30,src/world/wrap_08059d7c.c,10,10,yes
 0x08059D88,FUN_08059d88,src/script/cmd_call_and_succeed.c,12,12,yes
+0x08059D94,FUN_08059d94,src/script/cmd_owner_link_matches.c,88,88,yes
 0x08059E48,FUN_08059e48,src/script/cmd_forward_three_not.c,32,32,yes
 0x08059E68,FUN_08059e68,src/script/cmd_forward_three.c,22,22,yes
 0x08059E80,FUN_08059e80,src/script/cmd_owner_chain_flag.c,44,44,yes
@@ -577,6 +582,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805A024,FUN_0805a024,src/script/cmd_progress_minus.c,28,28,yes
 0x0805A070,FUN_0805a070,src/world/p1_5a070.c,58,58,yes
 0x0805A0AC,FUN_0805a0ac,src/script/cmd_progress_set.c,18,18,yes
+0x0805A0C0,FUN_0805a0c0,src/script/cmd_offset_then_slot.c,60,60,yes
 0x0805A0FC,FUN_0805a0fc,src/script/cmd_percent_to_fixed.c,22,22,yes
 0x0805A114,FUN_0805a114,src/script/cmd_anchor_unk34_unless_small.c,22,22,yes
 0x0805A12C,FUN_0805a12c,src/script/cmd_call_three_fixed.c,20,20,yes
