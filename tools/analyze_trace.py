@@ -17,6 +17,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 LOG = ROOT / "build" / "trace.log"
 LINE = re.compile(r"^f(\d+)\s+(\S+)\s+(.*)$")
 
+# Keep the original Turkish markers readable in logs saved before translation.
+SESSION_MARKERS = ("new session", "yeni oturum")
+SUPPRESSION_MARKERS = ("SUPPRESSED", "SUSTURULDU")
+DIAGNOSTIC_MARKERS = ("ERROR", "warning", "WORKED", "error",
+                      "HATA", "uyari", "CALISTI", "hata")
+
 REGIONS = {0x02: "EWRAM", 0x03: "IWRAM", 0x05: "PALET",
            0x06: "VRAM", 0x07: "OAM", 0x08: "ROM"}
 
@@ -36,7 +42,8 @@ def classify(value, syms):
 
 def sessions(lines):
     """The log holds several sessions; each is returned separately."""
-    marks = [i for i, l in enumerate(lines) if "new session" in l]
+    marks = [i for i, l in enumerate(lines)
+             if any(marker in l for marker in SESSION_MARKERS)]
     if not marks:
         return [lines]
     bounds = marks + [len(lines)]
@@ -70,7 +77,7 @@ def main(argv):
     if not events:
         print("no change records in this session.")
         for l in sess:
-            if "ERROR" in l or "warning" in l or "WORKED" in l or "error" in l:
+            if any(marker in l for marker in DIAGNOSTIC_MARKERS):
                 print(" ", l)
         return 1
 
@@ -100,10 +107,11 @@ def main(argv):
             print(f"  f{frame:<7} {raw} {note}")
         return 0
 
-    suppressed = [(f, n) for f, n, r in events if "SUPPRESSED" in r]
+    suppressed = [(f, n) for f, n, r in events
+                  if any(marker in r for marker in SUPPRESSION_MARKERS)]
     counts, first = defaultdict(int), {}
     for f, n, r in events:
-        if "SUPPRESSED" in r:
+        if any(marker in r for marker in SUPPRESSION_MARKERS):
             continue
         counts[n] += 1
         first.setdefault(n, f)
