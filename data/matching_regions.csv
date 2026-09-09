@@ -53,6 +53,7 @@ start,end,binary,module,notes
 0x08012E18,0x08012E78,build/world/queue_draw_request_direct.bin,world,0x08012E18 QueueDrawRequestDirect
 0x08012E78,0x08012F88,build/world/alloc_draw_entry.bin,world,0x08012E78 AllocDrawEntry
 0x08012F88,0x08013098,build/world/queue_draw_request.bin,world,0x08012F88 QueueDrawRequest + its twin 0x08013010
+0x080130D4,0x080130F0,build/world/reset_draw_queue.bin,world,"Draw queue reset; 0x02022ABC is a separate symbol, not an offset"
 0x080130F0,0x080130F4,build/world/p1_130f0.bin,world,Phase 1: natural C matching the ROM exactly
 0x08013450,0x080134A4,build/world/p1_13450.bin,world,Phase 1: natural C matching the ROM exactly
 0x080134A4,0x080134F8,build/world/p1_134a4.bin,world,Phase 1: natural C matching the ROM exactly
@@ -97,6 +98,7 @@ start,end,binary,module,notes
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Frame chain
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Three-layer chain + negation
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62-byte function + 2 bytes of alignment padding
+0x08029374,0x08029390,build/world/entry_state_is_one.bin,world,Entry state test; the element address must be its own statement ahead of the zero
 0x080294B4,0x080294E4,build/world/release_entry_e.bin,world,0x080294B4 ReleaseEntryE
 0x0802A610,0x0802A858,build/ui/draw_eight_digits.bin,ui,0x0802A610 DrawCounterDigits8 + 0x0802A734 DrawCounterDigits3
 0x0802A9F0,0x0802AB18,build/world/p1_2a9f0.bin,world,Phase 1: natural C matching the ROM exactly

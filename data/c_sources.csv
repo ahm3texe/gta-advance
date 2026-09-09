@@ -111,6 +111,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08012E78,AllocDrawEntry,src/world/alloc_draw_entry.c,272,272,yes
 0x08012F88,QueueDrawRequest,src/world/queue_draw_request.c,136,136,yes
 0x08013010,QueueDrawRequestDup,src/world/queue_draw_request.c,136,136,yes
+0x080130D4,ResetDrawQueue,src/world/reset_draw_queue.c,28,28,yes
 0x080130F0,NoOp080130F0,src/world/p1_130f0.c,2,2,yes
 0x08013450,FUN_08013450,src/world/p1_13450.c,84,84,yes
 0x080134A4,FUN_080134a4,src/world/p1_134a4.c,84,84,yes
@@ -227,6 +228,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080291B8,SpawnFollowupEntry,src/world/entries_a9.c,120,120,yes
 0x08029244,FindEntryByQuad,src/world/entries_a4.c,86,86,yes
 0x0802929C,RefreshEntryTimerByQuad,src/world/entries_a3.c,80,80,yes
+0x08029374,IsEntryStateOne,src/world/entry_state_is_one.c,28,28,yes
 0x08029390,SetActorOffsetFromRecord,src/world/entries_c1.c,104,104,yes
 0x080293F8,PlaceActorFromRecords,src/world/entries_c2.c,186,186,yes
 0x080294B4,ReleaseEntryE,src/world/release_entry_e.c,48,48,yes

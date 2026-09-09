@@ -88,7 +88,7 @@ extern Record gRecords[];
 #define gRecordAsset ((void *)0x08CAA3E4)
 
 extern void InitNodePool(void);
-extern void FUN_080130d4(void);
+extern void ResetDrawQueue(void);
 extern void FUN_08013520(void);
 extern void FUN_08013450(void);
 extern void FUN_08014fac(void);
@@ -135,7 +135,7 @@ void FUN_08051154(u32 index)
     gLoadFlag = 1;
 
     InitNodePool();
-    FUN_080130d4();
+    ResetDrawQueue();
     FUN_08013520();
     FUN_08013450();
     FUN_08014fac();

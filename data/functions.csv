@@ -284,7 +284,7 @@ address,name,size,status,module,notes
 0x08012F88,QueueDrawRequest,136,matching,world,verified from a byte-matching C source; QueueDrawRequest; queues a draw request with a 12-byte stride (find_twins.py)
 0x08013010,QueueDrawRequestDup,136,matching,world,verified from a byte-matching C source; QueueDrawRequestDup; the second copy of QueueDrawRequest in the ROM
 0x08013098,FUN_08013098,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x080130D4,FUN_080130d4,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080130D4,ResetDrawQueue,28,matching,world,28-byte body and literal pool reproduce ROM bytes 0x130D4-0x130EF exactly; 0x02022ABC is a separate symbol
 0x080130F0,NoOp080130F0,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
 0x080130F4,FUN_080130f4,176,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080131A4,FUN_080131a4,64,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -574,7 +574,7 @@ address,name,size,status,module,notes
 0x080291B8,SpawnFollowupEntry,120,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08029244,FindEntryByQuad,86,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0802929C,RefreshEntryTimerByQuad,80,matching,unknown,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists; boundary corrected against the ROM (audit_boundaries.py)
-0x08029374,FUN_08029374,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08029374,IsEntryStateOne,28,matching,world,"28-byte body and literal pool reproduce ROM bytes 0x29374-0x2938F exactly; rule 48 result variable, element address as its own statement"
 0x08029390,SetActorOffsetFromRecord,104,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x080293F8,PlaceActorFromRecords,186,matching,unknown,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists
 0x080294B4,ReleaseEntryE,48,matching,world,"verified from a byte-matching C source; ReleaseEntryE; twin of ReleaseEntryD, base gRam020254D0 (find_twins.py)"
