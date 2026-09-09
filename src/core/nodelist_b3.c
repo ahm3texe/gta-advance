@@ -1,82 +1,86 @@
-/* Varligin bagli dugumunu bosaltip baglanti bayraklarini yeniden kurma
- * 0x08053F6C, 136 bayt (son 4 bayt + orta 8 bayt literal havuzu).
+/* Release the entity's linked node and rebuild the link flags
+ * 0x08053F6C, 136 bytes (a 4-byte pool at the end and an 8-byte one in the
+ * middle).
  *
- * Varligin +0x2C alanindaki dugum alinip:
- *   1) alt nesnesi (+0x28) sifirlaniyor,
- *   2) +0x0B baytindaki "kirli" biti ve seviye yarim-bayti sifirlaniyor,
- *   3) dugumun +0x16 baglanti kimligi 0 ve 0x3FF disindaysa o kimlikle
- *      0x02035A80 listesinde bir dugum aranip, bulunanin +0x18 bayraginda
- *      0x1000 varsa ayni bit bizim dugume de yaziliyor,
- *   4) ayni kimlik ICIN ARAMA TEKRAR yapilip: bizim dugumde ya da
- *      bulunan dugumde 0x1000 varsa +0x18 bayrak kelimesi 0x1C03FFFF ile,
- *      yoksa 0x1C00FFFF ile maskeleniyor.
+ * The node at the entity's +0x2C field is taken and:
+ *   1) its sub-object (+0x28) is cleared,
+ *   2) the "dirty" bit and the level nibble in its +0x0B byte are cleared,
+ *   3) if the node's +0x16 link id is neither 0 nor 0x3FF, a node is searched
+ *      for under that id on the 0x02035A80 list and, if the one found has
+ *      0x1000 in its +0x18 flags, the same bit is written into our node too,
+ *   4) THE SEARCH IS REPEATED for the same id: if either our node or the one
+ *      found has 0x1000, the +0x18 flag word is masked with 0x1C03FFFF,
+ *      otherwise with 0x1C00FFFF.
  *
- * ROM'DAN OLCULEN AYRINTILAR
- * --------------------------
- * - `pop {r4}; pop {r0}; bx r0` -> donus tipi void (kural 35).
- * - Prolog `push {r4,lr}`: cagrilari asan TEK bir callee-saved deger var
- *   (dugum isaretcisi, r4). Yani baglanti kimligi cagriyi ASMIYOR --
- *   ikinci aramanin argumani bellekten YENIDEN okunuyor
- *   (`ldrh r0,[r4,#22]`).
- * - Dugum yerlesimi kardes nodelist_a4.c / nodelist_b1.c'deki Node ile
- *   ayni ailede: +0x0B bayrak bayti, +0x18 bayrak kelimesi, +0x28 alt
- *   nesne. Bu dosyada ilk kez +0x16 u16 baglanti kimligi goruluyor
- *   (`ldrh`, yani u16).
- * - +0x18 alani BURADA isaretsiz: yalniz `& 0x1000` ve iki maske var,
- *   b1.c'deki `bits < 0` kapisi yok, o yuzden `u32` birakildi.
- * - 0x1000 sabiti havuzdan degil `movs #0x80 / lsls #5` ile kuruluyor ve
- *   AYNI yazmac hemen ardindan `orrs` icin tekrar kullaniliyor; yani
- *   `node->bits |= LINK_BIT` bicimi dogru (ayri maske yereli GEREKMIYOR).
- * - 0x3FF, 0x1C00FFFF ve 0x1C03FFFF havuz sabiti; 0x3FF u16 ile
- *   karsilastiriliyor (immediate'e sigmiyor). Kural 44 GEREKMIYOR:
- *   kanoniklestirme yalniz `<`/`<=` sinamalarinda oluyor, burada `==` var.
+ * DETAILS MEASURED FROM THE ROM
+ * -----------------------------
+ * - `pop {r4}; pop {r0}; bx r0` -> a void return type (rule 35).
+ * - The prologue `push {r4,lr}`: only ONE callee-saved value crosses the calls
+ *   (the node pointer, r4). So the link id does NOT cross the call -- the
+ *   second search's argument is RE-READ from memory (`ldrh r0,[r4,#22]`).
+ * - The node layout is in the same family as the Node in the siblings
+ *   nodelist_a4.c / nodelist_b1.c: +0x0B flag byte, +0x18 flag word, +0x28
+ *   sub-object. The +0x16 u16 link id is seen for the first time in this file
+ *   (`ldrh`, so u16).
+ * - The +0x18 field is unsigned HERE: there are only `& 0x1000` and two masks,
+ *   with none of the `bits < 0` gate from b1.c, so it was left `u32`.
+ * - The constant 0x1000 is built with `movs #0x80 / lsls #5` rather than from
+ *   the pool, and the SAME register is reused immediately afterwards for the
+ *   `orrs`; so the `node->bits |= LINK_BIT` form is correct (a separate mask
+ *   local is NOT NEEDED).
+ * - 0x3FF, 0x1C00FFFF and 0x1C03FFFF are pool constants; 0x3FF is compared
+ *   against a u16 (it does not fit an immediate). Rule 44 is NOT NEEDED:
+ *   canonicalisation only happens in `<`/`<=` tests, and here it is `==`.
  *
- * +0x0B'DEKI TEK STRB'NIN SEBEBI (olculdu)
- * ----------------------------------------
- * ROM tek `ldrb` + iki `ands` (-2 ve 15) + tek `strb` uretiyor. Bu, arka
- * arkaya iki AYRI bitfield atamasinin (`dirty = 0;` sonra `level = 0;`)
- * sonucudur: ikinci atamanin `ldrb`si CSE ile, birincinin `strb`si de
- * olu-saklama elemesiyle dusuyor. Maske sirasi kaynak sirasini veriyor:
- * once -2 (dirty), sonra 15 (level).
- * Ayrica `movs r0,#0 / str r0,[r4,#40] / subs r0,#2` dizisi -2 sabitini
- * bir onceki sifirdan turetiyor; yani `node->sub = 0;` satiri bitfield
- * atamalarindan ONCE geliyor.
+ * WHY THERE IS A SINGLE STRB AT +0x0B (measured)
+ * ----------------------------------------------
+ * The ROM emits one `ldrb` + two `ands` (-2 and 15) + one `strb`. That is the
+ * result of two SEPARATE consecutive bitfield assignments (`dirty = 0;` then
+ * `level = 0;`): the second assignment's `ldrb` is removed by CSE and the
+ * first's `strb` by dead-store elimination. The mask order gives the source
+ * order: -2 (dirty) first, then 15 (level).
+ * Furthermore the sequence `movs r0,#0 / str r0,[r4,#40] / subs r0,#2`
+ * derives the -2 constant from the preceding zero; so the `node->sub = 0;`
+ * line comes BEFORE the bitfield assignments.
  *
- * DENEYIP ELEDIGIM YAZIMLAR (hepsi olculdu)
- * -----------------------------------------
- * 1. TEK ortak `other` yereli (iki aramanin sonucu ayni degiskene):
- *    136 bayt ama fark 68. Birinci aramanin sonucu r0'da kalamiyor,
- *    `adds r1,r0,#0` kopyasi cikiyor ve kuyruktaki r1/r2 rolleri de takas
- *    oluyor. Kural 45: her aramaya kendi yereli (`linked` / `other`)
- *    verilince fark 0. ROM'un birinci sonucu r0'da tuketip ikinciyi r2'ye
- *    koymasi tam olarak bu ayrimin izi.
- * 2. Ikinci aramaya yerel `id`i vermek (`FindFreeNode(id)`): fark 8.
- *    Deger cagriyi asiyor, prolog `push {r4,r5,lr}` oluyor ve kimlik r5'e
- *    dagitiliyor; ROM'da r5 YOK. Bu, "ikinci okuma bellekten" iddiasinin
- *    dogrudan kaniti -- kural 11'in tersi yonu.
- * 3. `level = 0;` once, `dirty = 0;` sonra: fark 90. Maskeler kaynak
- *    sirasini izliyor, ilk sabit `movs #15` oluyor ve -2 artik sifirdan
- *    turetilemeyip `movs #2 / negs` ile kuruluyor (bir komut fazla, tum
- *    havuz ofsetleri kayiyor).
- * 4. +0x0B'yi duz `u8 kind` yapip tek satirda `kind &= 0x0E`: 132 bayt,
- *    4 KISA. agbcc iki maskeyi katlayip `movs r0,#14` uretiyor; ROM'un
- *    iki ayri `ands`i ancak iki ayri bitfield atamasiyla cikiyor.
+ * FORMS I TRIED AND ELIMINATED (all measured)
+ * -------------------------------------------
+ * 1. A SINGLE shared `other` local (both search results into the same
+ *    variable): 136 bytes but 68 differences. The first search's result cannot
+ *    stay in r0, an `adds r1,r0,#0` copy appears and the r1/r2 roles in the
+ *    tail get swapped too. Rule 45: giving each search its own local
+ *    (`linked` / `other`) brings the difference to 0. That the ROM consumes
+ *    the first result in r0 and puts the second in r2 is exactly the trace of
+ *    this distinction.
+ * 2. Passing the local `id` to the second search (`FindFreeNode(id)`): 8
+ *    differences. The value crosses the call, the prologue becomes
+ *    `push {r4,r5,lr}` and the id is allocated r5; the ROM has NO r5. This is
+ *    direct evidence for the claim "the second read comes from memory" -- the
+ *    inverse direction of rule 11.
+ * 3. `level = 0;` first, `dirty = 0;` second: 90 differences. The masks follow
+ *    source order, the first constant becomes `movs #15`, and -2 can no longer
+ *    be derived from the zero, so it is built with `movs #2 / negs` (one extra
+ *    instruction, shifting every pool offset).
+ * 4. Making +0x0B a plain `u8 kind` and writing `kind &= 0x0E` on one line:
+ *    132 bytes, 4 SHORT. agbcc folds the two masks into `movs r0,#14`; the
+ *    ROM's two separate `ands` only come out from two separate bitfield
+ *    assignments.
  *
- * ESLESME: 136/136 bayt.
+ * MATCH: 136/136 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_b3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_b3.c
  */
 
 #include "gba_types.h"
 
-#define LINK_NONE   0x3FF        /* +0x16 icin "baglanti yok" kimligi */
-#define LINK_BIT    0x1000       /* +0x18 bayrak kelimesindeki baglanti biti */
-#define KEEP_PLAIN  0x1C00FFFF   /* baglanti yokken korunan bitler */
-#define KEEP_LINKED 0x1C03FFFF   /* baglanti varken ek olarak 0x30000 korunur */
+#define LINK_NONE   0x3FF        /* the "no link" id for +0x16 */
+#define LINK_BIT    0x1000       /* the link bit in the +0x18 flag word */
+#define KEEP_PLAIN  0x1C00FFFF   /* bits kept when there is no link */
+#define KEEP_LINKED 0x1C03FFFF   /* with a link, 0x30000 is kept as well */
 
-/* 0x02035A80 listesindeki dugum; yerlesim src/core/nodelist_a4.c ve
- * src/core/nodelist_b1.c ile ayni aileden, +0x16 burada eklendi. */
+/* A node on the 0x02035A80 list; the layout is from the same family as
+ * src/core/nodelist_a4.c and src/core/nodelist_b1.c, with +0x16 added here. */
 typedef struct Node {
     struct Node *next;          /* +0x00 */
     u8    pad04[7];
@@ -90,14 +94,14 @@ typedef struct Node {
     void *sub;                  /* +0x28 */
 } Node;
 
-/* Cagiranlar (0x0803795C ve 0x0803846C) bu nesneyi r0'da veriyor; burada
- * yalniz +0x2C alani kullaniliyor, gerisi adlandirilmadi. */
+/* The callers (0x0803795C and 0x0803846C) pass this object in r0; only its
+ * +0x2C field is used here, and the rest was not named. */
 typedef struct Entity {
     u8    pad00[0x2C];
     Node *node;                 /* +0x2C */
 } Entity;
 
-extern Node *FindFreeNode(u32 id);      /* 0x08055954: listede kimlik arar */
+extern Node *FindFreeNode(u32 id);      /* 0x08055954: search the list for an ID */
 
 /* 0x08053F6C */
 void ResetNodeLinkBits(Entity *ent)
@@ -123,8 +127,8 @@ void ResetNodeLinkBits(Entity *ent)
             node->bits |= LINK_BIT;
     }
 
-    /* Ikinci arama argumanini bellekten yeniden okuyor (yukaridaki prolog
-       notu); yerel `id` burada KULLANILMIYOR. */
+    /* The second search re-reads its argument from memory (see the prologue
+       note above); the local `id` is NOT USED here. */
     other = FindFreeNode(node->linkId);
     flags = node->bits;
     if ((flags & LINK_BIT) == 0

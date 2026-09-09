@@ -1,17 +1,17 @@
-/* Liste uzerinde geri cagirma — 0x08012944-0x08012967
+/* Callback over the list — 0x08012944-0x08012967
  *
- * Listenin her dugumu icin verilen isleyiciyi cagiriyor. Sonraki dugum
- * CAGRIDAN ONCE saklaniyor (ROM: `ldr r4,[r0,#0]` cagridan once), boylece
- * isleyici dugumu serbest birakabilir.
+ * It calls the given handler for every node of the list. The next node is saved
+ * BEFORE THE CALL (ROM: `ldr r4,[r0,#0]` before the call), so the handler is
+ * free to release the node.
  *
- * `_call_via_r7` bizim yazdigimiz bir sey DEGIL: agbcc, isaretci
- * uzerinden cagriyi -mthumb-interwork ile derlerken bu koprüyu kendisi
- * uretiyor. Kaynakta duz bir isaretci cagrisi yazmak yeterli.
+ * `_call_via_r7` is NOT something we wrote: agbcc produces this bridge itself
+ * when compiling a call through a pointer with -mthumb-interwork. Writing a
+ * plain pointer call in the source is enough.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/for_each_node.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/for_each_node.c
  */
 
 #include "gba_types.h"

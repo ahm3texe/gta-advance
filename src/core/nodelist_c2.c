@@ -1,23 +1,25 @@
-/* Dugumun yuvalarini bosaltip listeyi tazeleme — 0x08055C04-0x08055C8B
+/* Empty the node's slots and refresh the list — 0x08055C04-0x08055C8B
  *
- * Kimlikten dugumu buluyor. Dugum "kirli" (bit 0) ise ve ya seviyesi 1 ise
- * ya da zorlama bayragi verilmisse: dugumun yuva dizisindeki her kimlik icin
- * ReleaseAreaNode cagriliyor, ardindan yuvalar DMA ile bos kimlikle doldurulup
- * kirli biti temizleniyor. Zorlama varsa seviye 1'in ustundeyse 1'e cekiliyor.
- * Sonunda liste basi + kimlik ile FUN_08055D90 cagriliyor.
+ * It finds the node from the id. If the node is "dirty" (bit 0) and either its
+ * level is 1 or the force flag was given: ReleaseAreaNode is called for every
+ * id in the node's slot array, after which the slots are filled with the empty
+ * id via DMA and the dirty bit is cleared. With force, a level above 1 is
+ * pulled down to 1.
+ * At the end FUN_08055D90 is called with the list head + id.
  *
  * +0x0B BAYTI BITFIELD: `ldrb` + `lsls #24` / `asrs #28` cifti, bit 4..7'de
- * ISARETLI 4 bitlik bir alan demek. Ayni alanin `== 1` karsilastirmasi ise
- * kaydirmasiz `movs #240 / ands / cmp #16` uretiyor — agbcc'nin bitfield
- * esitlik karsilastirmasini maskeye indirgemesi. `level = 1` atamasi da
- * `movs #15 / ands / movs #16 / orrs` veriyor; ucu de ROM ile birebir.
+ * means a SIGNED 4-bit field. The `== 1` comparison on the same field, by
+ * contrast, produces `movs #240 / ands / cmp #16` with no shift — agbcc
+ * reducing a bitfield equality comparison to a mask. The `level = 1` assignment
+ * gives `movs #15 / ands / movs #16 / orrs`; all three match the ROM
+ * exactly.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * Kural 43: sayac ve isaretci birlikte ilerliyor -> ikisi de `for`
- * artiriminda, ROM sirasiyla (`adds r5,#1` sonra `adds r4,#2`).
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
+ * Rule 43: the counter and the pointer advance together -> both in the `for`
+ * increment, in the ROM's order (`adds r5,#1` then `adds r4,#2`).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_c2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_c2.c
  */
 
 #include "gba_types.h"

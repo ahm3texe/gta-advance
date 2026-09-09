@@ -1,20 +1,22 @@
-/* Uc alani disari yazma — 0x0800A930-0x0800A94B
+/* Write three fields out — 0x0800A930-0x0800A94B
  *
- * 0x02011030 blogunun +0x30, +0x34 ve +0x38 alanlarini cagiranin verdigi
- * uc isaretciye yaziyor.
+ * It writes the +0x30, +0x34 and +0x38 fields of the 0x02011030 block into the
+ * three pointers supplied by the caller.
  *
- * Kural 35: sondaki `pop {r0}; bx r0` donus tipinin void oldugunu soyluyor
- * (u32 donusunde r0 canli kalir ve agbcc donus adresini r1'e alirdi).
+ * Rule 35: the final `pop {r0}; bx r0` says the return type is void (with a
+ * u32 return, r0 would stay live and agbcc would take the return address into
+ * r1).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/read_triple.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/read_triple.c
  */
 
 #include "gba_types.h"
 
-/* TANIM src/misc/coord_accessors.c ve coord_more.c ile BIREBIR AYNI
-   tutulmali; ayni sembole celiskili extern turu `make check`i kirar
-   (TYPES-001). Alanlar dolgudan oyuldu, YERLESIM DEGISMEDI. */
+/* THE DEFINITION must be kept BYTE-FOR-BYTE the same as in
+   src/misc/coord_accessors.c and coord_more.c; a contradictory extern type for
+   the same symbol breaks `make check` (TYPES-001). The fields were carved out
+   of the padding; THE LAYOUT DID NOT CHANGE. */
 typedef struct CoordBlock {
     u32 unk00;                  /* +0  */
     u32 unk04;                  /* +4  */

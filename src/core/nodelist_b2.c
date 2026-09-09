@@ -1,80 +1,93 @@
-/* Alan baglamini yeni bir tanimla kurma -- 0x08053834, 250 bayt.
+/* Set up the area context from a new descriptor -- 0x08053834, 250 bytes.
  *
- * Uc arguman aliyor: alan baglami, tanim yapisi ve bir ad isaretcisi.
- * Once baglam DMA ile sifirlaniyor, sonra ada karsilik gelen kimlik
- * aranip tek yuvaya yaziliyor, ardindan tanimdaki kimlik dizisi
- * baglamin yuva dizisine kopyalanip her kimlik baglantiya diziliyor.
- * Kardesi ReleaseObjectNodeRefs (src/core/nodelist_a9.c) ile ayni yapi ailesi.
+ * It takes three arguments: the area context, the descriptor structure and a
+ * name pointer. The context is first cleared with DMA, then the id
+ * corresponding to the name is looked up and written into a single slot, after
+ * which the descriptor's id array is copied into the context's slot array and
+ * every id is threaded onto the link.
+ * Same structure family as its sibling ReleaseObjectNodeRefs
+ * (src/core/nodelist_a9.c).
  *
- * DURUM: PARK, 246/250 (dort bayt KISA), fark 13 -- gercekte TEK KOMUT.
- *   Onceki tur da 246 idi ama fark 137 ve elenen yollar YAZILMAMISTI.
- *   Bu tur kural 50 (degisken BOLME) iki yerde uygulandi, 137 -> 13:
+ * STATUS: PARKED, 246/250 (four bytes SHORT), 13 differences -- really a
+ *   SINGLE INSTRUCTION.
+ *   The previous round was also 246, but with 137 differences and the
+ *   eliminated paths WERE NOT WRITTEN DOWN.
+ *   This round rule 50 (variable SPLITTING) was applied in two places,
+ *   137 -> 13:
  *
- *   1. Iki dongu tek `i` sayacini paylasiyordu; tek allocno olunca omru
- *      uzuyor ve oncelik siralamasi ROM'unkinin tersine donuyordu
- *      (ROM: 1. dongu sayaci r4, 2. dongu sayaci r6, adim isaretcisi r5;
- *      bizde ikisi de r5, adim r4).  Ikinci donguye ayri `j` verildi:
- *      fark 33 -> 16, dagitim ROM ile birebir.
- *   2. `dst` hem FindFreeSlotRun donusunu hem sonraki `ctx->slots`
- *      okumasini tasiyordu; tek allocno cagrilari astigi icin callee-saved
- *      (r4) sectiriyordu.  ROM ilkini r1'de (caller-saved) tutuyor.
- *      Ilk deger ayri `run` yereline alindi: fark 16 -> 13.
- *   Ikisi de kural 50'nin "IKI AYRI URETIM YERI" kosulunu saglar
- *   (`i=0` iki kez / `FindFreeSlotRun()` ve `ctx->slots`), kopya tabanli
- *   bolme DEGILDIR -- o yuzden calisti.
+ *   1. The two loops shared a single `i` counter; as one allocno its lifetime
+ *      grew and the priority ordering came out the inverse of the ROM's
+ *      (ROM: first loop counter r4, second loop counter r6, step pointer r5;
+ *      ours had both in r5 and the step in r4).  The second loop was given its
+ *      own `j`: 33 -> 16 differences, with the allocation identical to the
+ *      ROM's.
+ *   2. `dst` carried both the FindFreeSlotRun return and the subsequent
+ *      `ctx->slots` read; as one allocno it crossed the calls and forced a
+ *      callee-saved register (r4).  The ROM keeps the first in r1
+ *      (caller-saved).
+ *      The first value was taken into a separate `run` local: 16 -> 13.
+ *   Both satisfy rule 50's "TWO SEPARATE PRODUCTION SITES" condition
+ *   (`i=0` twice / `FindFreeSlotRun()` and `ctx->slots`) and are NOT
+ *   copy-based splitting -- which is why they worked.
  *
- * KALAN TEK FARK -- olculdu, mekanizmasi bulundu, kaldiraci YOK:
+ * THE ONE REMAINING DIFFERENCE -- measured, mechanism found, NO lever:
  *   ROM:   lsls r0,r0,#16 / lsrs r0,r0,#16 / adds r4,r0,#0 / ldr r0,=0x7FFF
- *   bizde: lsls r0,r0,#16 / lsrs r4,r0,#16 /                 ldr r0,=0x7FFF
- *   ROM u16 daraltmasini bir GECICIYE yapip idx'e KOPYALIYOR; biz dogrudan
- *   idx'e yaziyoruz.  2 bayt kopya + 2 bayt havuz hizalama dolgusu = 4.
+ *   ours:  lsls r0,r0,#16 / lsrs r4,r0,#16 /                 ldr r0,=0x7FFF
+ *   The ROM does the u16 narrowing into a TEMPORARY and COPIES it into idx; we
+ *   write straight into idx.  2 bytes of copy + 2 bytes of pool alignment
+ *   padding = 4.
  *
- *   RTL dokumuyle izlendi (old_agbcc -dr -dc, dokumler t.i.rtl / t.i.cse):
- *   agbcc genisletmede kopyayi ZATEN URETIYOR --
+ *   Traced with RTL dumps (old_agbcc -dr -dc, dumps t.i.rtl / t.i.cse):
+ *   agbcc ALREADY PRODUCES the copy during expansion --
  *       (insn 145) reg62 = lshiftrt(reg63,16)     ; zext(raw)
- *       (insn 147) reg29 = reg62                  ; idx = <o gecici>
- *   ama t.i.cse'de insn 147 YOK: CSE reg29'un butun kullanimlarini reg62
- *   ile degistirip olu kopyayi atiyor; birakirsa da combine iki komutu
- *   birlestiriyor (reg62 kopyada oluyor).  Kopyanin ayakta kalmasi icin
- *   ya reg62 kopyadan SONRA da kullanilmali, ya da kopya ile idx'in ilk
- *   kullanimi ARASINDA bir CSE blok siniri (cok-onculu etiket) olmali.
- *   Ikisi de kaynaktan uretilemedi (asagi).  Bu, docs/COMPILER.md'deki
- *   "Yazmac kopyasi: kaynak duzeyinden uretilemeyen sinif" (ClearHudFieldA /
- *   ClearHudFieldB, ikisi de dort bayt kisa, fazladan `adds rX,rY,#0`)
- *   ile AYNI imza.  Yeni mekanizma cikmadan dokunmayin.
+ *       (insn 147) reg29 = reg62                  ; idx = <that temporary>
+ *   but insn 147 is ABSENT from t.i.cse: CSE replaces every use of reg29 with
+ *   reg62 and drops the dead copy; and even if it were left, combine would
+ *   merge the two instructions (reg62 dies in the copy).  For the copy to
+ *   survive, either reg62 must still be used AFTER the copy, or there must be
+ *   a CSE block boundary (a multiply-preceded label) BETWEEN the copy and
+ *   idx's first use.  Neither could be produced from the source (see below).
+ *   This has the SAME signature as "Register copy: a class that cannot be
+ *   produced at source level" in docs/COMPILER.md (ClearHudFieldA /
+ *   ClearHudFieldB, both four bytes short, with an extra `adds rX,rY,#0`).
+ *   Do not touch it until a new mechanism turns up.
  *
- * DENENIP ELENENLER (~55 varyant; belirtilmedikce 246 bayt / fark 13):
- *   - cast bicimleri: (u16)raw, raw & 0xFFFF, ((u32)raw<<16)>>16
- *   - tip/bildirim: raw u32/s32/u16, idx int/unsigned short/register,
- *     idx ile raw bildirim sirasi takasi
- *   - ara gecici: `half = raw; idx = half;` ve half/idx'in karsilastirma,
- *     saklama, cagri argumaninda 8 kombinasyonu -- CSE ikisini HER
- *     durumda tek yazmaca indiriyor (kural 50'nin kopya yasagi burada da)
- *   - `raw = (u16)raw; idx = raw;` (yerinde daraltma)
- *   - karsilastirma bicimleri: ID_NONE != idx, !(idx == ID_NONE),
- *     (idx - ID_NONE) != 0, idx > ID_NONE, (s32)/(u32) cast, ID_NONE'u
- *     yerele alma (kural 44)
- *   - `(idx ^ ID_NONE) != 0` -> 250 BAYT, fark 4; `idx < ID_NONE` -> 250
- *     bayt, fark 8.  Boyut tutuyor ama fazladan komut SABIT tarafinda
- *     (`ldr r1,=0x7FFF / adds r0,r1,#0 / cmp r0,r4`), ROM'unki DEGER
- *     tarafinda.  Yanlis komut; boyutu tutturmak icin KULLANMAYIN.
- *   - govde bicimleri: idx'i her dala ayri atama; `raw` yerine dogrudan
- *     `idx` ile goto zinciri; init + `break`; `while` bicimi; iki ayri
- *     `found` etiketi; testten once yapay birlesme etiketi (bir ve iki
- *     onculu) -- 246..258, hepsi daha kotu
- *   - cmp / `*slot =` / `PrepareAreaNode()` argumaninda idx yerine raw'in 8
- *     kombinasyonu (238..246, fark 16..58)
- *   - fonksiyon basinda `idx = ID_NONE` on-atamasi: 250 bayt / fark 18
- *     (sabit yuklemesi proloha tasiniyor, kopya yine cikmiyor)
- *   - `volatile int raw`: 250 bayt / fark 9 (yigin trafigi ekliyor)
+ * TRIED AND ELIMINATED (~55 variants; 246 bytes / 13 differences unless
+ * stated):
+ *   - cast forms: (u16)raw, raw & 0xFFFF, ((u32)raw<<16)>>16
+ *   - type/declaration: raw as u32/s32/u16, idx as int/unsigned short/register,
+ *     swapping the declaration order of idx and raw
+ *   - an intermediate temporary: `half = raw; idx = half;` plus the 8
+ *     combinations of half/idx in the comparison, the store and the call
+ *     argument -- CSE reduces the two to a single register in EVERY case
+ *     (rule 50's ban on copies applies here too)
+ *   - `raw = (u16)raw; idx = raw;` (narrowing in place)
+ *   - comparison forms: ID_NONE != idx, !(idx == ID_NONE),
+ *     (idx - ID_NONE) != 0, idx > ID_NONE, (s32)/(u32) casts, taking ID_NONE
+ *     into a local (rule 44)
+ *   - `(idx ^ ID_NONE) != 0` -> 250 BYTES, 4 differences; `idx < ID_NONE` ->
+ *     250 bytes, 8 differences.  The size matches, but the extra instruction
+ *     is on the CONSTANT side (`ldr r1,=0x7FFF / adds r0,r1,#0 / cmp r0,r4`)
+ *     while the ROM's is on the VALUE side.  The wrong instruction; DO NOT USE
+ *     it just to hit the size.
+ *   - body forms: assigning idx separately in each branch; a goto chain using
+ *     `idx` directly instead of `raw`; init + `break`; a `while` form; two
+ *     separate `found` labels; an artificial merge label before the test (with
+ *     one and with two predecessors) -- 246..258, all worse
+ *   - the 8 combinations of raw instead of idx in the cmp, in `*slot =` and in
+ *     the `PrepareAreaNode()` argument (238..246, 16..58 differences)
+ *   - a `idx = ID_NONE` pre-assignment at the top of the function: 250 bytes /
+ *     18 differences (the constant load moves into the prologue, and the copy
+ *     still does not appear)
+ *   - `volatile int raw`: 250 bytes / 9 differences (it adds stack traffic)
  *
- * DENENMEMIS TEK YOL: decomp-permuter (tools/make_permuter_dir.py).
- *   Kalan fark tek bir reg-reg kopyasi oldugundan skor duzlugu dar;
- *   memory'deki "permuter mekanizmayi yuzeye cikarir, sonra programatik
- *   tarama kapatir" kalibina uygun tek aday bu.
+ * THE ONE PATH NOT TRIED: decomp-permuter (tools/make_permuter_dir.py).
+ *   Since the remaining difference is a single reg-reg copy, the score plateau
+ *   is narrow; this is the one candidate that fits the "the permuter surfaces
+ *   the mechanism, then a programmatic sweep closes it" pattern from memory.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_b2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_b2.c
  */
 #include "gba_io.h"
 
@@ -123,11 +136,11 @@ u32 FUN_08053834(AreaCtx *ctx, AreaDesc *desc, const char *name)
     volatile u32 fill;
     u16  ime;
     int  i;
-    int  j;                 /* kural 50: 2. dongu AYRI sayac -- birlestirme */
+    int  j;                 /* rule 50: the 2nd loop gets its OWN counter */
     int  raw;
     u16  idx;
     u16 *slot;
-    u16 *run;               /* kural 50: yuva kosusunun ILK degeri ayri */
+    u16 *run;               /* rule 50: the slot run's FIRST value kept apart */
     u16 *dst;
     u16 *src;
 
@@ -165,8 +178,9 @@ found:
         PrepareAreaNode(idx);
     }
 
-    /* `run` ve `dst` ayri: ROM ilkini caller-saved r1'de tutuyor, ikincisi
-     * cagrilari astigi icin r4'te. Tek yerele indirmek dagitimi bozuyor. */
+    /* `run` and `dst` are separate: the ROM keeps the first in caller-saved
+     * r1 and the second in r4 because it crosses the calls. Merging them into
+     * one local breaks the allocation. */
     run = FindFreeSlotRun(desc->count);
     ctx->slots = run;
     if (desc->count != 0) {

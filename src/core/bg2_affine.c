@@ -1,7 +1,8 @@
-/* BG2 affine matrisi ile 24.8 referans koordinatlarini gunceller.
- * PARK: bitisik alan ve ayri ofset degiskenleri ile MMIO pointer artirimlari
- * denendi. En iyi cikti 168/176 bayt; kalan engel r8/r9 yasam araligi ve iki
- * calisma alani ofsetinin literal havuzuna ayri yerlestirilmesi. */
+/* Updates the BG2 affine matrix and the 24.8 reference coordinates.
+ * PARKED: contiguous fields, separate offset variables and MMIO pointer
+ * increments were tried. The best output is 168/176 bytes; the remaining
+ * obstacles are the r8/r9 live ranges and the two work-area offsets being
+ * placed separately in the literal pool. */
 
 #include "gba_types.h"
 

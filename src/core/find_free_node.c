@@ -1,16 +1,17 @@
-/* Serbest dugum listesinde kimlik arama — 0x08055954-0x0805596F
+/* Search the free node list for an id — 0x08055954-0x0805596F
  *
- * FindNode (src/world/node_search.c, 0x08055AA8) ile KOMUT KOMUT ayni;
- * tek fark liste basi: orada gNodeListHead (0x02035A70), burada
- * gList02035A80. tools/find_twins.py %92.9 benzerlikle isaret etti.
+ * INSTRUCTION FOR INSTRUCTION the same as FindNode (src/world/node_search.c,
+ * 0x08055AA8); the only difference is the list head: gNodeListHead
+ * (0x02035A70) there, gList02035A80 here. tools/find_twins.py pointed at it
+ * with 92.9% similarity.
  *
- * Liste kimlige gore SIRALI; arama kimligi gecince 0 donuyor. Baslik
- * nesnesinin +0x00'i listenin ilk dugumu oldugu icin dongu dogrudan
- * baslik adresinden basliyor -- tek `ldr r0,[r0,#0]` hem baslangici
- * hem ilerlemeyi yapiyor.
+ * The list is ORDERED by id; the search returns 0 once the id is passed.
+ * Because the header object's +0x00 is the list's first node, the loop starts
+ * directly from the header address -- a single `ldr r0,[r0,#0]` does both the
+ * start and the advance.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/find_free_node.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/find_free_node.c
  */
 
 #include "gba_types.h"

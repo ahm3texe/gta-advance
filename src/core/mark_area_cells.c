@@ -1,7 +1,8 @@
-/* Nesneye bagli koordinat listesini etkin alan hucrelerine isaretler.
- * PARK: parametre genisligi, for/while ve ilk sayac yasam araligi denendi.
- * Govde 164/164; yalniz 20 bayt farkli. Iki global literal yukleme sirasi
- * (gRam020307F0 / gGameState) dogal C'de ters kaliyor. */
+/* Marks the coordinate list attached to the object into the active area cells.
+ * PARKED: the parameter width, for/while and the first counter's lifetime were
+ * tried. The body is 164/164 with only 20 bytes differing. The load order of
+ * the two global literals
+ * (gRam020307F0 / gGameState) remains reversed in natural C. */
 
 #include "gba_types.h"
 

@@ -1,33 +1,35 @@
-/* Alan (kayit) yukleyicisi — 0x08051154-0x080512AF   BYTE-MATCHING
+/* Area (record) loader — 0x08051154-0x080512AF   BYTE-MATCHING
  *
- * Verilen indisle 0x08CAC248'deki 60 byte'lik kayit tablosundan bir kayit
- * secer, secimi gRecordIndex'e yazar ve tum dunya alt sistemlerini bu kaydin
- * alanlariyla kurar: dugum havuzu, pencere, giris tablolari, mesafe
- * birikimi vb. Sonra kaydin +0x20 alanindaki dogus listesinde flags == 0
- * olan ILK girisi arar; bulunursa baslangic konumu o girisin u16 x/y
- * degerlerinden 16.16 sabit noktaya cevrilir, bulunamazsa varsayilan
- * (0x18800000, 0x09400000) kalir. En sonda kare zinciri bir kez elle
- * cevrilir, BG1 acilir, 0x08CAA3E4 varligi yuklenip isaretcisi
- * gRam020303C4'e konur ve gRecordIndex'in +4/+8/+0xC alanlari
- * (0, 3600, 0) olarak kurulur.
+ * It selects a record from the 60-byte record table at 0x08CAC248 by the given
+ * index, writes the selection into gRecordIndex and sets up every world
+ * subsystem from that record's fields: the node pool, the window, the entry
+ * tables, the distance accumulation and so on. It then searches the spawn list
+ * in the record's +0x20 field for the FIRST entry with flags == 0; if one is
+ * found, the start position is converted to 16.16 fixed point from that entry's
+ * u16 x/y values, and otherwise the default (0x18800000, 0x09400000) remains.
+ * At the very end the frame chain is turned by hand once, BG1 is enabled, the
+ * 0x08CAA3E4 asset is loaded and its pointer put into gRam020303C4, and the
+ * +4/+8/+0xC fields of gRecordIndex are set to (0, 3600, 0).
  *
- * NOTLAR
- * - `start` yereli ROM'da OLU: sp+12/+16/+20'ye yaziliyor, hicbir yerde
- *   okunmuyor. agbcc yerel bir AGREGAT'in (struct) bellek yazimlarini
- *   silmedigi icin bu yazimlar ROM'da duruyor; skaler yereller ile ayni
- *   sey elde EDILEMEZ (silinirler). Orijinal kaynakta da olu kod.
- * - Iki adres data/ram_map.csv'de ADSIZ; bu dosyada ham adres olarak
- *   yazildilar (src/core/frame_dispatch.c'deki gFrameDelay ile ayni bicim).
- *   Isimlendirilmeleri gerekiyor:
- *     0x020303C0  4 byte, fonksiyon girisinde 1 yaziliyor  -> gLoadFlag
- *     0x08CAA3E4  ROM varlik isaretcisi, FUN_08036cac'e verilir
- * - Dongu bicimi olculdu: `for (i = 0; found == -1 && i < n; i++)`.
- *   Kosullarin SIRASI onemli — `i < n && found == -1` yazilirsa alttaki
- *   dongu testi ters sirada cikar. `if (... ) { found = i; break; }`
- *   bicimi de ROM'un sekline uymuyor (rule 60).
+ * NOTES
+ * - The `start` local is DEAD in the ROM: it is written to sp+12/+16/+20 and
+ *   never read. Because agbcc does not delete the memory stores of a local
+ *   AGGREGATE (a struct), those stores stand in the ROM; the same thing CANNOT
+ *   be achieved with scalar locals (they are deleted). It is dead code in the
+ *   original source too.
+ * - Two addresses are UNNAMED in data/ram_map.csv; they were written as raw
+ *   addresses in this file (the same form as gFrameDelay in
+ *   src/core/frame_dispatch.c). They need to be named:
+ *     0x020303C0  4 bytes, 1 is written on entry to the function -> gLoadFlag
+ *     0x08CAA3E4  a ROM asset pointer, passed to FUN_08036cac
+ * - The loop form was measured: `for (i = 0; found == -1 && i < n; i++)`.
+ *   The ORDER of the conditions matters — written `i < n && found == -1`, the
+ *   loop test at the bottom comes out in the reverse order. The
+ *   `if (... ) { found = i; break; }` form does not match the ROM's shape
+ *   either (rule 60).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/band_08051154.c   -> BYTE-MATCHING
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/band_08051154.c   -> BYTE-MATCHING
  */
 
 #include "gba_types.h"

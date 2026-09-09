@@ -1,101 +1,105 @@
-/* Ilerleme kosulu sorgusu — 0x080552D4-0x080554BF (492 bayt)
+/* Progress condition query — 0x080552D4-0x080554BF (492 bytes)
  *
- * TEK PARAMETRELI PREDIKAT: 0..23 arasindaki bir kosul kimligini alip
- * 0 veya 1 dondurur. ROM'da 24 girisli ATLAMA TABLOSU var
- * (0x080552EC-0x0805534B, 96 bayt), yani kaynak yogun bir `switch`:
+ * A SINGLE-PARAMETER PREDICATE: it takes a condition id between 0 and 23 and
+ * returns 0 or 1. The ROM has a 24-entry JUMP TABLE
+ * (0x080552EC-0x0805534B, 96 bytes), so the source is a dense `switch`:
  *
  *   push {lr} / cmp r0,#23 / bls .L / b default / lsls r0,#2 /
  *   ldr r1,=0x080552EC / adds r0,r0,r1 / ldr r0,[r0] / mov pc,r0
  *
- * `cmp #23` sonrasi `bls .L + b default` ikilisi elle yazilmis bir sey
- * degil: default blogu (0x080554BA) 482 bayt uzakta ve Thumb kosullu dal
- * +-254 bayta sigmiyor, agbcc kendi trambolinini uretiyor. Ayni sebeple
- * govdelerin cogunda `bls <yakin>` + `b <uzak>` ciftleri var.
+ * The `bls .L + b default` pair after `cmp #23` is not something written by
+ * hand: the default block (0x080554BA) is 482 bytes away and a Thumb
+ * conditional branch does not reach beyond +-254 bytes, so agbcc produces its
+ * own trampoline. For the same reason most of the bodies have `bls <near>` +
+ * `b <far>` pairs.
  *
- * Tablo girisi 0 -> default (0x080554BA), yani KAYNAKTA `case 0` YOK.
- * Tablo girisi 23 -> ortak `return 0` blogu, yani `case 23: return 0;`
- * capraz atlamayla kuyruga kaynamis.
+ * Table entry 0 -> default (0x080554BA), so THERE IS NO `case 0` IN THE
+ * SOURCE.
+ * Table entry 23 -> the shared `return 0` block, so `case 23: return 0;` has
+ * been welded into the tail by cross-jumping.
  *
- * VERI KAYNAGI: gSaveBuffer (0x02000D50, data/ram_map.csv). Uc ayri
- * bitfield kabi okunuyor; genislikler cikarma komutlarindan TERSINE
- * hesaplandi (`(v << (32-bitpos-w)) >> (32-w)` gcc'nin extract_bit_field
- * kalibi):
+ * THE DATA SOURCE: gSaveBuffer (0x02000D50, data/ram_map.csv). Three separate
+ * bitfield containers are read; the widths were computed BACKWARDS from the
+ * extraction instructions (`(v << (32-bitpos-w)) >> (32-w)` is gcc's
+ * extract_bit_field pattern):
  *
- *   +0x70  u32 kabi
- *       ldrb [+0x71] / lsls #27 / lsrs #27   -> bit  8, genislik 5
- *       ldr  [+0x70] / lsls #14 / lsrs #27   -> bit 13, genislik 5
- *       ldrb [+0x72] / lsls #25 / lsrs #27   -> bit 18, genislik 5
- *   +0x7C  u16 kabi
- *       ldrb [+0x7C] / lsls #28 / lsrs #28   -> bit  0, genislik 4
- *       ldrh [+0x7C] / lsls #21 / lsrs #25   -> bit  4, genislik 7
- *   +0x7E  u16 kabi
- *       ldrb [+0x7E] / lsls #26 / lsrs #27   -> bit  1, genislik 5
- *       ldrh [+0x7E] / lsls #21 / lsrs #27   -> bit  6, genislik 5
- *       ldrb [+0x7F] / lsrs #3               -> bit 11, genislik 5
+ *   +0x70  u32 container
+ *       ldrb [+0x71] / lsls #27 / lsrs #27   -> bit  8, width 5
+ *       ldr  [+0x70] / lsls #14 / lsrs #27   -> bit 13, width 5
+ *       ldrb [+0x72] / lsls #25 / lsrs #27   -> bit 18, width 5
+ *   +0x7C  u16 container
+ *       ldrb [+0x7C] / lsls #28 / lsrs #28   -> bit  0, width 4
+ *       ldrh [+0x7C] / lsls #21 / lsrs #25   -> bit  4, width 7
+ *   +0x7E  u16 container
+ *       ldrb [+0x7E] / lsls #26 / lsrs #27   -> bit  1, width 5
+ *       ldrh [+0x7E] / lsls #21 / lsrs #27   -> bit  6, width 5
+ *       ldrb [+0x7F] / lsrs #3               -> bit 11, width 5
  *
- * Son satirdaki tek `lsrs #3`: bit 11..15 baytin ust ucunda bittigi icin
- * gcc maskeyi eleyip yalniz kaydirmayi biraktigi hal. Yani alan 5 bit.
+ * The single `lsrs #3` on the last line: because bits 11..15 end at the top of
+ * the byte, gcc drops the mask and leaves only the shift. So the field is 5
+ * bits.
  *
- * KAP GENISLIGI ZORUNLU: +0x7E'deki 6..10 alani BAYT SINIRINI ASIYOR
- * (ldrh ile okunuyor), dolayisiyla bitfield tipi `u8` OLAMAZ; `u16`
- * olmali. Ayni sekilde +0x70'teki 13..17 alani ldr ile okunuyor -> `u32`.
- * +0x7C ile +0x7E AYRI kaplar: bitisik yazilirsa 0x7C kabinda 5 bit bos
- * kalir ve 0x7E'nin ilk alani oraya kayar.
+ * THE CONTAINER WIDTH IS MANDATORY: the 6..10 field at +0x7E CROSSES A BYTE
+ * BOUNDARY (it is read with ldrh), so the bitfield type CANNOT be `u8`; it
+ * must be `u16`. Likewise the 13..17 field at +0x70 is read with ldr -> `u32`.
+ * +0x7C and +0x7E are SEPARATE containers: written contiguously, 5 bits would
+ * be left empty in the 0x7C container and 0x7E's first field would shift into
+ * them.
  *
- * OLCUM GUNLUGU -- iki tur, ikisi de tek degiskenli (yeni deneyen BU
- * LISTEYE EKLESIN, mevcut satirlari SILMESIN):
+ * MEASUREMENT LOG -- two rounds, both single-variable (whoever tries something
+ * new should ADD TO THIS LIST and NOT DELETE existing lines):
  *
- * 1) `case 0` YOKKEN 488/492 -- DORT BAYT KISA.
- *    Belirti: bizim prologumuz `subs r0,#1 / cmp r0,#22` ve 23 girisli
- *    tablo uretiyordu, ROM'da ise `cmp r0,#23` ve 24 girisli tablo var.
- *    agbcc switch'in en kucuk case'ini cikarir; `subs` YOKSA en kucuk
- *    case SIFIRDIR. Yani kaynakta `case 0:` VAR ve govdesi default ile
- *    ayni (`return 1`) oldugu icin capraz atlamayla kaynamis; tabloda
- *    yalniz fazladan bir kelime birakiyor. `case 0: return 1;` eklemek
- *    488 -> 492 yapti (fark 154).
+ * 1) WITHOUT `case 0`, 488/492 -- FOUR BYTES SHORT.
+ *    The symptom: our prologue produced `subs r0,#1 / cmp r0,#22` and a
+ *    23-entry table, whereas the ROM has `cmp r0,#23` and a 24-entry table.
+ *    agbcc subtracts a switch's smallest case; with NO `subs`, the smallest
+ *    case IS ZERO. So the source DOES have a `case 0:`, and because its body
+ *    is the same as default's (`return 1`) it has been welded in by
+ *    cross-jumping, leaving only an extra word in the table. Adding
+ *    `case 0: return 1;` took 488 -> 492 (154 differences).
  *
- * 2) +0x70 KABININ KARSILASTIRMALARI UNSIGNED OLMALI: 154 -> 0.
- *    Olculen agbcc davranisi (probe ile dogrulandi):
- *        u16 alan : 5   ->  `cmp #19 / bhi`   (UNSIGNED)
- *        u32 alan : 5   ->  `cmp #19 / bgt`   (SIGNED)
- *    Yani bitfield'in BILDIRILEN TIPI karsilastirmanin isaretliligini
- *    belirliyor. +0x7C ve +0x7E kaplari `u16` oldugu icin zaten ROM'un
- *    `bhi/bls`sini veriyordu; +0x70 kabi `u32` OLMAK ZORUNDA (bit 13..17
- *    alani halfword sinirini asiyor, `u16` bildirilirse agbcc alani bir
- *    sonraki u16'ya kaydirir ve ofset +0x72'ye kayar), o yuzden isaret
- *    kaynakta duzeltildi: sabitlere `U` soneki.
- *    Elenen esdegerler (ucu de AYNI kodu veriyor, gereksiz):
- *        (u32)gSaveBuffer.score1 > 9      -- acik cast
- *        u32 v = gSaveBuffer.score1; v>9  -- ara yerel
- *        gSaveBuffer.score1 >= 10U        -- >= yazimi
+ * 2) THE +0x70 CONTAINER'S COMPARISONS MUST BE UNSIGNED: 154 -> 0.
+ *    The measured agbcc behaviour (confirmed with a probe):
+ *        a u16 field : 5   ->  `cmp #19 / bhi`   (UNSIGNED)
+ *        a u32 field : 5   ->  `cmp #19 / bgt`   (SIGNED)
+ *    So the bitfield's DECLARED TYPE decides the signedness of the comparison.
+ *    Because the +0x7C and +0x7E containers are `u16`, they already gave the
+ *    ROM's `bhi/bls`; the +0x70 container MUST BE `u32` (its bit 13..17 field
+ *    crosses a halfword boundary, and declared `u16` agbcc would shift the
+ *    field into the next u16 and the offset would move to +0x72), so the
+ *    signedness was corrected in the source: a `U` suffix on the constants.
+ *    Equivalents eliminated (all three give the SAME code and are redundant):
+ *        (u32)gSaveBuffer.score1 > 9      -- an explicit cast
+ *        u32 v = gSaveBuffer.score1; v>9  -- an intermediate local
+ *        gSaveBuffer.score1 >= 10U        -- the >= form
  *
- *    Bu duzeltmenin ZINCIRLEME etkisi vardi, sadece iki komut degil:
- *      - case 3/5/7 ancak isaretlilik tutunca case 1'in `cmp #19` /
- *        case 2'nin `cmp #9` kuyruguna capraz atlayabildi (ROM'da
- *        `b 0x8055372` ve `b 0x8055388` bunlar),
- *      - buna karsilik case 11..20 (FUN_08030390 donusu, SIGNED `bgt`)
- *        yanlislikla o kuyruklara KAYNAMISTI; isaret ayrisinca ROM'daki
- *        gibi kendi `cmp/bgt` ciftlerini geri aldilar.
- *    Tek bir tip kararinin hem birlestirdigi hem ayirdigi bloklar
- *    sayesinde 154 baytin tamami tek hamlede kapandi.
+ *    This correction had a CHAIN effect, not just two instructions:
+ *      - cases 3/5/7 could only cross-jump into case 1's `cmp #19` /
+ *        case 2's `cmp #9` tail once the signedness matched (these are
+ *        `b 0x8055372` and `b 0x8055388` in the ROM),
+ *      - conversely cases 11..20 (the FUN_08030390 return, a SIGNED `bgt`) had
+ *        been welded into those tails BY MISTAKE; once the signs separated
+ *        they got their own `cmp/bgt` pairs back, as in the ROM.
+ *    Thanks to the blocks that a single type decision both merged and
+ *    separated, all 154 bytes closed in one move.
  *
- * ESLESME: 492/492 bayt.
+ * MATCH: 492/492 bytes.
  *
- * DIS SEMBOL: 0x08061EC0 haritada EKSIKTI (onceki kayit 0x08061DF0,
- *   sonraki 0x08061EC4); ROM'da orada 4 baytlik `movs r0,#1 / bx lr`
- *   duruyor -- gercek bir yaprak fonksiyon, iki havuz kelimesinin
- *   arasinda kaldigi icin Ghidra kacirmis. Bildirildi ve
- *   data/functions.csv'ye `0x08061EC0,FUN_08061ec0,4` olarak eklendi.
+ * AN EXTERNAL SYMBOL: 0x08061EC0 was MISSING from the map (the previous record
+ *   is 0x08061DF0 and the next 0x08061EC4); in the ROM there is a 4-byte
+ *   `movs r0,#1 / bx lr` there -- a real leaf function that Ghidra missed
+ *   because it sits between two pool words. It was reported and added to
+ *   data/functions.csv as `0x08061EC0,FUN_08061ec0,4`.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_b8.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_b8.c
  */
 
 #include "gba_types.h"
 
-/* Kayit tamponunun bu ceviri biriminden gorunen yuzu. Diger gorunumler:
- * src/world/area_flags.c (SaveBuffer), src/world/stat_counters.c
- * (SaveCounters). Her TU kendi yerel gorunumunu bildiriyor. */
+/* The face of the save buffer as seen from this translation unit. The other
+ * views: src/world/area_flags.c (SaveBuffer) and src/world/stat_counters.c
+ * (SaveCounters). Each TU declares its own local view. */
 typedef struct SaveProgress {
     u8  pad00[0x70];            /* 0x00 */
 

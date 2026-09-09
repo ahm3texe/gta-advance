@@ -1,53 +1,54 @@
-/* Sirali dugum listesinde kimlik arama / son dugumu geri donusturme
- * 0x080547E8-0x0805486F  (136 bayt)
+/* Search the ordered node list for an id / recycle the last node
+ * 0x080547E8-0x0805486F  (136 bytes)
  *
- * gNodeListHead (0x02035A70) bir liste basligi: +0 bas, +4 son, +8 sayac
- * (src/core/linked_list.c ve src/core/insert_sorted.c ile ayni yerlesim).
- * Listedeki dugumler kimlige gore ARTAN sirali, bu yuzden tarama kimlik
- * asilinca duruyor.
+ * gNodeListHead (0x02035A70) is a list header: +0 head, +4 tail, +8 count (the
+ * same layout as src/core/linked_list.c and src/core/insert_sorted.c). The
+ * nodes on the list are in ASCENDING id order, so the scan stops once the id is
+ * passed.
  *
- * Uc sonuc yolu var:
- *   - kimlik listede bulundu           -> o dugum kullaniliyor
- *   - bulunamadi, SON dugum bos (0x7FEF) -> o dugum listeden cikarilip
- *     yeni kimlikle yeniden siraya sokuluyor
- *   - bulunamadi, son dugum dolu        -> sonuc 0
+ * There are three outcome paths:
+ *   - the id was found on the list      -> that node is used
+ *   - not found, the LAST node is empty (0x7FEF) -> that node is unlinked and
+ *     re-inserted in order under the new id
+ *   - not found, the last node is occupied -> the result is 0
  *
- * Sonda ortak kuyruk: dugumun +0x0B bayrak baytindaki `ready` biti kuruluysa
- * FUN_08052988 cagriliyor. ROM bu kuyruga sonuc 0 iken de giriyor, yani
- * `node->ready` okumasi bos isaretci uzerinden yapilabiliyor; bu ORIJINAL
- * DAVRANIS, kaynak ona gore yazildi (yoksa blok duzeni tutmuyor).
+ * A shared tail at the end: if the `ready` bit in the node's +0x0B flag byte is
+ * set, FUN_08052988 is called. The ROM enters this tail even when the result is
+ * 0, so the `node->ready` read can happen through a null pointer; this is the
+ * ORIGINAL BEHAVIOUR and the source was written accordingly (otherwise the
+ * block layout does not match).
  *
- * OLCULEN DORT AYRINTI:
+ * FOUR MEASURED DETAILS:
  *
- * 1) Dongu ETIKETLERLE yazildi (kural 40). Yapisal `while`/`for`/`do-while`
- *    biciminin hepsi denendi: agbcc dongu icindeki referanslari dongu
- *    derinligiyle agirlikliyor, bu da anahtar degerinin oncelik puanini
- *    (2*6/4 = 3.00) gezinme isaretcisininkinin (3*12/19 = 1.90) uzerine
- *    cikariyor ve anahtar r0'i kapiyor. ROM tersini istiyor. Etiketli
- *    bicimde dongu notu olusmadigi icin agirlik kalkiyor ve dagitim
- *    ROM'unki gibi cikiyor: gezinme r0, anahtar r1.
+ * 1) The loop was written WITH LABELS (rule 40). Every structured
+ *    `while`/`for`/`do-while` form was tried: agbcc weights in-loop references
+ *    by loop depth, which raises the key value's priority score (2*6/4 = 3.00)
+ *    above the walking pointer's (3*12/19 = 1.90) and lets the key claim r0.
+ *    The ROM wants the opposite. In the labelled form no loop note is created,
+ *    the weighting disappears and the allocation comes out as the ROM's:
+ *    walker r0, key r1.
  *
- * 2) +0x0B bayrak bayti BITFIELD olarak yazildi. Ayni ucluyu maske
- *    aritmetigiyle yazmak (`f = (f & 0x0F) | 2; f &= ~1;`) agbcc'ye
- *    maskeleri katlatiyor ya da -2'yi mevcut 2'den `sub r1,r1,#4` ile
- *    turettiriyor. Bitfield atamalari tek ldrb/strb'ye birlesiyor ve ROM'un
- *    `movs r1,#2 / negs r1,r1` ciftini uretiyor.
+ * 2) The +0x0B flag byte was written as a BITFIELD. Writing the same triple
+ *    with mask arithmetic (`f = (f & 0x0F) | 2; f &= ~1;`) makes agbcc fold the
+ *    masks, or derive -2 from the existing 2 with `sub r1,r1,#4`. Bitfield
+ *    assignments merge into a single ldrb/strb and produce the ROM's
+ *    `movs r1,#2 / negs r1,r1` pair.
  *
- * 3) "Bulundu" bloku kaynakta AYRI bir etikete (`found:`) alinip
- *    "bulunamadi" blokundan SONRA yazildi. `if (key == id) { node = cur;
- *    goto check; }` biciminde agbcc kosulu ters cevirip bloku dogrudan
- *    dallanmanin ardina koyuyor (`bne` + dusme); ROM ise bloku havuzun
- *    arkasinda tutup `beq` ile atliyor. Blok sirasi kaynaktaki etiket
- *    sirasini izliyor.
+ * 3) The "found" block was moved to a SEPARATE label (`found:`) in the source
+ *    and written AFTER the "not found" block. In the form
+ *    `if (key == id) { node = cur; goto check; }`, agbcc inverts the condition
+ *    and puts the block directly after the branch (`bne` + fall-through); the
+ *    ROM instead keeps the block behind the pool and skips over it with `beq`.
+ *    The block order follows the label order in the source.
  *
- * 4) Kayit tablosu ROM'da (0x08D49C00) oldugu icin sabit cast ile
- *    yaziliyor, extern sembol olarak degil (kural 1 yalniz RAM icin).
- *    Ayni tablo src/world/slot_table.c'de de bu bicimde.
+ * 4) Because the record table is in the ROM (0x08D49C00), it is written as a
+ *    constant cast rather than an extern symbol (rule 1 applies to RAM only).
+ *    The same table has the same form in src/world/slot_table.c.
  *
- * Kural 35'in tersi: `pop {r1}; bx r1` ve r0'da deger -> DEGER donduruyor.
+ * The inverse of rule 35: `pop {r1}; bx r1` with a value in r0 -> it RETURNS A VALUE.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_c1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_c1.c
  */
 
 #include "gba_types.h"
@@ -55,13 +56,13 @@
 #define ID_NONE       0x7FEF
 #define RECORD_SIZE   36
 
-/* +0x0B bayrak bayti bit alanlarina bolunmus. Yalniz `ready` (bit 1) ve
- * ust nibble `hi` bu fonksiyonda kullaniliyor; digerlerinin anlami henuz
- * bilinmiyor, adlar GECICI. */
+/* The +0x0B flag byte is split into bitfields. Only `ready` (bit 1) and the
+ * upper nibble `hi` are used in this function; the meaning of the others is not
+ * known yet and the names are TEMPORARY. */
 typedef struct Node {
     struct Node *next;          /* +0x00 */
     struct Node *prev;          /* +0x04 */
-    u16          key;           /* +0x08 kimlik */
+    u16          key;           /* +0x08 ID */
     u8           unk0A;         /* +0x0A */
     u8           low    : 1;    /* +0x0B bit 0 */
     u8           ready  : 1;    /* +0x0B bit 1 */

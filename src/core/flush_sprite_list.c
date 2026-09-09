@@ -1,34 +1,35 @@
-/* Aktif dugum listesini OAM'a yazma — 0x08012B9C-0x08012C0B
+/* Write the active node list into OAM — 0x08012B9C-0x08012C0B
  *
- * Aktif listeyi bastan gezip her dugumun uc OAM ozniteligini yaziyor,
- * ardindan GECEN KAREDEN kalan fazla yuvalari devre disi birakip yeni
- * sayiyi geri sakliyor.
+ * It walks the active list from the front, writing each node's three OAM
+ * attributes, then disables the surplus slots left over FROM THE PREVIOUS FRAME
+ * and stores the new count back.
  *
- * OAM tabani `movs r3,#224 / lsls r3,#19` ile kuruluyor = 0x07000000.
- * Bos yuva kalibi: attr0=512 (0x200, OBJ devre disi), attr1=0, attr2=0.
+ * The OAM base is built with `movs r3,#224 / lsls r3,#19` = 0x07000000.
+ * The empty slot pattern: attr0=512 (0x200, OBJ disabled), attr1=0, attr2=0.
  *
- * Isaretci ilerleyisi 2/2/4: OAM girisi 8 bayt ama dorduncu yarim-kelime
- * (donusum verisi) yazilmiyor, atlaniyor.
+ * The pointer advances 2/2/4: an OAM entry is 8 bytes, but the fourth halfword
+ * (the transform data) is not written and is skipped.
  *
- * Havuz duzeni bu fonksiyonla GENISLEDI:
- *     +0x800  bos liste basi
- *     +0x804  aktif liste basi
- *     +0x808  onceki kare sayaci  <- BURADA bulundu; ram_map boyutu
- *                                    2056 -> 2060 olarak duzeltildi
+ * The pool layout GREW with this function:
+ *     +0x800  free list head
+ *     +0x804  active list head
+ *     +0x808  previous frame count  <- found HERE; the ram_map size was
+ *                                      corrected from 2056 to 2060
  *
- * Dugum ve havuzun ortak yerlesimi include/sprite_pool.h icindedir.
+ * The shared layout of the node and the pool is in include/sprite_pool.h.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * ESLESME: 112/112 bayt. Kalan 9 baytlik komut-sirasi farkini
- * `for (i = count; i < left; i++)` kapatti. agbcc artan induksiyon
- * degiskenini azalan sayaca cevirirken `left - count` cikarmasini
- * dongu sabitlerinden SONRA yerlestiriyor. Elle `left -= count`
- * yazmak ise cikarmayi kaynak deyimi olarak sabitlerden ONCE yayiyor.
- * Ayri sabit yerelleri ve `while (--left != count)` denemeleri eslesmedi.
+ * MATCH: 112/112 bytes. The remaining 9-byte instruction-order difference was
+ * closed by `for (i = count; i < left; i++)`. When agbcc converts an ascending
+ * induction variable into a descending counter, it places the `left - count`
+ * subtraction AFTER the loop constants. Writing `left -= count` by hand instead
+ * emits the subtraction as a source statement, BEFORE the constants.
+ * Separate constant locals and `while (--left != count)` attempts did not
+ * match.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/flush_sprite_list.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/flush_sprite_list.c
  */
 
 #include "gba_io.h"

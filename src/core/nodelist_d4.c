@@ -1,66 +1,68 @@
-/* Dugum havuzlarini sifirlayip serbest listelere dizme
- * 0x08054450-0x0805456F  (288 bayt)
+/* Clear the node pools and thread them onto the free lists
+ * 0x08054450-0x0805456F  (288 bytes)
  *
- * Fonksiyon iki asamadan olusuyor:
+ * The function has two stages:
  *
- *   1) Bes ayri DMA3 doldurmasi. Dorttu 32-bit sifir dolgusu, sonuncusu
- *      16-bit 0x7FEF (bos kimlik) dolgusu. Her transfer REG_IME
- *      kaydedilip sifirlanarak, sonunda geri yuklenerek yapiliyor --
- *      src/core/init_sprite_pool.c ve src/world/slot_table.c ile ayni
- *      kalip. Kaynak yigindaki sabit bir hucre (DMA kontrolunde
- *      "kaynak sabit" biti kurulu).
+ *   1) Five separate DMA3 fills. Four are 32-bit zero fills; the last is a
+ *      16-bit 0x7FEF (empty id) fill. Every transfer is done with REG_IME saved
+ *      and cleared, then restored at the end -- the same pattern as
+ *      src/core/init_sprite_pool.c and src/world/slot_table.c. The source is a
+ *      fixed cell on the stack (the "source fixed" bit is set in the DMA
+ *      control word).
  *
- *   2) Uc liste basligi List2Init ile bosaltiliyor, ardindan uc havuzun
- *      TUM girisleri kimligi 0x7FEF yapilip List2PushFront ile kendi
- *      listesinin basina takiliyor.
+ *   2) Three list headers are emptied with List2Init, after which ALL entries
+ *      of the three pools get id 0x7FEF and are pushed onto the head of their
+ *      own list with List2PushFront.
  *
- * Havuz olculeri DMA uzunluklariyla dongulerin adimlarindan cikti ve
- * birbirini dogruluyor:
+ * The pool sizes fell out of the DMA lengths and the loop strides, and the two
+ * confirm each other:
  *
- *      0x02032B60  128 x 52 bayt = 6656 = 0x680 kelime  -> liste 0x02035A80
- *      0x02034560   64 x 72 bayt = 4608 = 0x480 kelime  -> gNodeListHead
- *      0x020357F0   16 x 40 bayt =  640 = 0x0A0 kelime  -> gRam02035780
- *      0x02030D50  gSlotArray, 128 x 60 = 7680 = 0x780 kelime
- *      0x02030C10  gSlotIds,   160 x u16, 0x7FEF ile dolduruluyor
+ *      0x02032B60  128 x 52 bytes = 6656 = 0x680 words  -> list 0x02035A80
+ *      0x02034560   64 x 72 bytes = 4608 = 0x480 words  -> gNodeListHead
+ *      0x020357F0   16 x 40 bytes =  640 = 0x0A0 words  -> gRam02035780
+ *      0x02030D50  gSlotArray, 128 x 60 = 7680 = 0x780 words
+ *      0x02030C10  gSlotIds,   160 x u16, filled with 0x7FEF
  *
- * Uc havuz tabani ve 0x02035A80 liste basligi data/ram_map.csv'de YOK.
- * Bu dosya data/ altina yazmadigi icin onlar #define sabit cast olarak
- * duruyor; adlar GECICI. Sembolleri eklemek gerekiyor (bkz. gorev
- * ciktisindaki new_symbols).
+ * The three pool bases and the 0x02035A80 list header are NOT in
+ * data/ram_map.csv. Because this file does not write under data/, they stand as
+ * #define constant casts and the names are TEMPORARY. The symbols need to be
+ * added (see new_symbols in the task output).
  *
- * OLCULEN DORT AYRINTI (hepsi eslesmeyi tek basina degistirdi):
+ * FOUR MEASURED DETAILS (each changed the match on its own):
  *
- * 1) `zero` ve `fill` volatile: ROM her transferde ayni degeri yigina
- *    YENIDEN yaziyor (`str r5,[sp,#0]` dort kez). volatile olmadan agbcc
- *    ikinci ve sonraki yazmalari gereksiz gorup siliyor.
+ * 1) `zero` and `fill` are volatile: the ROM RE-WRITES the same value to the
+ *    stack on every transfer (`str r5,[sp,#0]` four times). Without volatile,
+ *    agbcc considers the second and later stores redundant and deletes them.
  *
- * 2) Ilk dongu ARTAN ISARETLI indisle (`i <= 127`) ve DIZI INDISIYLE
- *    (`entryA[i]`) yazildi. Boylece isaretci `i`nin bir turev induksiyon
- *    degiskeni (giv) oluyor; agbcc `i`yi tamamen eleyip son degeri
- *    `taban + 127*52` (0x19CC) olarak kuruyor ve ISARETLI `ble`
- *    uretiyor -- kural 42'nin devami. Elle yazilmis isaretci
- *    karsilastirmasi (`p <= end`) ISARETSIZ `bls` veriyordu.
+ * 2) The first loop was written with an ASCENDING SIGNED index (`i <= 127`) and
+ *    ARRAY INDEXING (`entryA[i]`). That makes the pointer a derived induction
+ *    variable (giv) of `i`; agbcc eliminates `i` entirely, builds the final
+ *    value as `base + 127*52` (0x19CC) and emits a SIGNED `ble` -- a
+ *    continuation of rule 42. A hand-written pointer comparison (`p <= end`)
+ *    gave an UNSIGNED `bls`.
  *
- * 3) Ayni dongude taban icin AYRI YEREL sart (kural 37/22). `POOL_A[i]`
- *    dogrudan yazilinca agbcc `i`yi eleyemeyip sayaci koruyor
- *    (`adds r4,#1 / cmp r4,#127`); `entryA = POOL_A;` ara yereliyle
- *    `entryA[i]` yazilinca ROM'un `cmp r6,r4 / ble` bicimi cikiyor.
+ * 3) In the same loop a SEPARATE LOCAL for the base is required (rule 37/22).
+ *    Written directly as `POOL_A[i]`, agbcc cannot eliminate `i` and keeps the
+ *    counter (`adds r4,#1 / cmp r4,#127`); with the intermediate local
+ *    `entryA = POOL_A;` and `entryA[i]`, the ROM's `cmp r6,r4 / ble` form comes
+ *    out.
  *
- * 4) Ikinci ve ucuncu dongu AZALAN sayacli ve ISARETCI YURUYUSLU: orada
- *    isaretci ayri bir temel induksiyon degiskeni oldugu icin sayac
- *    elenemiyor ve ROM'daki `subs`/`cmp`/`bge` cikiyor. Artirim sirasi
- *    ROM'daki gibi once isaretci sonra sayac (kural 43).
- *    Bos kimlik bu iki donguye AYRI DEYIMLE (`id = ID_NONE;`) veriliyor:
- *    dongu govdesindeki ciplak sabit, dongu-degismezi olarak preheader'in
- *    SONUNA tasiniyordu (taban, sayac, sabit); ROM sabiti EN BASTA
- *    istiyor (sabit, taban, sayac). Kaynak deyimi olarak yazmak sirayi
- *    duzeltiyor. Ilk donguye gerek yok: oradaki sabit 16-bit DMA
- *    dolgusundaki `fill = ID_NONE` ile ortak alt ifade olup r5'te duruyor.
+ * 4) The second and third loops use a DESCENDING counter and a WALKING POINTER:
+ *    there the pointer is a separate basic induction variable, so the counter
+ *    cannot be eliminated and the ROM's `subs`/`cmp`/`bge` comes out. The
+ *    increment order is pointer first, counter second, as in the ROM (rule 43).
+ *    The empty id is given to these two loops in a SEPARATE STATEMENT
+ *    (`id = ID_NONE;`): a bare constant in the loop body was moved as a loop
+ *    invariant to the END of the preheader (base, counter, constant), whereas
+ *    the ROM wants the constant FIRST (constant, base, counter). Writing it as
+ *    a source statement fixes the order. The first loop does not need this: its
+ *    constant becomes a common subexpression with the `fill = ID_NONE` of the
+ *    16-bit DMA fill and stays in r5.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_d4.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_d4.c
  */
 
 #include "gba_io.h"
@@ -68,24 +70,24 @@
 
 #define ID_NONE      0x7FEF
 
-/* DMA3 kontrol bitleri: etkin + kaynak sabit (+ 32 bit). */
+/* DMA3 control bits: enable + source fixed (+ 32-bit). */
 #define DMA_FILL_32  0x85000000
 #define DMA_FILL_16  0x81000000
 
-/* gSlotIds: 160 u16 kimlik (src/world/slot_table.c ile ayni gorunum). */
+/* gSlotIds: 160 u16 ids (the same view as src/world/slot_table.c). */
 #define SLOT_COUNT       160
-/* gSlotArray: 128 x 60 baytlik yuva (src/world/slot_scan.c ile ayni). */
+/* gSlotArray: 128 slots of 60 bytes (the same as src/world/slot_scan.c). */
 #define SLOT_ARRAY_LEN   128
 #define SLOT_ARRAY_WORDS (SLOT_ARRAY_LEN * 15)
 
 #define POOL_A_COUNT 128
-#define POOL_A_WORDS (POOL_A_COUNT * 13)   /* 52 bayt / giris */
+#define POOL_A_WORDS (POOL_A_COUNT * 13)   /* 52 bytes / entry */
 #define POOL_B_COUNT 64
-#define POOL_B_WORDS (POOL_B_COUNT * 18)   /* 72 bayt / giris */
+#define POOL_B_WORDS (POOL_B_COUNT * 18)   /* 72 bytes / entry */
 #define POOL_C_COUNT 16
-#define POOL_C_WORDS (POOL_C_COUNT * 10)   /* 40 bayt / giris */
+#define POOL_C_WORDS (POOL_C_COUNT * 10)   /* 40 bytes / entry */
 
-/* Cift bagli liste basligi ve dugumu: src/core/list_ops2.c ile ayni. */
+/* The doubly linked list header and node: the same as src/core/list_ops2.c. */
 typedef struct Node2 {
     struct Node2 *next;         /* +0x00 */
     struct Node2 *prev;         /* +0x04 */
@@ -97,35 +99,35 @@ typedef struct List2 {
     int    count;               /* +0x08 */
 } List2;
 
-/* Uc havuz da ayni basligi tasiyor, yalniz adimlari farkli. */
+/* All three pools carry the same header; only their strides differ. */
 typedef struct EntryA {
     struct EntryA *next;        /* +0x00 */
     struct EntryA *prev;        /* +0x04 */
     u16 id;                     /* +0x08 */
-    u8  pad0A[42];              /* adim 52 */
+    u8  pad0A[42];              /* stride 52 */
 } EntryA;
 
 typedef struct EntryB {
     struct EntryB *next;        /* +0x00 */
     struct EntryB *prev;        /* +0x04 */
     u16 id;                     /* +0x08 */
-    u8  pad0A[62];              /* adim 72 */
+    u8  pad0A[62];              /* stride 72 */
 } EntryB;
 
 typedef struct EntryC {
     struct EntryC *next;        /* +0x00 */
     struct EntryC *prev;        /* +0x04 */
     u16 id;                     /* +0x08 */
-    u8  pad0A[30];              /* adim 40 */
+    u8  pad0A[30];              /* stride 40 */
 } EntryC;
 
 typedef struct Slot {
     u8  pad00[0x28];
-    u32 mark;                   /* +0x28: 0 ise bos */
-    u8  pad2C[0x10];            /* adim 60 */
+    u32 mark;                   /* +0x28: empty when 0 */
+    u8  pad2C[0x10];            /* stride 60 */
 } Slot;
 
-/* ram_map.csv'de kayitli olanlar extern, olmayanlar sabit cast. */
+/* Those recorded in ram_map.csv are extern; the rest are constant casts. */
 extern u16  gSlotIds[SLOT_COUNT];       /* 0x02030C10 */
 extern Slot gSlotArray[SLOT_ARRAY_LEN]; /* 0x02030D50 */
 extern NodeC4 *gNodeListHead;           /* 0x02035A70 */

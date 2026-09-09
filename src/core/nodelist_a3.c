@@ -1,33 +1,39 @@
-/* Girisin iki kimlik dizisini gezip her birini bosaltma. 0x08052DDC, 154 bayt.
+/* Walk the entry's two id arrays and empty each of them. 0x08052DDC, 154 bytes.
  *
- * Giris etkinse (+0x0B ust dortlusu sifirdan farkli) iki dizi geziliyor:
- *   +0x34'teki dizi  -> her kimlik FUN_08055be8'e
- *   +0x30'daki dizi  -> her kimlik FindOrRecycleNode'a; donen dugumun
- *                       +0x0B bayraklarinda 2 biti YOK ve 1 biti VARSA,
- *                       dugumun kendi +0x18 dizisi de gezilip her kimlik
- *                       DeactivateAreaNode'e (ikinci arguman 1) veriliyor
+ * If the entry is active (the upper nibble of +0x0B is nonzero), two arrays are
+ * walked:
+ *   the array at +0x34  -> every id goes to FUN_08055be8
+ *   the array at +0x30  -> every id goes to FindOrRecycleNode; if bit 2 of the
+ *                          returned node's +0x0B flags is CLEAR and bit 1 IS
+ *                          SET, the node's own +0x18 array is walked too and
+ *                          every id is passed to DeactivateAreaNode (with 1 as
+ *                          the second argument)
  *
- * Dizi uzunluklari kayittan (+0x28) her turda YENIDEN okunuyor: ROM ic
- * donguye girmeden once `ldrb [r9,#6]` yapip cikista tekrar yapiyor, yani
- * kosul degiskene alinmamis.
+ * The array lengths are RE-READ from the record (+0x28) every iteration: the
+ * ROM does `ldrb [r9,#6]` before entering the inner loop and again on exit, so
+ * the condition was not taken into a variable.
  *
- * Ic donguden sonra dis dongunun sayaci ve yurutucusu geri yukleniyor
- * (`adds r7,r4,#1` / `mov r8,r5` sonra `adds r4,r7,#0` / `mov r5,r8`);
- * bu, artirmalarin cagridan HEMEN SONRA yazildigini gosteriyor.
+ * After the inner loop the outer loop's counter and walker are restored
+ * (`adds r7,r4,#1` / `mov r8,r5`, then `adds r4,r7,#0` / `mov r5,r8`); that
+ * shows the increments are written IMMEDIATELY AFTER the call.
  *
- * DURUM: PARK, 154/154 boyut TUTUYOR, fark 17 (154 baytin 137'si dogru).
- *   ilk taslak                                   150/154, fark 4 kisa
- *   kaydi bayrak sinamalarindan once yazmaca al   154/154, fark 22
- *   kural 43 (sayac+isaretci `for` artiriminda)   154/154, fark 22
- *   sayaclari isaretcilerden once bildir          154/154, fark 17
+ * STATUS: PARKED, the size MATCHES at 154/154, 17 differences (137 of 154 bytes
+ * correct).
+ *   first draft                                    150/154, 4 bytes short
+ *   take the record into a register before the
+ *     flag tests                                   154/154, 22 differences
+ *   rule 43 (counter+pointer in the `for`
+ *     increment)                                   154/154, 22 differences
+ *   declare the counters before the pointers       154/154, 17 differences
  *
- * Kalan 17 baytin TAMAMI tek bir takas: ROM sayaci r4'te isaretciyi r5'te
- * tutuyor, bizimki tersi. Bildirim sirasi bunu CEVIRMIYOR -- uc yazim
- * denendi (sayaci once ata, isaretci-sayac serpistirilmis bildirim, i/j
- * ters), ucu de 17 veya daha kotu. Bilinen yazmac dagitimi sinifi.
+ * ALL of the remaining 17 bytes are a single swap: the ROM keeps the counter in
+ * r4 and the pointer in r5, ours the other way round. Declaration order does
+ * NOT flip this -- three forms were tried (assign the counter first, interleave
+ * the pointer and counter declarations, reverse i/j), and all three gave 17 or
+ * worse. A known register-allocation class.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_a3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_a3.c
  */
 
 #include "gba_types.h"
@@ -75,25 +81,27 @@ void ReleaseEntryNodeRefs(Entry *entry)
     rec = entry->record;
     if ((entry->kind & 0xf0) == 0) return;
 
-    /* Kural 43: sayac ve yurutucu ikisi de `for` artiriminda, ROM'un
-     * sirasiyla (once sayac, sonra isaretci). */
+    /* Rule 43: the counter and the walker are both in the `for` increment, in
+     * the ROM's order (counter first, then pointer). */
     p = entry->ids;
     for (i = 0; i < rec->idCount; i++, p++) {
         FUN_08055be8(*p);
     }
 
-    /* IKINCI dongunun isaretcisi AYRI yerel olmali.  Tek `p` kullanmak
-     * refs'i 14'e cikariyor; oncelik floor_log2(refs)*refs/omur oldugu icin
-     * 3*14/29 = 1.448 ile sayacin 1.185'ini geciyor ve r4'u kapiyor.
-     * Bolununce 2*7/14 = 1.000'e dusuyor, sayac once dagitilip r4'u aliyor
-     * -- ROM'un yerlesimi.  Belirleyici olan oran degil, floor_log2'nin bir
-     * basamak dusmesi. */
+    /* The SECOND loop's pointer must be a SEPARATE local.  Using a single `p`
+     * raises refs to 14; because the priority is
+     * floor_log2(refs)*refs/lifetime, 3*14/29 = 1.448 overtakes the counter's
+     * 1.185 and claims r4.
+     * Split, it drops to 2*7/14 = 1.000, the counter is allocated first and
+     * takes r4 -- the ROM's layout.  What decides it is not the ratio but
+     * floor_log2 dropping by one step. */
     p2 = entry->slots;
     for (i = 0; i < rec->slotCount; i++, p2++) {
         node = FindOrRecycleNode(*p2);
         if (node != 0) {
-            /* ROM ikisini de bayrak sinamalarindan ONCE yazmaca aliyor;
-             * kaydi dongu kosulunda birakmak her turda yeniden okutuyor. */
+            /* The ROM takes both into registers BEFORE the flag tests;
+             * leaving the record in the loop condition makes it be
+             * re-read every iteration. */
             q = node->ids;
             rec2 = node->record;
             if ((node->kind & 2) == 0 && (node->kind & 1) != 0) {

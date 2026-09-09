@@ -1,8 +1,8 @@
-/* Sprite listesini kararli eklemeli siralama ile yeniden kurar.
- * 0x08012A00-0x08012A97. Dugumun eski next'i eklemeden once saklanir.
- * Ortak ekleme govdesi dongunun icine acilir: 152/152 bayt eslesir.
- * Anahtarlar attr2 & 0x0C00 ve node->priority, ikisi de artan sirada.
- * Dogrulama: make c-match FILE=src/core/sort_sprite_list.c
+/* Rebuilds the sprite list with a stable insertion sort.
+ * 0x08012A00-0x08012A97. The node's old next is saved before the insertion.
+ * The shared insertion body is unrolled into the loop: 152/152 bytes match.
+ * The keys are attr2 & 0x0C00 and node->priority, both in ascending order.
+ * Verification: make c-match FILE=src/core/sort_sprite_list.c
  */
 
 #include "sprite_sort.h"

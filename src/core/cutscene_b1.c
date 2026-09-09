@@ -1,40 +1,44 @@
-/* Arka plan kaydirma ve afin donusum yazmaclarini sifirlama
- * 0x080034EC-0x0800355B  (112 bayt, ESLESTI)
+/* Clear the background scroll and affine transform registers
+ * 0x080034EC-0x0800355B  (112 bytes, MATCHED)
  *
- * Kesme kapatmadan, cagri yapmadan yalnizca 0x04000010-0x0400003F araligina
- * yaziyor: dort arka planin H/V kaydirmasi sifirlaniyor, BG2/BG3 afin
- * matrisleri birim matrise (pa = pd = 0x100, pb = pc = 0) ve referans
- * noktalari sifira cekiliyor. Yaprak fonksiyon, `bx lr` ile donuyor:
- * yigin cercevesi yok, donus tipi void (kural 35).
+ * Without disabling interrupts or making a call, it only writes to the range
+ * 0x04000010-0x0400003F: the H/V scroll of the four backgrounds is cleared, the
+ * BG2/BG3 affine matrices are set to the identity (pa = pd = 0x100, pb = pc = 0)
+ * and their reference points to zero. A leaf function returning with `bx lr`:
+ * no stack frame, and a void return type (rule 35).
  *
- * ROM tek literal yukluyor (0x04000012 = BG0VOFS) ve butun otekilere
- * `adds`/`subs` ile yuruyor; yani adresler kaynakta sabit ifade olarak
- * yaziliyor ve CSE onlari tek tabana bagliyor.
+ * The ROM loads a single literal (0x04000012 = BG0VOFS) and walks to all the
+ * others with `adds`/`subs`; that is, the addresses are written as constant
+ * expressions in the source and CSE ties them to a single base.
  *
- * YAZMA SIRASI ROM'DAN OKUNDU, tahmin degil (erisimler volatile oldugu icin
- * sira korunuyor):
- *   1) her BG icin ONCE VOFS sonra HOFS, BG0'dan BG3'e
- *   2) referans noktalari BG2/BG3 DONUSUMLU: X alt, X ust, Y alt, Y ust
- *   3) matris katsayilari yine BG2/BG3 donusumlu: pa, pb, pc, pd
+ * THE STORE ORDER WAS READ FROM THE ROM, not guessed (the order is preserved
+ * because the accesses are volatile):
+ *   1) for each BG, VOFS FIRST then HOFS, from BG0 to BG3
+ *   2) the reference points ALTERNATE between BG2/BG3: X low, X high, Y low,
+ *      Y high
+ *   3) the matrix coefficients likewise alternate between BG2/BG3: pa, pb, pc,
+ *      pd
  *
- * DENENEN TEK YAZIM ILK DENEMEDE TUTTU (112/112). Not olarak: burada kural 1
- * GECERLI DEGIL -- adresler extern sembol yapilmadi, `(vu16 *)0x040000xx`
- * sabit cast olarak birakildi. ROM'un tek literal + `adds`/`subs` yuruyusu
- * tam olarak sabit ifadenin isaretidir; extern sembole cevirmek tabani
- * havuzdan ayri ayri okuturdu (docs/COMPILER.md, "kural 1 evrensel degildir").
+ * THE ONE FORM TRIED MATCHED ON THE FIRST ATTEMPT (112/112). As a note: rule 1
+ * DOES NOT APPLY here -- the addresses were not made extern symbols and were
+ * left as `(vu16 *)0x040000xx` constant casts. The ROM's single literal plus
+ * `adds`/`subs` walk is exactly the signature of a constant expression;
+ * converting them to extern symbols would make the base be read separately from
+ * the pool (docs/COMPILER.md, "rule 1 is not universal").
  *
- * `volatile` sart (kural 4/12): niteleme kalkinca agbcc ard arda gelen
- * olu store'lari eleyip fonksiyonu bosaltir. AFFINE_ONE'in `movs r3,#128 /
- * lsls r3,#1 / adds r2,r3,#0` diye UC komutta kurulmasi -- yani fazladan
- * yazmac kopyasi -- kaynaktan zorlanmadi, dagiticidan kendiliginden cikti.
+ * `volatile` is required (rule 4/12): without the qualifier, agbcc eliminates
+ * the consecutive dead stores and empties the function. That AFFINE_ONE is
+ * built in THREE instructions (`movs r3,#128 / lsls r3,#1 / adds r2,r3,#0`) --
+ * i.e. with an extra register copy -- was not forced from the source; it came
+ * out of the allocator by itself.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/cutscene_b1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/cutscene_b1.c
  */
 
 #include "gba_types.h"
 
-/* Kaydirma yazmaclari (yalniz yazilir). */
+/* The scroll registers (write-only). */
 #define REG_BG0HOFS (*(vu16 *)0x04000010)
 #define REG_BG0VOFS (*(vu16 *)0x04000012)
 #define REG_BG1HOFS (*(vu16 *)0x04000014)
@@ -44,8 +48,9 @@
 #define REG_BG3HOFS (*(vu16 *)0x0400001C)
 #define REG_BG3VOFS (*(vu16 *)0x0400001E)
 
-/* BG2 afin matrisi ve referans noktasi. X/Y 28.4 sabit noktali 32 bit,
- * ROM iki halfword olarak yazdigi icin burada da alt/ust ayri. */
+/* The BG2 affine matrix and reference point. X/Y are 32-bit 28.4 fixed point;
+ * because the ROM writes them as two halfwords, low/high are separate here
+ * too. */
 #define REG_BG2PA   (*(vu16 *)0x04000020)
 #define REG_BG2PB   (*(vu16 *)0x04000022)
 #define REG_BG2PC   (*(vu16 *)0x04000024)
@@ -55,7 +60,7 @@
 #define REG_BG2Y_L  (*(vu16 *)0x0400002C)
 #define REG_BG2Y_H  (*(vu16 *)0x0400002E)
 
-/* BG3 afin matrisi ve referans noktasi. */
+/* The BG3 affine matrix and reference point. */
 #define REG_BG3PA   (*(vu16 *)0x04000030)
 #define REG_BG3PB   (*(vu16 *)0x04000032)
 #define REG_BG3PC   (*(vu16 *)0x04000034)
@@ -65,7 +70,7 @@
 #define REG_BG3Y_L  (*(vu16 *)0x0400003C)
 #define REG_BG3Y_H  (*(vu16 *)0x0400003E)
 
-/* Birim matrisin 8.8 sabit noktali 1.0 degeri. */
+/* The 8.8 fixed-point 1.0 value of the identity matrix. */
 #define AFFINE_ONE  0x100
 
 /* 0x080034EC */

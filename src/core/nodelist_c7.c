@@ -1,28 +1,33 @@
-/* Kimlik icin serbest listeden dugum edinip zincirin sonuna yurumek
- * 0x08054608-0x080546CB  (196 bayt)
+/* Acquire a node from the free list for an id and walk to the end of the chain
+ * 0x08054608-0x080546CB  (196 bytes)
  *
- * Kardes: GetOrCreateRecordNode (src/core/nodelist_b5.c, byte-matching dogrulandi).
- * Ortak govde (kimlik tarama + yedek dugum devralma + FUN_080521c4 cagrisi)
- * oradan alindi; bu fonksiyonun ek iki parcasi var:
- *   1. Girisde SPARE_ID (0x7FEF) kimliginin kendisi reddediliyor.
- *   2. Donusten once dugumun +0x30 zinciri sonuna kadar yurunuyor.
+ * The sibling: GetOrCreateRecordNode (src/core/nodelist_b5.c, verified
+ * byte-matching).
+ * The shared body (id scan + taking over the spare node + the FUN_080521c4
+ * call) was taken from there; this function has two extra pieces:
+ *   1. At entry, the SPARE_ID (0x7FEF) id itself is rejected.
+ *   2. Before returning, the node's +0x30 chain is walked to its end.
  *
- * DENENEN / ELENEN YOLLAR  (yeni deneme yapan bunlari TEKRAR ETMESIN,
- * kendi denediklerini bu listeye EKLESIN, silmesin):
- *   - Yok; ilk yazim asagidaki bicimle birebir esletti (196/196).
- *     Asagidaki secimler ROM'dan OKUNARAK yapildi, tahminle degil:
- *     * `flag = 2; flag &= node->kind;` -- kural 33. ROM `movs r0,#2` /
- *       `ldrb r1` / `ands r0,r1` uretiyor: sonuc SABITIN yazmacinda.
- *     * `owner->flags & 1` ise DUZ yazildi. ROM burada tersini uretiyor:
- *       `ldr r0,[r0,#12]` / `movs r1,#1` / `ands r0,r1` -- sonuc DEGERIN
- *       yazmacinda. Yani kural 33 bu ikinci maskeye UYGULANMAZ; ayni
- *       fonksiyon icinde iki maske iki ayri bicim istiyor.
- *     * Kuyruk yuruyusu `node = node->link;` ile yazildi, `node = cur;`
- *       ile DEGIL. ROM `ldr r4,[r4,#48]` ile alani YENIDEN okuyor;
- *       `node = cur` yazimi bunun yerine `adds r4,r0,#0` kopyasi uretir.
- *     * Dongu bicimi kardesten KOPYALANMADI: tarama dongusu girisi
- *       atlayan `goto test`, kuyruk yuruyusu de ayri bir `goto walk_test`
- *       aliyor -- ROM'da iki ayri `b` komutu var (0x8054620, 0x80546b4).
+ * PATHS TRIED / ELIMINATED  (whoever tries something new should NOT REPEAT
+ * these and should ADD their own attempts to this list rather than deleting
+ * it):
+ *   - None; the first writing matched exactly with the form below (196/196).
+ *     The choices below were made by READING THE ROM, not by guessing:
+ *     * `flag = 2; flag &= node->kind;` -- rule 33. The ROM emits
+ *       `movs r0,#2` / `ldrb r1` / `ands r0,r1`: the result is in THE
+ *       CONSTANT's register.
+ *     * `owner->flags & 1`, on the other hand, was written PLAINLY. The ROM
+ *       produces the inverse here: `ldr r0,[r0,#12]` / `movs r1,#1` /
+ *       `ands r0,r1` -- the result is in THE VALUE's register. So rule 33 is
+ *       NOT APPLIED to this second mask; within the same function the two masks
+ *       want two different forms.
+ *     * The tail walk was written `node = node->link;`, NOT `node = cur;`. The
+ *       ROM RE-READS the field with `ldr r4,[r4,#48]`; writing `node = cur`
+ *       would produce an `adds r4,r0,#0` copy instead.
+ *     * The loop form was NOT COPIED from the sibling: the scan loop takes a
+ *       `goto test` that skips the entry, and the tail walk takes a separate
+ *       `goto walk_test` -- the ROM has two separate `b` instructions
+ *       (0x8054620, 0x80546b4).
  */
 
 #include "gba_types.h"
@@ -30,23 +35,23 @@
 #define SPARE_ID    0x7FEF
 #define ENTRY_SIZE  64
 
-/* +0x28'deki nesnenin yalnizca +0x0C bayrak kelimesi kullaniliyor;
- * geri kalani icin ad uydurulmadi, pad birakildi. */
+/* Only the +0x0C flag word of the object at +0x28 is used; no names were
+ * invented for the rest, which was left as padding. */
 typedef struct Owner {
     u8  pad00[0x0C];                /* +0x00 */
-    u32 flags;                      /* +0x0C bit0: zincir yuruyusunu atla */
+    u32 flags;                      /* +0x0C bit0: skip the chain walk */
 } Owner;
 
 typedef struct Node {
     struct Node  *next;             /* +0x00 */
     struct Node  *prev;             /* +0x04 */
-    u16           key;              /* +0x08 kimlik */
+    u16           key;              /* +0x08 ID */
     u8            slot;             /* +0x0A */
-    u8            kind;             /* +0x0B bayrak bayti */
+    u8            kind;             /* +0x0B flag byte */
     u8            pad0C[0x1C];      /* +0x0C..0x27 */
     Owner        *owner;            /* +0x28 */
     u8            pad2C[4];         /* +0x2C */
-    struct Node  *link;             /* +0x30 alt/devam zinciri */
+    struct Node  *link;             /* +0x30 child/continuation chain */
 } Node;
 
 typedef struct Entry {
@@ -55,14 +60,14 @@ typedef struct Entry {
 
 typedef struct RecordTable {
     u8     pad00[4];                /* +0x00 */
-    int    count;                   /* +0x04 gecerli kimlik ust siniri */
+    int    count;                   /* +0x04 upper bound of valid ids */
     u8     pad08[0x14];             /* +0x08..0x1B */
     Entry *entries;                 /* +0x1C */
 } RecordTable;
 
 #define RECORD_TABLE  ((const RecordTable *)0x08D49C00)
 
-extern Node *gList02035A80;         /* 0x02035A80 liste basligi */
+extern Node *gList02035A80;         /* 0x02035A80 list head */
 
 extern void ListRemove(Node **list, Node *node);
 extern void InsertSorted(Node **list, Node *node, s32 id);
@@ -79,7 +84,7 @@ Node *ResolveRecordNodeChain(s32 id)
     s32    k;
     s32    flag;
 
-    /* Yedek dugumun kendi kimligi gecerli bir arama anahtari degil. */
+    /* The spare node's own id is not a valid search key. */
     if (id == SPARE_ID)
         goto none;
 
@@ -102,7 +107,7 @@ test:
         goto step;
 
 scanned:
-    /* Liste bitti: yedek dugum hala bostaysa devralinir. */
+    /* The list is exhausted: if the spare node is still free, it is taken over. */
     if (spare->key == SPARE_ID)
         goto insert;
     goto none;
@@ -135,15 +140,15 @@ body:
     if (flag != 0)
         FUN_080521c4(node, RECORD_TABLE->entries + id);
 
-    /* Sahip nesnesi bit0'i kurmussa dugum oldugu gibi dondurulur. */
+    /* If the owner object has bit0 set, the node is returned as it is. */
     owner = node->owner;
     if (owner != 0) {
         if ((owner->flags & 1) != 0)
             goto done;
     }
 
-    /* Aksi halde +0x30 zincirinin son halkasina yurunur.
-     * Kendine donen halka (cur == node) yuruyusu hic baslatmaz. */
+    /* Otherwise it walks to the last link of the +0x30 chain.
+     * A self-referencing link (cur == node) never starts the walk. */
     cur = node->link;
     if (cur == node)
         goto done;

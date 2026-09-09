@@ -1,48 +1,50 @@
-/* Bekleyen palet aktarimlarini bosaltma — 0x08013900-0x08013973
+/* Flush the pending palette transfers — 0x08013900-0x08013973
  *
- * gRam02022E50 +0x104'teki listeyi yuruyor; bayragi kurulu her dugum icin
- * DMA3 bosalana kadar bekleyip, kesmeler kapaliyken palet transferini
- * baslatiyor ve bayragi temizliyor.
+ * It walks the list at gRam02022E50 +0x104; for every node whose flag is set it
+ * waits for DMA3 to drain, starts the palette transfer with interrupts disabled
+ * and clears the flag.
  *
- * Kontrol akisi tools/dump_cfg.py ile cikarildi (8 blok, uc birlesme
- * noktasi) ve etiketlerle yazildi.
+ * The control flow was extracted with tools/dump_cfg.py (8 blocks, three merge
+ * points) and written with labels.
  *
- * Sabit kaliplari: +0x104 ofseti `movs r1,#130 / lsls r1,#1` ile,
- * 0x80000000 maskesi `movs r1,#128 / lsls r1,#24` ile KURULUYOR;
- * 0x05000200 ve 0x84000008 HAVUZDAN yukleniyor.
+ * Constant patterns: the +0x104 offset is BUILT with
+ * `movs r1,#130 / lsls r1,#1` and the 0x80000000 mask with
+ * `movs r1,#128 / lsls r1,#24`; 0x05000200 and 0x84000008 are loaded FROM THE
+ * POOL.
  *
- * Bekleme dongusu: ROM once `cmp r0,#0 / bge` ile bit 31 zaten bossa
- * dongoyu ATLIYOR, aksi halde maskeyle donuyor.
+ * The wait loop: the ROM first SKIPS the loop with `cmp r0,#0 / bge` if bit 31
+ * is already clear, and otherwise spins on the mask.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * DURUM: PARK — 97/120 fark (ROM 116 bayt).  Yapisi dogru, dagitimi degil.
+ * STATUS: PARKED — 97/120 differences (the ROM is 116 bytes).  The structure is
+ * right, the allocation is not.
  *
- * KAZANIM: prologun ilk 10 bayti BIREBIR tutuyor.  +0x104 erisiminin
- * dizi degil YAPI UYESI oldugu boylece kanitlandi: `ldr rX,[rY,#260]`
- * kodlanamadigi icin (word yuklemede tavan 124) AGBCC 260'i
- * `movs #130 / lsls #1 / adds` ile kuruyor.  Dizi + sabit ofset yazimi
- * bunu tek havuz sabitine katliyordu.
+ * WHAT WAS GAINED: the first 10 bytes of the prologue match exactly.  That
+ * proved the +0x104 access is a STRUCT MEMBER, not an array: because
+ * `ldr rX,[rY,#260]` cannot be encoded (the ceiling for a word load is 124),
+ * AGBCC builds 260 with `movs #130 / lsls #1 / adds`.  Writing it as an array
+ * plus a constant offset folded that into a single pool constant.
  *
- * KALAN FARK — dongu degismezi sabitleme.  ROM ucunu de donguden ONCE
- * yazmaca pinliyor:
- *     ldr  r7, =0x04000208      (REG_IME adresi)
- *     movs r3, #0 / mov ip, r3  (sabit 0, YUKSEK yazmacta)
- *     ldr  r5, =0x040000D4      (DMA3 tabani)
- * Bizim surumumuz ucunu de dongu icinde yeniden uretiyor.
+ * THE REMAINING DIFFERENCE — pinning loop invariants.  The ROM pins all three
+ * in registers BEFORE the loop:
+ *     ldr  r7, =0x04000208      (the REG_IME address)
+ *     movs r3, #0 / mov ip, r3  (the constant 0, in a HIGH register)
+ *     ldr  r5, =0x040000D4      (the DMA3 base)
+ * Our version reproduces all three inside the loop.
  *
- * ELENEN IKI YOL:
- *   1. Dizi + sabit ofset  -> ofset katlandi, 85/116.
- *   2. Bildirilmis extern nesne (`extern vu16 REG_IME;`) yerine
- *      adres-cast makrosu  -> 99/120, DAHA KOTU.  Nesne biciminin
- *      adresi pinleyecegi varsayimi YANLIS cikti.
+ * TWO ELIMINATED PATHS:
+ *   1. An array plus a constant offset  -> the offset folded, 85/116.
+ *   2. An address-cast macro instead of a declared extern object
+ *      (`extern vu16 REG_IME;`)  -> 99/120, WORSE.  The assumption that the
+ *      object form would pin the address turned out to be WRONG.
  *
- * Bu, docs/COMPILER.md'de acik duran "bir fazla canli deger" sinifi.
- * Ayni sinif: step_decay.c, try_engage_target.c, unlink_to_free.c.
- * Genellenebilir bir cozum bulunana kadar park.
+ * This is the "one live value too many" class left open in docs/COMPILER.md.
+ * The same class: step_decay.c, try_engage_target.c, unlink_to_free.c.
+ * Parked until a generalisable solution is found.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/flush_palette_queue.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/flush_palette_queue.c
  */
 
 #include "gba_types.h"
@@ -62,8 +64,8 @@ typedef struct DmaChannel {
 #define REG_IME (*(vu16 *)0x04000208)
 #define DMA3    ((volatile DmaChannel *)0x040000D4)
 
-/* list_head.c'deki mevcut Entry ile AYNI bayt duzeni; oradaki pad00[8]'in
-   ic alanlari burada adlandirildi (boyut ve ofsetler degismedi). */
+/* THE SAME byte layout as the existing Entry in list_head.c; the inner fields
+   of its pad00[8] were named here (sizes and offsets unchanged). */
 typedef struct Entry {
     u8            index;        /* +0x00 */
     u8            pad01[2];
@@ -72,10 +74,10 @@ typedef struct Entry {
     struct Entry *next;         /* +0x08 */
 } Entry;
 
-/* +0x104 ofseti `ldr rX,[rY,#imm]` kodlamasina sigmiyor (word yuklemede
-   tavan 124), bu yuzden AGBCC 260'i ayri bir yazmaca kuruyor: kalip
-   bir dizi aritmetigi degil, YAPI UYESI erisimi.  Ayni sembolun ayni
-   yapisi zaten list_head.c'de (eslesmis) kullaniliyor. */
+/* The +0x104 offset does not fit the `ldr rX,[rY,#imm]` encoding (the ceiling
+   for a word load is 124), so AGBCC builds 260 in a separate register: the
+   pattern is a STRUCT MEMBER access, not array arithmetic.  The same structure
+   of the same symbol is already used (and matched) in list_head.c. */
 typedef struct ListRoot {
     u8     pad00[0x100];
     Entry *listHead;            /* +0x100 */

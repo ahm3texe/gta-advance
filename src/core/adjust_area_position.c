@@ -1,4 +1,4 @@
-/* Alan derinligi degistiginde sabit nokta konumunu gecis ofsetiyle duzeltir. */
+/* Corrects the fixed-point position with the transition offset when the area depth changes. */
 
 #include "gba_types.h"
 

@@ -1,12 +1,12 @@
-/* Iki calisma tamponunu ayirip ilgili durum alanlarini sifirlama.
+/* Allocate two work buffers and clear the related state fields.
  *
- * 0x02014ED0 tabanindan 0x1000 ve 0x2400 baytlik iki ayirma yapilir.
- * Ikinci tampon IWRAM'deki 0x03000028 isaretcisine yazilir. Ardindan iki
- * EWRAM durumu sifirlanir, 0x0201AAB0'daki 0x102 word DMA3 ile temizlenir
- * ve 0x02000D14 durumu sifirlanir.
+ * Two allocations of 0x1000 and 0x2400 bytes are made from the 0x02014ED0
+ * base. The second buffer is written into the 0x03000028 pointer in IWRAM.
+ * Then two EWRAM states are cleared, the 0x102 words at 0x0201AAB0 are cleared
+ * with DMA3, and the 0x02000D14 state is cleared.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm
- * Dogrulama: make c-match FILE=src/core/memory_init.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm
+ * Verification: make c-match FILE=src/core/memory_init.c
  */
 
 #include "gba_io.h"

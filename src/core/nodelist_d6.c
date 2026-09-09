@@ -1,79 +1,81 @@
-/* Alani sifirlayip kimlik dizisini yeniden kurma — 0x08052E78-0x0805302F
- * (440 bayt; son 22 bayt literal havuzu)
+/* Clear the area and rebuild the id array — 0x08052E78-0x0805302F
+ * (440 bytes; the last 22 are a literal pool)
  *
- * Alanin +0x28'indeki tanim blogu iki sey tasiyor: +0x05 girdi sayisi ve
- * +0x0C u16 kimlik dizisi (sablon). Fonksiyon once alanin seviye nibble'ini
- * sifirliyor, sonra sablondaki her kimlik icin:
+ * The descriptor block at the area's +0x28 carries two things: an entry count
+ * at +0x05 and a u16 id array (the template) at +0x0C. The function first
+ * clears the area's level nibble, then, for every id in the template:
  *
- *   1) ROM bankasindaki (gAreaBank +0x24) 36 baytlik alan girisini aliyor;
- *      girisin +0x06 yuva sayisi kadar +0x10 yuva dizisini geziyor. Her
- *      yuva kimligi icin:
- *        - FindFreeNode ile isaret nesnesi aranip bulunursa +0x18 bayrak
- *          kelimesi 0xE3FF0000 ile maskeleniyor,
- *        - ReleaseAreaNode cagriliyor,
- *        - ayni kimlikle bankanin +0x1C alanindaki 64 baytlik alt kayit
- *          aliniyor; onun +0x0D yuva sayisi sifir degilse +0x10 dizisi de
- *          ayni iki adimla geziliyor.
- *   2) Kimlik sirali dugum listesinde aranıyor (FindNode). Dugum varsa:
- *        - kirliyse (bit 0) dugumun kendi yuva dizisi ReleaseAreaNode ile
- *          gezilip FillSlotsWithNone ile bos kimlige cekiliyor ve kirli
- *          biti temizleniyor (nodelist_c2.c / d1.c ile ayni govde),
- *        - seviyesi 1'den BUYUKSE 1'e cekiliyor,
- *        - gNodeListHead o kimlikle tazeleniyor.
+ *   1) It takes the 36-byte area entry from the ROM bank (gAreaBank +0x24) and
+ *      walks the +0x10 slot array for as many entries as the +0x06 slot count.
+ *      For each slot id:
+ *        - the marker object is looked up with FindFreeNode and, if found, its
+ *          +0x18 flag word is masked with 0xE3FF0000,
+ *        - ReleaseAreaNode is called,
+ *        - the 64-byte sub-record in the bank's +0x1C field is taken under the
+ *          same id; if its +0x0D slot count is nonzero, its +0x10 array is
+ *          walked with the same two steps.
+ *   2) The id is searched in the ordered node list (FindNode). If the node
+ *      exists:
+ *        - if it is dirty (bit 0), the node's own slot array is walked with
+ *          ReleaseAreaNode, pulled to the empty id with FillSlotsWithNone and
+ *          the dirty bit cleared (the same body as nodelist_c2.c / d1.c),
+ *        - if its level is GREATER than 1, it is pulled down to 1,
+ *        - gNodeListHead is refreshed with that id.
  *
- * Son olarak alanin +0x30 cikti dizisi varsa sablon yeniden gezilip her
- * kimlik oraya yaziliyor; 0x7FFF'ten buyuk kimlikler alanin +0x18'indeki
- * yeniden esleme tablosundan geciriliyor (kimlik - 0x8000 indeksiyle).
- * Yazilan kimlik FUN_08052C68'e veriliyor.
+ * Finally, if the area has a +0x30 output array, the template is walked again
+ * and every id written there; ids greater than 0x7FFF are passed through the
+ * remapping table at the area's +0x18 (indexed by id - 0x8000). The written id
+ * is passed to FUN_08052C68.
  *
- * YAPI IPUCLARI:
- *   - gAreaBank (0x08D49C00) +0x24 = 36 baytlik giris dizisi
- *     (src/core/nodelist_c3.c, src/core/nodelist_d5.c ile ayni),
- *     +0x1C = 64 baytlik alt kayit dizisi (BU DOSYADA ILK KEZ gorunuyor).
- *     Taban ROM'da DUZ yuklenip ofset yukleme komutunda birakiliyor
- *     (`ldr r2,=0x08D49C00` + `ldr r1,[r2,#36]`), yani YAPI UYESI erisimi;
- *     sabit cast yazmak ofseti havuz sabitine katlar (kural 1).
- *   - Alanin tanim blogu src/core/nodelist_d2.c'deki SlotDesc ile ayni:
- *     +0x05 countA (alanin kimlik sayisi), +0x06 countB (dugumun yuva
- *     sayisi). +0x0C sablon dizisi bu dosyada eklendi.
+ * STRUCTURE HINTS:
+ *   - gAreaBank (0x08D49C00) +0x24 = the array of 36-byte entries
+ *     (the same as in src/core/nodelist_c3.c and src/core/nodelist_d5.c),
+ *     +0x1C = the array of 64-byte sub-records (SEEN FOR THE FIRST TIME IN
+ *     THIS FILE).
+ *     In the ROM the base is loaded PLAINLY and the offset left in the load
+ *     instruction (`ldr r2,=0x08D49C00` + `ldr r1,[r2,#36]`), i.e. a STRUCT
+ *     MEMBER access; writing a constant cast folds the offset into the pool
+ *     constant (rule 1).
+ *   - The area's descriptor block is the same as the SlotDesc in
+ *     src/core/nodelist_d2.c: +0x05 countA (the area's id count), +0x06 countB
+ *     (the node's slot count). The +0x0C template array was added in this
+ *     file.
  *
- * UYGULANAN KURALLAR:
- *   - Kural 1: gAreaBank / gNodeListHead extern sembol.
- *   - Kural 2: `entry = &gAreaBank.entries[id]` biciminde ARA ISARETCI;
- *     ROM tabani r7'de tutup `ldr r0,[r7,#16]` / `ldrb r1,[r7,#6]` ile
- *     uyelere gidiyor.
- *   - Kural 9/31: sayaclar `int`; ROM `blt`/`bge` (isaretli) uretiyor.
- *     Buna karsilik 0x7FFF karsilastirmasi ROM'da `bls` (ISARETSIZ), bu
- *     yuzden oradaki kimlik yereli `u32`.
- *   - Kural 24/26: alanin ve dugumun +0x0B baytlari bitfield.
+ * RULES APPLIED:
+ *   - Rule 1: gAreaBank / gNodeListHead are extern symbols.
+ *   - Rule 2: an INTERMEDIATE POINTER in the form
+ *     `entry = &gAreaBank.entries[id]`; the ROM keeps the base in r7 and
+ *     reaches the members with `ldr r0,[r7,#16]` / `ldrb r1,[r7,#6]`.
+ *   - Rule 9/31: the counters are `int`; the ROM emits `blt`/`bge` (signed).
+ *     The 0x7FFF comparison, by contrast, is `bls` (UNSIGNED) in the ROM, so
+ *     the id local there is `u32`.
+ *   - Rule 24/26: the +0x0B bytes of the area and the node are bitfields.
  *     `area->level = 0` -> `movs #15 / ands / strb`;
  *     `node->dirty = 0` -> `movs #2 / negs`;
- *     `node->level > 1` -> ISARETLI 4 bitlik alan, `lsls #24 / asrs #28`.
- *   - Kural 11: kimlik FindNode cagrisini asiyor -> ayri `u32` yerel
- *     (ROM r7'de tutuyor; `ldrh r7,[r2]` + `adds r0,r7,#0` sirasi
- *     nodelist_d3.c'deki olcumun `u32` yonu).
- *   - Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- *   - Ic yuva dizileri ISARETCI YURUTMEYLE degil INDEKSLE geziliyor
- *     (ROM `lsls r4,r6,#1` ile j*2'yi bir kez kurup uc erisimde
- *     paylasiyor); dugumun kendi dizisi ise yurutuluyor (`adds r5,#2`).
+ *     `node->level > 1` -> a SIGNED 4-bit field, `lsls #24 / asrs #28`.
+ *   - Rule 11: the id crosses the FindNode call -> a separate `u32` local
+ *     (the ROM keeps it in r7; the `ldrh r7,[r2]` + `adds r0,r7,#0` order is
+ *     the `u32` direction of the measurement in nodelist_d3.c).
+ *   - Rule 35: `pop {r0}; bx r0` -> a void return type.
+ *   - The inner slot arrays are walked BY INDEX, not by ADVANCING A POINTER
+ *     (the ROM builds j*2 once with `lsls r4,r6,#1` and shares it across three
+ *     accesses); the node's own array, on the other hand, is advanced
+ *     (`adds r5,#2`).
  *
- * OLCULEN TEK AYRINTI — kural 43'un TERS YONU (16 bayt fark -> 0):
- *   Ilk dis dongunun artirimlari `i++, ids++` yazildiginda 16 bayt fark
- *   kaliyordu; komutlar dogru, yalniz SIRALARI tersti. Bu dongude
- *   artirimlar govdenin BASINA kaldirilip yigina tasiyor (sp+4 = i+1,
- *   sp+8 = ids+2) ve dip tarafta geri okunuyor. agbcc bu iki tasiyiciyi
- *   KAYNAK SIRASINDA yayiyor, yani ROM'un
+ * THE ONE MEASURED DETAIL — the INVERSE DIRECTION of rule 43 (16 differences
+ * -> 0):
+ *   Written as `i++, ids++`, the first outer loop's increments left a 16-byte
+ *   difference; the instructions were right, only their ORDER was reversed. In
+ *   this loop the increments are hoisted to the TOP of the body and spilled to
+ *   the stack (sp+4 = i+1, sp+8 = ids+2), then read back at the bottom. agbcc
+ *   emits those two carriers IN SOURCE ORDER, so the ROM's
  *       mov r0,r8 / adds r0,#2 / str r0,[sp,#8] / adds r5,#1 / str r5,[sp,#4]
- *   sirasi ancak `ids++, i++` ile cikiyor. Ikinci dis dongude ise ROM
- *   sayaci once artiriyor, orada `i++, out++, ids++` dogru sira.
- *   Yani kural 43 "sayac once" diye ezberlenemez: her dongude ROM'un
- *   kendi artirim sirasi okunup kaynaga o sirayla yazilmali.
- *   nodelist_d1.c/d2.c'de sira sayac-once idi; burada tersi.
- *
- * ESLESME: 440/440 bayt.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_d6.c
+ *   order only comes out with `ids++, i++`. In the second outer loop, by
+ *   contrast, the ROM increments the counter first, and there `i++, out++,
+ *   ids++` is the right order.
+ *   So rule 43 cannot be memorised as "counter first": in every loop the ROM's
+ *   own increment order must be read and written into the source in that
+ *   order.
  */
 
 #include "gba_types.h"
@@ -82,16 +84,16 @@
 #define MARKER_KEEP  0xE3FF0000
 #define REMAP_BASE   0x8000
 
-/* src/core/nodelist_d2.c'deki SlotDesc ile ayni; +0x0C eklendi. */
+/* The same as the SlotDesc in src/core/nodelist_d2.c, with +0x0C added. */
 typedef struct SlotDesc {
     u8   pad00[5];
-    u8   countA;                /* +0x05 alanin kimlik sayisi */
-    u8   countB;                /* +0x06 dugumun yuva sayisi  */
+    u8   countA;                /* +0x05 the area's id count */
+    u8   countB;                /* +0x06 the node's slot count */
     u8   pad07[5];
-    u16 *ids;                   /* +0x0C sablon kimlik dizisi */
+    u16 *ids;                   /* +0x0C the template id array */
 } SlotDesc;
 
-/* src/core/nodelist_d1.c / d5.c ile ayni yerlesim. */
+/* The same layout as src/core/nodelist_d1.c / d5.c. */
 typedef struct Node {
     struct Node *next;          /* +0x00 */
     u8           pad04[4];
@@ -105,15 +107,14 @@ typedef struct Node {
     u16         *slots;         /* +0x18 */
 } Node;
 
-/* 0x02035A80 listesindeki nesne; burada yalniz +0x18 bayrak kelimesi
- * kullaniliyor. */
+/* An object on the 0x02035A80 list; only its +0x18 flag word is used here. */
 typedef struct Marker {
     u8  pad00[0x18];
     u32 flags;                  /* +0x18 */
 } Marker;
 
-/* 36 baytlik alan girisi; src/core/nodelist_c3.c ile ayni, +0x06 ve +0x10
- * bu dosyada adlandirildi. */
+/* A 36-byte area entry; the same as in src/core/nodelist_c3.c, with +0x06 and
+ * +0x10 named in this file. */
 typedef struct AreaEntry {
     u8   pad00[6];
     u8   count;                 /* +0x06 */
@@ -127,7 +128,7 @@ typedef struct AreaEntry {
     u8   flags;                 /* +0x23 */
 } AreaEntry;
 
-/* 64 baytlik alt kayit. */
+/* 64-byte subrecord. */
 typedef struct AreaSub {
     u8   pad00[13];
     u8   count;                 /* +0x0D */

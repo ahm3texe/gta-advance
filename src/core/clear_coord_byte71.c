@@ -1,9 +1,10 @@
-/* CoordBlock +0x71 baytini sifirlama — 0x0800AB30-0x0800AB3F
+/* Clear the byte at CoordBlock +0x71 — 0x0800AB30-0x0800AB3F
  *
- * CoordBlock tanimi src/misc/coord_accessors.c ile BIREBIR AYNI tutulmali.
+ * The CoordBlock definition must be kept BYTE-FOR-BYTE the same as in
+ * src/misc/coord_accessors.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/clear_coord_byte71.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/clear_coord_byte71.c
  */
 
 #include "gba_types.h"

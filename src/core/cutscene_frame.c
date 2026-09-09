@@ -1,26 +1,28 @@
-/* Sikistirilmis bir kare acip DMA ile ekrana yaziyor. 0x08003454, 152 bayt.
+/* Decompress a frame and write it to the screen with DMA. 0x08003454, 152 bytes.
  *
- * gRam02001440 bir {tablo tabani, indeks} cifti tutuyor; tablodaki her giris
- * 8 bayt: ilk kelime LZ77 sikistirilmis KARO verisi, ikincisi varsa PALET.
- * Karo her zaman aciliyor ve 0x06000040'a, palet varsa 0x05000000'a
- * gonderiliyor. Sonra indeks bir artiyor ve tablonun sonuna (ilk kelimesi 0
- * olan girise) gelinince sifirlaniyor -- yani kareler donguye giriyor.
+ * gRam02001440 holds a {table base, index} pair; every entry in the table is 8
+ * bytes: the first word is LZ77-compressed TILE data and the second, when
+ * present, is a PALETTE. The tiles are always decompressed and sent to
+ * 0x06000040, and the palette, if present, to 0x05000000. The index is then
+ * incremented and reset when the end of the table (the entry whose first word
+ * is 0) is reached -- so the frames loop.
  *
- * Iki aktarim da kesmeler kapaliyken yapiliyor: REG_IME saklanip sifirlaniyor,
- * DMA3 kurulduktan sonra geri yaziliyor. Ayni kalip flush_palette_queue.c'de
- * de var.
+ * Both transfers happen with interrupts disabled: REG_IME is saved and cleared,
+ * then written back after DMA3 is set up. The same pattern is present in
+ * flush_palette_queue.c.
  *
 
- * DMA kurulduktan sonra denetim yazmaci GERI OKUNUYOR (`ldr r0,[r4,#8]`).
- * Islevsel gorunmuyor ama ROM'da duruyor ve atlanirsa dort bayt eksiliyor;
- * flush_palette_queue.c'de de ayni satir var.
+ * After the DMA is set up, the control register is READ BACK
+ * (`ldr r0,[r4,#8]`). It does not look functional, but it stands in the ROM and
+ * skipping it costs four bytes; flush_palette_queue.c has the same line.
  *
- * Ghidra'nin sondaki "Could not recover jumptable" uyarisi YANILTICI: orada
- * tablo yok, `pop {r0}; bx r0` dizisinin interworking donusu var (kural 35,
- * donus tipi void). Ayni yanilgi FUN_08017628'de de olmustu.
+ * Ghidra's trailing "Could not recover jumptable" warning is MISLEADING: there
+ * is no table there, only the interworking return of the `pop {r0}; bx r0`
+ * sequence (rule 35, a void return type). The same mistake occurred with
+ * FUN_08017628.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/cutscene_frame.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/cutscene_frame.c
  */
 
 #include "gba_types.h"
@@ -76,9 +78,10 @@ void ShowNextCutsceneFrame(void)
         REG_IME = ime;
     }
 
-    /* ROM indeksi YERINDE artiriyor (`adds r0,#1`) ve ARTMIS degerle
-     * indeksliyor; `i + 1` diye ayri bir deger uretmek ofseti 8'e katliyor
-     * ve uc komut sapiyor. */
+    /* The ROM increments the index IN PLACE (`adds r0,#1`) and
+     * indexes with the INCREMENTED value; producing a separate
+     * value as `i + 1` folds the offset into 8 and three
+     * instructions diverge. */
     i = table->index;
     i++;
     table->index = i;

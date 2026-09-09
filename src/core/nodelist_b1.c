@@ -1,72 +1,82 @@
-/* Dugumu ve bagli alt nesnelerini kapatma. 0x08052828, 352 bayt. ESLESTI.
+/* Shut down the node and its attached sub-objects. 0x08052828, 352 bytes. MATCHED.
  *
- * Kardes ReleaseAreaNode (src/core/nodelist_a4.c, 0x08052750) ile ayni aileden:
- * ayni `index >= gAreaBank.count` kapisi, ayni gList02035A80 liste basi, ayni
- * FindNodeAfter (0x08055A94) aramasi, ayni +0x18 bayrak kelimesi ve ayni
- * 0x020110C0 kuyruk cagrisi. Farklari: burada bir ON kapi daha var
- * (index == 0x7FEF), fonksiyon KENDINI cagiriyor (sekil listesindeki her alt
- * kimlik icin) ve +0x30'daki "sahip" dugumu de temizliyor.
+ * Same family as the sibling ReleaseAreaNode (src/core/nodelist_a4.c,
+ * 0x08052750): the same `index >= gAreaBank.count` gate, the same
+ * gList02035A80 list head, the same FindNodeAfter (0x08055A94) search, the same
+ * +0x18 flag word and the same 0x020110C0 tail call. The differences: there is
+ * one MORE entry gate here (index == 0x7FEF), the function CALLS ITSELF (for
+ * every sub-id in the shape list) and it also clears the "owner" node at +0x30.
  *
- * ROM'DAN OLCULEN AYRINTILAR
- *   - Ilk kapi `ldr r0,=0x7fef / cmp r2,r0 / bne` -- esitlik sinamasi, havuz
- *     sabiti. Kural 44 (karsilastirma sabitini yerele al) BURADA GEREKMIYOR:
- *     kanoniklestirme yalnizca `<`/`<=` sinamalarinda oluyor, `==` degismiyor.
- *   - +0x18 alani ISARETLI (s32): ikinci kapi `cmp r1,#0 / bge`, yani
- *     `bits < 0`. Maskeli yazim (`bits & 0x80000000`) bu dali uretmez.
- *   - +0x30 SAHIP DUGUMU ve ayni Node yerlesimini tasiyor: r4 uzerinden
- *     hem `[r4,#40]` (+0x28 alt nesne) hem `[r4,#24]` (+0x18 bayrak) okunuyor.
- *     Yani `Node *owner` -- ayri bir tip degil.
- *   - `owner = node->owner;` ATAMASI, `bits < 0` KAPISINDAN ONCE olmali:
- *     ROM `ldr r4,[r5,#48]`i `ldr r1,[r5,#24]`den once yayiyor (kural 11/16).
- *   - Dongu bicimi: `movs r4,#0 / b .Lcond` ile DONDURULMUS for. On-baslikta
- *     sekil yuklemesi YOK; sekil kosul blogunda okunup govdeye CSE ediliyor
- *     (govde `ldr r0,[r0,#16]` ile dogrudan kosuldaki r0'i kullaniyor).
- *     Kardes a4'te ROM'un on-baslikta ucuncu bir yukleme yaptigi icin ORADA
- *     dal-ici ayri yerel (`Node *n = node;`) gerekiyordu; BURADA GEREKMIYOR --
- *     kural 49'un "dongu bicimini kardesten kopyalama" uyarisinin ornegi.
- *     Dogrulamasi prologda: burada `push {r4,r5,r6,lr}` (r7 yok), a4'te
- *     `push {r4-r7,lr}`.
- *   - 0x08041EE0 BIR ARGUMAN ALIYOR. Ikinci cagri oncesi acik `adds r0,r2,#0`
- *     var; birinci cagri oncesi yok cunku alt nesne zaten r0'a dagitilmis.
- *     src/core/nodelist_a8.c orayi `void NoOp08041EE0(void)` diye bildirmis ve
- *     eslesmis (orada r0 tesadufen doluydu) -- BURADA argumansiz bildirim
- *     8 bayt fark veriyor (olculdu).
- *   - Maskeler int genisliginde: `movs #17 / negs` = ~0x10, `movs #129 / negs`
- *     = ~0x80. Alanlar u32 oldugu icin kural 47 bir sey gerektirmiyor.
- *   - Havuzdaki iki negatif sabit: 0xFFFFFEFF = ~0x100 ve 0xFFFFFEEF = ~0x110.
- *     Ikincisi ~0x111 DEGIL -- tek bayt farkla eslesmeyi bozan yer burasiydi.
- *   - Iki dal `node->bits |= <sabit>` kuyrugunu PAYLASIYOR (capraz atlama,
- *     0x08052964). Kural 29'un tersi: ROM birlesmeyi zaten yapmis, kaynakta
- *     duz if/else yazmak dogru.
+ * DETAILS MEASURED FROM THE ROM
+ *   - The first gate is `ldr r0,=0x7fef / cmp r2,r0 / bne` -- an equality test
+ *     with a pool constant. Rule 44 (take the comparison constant into a
+ *     local) IS NOT NEEDED HERE: canonicalisation only happens in `<`/`<=`
+ *     tests; `==` is left alone.
+ *   - The +0x18 field is SIGNED (s32): the second gate is `cmp r1,#0 / bge`,
+ *     i.e. `bits < 0`. A masked form (`bits & 0x80000000`) does not produce
+ *     that branch.
+ *   - +0x30 IS AN OWNER NODE and carries the same Node layout: through r4 both
+ *     `[r4,#40]` (+0x28 sub-object) and `[r4,#24]` (+0x18 flags) are read. So
+ *     it is `Node *owner` -- not a separate type.
+ *   - The `owner = node->owner;` ASSIGNMENT must come BEFORE the `bits < 0`
+ *     gate: the ROM emits `ldr r4,[r5,#48]` before `ldr r1,[r5,#24]`
+ *     (rule 11/16).
+ *   - The loop form: a ROTATED for with `movs r4,#0 / b .Lcond`. There is NO
+ *     shape load in the pre-header; the shape is read in the condition block
+ *     and CSEd into the body (the body uses the condition's r0 directly with
+ *     `ldr r0,[r0,#16]`).
+ *     In the sibling a4 the ROM does a third load in the pre-header, which is
+ *     why a branch-local (`Node *n = node;`) was needed THERE; it is NOT NEEDED
+ *     HERE -- an example of rule 49's warning against copying a loop form from
+ *     a sibling.
+ *     The confirmation is in the prologue: `push {r4,r5,r6,lr}` here (no r7)
+ *     versus `push {r4-r7,lr}` in a4.
+ *   - 0x08041EE0 TAKES ONE ARGUMENT. There is an explicit `adds r0,r2,#0`
+ *     before the second call; there is none before the first because the
+ *     sub-object is already allocated to r0.
+ *     src/core/nodelist_a8.c declared it `void NoOp08041EE0(void)` and matched
+ *     (r0 happened to be loaded there) -- HERE an argument-less declaration
+ *     gives an 8-byte difference (measured).
+ *   - The masks are at int width: `movs #17 / negs` = ~0x10, `movs #129 / negs`
+ *     = ~0x80. Because the fields are u32, rule 47 requires nothing.
+ *   - Two negative constants in the pool: 0xFFFFFEFF = ~0x100 and
+ *     0xFFFFFEEF = ~0x110. The second is NOT ~0x111 -- that single byte was
+ *     what broke the match.
+ *   - The two branches SHARE the `node->bits |= <constant>` tail (cross-jumping
+ *     at 0x08052964). The inverse of rule 29: the ROM has already done the
+ *     merge, so writing a plain if/else in the source is correct.
  *
- * DENEYIP ELEDIGIM YAZIMLAR (olculdu)
- *   - `sub->anim` uc sifir saklamasi KAYNAK SIRASININ TERSINE yayiliyor.
- *     0x00,0x04,0x08 sirasiyla yazinca ROM'un 0x08,0x04,0x00 sirasi cikmiyor:
- *     2 bayt fark. Kaynaga tersten yazildi. (Kural 8'in ayni yondeki etkisi.)
- *   - `else if (arm != 0) {...} else {...}` diye ters yazim: fonksiyon 348
- *     bayta iniyor ve 80 bayt farkli. agbcc kosulu cevirmiyor; ROM'daki
- *     `cmp r6,#0 / bne` ancak kaynakta ONCE `arm == 0` dali varken cikiyor.
- *   - `NoOp08041EE0()` argumansiz: 8 bayt fark (yukarida).
- *   - +0x0B alani `u8` vs `s8`: FARK ETMIYOR, ikisi de 0 fark veriyor.
- *     Alan yalniz `& 2` ile okunuyor, hicbir yerde yazilmiyor; kural 47'nin
- *     kaldiraci burada yok. a4'teki `s8` secimiyle tutarli kalsin diye `s8`
- *     birakildi -- bu dosyada KANIT DEGIL, yalnizca uyum.
+ * FORMS I TRIED AND ELIMINATED (measured)
+ *   - The three zero stores to `sub->anim` are emitted IN REVERSE OF SOURCE
+ *     ORDER. Writing them 0x00, 0x04, 0x08 does not produce the ROM's 0x08,
+ *     0x04, 0x00 order: 2 bytes of difference. They were written in reverse in
+ *     the source. (The same-direction effect as rule 8.)
+ *   - Inverting it as `else if (arm != 0) {...} else {...}`: the function drops
+ *     to 348 bytes with 80 bytes differing. agbcc does not invert the
+ *     condition; the ROM's `cmp r6,#0 / bne` only comes out when the source has
+ *     the `arm == 0` branch FIRST.
+ *   - `NoOp08041EE0()` without an argument: 8 bytes of difference (above).
+ *   - The +0x0B field as `u8` versus `s8`: NO DIFFERENCE, both give 0. The
+ *     field is only read with `& 2` and never written; rule 47's lever does not
+ *     exist here. It was left `s8` to stay consistent with the `s8` choice in
+ *     a4 -- in this file that is NOT EVIDENCE, only consistency.
  *
- * ACIK KALAN -- SEMBOL BILDIRIMI GEREKIYOR
- *   0x020110C0 data/ram_map.csv'de YOK (a4 ayni bosluk icin ayni notu
- *   dusmustu). Yalniz ADRESI arguman olarak geciyor, uye erisimi yok, bu
- *   yuzden ham cast havuz sabitini bozmuyor. ram_map'e dokunmadim.
- *   Alt nesnedeki 0x80/0x01/0x100/0x40/0x10/0x110/0x4000 bitlerinin anlami
- *   bilinmiyor; SUB_A..SUB_G diye notrsel adlandirildi, anlam UYDURULMADI.
+ * STILL OPEN -- A SYMBOL DECLARATION IS NEEDED
+ *   0x020110C0 is NOT in data/ram_map.csv (a4 left the same note for the same
+ *   gap). Only its ADDRESS is passed as an argument, with no member access, so
+ *   a raw cast does not disturb the pool constant. I did not touch ram_map.
+ *   The meaning of the 0x80/0x01/0x100/0x40/0x10/0x110/0x4000 bits in the
+ *   sub-object is unknown; they were named neutrally SUB_A..SUB_G, and no
+ *   meaning was INVENTED.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_b1.c  -> BYTE-MATCHING
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_b1.c  -> BYTE-MATCHING
  */
 #include "gba_types.h"
 
-#define INDEX_NONE   0x7FEF      /* ilk kapi: gecersiz kimlik */
+#define INDEX_NONE   0x7FEF      /* first gate: an invalid id */
 #define KIND_BUSY    0x02        /* +0x0B bit 1 */
-#define BITS_SIGN    0x80000000  /* +0x18 isaret biti: `cmp/bge` ile sinaniyor */
+#define BITS_SIGN    0x80000000  /* +0x18 sign bit: tested with `cmp/bge` */
 #define BITS_HOLD    0x40000000
 #define BITS_LIST    0x100
 #define BITS_SUB     0x400
@@ -117,7 +127,7 @@ typedef struct AreaBank {
     s32 count;                  /* 0x04 */
 } AreaBank;
 
-extern AreaBank gAreaBank;              /* 0x08D49C00 (ROM tablosu) */
+extern AreaBank gAreaBank;              /* 0x08D49C00 (ROM table) */
 extern Node    *gList02035A80;          /* 0x02035A80 */
 
 #define gRam020110C0 ((u32 *)0x020110C0)

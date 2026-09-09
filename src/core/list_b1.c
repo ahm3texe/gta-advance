@@ -1,28 +1,30 @@
-/* Liste basini ve iki bloku sifirlama — 0x0800DB80-0x0800DBE7
+/* Clear the list head and two blocks — 0x0800DB80-0x0800DBE7
  *
- * Once 0x02016280'deki liste basini sifirliyor, sonra DMA3 ile iki blok
- * dolduruyor: 0x02016290'a 0x11F8 kelime (18400 bayt) ve 0x0201AA80'e
- * 3 kelime. Her DMA kendi REG_IME kaydet/geri-yukle ciftinin icinde.
- * Sonda 0x0201AA9C baytini sifirliyor.
+ * It first clears the list head at 0x02016280, then fills two blocks with DMA3:
+ * 0x11F8 words (18400 bytes) at 0x02016290 and 3 words at 0x0201AA80. Each DMA
+ * sits inside its own REG_IME save/restore pair.
+ * At the end it clears the byte at 0x0201AA9C.
  *
- * Havuzdaki uc adres (0x02016290, 0x0201AA80, 0x0201AA9C) ROM'da AYRI
- * literal olarak yukleniyor, taban+ofset olarak degil -- bu yuzden ayri
- * nesneler olarak yazildi. Ucu de data/ram_map.csv'de YOK; ham adres
- * cast'i ile gecildi (kural 1'in katlanma tuzagi burada olusmuyor,
- * cunku hicbiri ortak bir tabanin uyesi degil).
+ * The three addresses in the pool (0x02016290, 0x0201AA80, 0x0201AA9C) are
+ * loaded as SEPARATE literals in the ROM, not as base+offset -- which is why
+ * they were written as separate objects. None of the three is in
+ * data/ram_map.csv; they were reached through raw address casts (rule 1's
+ * folding trap does not arise here, because none of them is a member of a
+ * shared base).
  *
- * `str r3,[sp]` iki kez cikiyor -> yigin gecicisi `volatile` olmali,
- * yoksa ikinci sifir yazimi olu deger olarak eleniyor (kural 3).
- * `movs r5,#0` ayri bir sifir: byte yazimi QImode oldugu icin kendi
- * pseudo'suna dusuyor, u32 sifiriyla birlesmiyor.
+ * `str r3,[sp]` appears twice -> the stack temporary must be `volatile`,
+ * otherwise the second zero store is eliminated as a dead value (rule 3).
+ * `movs r5,#0` is a separate zero: because a byte store is QImode it falls to
+ * its own pseudo and does not merge with the u32 zero.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * ESLESME: 104/104 bayt, ilk denemede. Sablon src/core/init_sprite_pool.c
- * ve src/world/dma_flush.c'deki REG_IME + REG_DMA3 kalibi.
+ * MATCH: 104/104 bytes, on the first attempt. The template is the
+ * REG_IME + REG_DMA3 pattern from src/core/init_sprite_pool.c and
+ * src/world/dma_flush.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/list_b1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/list_b1.c
  */
 
 #include "gba_io.h"

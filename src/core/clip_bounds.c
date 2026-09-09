@@ -1,48 +1,50 @@
-/* Sinir kutusunu daraltma — 0x0800A980-0x0800A9E3
+/* Narrow the bounding box — 0x0800A980-0x0800A9E3
  *
- * Iki gecis: once alt siniri kutunun (merkez - pay) degerine YUKSELTIYOR,
- * sonra ust siniri (merkez + pay) degerine INDIRIYOR. Yani gClipBounds,
- * verilen kutuyla kesistiriliyor.
+ * Two passes: the lower bound is first RAISED to the box's (centre - margin)
+ * value, then the upper bound is LOWERED to (centre + margin). That is,
+ * gClipBounds is intersected with the given box.
  *
- * Ucuncu bilesen kenar payi yerine sabit 0x80000 kullaniyor ve ROM'da
- * ONEMLI BIR ASIMETRI var:
- *   birinci gecis: `ldr r5, [pc]` ile 0xFFF80000 (negatif, HAVUZDAN)
- *   ikinci gecis:  `movs r2,#128 / lsls r2,#12` ile 0x80000 (KAYDIRMAYLA)
- * Ikisi de TOPLAMA olarak yazilmali. `- 0x80000` yazmak sabiti kaydirmayla
- * kurdurup havuz kelimesini goturuyordu (96 bayt, ROM 100); 0xFFF80000
- * kaydirmayla uretilemedigi icin toplama bicimi havuzu zorunlu kiliyor.
+ * The third component uses the constant 0x80000 instead of an edge margin, and
+ * there is AN IMPORTANT ASYMMETRY in the ROM:
+ *   first pass:  `ldr r5, [pc]` loads 0xFFF80000 (negative, FROM THE POOL)
+ *   second pass: `movs r2,#128 / lsls r2,#12` builds 0x80000 (BY SHIFTING)
+ * Both must be written as ADDITIONS. Writing `- 0x80000` made the constant be
+ * built by shifting and removed the pool word (96 bytes, the ROM has 100);
+ * because 0xFFF80000 cannot be produced by shifting, the addition form forces
+ * the pool.
  *
- * Taban (gClipBounds) ve pay, ilk karsilastirmadan ONCE kuruluyor
- * (kural 37) -- ROM `ldr r3` ve `lsls r1` ile ikisini de basta hazirliyor.
+ * The base (gClipBounds) and the margin are set up BEFORE the first comparison
+ * (rule 37) -- the ROM prepares both up front with `ldr r3` and `lsls r1`.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * HENUZ ESLESMIYOR: bizim cikti 96 bayt, ROM 100. Engel TEK bir yapisal
- * nedene iniyor: BIR FAZLA callee-saved register kullaniyoruz.
- *     ROM  : push {r4,r5,lr}       -- her bileseni r0'a TAZEDEN yukluyor
- *     bizim: push {r4,r5,r6,lr}    -- yuklenen degerler r5/r6'da yasiyor
- * Farklarin tamami bunun turevi (+0x14 ldr r5 vs r0, +0x20 ldr r6 vs r0,
- * +0x22/+0x24 sabit ve toplama register'lari).
+ * DOES NOT MATCH YET: our output is 96 bytes, the ROM 100. The obstacle comes
+ * down to a SINGLE structural reason: we use ONE MORE callee-saved register.
+ *     ROM  : push {r4,r5,lr}       -- it loads every component into r0 AFRESH
+ *     ours : push {r4,r5,r6,lr}    -- the loaded values live in r5/r6
+ * Every difference derives from that (+0x14 ldr r5 vs r0, +0x20 ldr r6 vs r0,
+ * +0x22/+0x24 the constant and addition registers).
  *
- * Yani ROM'da her `box->` okumasi kisa omurlu bir gecici; bizde derleyici
- * onlari ortak alt ifade olarak tutup omurlerini uzatiyor.
+ * So in the ROM every `box->` read is a short-lived temporary; for us the
+ * compiler keeps them as common subexpressions and lengthens their lifetimes.
  *
- * Denenenler: `- 0x80000` yerine `+ (s32)0xFFF80000` (havuz yuklemesini
- * dogru uretti ama register sayisini degistirmedi); negatif sabiti ayri
- * bir `zlo` yereline almak (etkisiz). Ikisi de 96 bayt.
+ * What was tried: `+ (s32)0xFFF80000` instead of `- 0x80000` (it produced the
+ * pool load correctly but did not change the register count); taking the
+ * negative constant into a separate `zlo` local (no effect). Both give 96
+ * bytes.
  *
- * Sonraki fikir: okumalarin omrunu kisaltmak icin her bileseni ayri bir
- * blok icinde ele almak, ya da pass 1 / pass 2'yi ayri yardimci
- * fonksiyonlara bolup inline ettirmek.
+ * The next idea: shorten the lifetime of the reads by handling each component
+ * inside its own block, or split pass 1 / pass 2 into separate helper functions
+ * and have them inlined.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/clip_bounds.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/clip_bounds.c
  */
 
 #include "gba_types.h"
 
-#define Z_LOWER  ((s32)0xFFF80000)   /* havuzdan yuklenir */
-#define Z_UPPER  (0x80 << 12)          /* kaydirmayla kurulur */
+#define Z_LOWER  ((s32)0xFFF80000)   /* loaded from the literal pool */
+#define Z_UPPER  (0x80 << 12)          /* constructed with a shift */
 
 typedef struct Vec3 {
     s32 x;                      /* +0x00 */

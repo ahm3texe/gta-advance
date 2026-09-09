@@ -1,11 +1,12 @@
-/* Cift bagli liste (ozel offsetli) — 0x080127FC-0x0801282B
+/* Doubly linked list (with custom offsets) — 0x080127FC-0x0801282B
  *
- * src/core/linked_list.c'deki desenin varyanti: baslik +0 head, +4 tail,
- * +8 count. Dugum +0 next, +4 prev. `ListInit` sifirlar, `PushFront`
- * yeni dugumu listenin BASINA ekleyip sayaci artirir.
+ * A variant of the pattern in src/core/linked_list.c: the header is +0 head,
+ * +4 tail, +8 count. Each node has +0 next and +4 prev. `ListInit` clears
+ * the header; `PushFront` pushes the new node onto the FRONT of the list
+ * and increments the count.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/list_ops2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/list_ops2.c
  */
 
 #include "gba_types.h"
@@ -29,7 +30,7 @@ void List2Init(List2 *list)
     list->count = 0;
 }
 
-/* 0x08012808 — listenin BASINA ekle. */
+/* 0x08012808 — insert at the HEAD of the list. */
 void List2PushFront(List2 *list, Node2 *node)
 {
     Node2 *old;

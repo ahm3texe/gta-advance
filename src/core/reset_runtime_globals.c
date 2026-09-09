@@ -1,4 +1,4 @@
-/* Calisma zamaninda kullanilan bagimsiz global durum alanlarini sifirlar. */
+/* Zeroes the independent global state fields used at runtime. */
 
 #include "gba_types.h"
 

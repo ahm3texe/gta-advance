@@ -1,4 +1,4 @@
-/* Konumu dort yatay/dikey ofsette sinar; hicbiri tutmazsa geri yukler. */
+/* Tests the position at four horizontal/vertical offsets; restores it if none works. */
 
 #include "gba_types.h"
 

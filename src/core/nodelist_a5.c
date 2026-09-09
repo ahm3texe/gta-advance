@@ -1,71 +1,77 @@
-/* Dugumun yuva dizisini kurup kaydini tazeleme - 0x08052BBC-0x08052C65, 170 bayt.
+/* Build the node's slot array and refresh its record - 0x08052BBC-0x08052C65, 170 bytes.
  *
- * DURUM: BYTE-MATCHING (170/170).
+ * STATUS: BYTE-MATCHING (170/170).
  *
- * Ne yapiyor: dugumun +0x14 tanimindan (SlotDesc) yuva sayisini alip
- * FindFreeSlotRun ile ardisik bos yuva blogu ariyor, blogu dugumun +0x18
- * alanina yaziyor, tanimin +0x10 kimlik dizisini bu bloga kopyalayip her
- * kimlik icin RebuildAreaEntry cagiriyor, sonra +0x0A'ya 0xFF yazip
- * "kirli" bitini kuruyor. Kuyrukta bit hala kuruluysa FUN_08051d10'a
- * tanimin +0x14 isaretcisi ve +0x07 baytiyla gidiliyor.
+ * What it does: it takes the slot count from the node's +0x14 descriptor
+ * (SlotDesc), looks for a run of consecutive free slots with FindFreeSlotRun,
+ * writes the run into the node's +0x18 field, copies the descriptor's +0x10 id
+ * array into that run and calls RebuildAreaEntry for every id, then writes 0xFF
+ * to +0x0A and sets the "dirty" bit. If the bit is still set in the tail,
+ * FUN_08051d10 is called with the descriptor's +0x14 pointer and its +0x07 byte.
  *
- * Struct ve imzalar kardeslerden ALINDI, uydurulmadi:
- *   Node yerlesimi + 0x0B bitfield'i (dirty:1 / pad:3 / level:4 ISARETLI)
- *     ve SlotDesc.count(+0x06)  -> src/core/nodelist_c2.c (ReleaseNodeSlots)
+ * The structs and signatures were TAKEN from the siblings, not invented:
+ *   The Node layout + the 0x0B bitfield (dirty:1 / pad:3 / level:4 SIGNED)
+ *     and SlotDesc.count(+0x06)  -> src/core/nodelist_c2.c (ReleaseNodeSlots)
  *   FindFreeSlotRun(int) -> u16*  -> src/world/slot_table.c
- *   RebuildAreaEntry(s32, u32)    -> src/core/nodelist_b6.c (imza AYNEN
- *     korundu; ROM ikinci argumana dugum isaretcisini veriyor, bu yuzden
- *     cagri yerinde (u32) donusumu var - imzayi degistirmek check_consistency
- *     acisindan gereksiz risk)
+ *   RebuildAreaEntry(s32, u32)    -> src/core/nodelist_b6.c (the signature was
+ *     kept VERBATIM; the ROM passes the node pointer as the second argument,
+ *     hence the (u32) conversion at the call site - changing the signature
+ *     would be a needless risk for check_consistency)
  *   ReleaseNodeSlots(u32, u32)    -> src/core/nodelist_c2.c
- * SlotDesc'in +0x07 (mode), +0x10 (ids), +0x14 (table) alanlari bu ROM
- * govdesinden olculdu; +0x14 FUN_08051d10 icinde 0'a karsi sinanip
- * bir global'e SOZCUK olarak yazildigi icin ISARETCI, +0x07 `ldrb`.
+ * SlotDesc's +0x07 (mode), +0x10 (ids) and +0x14 (table) fields were measured
+ * from this ROM body; +0x14 is a POINTER because FUN_08051d10 tests it against
+ * 0 and writes it to a global as a WORD, and +0x07 is `ldrb`.
  *
- * OLCULEN AYRINTILAR
+ * MEASURED DETAILS
  *
- * 1) IKI AYRI SIFIR DEGISKENI (islerin kilidi buydu).
- *    ROM prologda `movs r1,#0 / mov r9,r1` ile r9'u sifirliyor; r9 dongude
- *    HIC artirilmiyor. Dongunun kendi sayaci r7. r9 iki yerde okunuyor:
- *      - dongu GIRIS korumasi   `cmp r9,r1 / bcs` (r1 = desc->count)
- *      - dongudensonraki  test  `mov r0,r9 / cmp r0,#0 / beq`
- *    Yani kaynakta iki degisken var: `n` (r9) ve dongu sayaci `i` (r7).
- *    Dongu `for (i = n; i < desc->count; i++)` yazilinca agbcc korumayi
- *    n'den, govde sayacini sifirdan uretiyor - ROM'daki tam bu ikilik.
- *    n hicbir yerde atanmadigi icin `if (n != 0)` govdesi (0x08052C3C,
- *    ReleaseNodeSlots cagrisi) ULASILAMAZ; Ghidra bu yuzden
- *    "Removing unreachable block (ram,0x08052c3c)" diyip blogu ATTI ve
- *    dongu korumasini da `count != 0`a indirdi. ROM'da blok DURUYOR,
- *    dolayisiyla taslak degil ROM esas alindi.
+ * 1) TWO SEPARATE ZERO VARIABLES (this was the key to the whole thing).
+ *    In the prologue the ROM zeroes r9 with `movs r1,#0 / mov r9,r1`; r9 is
+ *    NEVER incremented in the loop. The loop's own counter is r7. r9 is read in
+ *    two places:
+ *      - the loop ENTRY guard   `cmp r9,r1 / bcs` (r1 = desc->count)
+ *      - the test after the loop `mov r0,r9 / cmp r0,#0 / beq`
+ *    So there are two variables in the source: `n` (r9) and the loop counter
+ *    `i` (r7).
+ *    Written as `for (i = n; i < desc->count; i++)`, agbcc derives the guard
+ *    from n and the body counter from zero - exactly the ROM's duality.
+ *    Because n is never assigned, the `if (n != 0)` body (0x08052C3C, the
+ *    ReleaseNodeSlots call) is UNREACHABLE; Ghidra therefore said "Removing
+ *    unreachable block (ram,0x08052c3c)", DROPPED the block and reduced the
+ *    loop guard to `count != 0`. In the ROM the block IS THERE, so the ROM was
+ *    taken as the authority, not the draft.
  *
- * 2) `node->slots` ATAMASI ILE `dst` AYRI (2 bayt buradaydi).
+ * 2) THE `node->slots` ASSIGNMENT AND `dst` ARE SEPARATE (2 bytes were here).
  *    ROM: `adds r1,r0,#0 / str r1,[r6,#24]` ... `cmp r1,#0` ...
- *         `adds r4,r1,#0`  <- fazladan kopya.
- *    Yani cagri sonucu once alana yaziliyor, sifir sinamasi ayni degerden
- *    yapiliyor, gezinme isaretcisi ise SONRA kuruluyor. Sonucu dogrudan
- *    `dst`e alip `node->slots = dst` yazmak bu kopyayi yok ediyor.
+ *         `adds r4,r1,#0`  <- an extra copy.
+ *    That is, the call result is written into the field first, the zero test is
+ *    done on the same value, and the walking pointer is built AFTERWARDS.
+ *    Taking the result straight into `dst` and writing `node->slots = dst`
+ *    destroys that copy.
  *
- * 3) Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * 4) Kural 47: +0x0B ust dortlusu `lsls #24 / asrs #28` ile okunuyor ->
- *    ISARETLI 4 bitlik alan, `level > 0` karsilastirmasi isaretli.
- *    Ayni baytin 0. biti ise `movs #1 / ands` ile duz maskeleniyor.
- * 5) desc->count her turda YENIDEN okunuyor (dongu icinde `ldrb [r8,#6]`),
- *    yani kosul yerele alinmamis.
+ * 3) Rule 35: `pop {r0}; bx r0` -> a void return type.
+ * 4) Rule 47: the upper nibble of +0x0B is read with `lsls #24 / asrs #28` ->
+ *    a SIGNED 4-bit field, and the `level > 0` comparison is signed.
+ *    Bit 0 of the same byte, by contrast, is masked plainly with
+ *    `movs #1 / ands`.
+ * 5) desc->count is RE-READ every iteration (`ldrb [r8,#6]` inside the loop),
+ *    so the condition was not taken into a local.
  *
- * DENEYIP ELEDIGIM YAZIMLAR
- *   a. Tek degisken (`i` hem dongu sayaci hem son test):  150/170 bayt.
- *      agbcc `i`yi r2'ye koyup her `bl` etrafinda YIGINA DOKUYOR
- *      (`sub sp,#4` + `str/ldr [sp,#0]`); ROM'un `mov r8/mov r9` yuksek
- *      yazmac cifti hic olusmuyor. Yani eksik olan sey optimizasyon degil,
- *      KAYNAKTA BIR DEGISKEN DAHA olmasiydi (yukarida 1).
- *   b. (a) + iki degisken, ama `node->slots = dst` bicimi:  168/170,
- *      fark yalnizca yukaridaki 2. maddedeki kopya ve ondan turetilen
- *      yazmac dagitimi (ROM r8 icin gecici olarak r2, bizimki r0/r1).
- *      2. maddeyi duzeltince yazmac dagitimi da KENDILIGINDEN duzeldi;
- *      ayrica bir dagitim mudahalesi gerekmedi.
+ * FORMS I TRIED AND ELIMINATED
+ *   a. A single variable (`i` as both the loop counter and the final test):
+ *      150/170 bytes.
+ *      agbcc puts `i` in r2 and SPILLS IT TO THE STACK around every `bl`
+ *      (`sub sp,#4` + `str/ldr [sp,#0]`); the ROM's `mov r8/mov r9` high
+ *      register pair never forms. So what was missing was not an optimization
+ *      but ONE MORE VARIABLE IN THE SOURCE (point 1 above).
+ *   b. (a) plus two variables, but with the `node->slots = dst` form: 168/170,
+ *      the difference being only the copy from point 2 above and the register
+ *      allocation derived from it (the ROM uses r2 as a temporary for r8, ours
+ *      r0/r1).
+ *      Fixing point 2 fixed the register allocation BY ITSELF; no separate
+ *      allocation intervention was needed.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_a5.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_a5.c
  */
 #include "gba_types.h"
 

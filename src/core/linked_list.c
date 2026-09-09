@@ -1,14 +1,14 @@
-/* Cift bagli liste — 0x08012898-0x08012943
+/* Doubly linked list — 0x08012898-0x08012943
  *
- * Dugum: +0 sonraki, +4 onceki. Liste basligi: +0 bas, +4 son, +8 sayac.
- * Dolasim fonksiyonlari dugum isaretcisini once kopyaliyor, boylece geri
- * cagri dugumu listeden cikarabiliyor.
+ * A node: +0 next, +4 prev. The list header: +0 head, +4 tail, +8 count.
+ * The traversal functions copy the node pointer first, so the callback is free
+ * to unlink the node.
  *
- * Dolayli cagrilar `bl _call_via_rN` veneer'ine gidiyor; bu, agbcc'nin
- * -mthumb-interwork ile fonksiyon isaretcisi cagirma bicimidir.
+ * Indirect calls go to the `bl _call_via_rN` veneer; that is agbcc's way of
+ * calling a function pointer with -mthumb-interwork.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/linked_list.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/linked_list.c
  */
 
 #include "gba_types.h"

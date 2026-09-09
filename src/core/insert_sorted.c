@@ -1,26 +1,27 @@
-/* Sirali listeye ekleme — 0x0801282C-0x08012895
+/* Insert into an ordered list — 0x0801282C-0x08012895
  *
- * Anahtara gore sirali cift bagli listeye dugum ekliyor ve sayaci
- * artiriyor. Uc yol: bos liste, araya ekleme, sona ekleme.
+ * It inserts a node into a doubly linked list ordered by key and increments the
+ * count. Three paths: an empty list, insertion in the middle, insertion at the
+ * end.
  *
- * Kontrol akisi ROM'daki gibi ETIKETLERLE yaziliyor. Dongu ROM'da
- * DONDURULMUS (rotated): giriste bir kez sinaniyor, govde sonunda tekrar.
- * Yapisal `while` yazmak agbcc'ye farkli blok sirasi urettiriyor -- ayni
- * durum src/world/engage_actor.c ve src/world/bump_or_reset.c'de de
- * olculmustu.
+ * The control flow is written WITH LABELS, as in the ROM. The loop is ROTATED
+ * in the ROM: tested once at entry and again at the end of the body. Writing a
+ * structured `while` makes agbcc produce a different block order -- the same
+ * situation was measured in src/world/engage_actor.c and
+ * src/world/bump_or_reset.c.
  *
- * Sayac (`count`) cagri oncesinde okunuyor ve UC yolun ucunde de ayni
- * yerden geliyor; ROM r5'te tutuyor.
+ * The count (`count`) is read before the call and comes from the same place on
+ * all THREE paths; the ROM keeps it in r5.
  *
- * ANAHTAR PARAMETRESI u32 OLMALI, u16 DEGIL. `u16 key` yazmak agbcc'ye
- * giriste parametre kirpmasi yaptiriyor (`lsls r2,#16` + `lsrs r2,#16`,
- * tam 4 bayt) ve ROM'da o yok. `strh` zaten alt 16 biti yaziyor,
- * karsilastirma da `ldrh` sonucuyla dogal olarak unsigned kaliyor.
+ * THE KEY PARAMETER MUST BE u32, NOT u16. Writing `u16 key` makes agbcc
+ * truncate the parameter at entry (`lsls r2,#16` + `lsrs r2,#16`, exactly 4
+ * bytes), and the ROM has none of that. `strh` already writes the low 16 bits,
+ * and the comparison naturally stays unsigned through the `ldrh` result.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/insert_sorted.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/insert_sorted.c
  */
 
 #include "gba_types.h"
@@ -55,8 +56,8 @@ void InsertSorted(List *list, Node *node, u32 key)
         goto done;
     }
 
-    /* SIRA onemli: ROM once cur->next'i, SONRA sayaci okuyor. Sayaci
-       once yazmak iki yuklemenin yerini degistiriyordu. */
+    /* THE ORDER matters: the ROM reads cur->next FIRST and the count SECOND.
+       Writing the count first swapped the positions of the two loads. */
     cur = list->head;
     next = cur->next;
     count = list->count;

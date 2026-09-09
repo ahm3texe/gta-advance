@@ -1,96 +1,100 @@
-/* Etkin bolge maskesi yenilendiginde alanlari yukle/bosalt
- * 0x0805518C-0x080552D3  (328 bayt; son 4 bayt literal havuzu)
+/* Load/unload areas when the active region mask is refreshed
+ * 0x0805518C-0x080552D3  (328 bytes; the last 4 are a literal pool)
  *
- * Oyuncu(lar)in dunya koordinatindan bir bolge indeksi hesaplanip
- * `1 << indeks` ile maske kuruluyor. Iki oyuncu varsa (gGameState[12])
- * ikinci oyuncunun biti de ekleniyor. Oyuncu nesnesi yoksa maske -1.
+ * A region index is computed from the player's (or players') world coordinate
+ * and a mask is built with `1 << index`. With two players (gGameState[12]) the
+ * second player's bit is added as well. If there is no player object the mask
+ * is -1.
  *
- * Yeni maske gRam02030C00'e yaziliyor. Maske -1 ise ya da ONCEKI maskeyle
- * ayniysa is bitiyor. Degistiyse GetRecordIndex()'in verdigi kayit grubunun
- * kimlik dizisi taraniyor; her kimlik icin ROM bankasindaki (0x08D49C00
- * +0x24) 36 baytlik alan girisinin +0x1C maskesine bakiliyor:
+ * The new mask is written to gRam02030C00. If the mask is -1, or if it equals
+ * the PREVIOUS mask, the work is done. If it changed, the id array of the
+ * record group given by GetRecordIndex() is scanned; for each id, the +0x1C
+ * mask of the 36-byte area entry in the ROM bank (0x08D49C00 +0x24) is
+ * examined:
  *
- *   - giris maskesi -1              -> atla
- *   - ESKI maskeyle kesisiyorsa     -> alan artik gorunmuyor demektir:
- *       yeni maskeyle de kesisiyorsa atla, yoksa BOSALT
- *       (FindNode + kirli/seviye-1 ise yuvalari temizle + FUN_08055D90)
- *   - eski maskeyle kesismiyorsa    -> alan yeni geldi demektir:
- *       yeni maskeyle kesisiyorsa YUKLE (FUN_08052C68)
+ *   - entry mask -1                     -> skip
+ *   - intersects the OLD mask           -> the area is no longer visible:
+ *       if it also intersects the new mask, skip; otherwise UNLOAD
+ *       (FindNode + clear the slots if dirty/level-1 + FUN_08055D90)
+ *   - does not intersect the old mask   -> the area has just appeared:
+ *       if it intersects the new mask, LOAD (FUN_08052C68)
  *
- * Bosaltma govdesi src/core/nodelist_c2.c'deki FUN_08055C04 ile birebir
- * ayni: tek `ldrb` uzerinden iki AYRI test (`movs #1 / ands` ve
- * `movs #240 / ands / cmp #16`), ic yuva dongusu, FillSlotsWithNone,
- * `movs #2 / negs` ile kirli bitin temizlenmesi.
+ * The unload body is byte-for-byte the same as FUN_08055C04 in
+ * src/core/nodelist_c2.c: two SEPARATE tests through a single `ldrb`
+ * (`movs #1 / ands` and `movs #240 / ands / cmp #16`), the inner slot loop,
+ * FillSlotsWithNone, and clearing the dirty bit with `movs #2 / negs`.
  *
- * YAPI IPUCLARI:
- *   - 0x08D49C00 bankasinin +0x2C alani 16 baytlik "kayit grubu" dizisi:
- *     +0x04 u8 kimlik sayisi, +0x08 u16 kimlik dizisi. Taban ROM'da DUZ
- *     yuklenip ofset yukleme komutunda birakiliyor (`ldr r1,=0x08D49C00`
- *     + `ldr r1,[r1,#44]`), yani YAPI UYESI erisimi -> extern nesne.
- *     src/core/nodelist_c3.c ayni bankanin +0x24 alanini kullaniyor.
- *   - Oyuncu yuvalari (gRam02000F10 / gRam02001140) +0x00'da bir
- *     isaretci tasiyor; o nesnenin +0x18'i {s32 x, s32 y} koordinati.
+ * STRUCTURE HINTS:
+ *   - The +0x2C field of the 0x08D49C00 bank is an array of 16-byte "record
+ *     groups": +0x04 u8 id count, +0x08 u16 id array. In the ROM the base is
+ *     loaded PLAINLY and the offset left in the load instruction
+ *     (`ldr r1,=0x08D49C00` + `ldr r1,[r1,#44]`), i.e. a STRUCT MEMBER access
+ *     -> an extern object.
+ *     src/core/nodelist_c3.c uses the +0x24 field of the same bank.
+ *   - The player slots (gRam02000F10 / gRam02001140) carry a pointer at
+ *     +0x00; that object's +0x18 is a {s32 x, s32 y} coordinate.
  *
- * OLCULEN DORT AYRINTI (her biri tek basina denendi, dordu de belirleyici):
+ * FOUR MEASURED DETAILS (each was tried on its own; all four are decisive):
  *
- * 1) MASKE ADRESI ICIN AYRI YEREL, HEM DE OKUMADAN SONRA BILDIRILEN.
- *    ROM adresi bir kez havuzdan yukluyor (r1), degeri okuyor, sonra
- *    adresi `adds r6,r1,#0` ile KOPYALAYIP cagrilar boyunca r6'da
- *    tutuyor ve sondaki store'u oradan yapiyor. Duz `gRam02030C00 = ...`
- *    yazmak store'un onune ikinci bir havuz yuklemesi koyuyor; kod 2
- *    bayt kisaliyor, havuz hizalama dolgusu 2 bayt ekliyor, net 332/218
- *    fark. `cur = &gRam02030C00;` satirini OKUMADAN SONRA yazmak (kural
- *    19: kaynak sirasi korunur) CSE'ye o atamayi ilk yuklemenin kopyasina
- *    cevirtiyor -- ROM'un `adds r6,r1,#0` komutu tam olarak budur.
- *    Satiri okumadan ONCE yazmak tek pseudo uretir (`ldr r6,havuz`),
- *    kopya cikmaz.
+ * 1) A SEPARATE LOCAL FOR THE MASK ADDRESS, DECLARED AFTER THE READ.
+ *    The ROM loads the address from the pool once (r1), reads the value, then
+ *    COPIES the address with `adds r6,r1,#0`, keeps it in r6 across the calls
+ *    and does the final store from there. Writing `gRam02030C00 = ...` plainly
+ *    puts a second pool load in front of the store; the code shrinks by 2
+ *    bytes, the pool alignment padding adds 2 bytes, for a net 332/218
+ *    differences. Writing the `cur = &gRam02030C00;` line AFTER THE READ (rule
+ *    19: source order is preserved) makes CSE turn that assignment into a copy
+ *    of the first load -- which is exactly the ROM's `adds r6,r1,#0`.
+ *    Writing the line BEFORE the read produces a single pseudo
+ *    (`ldr r6,pool`) and no copy comes out.
  *
- * 2) SONUC ICIN IKI AYRI YEREL: `bits` ve `active`. ROM'un -1 dali r1'i,
- *    hesaplanan dali r4'u kuruyor ve else dalinin sonunda
- *    `adds r1,r4,#0` ile birlestiriyor; -1 dali bu kopyanin USTUNE
- *    (0x080551E2) atliyor. Tek degiskenle yazildiginda agbcc iki dala da
- *    r4'u verip kopyayi hic uretmiyordu (127/328 fark). `bits` else
- *    dalinda hesaplanip sonunda `active = bits;` yazilinca kopya cikti
- *    ve fark 8'e indi.
+ * 2) TWO SEPARATE LOCALS FOR THE RESULT: `bits` and `active`. The ROM's -1
+ *    branch builds r1 and the computed branch r4, merging them with
+ *    `adds r1,r4,#0` at the end of the else branch; the -1 branch jumps OVER
+ *    that copy (to 0x080551E2). Written with a single variable, agbcc gave
+ *    both branches r4 and never produced the copy (127/328 differences).
+ *    Computing `bits` in the else branch and writing `active = bits;` at its
+ *    end produced the copy and brought the difference down to 8.
  *
- * 3) KIMLIK YERELI `u32` OLMALI, `u16` DEGIL. `u16 id` ile ROM'un tek
- *    `ldrh r7,[r0]`i yerine `ldrh r2,[r0]` + `adds r7,r2,#0` cifti
- *    cikiyor: HImode yerel, hem indeks hesabi hem cagri argumani icin
- *    ayri bir SImode pseudo'ya genisliyor. Bu, src/core/nodelist_d3.c'de
- *    olculen kuralin TERSI yonu -- orada ROM iki register kullandigi icin
- *    `u16` gerekiyordu. Yani kimlik yerelinin genisligi ezberlenmez,
- *    ROM'un kac register kullandigina bakilir.
+ * 3) THE ID LOCAL MUST BE `u32`, NOT `u16`. With a `u16 id`, instead of the
+ *    ROM's single `ldrh r7,[r0]` the pair `ldrh r2,[r0]` + `adds r7,r2,#0`
+ *    comes out: an HImode local widens into a separate SImode pseudo for both
+ *    the index computation and the call argument. This is the INVERSE
+ *    direction of the rule measured in src/core/nodelist_d3.c -- there the ROM
+ *    used two registers, so `u16` was required. So the width of an id local is
+ *    not memorised; it follows from how many registers the ROM uses.
  *
- * 4) ALAN GIRISI ICIN AYRI ISARETCI YERELI. `mask = gAreaBank.entries[id].mask;`
- *    yazildiginda agbcc once `entries` uyesini yukluyor, sonra id*36'yi
- *    olcekliyor ve toplami INDEKS register'inda birakiyor. ROM tersini
- *    yapiyor: once id*36, sonra `ldr r0,[r0,#36]`, toplam TABAN
- *    register'inda. Aradaki fark 4 komut / 8 bayt. `entry = &gAreaBank.entries[id];`
- *    ayri bir adres hesabi (ADDR_EXPR) urettigi icin sira ve register
- *    dagitimi ROM'unkine oturuyor. Ayni kalibin dogrulanmis ornegi
- *    src/core/nodelist_c3.c'deki FUN_08052C68: orada da
- *    `ldr r7,havuz / lsls / adds / lsls / ldr r0,[r7,#36] / adds r4,r0,r6`.
- *    `(gAreaBank.entries + id)->mask` yazmak ise hicbir seyi degistirmedi
- *    (ayni agac, ayni RTL).
+ * 4) A SEPARATE POINTER LOCAL FOR THE AREA ENTRY. Written as
+ *    `mask = gAreaBank.entries[id].mask;`, agbcc loads the `entries` member
+ *    first, then scales id*36 and leaves the sum in the INDEX register. The
+ *    ROM does the opposite: id*36 first, then `ldr r0,[r0,#36]`, with the sum
+ *    in the BASE register. The gap is 4 instructions / 8 bytes.
+ *    `entry = &gAreaBank.entries[id];` produces a separate address computation
+ *    (an ADDR_EXPR), so the order and register allocation fall into the ROM's.
+ *    A verified example of the same pattern is FUN_08052C68 in
+ *    src/core/nodelist_c3.c: there too the form is
+ *    `ldr r7,pool / lsls / adds / lsls / ldr r0,[r7,#36] / adds r4,r0,r6`.
+ *    Writing `(gAreaBank.entries + id)->mask` changed nothing (the same tree,
+ *    the same RTL).
  *
- * DIGER UYGULANAN KURALLAR:
- *   - Kural 1: gRam02030C00 / gNodeListHead / gAreaBank extern sembol.
- *     `((AreaBank *)0x08D49C00)->groups` yazmak ofseti havuz sabitine
- *     katlar (nodelist_c3.c'de olculdu).
- *   - Kural 9/31: sayaclar `int`; ROM `bge` / `blt` (isaretli) uretiyor.
- *   - Kural 24/26: dugumun +0x0B bayti bitfield; `dirty = 0` atamasi
- *     `movs #2 / negs` ciftini veriyor.
- *   - Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- *   - `1 << ...` iki yerde de ayni sabitten turuyor; ROM sabiti r5'te
- *     paylasip `adds r4,r5,#0` uretiyor -- ayri ayri `movs #1` yazmak
- *     gerekmiyor, kaynakta iki kez `1 <<` yazmak yetiyor.
- *   - Ic yuva dongusu ve kirli bitin temizlenmesi src/core/nodelist_c2.c
- *     ile birebir ayni kaynaktan geliyor.
+ * OTHER RULES APPLIED:
+ *   - Rule 1: gRam02030C00 / gNodeListHead / gAreaBank are extern symbols.
+ *     Writing `((AreaBank *)0x08D49C00)->groups` folds the offset into the
+ *     pool constant (measured in nodelist_c3.c).
+ *   - Rule 9/31: the counters are `int`; the ROM emits `bge` / `blt` (signed).
+ *   - Rule 24/26: the node's +0x0B byte is a bitfield; the `dirty = 0`
+ *     assignment gives the `movs #2 / negs` pair.
+ *   - Rule 35: `pop {r0}; bx r0` -> a void return type.
+ *   - Both `1 << ...` derive from the same constant; the ROM shares the
+ *     constant in r5 and emits `adds r4,r5,#0` -- there is no need to write
+ *     separate `movs #1`s, writing `1 <<` twice in the source is enough.
+ *   - The inner slot loop and the clearing of the dirty bit come from the same
+ *     source as src/core/nodelist_c2.c.
  *
- * ESLESME: 328/328 bayt.
+ * MATCH: 328/328 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_d5.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_d5.c
  */
 
 #include "gba_types.h"
@@ -98,7 +102,7 @@
 
 #define LEVEL_BASE  1
 
-/* Oyuncu nesnesinin +0x18'indeki dunya koordinati. */
+/* The world coordinate at the player object's +0x18. */
 typedef struct Coord {
     s32 x;                      /* +0x00 */
     s32 y;                      /* +0x04 */
@@ -109,7 +113,7 @@ typedef struct Racer {
     Coord *coord;               /* +0x18 */
 } Racer;
 
-/* src/core/nodelist_d1.c / nodelist_c2.c ile ayni yerlesim. */
+/* The same layout as src/core/nodelist_d1.c / nodelist_c2.c. */
 typedef struct SlotDesc {
     u8 pad00[6];
     u8 count;                   /* +0x06 */
@@ -128,7 +132,7 @@ typedef struct Node {
     u16         *slots;         /* +0x18 */
 } Node;
 
-/* 36 baytlik alan girisi; src/core/nodelist_c3.c ile ayni. */
+/* A 36-byte area entry; the same as in src/core/nodelist_c3.c. */
 typedef struct AreaEntry {
     u8  unk00[0x18];            /* 0x00 */
     u16 areaFlag;               /* 0x18 */
@@ -138,7 +142,7 @@ typedef struct AreaEntry {
     u8  flags;                  /* 0x23 */
 } AreaEntry;
 
-/* 16 baytlik kayit grubu. */
+/* A 16-byte record group. */
 typedef struct AreaGroup {
     u8   pad00[4];              /* 0x00 */
     u8   count;                 /* 0x04 */
@@ -186,9 +190,9 @@ void RefreshActiveAreas(void)
 
     old = gRam02030C00;
     racer = *(Racer **)gRam02000F10;
-    cur = &gRam02030C00;        /* OKUMADAN SONRA: CSE bunu ilk havuz
-                                   yuklemesinin kopyasina cevirir; ust
-                                   yorumdaki 1. maddeye bak */
+    cur = &gRam02030C00;        /* AFTER THE READ: CSE turns this into a
+                                   copy of the first pool load; see point 1
+                                   in the header comment */
     if (racer == 0) {
         active = -1;
     } else {
@@ -197,8 +201,8 @@ void RefreshActiveAreas(void)
             racer = *(Racer **)gRam02001140;
             bits |= 1 << FUN_080313f0(racer->coord->x, racer->coord->y);
         }
-        active = bits;          /* iki dalin ORTAK store'da birlesmesi icin
-                                   ayri yerel; ust yorum 2. madde */
+        active = bits;          /* a separate local so the two branches merge
+                                   at the SHARED store; header point 2 */
     }
     *cur = active;
 
@@ -211,8 +215,8 @@ void RefreshActiveAreas(void)
 
     for (i = 0; i < group->count; i++) {
         id = group->ids[i];
-        /* Ayri isaretci yereli: sira ve register dagitimi ancak boyle
-           ROM'unkine oturuyor (ust yorum 4. madde). */
+        /* A separate pointer local: only this way do the order and the
+           register allocation match the ROM's (header point 4). */
         entry = &gAreaBank.entries[id];
         mask = entry->mask;
         if (mask == -1)

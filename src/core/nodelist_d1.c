@@ -1,66 +1,69 @@
-/* Nesnenin butun kimliklerini ve yuva kayitlarini bosaltma
- * 0x080536BC-0x08053793  (216 bayt; son 4 bayt literal havuzu)
+/* Empty all of the object's ids and slot records
+ * 0x080536BC-0x08053793  (216 bytes; the last 4 are a literal pool)
  *
- * Nesnenin +0x18'indeki basligi (sayaclar) ve +0x20'deki u16 kimlik dizisini
- * aliyor. Kimlik dizisinin her girisi icin:
- *   - kimlikten dugum bulunuyor (FindNode),
- *   - dugum "kirli" (bit 0) ve seviyesi 1 ise dugumun kendi yuva dizisindeki
- *     her kimlik icin ReleaseAreaNode cagriliyor, yuvalar DMA ile bos kimlikle
- *     dolduruluyor ve kirli biti temizleniyor -- bu govde nodelist_c2.c'deki
- *     FUN_08055C04 ile birebir ayni,
- *   - dugum bulunduysa liste basi + kimlik ile FUN_08055D90 cagriliyor.
- * Sonra nesnenin kendi kimlik dizisi bos kimlikle dolduruluyor, +0x24'teki
- * 60 baytlik yuva kayitlarinin her biri FUN_08052CF8'e veriliyor, kayit
- * dizisi ClearSlots ile temizleniyor ve nesnenin kirli biti siliniyor.
+ * It takes the header (the counters) at the object's +0x18 and the u16 id array
+ * at +0x20. For every entry of the id array:
+ *   - a node is found from the id (FindNode),
+ *   - if the node is "dirty" (bit 0) and its level is 1, ReleaseAreaNode is
+ *     called for every id in the node's own slot array, the slots are filled
+ *     with the empty id via DMA and the dirty bit is cleared -- this body is
+ *     byte-for-byte the same as FUN_08055C04 in nodelist_c2.c,
+ *   - if the node exists, FUN_08055D90 is called with the list head + id.
+ * Then the object's own id array is filled with the empty id, each of the
+ * 60-byte slot records at +0x24 is passed to FUN_08052CF8, the record array is
+ * cleared with ClearSlots and the object's dirty bit is cleared.
  *
- * Yapi ipuclari:
- *   - Cagiran RefreshThenNotify (src/world/refresh_then_notify.c) nesnenin
- *     +0x0B baytini 0xF1 ile maskeleyip 17 ile karsilastiriyor; yani nesne
- *     de dugumler gibi bit0 = kirli, bit4..7 = seviye tasiyor.
- *   - Basligin +0x05 bayti kimlik sayisi, +0x07 bayti yuva kaydi sayisi.
- *   - Yuva kaydi 60 bayt (`adds r5, #60`).
+ * Structure hints:
+ *   - The caller RefreshThenNotify (src/world/refresh_then_notify.c) masks the
+ *     object's +0x0B byte with 0xF1 and compares it against 17; so the object,
+ *     like the nodes, carries bit0 = dirty and bits 4..7 = level.
+ *   - The header's +0x05 byte is the id count and its +0x07 byte the slot
+ *     record count.
+ *   - A slot record is 60 bytes (`adds r5, #60`).
  *
- * OLCULEN AYRINTILAR:
- *   - +0x0B BITFIELD olarak yaziliyor (nodelist_c1.c / nodelist_c2.c ile
- *     ayni): `dirty` testi `movs #1 / ands / cmp #0`, `level == 1` testi
- *     kaydirmasiz `movs #240 / ands / cmp #16`, `dirty = 0` ise
- *     `movs #2 / negs` ciftini veriyor. Maske aritmetigi yazmak ucunu de
- *     bozar.
- *   - Kural 43: sayac ve isaretci birlikte ilerliyor -> ikisi de `for`
- *     artiriminda ve ROM sirasiyla (once `adds r4,#1`, sonra `adds r6,#2`).
- *     Artirimlari ters yazmak (`ids++, i++`) ROM'un sirasini bozuyor.
- *   - Kural 9/31: sayaclar `int`; ROM'un dallari isaretli (`bge` / `blt`).
- *   - Kural 11: kimlik cagrilar boyunca yasiyor (ROM r9'da tutuyor), bu
- *     yuzden ayri yerele aliniyor.
- *   - Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- *   - Dongu bittikten sonraki FillSlotsWithNone / ClearSlots cagrilarinda
- *     dizi tabani yurutulmus isaretciden degil, nesneden YENIDEN okunuyor
- *     (`ldr r0, [r1, #32]` / `ldr r0, [r2, #36]`).
- *   - `i` her iki donguda da AYNI degisken. Ikinci dongu icin ayri bir
- *     sayac acmak farki 8 bayttan 22 bayta cikardi.
- *   - Bos dugum icin `continue` yaziliyor. Govdeyi `if (node != 0) { ... }`
- *     icine almak ayni komutlari uretiyor ama asagidaki beraberligi ters
- *     cozuyor ve 8 bayt fark birakiyor.
+ * MEASURED DETAILS:
+ *   - +0x0B is written as a BITFIELD (the same as in nodelist_c1.c /
+ *     nodelist_c2.c): the `dirty` test gives `movs #1 / ands / cmp #0`, the
+ *     `level == 1` test gives `movs #240 / ands / cmp #16` with no shift, and
+ *     `dirty = 0` gives the `movs #2 / negs` pair. Writing mask arithmetic
+ *     breaks all three.
+ *   - Rule 43: the counter and the pointer advance together -> both in the
+ *     `for` increment and in the ROM's order (`adds r4,#1` first, then
+ *     `adds r6,#2`). Writing the increments the other way round (`ids++, i++`)
+ *     breaks the ROM's order.
+ *   - Rule 9/31: the counters are `int`; the ROM's branches are signed
+ *     (`bge` / `blt`).
+ *   - Rule 11: the id lives across the calls (the ROM keeps it in r9), so it is
+ *     taken into a separate local.
+ *   - Rule 35: `pop {r0}; bx r0` -> a void return type.
+ *   - In the FillSlotsWithNone / ClearSlots calls after the loop, the array
+ *     base is RE-READ from the object rather than taken from the advanced
+ *     pointer (`ldr r0, [r1, #32]` / `ldr r0, [r2, #36]`).
+ *   - `i` is THE SAME variable in both loops. Opening a separate counter for
+ *     the second loop raised the difference from 8 bytes to 22.
+ *   - `continue` is written for an empty node. Wrapping the body in
+ *     `if (node != 0) { ... }` produces the same instructions but breaks the
+ *     tie below the wrong way and leaves an 8-byte difference.
  *
- * BILDIRIM SIRASI BURADA ANLAMLI -- son 8 baytin sebebi buydu:
- *   agbcc'nin dongu gecidi, dongu boyunca tasinan artirimlar icin iki EK
- *   pseudo uretiyor (`i+1` ve `ids+2`; -dg dokumunde 72 ve 73). Ikisi de
- *   refs=4, live_length=48 tasiyor, yani oncelikleri
- *   (floor_log2(4)*4/48 = 0.167) BIREBIR ESIT. global.c beraberligi allocno
- *   NUMARASIYLA coziyor; o numara da kaynaktaki BILDIRIM SIRASINDAN
- *   geliyor. `ids` once bildirilirse onun tasiyicisi `sl`'i kapiyor,
- *   sayacinki yigina tasiyor:
- *       adds r4,#1 / str r4,[sp] / adds r6,#2 / mov sl,r6      (YANLIS)
- *   Sayaclar once bildirilince sira donuyor ve ROM cikiyor:
- *       adds r4,#1 / mov sl,r4  / adds r6,#2 / str r6,[sp]     (DOGRU)
- *   Yani asagidaki bildirim sirasi degistirilemez; `ids`'i en sona almak da
- *   ayni sonucu veriyor -- onemli olan `i`'nin `ids`'ten ONCE bildirilmesi.
- *   Kayan komutlar ayni yerde kaldigi, yalnizca DEPOLARI takas oldugu icin
- *   bu fark hicbir "yeniden yaz" denemesiyle degil, ancak -dg dokumunu
- *   okuyup beraberligi gorerek kapaniyor.
+ * DECLARATION ORDER MATTERS HERE -- it was the cause of the last 8 bytes:
+ *   agbcc's loop pass produces two EXTRA pseudos for the increments carried
+ *   across the loop (`i+1` and `ids+2`; 72 and 73 in the -dg dump). Both carry
+ *   refs=4 and live_length=48, so their priorities
+ *   (floor_log2(4)*4/48 = 0.167) are EXACTLY EQUAL. global.c breaks the tie by
+ *   ALLOCNO NUMBER, and that number comes from the DECLARATION ORDER in the
+ *   source. If `ids` is declared first, its carrier claims `sl` and the
+ *   counter's spills to the stack:
+ *       adds r4,#1 / str r4,[sp] / adds r6,#2 / mov sl,r6      (WRONG)
+ *   Declaring the counters first reverses the order and the ROM comes out:
+ *       adds r4,#1 / mov sl,r4  / adds r6,#2 / str r6,[sp]     (RIGHT)
+ *   So the declaration order below cannot be changed; putting `ids` last gives
+ *   the same result -- what matters is that `i` is declared BEFORE `ids`.
+ *   Because the instructions stay in place and only their STORES are swapped,
+ *   this difference closes not through any "rewrite" attempt but only by
+ *   reading the -dg dump and seeing the tie.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_d1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_d1.c
  */
 
 #include "gba_types.h"
@@ -85,7 +88,7 @@ typedef struct Node {
     u16         *slots;         /* +0x18 */
 } Node;
 
-/* Nesnenin basligi: yalniz iki sayac alani kullaniliyor. */
+/* The object's header: only two counter fields are used. */
 typedef struct ObjHeader {
     u8 pad00[5];
     u8 idCount;                 /* +0x05 */
@@ -93,7 +96,7 @@ typedef struct ObjHeader {
     u8 recordCount;             /* +0x07 */
 } ObjHeader;
 
-/* Yuva kaydi; yalniz boyu (60 bayt) biliniyor. */
+/* A slot record; only its size (60 bytes) is known. */
 typedef struct ObjRecord {
     u8 pad00[60];
 } ObjRecord;
@@ -122,8 +125,8 @@ extern void  FUN_08055d90(u32 *head, u32 id);
 /* 0x080536BC */
 void ClearObjectIdsAndSlots(Obj *obj)
 {
-    /* Sira onemli: sayaclar isaretcilerden ONCE gelmeli.
-     * Ust yorumdaki "BILDIRIM SIRASI" notuna bak. */
+    /* The order matters: the counters must come BEFORE the pointers.
+     * See the "DECLARATION ORDER" note in the header. */
     int        i;
     int        j;
     ObjHeader *header;

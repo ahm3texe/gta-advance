@@ -1,66 +1,70 @@
-/* gListHead02016280 listesini anahtara gore siralama — 0x0800D530-0x0800D65F
+/* Sort the gListHead02016280 list by key — 0x0800D530-0x0800D65F
  *
- * Ne yapiyor: 0x02016280'deki cift bagli listeyi bosaltip 0x02016288'deki
- * ikinci listeye ekleme siralamasiyla (insertion sort) yeniden diziyor,
- * sonunda sirali listenin basini 0x02016280'e geri yaziyor.
+ * What it does: it empties the doubly linked list at 0x02016280 and rebuilds it
+ * into the second list at 0x02016288 by insertion sort, finally writing the
+ * sorted list's head back to 0x02016280.
  *
- * Siralama anahtari 32 bit: ust yariya GetNodeBoxDistance'nin dondurdugu puan
- * (dugumun +0x1C alanina da yaziliyor), alt yariya 255 - dugumun sahip
- * kaydindaki (+0x10 -> +0x14) sira degeri konuyor. Karsilastirmalar
- * ISARETSIZ (`bls`/`bhi`), yani anahtar u32. Liste anahtara gore AZALAN
- * sirali.
+ * The sort key is 32 bits: the upper half is the score returned by
+ * GetNodeBoxDistance (which is also written into the node's +0x1C field), and
+ * the lower half is 255 minus the order value in the node's owner record
+ * (+0x10 -> +0x14). The comparisons are UNSIGNED (`bls`/`bhi`), so the key is
+ * u32. The list is in DESCENDING key order.
  *
- * Ekleme noktasi bastan taranmiyor: bir onceki eklenen dugumden (prev)
- * baslayip anahtar buyukse ileri (next), kucuk/esitse geri (prev) yonde
- * yuruyor. Iki tarama simetrik yazildi, ROM'daki iki ayri dongu bu.
+ * The insertion point is not scanned from the front: starting from the
+ * previously inserted node (prev), it walks forward (next) if the key is
+ * larger and backward (prev) if it is smaller or equal. The two scans are
+ * written symmetrically; those are the ROM's two separate loops.
  *
- * Dugum yerlesimi: +0x10 sahip kaydi, +0x14 next, +0x18 prev, +0x1C puan.
- * +0x14/+0x18 src/world/list_ops.c'deki Node ile ayni; sahip kaydinin
- * +0x14 alani GetNodeBoxDistance'nin de okudugu blok.
+ * Node layout: +0x10 owner record, +0x14 next, +0x18 prev, +0x1C score.
+ * +0x14/+0x18 match the Node in src/world/list_ops.c; the owner record's +0x14
+ * field is the same block GetNodeBoxDistance reads.
  *
- * ADRES NOTU: 0x02016280 data/ram_map.csv'de kayitli, extern sembol
- * olarak kullanildi (kural 1). 0x02016288 KAYITLI DEGIL ve bu oturumda
- * data/ altina yazmak yasak, bu yuzden src/core/list_b1.c'deki gibi
- * #define ile adres cast'i yazildi. Katlanma tuzagi burada olusmuyor:
- * adresten hicbir ofset kullanilmiyor, ROM da onu her seferinde AYRI
- * literal olarak yukluyor. Havuz yerlesimi (0x02016280, 0x02016288,
- * 0x02016288, 0x02016280, 0x02016288) ROM'unkiyle birebir cikti.
+ * ADDRESS NOTE: 0x02016280 is recorded in data/ram_map.csv and was used as an
+ * extern symbol (rule 1). 0x02016288 is NOT RECORDED and writing under data/
+ * was not allowed in this session, so an address cast via #define was written,
+ * as in src/core/list_b1.c. The folding trap does not arise here: no offset is
+ * used from the address, and the ROM also loads it as a SEPARATE literal every
+ * time. The pool layout (0x02016280, 0x02016288, 0x02016288, 0x02016280,
+ * 0x02016288) came out identical to the ROM's.
  *
- * OLCULEN TEK AYRINTI -- `sorted` yereli neden var:
- * Ilk surum 296/304 uretti ve TEK fark register numaralariydi: bizde
- * sabit 255 r7'de, `next` r8'de; ROM'da 255 r8'de, `next` r9'da. Sekiz
- * baytin tamami bu kaymanin bedeli (prolog +2, `movs r0,#255`/`mov r8,r0`
- * +2, `mov r2,r8` +2, epilog +2) -- komut dizisi zaten aynidiydi.
- * Sebep: ROM 0x02016288 ADRESINI ileri taramanin basinda bir pseudo'ya
- * alip dongu boyunca canli tutuyor (r7), biz ise karsilastirmanin hemen
- * onunde kisa omurlu bir scratch'a (r1) aliyorduk. Fazladan bir canli
- * deger, callee-saved listesini bir kaydiriyor (docs/COMPILER.md register
- * tablosu). Adresi `sorted = gSortedHeadPtr;` ile ACIK bir yerele almak
- * -- ve karsilastirma ile geri yazimi `*sorted` uzerinden yapmak -- o
- * omru uretti: 296 -> 304, birebir.
- * Yerin onemli: atama `q = prev->next;`den SONRA, dongudEN once olmali;
- * ROM'da `ldr r7,=...` tam o iki komutun arasinda duruyor.
- * Geri taramadaki bas-a-ekleme ve fonksiyon sonundaki geri yazim
- * `sorted`i KULLANMIYOR (makroyu kullaniyor); ROM oralarda adresi yeniden
- * havuzdan yukluyor, `sorted`i oraya da tasimak omru uzatir ve bozar.
+ * THE ONE MEASURED DETAIL -- why the `sorted` local exists:
+ * The first version produced 296/304 and the ONLY difference was register
+ * numbers: for us the constant 255 was in r7 and `next` in r8; in the ROM 255
+ * is in r8 and `next` in r9. All eight bytes are the price of that shift
+ * (prologue +2, `movs r0,#255`/`mov r8,r0` +2, `mov r2,r8` +2, epilogue +2) --
+ * the instruction sequence was already the same.
+ * The reason: the ROM takes the ADDRESS 0x02016288 into a pseudo at the start
+ * of the forward scan and keeps it live throughout the loop (r7), whereas we
+ * took it into a short-lived scratch (r1) right before the comparison. One
+ * extra live value shifts the callee-saved list by one (the register table in
+ * docs/COMPILER.md). Taking the address into an EXPLICIT local with
+ * `sorted = gSortedHeadPtr;` -- and doing the comparison and the write-back
+ * through `*sorted` -- produced that lifetime: 296 -> 304, exactly.
+ * The position matters: the assignment must come AFTER `q = prev->next;` and
+ * BEFORE the loop; in the ROM the `ldr r7,=...` sits exactly between those two
+ * instructions.
+ * The head insertion in the backward scan and the write-back at the end of the
+ * function DO NOT USE `sorted` (they use the macro); the ROM reloads the
+ * address from the pool there, and carrying `sorted` into those places would
+ * lengthen its lifetime and break the match.
  *
- * ELENEN YOL: 0x02016288'i extern sembol yapmak (kural 1'in dogal
- * secimi) denenemedi -- data/ram_map.csv'ye yazmak bu oturumda yasak.
- * Gerek de kalmadi: #define adres cast'i, yukaridaki `sorted` yereliyle
- * birlikte ROM'un uretmis oldugu kodun aynisini veriyor.
+ * AN ELIMINATED PATH: making 0x02016288 an extern symbol (the natural choice
+ * under rule 1) could not be tried -- writing to data/ram_map.csv was not
+ * allowed in this session. Nor was it needed: the #define address cast,
+ * together with the `sorted` local above, gives exactly the code the ROM has.
  *
- * ESLESME: 304/304 bayt, ikinci denemede.
+ * MATCH: 304/304 bytes, on the second attempt.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/listhead_e1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/listhead_e1.c
  */
 
 #include "gba_types.h"
 
-/* Alt yarinin tumleyeni: kucuk sira degeri buyuk anahtar demek. */
+/* The complement of the lower half: a small order value means a large key. */
 #define RANK_BIAS 255
 
-/* Dugumun +0x10'da gosterdigi kayit; yalniz +0x14 kullaniliyor. */
+/* The record the node points at from +0x10; only +0x14 is used. */
 typedef struct Owner {
     u8  pad00[20];
     u32 rank;                   /* +0x14 */
@@ -74,13 +78,13 @@ typedef struct Node {
     u16 score;                  /* +0x1C */
 } Node;
 
-/* Sirali listenin basi; data/ram_map.csv'de kaydi yok (bkz. ADRES NOTU). */
+/* The head of the sorted list; not recorded in data/ram_map.csv (see ADDRESS NOTE). */
 #define gSortedHeadPtr       ((Node **)0x02016288)
 #define gSortedHead02016288  (*gSortedHeadPtr)
 
 extern Node *gListHead02016280;
 
-/* 0x0800D450: dugumun kamera/bolge kaydina uzakligindan puan uretiyor. */
+/* 0x0800D450: produces a score from the node's distance to the camera/region record. */
 extern int GetNodeBoxDistance(Node *node);
 
 #define SORT_KEY(n) \
@@ -102,7 +106,7 @@ void SortListByKey(void)
     if (gListHead02016280 == 0)
         return;
 
-    /* Ilk dugum sirali listenin tek elemani olarak kuruluyor. */
+    /* The first node is set up as the sole element of the sorted list. */
     cur = gListHead02016280->next;
     gSortedHead02016288 = gListHead02016280;
     gListHead02016280->next = 0;
@@ -118,7 +122,7 @@ void SortListByKey(void)
 
         p = prev;
         if (SORT_KEY(prev) > key) {
-            /* Ileri tarama: anahtari buyuk olan son dugumun ardina. */
+            /* Forward scan: after the last node with a larger key. */
             q = prev->next;
             sorted = gSortedHeadPtr;
             while (q != 0 && SORT_KEY(q) > key) {
@@ -138,7 +142,7 @@ void SortListByKey(void)
                     q->prev = cur;
             }
         } else {
-            /* Geri tarama: anahtari kucuk/esit olanlarin onune. */
+            /* Backward scan: in front of those with a smaller or equal key. */
             q = prev->prev;
             while (q != 0 && SORT_KEY(q) <= key) {
                 p = q;

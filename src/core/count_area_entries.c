@@ -1,7 +1,8 @@
-/* Alan kayitlarini iki baytlik anahtara gore sayar.
- * PARK: extern/makro/volatile taban ve Ghidra yerel sirasi denendi. Govde
- * 124/124; 95 bayt fark. Derleyici alan bankasi tabanini r7'de tutunca ilk
- * parametreyi stack'e tasiyor; ROM tabani cagri sonrasinda yeniden yukluyor. */
+/* Counts the area records by a two-byte key.
+ * PARKED: an extern/macro/volatile base and Ghidra's local order were tried.
+ * The body is 124/124 with 95 bytes differing. When the compiler keeps the area
+ * bank base in r7 it spills the first parameter to the stack; the ROM reloads
+ * the base after the call. */
 
 #include "gba_types.h"
 

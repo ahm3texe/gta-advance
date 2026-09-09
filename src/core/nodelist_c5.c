@@ -1,70 +1,77 @@
-/* Kimlik icin dugumu edinip alan kaydini bagla — 0x08053650, 108 bayt.
+/* Acquire the node for an id and bind the area record — 0x08053650, 108 bytes.
  *
- * ESLESME: 108/108 bayt (byte-matching).
+ * MATCH: 108/108 bytes (byte-matching).
  *
- * ROM okumasi:
- *   1) FUN_080543D0(&gRam02035780, id) ile sirali listeden dugum aliniyor
- *      (NULL kontrolu YOK).
- *   2) ROM bankasindaki (gAreaBank +0x20) 28 baytlik kayit dizisinden
- *      id'inci kaydin +0x1A bayrak baytinda 8 biti varsa gRam020004A0'a 1
- *      yaziliyor.
- *   3) Dugumun +0x0B baytinin ust yarisi 0x10 ise kayit isaretcisi kurulup
- *      dort alan sifirlaniyor ve +0x0B'den iki bit temizleniyor.
+ * Reading the ROM:
+ *   1) A node is obtained from the ordered list with
+ *      FUN_080543D0(&gRam02035780, id) (there is NO NULL check).
+ *   2) If bit 8 is set in the +0x1A flag byte of the id-th record of the
+ *      28-byte record array in the ROM bank (gAreaBank +0x20), 1 is written to
+ *      gRam020004A0.
+ *   3) If the upper half of the node's +0x0B byte is 0x10, the record pointer
+ *      is set up, four fields are cleared and two bits are cleared from +0x0B.
  *
- * KUYRUK GOVDESI src/core/nodelist_a2.c (FindOrInitAreaNode) ILE BIREBIR AYNI:
+ * THE TAIL BODY IS BYTE-FOR-BYTE THE SAME AS src/core/nodelist_a2.c
+ * (FindOrInitAreaNode):
  *   record = id*28 + bank->records / mark=0 / init=0x3FF / a=b=c=0 /
- *   kind &= ~1 ... kind &= ~2.  O dosyada olculen uc mekanizma buraya
- *   dogrudan uygulandi:
- *     - negatif sabit CSE'ye dusmesin diye `m = ~1; m &= k;` ve
- *       `n = 3; n = -n; m &= n;` (negasyon AYRI deyim olmali),
- *     - isaretci aritmetigi TAMSAYI olarak yazilir
- *       `(void *)(id * 28 + (s32)bank->records)`, aksi halde gcc isaretciyi
- *       kanonik olarak basa alip `adds r0,r0,r1` yerine tersini uretiyor,
- *     - sembol adresi ayri gecicide (`bank = &gAreaBank;`) tutulur ki
- *       yukleme carpimdan ONCE yayilsin.
+ *   kind &= ~1 ... kind &= ~2.  The three mechanisms measured in that file were
+ *   applied here directly:
+ *     - so that the negative constant does not fall to CSE, `m = ~1; m &= k;`
+ *       and `n = 3; n = -n; m &= n;` (the negation must be a SEPARATE
+ *       statement),
+ *     - the pointer arithmetic is written as an INTEGER,
+ *       `(void *)(id * 28 + (s32)bank->records)`; otherwise gcc canonically
+ *       moves the pointer to the front and produces the inverse of
+ *       `adds r0,r0,r1`,
+ *     - the symbol's address is held in a separate temporary
+ *       (`bank = &gAreaBank;`) so that the load is emitted BEFORE the
+ *       multiplication.
  *
- * `id*28` carpimi ROM'da bir kez kuruluyor (`lsls #3 / subs / lsls #2`) ve
- * r2'de iki kullanim boyunca yasiyor; buna karsilik `bank->records` IKI KEZ
- * okunuyor (`ldr rX,[r5,#32]`), cunku aradaki `gRam020004A0 = 1` yazimi
- * bellek CSE'sini gecersiz kiliyor. Ikinci okumayi kaynakta IFADE olarak
- * birakmak yeterli: yazim bellek ifadesini oldurdugu icin derleyici ilk
- * okumanin yazmacini yeniden kullanmiyor, taze `ldr` uretiyor.
+ * The `id*28` product is built once in the ROM (`lsls #3 / subs / lsls #2`) and
+ * lives in r2 across two uses; `bank->records`, by contrast, is read TWICE
+ * (`ldr rX,[r5,#32]`), because the `gRam020004A0 = 1` store in between
+ * invalidates the memory CSE. Leaving the second read as an EXPRESSION in the
+ * source is enough: because the store kills the memory expression, the compiler
+ * does not reuse the first read's register and emits a fresh `ldr`.
  *
- * TEK OLCULEN FARK — YUKLEMENIN CARPIMA GORE YERI (8 bayt -> 0):
- *   Ilk taslak ilk kaydin adresini tek ifadede kuruyordu:
+ * THE ONE MEASURED DIFFERENCE — THE POSITION OF THE LOAD RELATIVE TO THE
+ * MULTIPLICATION (8 bytes -> 0):
+ *   The first draft built the first record's address in a single expression:
  *       rec = (AreaRecord *)(id * RECORD_SZ + (s32)bank->records);
- *   Bu 52 komutun 51'ini dogru uretiyor, ama `ldr r1,[r5,#32]` komutunu
- *   carpimdan SONRAYA atiyor; ROM onu carpimdan ONCE yayiyor. (Ayni sinif
- *   nodelist_a2.c'deki 3 numarali mekanizmada olculmustu.) Uye okumasi
- *   AYRI bir deyime alininca sira ROM'unkine oturuyor:
+ *   That produces 51 of 52 instructions correctly, but pushes the
+ *   `ldr r1,[r5,#32]` instruction AFTER the multiplication; the ROM emits it
+ *   BEFORE. (The same class was measured as mechanism 3 in nodelist_a2.c.)
+ *   Taking the member read into a SEPARATE statement settles the order onto the
+ *   ROM's:
  *       recs = (s32)bank->records;
  *       rec  = (AreaRecord *)(id * RECORD_SZ + recs);
- *   Yani "sembol adresini gecicide tut" (`bank`) TEK BASINA yetmiyor; uye
- *   okumasinin da kendi deyimi olmasi gerekiyor. `recs` YALNIZ ilk kullanim
- *   icindir -- ikinci kullanimda da `recs` yazmak ROM'un ikinci `ldr`'sini
- *   siler.
+ *   So "hold the symbol address in a temporary" (`bank`) IS NOT ENOUGH ON ITS
+ *   OWN; the member read must have its own statement too. `recs` is ONLY for
+ *   the first use -- writing `recs` at the second use as well would delete the
+ *   ROM's second `ldr`.
  *
- * Kural 35: `pop {r4,r5}; pop {r0}; bx r0` -> donus tipi void.
- * Kural 1: gAreaBank / gRam020004A0 / gRam02035780 extern sembol.
+ * Rule 35: `pop {r4,r5}; pop {r0}; bx r0` -> a void return type.
+ * Rule 1: gAreaBank / gRam020004A0 / gRam02035780 are extern symbols.
  *
- * ELENEN YOL (tekrar denemeyin):
- *   - Kayit adresini tek ifadede kurmak (yukarida): 108/108 boyut TUTAR
- *     ama `ldr r1,[r5,#32]` yanlis yerde, fark 8 bayt.
+ * AN ELIMINATED PATH (do not retry):
+ *   - Building the record address in a single expression (above): the size
+ *     MATCHES at 108/108 but `ldr r1,[r5,#32]` is in the wrong place, 8 bytes
+ *     of difference.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_c5.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_c5.c
  */
 
 #include "gba_types.h"
 #include "node_list.h"
 
-#define RECORD_SZ   28          /* alan kaydi boyu */
-#define INIT_FIELD  0x3FF       /* +0x14'e yazilan ilk deger */
-#define KIND_MASK   0xF0        /* +0x0B'nin ust yarisi */
-#define KIND_READY  0x10        /* kuyrugun calistigi seviye */
-#define REC_FLAG    8           /* kaydin +0x1A bayragindaki kapi biti */
+#define RECORD_SZ   28          /* area record size */
+#define INIT_FIELD  0x3FF       /* initial value written to +0x14 */
+#define KIND_MASK   0xF0        /* high nibble of +0x0B */
+#define KIND_READY  0x10        /* the level at which the tail runs */
+#define REC_FLAG    8           /* the gate bit in the record's +0x1A flags */
 
-/* src/core/nodelist_a2.c'deki Node ile ayni yerlesim. */
+/* The same layout as the Node in src/core/nodelist_a2.c. */
 typedef struct Node {
     struct Node *next;          /* 0x00 */
     u8    pad04[4];
@@ -81,23 +88,22 @@ typedef struct Node {
     s32   c;                    /* 0x24 */
 } Node;
 
-/* 28 baytlik alan kaydi; yalniz bayrak bayti biliniyor. */
+/* A 28-byte area record; only the flag byte is known. */
 typedef struct AreaRecord {
     u8 pad00[26];
     u8 flags;                   /* 0x1A */
     u8 pad1B;
 } AreaRecord;
 
-/* Bankanin bu ceviri birimindeki gorunumu; +0x20 kayit dizisi. */
+/* The bank's view in this translation unit; +0x20 is the record array. */
 typedef struct AreaBank {
     u8  pad00[0x20];
     u8 *records;                /* 0x20 */
 } AreaBank;
 
-/* gRam02035780 node_list.h'de `NodeC4 *` olarak bildirilmis; ayni sembole
- * ikinci bir extern tur vermek check_consistency'nin ram-extern denetimine
- * takiliyor, bu yuzden adres uzerinden cast ediliyor (nodelist_a2.c ile
- * ayni cozum). */
+/* gRam02035780 is declared `NodeC4 *` in node_list.h; giving the same symbol a
+ * second extern type trips check_consistency's ram-extern check, so it is cast
+ * through the address (the same solution as in nodelist_a2.c). */
 #define NODE_LIST ((Node **)&gRam02035780)
 
 extern AreaBank gAreaBank;

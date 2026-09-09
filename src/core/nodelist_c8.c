@@ -1,71 +1,81 @@
-/* Dort geri sayim sayacini kare gecikmesi kadar azaltma — 0x08053AD8 (108 bayt)
+/* Decrement four countdown counters by the frame delay — 0x08053AD8 (108 bytes)
  *
- * ROM govdesi ayni on komutluk blogu DORT KEZ, elle acilmis halde tasiyor:
+ * The ROM body carries the same ten-instruction block FOUR TIMES, unrolled by
+ * hand:
  *
- *     ldr r1,[r2,#N] / cmp #0 / ble   -> sayac pozitif mi
- *     movs #192 / lsls #18 / ldr      -> 0x03000000'daki kare gecikmesi
- *     subs / str                      -> sayac -= gecikme
- *     cmp #0 / bge / movs #0 / str    -> sifirin altina inmesin
+ *     ldr r1,[r2,#N] / cmp #0 / ble   -> is the counter positive
+ *     movs #192 / lsls #18 / ldr      -> the frame delay at 0x03000000
+ *     subs / str                      -> counter -= delay
+ *     cmp #0 / bge / movs #0 / str    -> do not let it go below zero
  *
- * Yani kaynak da dort kez ayni deyimi yaziyor; agbcc -O2 dongu acmiyor,
- * acilmis blok sayisi dogrudan kaynaktaki deyim sayisidir.
+ * So the source writes the same statement four times as well; agbcc -O2 does
+ * not unroll loops, and the number of unrolled blocks is directly the number of
+ * statements in the source.
  *
- * OLCULEN 1 — taban EXTERN SEMBOL olmali, `#define ((s32 *)0x02035B30)` degil:
- *   Sabit ifade yazilinca agbcc taban+ofseti DORT AYRI literale katliyor
- *   (`.word 0x2035b30`, `+4`, `+8`, `+12`) ve her blok kendi havuz okumasini
- *   yapiyor: 124 bayt, 26 komut fark. Kural 1'in tam ornegi.
- *   ELENEN ARA YOL — yerel isaretci (`s32 *p = (s32 *)0x02035B30;`):
- *   tabani yazmacta tutuyor ve 50 komutun 50'si tutuyor, AMA ROM'un
- *   `ldr r0,<havuz>` + `adds r2,r0,#0` ciftini tek `ldr r2,<havuz>`e
- *   indirgiyor -> 104 bayt (2 bayt kopya + 2 bayt hizalama dolgusu eksik).
- *   O fazladan kopyayi yalnizca gercek sembol referansi uretiyor: sembol
- *   adresi kendi pseudo'suna (r0) yukleniyor, ilk elemani oradan okuduktan
- *   sonra kalan uc blok icin ayri bir pseudo'ya (r2) kopyalaniyor.
+ * MEASURED 1 — the base must be an EXTERN SYMBOL, not `#define ((s32 *)0x02035B30)`:
+ *   Written as a constant expression, agbcc folds base+offset into FOUR
+ *   SEPARATE literals (`.word 0x2035b30`, `+4`, `+8`, `+12`) and every block
+ *   does its own pool read: 124 bytes, 26 instructions differing. A textbook
+ *   example of rule 1.
+ *   AN ELIMINATED MIDDLE PATH -- a local pointer (`s32 *p = (s32 *)0x02035B30;`):
+ *   it keeps the base in a register and 50 of 50 instructions match, BUT it
+ *   reduces the ROM's `ldr r0,<pool>` + `adds r2,r0,#0` pair to a single
+ *   `ldr r2,<pool>` -> 104 bytes (2 bytes of copy plus 2 bytes of alignment
+ *   padding short).
+ *   Only a real symbol reference produces that extra copy: the symbol's address
+ *   is loaded into its own pseudo (r0) and, after the first element is read
+ *   from it, copied into a separate pseudo (r2) for the remaining three blocks.
  *
- * OLCULEN 2 — kare gecikmesi HER BLOKTA YENIDEN okunuyor:
- *   ROM dort blokta da `movs #192 / lsls #18 / ldr r0,[r0]` uretiyor, tek
- *   yazmaca alip tasimiyor: aradaki `str`'ler okumayi olduruyor (GCC 2.8.1
- *   takma-ad cozumlemesi sabit adresli MEM'i dizi yazmalariyla cakisir
- *   sayiyor). Bu yuzden kaynakta dogrudan `gFrameDelay` yaziliyor; yerel
- *   kopyaya almak (`u32 d = gFrameDelay;`) tek okuma birakip uc bloktan
- *   altisar bayt dusururdu.
+ * MEASURED 2 — the frame delay is RE-READ IN EVERY BLOCK:
+ *   The ROM emits `movs #192 / lsls #18 / ldr r0,[r0]` in all four blocks
+ *   rather than taking it into one register and carrying it: the `str`s in
+ *   between kill the load (GCC 2.8.1's alias analysis treats a MEM at a
+ *   constant address as clashing with the array stores). So `gFrameDelay` is
+ *   written directly in the source; taking it into a local copy
+ *   (`u32 d = gFrameDelay;`) would leave a single read and cut six bytes from
+ *   each of three blocks.
  *
- * OLCULEN 3 — 0x03000000 SABIT IFADE olmali, sembol degil (kural 1'in TERSI):
- *   ROM adresi `movs #192 / lsls #18` ile KURUYOR, literal havuzdan
- *   okumuyor. Extern sembol olsaydi havuza inerdi. src/interrupt/vblank_intr.c
- *   ve irq_helpers.c ayni tercihi ayni adres icin olcmustu; oradaki
- *   `#define gFrameDelay (*(u32 *)0x03000000)` bicimi aynen kullanildi.
- *   Iki adresin zit davranmasinin sebebi kaydirmayla kurulabilirlik:
- *   0x03000000 = 192 << 18, 0x02035B30 kurulamaz.
+ * MEASURED 3 — 0x03000000 must be a CONSTANT EXPRESSION, not a symbol (the
+ * INVERSE of rule 1):
+ *   The ROM BUILDS the address with `movs #192 / lsls #18` rather than reading
+ *   it from the literal pool. As an extern symbol it would go into the pool.
+ *   src/interrupt/vblank_intr.c and irq_helpers.c had measured the same choice
+ *   for the same address; the `#define gFrameDelay (*(u32 *)0x03000000)` form
+ *   from there was reused verbatim.
+ *   The reason the two addresses behave oppositely is whether they can be built
+ *   by shifting: 0x03000000 = 192 << 18, while 0x02035B30 cannot.
  *
- * Kural 31: `ble`/`bge` isaretli -> sayaclar s32, `cmp #0` ile karsilastiriliyor.
- * Kural 35: `bx lr`, push yok -> void donus, yaprak fonksiyon.
+ * Rule 31: `ble`/`bge` are signed -> the counters are s32, compared with
+ * `cmp #0`.
+ * Rule 35: `bx lr` with no push -> a void return, a leaf function.
  *
- * Cikarma `s32 - u32` oldugu icin ara sonuc unsigned; ROM'un `subs` komutu
- * ayni. Kirpma testi geri yazilmis s32 lvalue uzerinden yapiliyor, o yuzden
- * karsilastirma isaretli kaliyor (`bge`).
+ * Because the subtraction is `s32 - u32`, the intermediate is unsigned; the
+ * ROM's `subs` instruction is the same. The clamp test is done through the
+ * written-back s32 lvalue, so the comparison stays signed (`bge`).
  *
- * ESLESME: 108/108 bayt (elle assemble+link ile dogrulandi, asagiya bak).
+ * MATCH: 108/108 bytes (verified by assembling and linking by hand, see below).
  *
- * GEREKLI KAYIT: data/ram_map.csv'de 0x02035B30 icin giris YOK. Derleme
- * katmani `.equ`yu oradan uretiyor, bu yuzden dosya ancak su satir eklenince
- * `make c-match` ile dogrulanabilir:
- *     0x02035B30,16,gCountdownTimers,decomp,provisional,"Dort s32 geri sayim
- *     sayaci; 0x08053AD8 her karede gFrameDelay kadar azaltip sifirda kirpiyor"
- * Kaydi eklemek bana yasak (data altindaki csv dosyalarina dokunulmuyor).
+ * A REQUIRED RECORD: data/ram_map.csv has NO entry for 0x02035B30. The build
+ * layer generates the `.equ` from there, so this file can only be verified with
+ * `make c-match` once this line is added:
+ *     0x02035B30,16,gCountdownTimers,decomp,provisional,"Four s32 countdown
+ *     counters; 0x08053AD8 decrements each by gFrameDelay every frame and
+ *     clamps at zero"
+ * Adding the record is not allowed for me (the csv files under data/ are not
+ * to be touched).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_c8.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_c8.c
  */
 
 #include "gba_types.h"
 
-/* 0x03000000 — VBlank'te yazilan kare gecikmesi (data/ram_map.csv: gFrameDelay).
- * Sabit ifade olarak yaziliyor; gerekce OLCULEN 3. */
+/* 0x03000000 — the frame delay written during VBlank (data/ram_map.csv:
+ * gFrameDelay). Written as a constant expression; the reason is MEASURED 3. */
 #define gFrameDelay (*(u32 *)0x03000000)
 
-/* 0x02035B30 — dort adet s32 geri sayim sayaci. Alanlarin tek tek anlami
- * bilinmiyor, o yuzden isimlendirilmemis dizi olarak birakildi. */
+/* 0x02035B30 — four s32 countdown counters. The individual meaning of the
+ * fields is unknown, so it was left as an unnamed array. */
 extern s32 gCountdownTimers[4];
 
 /* 0x08053AD8 */

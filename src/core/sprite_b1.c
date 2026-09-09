@@ -1,70 +1,77 @@
-/* FUN_08012cd8 @ 0x08012CD8, 320 bayt -- RLE (run-length) cozucu.
+/* FUN_08012cd8 @ 0x08012CD8, 320 bytes -- an RLE (run-length) decoder.
  *
- * TESHIS -- DOSYA ADI YANILTICI: "sprite_b1" kardes atamasindan geldi, govde
- * sprite ile ILGISIZ. src[0] & 0xF0 == 0x30 kontrolu GBA sikistirma
- * basligidir (0x10 LZ77, 0x20 Huffman, 0x30 RL). Cozulmus boyut src[1..3]'ten
- * 24 bit little-endian okunur, veri src[4]'ten baslar.
+ * DIAGNOSIS -- THE FILE NAME IS MISLEADING: "sprite_b1" came from a sibling
+ * assignment; the body has NOTHING TO DO with sprites. The src[0] & 0xF0 ==
+ * 0x30 check is the GBA compression header (0x10 LZ77, 0x20 Huffman, 0x30 RL).
+ * The decompressed size is read as 24-bit little-endian from src[1..3], and
+ * the data starts at src[4].
  *
- * Cikis 16 bit hizali yazilir -- hedef VRAM oldugundan bayt yazisi yasak.
- * Bu yuzden tek adrese denk gelen bayt bir sonraki halfword yazmasina
- * "carry" olarak tasinir; kosunun sonunda artan tek bayt da bir sonraki
- * kosuya carry olur. carry u8'dir: her atamada lsls#24/lsrs#24 cikar.
+ * The output is written 16-bit aligned -- byte stores are forbidden because
+ * the destination is VRAM. So a byte landing on an odd address is carried into
+ * the next halfword store as a "carry", and a leftover odd byte at the end of
+ * a run carries into the next run. carry is a u8: every assignment produces
+ * an lsls#24/lsrs#24.
  *
- * Bayrak baytinin bit7'si kosuyu secer:
- *   set   -> uzunluk (bayrak & 0x7F) + 3, tek veri bayti tekrarlanir
- *   clear -> uzunluk (bayrak & 0x7F) + 1, o kadar bayt aynen kopyalanir
- * Kopyalama kolunda KAYNAK adresinin tekligi ayrica dallanir: cift ise
- * dogrudan halfword okunur, tek ise iki bayttan elle birlestirilir. ROM
- * ni/nj hesabini iki kolun ICINDE de tekrarliyor -- oyle birakildi.
+ * Bit 7 of the flag byte selects the run:
+ *   set   -> length (flag & 0x7F) + 3, a single data byte is repeated
+ *   clear -> length (flag & 0x7F) + 1, that many bytes are copied verbatim
+ * In the copy arm the parity of the SOURCE address branches as well: if even,
+ * a halfword is read directly; if odd, it is assembled by hand from two bytes.
+ * The ROM repeats the ni/nj computation INSIDE both arms as well -- that was
+ * left as it is.
  *
- * DURUM: 320/320 bayt boyut TUTUYOR, 290/320 bayt AYNI. Komut dizisi
- * (govde, dallar, dongu bicimleri, operand sirasi) ROM ile BIREBIR.
- * Kalan 30 bayt TEK BIR YAZMAC TAKASI: ROM `src`'i yigina koyup sl'yi
- * kopyalama kolunun `tail` gecicisine verir; agbcc bizde tersini yapar
- * (src -> sl, tail -> sp+8). Ikisi de ayni komut sayisi, ayni boyut.
+ * STATUS: the size MATCHES at 320/320 bytes, with 290/320 bytes IDENTICAL. The
+ * instruction sequence (body, branches, loop forms, operand order) is
+ * BYTE-FOR-BYTE the ROM's. The remaining 30 bytes are A SINGLE REGISTER SWAP:
+ * the ROM puts `src` on the stack and gives sl to the copy arm's `tail`
+ * temporary; agbcc does the opposite for us (src -> sl, tail -> sp+8). Both
+ * have the same instruction count and the same size.
  *
- * OLCULEN NEDEN (agbcc -dg dokumu, global.c onceligi
- * = floor_log2(refs) * refs / live_length):
- *     src  : refs 11, live_length 122  -> 0.2705   (yazmac alir)
- *     tail : refs  6, live_length  46  -> 0.2609   (yigina duser)
- * Sira %3.7 farkla src lehine. Cevirmek icin src >= 127 live_length
- * ya da refs <= 10 ya da tail <= 45 live_length gerekiyor.
+ * THE MEASURED REASON (agbcc -dg dump; the global.c priority is
+ * floor_log2(refs) * refs / live_length):
+ *     src  : refs 11, live_length 122  -> 0.2705   (gets a register)
+ *     tail : refs  6, live_length  46  -> 0.2609   (falls to the stack)
+ * The order favours src by 3.7%. To flip it, src needs live_length >= 127, or
+ * refs <= 10, or tail needs live_length <= 45.
  *
- * DENENENLER / ELENENLER -- TEKRAR DENEME, yeni deneyeni buraya EKLE:
- *  1. ni/nj/tail/n/s/d/b kapsam (dal ici / dongu govdesi / fonksiyon)
- *     512 kombinasyon tarandi. TEK kazanan: `ni` dongu govdesine tasinir
- *     (67 -> 30 bayt). Digerlerinin hepsi >= 30.
- *  2. Yerel bildirim SIRASI (6! permutasyon) -- agbcc'yi hic etkilemiyor.
- *  3. `nj` dongu/fonksiyon kapsamina -- 308 bayt, boyut bozuluyor.
- *  4. `ni` ya da `nj`'yi atip `i += len` / `j++` yazmak -- 304..306 bayt.
- *  5. ni/nj sirasini cevirmek (compressed kolda) -- 322 bayt.
- *  6. `carry = tail` yerine `carry = (n != 0) ? ... : carry` ucluk
- *     islec -- phi yapisini kaybediyor, 296 bayt.
- *  7. `carry` u32 + `& 0xFF` -- 78 bayt fark (lsls/lsrs yerine ands).
- *  8. `len`i dallarin icinde hesaplamak -- 330 bayt (agbcc hoisting
- *     yapmiyor, iki kolda da ayri `ands` cikiyor).
- *  9. `u8 *volatile src` ile src'i yigina zorlamak -- 288 bayt, her
- *     ifade icinde yeniden yukluyor.
- * 10. Adres hesabini bolmek (`s = src; s += j;`) reload oncesi RTL'ye
- *     komut EKLIYOR, cikti degismiyor: src live_length 122 -> 124.
- *     Gerekli 127'ye ulasmiyor; compressed koldaki bolme +0 katkili
- *     (src'in son kullanimindan SONRA kaliyor).
- * 11. Baslik okumalarini bolmek (`t = src[1]; size |= t;`) -- combine
- *     geri birlestiriyor, live_length degismiyor.
- * 12. `tail`i odd-adres yazmasinda kullanip referans eklemek -- kopya
- *     yayilimi carry'ye geri katliyor, sayilar degismiyor.
- * 13. Bayt kopyasi ile allocno bolme (`b2 = b;`) -- CLAUDE.md kural:
- *     her zaman eleniyor; burada da elendi (live_length 122'de kaldi).
- * 14. decomp-permuter: 28. yinelemeden sonra her mutasyon derleme
- *     hatasi veriyor, bu govdede kullanilamadi.
+ * TRIED / ELIMINATED -- DO NOT RETRY; ADD anything new you try here:
+ *  1. The scope of ni/nj/tail/n/s/d/b (inside the branch / the loop body / the
+ *     function): 512 combinations swept. The ONLY winner: moving `ni` into the
+ *     loop body (67 -> 30 bytes). Everything else is >= 30.
+ *  2. Local declaration ORDER (all 6! permutations) -- agbcc is unaffected.
+ *  3. `nj` at loop or function scope -- 308 bytes, the size breaks.
+ *  4. Dropping `ni` or `nj` and writing `i += len` / `j++` -- 304..306 bytes.
+ *  5. Swapping the ni/nj order (in the compressed arm) -- 322 bytes.
+ *  6. `carry = (n != 0) ? ... : carry` as a ternary instead of `carry = tail`
+ *     -- it loses the phi structure, 296 bytes.
+ *  7. `carry` as u32 with `& 0xFF` -- 78 bytes of difference (ands instead of
+ *     lsls/lsrs).
+ *  8. Computing `len` inside the branches -- 330 bytes (agbcc does not hoist,
+ *     and a separate `ands` comes out in both arms).
+ *  9. Forcing src onto the stack with `u8 *volatile src` -- 288 bytes; it
+ *     reloads inside every expression.
+ * 10. Splitting the address computation (`s = src; s += j;`) ADDS an
+ *     instruction to the pre-reload RTL without changing the output: src's
+ *     live_length goes 122 -> 124. That does not reach the required 127; the
+ *     split in the compressed arm contributes +0 (it falls AFTER src's last
+ *     use).
+ * 11. Splitting the header reads (`t = src[1]; size |= t;`) -- combine merges
+ *     them back and live_length does not change.
+ * 12. Using `tail` in the odd-address store to add a reference -- copy
+ *     propagation folds it back into carry and the numbers do not change.
+ * 13. Splitting the allocno with a byte copy (`b2 = b;`) -- the CLAUDE.md rule:
+ *     it is always eliminated, and it was eliminated here too (live_length
+ *     stayed at 122).
+ * 14. decomp-permuter: after the 28th iteration every mutation gives a compile
+ *     error; it could not be used on this body.
  *
- * SONRAKI ADIM ICIN NOT: kalan fark KAYNAK YAPISINDA degil, tek bir
- * oncelik esiginde. Aranacak sey, cikti komutlarini degistirmeden
- * kopyalama kolunun ON EKINE (`s = src` satirindan ONCE) 3 komut daha
- * ekleyen ya da `tail = carry` ile `carry = tail` ARASINDAN 1 komut
- * cikaran bir yeniden yazim.
+ * A NOTE FOR THE NEXT STEP: the remaining difference is not in the SOURCE
+ * STRUCTURE but in a single priority threshold. What to look for is a rewrite
+ * that, without changing the output instructions, adds 3 more instructions to
+ * the copy arm's PREFIX (BEFORE the `s = src` line) or removes 1 instruction
+ * from BETWEEN `tail = carry` and `carry = tail`.
  *
- * Dogrulama: make c-match FILE=src/core/sprite_b1.c
+ * Verification: make c-match FILE=src/core/sprite_b1.c
  */
 
 #include "gba_types.h"
@@ -79,7 +86,7 @@ void FUN_08012cd8(u8 *src, u8 *dst)
     u32 flag;
     s32 len;
 
-    /* Yalnizca RL basligi (0x3n) kabul edilir. */
+    /* Only an RL header (0x3n) is accepted. */
     if ((src[0] & 0xF0) != 0x30)
         return;
 
@@ -102,7 +109,7 @@ void FUN_08012cd8(u8 *src, u8 *dst)
             u32 tail;
             s32 nj;
 
-            /* Tekrar kosusu: tek bayt (len+3) kez yazilir. */
+            /* Repeat run: a single byte is written (len+3) times. */
             len += 3;
             j++;
             s = &src[j];
@@ -111,7 +118,7 @@ void FUN_08012cd8(u8 *src, u8 *dst)
             n = len;
             tail = carry;
             if (((u32)d & 1) != 0) {
-                /* Tek adres: onceki bayti da yanina alip halfword yaz. */
+                /* Odd address: take the previous byte along and store a halfword. */
                 *(u16 *)(d - 1) = carry | (b << 8);
                 d++;
                 n--;
@@ -135,7 +142,7 @@ void FUN_08012cd8(u8 *src, u8 *dst)
             u32 tail;
             s32 nj;
 
-            /* Duz kopya kosusu: (len+1) bayt aynen aktarilir. */
+            /* Plain copy run: (len+1) bytes are transferred verbatim. */
             len += 1;
             j++;
             d = &dst[i];
@@ -149,7 +156,7 @@ void FUN_08012cd8(u8 *src, u8 *dst)
                 s++;
             }
             if (((u32)s & 1) != 0) {
-                /* Kaynak tek adreste: halfword okunamaz, elle birlestir. */
+                /* The source is at an odd address: a halfword cannot be read, assemble it by hand. */
                 ni = i + len;
                 nj = j + len;
                 while (n > 1) {

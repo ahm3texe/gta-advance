@@ -1,7 +1,7 @@
-/* Kimlik icin serbest listeden dugum edinip kaydini baglama
- * 0x08054570-0x08054607  (152 bayt)
+/* Acquire a node from the free list for an id and bind its record
+ * 0x08054570-0x08054607  (152 bytes)
  *
- * TASLAK
+ * DRAFT
  */
 
 #include "gba_types.h"
@@ -12,9 +12,9 @@
 typedef struct Node {
     struct Node *next;              /* +0x00 */
     struct Node *prev;              /* +0x04 */
-    u16          key;               /* +0x08 kimlik */
+    u16          key;               /* +0x08 ID */
     u8           slot;              /* +0x0A */
-    u8           kind;              /* +0x0B bayrak bayti */
+    u8           kind;              /* +0x0B flag byte */
 } Node;
 
 typedef struct Entry {
@@ -23,14 +23,14 @@ typedef struct Entry {
 
 typedef struct RecordTable {
     u8     pad00[4];                /* +0x00 */
-    int    count;                   /* +0x04 gecerli kimlik ust siniri */
+    int    count;                   /* +0x04 upper bound of valid ids */
     u8     pad08[0x14];             /* +0x08..0x1B */
     Entry *entries;                 /* +0x1C */
 } RecordTable;
 
 #define RECORD_TABLE  ((const RecordTable *)0x08D49C00)
 
-extern Node *gList02035A80;         /* 0x02035A80 liste basligi */
+extern Node *gList02035A80;         /* 0x02035A80 list head */
 
 extern void ListRemove(Node **list, Node *node);
 extern void InsertSorted(Node **list, Node *node, s32 id);

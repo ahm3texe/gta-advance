@@ -1,4 +1,4 @@
-/* Kare isleme zincirlerini calistirir ve tani koyma asamasini kaydeder. */
+/* Runs the frame processing chains and records the diagnostic stage. */
 
 #include "gba_types.h"
 
@@ -41,8 +41,8 @@ extern void SortActiveSprites(void);
 /* 0x0805135C */
 void RunFrameStageOne(void)
 {
-    /* Ana dunya zincirinin ilk yarisi. Isaretler kilitlenme aninda son
-     * tamamlanan asamayi RAM'den okumayi saglar. */
+    /* The first half of the main world chain. The markers make the last
+     * completed stage readable from RAM at the moment of a lockup. */
     RefreshActiveAreas();
     gRam02023700 = 0x65;
     FUN_080386a8();
@@ -63,7 +63,7 @@ void RunFrameStageOne(void)
     gRam02023700 = 0x6C;
     MaybeReset();
     FUN_08013704();
-    /* 0x03000000 VBlank tarafindan yazilan kare gecikmesidir. */
+    /* 0x03000000 is the frame delay written by VBlank. */
     FUN_0805eff0(gFrameDelay);
     gRam02023700 = 0x73;
     FUN_08035318();
@@ -79,7 +79,7 @@ void RunFrameStageTwo(void)
 {
     u32 marker;
 
-    /* Volatile okuma ROM'da korunmus; degerin kendisi bu zincirde kullanilmaz. */
+    /* The volatile read is preserved in the ROM; the value itself is not used in this chain. */
     (void)gVBlankState;
     gRam02023700 = 0x6D;
     FUN_08008f14();
@@ -95,7 +95,7 @@ void RunFrameStageTwo(void)
     gRam02023700 = marker;
     FrameChain();
     gRam02023700 = marker;
-    /* Iki ardil adim ayni VBlank gecikme degerini tuketir. */
+    /* Two consecutive steps consume the same VBlank delay value. */
     FUN_08029e44(gFrameDelay, 0);
     FUN_0805e28c(gFrameDelay);
     gRam02023700 = 0x74;

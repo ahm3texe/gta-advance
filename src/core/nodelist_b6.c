@@ -1,42 +1,44 @@
-/* Alan girisini yeniden kurup dugumu geri veriyor. 0x080526B8, 152 bayt.
+/* Rebuild the area entry and return the node. 0x080526B8, 152 bytes.
  *
- * FUN_08052C68 (src/core/nodelist_c3.c) ile kardes: ayni `gRam020004A0
- * acikken bayrak biti 8 kapiyor` korumasini ve ayni `(kind & 0xF0) == 0x10`
- * sinamasini kullaniyor. Farki, kapiya takilmayan durumda dugumun +0x0B
- * bayraklarindan iki bit temizleyip sayaci yeniden kurmasi ve dugumu
- * DONDURMESI.
+ * A sibling of FUN_08052C68 (src/core/nodelist_c3.c): it uses the same
+ * "flag bit 8 gates while gRam020004A0 is on" guard and the same
+ * `(kind & 0xF0) == 0x10` test. The difference: when the gate is not hit, it
+ * clears two bits from the node's +0x0B flags, rebuilds the counter and RETURNS
+ * the node.
  *
- * DIKKAT -- iki AYRI liste var. Burada gecilen bas isaretcisi
- * gList02035A80 (0x02035A80); nodelist_c3.c'nin kullandigi gNodeListHead
- * (0x02035A70) DEGIL. ram_map notu ikisinin ayri nesneler oldugunu
- * kaydediyor; adresleri komsu oldugu icin kolayca karistirilir.
+ * CAREFUL -- there are TWO SEPARATE lists. The head pointer passed here is
+ * gList02035A80 (0x02035A80), NOT the gNodeListHead (0x02035A70) that
+ * nodelist_c3.c uses. The ram_map note records that the two are separate
+ * objects; because their addresses are neighbours they are easily confused.
  *
- * gAreaBank burada +0x04 (sayac) ve +0x1C (64 baytlik kayit dizisi) olarak
- * goruluyor; nodelist_c3.c ayni sembolu +0x24'teki 36 baytlik giris dizisi
- * olarak goruyor. Ikisi de dogru: her translation unit kendi yerel gorunumune
- * cast ediyor (bkz. include/ram_symbols.h basligi).
+ * gAreaBank is seen here as +0x04 (a counter) and +0x1C (an array of 64-byte
+ * records); nodelist_c3.c sees the same symbol as the array of 36-byte entries
+ * at +0x24. Both are correct: each translation unit casts to its own local view
+ * (see the header of include/ram_symbols.h).
  *
- * Maske: ROM `movs r0,#13 / negs r0,r0` ile -13 kuruyor.  Burada alanin
- * isaretliligi FARK ETMIYOR (u8 ile de eslesiyor), cunku `&= ~12` bileşik
- * atamasinda islem int genisliginde yapiliyor ve `~12` zaten -13.
- * Kural 47'nin gecerli oldugu durum baska: sonuc DAR tipe indirgenerek
- * kullanildiginda (ResetActor'de oldugu gibi) u8 alanda sabit 0xF0'a
- * katlaniyor.
+ * The mask: the ROM builds -13 with `movs r0,#13 / negs r0,r0`. The field's
+ * signedness MAKES NO DIFFERENCE here (it matches with u8 too), because in the
+ * compound assignment `&= ~12` the operation happens at int width and `~12` is
+ * already -13.
+ * The case where rule 47 does apply is different: when the result is used
+ * NARROWED to a small type (as in ResetActor), it folds to the constant 0xF0 on
+ * a u8 field.
  *
- * ELENEN YAZIM: sonucu once `s32` yerele alip alana geri yazmak.  agbcc
- * o durumda depolamadan once `lsls #24 / asrs #24` ile normallestirme
- * sokuyor -- iki fazla komut, ROM'da yok.  Dogrudan bileşik atama dogru.
+ * AN ELIMINATED FORM: taking the result into an `s32` local first and writing
+ * it back to the field. agbcc then inserts an `lsls #24 / asrs #24`
+ * normalization before the store -- two extra instructions the ROM does not
+ * have. The direct compound assignment is correct.
  *
- * Donus tipi: ROM cikista `adds r0,r4,#0` yapip `pop {r1}; bx r1` ile
- * donuyor, yani r0 CANLI -> deger donduren fonksiyon.
+ * The return type: on exit the ROM does `adds r0,r4,#0` and returns with
+ * `pop {r1}; bx r1`, so r0 is LIVE -> a value-returning function.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_b6.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_b6.c
  */
 
 #include "gba_types.h"
 
-#define KIND_CLEAR  12          /* +0x0B'de temizlenen iki bit */
+#define KIND_CLEAR  12          /* two bits cleared at +0x0B */
 #define KIND_MASK   0xF0
 #define KIND_READY  0x10
 #define SPAN_NUM    15
@@ -66,7 +68,7 @@ typedef struct Node {
     Shape *shape;               /* 0x2C */
 } Node;
 
-/* 64 baytlik alan kaydi; yalnizca kullanilan alan adlandirildi. */
+/* A 64-byte area record; only the field that is used was named. */
 typedef struct Record {
     u8 pad00[0x3d];
     u8 flags;                   /* 0x3D */

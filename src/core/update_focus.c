@@ -1,92 +1,95 @@
-/* Odak noktasi guncelleme - 0x0800A9E4-0x0800AA3B  (88 bayt, ESLESTI)
+/* Focus point update - 0x0800A9E4-0x0800AA3B  (88 bytes, MATCHED)
  *
- * gGameState +0x0C bayragi kuruluysa VE ikinci hedef varsa iki hedefin
- * konumlarinin ORTA NOKTASINI, aksi halde birinci hedefin konumunu
- * gFocusPoint'e yaziyor. Bolme `asrs #1`, yani isaretli.
+ * If the gGameState +0x0C flag is set AND a second target exists, it writes
+ * the MIDPOINT of the two targets' positions into gFocusPoint; otherwise the
+ * first target's position. The division is `asrs #1`, i.e. signed.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * CoordBlock tanimi src/misc/coord_accessors.c ile BIREBIR AYNI olmali;
- * +0x04 ve +0x08 hedef isaretcisi olarak cast ediliyor.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
+ * The CoordBlock definition must be BYTE-FOR-BYTE the same as in
+ * src/misc/coord_accessors.c; +0x04 and +0x08 are cast to target pointers.
  *
- * Izleme logu (docs/GAME_FLOW.md) gFocusPoint'in iki adet 16.16 sabit
- * nokta s32 oldugunu OLCTU (baslangic 3360.000 / 9568.000; bazi farklar
- * tam 65536 ve 262144). Buradaki `Vec2 {s32 x; s32 y;}` tanimini
- * DOGRULADI.
+ * The trace log (docs/GAME_FLOW.md) MEASURED gFocusPoint to be two 16.16
+ * fixed-point s32 values (starting at 3360.000 / 9568.000; some differences
+ * are exactly 65536 and 262144). That VERIFIED the `Vec2 {s32 x; s32 y;}`
+ * definition used here.
  *
- * ================= FARKI KAPATAN IKI OLCUM =================
+ * ================= THE TWO MEASUREMENTS THAT CLOSED THE GAP ==============
  *
- * (1) KURAL 45 -- DAL BASINA AYRI YERELLER.  77 -> 26 bayt fark.
- *     Onceki yazim iki dalda da ayni `out` ve `first` yerellerini
- *     kullaniyordu.  Iki dalin son komutu (`str r0,[out+4]`) o yuzden
- *     RTL'de AYNI insn oluyordu ve `jump` gecisi CROSS-JUMPING ile
- *     ikisini birlestiriyordu: cikti 84 bayt kaliyordu (ROM 88), dusme
- *     dali sondaki store'a `b` ile atliyordu.  Dallara ayri yereller
- *     (`out`/`mout`, `first`/`mfirst`) verilince birlesme imkansiz
- *     oldu; boyut 88'e ciktI ve YAZMAC DAGITIMI DA kendiliginden ROM'a
- *     oturdu (block r2->r3, out r4->r2, konum isaretcisi r0->r1).
- *     Yani "kalan fark yazmac dagitimi" teshisi YANLISTI; tek sebep
- *     ortak yereldi.
+ * (1) RULE 45 -- SEPARATE LOCALS PER BRANCH.  77 -> 26 bytes of difference.
+ *     The earlier form used the same `out` and `first` locals in both
+ *     branches.  The last instruction of the two branches (`str r0,[out+4]`)
+ *     was therefore the SAME insn in RTL, and the `jump` pass merged them by
+ *     CROSS-JUMPING: the output stayed at 84 bytes (the ROM has 88) and the
+ *     fall-through branch jumped to the final store with a `b`.  Giving the
+ *     branches separate locals (`out`/`mout`, `first`/`mfirst`) made the merge
+ *     impossible; the size rose to 88 and THE REGISTER ALLOCATION also settled
+ *     onto the ROM's by itself (block r2->r3, out r4->r2, the position pointer
+ *     r0->r1).
+ *     So the diagnosis "the remaining difference is register allocation" was
+ *     WRONG; the sole cause was the shared local.
  *
- * (2) TABAN KOPYASI `adds r0,r3,#0`.  26 -> 0 bayt fark.
- *     ROM tabani AYRI bir yazmaca kopyalayip iki yerde o kopyayi
- *     kullaniyor:
- *         800a9f0  adds r0,r3,#0      <- kopya
- *         800a9f2  ldr  r1,[r0,#8]    <- kopyadan (bayrak dali)
- *         800aa16  ldr  r0,[r0,#4]    <- kopyadan (orta nokta dali)
- *         800a9fa  ldr  r0,[r3,#4]    <- OZGUN tabandan (dusme dali)
- *     Kopyayi ureten sey `probe = block;` DEGIL (asagiya bak), SEMBOLU
- *     IKI KEZ YAZMAK:  bayrak dalinda `probe = &gRam02011030;`, dusme
- *     dalinda `block = &gRam02011030;`.  Iki referans FARKLI CSE
- *     bloklarinda oldugu icin CSE ikisini tek yazmaca indirgemiyor;
- *     ortak alt ifade sonradan havuz yuklemesini dal oncesine tasiyor
- *     ve bayrak dalina reg-reg kopyasini birakiyor.  Sonuc tam olarak
- *     ROM'un sekli: havuz yuklemesi 0x800a9ea'da (dal oncesi, dusme
- *     dalina hizmet ediyor), kopya 0x800a9f0'da (bayrak + orta nokta
- *     dallarina hizmet ediyor).
+ * (2) THE BASE COPY `adds r0,r3,#0`.  26 -> 0 bytes of difference.
+ *     The ROM copies the base into a SEPARATE register and uses that copy in
+ *     two places:
+ *         800a9f0  adds r0,r3,#0      <- the copy
+ *         800a9f2  ldr  r1,[r0,#8]    <- from the copy (flag branch)
+ *         800aa16  ldr  r0,[r0,#4]    <- from the copy (midpoint branch)
+ *         800a9fa  ldr  r0,[r3,#4]    <- from the ORIGINAL base (fall-through)
+ *     What produces the copy is NOT `probe = block;` (see below) but WRITING
+ *     THE SYMBOL TWICE: `probe = &gRam02011030;` in the flag branch and
+ *     `block = &gRam02011030;` in the fall-through branch.  Because the two
+ *     references are in DIFFERENT CSE blocks, CSE does not reduce them to a
+ *     single register; the common subexpression then moves the pool load ahead
+ *     of the branch and leaves a reg-reg copy in the flag branch.  The result
+ *     is exactly the ROM's shape: the pool load at 0x800a9ea (before the
+ *     branch, serving the fall-through) and the copy at 0x800a9f0 (serving the
+ *     flag and midpoint branches).
  *
- * ============== DENENIP ELENEN YAZIMLAR (tekrar etmeyin) ==============
+ * ============== FORMS TRIED AND ELIMINATED (do not repeat) ==============
  *
- * KOPYA SINIFI -- hepsi kopyayi YOK ETTI, cikti degismedi (fark 26):
- *   - `probe = block;`                       (uc ayri oturumda denendi)
+ * THE COPY CLASS -- all of these DESTROYED the copy, and the output did not
+ * change (26 differences):
+ *   - `probe = block;`                       (tried in three separate sessions)
  *   - `probe = block + 0;`
  *   - `probe = (CoordBlock *)((char *)block + 0);`
- *   - `probe = &gRam02011030;` AMA `block` da ayni EBB'de kaliyorken
- *     (H_twoRefs_order: `block = &gRam02011030;` dal ONCESINE alinmis).
- *     KRITIK: iki referansin ayri CSE bloklarinda olmasi SART; ikisi de
- *     giris blogunda olursa CSE tek yazmaca indirir.
- *   - `probe = 0;` ile on-atama (olu kod, DCE siliyor).
- *   - Bildirim SIRASI permutasyonlari (block/probe/flag once, probe en
- *     sonda, block en sonda -> BESI DE fark 26).  Pseudo numaralari
- *     CSE'nin kanoniklestirme yonunu DEGISTIRMIYOR.
+ *   - `probe = &gRam02011030;` BUT with `block` still in the same EBB
+ *     (H_twoRefs_order: `block = &gRam02011030;` moved BEFORE the branch).
+ *     CRITICAL: the two references MUST be in separate CSE blocks; if both are
+ *     in the entry block, CSE reduces them to a single register.
+ *   - A pre-assignment `probe = 0;` (dead code, DCE removes it).
+ *   - Permutations of DECLARATION order (block/probe/flag first, probe last,
+ *     block last -> ALL FIVE give 26 differences).  Pseudo numbers DO NOT
+ *     change the direction of CSE's canonicalisation.
  *
- * CFG SINIFI -- hepsi fark 26 (yani CFG'yi degistirmek tek basina
- * yetmiyor; base26 ile ayni RTL cikiyor):
- *   - `if (flag == 0 || (second = probe->unk08) == 0) { dusme; return; }`
- *   - Ayni sey virgul operatoruyle: `(probe = block, second = ...)`
+ * THE CFG CLASS -- all give 26 differences (so changing the CFG alone is not
+ * enough; the same RTL comes out as with base26):
+ *   - `if (flag == 0 || (second = probe->unk08) == 0) { fallthrough; return; }`
+ *   - The same with the comma operator: `(probe = block, second = ...)`
  *   - `if (... && ...) goto midpoint;`
- *   - `if (second == 0) goto simple; goto midpoint;` ikili goto
+ *   - The double goto `if (second == 0) goto simple; goto midpoint;`
  *
- * MERGE SINIFI -- kopyayi YASATTI ama 2 bayt PAHALI (fark 81, 92 bayt):
- *   - `second = 0;` ile ikinci testi if govdesinden CIKARMAK.  Araya
- *     cok referansli bir code_label giriyor, CSE blogu orada bitiyor,
- *     kopya yasiyor.  Ama `movs r1,#0` fazladan 2 bayt + havuz hizasi
- *     icin 2 bayt dolgu getiriyor.  Dogru mekanizma, yanlis bedel.
- *   - `second`i `&gRam02011030` gibi bir nobet degeriyle merge etmek:
- *     96 bayt, fark 86.  Cok daha kotu.
+ * THE MERGE CLASS -- KEPT the copy alive but 2 bytes TOO EXPENSIVE (81
+ * differences, 92 bytes):
+ *   - Moving the second test OUT of the if body with `second = 0;`.  A
+ *     multiply-referenced code_label lands in between, the CSE block ends
+ *     there, and the copy survives.  But `movs r1,#0` costs an extra 2 bytes
+ *     plus 2 bytes of padding for the pool alignment.  The right mechanism,
+ *     the wrong price.
+ *   - Merging `second` with a sentinel such as `&gRam02011030`: 96 bytes, 86
+ *     differences.  Much worse.
  *
- * TESHIS ARACI (baskasi ayni duvara toslarsa): agbcc `-da` bayragini
- * KABUL EDIYOR.  `old_agbcc -mthumb-interwork -O2 -fhex-asm -da -o x.s
- * x.i` her gecis icin bir RTL dokumu birakiyor (x.i.rtl, x.i.jump,
- * x.i.cse, x.i.gcse, x.i.loop, x.i.cse2, x.i.flow, x.i.combine,
- * x.i.regmove, x.i.lreg, x.i.greg).  Kopyanin nerede oldugunu bununla
- * OLCTUK: `probe = block` insn 9 olarak rtl'de duruyor, CSE her iki
- * kullanimini da `block`a ceviriyor (insn 24 ve insn 61), `flow`
- * gecisi olu kalan kopyayi siliyor.  `-fno-cse-follow-jumps` ile de
- * silinmesi, sebebin dal takibi DEGIL ayni blok icindeki
- * kanoniklestirme oldugunu gosterdi.
+ * A DIAGNOSTIC TOOL (in case someone else hits the same wall): agbcc ACCEPTS
+ * the `-da` flag.  `old_agbcc -mthumb-interwork -O2 -fhex-asm -da -o x.s x.i`
+ * leaves an RTL dump for every pass (x.i.rtl, x.i.jump, x.i.cse, x.i.gcse,
+ * x.i.loop, x.i.cse2, x.i.flow, x.i.combine, x.i.regmove, x.i.lreg, x.i.greg).
+ * That is how we MEASURED where the copy goes: `probe = block` stands as insn
+ * 9 in the rtl, CSE turns both of its uses into `block` (insn 24 and insn 61),
+ * and the `flow` pass deletes the now-dead copy.  That it is also deleted
+ * under `-fno-cse-follow-jumps` showed the cause is NOT jump following but
+ * canonicalisation within the same block.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/update_focus.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/update_focus.c
  */
 
 #include "gba_types.h"
@@ -134,10 +137,10 @@ void UpdateFocusPoint(void)
     Vec2 *mout;
     u32 flag;
 
-    /* SIRA: ROM once gGameState bayragini OKUYOR.  Blok tabani, bayrak
-       dalinda ve dusme dalinda AYRI AYRI yaziliyor (yukaridaki olcum 2):
-       iki referans ayri CSE bloklarinda oldugu icin ROM'un
-       `ldr r3,=blok` + `adds r0,r3,#0` ikilisi cikiyor. */
+    /* ORDER: the ROM READS the gGameState flag first.  The block base is
+       written SEPARATELY in the flag branch and in the fall-through branch
+       (measurement 2 above): because the two references are in different CSE
+       blocks, the ROM's `ldr r3,=block` + `adds r0,r3,#0` pair comes out. */
     flag = gGameState.flag;
     if (flag != 0) {
         probe = &gRam02011030;
@@ -146,9 +149,10 @@ void UpdateFocusPoint(void)
             goto midpoint;
     }
 
-    /* Dusme dali: ozgun tabandan okuyor (ROM: ldr r0,[r3,#4]).
-       Kural 45 -- bu dalin yerelleri orta nokta dalindan AYRI olmali,
-       yoksa sondaki store cross-jumping ile birlesiyor. */
+    /* The fall-through branch reads from the original base (ROM:
+       ldr r0,[r3,#4]).  Rule 45 -- this branch's locals must be SEPARATE from
+       the midpoint branch's, otherwise the final store is merged by
+       cross-jumping. */
     block = &gRam02011030;
     out = &gFocusPoint;
     first = (Target *)block->unk04;
@@ -158,7 +162,7 @@ void UpdateFocusPoint(void)
 
 midpoint:
     /* Orta nokta dali: +0x04 KOPYADAN okunuyor (ROM: ldr r0,[r0,#4]).
-       Kural 49 -- ROM bu seyrek govdeyi fonksiyonun SONUNDA tutuyor. */
+       Rule 49 -- the ROM keeps this rare body at the END of the function. */
     mout = &gFocusPoint;
     mfirst = (Target *)probe->unk04;
     mout->x = (mfirst->pos->x + second->pos->x) >> 1;

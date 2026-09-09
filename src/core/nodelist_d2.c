@@ -1,77 +1,81 @@
-/* Bolgenin iki kimlik dizisini bosaltma — 0x08052CF8-0x08052DDB (228 bayt)
+/* Empty the region's two id arrays — 0x08052CF8-0x08052DDB (228 bytes)
  *
- * Bolge nesnesinin +0x28 alanindaki tanim blogu iki u16 kimlik dizisini ve
- * bir yuva blogunu tarifliyor:
+ * The descriptor block at the region object's +0x28 field describes two u16 id
+ * arrays and a slot block:
  *
- *     +0x05  u8   listA girdi sayisi
- *     +0x06  u8   listB girdi sayisi
- *     +0x0A  u16  listC yuva sayisi
+ *     +0x05  u8   listA entry count
+ *     +0x06  u8   listB entry count
+ *     +0x0A  u16  listC slot count
  *
- * Bolgenin +0x0B baytindaki ISARETLI 4 bitlik ust alan ("level") sifirsa
- * fonksiyon hicbir sey yapmadan donuyor. Aksi halde:
+ * If the SIGNED 4-bit upper field ("level") in the region's +0x0B byte is
+ * zero, the function returns without doing anything. Otherwise:
  *
- *   1) listB'deki (+0x34) her kimlik icin RefreshThenNotify cagriliyor.
- *   2) listA'daki (+0x30) her kimlik icin dugum aranıyor. Dugum bulunduysa
- *      ve kirliyse (bit 0) ve seviyesi 1 ise, dugumun yuva dizisindeki her
- *      kimlik icin ReleaseAreaNode cagrilip yuvalar bos kimlikle doldurularak
- *      kirli biti temizleniyor. Dugum bulunduysa HER DURUMDA liste basi +
- *      kimlik ile FUN_08055D90 cagriliyor.
- *   3) Iki dizi de bos kimlikle dolduruluyor, yuva blogu DMA ile siliniyor.
+ *   1) RefreshThenNotify is called for every id in listB (+0x34).
+ *   2) A node is searched for every id in listA (+0x30). If the node exists and
+ *      is dirty (bit 0) and its level is 1, ReleaseAreaNode is called for every
+ *      id in the node's slot array, the slots are filled with the empty id and
+ *      the dirty bit is cleared. If the node exists, FUN_08055D90 is called
+ *      with the list head + id IN EVERY CASE.
+ *   3) Both arrays are filled with the empty id, and the slot block is cleared
+ *      with DMA.
  *
- * Bu, 0x08055C04'un (src/core/nodelist_c2.c) tek dugumluk halinin dizi
- * uzerinde tekrarlanmis surumu; +0x0B bitfield'lari ve ic dongu oradaki
- * ile birebir ayni kodu uretiyor.
+ * This is the array-repeated version of the single-node 0x08055C04
+ * (src/core/nodelist_c2.c); the +0x0B bitfields and the inner loop produce
+ * byte-for-byte the same code as there.
  *
- * OLCULEN IKI AYRINTI (ikisi de tek basina denendi, ikisi de belirleyici):
+ * TWO MEASURED DETAILS (each was tried on its own; both are decisive):
  *
- * 1) IKI DIS DONGU AYNI SAYACI PAYLASIYOR. Ayri `i` ve `j` yazildiginda
- *    agbcc iki gezinme isaretcisini r4'te birlestirip sayaclari r5/r6'ya
- *    itiyordu (22/228 bayt fark); ROM ise tersini yapiyor: her iki
- *    dongude sayac r4, isaretciler r5 ve r6. Sebep dagitim onceligi
- *    (docs/COMPILER.md formulu): ayri sayaclar 8 refs / 26 omur ->
- *    0.923 verirken, paylasilan sayac 16 refs / 54 omur -> 1.185
- *    veriyor ve isaretcinin onune geciyor. floor_log2(16)=4 carpani
- *    referanslari birlestirmeyi karli kiliyor. Fark 22 -> 8 bayta indi.
+ * 1) THE TWO OUTER LOOPS SHARE THE SAME COUNTER. Written with separate `i` and
+ *    `j`, agbcc merged the two walking pointers into r4 and pushed the
+ *    counters to r5/r6 (22/228 bytes of difference); the ROM does the
+ *    opposite: in both loops the counter is r4 and the pointers are r5 and r6.
+ *    The reason is allocation priority (the docs/COMPILER.md formula):
+ *    separate counters give 8 refs / 26 lifetime -> 0.923, while a shared
+ *    counter gives 16 refs / 54 lifetime -> 1.185 and overtakes the pointer.
+ *    The floor_log2(16)=4 factor makes merging the references profitable. The
+ *    difference dropped from 22 to 8 bytes.
  *
- * 2) BILDIRIM SIRASI, DAGITIM ESITLIGINI BOZUYOR. Kalan 8 bayt, ikinci
- *    dongude sayacin mi isaretcinin mi `sl`ye (yuksek register) kaydedilip
- *    digerinin yigina tasacagi farkiydi. `-dg` dokumunde iki artirim
- *    gecicisi de refs=4 / omur=48 tasiyor, yani ONCELIKLERI ESIT; GCC 2.8
- *    esitligi pseudo NUMARASIYLA bozuyor ve pseudo numaralari kaynaktaki
- *    BILDIRIM SIRASINDAN geliyor (area=22, desc=23, node=24, ...).
- *    Sayac `entryA`dan SONRA bildirilince isaretcinin gecicisi kucuk
- *    numarayi alip `sl`yi kapiyordu. `i`yi isaretcilerden ONCE bildirmek
- *    sirayi cevirdi: `mov sl, r4` (sayac) + `str r6, [sp]` (isaretci).
- *    Fark 8 -> 0.
+ * 2) DECLARATION ORDER BREAKS AN ALLOCATION TIE. The remaining 8 bytes were
+ *    whether the counter or the pointer would be saved into `sl` (a high
+ *    register) in the second loop, with the other spilling to the stack. In
+ *    the `-dg` dump both increment temporaries carry refs=4 / lifetime=48, so
+ *    THEIR PRIORITIES ARE EQUAL; GCC 2.8 breaks the tie by PSEUDO NUMBER, and
+ *    the pseudo numbers come from the DECLARATION ORDER in the source
+ *    (area=22, desc=23, node=24, ...).
+ *    Declared AFTER `entryA`, the counter let the pointer's temporary take the
+ *    lower number and claim `sl`. Declaring `i` BEFORE the pointers reversed
+ *    the order: `mov sl, r4` (counter) + `str r6, [sp]` (pointer).
+ *    8 differences -> 0.
  *
- *    Bu, docs/COMPILER.md'deki "bildirim sirasi yigin yerlesimini
- *    degistirmez" olcumunun tamamlayicisi: yigin yerlesimini degistirmiyor
- *    ama ESIT ONCELIKLI pseudo'lar arasindaki dagitim sirasini belirliyor.
+ *    This is the complement of the docs/COMPILER.md measurement "declaration
+ *    order does not change the stack layout": it does not change the stack
+ *    layout, but it does decide the allocation order among pseudos of EQUAL
+ *    PRIORITY.
  *
- * DENENIP ELENENLER:
- *   - `continue` yerine `if (node != 0) { ... }` bloku: tek bayt
- *     degistirmedi (ayni RTL).
- *   - Artirimlari `for` yan tumcesinden govdeye, cagrinin hemen ardina
- *     tasimak: dongu dondurmesini bozdu, cok daha kotu kod.
- *   - Yalniz `id`/`k` bildirimlerini oynatmak: sayac hala isaretcilerden
- *     sonra kaldigi icin etkisiz.
+ * TRIED AND ELIMINATED:
+ *   - An `if (node != 0) { ... }` block instead of `continue`: not a single
+ *     byte changed (the same RTL).
+ *   - Moving the increments out of the `for` clause into the body, right after
+ *     the call: it broke the loop rotation and gave much worse code.
+ *   - Moving only the `id`/`k` declarations: no effect, because the counter
+ *     still comes after the pointers.
  *
- * Diger uygulanan kurallar:
- *   - Kural 19: `desc` okumasi seviye kontrolunden ONCE yazildi; ROM da
- *     `ldr r7, [r0, #40]`i maske testinden once yayiyor.
- *   - Kural 24/26: ust nibble ISARETLI bitfield; `== 0` testi agbcc'de
- *     kaydirmasiz `movs #240 / ands / cmp #0` uretiyor.
- *   - Kural 37: iki dizi gezicisi ayri yerel.
- *   - Kural 43: sayac ve gezici `for` artiriminda, ROM sirasiyla (once
- *     `adds r4, #1`, sonra `adds r6, #2`).
- *   - Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- *   - Sondaki uc cagri gezicileri degil yeniden `area->...` alanlarini
- *     okuyor; ROM da oyle.
+ * Other rules applied:
+ *   - Rule 19: the `desc` read is written BEFORE the level check; the ROM also
+ *     emits `ldr r7, [r0, #40]` before the mask test.
+ *   - Rule 24/26: the upper nibble is a SIGNED bitfield; in agbcc the `== 0`
+ *     test produces `movs #240 / ands / cmp #0` with no shift.
+ *   - Rule 37: the two array walkers are separate locals.
+ *   - Rule 43: the counter and the walker are in the `for` increment, in the
+ *     ROM's order (`adds r4, #1` first, then `adds r6, #2`).
+ *   - Rule 35: `pop {r0}; bx r0` -> a void return type.
+ *   - The three calls at the end read the `area->...` fields again rather than
+ *     the walkers; so does the ROM.
  *
- * ESLESME: 228/228 bayt.
+ * MATCH: 228/228 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_d2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_d2.c
  */
 
 #include "gba_types.h"
@@ -125,7 +129,7 @@ void ClearAreaIdArrays(Area *area)
 {
     SlotDesc *desc;
     Node     *node;
-    int       i;                /* iki dis dongude de ayni sayac */
+    int       i;                /* the same counter in both outer loops */
     u16      *entryB;
     u16      *entryA;
     u16      *slot;

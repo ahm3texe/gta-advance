@@ -1,45 +1,51 @@
-/* Alan girisini kosullardan gecirip dugume baglama — 0x08052C68-0x08052CF7
+/* Pass the area entry through the conditions and bind it to a node — 0x08052C68-0x08052CF7
  *
- * ROM tablosundaki (0x08D49C00 +0x24) 36 baytlik giris dizisinden index'inci
- * girisi aliyor ve dort kapidan geciriyor:
- *   1. gRam020004A0 acikken girisin +0x23 bayrak baytinda 8 biti varsa cik
- *   2. giris maskesi (+0x1C) -1 degilse ve gRam02030C00 ile kesismiyorsa cik
- *   3. +0x18 alan bayragi kuruluysa (IsAreaFlagSet) cik
- *   4. +0x1A kimligi IsProgressThresholdMet'u gecemiyorsa cik
- * Hepsi gecilirse sirali dugum listesinde (gNodeListHead) index aranir;
- * bulunan dugumun +0x0B baytinin ust yarisi 0x10 ise FUN_08052988 cagrilir.
+ * It takes the index-th entry from the array of 36-byte entries in the ROM
+ * table (0x08D49C00 +0x24) and passes it through four gates:
+ *   1. while gRam020004A0 is on, exit if bit 8 is set in the entry's +0x23 flag
+ *      byte
+ *   2. exit if the entry mask (+0x1C) is not -1 and does not intersect
+ *      gRam02030C00
+ *   3. exit if the +0x18 area flag is set (IsAreaFlagSet)
+ *   4. exit if the +0x1A id does not pass IsProgressThresholdMet
+ * If all are passed, the index is searched in the ordered node list
+ * (gNodeListHead); if the upper half of the found node's +0x0B byte is 0x10,
+ * FUN_08052988 is called.
  *
- * Havuz duzeni (4 sozcuk, 0x08052CE8'de):
- *     0x08D49C00  ROM tablo taban yapisi, +0x24 giris dizisi isaretcisi
- *     0x020004A0  bayrak kapisinin anahtari
- *     0x02030C00  maske kapisinin anahtari
+ * The pool layout (4 words, at 0x08052CE8):
+ *     0x08D49C00  the ROM table base structure, +0x24 the entry array pointer
+ *     0x020004A0  the flag gate's switch
+ *     0x02030C00  the mask gate's switch
  *     0x02035A70  gNodeListHead
  *
- * Taban ROM'da DUZ yukleniyor (`ldr r7,=0x08D49C00` + `ldr r0,[r7,#36]`) ve
- * r7'de tutuluyor -> dizi aritmetigi degil YAPI UYESI erisimi. Olculdu:
- * `extern Bank gAreaBank; gAreaBank.entries` tam bu ikiliyi uretiyor,
- * `((Bank*)0x08D49C00)->entries` ise ofseti havuz sabitine katliyor.
+ * The base is loaded PLAINLY in the ROM (`ldr r7,=0x08D49C00` +
+ * `ldr r0,[r7,#36]`) and kept in r7 -> a STRUCT MEMBER access, not array
+ * arithmetic. Measured: `extern Bank gAreaBank; gAreaBank.entries` produces
+ * exactly that pair, while `((Bank*)0x08D49C00)->entries` folds the offset into
+ * the pool constant.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * YENI SEMBOLLER: 0x08D49C00 (gAreaBank), 0x020004A0 (gRam020004A0),
- * 0x02030C00 (gRam02030C00) data/ram_map.csv'de YOK. Baska ajanlar ayni
- * dosyaya yazdigi icin oraya eklenmedi; adresler bu dosyada dosya kapsamli
- * Semboller data/ram_map.csv'de kayitli (birlestirme sirasinda eklendi;
- * ajan calisirken ortak dosyaya yazmasi yasakti ve gecici olarak
- * `asm(".equ ...")` kullanmisti -- o kacamak kaldirildi).  Boylece kural 1
- * (RAM/ROM adresleri extern sembol olmali) korunuyor: derleyici taban+ofset
- * katlamasi yapamiyor. ram_map'e eklendiklerinde bu uc satir silinebilir.
+ * NEW SYMBOLS: 0x08D49C00 (gAreaBank), 0x020004A0 (gRam020004A0) and
+ * 0x02030C00 (gRam02030C00) were NOT in data/ram_map.csv. They were not added
+ * there because other agents were writing to the same file; the addresses are
+ * file-scoped in this file.
+ * The symbols are now recorded in data/ram_map.csv (added during the merge;
+ * while the agent was running it was forbidden to write to the shared file and
+ * it had temporarily used `asm(".equ ...")` -- that workaround was removed).
+ * This preserves rule 1 (RAM/ROM addresses must be extern symbols): the
+ * compiler cannot fold base+offset. Once they are in ram_map, these three lines
+ * can be deleted.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_c3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_c3.c
  */
 
 #include "gba_types.h"
 
-/* Bkz. dosya basi: ram_map'e yazamadigimiz uc adres. */
+/* See the top of the file: the three addresses we could not write to ram_map. */
 
-/* 36 baytlik alan girisi; sadece kullanilan alanlar adlandirildi. */
+/* A 36-byte area entry; only the fields that are used were named. */
 typedef struct AreaEntry {
     u8  unk00[0x18];        /* 0x00 */
     u16 areaFlag;           /* 0x18 */
@@ -54,7 +60,7 @@ typedef struct AreaBank {
     AreaEntry *entries;     /* 0x24 */
 } AreaBank;
 
-/* src/world/node_search.c'deki Node ile ayni yerlesim; +0x0A/+0x0B eklendi. */
+/* The same layout as the Node in src/world/node_search.c, with +0x0A/+0x0B added. */
 typedef struct Node {
     struct Node *next;      /* 0x00 */
     u8           pad04[4];

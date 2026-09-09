@@ -1,116 +1,135 @@
-/* Kimligi listede bulup sayacini artirma, yoksa yedek dugumu kurma.
- * 0x080543D0, 126 bayt.
+/* Find an id in the list and bump its counter, otherwise set up the spare node.
+ * 0x080543D0, 126 bytes.
  *
- * Liste basligi +0x00 bas, +0x04 yedek dugum. Liste kimlige gore SIRALI:
- * arama, gecerli kimlik arananI GECINCE duruyor.
+ * The list header is +0x00 head, +0x04 spare node. The list is ORDERED by id:
+ * the search stops as soon as the current id PASSES the one being sought.
  *
- *   bulunursa  -> dugumun +0x0B alanindaki UST DORTLU bir artirilip
- *                 dugum donduruluyor (basvuru sayaci gibi davraniyor)
- *   bulunmazsa -> yedek dugumun kimligi 0x7FEF (bos isareti) ise
- *                 listeden cikarilip yeni kimlikle kurulup geri takiliyor
- *   yedek bos degilse -> 0
+ *   found     -> the UPPER NIBBLE of the node's +0x0B field is incremented by
+ *                one and the node is returned (it behaves like a reference
+ *                count)
+ *   not found -> if the spare node's id is 0x7FEF (the empty marker), it is
+ *                unlinked, set up under the new id and relinked
+ *   spare not empty -> 0
  *
- * Ust dortlu `lsls #24 / asrs #28` ile ISARETLI okunuyor, yani ust dortlu
- * isaretli bir sayac. ALAN TIPI YINE DE u8: ROM `ldrb` ile okuyor; s8
- * yapinca derleyici `ldrsb` + `asrs #4`e katliyor (fark +6).
+ * The upper nibble is read SIGNED with `lsls #24 / asrs #28`, so it is a
+ * signed counter. THE FIELD TYPE IS STILL u8: the ROM reads it with `ldrb`;
+ * making it s8 makes the compiler fold it into `ldrsb` + `asrs #4`
+ * (+6 differences).
  *
- * DURUM: BYTE-MATCHING, 126/126.  (Onceki oturum 41 -> 7'ye indirmisti;
- * bu oturumda kalan 7 bayt iki olcumle kapandi -- asagida (0) ve (1).)
+ * STATUS: BYTE-MATCHING, 126/126.  (An earlier session took it from 41 to 7;
+ * this session closed the remaining 7 bytes with two measurements -- (0) and
+ * (1) below.)
  *
  * ----------------------------------------------------------------------
- * OLCULEN MEKANIZMALAR (hepsi -da dokumleriyle / diff_function ile dogrulandi)
+ * MEASURED MECHANISMS (all verified with -da dumps / diff_function)
  * ----------------------------------------------------------------------
- * 0) found blogu: BIRIKTIRICIYI SABITE KUR, KAYMAYI ONCE HESAPLA  [5 bayt]
- *    ROM: `movs r2,#15 / ands r2,r0 / orrs r2,r1 / strb r2,[r3,#11]` --
- *    yani iki adresli `andsi3`in hedefi SABITIN yazmaci, k2'nin degil.
- *    `(k2 & 15) | ...` gibi her IFADE yaziminda regmove hedefi k2'nin
- *    pseudo'suna bagliyor (onceki oturumun 20+ denemesi hep bunda takildi).
- *    KALDIRAC: sabiti bir yerele atayip UZERINE bileske atama yapmak --
+ * 0) The found block: BUILD THE ACCUMULATOR FROM THE CONSTANT, COMPUTE THE
+ *    SHIFT FIRST  [5 bytes]
+ *    ROM: `movs r2,#15 / ands r2,r0 / orrs r2,r1 / strb r2,[r3,#11]` -- that
+ *    is, the destination of the two-address `andsi3` is the CONSTANT's
+ *    register, not k2's.
+ *    In every EXPRESSION form such as `(k2 & 15) | ...`, regmove binds the
+ *    destination to k2's pseudo (the 20+ attempts of the previous session all
+ *    got stuck on this).
+ *    THE LEVER: assign the constant to a local and use a COMPOUND ASSIGNMENT
+ *    on top of it --
  *        m = 15;  m &= k2;  m |= t;  cur->kind = m;
- *    Boylece expand daha en basta `(set m (and m k2))` uretiyor; regmove'un
- *    ceviresek bir seyi kalmiyor. Bu tek basina yonu duzeltti (7 -> ...),
- *    AMA sirayi bozdu: `movs r2,#15 / ands r2,r0` kaymadan ONCE cikti.
- *    Ikinci yari: `(hi + 1) << 4` AYRI bir deyimle (`t`) once hesaplanmali.
- *    Ikisi birlikte ROM'un komut sirasini aynen veriyor (fark 12 -> 4).
+ *    Expansion then produces `(set m (and m k2))` right from the start, and
+ *    regmove has nothing left to flip. On its own this fixed the direction
+ *    (7 -> ...), BUT it broke the order: `movs r2,#15 / ands r2,r0` came out
+ *    BEFORE the shift.
+ *    The second half: `(hi + 1) << 4` must be computed first, in a SEPARATE
+ *    statement (`t`). Together the two reproduce the ROM's instruction order
+ *    exactly (12 -> 4 differences).
  *
- * 1) r5/r6 TAKASI -- COZUM: DONGUYU GERCEK do/while YAP  [4 bayt]
- *    ROM r6=list r5=id; duz yazimda tersiydi (~10 bayt). Sebep: global
- *    dagitici onceligi floor_log2(refs)*refs/omur; list 5 ref/45 = 0.2222,
- *    id 5 ref/46 = 0.2174. list ONCE isleniyor ve find_reg EN KUCUK bos
- *    yazmaci (r5) veriyor. id'nin omru list'inkinden HER ZAMAN 1 fazla:
- *    prologda list once kopyalaniyor (def -1), cagri argumanlari ise her
- *    zaman r0,r1,r2 sirasinda uretiliyor (son kullanim +2).
- *    KALDIRAC (yeni, genel): tarama dongusu `goto scan` ile yazilinca gcc
- *    NOTE_INSN_LOOP_BEG/END NOTU URETMIYOR, dolayisiyla flow.c'nin
- *    `REG_N_REFS += loop_depth` agirliklandirmasi calismiyor ve dongu ici
- *    referanslar 1 sayiliyor. Ayni govde giris korumali `do { } while` ile
- *    yazilinca dongu notlari cikiyor: id'nin dongudeki IKI `cmp` referansi
- *    agirlik kazaniyor (5 -> 7), floor_log2(7)*7/46 = 0.304 ile list'in
- *    0.2222'sini geciyor, id ONCE isleniyor ve r5'i aliyor.
- *    list dongu icinde HIC gecmedigi icin onun agirligi degismiyor --
- *    esik bu yuzden asilabiliyor.
- *    Bunun yan faydasi: 3. argumani artik BELLEKTEN okumaya gerek yok,
- *    `InsertSorted(list, spare, id)` dogrudan `adds r2,r5,#0` veriyor
- *    (onceki cozumun bedeli olan fazladan `ldrh r2,[r4,#8]` gitti).
- *    NOT: dongu bicimi ROM'dan okundu -- giris korumali do/while; `while`
- *    ya da `for` yazimi ust testi one alip dallanmayi tersine ceviriyor.
+ * 1) THE r5/r6 SWAP -- SOLUTION: MAKE THE LOOP A REAL do/while  [4 bytes]
+ *    The ROM has r6=list, r5=id; written plainly it was the other way round
+ *    (~10 bytes). The reason: the global allocator's priority is
+ *    floor_log2(refs)*refs/lifetime; list has 5 refs/45 = 0.2222 and id 5
+ *    refs/46 = 0.2174. list is processed FIRST and find_reg gives it the
+ *    LOWEST free register (r5). id's lifetime is ALWAYS 1 longer than list's:
+ *    in the prologue list is copied first (def -1), and call arguments are
+ *    always produced in the order r0,r1,r2 (last use +2).
+ *    THE LEVER (new, general): when the scan loop is written with `goto scan`,
+ *    gcc DOES NOT EMIT the NOTE_INSN_LOOP_BEG/END notes, so flow.c's
+ *    `REG_N_REFS += loop_depth` weighting never runs and in-loop references
+ *    count as 1. Written as an entry-guarded `do { } while`, the same body
+ *    does produce the loop notes: id's TWO `cmp` references inside the loop
+ *    gain weight (5 -> 7), floor_log2(7)*7/46 = 0.304 overtakes list's
+ *    0.2222, id is processed FIRST and takes r5.
+ *    Because list never appears inside the loop, its weight does not change --
+ *    which is why the threshold can be crossed at all.
+ *    A side benefit: the third argument no longer needs to be read FROM
+ *    MEMORY; `InsertSorted(list, spare, id)` now gives `adds r2,r5,#0`
+ *    directly (the extra `ldrh r2,[r4,#8]` that the previous solution cost is
+ *    gone).
+ *    NOTE: the loop form was read from the ROM -- an entry-guarded do/while;
+ *    a `while` or `for` moves the test to the front and inverts the branching.
  *
- * 2) `movs r1,#2 / negs r1,r1` -- (u8) DARALTMASI
- *    Duz yazimda derleyici bunu `subs r1,#4` diye tek komuta indiriyordu;
- *    2 bayt kayiyor, literal havuzu hizalamasi bozuluyor ve aradaki ~10
- *    komut kayarak fark 20 bayt buyuyordu.
- *    Sebep OLCULDU: donusum RELOAD sonrasindaki `move2add`; dokumlerde
- *    `const_int -4` ILK KEZ .greg'de beliriyor, .lreg'de yok. move2add
- *    bir DONANIM yazmacindaki sabiti izliyor ve yeni sabit daha pahaliysa
- *    (negatif sabit = movs+negs, 2 komut) `adds/subs` ile turetiyor. AMA
- *    izleme KIPE duyarli: reg_mode ayni degilse tetiklenmiyor.
- *    ROM'da `| 16` QImode (`*movqi_insn`) ve `| 2` de QImode; `& -2`
- *    SImode oldugu icin zincir kopuyor. Bizde `| 2` SImode idi -> zincir
- *    kurulup `subs r1,#4` cikiyordu. `k = (u8)(k | 2);` yazimi o sabiti
- *    QImode'a indiriyor ve ROM'un movs/negs kalibi aynen cikiyor.
- *    (-2'den -13'e olan `subs r1,#11` zinciri ROM'da da var, dokunma.)
+ * 2) `movs r1,#2 / negs r1,r1` -- THE (u8) NARROWING
+ *    Written plainly, the compiler reduced this to the single instruction
+ *    `subs r1,#4`; 2 bytes shift, the literal pool alignment breaks, and the
+ *    ~10 instructions in between move, growing the difference by 20 bytes.
+ *    The cause was MEASURED: the transformation is `move2add` after RELOAD; in
+ *    the dumps `const_int -4` appears FIRST in .greg and is absent from .lreg.
+ *    move2add tracks the constant in a HARD register and, when a new constant
+ *    is more expensive (a negative constant = movs+negs, 2 instructions),
+ *    derives it with `adds/subs`. BUT the tracking is MODE-sensitive: it does
+ *    not fire unless reg_mode is the same.
+ *    In the ROM `| 16` is QImode (`*movqi_insn`) and `| 2` is QImode too;
+ *    because `& -2` is SImode, the chain breaks. In ours `| 2` was SImode ->
+ *    the chain formed and `subs r1,#4` came out. Writing
+ *    `k = (u8)(k | 2);` drops that constant to QImode and the ROM's movs/negs
+ *    pattern comes out exactly.
+ *    (The `subs r1,#11` chain from -2 to -13 is present in the ROM too; do
+ *    not touch it.)
  *
- * 3) `| 2` SIRASI -- ROM'daki gibi iki AND'den ONCE olmali; ama (u8)
- *    daraltmasi olmadan one alinirsa (2) devreye giriyor.
+ * 3) THE POSITION OF `| 2` -- it must come BEFORE the two ANDs, as in the ROM;
+ *    but if it is moved forward without the (u8) narrowing, (2) kicks in.
  *
- * ELENEN YOLLAR (tekrar denemeyin):
- *   - `k & -2` / `& 0xFFFFFFFE` / `& (0-2)` / maskeleri yerele alma
- *     (`m = ~1; k &= m;`): hepsi ayni RTL, hicbiri zinciri kirmiyor.
- *   - `| 2`yi iki AND arasina ya da sonuna almak: zincir kirilir ama
- *     komut SIRASI ROM'dan sapar (fark 15/16; (u8) yazimi 7).
- *   - `(k | 2) & ~1 & ~12` tek ifade: 122 bayt, ANDler birlesiyor.
- *   - `spare->slot = 0;` magazasini `| 16` ile `| 2` arasindan cikarmak:
- *     iki `orrs` tek `orrs #18`e katlaniyor. Yeri ROM'daki gibi kalmali.
- *   - InsertSorted 3. argumanini `spare->id` yapip BELLEKTEN okumak:
- *     r5/r6'yi duzeltiyor ama fazladan `ldrh r2,[r4,#8]` biraktigi icin
- *     4 bayt fark kaliyor. (1)'deki dongu kaldiraci bunun yerini aldi.
- *   - `id`nin omrunu kisaltmanin BASKA yolu yok (arg kopyalari her zaman
- *     r0,r1,r2 sirasinda); `spare->slot = id` gibi fazladan referans da
- *     omru 46'ya cikariyor.
- *   - found blogundaki `ands r2,r0` yonu icin denenen ve elenen 20+ IFADE
- *     yazimi (cozum ifade degil, BILESKE ATAMA -- bkz. (0)):
- *       `(k2&15) | ((hi+1)<<4)`, `(15&k2)`, `(m15&k2)` (m15 yerel; ilk ya
- *       da son bildirim, blok icinde/disinda atanmis), sonucu s32/u8 k3
- *       yereline alma, `hi+1`i ayri komuta bolme, kaymayi t degiskenine
- *       alma, alani (`cur->kind`) ifade icinde TEKRAR okuma, k2'yi u8/u16
- *       yapma, k2'yi hic kullanmama. HEPSI 7 ya da daha kotu (14/22/25).
- *     Olculen sebep: `regmove` pasi iki adresli `andsi3`in hedefini HER
- *     ZAMAN k2'nin pseudo'suna bagliyor -- .combine'da
- *     `(set (reg 81) (and (reg 29) (reg 80)))`, .regmove'da
- *     `(set (reg 29) (and (reg 29) (reg 80)))` -- operand sirasindan
- *     BAGIMSIZ olarak (m15 ile operandlari cevirince de ayni). ROM sabitin
- *     yazmacina bagliyor. Cozum regmove'u ikna etmek degil, ona hic is
- *     birakmamak: `m = 15; m &= k2;` (bkz. (0)).
- *   - `m |= (hi + 1) << 4;` tek deyimde: yon dogru ama sira ters
- *     (`movs #15/ands` kaymadan once cikiyor, fark 12). Kaymayi ayri bir
- *     `t` deyimine almak sart.
+ * ELIMINATED PATHS (do not retry):
+ *   - `k & -2` / `& 0xFFFFFFFE` / `& (0-2)` / taking the masks into locals
+ *     (`m = ~1; k &= m;`): all give the same RTL, none breaks the chain.
+ *   - Moving `| 2` between the two ANDs or to the end: the chain breaks but
+ *     the instruction ORDER diverges from the ROM (15/16 differences; the (u8)
+ *     form gives 7).
+ *   - `(k | 2) & ~1 & ~12` as a single expression: 122 bytes, the ANDs merge.
+ *   - Moving the `spare->slot = 0;` store out from between `| 16` and `| 2`:
+ *     the two `orrs` fold into a single `orrs #18`. Its position must stay as
+ *     in the ROM.
+ *   - Making InsertSorted's third argument `spare->id` and reading it FROM
+ *     MEMORY: it fixes r5/r6 but leaves an extra `ldrh r2,[r4,#8]`, so a
+ *     4-byte difference remains. The loop lever in (1) replaced this.
+ *   - There is NO OTHER way to shorten `id`'s lifetime (argument copies are
+ *     always in r0,r1,r2 order); an extra reference such as
+ *     `spare->slot = id` also pushes the lifetime to 46.
+ *   - The 20+ EXPRESSION forms tried and eliminated for the direction of
+ *     `ands r2,r0` in the found block (the solution is not an expression but a
+ *     COMPOUND ASSIGNMENT -- see (0)):
+ *       `(k2&15) | ((hi+1)<<4)`, `(15&k2)`, `(m15&k2)` (m15 as a local;
+ *       declared first or last, assigned inside or outside the block), taking
+ *       the result into an s32/u8 local k3, splitting `hi+1` into a separate
+ *       instruction, taking the shift into a variable t, RE-READING the field
+ *       (`cur->kind`) inside the expression, making k2 u8/u16, and not using
+ *       k2 at all. ALL give 7 or worse (14/22/25).
+ *     The measured cause: the `regmove` pass ALWAYS binds the destination of
+ *     the two-address `andsi3` to k2's pseudo -- in .combine
+ *     `(set (reg 81) (and (reg 29) (reg 80)))` and in .regmove
+ *     `(set (reg 29) (and (reg 29) (reg 80)))` -- INDEPENDENTLY of operand
+ *     order (swapping the operands with m15 gives the same). The ROM binds it
+ *     to the constant's register. The solution is not to persuade regmove but
+ *     to leave it no work at all: `m = 15; m &= k2;` (see (0)).
+ *   - `m |= (hi + 1) << 4;` as one statement: the direction is right but the
+ *     order is reversed (`movs #15/ands` comes out before the shift, 12
+ *     differences). Taking the shift into a separate `t` statement is
+ *     required.
  *
- * Kardes dosyalar: nodelist_c3.c bu fonksiyonun imzasini zaten
- * bildiriyordu (`Node *FindOrClaimNode(Node **head, s32 index)`), nodelist_b6.c
- * de cagiriyor. Node yerlesimi oradan alindi.
+ * Sibling files: nodelist_c3.c already declared this function's signature
+ * (`Node *FindOrClaimNode(Node **head, s32 index)`), and nodelist_b6.c calls
+ * it. The Node layout was taken from there.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/core/nodelist_a1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/core/nodelist_a1.c
  */
 
 #include "gba_types.h"
@@ -147,9 +166,9 @@ Node *FindOrClaimNode(NodeList *list, s32 id)
 
     cur = list->head;
     spare = list->spare;
-    /* GERCEK dongu deyimi sart: `goto` ile yazilinca gcc dongu notu
-     * uretmiyor, `id`nin dongu ici iki referansi agirlik kazanmiyor ve
-     * r5 list'e gidiyor -- basliktaki (1). */
+    /* A REAL loop statement is required: written with `goto`, gcc emits no
+     * loop note, id's two in-loop references gain no weight, and
+     * r5 is assigned to list -- see header note (1). */
     if (cur != 0) {
         do {
             cid = cur->id;
@@ -164,9 +183,10 @@ Node *FindOrClaimNode(NodeList *list, s32 id)
     ListRemove(list, spare);
     spare->id = id;
     k = (spare->kind & 15) | 16;
-    /* Aradaki magaza `| 16` ile `| 2`nin tek `orrs`a katlanmasini
-     * engelliyor (ROM'da iki ayri `orrs` var); (u8) ise sabiti QImode'a
-     * indirip move2add zincirini kiriyor -- basliktaki (2). */
+    /* The store in between stops `| 16` and `| 2` folding into a
+     * single `orrs` (the ROM has two separate `orrs`); the (u8)
+     * drops the constant to QImode and breaks the move2add chain
+     * -- point (2) in the header. */
     spare->slot = 0;
     k = (u8)(k | 2);
     k = k & ~1;
@@ -175,18 +195,22 @@ Node *FindOrClaimNode(NodeList *list, s32 id)
     InsertSorted(list, spare, id);
     return spare;
 
-    /* ROM bu govdeyi fonksiyonun SONUNDA tutuyor (`beq` ileri atliyor);
-     * dongunun icine yazmak blogu one aliyor ve dallanma tersine donuyor. */
+    /* The ROM keeps this body at the END of the function (`beq` jumps
+     * forward); writing it inside the loop moves the block forward and inverts
+     * the branching. */
 found:
-    /* AYRI yerel: `k` hem insert hem found dalinda kullanilinca 19 referansa
-     * cikip r2'ye dusuyordu; bolununce 12'ye inip ROM'un r0'ini aliyor. */
+    /* A SEPARATE local: used in both the insert and the found branch, `k`
+     * reached 19 references and dropped to r2; split, it falls to 12 and takes
+     * the ROM's r0. */
     k2 = cur->kind;
     hi = (s32)(k2 << 24) >> 28;
-    /* Kayma ONCE ayri bir deyimde: ROM `adds #1 / lsls #4`i maskeden once
-     * kuruyor; tek ifadede yazilinca `movs #15 / ands` one geciyor. */
+    /* The shift comes FIRST, in its own statement: the ROM builds
+     * `adds #1 / lsls #4` before the mask; written as one expression,
+     * `movs #15 / ands` moves ahead of it. */
     t = (hi + 1) << 4;
-    /* Sabiti yerele kurup UZERINE bileske atama: iki adresli `ands`in
-     * hedefi boylece sabitin yazmaci oluyor -- basliktaki (0). */
+    /* Build the constant in a local and use a compound assignment ON TOP of
+     * it: the destination of the two-address `ands` then becomes the
+     * constant's register -- point (0) in the header. */
     m = 15;
     m &= k2;
     m |= t;
