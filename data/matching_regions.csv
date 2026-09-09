@@ -292,6 +292,7 @@ start,end,binary,module,notes
 0x0805A78C,0x0805A7A0,build/script/cmd_call_minus_one.bin,script,Handler: operand into FUN_08041EF8 with a constant -1
 0x0805AA1C,0x0805AA30,build/script/cmd_release_slot.bin,script,Handler: FUN_08030D0C's answer straight into ReleaseSlot
 0x0805AB04,0x0805AB14,build/script/cmd_call_080351ac.bin,script,Handler: operand into FUN_080351AC
+0x0805AB7C,0x0805AB90,build/script/cmd_maybe_reset.bin,script,Handler: FUN_08059818(0) when FUN_08061F54 says so; the only void handler in the block
 0x0805AB90,0x0805ABDC,build/world/p1_5ab90.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805ABDC,0x0805AC10,build/world/p1_5abdc.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805AC10,0x0805AC44,build/world/p1_5ac10.bin,world,Phase 1: natural C matching the ROM exactly
@@ -301,10 +302,19 @@ start,end,binary,module,notes
 0x0805AD10,0x0805AD68,build/world/p1_5ad10.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805AD68,0x0805ADC0,build/world/p1_5ad68.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805AEFC,0x0805AF48,build/world/p1_5aefc.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805B0C4,0x0805B0EC,build/script/cmd_call_kind.bin,script,Handlers: the operand into FUN_0803ABC4 with kind 1 and 2
+0x0805B11C,0x0805B134,build/script/cmd_bump_counts.bin,script,"Handlers: BumpCount70 and BumpCount80, always answering 1"
+0x0805B1AC,0x0805B1C0,build/script/cmd_anchor_unk34_zero.bin,script,Handler: 1 when GetAnchorUnk34 is zero; rule 72
+0x0805B214,0x0805B224,build/script/read_stat_word.bin,script,"Reads gRam02035AD0[index]; not a handler, no prologue"
 0x0805B2A4,0x0805B2BC,build/world/p1_5b2a4.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805B388,0x0805B40C,build/world/p1_5b388.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805B484,0x0805B508,build/world/p1_5b484.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805B760,0x0805B770,build/script/cmd_call_0803c840.bin,script,Handler: the operand into FUN_0803C840
+0x0805B770,0x0805B7A0,build/script/cmd_select_mode.bin,script,"Handlers: FUN_0803AB0C with 3, 1 and 2 in ROM order"
 0x0805B854,0x0805B86C,build/world/p1_5b854.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805B908,0x0805B914,build/script/cmd_bump_count82.bin,script,"Handler: BumpCount82, always answering 1"
+0x0805B9E4,0x0805B9F8,build/script/cmd_clear_slot_word.bin,script,"Handler: clears the +0x4C word of slot 1, with no null check"
+0x0805B9F8,0x0805BA04,build/script/cmd_reset_area_ids.bin,script,"Handler: ResetAreaIds, always answering 1"
 0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x080611CC,0x0806149C,build/world/mark_distant_actors.bin,world,0x080611CC MarkDistantActors + 0x08061334 MarkDistantActorsB (the 0x0202F2C0 list)
