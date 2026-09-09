@@ -178,10 +178,16 @@ Both show the **same systematic difference**: the ROM loads the base address
 before the index computation, agbcc after. For `GetSaveSlotHeader`, five
 different local variable arrangements, pointer arithmetic, an inverted condition,
 a `void*` return, an extern array symbol, and two compiler variants were tried —
-**all five produced byte-for-byte identical output.** agbcc is insensitive to the
-C form in this function, so it is not a problem that can be solved by tinkering
-with the C. The remaining possibilities: a difference between pret/agbcc's
-rebuilt version and the original SDK version, or a compiler flag not yet found.
+**every one of them produced byte-for-byte identical output.** agbcc is
+insensitive to the C form in this function, so it is not a problem that can be
+solved by tinkering with the C. The remaining possibilities: a difference between
+pret/agbcc's rebuilt version and the original SDK version, or a compiler flag not
+yet found.
+
+> **Later:** this diagnosis was wrong. The cause was on the C side after all —
+> the RAM address was a cast macro, which agbcc folds, instead of an `extern`
+> symbol, which it cannot. Both functions match now; see "RAM addresses must be
+> extern symbols" in `docs/COMPILER.md`.
 
 `WriteU16LE` is also open (nine C forms tried, recorded).
 

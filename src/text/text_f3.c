@@ -54,7 +54,7 @@
  * rem and embed TILE_WIDTH-sub directly in the loop control expression.
  * Invariant motion then places 8-sub after invariant loads in the preheader
  * as a short-lived temporary, matching movs r0,#8 / subs r0,r0,r4. Separate
- * rem creates a long-lived r4 allocno and shifts the preheader (inverse rule 40).
+ * rem creates a long-lived r4 allocno and shifts the preheader (inverse rule 69).
  *
  * REJECTED THIS SESSION (~1200 builds; score = differing instructions, base 66):
  * - 720 preheader statement permutations (pairs/nxt/ncol/rem/dst): best order
@@ -87,7 +87,7 @@
  *   x naturally receives r7.
  *
  * THREE EARLIER IMPROVEMENTS (100 -> 70):
- * 1. Separate ime per block (rule 40) matches all 19 full-tile instructions
+ * 1. Separate ime per block (rule 69) matches all 19 full-tile instructions
  *    and assigns dest to r6.
  * 2. nxt/ncol intermediates put the five preheader instructions
  *    (movs #64 ... mov sl,r5) in ROM order.

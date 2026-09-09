@@ -63,7 +63,7 @@
  *     the for (i = 0; i <= 2; i++) form                     4
  *     using a fill variable (the constant is not hoisted)  61
  *   From earlier rounds (the structure is obsolete, but keep the note):
- *     a rule 40 narrow volatile read of fill2              85
+ *     a rule 69 narrow volatile read of fill2              85
  *     not loading the block before the loop                23
  *     making the counter s32                               22
  *   The declaration order has NO EFFECT in this function (all three

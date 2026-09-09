@@ -15,7 +15,7 @@
  *
  * THREE MEASURED PATTERNS (each verified individually, do not change them):
  *
- * 1) THE `t` TEMPORARY IS REQUIRED (rule 40).  At the merge point the ROM
+ * 1) THE `t` TEMPORARY IS REQUIRED (rule 69).  At the merge point the ROM
  *    keeps two copies: `adds r0,r1,#0` on the else branch and `adds r2,r0,#0`
  *    at the merge.  Dropping `t` and writing straight into `value` makes both
  *    branches produce into value's register, and two instructions disappear

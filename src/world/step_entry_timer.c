@@ -77,7 +77,7 @@
  * arg2 was produced.  Fiddling with the arg1 expression was the wrong axis.
  * THE LESSON: a difference that looks like "the wrong register" was really a
  * difference in EMISSION ORDER; taking a subexpression into a separate
- * statement (using rule 40 in the reverse direction) turns the production
+ * statement (using rule 69 in the reverse direction) turns the production
  * order of the call arguments into the ROM's.
  *
  * A pool note (for the record): no pool word was ever missing.  Both pools

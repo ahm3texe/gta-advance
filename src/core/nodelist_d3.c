@@ -40,7 +40,7 @@
  * Clearing the dirty bit gives the `movs #2 / negs` pair: ~1 = -2, so the mask
  * stays at 32 bits (rule 26). A bitfield assignment produces this.
  *
- * MEASURED 3 — the loop temporaries must be BLOCK-SCOPED (rule 40):
+ * MEASURED 3 — the loop temporaries must be BLOCK-SCOPED (rule 69):
  *   Making `entry` and `id` shared function-scope locals across both loops
  *   spreads their lifetimes over the whole function; the first loop's `entry`
  *   then wants a callee-saved register too, `desc` is pushed from r7 to r8, and
