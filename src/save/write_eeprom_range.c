@@ -1,57 +1,59 @@
-/* Hizalanmamis EEPROM byte araligi yazma — 0x08000F1C-0x08001094
+/* Write an unaligned EEPROM byte range — 0x08000F1C-0x08001094
  *
- * ReadEepromRange'in (0x08000DDC) yazma esi. EEPROM yalnizca 8 byte'lik
- * bloklar halinde programlanabildigi icin rutin, byte ofsetini "blok
- * indeksi" (offset >> 3) ve "blok ici atlanacak byte sayisi" (offset & 7)
- * olarak ikiye ayirir. Her blok once yigin uzerindeki 8 byte'lik tampona
- * kurulur, sonra tek seferde programlanir. EEPROM sozcugu big-endian
- * geldigi icin tampon 7'den 0'a dogru doldurulur.
+ * The write counterpart of ReadEepromRange (0x08000DDC). Because EEPROM can
+ * only be programmed in 8-byte blocks, the routine splits the byte offset
+ * into a "block index" (offset >> 3) and a "number of bytes to skip inside
+ * the block" (offset & 7). Each block is first assembled in an 8-byte buffer
+ * on the stack, then programmed in one go. Since the EEPROM word arrives
+ * big-endian, the buffer is filled from 7 down to 0.
  *
- * Okumadan farkli iki nokta var:
- *   - Yazilacak blok sayisi bastan hesaplanir ve aralik 64 blok (512 byte)
- *     sinirina karsi dogrulanir; tasan istek hicbir sey yazmadan basarisiz
- *     doner.
- *   - Her blok icin programlama en fazla 10 kez denenir (retry <= 9);
- *     onuncu deneme de hata verirse tum islem basarisiz sayilir.
+ * Two things differ from the read side:
+ *   - The number of blocks to write is computed up front and the range is
+ *     validated against the 64-block (512-byte) limit; a request that
+ *     overflows fails without writing anything.
+ *   - Programming is attempted at most 10 times per block (retry <= 9); if
+ *     the tenth attempt also fails, the whole operation is considered failed.
  *
- * Donus: basarili yazmada 1, tanimlama/aralik/programlama hatasinda 0.
+ * Returns: 1 on a successful write, 0 on an identification, range or
+ * programming error.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/write_eeprom_range.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/write_eeprom_range.c
  */
 
 #include "gba_io.h"
 
-/* Kural 1'in tersi yonu: DMA3 sabit cast olarak yazilir, ama tekil bir
- * `*(volatile u32 *)0x040000DC` degil struct uyesi olarak. Tekil biciminde
- * agbcc taban+ofseti tek literale katliyor (0x040000DC / [r2,#0]); ROM ise
- * tabani register'da tutup ofsetle eriyor (0x040000D4 / [r2,#8]). */
+/* The inverse direction of rule 1: DMA3 is written as a constant cast, but
+ * as a struct member rather than a standalone `*(volatile u32 *)0x040000DC`.
+ * In the standalone form agbcc folds base+offset into a single literal
+ * (0x040000DC / [r2,#0]); the ROM instead keeps the base in a register and
+ * reaches it by offset (0x040000D4 / [r2,#8]). */
 #define DMA_ENABLE 0x80000000
 
-#define EEPROM_BLOCK       8    /* EEPROM erisim birimi (byte)          */
-#define EEPROM_BLOCK_MASK  7    /* blok ici byte ofseti                 */
-#define EEPROM_BLOCK_SHIFT 3    /* byte ofseti -> blok indeksi          */
-#define EEPROM_DEVICE_TYPE 4    /* tanimlama rutinine verilen tip kodu  */
-#define EEPROM_BLOCKS      64   /* 4 Kbit EEPROM = 64 x 8 byte          */
-#define EEPROM_MAX_RETRY   9    /* onuncu denemeden sonra vazgecilir    */
+#define EEPROM_BLOCK       8    /* EEPROM access unit (bytes)           */
+#define EEPROM_BLOCK_MASK  7    /* byte offset inside a block           */
+#define EEPROM_BLOCK_SHIFT 3    /* byte offset -> block index           */
+#define EEPROM_DEVICE_TYPE 4    /* type code passed to the ID routine   */
+#define EEPROM_BLOCKS      64   /* 4 Kbit EEPROM = 64 x 8 bytes         */
+#define EEPROM_MAX_RETRY   9    /* give up after the tenth attempt      */
 
-/* 0x02000EB8: sifirdan farkliyken EEPROM tanimli ve erisim suruyor. */
+/* 0x02000EB8: while nonzero, the EEPROM is identified and access is live. */
 extern u32 gEepromAvailable;
 
-/* Kayit G/C bolgesine giris/cikis; adlari data/functions.csv'de henuz
- * cozulmedi. */
+/* Entry to and exit from the save I/O region; their names are not yet
+ * resolved in data/functions.csv. */
 extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_08033b74(void);
 
-/* EEPROM tanimlama ve tek blok programlama; ikisi de sifirdan farkli bir
- * u16 ile hata bildirir (ROM donus degerini `lsls #16` ile sinayor). */
+/* EEPROM identification and single-block programming; both report an error
+ * with a nonzero u16 (the ROM tests the return value with `lsls #16`). */
 extern u16 FUN_0806bd34(u32 deviceType);
 extern u16 FUN_0806c078(u16 block, const void *data);
 
-/* Sekiz kopya acik yazilir (kural 14): bir byte, atlama sayaci bittikten
- * sonra ve kaynakta byte kaldigi surece tampona alinir. `skip` isaretli
- * olmali — ROM `ble` (isaretli) uretiyor, isaretsiz olsaydi `bls` cikardi
- * (kural 9). */
+/* The eight copies are written out explicitly (rule 14): a byte is taken
+ * into the buffer once the skip counter is exhausted and while bytes remain
+ * in the source. `skip` must be signed -- the ROM emits `ble` (signed); if it
+ * were unsigned, `bls` would come out (rule 9). */
 #define COPY_EEPROM_BYTE(index)  \
     if (skip > 0)                \
         skip--;                  \
@@ -73,13 +75,15 @@ u32 WriteEepromRange(u32 offset, const u8 *src, u32 length)
 
     StopAudioDmaOnCartFlag();
 
-    /* `length` isaretsiz olmali: ROM (length-1)/8'i `lsrs` ile yapiyor,
-     * isaretli olsaydi `asrs` cikardi (kural 13). Blok sayisi ise isaretli,
-     * cunku dongu karsilastirmasi `bge`/`blt` (kural 9). */
+    /* `length` must be unsigned: the ROM does (length-1)/8 with `lsrs`; if
+     * it were signed, `asrs` would come out (rule 13). The block count, by
+     * contrast, is signed, because the loop comparison is `bge`/`blt`
+     * (rule 9). */
     blockCount = ((length - 1) >> EEPROM_BLOCK_SHIFT) + 1;
     skip = offset & EEPROM_BLOCK_MASK;
-    /* Ofset yerinde blok indeksine cevrilir; ayri bir `block` degiskeni
-     * fazladan bir register kopyasi uretiyor (ReadEepromRange'te de oyle). */
+    /* The offset is converted to a block index in place; a separate `block`
+     * variable produces an extra register copy (the same holds in
+     * ReadEepromRange). */
     offset >>= EEPROM_BLOCK_SHIFT;
 
     REG_IME = 0;
@@ -104,21 +108,23 @@ u32 WriteEepromRange(u32 offset, const u8 *src, u32 length)
             COPY_EEPROM_BYTE(1);
             COPY_EEPROM_BYTE(0);
 
-            /* Sayac cagridan hemen sonra, hata sinamasindan once artiyor:
-             * ROM `adds r6,#1`i `cmp r0,#0`in onune koyuyor, yani artirma
-             * hata daline bagli degil. Olculdu: ayni mantigi
-             * `while ((err = ...) != 0) { if (++retry > 9) ... }` biciminde
-             * yazmak 372 byte / 167 fark uretiyor — artirma hata dalinin
-             * icine giriyor ve blok siralamasi bastan degisiyor. */
+            /* The counter is incremented right after the call, before the
+             * error test: the ROM puts `adds r6,#1` ahead of `cmp r0,#0`, so
+             * the increment does not depend on the error branch. Measured:
+             * writing the same logic as
+             * `while ((err = ...) != 0) { if (++retry > 9) ... }` produces
+             * 372 bytes / 167 differences -- the increment moves inside the
+             * error branch and the block ordering changes from the start. */
             retry = 0;
             do {
-                /* Blok adresi her turda `(u16)(offset + i)` olarak yeniden
-                 * yazilir. Ayri bir `u16 block` degiskenini artirmak
-                 * (block++) her dongude `add / lsl #16 / lsr #16` uretiyor;
-                 * ROM ise degeri 16 bit kaydirilmis tutup (r8 += 0x10000)
-                 * kullanirken `lsrs r0,r2,#16` ile ayikliyor. Bu bicim
-                 * agbcc'nin dongu kuvvet indirgemesinden cikiyor ve ancak
-                 * kirpma cagri yerinde yazilinca olusuyor. */
+                /* The block address is rewritten as `(u16)(offset + i)` on
+                 * every iteration. Incrementing a separate `u16 block`
+                 * variable (block++) produces `add / lsl #16 / lsr #16` in
+                 * every loop; the ROM instead keeps the value shifted left by
+                 * 16 (r8 += 0x10000) and extracts it at the use site with
+                 * `lsrs r0,r2,#16`. That form comes out of agbcc's loop
+                 * strength reduction, and only when the truncation is written
+                 * at the call site. */
                 err = FUN_0806c078((u16)(offset + i), buffer);
                 retry++;
             } while (err != 0 && retry <= EEPROM_MAX_RETRY);

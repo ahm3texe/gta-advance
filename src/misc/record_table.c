@@ -1,11 +1,11 @@
-/* Kayit tablosu erisimcileri — 0x080514C8-0x08051513
+/* Record table accessors — 0x080514C8-0x08051513
  *
- * 0x08CAC248 adresinden itibaren 60 byte'lik kayitlar var; gRecordIndex
- * hangisinin kullanildigini secer. Ilk iki fonksiyon secili kayittan birer
- * alan okuyup 16.16 sabit noktaya cevirir, ucuncusu istenen kaydin adresini
- * dondurur. Alanlarin anlami henuz bilinmiyor.
+ * From 0x08CAC248 onwards there are 60-byte records; gRecordIndex selects
+ * which one is in use. The first two functions each read one field from the
+ * selected record and convert it to 16.16 fixed point; the third returns the
+ * address of the requested record. The meaning of the fields is not known yet.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/misc/record_table.c
  */
 
@@ -30,8 +30,9 @@ extern Record gRecords[];
 /* 0x080514C8 */
 u32 GetRecordUnk04(void)
 {
-    /* Yerel isaretci sart: dogrudan gRecords[i].unk04 yazilirsa agbcc +4'u
-     * taban literaline katliyor, ROM ise yukleme ofsetinde birakiyor. */
+    /* A local pointer is required: writing gRecords[i].unk04 directly makes
+     * agbcc fold the +4 into the base literal, whereas the ROM leaves it in
+     * the load offset. */
     Record *record = &gRecords[gRecordIndex.index];
 
     return record->unk04 << 16;

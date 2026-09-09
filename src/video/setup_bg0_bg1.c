@@ -1,27 +1,29 @@
-/* BG0/BG1 kurulumu — 0x080127A8-0x080127FB
+/* BG0/BG1 setup — 0x080127A8-0x080127FB
  *
- * DISPCNT 0x0300 (kip 0, BG0+BG1 acik), BG0CNT 0xC003 | 0x1A00
- * (oncelik 3, boyut 3, ekran tabani 13), BG1CNT 0x4002 | 0x1E00
- * (oncelik 2, boyut 1, ekran tabani 15).
+ * DISPCNT 0x0300 (mode 0, BG0+BG1 on), BG0CNT 0xC003 | 0x1A00 (priority 3,
+ * size 3, screen base 13), BG1CNT 0x4002 | 0x1E00 (priority 2, size 1,
+ * screen base 15).
  *
- * IKI SEY BURADA BELIRLEYICI:
+ * TWO THINGS ARE DECISIVE HERE:
  *
- * 1) Denetim yazmaci MUTLAK MAKRO ile yazilmali, isaretci degiskeniyle
- *    DEGIL. Isaretci degiskeni kullanilirsa agbcc 0x04000008'i
- *    0x04000000 + 8 diye ortak altifadeye cikariyor (`adds r1,#8`) ve
- *    havuzdaki 0x04000008 girisi kayboluyor. Mutlak makroda adres bir
- *    MEM adresi olarak kaliyor, sozde-yazmac olmuyor, CSE gormuyor.
+ * 1) The control register must be written through an ABSOLUTE MACRO, NOT
+ *    through a pointer variable. With a pointer variable agbcc lifts
+ *    0x04000008 into a common subexpression as 0x04000000 + 8
+ *    (`adds r1,#8`) and the 0x04000008 entry disappears from the pool. With
+ *    an absolute macro the address stays a MEM address, never becomes a
+ *    pseudo-register, and CSE does not see it.
  *
- * 2) Yazmaclar `vu16` olmali. include/gba_io.h'daki REG_BG0CNT/REG_BG1CNT
- *    `u16 *` (volatile DEGIL); onlarla ROM'daki geri okuma-yazma ciftleri
- *    (ldrh/strh) tamamen siliniyor. Bu yuzden bu dosya kendi volatile
- *    makrolarini tanimliyor.
+ * 2) The registers must be `vu16`. REG_BG0CNT/REG_BG1CNT in include/gba_io.h
+ *    are `u16 *` (NOT volatile); with those, the ROM's read-back/write pairs
+ *    (ldrh/strh) are eliminated entirely. That is why this file defines its
+ *    own volatile macros.
  *
- * `BG0CNT_V = BG0CNT_V;` ROM'da gercekten var (ldrh + strh). Deger
- *    degismiyor ama volatile oldugu icin iki veriyolu islemi kaliyor.
+ * `BG0CNT_V = BG0CNT_V;` really is present in the ROM (ldrh + strh). The value
+ *    does not change, but because it is volatile the two bus operations
+ *    remain.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/video/setup_bg0_bg1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/video/setup_bg0_bg1.c
  */
 
 #include "gba_types.h"

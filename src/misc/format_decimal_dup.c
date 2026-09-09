@@ -1,15 +1,16 @@
-/* Ondalik basamak yazicinin IKINCI kopyasi — 0x080674B0-0x08067523
+/* The SECOND copy of the decimal digit writer — 0x080674B0-0x08067523
  *
- * ROM'da bu fonksiyon IKI KEZ var. 0x080672FC ile bu adres arasindaki
- * 116 baytin md5'i BIREBIR AYNI (dogrulandi); yani ayni kaynak iki ayri
- * derleme birimine girmis ve baglayici tekillestirmemis.
+ * This function appears TWICE in the ROM. The md5 of the 116 bytes at
+ * 0x080672FC and at this address is IDENTICAL (verified); that is, the same
+ * source went into two separate translation units and the linker did not
+ * deduplicate it.
  *
- * Govde src/misc/format_decimal.c ile ayni; yalnizca fonksiyon adi
- * farkli. Ikisi ayri ayri kayitli olmali cunku ROM'da ayri adreslerde
- * duruyorlar.
+ * The body is the same as src/misc/format_decimal.c; only the function name
+ * differs. The two must be recorded separately because they sit at separate
+ * addresses in the ROM.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/format_decimal_dup.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/format_decimal_dup.c
  */
 
 #include "gba_types.h"

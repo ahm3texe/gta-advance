@@ -1,52 +1,55 @@
-/* VBlank kesme isleyicisi — 0x08000220-0x0800038C
+/* VBlank interrupt handler — 0x08000220-0x0800038C
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/interrupt/vblank_intr.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/interrupt/vblank_intr.c
  *
- * VBlank'a girildiginde iki kare sayaci artirilir, sonra yuvalama sayaci
- * (gEepromAvailable) bir artirilir. Sayac 1 degilse isleyici zaten
- * calisiyordur; is yapilmadan cikilir. Asil is VCOUNT'a bakarak yapilir:
- * VBlank penceresinin ne kadari kaldiysa aktarim adimlarinin tamami ya da
- * hicbiri calistirilir. gVBlankState bu karari kareler arasinda tasiyan
- * kucuk durum makinesidir.
+ * On entering VBlank two frame counters are incremented, then the nesting
+ * counter (gEepromAvailable) is incremented by one. If the counter is not 1
+ * the handler is already running, and it returns without doing any work. The
+ * real work is decided by VCOUNT: depending on how much of the VBlank window
+ * is left, either all of the transfer steps or none of them are run.
+ * gVBlankState is the small state machine that carries that decision across
+ * frames.
  */
 
 #include "gba_io.h"
 
-/* IWRAM adresi sabit cast olarak yazilir, extern sembol olarak degil:
- * ROM 0x03000000'i kaydirmayla uretiyor (movs #0xc0 / lsls #18), sembol
- * olsaydi literal havuzdan okunurdu. (docs/COMPILER.md, kural 1'in istisnasi) */
+/* The IWRAM address is written as a constant cast, not as an extern symbol:
+ * the ROM produces 0x03000000 by shifting (movs #0xc0 / lsls #18); as a
+ * symbol it would be read from the literal pool. (docs/COMPILER.md, the
+ * exception to rule 1.) */
 #define gFrameDelay (*(u32 *)0x03000000)
 
-/* VBlank 160. tarama satirinda baslar; VCOUNT - 160 gecen satir sayisidir. */
+/* VBlank starts at scanline 160; VCOUNT - 160 is the number of lines elapsed. */
 #define VBLANK_FIRST_LINE 160
-/* Kisa butce: durum makinesi zaten hazir oldugunda aktarima izin verilen
- * gecikme. Uzun butce: ilk kez baslarken kabul edilen gecikme. */
+/* Short budget: the delay still allowed for a transfer when the state machine
+ * is already ready. Long budget: the delay accepted when starting for the
+ * first time. */
 #define BUDGET_SHORT 10
 #define BUDGET_LONG  19
 
 #define FRAME_DELAY_MAX 5
 
 /* gVBlankState degerleri */
-#define VBLANK_IDLE  0   /* bir sonraki VBlank'ta aktarim denenecek */
-#define VBLANK_BUSY  1   /* aktarim bu karede yapildi                */
-#define VBLANK_READY 2   /* pencere kacti, gelecek karede dogrudan aktar */
+#define VBLANK_IDLE  0   /* a transfer will be attempted next VBlank */
+#define VBLANK_BUSY  1   /* the transfer was done this frame         */
+#define VBLANK_READY 2   /* the window was missed; transfer directly next frame */
 
 extern u32 gFrameCounterLate;
 extern u32 gIwramFrameCounter;
-/* Ayni sozcuk hem EEPROM bulundu bayragi hem kesme yuvalama sayaci olarak
- * kullaniliyor (data/ram_map.csv 0x02000EB8). */
+/* The same word is used both as the EEPROM-found flag and as the interrupt
+ * nesting counter (data/ram_map.csv 0x02000EB8). */
 extern u32 gEepromAvailable;
 extern u16 gVBlankEnabled;
-/* volatile SART: kaldirilinca agbcc uc karsilastirmanin tekini yukleyip
- * degeri callee-saved register'da tutuyor; ROM her dalda yeniden okuyor
- * (0x8000270, 0x80002E0, 0x8000358). volatile burada semantik degil
- * siralama/yeniden-yukleme dugmesi — docs/COMPILER.md kural 4. */
+/* volatile is REQUIRED: without it agbcc loads the value once for the three
+ * comparisons and keeps it in a callee-saved register; the ROM re-reads it in
+ * every branch (0x8000270, 0x80002E0, 0x8000358). Here volatile is not a
+ * semantic marker but an ordering/reload switch — docs/COMPILER.md rule 4. */
 extern volatile u8 gVBlankState;
 extern u32 gAsyncState;
 extern u8  gGameState[16];
 
-/* VBlank sirasinda calisan alt sistemler; henuz adlandirilmadi. */
+/* The subsystems that run during VBlank; not named yet. */
 extern void FUN_08033264(void);
 extern void FUN_08011ec4(void);
 extern void ServiceLinkFrame(void);
@@ -68,7 +71,7 @@ void VBlankIntr(void)
     gFrameCounterLate++;
     gIwramFrameCounter++;
 
-    /* Yuvalanmis girisler isi tekrarlamaz, yalnizca sayaci tasir. */
+    /* A nested entry does not repeat the work, it only carries the counter. */
     depth = ++gEepromAvailable;
     if (depth == 1) {
         FUN_08033264();
@@ -78,7 +81,7 @@ void VBlankIntr(void)
 
         if ((u16)(REG_VCOUNT - VBLANK_FIRST_LINE) <= BUDGET_SHORT) {
             if (gVBlankState == VBLANK_READY) {
-                /* Gecen karede pencere kacirilmisti: dogrudan aktar. */
+                /* The window was missed last frame: transfer directly. */
                 FlushSpriteList();
                 FUN_080133a8();
                 FUN_080130f4();
@@ -99,9 +102,9 @@ void VBlankIntr(void)
                 if (gAsyncState == 0)
                     FUN_080108f4();
 
-                /* Ust adim zaman yemis olabilir; VCOUNT yeniden okunur.
-                 * Kosul ROM'daki gibi ters yazili: agbcc boylece "then"
-                 * dalini once yerlestiriyor (cmp #19 / bls). */
+                /* The step above may have eaten time; VCOUNT is re-read.
+                 * The condition is written inverted, as in the ROM: that makes
+                 * agbcc place the "then" branch first (cmp #19 / bls). */
                 if ((u16)(REG_VCOUNT - VBLANK_FIRST_LINE) > BUDGET_LONG) {
                     gVBlankState = VBLANK_READY;
                 } else {
@@ -134,19 +137,21 @@ void VBlankIntr(void)
     gBiosIrqFlags |= 1;
 }
 
-/* Notlar (denenip olculenler):
- *  - Aktarim blogu iki kez acik yazilmistir. Ortak bir yardimci fonksiyona
- *    alinirsa agbcc -O2 onu inline etmiyor ve iki `bl` uretiyor; ROM'da kod
- *    iki kez kopyalanmis durumda (docs/COMPILER.md kural 14 ile ayni mantik).
- *  - gVBlankState volatile olmadan: 356 byte, 168 byte farkli. Derleyici
- *    ilk `ldrb`in sonucunu r4'te tutup ikinci ve ucuncu karsilastirmada
- *    yeniden kullaniyor, adres ise r7'ye gidiyor; ROM tam tersini yapiyor
- *    (adres r4'te, deger her dalda yeniden okunuyor).
- *  - Ikinci VCOUNT kosulu duz yazildiginda (`<= BUDGET_LONG`) agbcc
- *    `bhi else` uretiyor; ROM `bls then` kullaniyor, yani kaynakta kosul
- *    ters yazilmis. Bu ayni zamanda ikinci literal havuzunun yerini de
- *    degistiriyor (ROM'da havuz `movs #2 / b` ile aktarim blogu arasinda).
+/* Notes (tried and measured):
+ *  - The transfer block is written out twice. Factored into a shared helper,
+ *    agbcc -O2 does not inline it and emits two `bl`s; in the ROM the code is
+ *    duplicated (the same reasoning as docs/COMPILER.md rule 14).
+ *  - Without volatile on gVBlankState: 356 bytes, 168 bytes differing. The
+ *    compiler keeps the result of the first `ldrb` in r4 and reuses it for the
+ *    second and third comparisons, while the address goes to r7; the ROM does
+ *    exactly the opposite (address in r4, value re-read in every branch).
+ *  - Written plainly (`<= BUDGET_LONG`), the second VCOUNT condition makes
+ *    agbcc emit `bhi else`; the ROM uses `bls then`, so the condition was
+ *    written inverted in the source. That also changes where the second
+ *    literal pool sits (in the ROM the pool is between `movs #2 / b` and the
+ *    transfer block).
  *  - gFrameCounterLate / gEepromAvailable / gVBlankEnabled / gAsyncState /
- *    gGameState / gBiosIrqFlags extern sembol olarak birakildi: ROM hepsini
- *    literal havuzdan okuyor. gFrameDelay tam tersi — kaydirmayla uretiliyor.
+ *    gGameState / gBiosIrqFlags were left as extern symbols: the ROM reads all
+ *    of them from the literal pool. gFrameDelay is the opposite -- it is
+ *    produced by shifting.
  */

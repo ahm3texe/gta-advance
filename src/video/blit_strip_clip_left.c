@@ -1,32 +1,34 @@
-/* 8x48 4bpp serit cizici, SOL kirpma — 0x08031844-0x08031A1B
+/* 8x48 4bpp strip blitter, LEFT clipping — 0x08031844-0x08031A1B
  *
- * src/video/blit_strip_4bpp.c'deki 0x08031A1C ile AYNI KAYNAK; tek fark
- * sutun testinin yonu.
+ * THE SAME SOURCE as 0x08031A1C in src/video/blit_strip_4bpp.c; the only
+ * difference is the direction of the column test.
  *
- * NASIL BULUNDU (yeni denemeden once bunu yapin): iki ROM govdesinin
- * komut listeleri karsilastirildi --
+ * HOW IT WAS FOUND (do this before starting a new attempt): the instruction
+ * listings of the two ROM bodies were compared --
  *     python3 tools/disasm_function.py 0x08031844 > a
  *     python3 tools/disasm_function.py 0x08031A1C > b
- *     diff a b        # yalnizca DAL komutlari farkli
- * 235 komutun 235'i ayni; fark yalnizca dal hedefleri ve sutun testinin
- * kosulu (`blt` -> `bge`). Yani 0x08031A1C `col >= 0` iken duz kaynagi
- * aliyor, bu fonksiyon `col < 0` iken aliyor -- seridin ters kenari.
- * Kaynakta karsiligi tek karakter: `if (col++ >= 0)` -> `if (col++ < 0)`.
+ *     diff a b        # only the BRANCH instructions differ
+ * All 235 instructions are the same; the only differences are the branch
+ * targets and the condition of the column test (`blt` -> `bge`). So 0x08031A1C
+ * takes the plain source while `col >= 0`, and this function takes it while
+ * `col < 0` -- the opposite edge of the strip. In the source that is a single
+ * character: `if (col++ >= 0)` -> `if (col++ < 0)`.
  *
- * Bu ders genellenebilir: bir fonksiyon eslesmiyorsa ve ROM'da AYNI
- * BOYUTA yakin bir kardesi zaten eslesiyorsa, once iki govdeyi
- * birbiriyle diff'leyin. Yazmac dagitimi kovalamadan once bu bakilmali.
+ * The lesson generalises: if a function does not match and a sibling of nearly
+ * THE SAME SIZE in the ROM already does, diff the two bodies against each
+ * other first. Check that before chasing register allocation.
  *
- * Kardesten devralinan olcumler (hepsi burada da gecerli):
- *  1. Dongu AZALAN; satir `rowBase + (48 - i)` diye YENIDEN hesaplaniyor.
- *  2. Dikey kirpma testi TEK `if (a || b)`.
- *  3. `(*mask & *under)` sirasi onemli: agbcc AND'in IKINCI operandini
- *     once yukluyor.
- *  4. HIZLI YOLDA mask/under NIBBLE BASINA artirilmali; ROM'daki tek
- *     `+= 8`'i derleyici dagitimdan SONRA kendisi uretiyor.
+ * Measurements inherited from the sibling (all hold here too):
+ *  1. The loop is DESCENDING; the row is RECOMPUTED as `rowBase + (48 - i)`.
+ *  2. The vertical clip test is a SINGLE `if (a || b)`.
+ *  3. The order in `(*mask & *under)` matters: agbcc loads the SECOND operand
+ *     of the AND first.
+ *  4. On the FAST path, mask/under must be incremented PER NIBBLE; the ROM's
+ *     single `+= 8` is something the compiler produces itself, AFTER
+ *     allocation.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/video/blit_strip_clip_left.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/video/blit_strip_clip_left.c
  */
 
 #include "gba_types.h"

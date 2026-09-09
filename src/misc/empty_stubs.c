@@ -1,20 +1,20 @@
-/* Bos saplamalar — tek komutluk `bx lr` fonksiyonlari
+/* Empty stubs — single-instruction `bx lr` functions
  *
- * ROM'da 27 adet iki baytlik fonksiyon var; hepsi tek bir `bx lr`.
- * Hepsi `bl` ile CAGRILIYOR, yani gercek fonksiyonlar -- sinir hatasi degil.
+ * The ROM has 27 two-byte functions, each a single `bx lr`. All of them are
+ * CALLED with `bl`, so they are real functions -- not boundary errors.
  *
- * NE KADAR DEGERLI OLDUGU konusunda durust olmak gerekirse: toplam 54
- * bayt, yani yuzdeyi neredeyse hic oynatmiyor.  Fonksiyon SAYISINI artiriyor,
- * anlayisi degil.  Bos bir govde imzadan BAGIMSIZ olarak `bx lr` uretiyor,
- * bu yuzden buradaki `void f(void)` imzalari DOGRULANMIS DEGIL -- yalnizca
- * en basit bicim.  Bir cagiran arguman gecirirse tutarlilik denetleyicisi
- * bunu yakalayacak ve o zaman imza duzeltilecek.
+ * To be honest about HOW VALUABLE THIS IS: 54 bytes in total, so it barely
+ * moves the percentage. It raises the function COUNT, not the understanding.
+ * An empty body produces `bx lr` REGARDLESS of the signature, so the
+ * `void f(void)` signatures here are NOT VERIFIED -- they are merely the
+ * simplest form. If a caller passes an argument, the consistency checker will
+ * catch it and the signature will be corrected then.
  *
- * Arac zincirinin interworking veneer tablosu (0x0806C0B8-0x0806C0D8,
- * `bx r0`..`bx r8` dizisi) BILEREK DISARIDA birakildi: o oyun kodu degil.
+ * The toolchain's interworking veneer table (0x0806C0B8-0x0806C0D8, the
+ * `bx r0`..`bx r8` sequence) was left out DELIBERATELY: that is not game code.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/empty_stubs.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/empty_stubs.c
  */
 
 #include "gba_types.h"

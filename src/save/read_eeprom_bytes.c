@@ -1,10 +1,10 @@
-/* Hizali EEPROM okumasi — 0x0800091C-0x080009EB
+/* Aligned EEPROM read — 0x0800091C-0x080009EB
  *
- * Nintendo EEPROM rutininden 8 byte'lik bloklar okur ve byte sirasini
- * ters cevirerek hedef tampona aktarir.
+ * Reads 8-byte blocks from the Nintendo EEPROM routine and transfers them into
+ * the destination buffer with the byte order reversed.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/read_eeprom_bytes.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/read_eeprom_bytes.c
  */
 
 #include "gba_io.h"
@@ -37,9 +37,10 @@ u32 ReadEepromBytes(u32 block, s32 size, u8 *dest)
     for (i = 0; i < blocks; i++) {
         FUN_0806bdfc((u16)(block + i), buffer);
 
-        /* EEPROM sozcugu big-endian gelir; byte'lar ters sirayla aktarilir.
-         * ROM'da bu sekiz kopya acik yazilmis: derleyici bayraklariyla
-         * (-funroll-loops) uretilen bicim ROM'dakine uymuyor. */
+        /* The EEPROM word arrives big-endian; the bytes are transferred in
+         * reverse order. In the ROM these eight copies are written out
+         * explicitly: the form produced with compiler flags (-funroll-loops)
+         * does not match the ROM's. */
         COPY_EEPROM_BYTE(7);
         COPY_EEPROM_BYTE(6);
         COPY_EEPROM_BYTE(5);

@@ -1,76 +1,79 @@
-/* GameInit — 0x08000430-0x0800072F (768 byte)  BYTE-MATCHING
+/* GameInit — 0x08000430-0x0800072F (768 bytes)  BYTE-MATCHING
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama: python3 tools/verify_c_function.py src/bootstrap/game_init.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification: python3 tools/verify_c_function.py src/bootstrap/game_init.c
  *
- * Donanimi ayaga kaldirir (WAITCNT, EWRAM/IWRAM/VRAM/OAM temizleme, kesmeler),
- * sonra iki ic ice sonsuz dongu calistirir: dis dongu bir oturumu kurar, ic
- * dongu her kareyi isler. Ic dongu gLoopState 1 olunca ya da IsSessionActive
- * sifirdan farkli donunce biter; ardindan ekran sifirlanip dis dongu bastan
- * baslar.
+ * Brings the hardware up (WAITCNT, clearing EWRAM/IWRAM/VRAM/OAM, interrupts),
+ * then runs two nested infinite loops: the outer loop sets up a session, the
+ * inner loop processes each frame. The inner loop ends when gLoopState becomes
+ * 1 or IsSessionActive returns nonzero; the display is then reset and the
+ * outer loop starts again.
  *
  * -----------------------------------------------------------------------
- * OLCULEN YAZIM KURALLARI (bu fonksiyonu eslesmeye goturen dort ayrinti)
+ * MEASURED SOURCE-FORM RULES (the four details that brought this function
+ * to a match)
  * -----------------------------------------------------------------------
  *
- * 1. DMA KAYNAK YUVALARI: ROM yigin cercevesi 16 byte ve yuvalar DORT byte
- *    arali (sp+0 word, sp+4 halfword, sp+8 halfword, sp+12 word) — ama sp+4
- *    ve sp+8'e HALFWORD yaziliyor. Duz `u16` degiskenler 2 byte arali
- *    yerlesip cerceveyi 12 bayta dusuruyor (673 fark); `u32` dogru cerceveyi
- *    verip yazimi word yapiyor (264 fark).
+ * 1. DMA SOURCE SLOTS: the ROM's stack frame is 16 bytes and the slots are
+ *    FOUR bytes apart (sp+0 word, sp+4 halfword, sp+8 halfword, sp+12 word)
+ *    -- yet sp+4 and sp+8 are written as HALFWORDS. Plain `u16` variables lay
+ *    out 2 bytes apart and shrink the frame to 12 bytes (673 differences);
+ *    `u32` gives the right frame but makes the store a word (264 differences).
  *
- *    Cozum: her yuva `u16 x[2]` DIZISI. Dizi BLKmode oldugu icin agbcc onu
- *    expand_decl aninda, bildirim sirasinda, 4 bayta hizali yerlestiriyor;
- *    `x[0] = 0` yine `strh` uretiyor ve `(u32)x` adresi tek komutta
- *    hesaplaniyor (`mov r0, sp` / `add r0, sp, #4` / `add r6, sp, #8`).
- *    Word yuvasi da dizi olmali (`fillSlot`, `*(u32 *)fillSlot` ile yazilir):
- *    skaler `u32` yazilirsa dizilerden SONRA yerlesip sp+0'i kaybediyor ve
- *    `&fill` artik `mov rX, sp` ile tek komutta uretilemiyor.
+ *    Solution: each slot is a `u16 x[2]` ARRAY. Because an array is BLKmode,
+ *    agbcc lays it out 4-byte aligned at expand_decl time, in declaration
+ *    order; `x[0] = 0` still emits `strh` and the address `(u32)x` is computed
+ *    in a single instruction (`mov r0, sp` / `add r0, sp, #4` /
+ *    `add r6, sp, #8`).
+ *    The word slot must be an array too (`fillSlot`, written through
+ *    `*(u32 *)fillSlot`): a scalar `u32` is laid out AFTER the arrays, loses
+ *    sp+0, and `&fill` can no longer be produced by a single `mov rX, sp`.
  *
- *    Denenip tutmayanlar: struct{u16 h; u16 pad;} (agbcc bunu SImode sayip
- *    `ldr`/`and`/`str` uretiyor), tek buyuk struct (uye erisimi `[sp, #4]`
- *    tabanina donusuyor, ROM'un `add r0,sp,#4` + `[r0,#0]` bicimini
- *    bozuyor), union, u32 yuva + (u16) cast.
+ *    Tried and rejected: struct{u16 h; u16 pad;} (agbcc treats it as SImode
+ *    and emits `ldr`/`and`/`str`), one large struct (member access turns into
+ *    a `[sp, #4]` base and breaks the ROM's `add r0,sp,#4` + `[r0,#0]` form),
+ *    a union, and a u32 slot with a (u16) cast.
  *
- * 2. DMA3 TABAN ISARETCISI UC AYRI YEREL (COMPILER.md kural 17). ROM tabani
- *    uc ayri register'da tutuyor: init'te r4, ic dongude r4 (yeniden
- *    yuklenmis), dis dongunun kapanis blogunda r8. Tek `dma` degiskeni
- *    kullanilirsa omru tum fonksiyona yayiliyor, onceligi dusuyor ve r7'ye
- *    kayiyor — sonra sifir sabiti r4'u kapiyor ve TUM register dagitimi
- *    kayiyor (656/764 fark).
+ * 2. THE DMA3 BASE POINTER IS THREE SEPARATE LOCALS (COMPILER.md rule 17).
+ *    The ROM keeps the base in three separate registers: r4 during init, r4
+ *    again (reloaded) in the inner loop, and r8 in the outer loop's closing
+ *    block. With a single `dma` variable its lifetime spans the whole
+ *    function, its priority drops and it moves to r7 -- then the zero constant
+ *    takes r4 and the ENTIRE register allocation shifts (656/764 differences).
  *
- * 3. DONGU ICI TABAN ATAMALARI DONGUNUN ICINDE YAZILIR (kural 19'un tersi
- *    yonu). `dmaFrame`/`dmaReset` atamalari dongu ONUNE yazilirsa agbcc
- *    onlari kaynak deyimi olarak, derleyicinin kendi urettigi preheader
- *    kopyalarindan ONCE yayiyor:
- *        mov r8,r4 / adds r7,r6,#0 / mov sl,r5     (bizim)
+ * 3. THE IN-LOOP BASE ASSIGNMENTS ARE WRITTEN INSIDE THE LOOP (the inverse
+ *    direction of rule 19). If the `dmaFrame`/`dmaReset` assignments are
+ *    written BEFORE the loop, agbcc emits them as source statements, ahead of
+ *    the preheader copies it generates itself:
+ *        mov r8,r4 / adds r7,r6,#0 / mov sl,r5     (ours)
  *        adds r7,r6,#0 / mov sl,r5 / mov r8,r4     (ROM)
- *    Atamalar dongunun icine alininca agbcc'nin dongu-degismezi tasiyicisi
- *    onlari preheader'in SONUNA koyuyor ve sira ROM'unkine oturuyor.
- *    Bu tek degisiklik 11 farkli bayti sifira indirdi.
- *    Onemli: `dmaReset = dma;` (kopya) DEGIL, `= (vu32 *)REG_DMA3_ADDR;`
- *    (sabit) yazilmali — kopya yazilirsa agbcc iki degiskeni birlestirip
- *    tek isaretciye donuyor.
+ *    Moving the assignments inside the loop makes agbcc's loop-invariant
+ *    motion place them at the END of the preheader, and the order matches the
+ *    ROM's. That single change took 11 differing bytes to zero.
+ *    Important: it must be written `= (vu32 *)REG_DMA3_ADDR;` (the constant),
+ *    NOT `dmaReset = dma;` (a copy) -- with a copy agbcc coalesces the two
+ *    variables into a single pointer.
  *
- * 4. DMA kontrol yazmacindan yapilan OLU OKUMA (`dma[2];`) ROM'daki
- *    `ldr r0, [r4, #8]` komutlarinin karsiligidir; her blokta gerekli.
+ * 4. The DEAD READ of the DMA control register (`dma[2];`) corresponds to the
+ *    `ldr r0, [r4, #8]` instructions in the ROM; it is needed in every block.
  */
 
 #include "gba_io.h"
 
-/* Yazmac adresleri sabit cast olarak yazilir: agbcc hepsini literal havuzdan
- * okuyor, ROM da oyle. (COMPILER.md kural 1'in istisnasi.) */
+/* Register addresses are written as constant casts: agbcc reads all of them
+ * from the literal pool, and so does the ROM. (The exception to COMPILER.md
+ * rule 1.) */
 
 #define WAITCNT_BITS 0x4014
 
-/* Hedef adresler: agbcc bunlari kaydirmayla uretiyor (movs #0x80 / lsls #18
- * gibi), ROM'da da oyle. */
+/* Destination addresses: agbcc produces these by shifting (such as
+ * movs #0x80 / lsls #18), and so does the ROM. */
 #define EWRAM 0x02000000
 #define IWRAM 0x03000000
 #define VRAM  0x06000000
 #define OAM   0x07000000
 
-/* DMA CNT (ust 16 bit kontrol, alt 16 bit transfer sayisi) */
+/* DMA CNT (upper 16 bits control, lower 16 bits transfer count) */
 #define DMA_CLEAR_EWRAM  0x85010000   /* 0x10000 word  = 256K EWRAM     */
 #define DMA_CLEAR_IWRAM  0x85001F80   /* 0x1F80 word   = 32256 byte     */
 #define DMA_CLEAR_VRAM   0x8100C000   /* 0xC000 half   = 96K VRAM       */
@@ -110,7 +113,7 @@ extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_0803004c(void);
 extern void FUN_0805b1c0(s32 arg);
 extern void ZeroHistory(void);
-extern s32  IsSessionActive(void);          /* sifirdan farkli ise dongu biter */
+extern s32  IsSessionActive(void);          /* nonzero ends the loop */
 extern void FUN_08013824(void);
 extern void FUN_08012248(void);
 extern void FUN_08012198(void);
@@ -143,10 +146,10 @@ extern void FUN_08063d3c(void);
 void GameInit(void)
 {
     vu32 *dma;         /* init blogu           (ROM: r4) */
-    vu32 *dmaFrame;    /* ic dongu sifirlamasi (ROM: r4, dongude yeniden yuklenir) */
-    vu32 *dmaReset;    /* dis dongu kapanisi   (ROM: r8) */
+    vu32 *dmaFrame;    /* inner-loop clear (ROM: r4, reloaded in the loop) */
+    vu32 *dmaReset;    /* outer-loop shutdown  (ROM: r8) */
     vu16 *waitcnt;
-    /* Yigin yuvalari — bkz. yukarida (1). Sirasi cerceveyi belirler:
+    /* Stack slots -- see (1) above. Their order determines the frame:
      * sp+0 fillSlot, sp+4 clearSource, sp+8 frameClearSource, sp+12 pending. */
     u16 fillSlot[2];
     u16 clearSource[2];
@@ -166,7 +169,7 @@ void GameInit(void)
     dma[2] = DMA_CLEAR_EWRAM;
     dma[2];
 
-    /* IWRAM'i sifirla (yigin haric) */
+    /* Clear IWRAM (excluding the stack) */
     *(u32 *)fillSlot = 0;
     dma[0] = (u32)fillSlot;
     dma[1] = IWRAM;
@@ -182,7 +185,7 @@ void GameInit(void)
 
     RegisterRamReset(1);
 
-    /* Bellegi tanitici desenle doldur (bozuk okuma yakalamak icin) */
+    /* Fill memory with an identifying pattern (to catch corrupt reads) */
     *(u32 *)fillSlot = EWRAM_FILL;
     dma[0] = (u32)fillSlot;
     dma[1] = EWRAM;
@@ -248,9 +251,9 @@ void GameInit(void)
             gFrameCounterEwram = 0;
             FUN_0800cae4();
 
-            /* Ilk karede ekran zaten kurulu; sonrakilerde yeniden kurulur. */
+            /* On the first frame the display is already set up; on later ones it is rebuilt. */
             if (first == 0) {
-                /* Taban atamasi blogun ICINDE — bkz. yukarida (3). */
+                /* The base assignment is INSIDE the block -- see (3) above. */
                 dmaFrame = (vu32 *)REG_DMA3_ADDR;
                 FUN_08063b74();
                 frameClearSource[0] = 0;
@@ -311,13 +314,13 @@ void GameInit(void)
         if (IsSessionActive() != 0)
             pending = 1;
 
-        /* gGameState[12] 1 veya 2 ise sifirlanir (u8 kirpmasi ROM'daki
-         * lsls #24 / lsrs #24 ciftini uretir). */
+        /* gGameState[12] is cleared when it is 1 or 2 (the u8 truncation
+         * produces the ROM's lsls #24 / lsrs #24 pair). */
         phase = gGameState[12] - 1;
         if (phase <= 1)
             gGameState[12] = 0;
 
-        /* Taban atamasi dis dongunun ICINDE — bkz. yukarida (3). */
+        /* The base assignment is INSIDE the outer loop -- see (3) above. */
         dmaReset = (vu32 *)REG_DMA3_ADDR;
         FUN_08063b74();
         frameClearSource[0] = 0;

@@ -1,45 +1,47 @@
-/* Kesme sistemi kurulumu — 0x0800038C-0x08000430
+/* Interrupt system setup — 0x0800038C-0x08000430
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/bootstrap/init_interrupts.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/bootstrap/init_interrupts.c
  */
 
 #include "gba_io.h"
 
 typedef void (*IrqHandler)(void);
 
-/* VBlank + VCount kesmeleri acik, VCount tetigi 50. tarama satirinda. */
+/* VBlank + VCount interrupts enabled, the VCount trigger on scanline 50. */
 #define DISPSTAT_SETUP 0x3228
 #define IRQ_ENABLE_MASK 0x0005   /* bit0 VBlank | bit2 VCount */
 
-/* enable | 32 bit birim | 0x200 kelime (2 KB) */
+/* enable | 32-bit unit | 0x200 words (2 KB) */
 #define DMA_COPY_DISPATCHER 0x84000200
 
-/* IntrMain'in tablo indisleri: ip sayaci 0'dan basliyor ama ilk testten once
- * bir kez artiyor, yani 0 ve 2 hic dagitilmiyor. Tablonun 13 girdisi var,
- * son girdi de dagitim disinda. */
+/* IntrMain's table indices: the ip counter starts at 0 but is incremented
+ * once before the first test, so 0 and 2 are never dispatched. The table has
+ * 13 entries, and the last one is outside dispatch as well. */
 #define IRQ_SLOT_COUNT  13
 #define IRQ_SLOT_VBLANK 1
 #define IRQ_SLOT_VCOUNT 3
 
 extern IrqHandler gIrqHandlerTable[IRQ_SLOT_COUNT];
 extern void *gIrqVector;
-/* IRQ dagiticisinin EWRAM'daki kopyasi; BIOS vektoru buraya bakiyor. */
+/* The EWRAM copy of the IRQ dispatcher; the BIOS vector points here. */
 extern u32 gIntrMainEwram[];
-/* ram_map.csv'de gEepromAvailable adiyla duruyor; burada IRQ derinlik sayaci
- * olarak sifirlaniyor. Iki rolun ayni sozcugu paylasmasi henuz dogrulanmadi. */
+/* It appears under the name gEepromAvailable in ram_map.csv; here it is
+ * cleared as the IRQ depth counter. That the two roles share the same word is
+ * not verified yet. */
 extern u32 gEepromAvailable;
 extern u32 gAsyncState;
 
-/* ARM modunda; DMA3 ile EWRAM'a kopyalanip BIOS kesme vektorune baglaniyor. */
+/* In ARM mode; copied to EWRAM with DMA3 and hooked into the BIOS interrupt
+ * vector. */
 extern void IntrMain(void);
 extern void DummyIntr(void);
 extern void VBlankIntr(void);
 extern void VCountIntr(void);
 
-/* Dis semboller assembler'a .equ ile mutlak adres olarak veriliyor
- * (docs/COMPILER.md kural 5), bu yuzden Thumb biti kendiliginden gelmiyor;
- * tabloya yazilan her Thumb isleyicide elle eklenir. */
+/* External symbols are given to the assembler as absolute addresses with .equ
+ * (docs/COMPILER.md rule 5), so the Thumb bit does not come along by itself;
+ * it is added by hand for every Thumb handler written into the table. */
 #define THUMB_ENTRY(fn) ((IrqHandler)((u32)(fn) + 1))
 
 /* 0x0800038C */
@@ -63,7 +65,7 @@ void InitInterrupts(void)
     gIrqHandlerTable[11] = THUMB_ENTRY(DummyIntr);
     gIrqHandlerTable[12] = THUMB_ENTRY(DummyIntr);
 
-    /* Dagiticiyi EWRAM'a tasirken kesmeler kapali kalir. */
+    /* Interrupts stay disabled while the dispatcher is moved to EWRAM. */
     saved_ime = REG_IME;
     REG_IME = 0;
     REG_DMA3.src = (const void *)IntrMain;

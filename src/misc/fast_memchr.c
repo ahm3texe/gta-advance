@@ -1,12 +1,14 @@
-/* Bellekte bir bayti word-hizli tarayan memchr benzeri yardimci.
+/* A memchr-like helper that scans memory for a byte at word speed.
  *
- * Hizali ve en az dort baytlik kisimlarda dort kopyali arama kelimesi ile
- * sifir-bayt algilama hilesi kullanilir; kalan baytlar dogrudan taranir.
+ * On aligned parts of at least four bytes it uses a four-way replicated search
+ * word together with the zero-byte detection trick; the remaining bytes are
+ * scanned directly.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm
- * Dogrulama: make c-match FILE=src/misc/fast_memchr.c
- * PARK: tekrar sabiti ve sifir-bayt hilesinin ifade/scope bicimleri denendi;
- * 136/132 bayt, 83/136 fark. Kalan engel r4-r7 yazmac dagitimi.
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm
+ * Verification: make c-match FILE=src/misc/fast_memchr.c
+ * PARKED: the replication constant and various expression/scope forms of the
+ * zero-byte trick were tried; 136/132 bytes, 83/136 differences. The remaining
+ * obstacle is the r4-r7 register allocation.
  */
 
 #include "gba_types.h"

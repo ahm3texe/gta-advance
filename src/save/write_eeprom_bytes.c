@@ -1,36 +1,39 @@
-/* Hizali EEPROM yazimi — 0x080009EC-0x08000B00
+/* Aligned EEPROM write — 0x080009EC-0x08000B00
  *
- * Kaynak tamponu 8 byte'lik EEPROM bloklarina ters byte sirasiyla paketler,
- * her blogu yazar ve geri okuyarak dogrular. Dogrulama basarisiz olursa blok
- * yeniden yazilir; deneme sayaci butun cagri boyunca ortaktir, blok basina
- * sifirlanmaz (ROM'da 'mov sl, r0' dis dongunun disinda).
+ * Packs the source buffer into 8-byte EEPROM blocks in reverse byte order,
+ * writes each block and validates it by reading it back. If validation fails
+ * the block is rewritten; the attempt counter is shared across the whole call
+ * and is not reset per block (in the ROM 'mov sl, r0' sits outside the outer
+ * loop).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/write_eeprom_bytes.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/write_eeprom_bytes.c
  */
 
 #include "gba_io.h"
 
-/* IO register'lari sabit cast: ROM bunlari literal havuzdan tek taban olarak
- * okuyup ofsetliyor (ldr r0, [r2, #8]), extern sembol degil. */
+/* The IO registers are constant casts: the ROM reads them from the literal
+ * pool as a single base and offsets from it (ldr r0, [r2, #8]), not as extern
+ * symbols. */
 #define DMA_ENABLE   0x80000000
 #define EEPROM_BLOCK 8
 
-/* Bir blok icin izin verilen yeniden yazma denemesi. ROM'daki karsilastirma
- * isaretli: cmp #19 / ble. */
+/* Rewrite attempts allowed for one block. The comparison in the ROM is
+ * signed: cmp #19 / ble. */
 #define MAX_RETRIES  20
 
-/* Nintendo EEPROM rutinleri; data/functions.csv'de henuz adlandirilmadi.
- * FUN_0806beac bir sozcuk programlar, FUN_0806c020 geri okuyup karsilastirir
- * ve sifirdan farkli bir u16 ile hatayi bildirir. */
+/* Nintendo EEPROM routines; not yet named in data/functions.csv.
+ * FUN_0806beac programs one word, FUN_0806c020 reads it back, compares it and
+ * reports an error with a nonzero u16. */
 extern void FUN_0806beac(u16 block, const void *buffer);
 extern u16  FUN_0806c020(u16 block, const void *buffer);
 
-/* EEPROM sozcugu big-endian yazilir: kaynagin ilk byte'i blogun son byte'ina
- * gider. Kaynak bitince (size < 0) blogun kalani dokunulmaz -- bu yuzden
- * paketleme do/while(0) icine sarilip 'break' ile terk edilir; 'continue'
- * olsaydi programlama adimi da atlanirdi. Sekiz kopya acik yazilir, dongu
- * hali farkli kod uretiyor (COMPILER.md kural 14). */
+/* The EEPROM word is written big-endian: the source's first byte goes to the
+ * block's last byte. Once the source runs out (size < 0) the rest of the block
+ * is left untouched -- that is why the packing is wrapped in a do/while(0) and
+ * left with 'break'; with 'continue' the programming step would be skipped as
+ * well. The eight copies are written out explicitly; a loop form produces
+ * different code (COMPILER.md rule 14). */
 #define COPY_EEPROM_BYTE(index) \
     if (size < 0)               \
         break;                  \
@@ -65,13 +68,14 @@ u32 WriteEepromBytes(u32 block, s32 size, const u8 *src)
             COPY_EEPROM_BYTE(0);
         } while (0);
 
-        /* 'block + i' bir yerel degiskene ALINMAZ. Yerel degiskenle
-         * (u32 word = block + i) uretilen kod baska turlu her yerde ayni,
-         * ama register dagitimi kayiyor: derleyici degiskeni r8'e koyup
-         * dongu sayacini r6'da tutuyor. ROM ise 'block + i' CSE gecicisini
-         * callee-saved r4'te tutup sayaci sp+16'ya tasiyor (bu yuzden
-         * 'sub sp, #20', #16 degil). Ifade uc yerde de acik yazilinca
-         * agbcc ROM'un dagitimini uretiyor. */
+        /* 'block + i' is NOT taken into a local variable. With a local
+         * (u32 word = block + i) the generated code is otherwise identical
+         * everywhere, but the register allocation shifts: the compiler puts
+         * the variable in r8 and keeps the loop counter in r6. The ROM instead
+         * keeps the 'block + i' CSE temporary in callee-saved r4 and moves the
+         * counter to sp+16 (which is why it is 'sub sp, #20', not #16).
+         * Writing the expression out at all three sites makes agbcc produce
+         * the ROM's allocation. */
         FUN_0806beac((u16)(block + i), buffer);
 
         while (FUN_0806c020((u16)(block + i), buffer) != 0

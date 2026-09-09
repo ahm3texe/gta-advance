@@ -1,11 +1,11 @@
-/* Kayit sistemi baslatma — 0x0800082C-0x0800091B
+/* Save system initialization — 0x0800082C-0x0800091B
  *
- * EEPROM kitapligini baslatir, slot sayisini 1..16 araligina sinirlar,
- * CRAWSAVE metadata imzasini dogrular veya olusturur ve slot basina kayit
- * boyutunu sekiz byte'a hizalar.
+ * Initializes the EEPROM library, clamps the slot count to the range 1..16,
+ * validates or creates the CRAWSAVE metadata signature, and aligns the
+ * per-slot save size to eight bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  python3 tools/verify_c_function.py src/save/init_save_system.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  python3 tools/verify_c_function.py src/save/init_save_system.c
  */
 
 #include "gba_io.h"
@@ -25,33 +25,36 @@ extern s32  __divsi3(s32 dividend, s32 divisor);
 extern u32  ReadSaveMetadata(u8 *dest);
 extern u32  WriteSaveMetadata(const u8 *src);
 
-/* 0x0800082C — 240/240 byte BYTE-MATCHING
+/* 0x0800082C — 240/240 bytes BYTE-MATCHING
  *
- * Uc yazim ayrintisi olculerek bulundu; ucu de gerekli:
+ * Three details of the source form were found by measurement; all three are
+ * required:
  *
- *  1. Bayrak temizleme dongusu ILERIYE yazilir (COMPILER.md kural 8).
- *     agbcc bunu kendisi ters cevirip ROM'daki asagi yuruyen isaretciye
- *     (adds r2,#31 / subs r2,#1, sayac 15..0) donusturuyor. Elle geriye
- *     yazmak farkli kod uretiyor — olculen ilk-fark ofsetleri:
- *       i=0..15,  [16+i] ileri  -> @176  (dongu TAM eslesiyor)
- *       i=15..0,  [16+i] geri   -> @152
- *       i=16..31, [i]    ileri  -> @112
- *       i=0..15,  [31-i]        -> @160
+ *  1. The flag-clearing loop is written FORWARDS (COMPILER.md rule 8). agbcc
+ *     reverses it itself and turns it into the downward-walking pointer in the
+ *     ROM (adds r2,#31 / subs r2,#1, counter 15..0). Writing it backwards by
+ *     hand produces different code -- the measured first-difference offsets:
+ *       i=0..15,  [16+i] forwards  -> @176  (the loop matches EXACTLY)
+ *       i=15..0,  [16+i] backwards -> @152
+ *       i=16..31, [i]    forwards  -> @112
+ *       i=0..15,  [31-i]           -> @160
  *
- *  2. Bolme cagrisinin bolen argumani ONCE yerel degiskene alinir
- *     (COMPILER.md kural 11). ROM once arguman 2'yi kuruyor
- *     (ldr r0,=&gSaveSlotCount / ldr r1,[r0]), sonra sabit olan arguman
- *     1'i (movs r0,#240 / lsls r0,#1). Cagriya dogrudan gSaveSlotCount
- *     yazilirsa agbcc sabiti once kuruyor ve sira ters cikiyor (fark 23).
+ *  2. The divisor argument of the division call is taken into a local variable
+ *     FIRST (COMPILER.md rule 11). The ROM builds argument 2 first
+ *     (ldr r0,=&gSaveSlotCount / ldr r1,[r0]), then the constant argument 1
+ *     (movs r0,#240 / lsls r0,#1). Writing gSaveSlotCount directly into the
+ *     call makes agbcc build the constant first and the order comes out
+ *     reversed (23 differences).
  *
- *  3. &gSavePayloadSize icin IKI AYRI isaretci degiskeni gerekiyor; her
- *     biri yalnizca BIR kez kullanilir. ROM adresi callee-saved r4'te
- *     tutuyor ve if blogunun icinde r3'e kopyaliyor (adds r3,r4,#0).
- *     Tek isaretciyi iki yerde kullanmak agbcc'nin &gSavePayloadSize
- *     hesabini fonksiyon basina kaldirmasina yol aciyor: fonksiyon 236
- *     byte'a dusuyor ve ilk fark 48. ofsete geri kayiyor. Ayni adres icin
- *     ikinci bir yerel degisken kullanmak kopyayi geri getiriyor.
- *     Isaretcisiz tum bicimler (global dogrudan) 41 bayt farkta kaliyor. */
+ *  3. TWO SEPARATE pointer variables are needed for &gSavePayloadSize, each
+ *     used only ONCE. The ROM keeps the address in callee-saved r4 and copies
+ *     it into r3 inside the if block (adds r3,r4,#0). Using a single pointer
+ *     in two places lets agbcc hoist the &gSavePayloadSize computation to the
+ *     top of the function: the function shrinks to 236 bytes and the first
+ *     difference moves back to offset 48. Using a second local variable for
+ *     the same address brings the copy back.
+ *     Every pointer-free form (the global used directly) stays at a
+ *     41-byte difference. */
 s32 InitSaveSystem(s32 slotCount)
 {
     s32 size;
@@ -86,21 +89,21 @@ s32 InitSaveSystem(s32 slotCount)
         gSaveMetadata[7] = 'E';
         gSaveMetadata[8] = gSaveSlotCount;
 
-        /* Slot bayraklarini temizle — ileriye yaz, bkz. yukarida (1) */
+        /* Clear the slot flags -- written forwards, see (1) above */
         for (i = 0; i < SAVE_SLOT_MAX; i++)
             gSaveMetadata[SAVE_SLOT_FLAGS + i] = 0;
 
         WriteSaveMetadata(gSaveMetadata);
     }
 
-    /* Geri donuste okunacak adres; cagrilar boyunca register'da yasar */
+    /* The address read on return; it lives in a register across the calls */
     payloadSize = &gSavePayloadSize;
 
     slots = gSaveSlotCount;
     size = __divsi3(EEPROM_TOTAL, slots);
     gSavePayloadSize = size;
 
-    /* Slot basina boyutu sekiz byte'in altina hizala */
+    /* Align the per-slot size down to eight bytes */
     if (size & EEPROM_BLOCK_MASK) {
         s32 *alignedSize = &gSavePayloadSize;
 

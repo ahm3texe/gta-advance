@@ -1,14 +1,14 @@
-/* Koordinat erisimcileri — 0x0800A94C-0x0800A97F
+/* Coordinate accessors — 0x0800A94C-0x0800A97F
  *
- * 0x02011030'daki blogun +12/+16 kelime ciftini okuyup yazan dort kucuk
- * yaprak fonksiyon. Cift her zaman ters sirada isleniyor: ilk parametre
- * +16'ya, ikinci parametre +12'ye karsilik geliyor.
+ * Four small leaf functions that read and write the +12/+16 word pair of the
+ * block at 0x02011030. The pair is always processed in reverse order: the
+ * first parameter corresponds to +16 and the second to +12.
  *
- * 0x020110AC = 0x02011030 + 0x7C olmasina ragmen ROM ayri bir literal
- * yukluyor, bu yuzden ayri sembol (docs/COMPILER.md kural 22).
+ * Even though 0x020110AC = 0x02011030 + 0x7C, the ROM loads a separate
+ * literal, so it is a separate symbol (docs/COMPILER.md rule 22).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/coord_accessors.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/coord_accessors.c
  */
 
 #include "gba_types.h"

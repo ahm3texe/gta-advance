@@ -1,11 +1,11 @@
-/* Menu icin BG0/BG1 kurulumu — 0x08012750-0x0801279F
+/* BG0/BG1 setup for the menu — 0x08012750-0x0801279F
  *
- * SetupBg0Bg1 (src/video/setup_bg0_bg1.c) ile ayni volatile makro
- * duzeni; degerler farkli: DISPCNT 0x1740, BG0CNT 0x82|0x1500,
- * BG1CNT 0|8|0x1300. Kural 65-66 burada da belirleyici.
+ * The same volatile macro arrangement as SetupBg0Bg1
+ * (src/video/setup_bg0_bg1.c); the values differ: DISPCNT 0x1740, BG0CNT
+ * 0x82|0x1500, BG1CNT 0|8|0x1300. Rules 65-66 are decisive here as well.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/video/setup_bg0_bg1_menu.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/video/setup_bg0_bg1_menu.c
  */
 
 #include "gba_types.h"

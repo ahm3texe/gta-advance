@@ -1,10 +1,10 @@
-/* Ek koordinat erisimcileri — 0x0800AAD0-0x0800AAE3
+/* Additional coordinate accessors — 0x0800AAD0-0x0800AAE3
  *
- * src/misc/coord_accessors.c'nin devami: `second` okuyucu (+4) ve
- * `gRam020110AC` bayragina 80 yaziyor.
+ * A continuation of src/misc/coord_accessors.c: the `second` reader (+4), and
+ * writing 80 into the `gRam020110AC` flag.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/coord_more.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/coord_more.c
  */
 
 #include "gba_types.h"

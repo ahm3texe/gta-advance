@@ -1,10 +1,10 @@
-/* Ekran ve kesme sifirlama — 0x080007B4-0x0800082B
+/* Display and interrupt reset — 0x080007B4-0x0800082B
  *
- * VRAM ve OAM'i DMA3 ile temizler, VBlank bekler ve kesme tablosunu
- * yeniden kurar.
+ * Clears VRAM and OAM with DMA3, waits for VBlank and rebuilds the interrupt
+ * table.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/bootstrap/reset_display_interrupts.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/bootstrap/reset_display_interrupts.c
  */
 
 #include "gba_io.h"
@@ -16,14 +16,15 @@
 
 extern volatile u8 gVBlankState;
 extern u32 gDisplayState;
-/* BIOS kesme denetim bayraklari (IntrWait). volatile DEGIL: volatile
- * isaretlenince agbcc yukleme sirasini degistiriyor ve ROM'dan sapiyor. */
+/* BIOS interrupt check flags (IntrWait). NOT volatile: marked volatile,
+ * agbcc changes the load order and diverges from the ROM. */
 
-/* Asagidaki uc fonksiyon henuz adlandirilmadi. Assembly kaynaginda
- * WaitForDma3 / InitSubsystem / WaitForVBlank diye etiketlenmislerdi ama
- * disassembly bu isimleri desteklemiyor: FUN_08063b74 bir DMA dongusu degil,
- * dort donanim register'ina sabit yaziyor; FUN_0800cae4 VBlank beklemiyor,
- * iki fonksiyon cagiriyor. Dogrulanana kadar Ghidra adlari kullaniliyor. */
+/* The three functions below are not named yet. In the assembly source they
+ * were labelled WaitForDma3 / InitSubsystem / WaitForVBlank, but the
+ * disassembly does not support those names: FUN_08063b74 is not a DMA loop, it
+ * writes constants to four hardware registers; FUN_0800cae4 does not wait for
+ * VBlank, it calls two functions. The Ghidra names are used until this is
+ * verified. */
 extern void FUN_08063b74(void);
 extern void FUN_0803251c(u32 argument);
 extern void FUN_0800cae4(void);

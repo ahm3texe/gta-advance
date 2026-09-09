@@ -1,35 +1,36 @@
-/* Maskesiz/maskeli serit cizici ve yuva alt nesnesi birakma
+/* Unmasked/masked strip blitter and slot sub-object release
  * — 0x08031684-0x080317ED
  *
- * SINIR NOTU: data/functions.csv burada uzun sure tek bir 0x0803173E
- * kaydi tutuyordu. O adres bir fonksiyon degil; 0x0803073C'deki sozde
- * `bl 0x0803173E` aslinda bir havuz kelimesi (0xF000FFFF) ve
- * discover_functions.py havuzu kod sanmisti. Olculen gercek yerlesim:
- * 0x08031684 (44 bayt) ve 0x080316B0 (318 bayt). Ikisi BITISIK oldugu
- * icin ayni ceviri biriminde durabiliyorlar.
+ * BOUNDARY NOTE: data/functions.csv held a single 0x0803173E record here for
+ * a long time. That address is not a function; the apparent
+ * `bl 0x0803173E` at 0x0803073C is really a pool word (0xF000FFFF), and
+ * discover_functions.py mistook the pool for code. The measured real layout
+ * is 0x08031684 (44 bytes) and 0x080316B0 (318 bytes). Because the two are
+ * ADJACENT, they can live in the same translation unit.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/video/blit_strip_plain.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/video/blit_strip_plain.c
  */
 
 #include "gba_types.h"
 #include "ram_symbols.h"
 
-/* ---- 0x08031684 — yuvanin alt nesnesini birakir ---------------------
+/* ---- 0x08031684 — releases the slot's sub-object ---------------------
  *
- * gRam02025810'daki 24 x 180 baytlik yuva dizisi (bkz.
- * docs/GRAM02025810_LAYOUT.md ve src/world/release_slot.c). Eleman ici
- * +0xB1 bayragi kuruluysa eleman ici +0x64'teki alt nesne birakilip
- * bayrak sifirlaniyor.
+ * The 24 x 180-byte slot array at gRam02025810 (see
+ * docs/GRAM02025810_LAYOUT.md and src/world/release_slot.c). If the +0xB1
+ * flag inside the element is set, the sub-object at +0x64 inside the element
+ * is released and the flag is cleared.
  *
- * Iki taban AYRI YERELDE kurulmali (release_slot.c ile ayni olcut):
- * bayrak (taban + olcek) + 0xED, alt nesne ise olcek + (taban + 0xA0)
- * seklinde toplaniyor -- ROM'un iki farkli birlesim sirasi bu.
+ * The two bases must be built in SEPARATE LOCALS (the same measurement as in
+ * release_slot.c): the flag adds up as (base + scale) + 0xED while the
+ * sub-object adds up as scale + (base + 0xA0) -- these are the ROM's two
+ * different association orders.
  * ------------------------------------------------------------------ */
 
 #define SLOT_STRIDE  180            /* 0xB4 */
-#define OFF_SUB      0xA0           /* blok basi; eleman ici +0x64 */
-#define OFF_FLAG     0xED           /* blok basi; eleman ici +0xB1 */
+#define OFF_SUB      0xA0           /* block start; +0x64 inside the element */
+#define OFF_FLAG     0xED           /* block start; +0xB1 inside the element */
 
 extern void ReleaseObject(u8 *sub);
 
@@ -52,26 +53,28 @@ void ReleaseSlotSub(u32 index)
     *flag = 0;
 }
 
-/* ---- 0x080316B0 — 318 bayt, 8x48 4bpp serit cizici ------------------
+/* ---- 0x080316B0 — 318 bytes, 8x48 4bpp strip blitter -----------------
  *
- * src/video/blit_strip_4bpp.c'deki 0x08031A1C ile ayni ailedendir; fark:
- * BURADA SUTUN KIRPMASI YOK. Satir dikey aralik disindaysa (row >=
- * rowLimit ya da row < 0) sekiz kaynak nibble'i oldugu gibi aliniyor;
- * aralik icindeyse hepsi `(*mask & *under) | *src` ile harmanlaniyor.
- * Sekiz deger dorder bitlik alanlara paketlenip iki yarim soz olarak
- * dst'ye yaziliyor.
+ * Same family as 0x08031A1C in src/video/blit_strip_4bpp.c; the difference
+ * is that THERE IS NO COLUMN CLIPPING HERE. If the row falls outside the
+ * vertical range (row >= rowLimit or row < 0), the eight source nibbles are
+ * taken as they are; inside the range all of them are blended with
+ * `(*mask & *under) | *src`. The eight values are packed into four-bit fields
+ * and written to dst as two halfwords.
  *
- * Kardesten devralinan ve BURADA DA GECERLI olan uc olcum:
- *  1. Dongu AZALAN yazilmali ve satir `rowBase + (48 - i)` diye YENIDEN
- *     hesaplanmali; ROM `movs #48 / add ip,-1 / cmp #0 / beq` uretiyor.
- *  2. Kirpma testi TEK `if (a || b)` olmali; agbcc `bge HIZLI /
- *     bge MASKELI / (dusus) HIZLI` uretiyor, ROM'un blok sirasi bu.
- *  3. HIZLI YOLDA mask/under NIBBLE BASINA artirilmali. ROM'da tek bir
- *     `adds r6,#8 / adds r5,#8` gorunur ama kaynakta oyle yazilirsa
- *     gecicilerin omurleri kayiyor; birlestirmeyi derleyici dagitimdan
- *     SONRA kendisi yapiyor.
- * Satir sonu adimlari: mask degisken (maskStep), under ve src 40 bayt
- * (sekiz nibble zaten teker teker ilerledigi icin satir adimi 48).
+ * Three measurements inherited from the sibling that ALSO HOLD HERE:
+ *  1. The loop must be written DESCENDING and the row RECOMPUTED as
+ *     `rowBase + (48 - i)`; the ROM emits `movs #48 / add ip,-1 / cmp #0 /
+ *     beq`.
+ *  2. The clip test must be a SINGLE `if (a || b)`; agbcc emits
+ *     `bge FAST / bge MASKED / (fallthrough) FAST`, which is the ROM's block
+ *     order.
+ *  3. On the FAST path, mask/under must be incremented PER NIBBLE. The ROM
+ *     shows a single `adds r6,#8 / adds r5,#8`, but writing it that way in
+ *     the source shifts the temporaries' lifetimes; the compiler performs the
+ *     merge itself, AFTER allocation.
+ * End-of-row strides: mask is variable (maskStep), under and src are 40 bytes
+ * (the row stride is 48 because the eight nibbles already advance one by one).
  * ------------------------------------------------------------------ */
 
 #define STRIP_ROWS   48

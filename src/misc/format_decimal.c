@@ -1,15 +1,17 @@
-/* Ondalik basamak yazici — 0x080672FC-0x0806736F
+/* Decimal digit writer — 0x080672FC-0x0806736F
  *
- * Sayiyi bastaki sifirlar olmadan ASCII basamaklara ceviriyor. Bolme
- * yok: 0x08FD17FC'deki 10^0..10^9 tablosundan tekrarli cikarma yapiyor
- * (agbcc'de `/` __divsi3 uretirdi, ROM'da o cagri yok).
+ * Converts a number into ASCII digits without leading zeroes. There is no
+ * division: it performs repeated subtraction using the 10^0..10^9 table at
+ * 0x08FD17FC (in agbcc a `/` would emit __divsi3, and the ROM has no such
+ * call).
  *
- * Once degeri kapsayan en yuksek kuvvet bulunuyor, sonra o basamaktan
- * asagi dogru her kuvvet icin cikarma sayisi '0' uzerine ekleniyor.
- * Basamak u8: ROM her artirimdan sonra 24 bit kaydirmayla kirpiyor.
+ * First the highest power covering the value is found, then, working down from
+ * that digit, the subtraction count for each power is added on top of '0'.
+ * The digit is u8: the ROM truncates it with a 24-bit shift after every
+ * increment.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/format_decimal.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/format_decimal.c
  */
 
 #include "gba_types.h"

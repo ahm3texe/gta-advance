@@ -1,20 +1,22 @@
-/* Dil secimi ve yerellestirilmis metin okuma — 0x0805E6C4-0x0805E6FF
+/* Language selection and localized text lookup — 0x0805E6C4-0x0805E6FF
  *
- * 0x08EC46D4'teki tablo, oyunun METIN ISARETCI TABLOSU: dil basina 618
- * dize, bes dil icin toplam 3090 giris.  gLanguage hangi dilin kullanildigini
- * secer; ucuncu fonksiyon o dilin bloğundan bir dize isaretcisi dondurur.
+ * The table at 0x08EC46D4 is the game's TEXT POINTER TABLE: 618 strings per
+ * language, 3090 entries in total for five languages.  gLanguage selects which
+ * language is in use; the third function returns a string pointer from that
+ * language's block.
  *
- * Tablonun ne oldugu DORT BAGIMSIZ YONDEN dogrulandi:
- *   1. Ayarlayici indeksi 0..4'e kirpiyor            -> tam bes deger
- *   2. Okuyucudaki carpan 0x9A8 = 2472 = 618 * 4     -> dil basina 618 dize
- *   3. Tablo boyutu 3090 giris = 618 * 5             -> bes dil
- *   4. Izleme logu: acilis dil ekraninda bes secenek
+ * What the table is was verified FROM FOUR INDEPENDENT DIRECTIONS:
+ *   1. The setter clamps the index to 0..4          -> exactly five values
+ *   2. The reader's multiplier 0x9A8 = 2472 = 618*4 -> 618 strings per language
+ *   3. The table size 3090 entries = 618 * 5        -> five languages
+ *   4. The trace log: five options on the boot language screen
  *      (gActiveMenuItemCount 0->5, docs/GAME_FLOW.md)
- * Ayrica her dil bloğunun ilk isaretcisi, o dilin adinin hemen ardina
- * dusuyor (DEUTSCH / FRANCAIS / ITALIANO).  Ayrinti: docs/TEXT_MAP.md
+ * Furthermore, the first pointer of each language block lands immediately
+ * after that language's name (DEUTSCH / FRANCAIS / ITALIANO).  Details:
+ * docs/TEXT_MAP.md
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/table_lookup.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/table_lookup.c
  */
 
 #include "gba_types.h"

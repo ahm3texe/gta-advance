@@ -1,74 +1,78 @@
-/* Ucgen donusumu ve gorunurluk sinamasi — 0x0806A77C-0x0806A83F (196 bayt)
+/* Triangle transform and visibility test — 0x0806A77C-0x0806A83F (196 bytes)
  *
  * MODE: ARM   <- the build chain switches to agbcc_arm on this marker
  *
- * Uc kosenin her birini (uc adet s16) okuyup taban ucluye gore donusturuyor,
- * donusmus ucluleri cikis tamponuna yaziyor, ilk iki kosenin CAPRAZ
- * CARPIMINI alip ucuncu koseyle NOKTA CARPIMINA sokuyor ve sonucu donduruyor.
+ * Reads each of the three corners (three s16 each), transforms them against
+ * the base triple, writes the transformed triples into the output buffer,
+ * takes the CROSS PRODUCT of the first two corners, feeds it into a DOT
+ * PRODUCT with the third corner and returns the result.
  *
- * Donusum bilesenlere gore ASIMETRIK (ROM'dan olculdu):
- *     x = giris.x - taban.x     (rsb)
- *     y = taban.y + giris.y     (add)
- *     z = taban.z - giris.z     (sub)
+ * The transform is ASYMMETRIC per component (measured from the ROM):
+ *     x = input.x - base.x     (rsb)
+ *     y = base.y + input.y     (add)
+ *     z = base.z - input.z     (sub)
  *
- * `ldrh rN,[r0],#2` + `lsl #16` + `asr #16`: s16 okuyup isaret genisletme.
- * Cikis isaretcisi her ucluden sonra 8 bayt atliyor (stmia + add #8), yani
- * hedef yapi 20 baytlik adimlarla ilerliyor.
+ * `ldrh rN,[r0],#2` + `lsl #16` + `asr #16`: read an s16 and sign-extend it.
+ * The output pointer skips 8 bytes after every triple (stmia + add #8), so
+ * the target structure advances in 20-byte strides.
  *
- * Fonksiyon tamamen ACILMIS; dongu yok, o yuzden kaynak da acilmis yazildi.
+ * The function is fully UNROLLED; there is no loop, so the source was written
+ * unrolled as well.
  *
- * DURUM: PARK — 171/196 fark, cikti 188 bayt (ROM 196).
+ * STATUS: PARKED — 171/196 differences, output 188 bytes (ROM 196).
  *
- * Bu, projedeki ILK ARM kipi denemesi.  Onceki tum denemeler teknik olarak
- * imkansizdi: derleme zinciri yalnizca Thumb'a bagliydi.
+ * This is the project's FIRST attempt in ARM mode.  Every earlier attempt was
+ * technically impossible: the build chain was bound to Thumb only.
  *
- * BAYRAK KESFI (kalici olarak agbcc_build.py'ye eklendi):
- *   -fomit-frame-pointer                244 -> 240 bayt
+ * FLAG DISCOVERY (added permanently to agbcc_build.py):
+ *   -fomit-frame-pointer                244 -> 240 bytes
  *   + -fno-schedule-insns               240 -> 216
  *   + -fno-schedule-insns2              216 -> 188  (ROM 196)
- * Bunlar olmadan agbcc_arm yigin cercevesi kurup ara sonuclari
- * tasiriyordu.  Butun ARM adaylari bundan yararlanacak.
+ * Without these, agbcc_arm set up a stack frame and spilled the intermediate
+ * results.  Every ARM candidate will benefit from them.
  *
- * DAGITIM TAVANI — ONEMLI SINIR:
- * ROM ONBIR yazmac itiyor (r3,r4,...,sl,fp,ip,lr) ve hic tasma yapmiyor.
- * agbcc_arm on canli degerle sinandi: HER ZAMAN yalnizca sekiz yazmac
- * ({r4,r5,r6,r7,r8,r9,sl,lr}) itiyor ve fp/ip'yi genel dagitima HIC
- * sokmuyor.  Dokuz ayri bayrak denendi (-mapcs-frame, -mno-apcs-frame,
+ * ALLOCATION CEILING — AN IMPORTANT LIMIT:
+ * The ROM pushes ELEVEN registers (r3,r4,...,sl,fp,ip,lr) and never spills.
+ * agbcc_arm was tested with ten live values: it ALWAYS pushes only eight
+ * registers ({r4,r5,r6,r7,r8,r9,sl,lr}) and NEVER brings fp/ip into general
+ * allocation.  Nine separate flags were tried (-mapcs-frame, -mno-apcs-frame,
  * -ffixed-fp, -mapcs-reentrant, -fcall-used-fp, -fcall-used-ip, -O3,
- * -fforce-mem, -fno-schedule-insns); yalnizca sonuncusu fark yaratti,
- * hicbiri yazmac kumesini genisletmedi.
+ * -fforce-mem, -fno-schedule-insns); only the last made any difference, and
+ * none of them widened the register set.
  *
- * KRITIK BULGU — ARM BOLGESI C'DEN ULASILABILIR:
- * ROM'daki ARM kodu barrel-shifter kaynasmalari kullaniyor
- * (`rsb r6, r3, r6, asr #16` gibi) ve bunlarin elle yazilmis assembly
- * olabilecegi supheniyle sinandi.  agbcc_arm bu kaliplarin UCUNU DE
- * C'den uretiyor (olculdu):
+ * CRITICAL FINDING — THE ARM REGION IS REACHABLE FROM C:
+ * The ARM code in the ROM uses barrel-shifter fusions (such as
+ * `rsb r6, r3, r6, asr #16`), and it was tested on the suspicion that these
+ * might be hand-written assembly.  agbcc_arm produces ALL THREE of these
+ * patterns from C (measured):
  *     a - (b >> 16)   ->  sub r0, r0, r1, asr #16
  *     (b >> 16) - a   ->  rsb r0, r0, r1, asr #16
  *     a + (b >> 16)   ->  add r0, r0, r1, asr #16
- * Yani 14920 baytlik ARM bolgesi normal bir eslestirme problemi.
+ * So the 14920-byte ARM region is an ordinary matching problem.
  *
- * ELENEN (2): acik kaydirma bicimi -- kaynagi u16 okuyup `<< 16`'yi ayri
- * yerelde tutup `>> 16`'yi aritmetige kaynastirma denendi (ilerleyen ve
- * indeksli cikis yazimiyla).  IKISI DE GERILEDI: 232/207 ve 216/179.
- * Duz s16 + indeksli yazim (188/171) en iyisi olarak kaldi.
+ * ELIMINATED (2): the explicit-shift form -- reading the source as u16,
+ * keeping the `<< 16` in a separate local and fusing the `>> 16` into the
+ * arithmetic (with both an advancing and an indexed output write).  BOTH
+ * REGRESSED: 232/207 and 216/179.  Plain s16 plus indexed writes (188/171)
+ * remained the best.
  *
- * ELENEN (1): yapi atamasiyla `ldm`/`stmia` blok transferi uretme denendi
- * (uc bicim: dizi indeksli, ilerleyen kaynak, ilerleyen kaynak+hedef).
- * UCU DE BELIRGIN GERILEDI: 304 bayt / ~288 fark.  agbcc_arm yapi
- * atamalarini daha AZ degil daha COK koda aciyor.  Skaler bicim
- * (240 bayt / 216 fark) en iyisi olarak kaldi.
+ * ELIMINATED (1): producing an `ldm`/`stmia` block transfer through struct
+ * assignment (three forms: array-indexed, advancing source, advancing source
+ * and destination).  ALL THREE REGRESSED CLEARLY: 304 bytes / ~288
+ * differences.  agbcc_arm expands struct assignments into MORE code, not
+ * less.  The scalar form (240 bytes / 216 differences) remained the best.
  *
- * Sonraki adimlar (denenmedi):
- *   1. Cikis ofsetleri 20 bayt adimla ilerliyor; dst[5]/dst[10] yerine
- *      20 baytlik yapi dizisi denenebilir
- *   2. Capraz carpim terim sirasi ROM'daki mul/mla sirasiyla eslenmeli
- *      (ROM sonda `mul` + iki `mla` kullaniyor, bizimki ayri carpimlar)
- *   3. Kosе okumalari ROM'da post-index (`ldrh rN,[r0],#2`); kaynakta
- *      ilerleyen isaretci kullanmak bunu uretebilir
+ * Next steps (not attempted):
+ *   1. The output offsets advance in 20-byte strides; instead of
+ *      dst[5]/dst[10] an array of 20-byte structs could be tried
+ *   2. The cross-product term order should be matched to the ROM's mul/mla
+ *      order (the ROM ends with one `mul` plus two `mla`, ours has separate
+ *      multiplications)
+ *   3. The corner reads are post-indexed in the ROM (`ldrh rN,[r0],#2`);
+ *      using an advancing pointer in the source could produce that
  *
- * Derleyici: agbcc_arm -mthumb-interwork -O2   (-fhex-asm ARM'da YOK)
- * Dogrulama:  make c-match FILE=src/arm/plane_test.c
+ * Compiler: agbcc_arm -mthumb-interwork -O2   (-fhex-asm does NOT exist on ARM)
+ * Verification:  make c-match FILE=src/arm/plane_test.c
  */
 
 #include "gba_types.h"

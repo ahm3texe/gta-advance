@@ -1,9 +1,10 @@
-/* Kucuk oturum yardimcilari — 0x0803C77C-0x0803C797
+/* Small session helpers — 0x0803C77C-0x0803C797
  *
- * 0x0803C790'daki fonksiyonu Ghidra'nin fonksiyon haritasi kacirmisti.
- * Yapilarin alan adlari bilinmiyor; ofsetler ROM'dan okundu.
+ * Ghidra's function map had missed the function at 0x0803C790.
+ * The field names of the structures are unknown; the offsets were read from
+ * the ROM.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/misc/session_reset.c
  */
 
@@ -25,7 +26,7 @@ u32 GetScaleFactor(void)
     return factor;
 }
 
-/* 0x0803C790 — Ghidra bu fonksiyonu kacirmisti */
+/* 0x0803C790 — Ghidra had missed this function */
 u32 ReturnOne(void)
 {
     return 1;

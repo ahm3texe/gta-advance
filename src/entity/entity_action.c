@@ -1,26 +1,30 @@
-/* Varlik eylem denemesi — 0x08020A9C-0x08020B6D
+/* Entity action attempt — 0x08020A9C-0x08020B6D
  *
- * Adi henuz bilinmiyor. Varligin 0x64'teki alt nesnesi uzerinde iki kez
- * FUN_080208a8 deneniyor; sonuca ve bayraklara gore 0x114'teki durum
- * baytina 2 veya 8 yaziliyor.
+ * The name is not known yet. FUN_080208a8 is attempted twice on the entity's
+ * sub-object at 0x64; depending on the result and the flags, either 2 or 8 is
+ * written to the state byte at 0x114.
  *
- * ROM'un kuyrugunda ucu de ayni depolamaya varan uc yol var: bayrak testi
- * ile durum testi hicbir seyi degistirmiyor, yalnizca adres hesabi bir
- * yolda tekrarlaniyor. Bicim ROM'daki gibi birakildi.
+ * The ROM's tail has three paths that all reach the same store: the flag test
+ * and the state test change nothing, only the address computation is repeated
+ * on one path. The form was kept as it is in the ROM.
  *
- * HENUZ ESLESMIYOR: 98 komutun 85'i birebir tutuyor. Prolog ve ilk cagriya
- * kadar (0x08020A9C-0x08020ACE) tam eslesiyor. Iki fark kaldi:
- *   - `return 0` blogunun yeri: ROM onu erken koyup (0x8020AD2) dort yerden
- *     oraya dalliyor; biz sona koyup ileri dalliyoruz.
- *   - Kuyruktaki dalin yonu: ROM `bls` ile depolamaya, biz `bhi` ile else'e.
+ * DOES NOT MATCH YET: 85 of 98 instructions are identical. Everything up to
+ * the prologue and the first call (0x08020A9C-0x08020ACE) matches exactly.
+ * Two differences remain:
+ *   - Where the `return 0` block sits: the ROM places it early (0x8020AD2)
+ *     and branches to it from four places; we place it at the end and branch
+ *     forwards.
+ *   - The direction of the tail branch: the ROM goes to the store with `bls`,
+ *     we go to the else with `bhi`.
  *
- * Denenenler: `==0 return` / `!` / govdeyi if icine almak (151/151/140 bayt;
- * sonuncusu secildi), uc yollu kuyruk (150-151), ters kosul (140), tek if
- * (140), kosulsuz depolama (133 bayt ama yalnizca 76/98 komut -- bayt sayisi
- * dal ofsetleri yuzunden yaniltici, hizalama olcutu daha guvenilir).
+ * Tried: `==0 return` / `!` / wrapping the body in an if (151/151/140 bytes;
+ * the last was chosen), a three-way tail (150-151), an inverted condition
+ * (140), a single if (140), and an unconditional store (133 bytes but only
+ * 76/98 instructions -- the byte count is misleading because of branch
+ * offsets, the alignment metric is more reliable).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/entity/entity_action.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/entity/entity_action.c
  */
 
 #include "gba_types.h"

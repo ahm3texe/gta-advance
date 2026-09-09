@@ -1,17 +1,18 @@
-/* Hizalanmamis EEPROM byte araligi okumasi — 0x08000DDC-0x08000F1C
+/* Unaligned EEPROM byte range read — 0x08000DDC-0x08000F1C
  *
- * EEPROM donanimi yalnizca 8 byte'lik bloklar halinde okunabilir. Bu rutin
- * rastgele bir byte ofsetinden rastgele uzunlukta okuma yapabilmek icin
- * ofseti "blok indeksi" + "blok ici atlanacak byte sayisi" olarak ikiye
- * ayirir. Her blok yigin uzerindeki gecici tampona okunur, tampondan
- * yalnizca istenen byte'lar hedefe aktarilir. EEPROM sozcugu big-endian
- * geldigi icin kopyalama 7'den 0'a dogru ilerler.
+ * The EEPROM hardware can only be read in 8-byte blocks. To allow a read of
+ * arbitrary length from an arbitrary byte offset, this routine splits the
+ * offset into a "block index" plus a "number of bytes to skip inside the
+ * block". Each block is read into a temporary buffer on the stack, and only
+ * the requested bytes are transferred from the buffer to the destination.
+ * Since the EEPROM word arrives big-endian, copying proceeds from 7 down to 0.
  *
- * Ilk blokta bastaki `skip` byte atlanir, son blokta `length` bitince
- * kalan byte'lar birakilir; aradaki bloklar tam kopyalanir.
+ * In the first block the leading `skip` bytes are skipped; in the last block
+ * the remaining bytes are dropped once `length` is exhausted; the blocks in
+ * between are copied in full.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/read_eeprom_range.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/read_eeprom_range.c
  */
 
 #include "gba_io.h"
@@ -19,26 +20,27 @@
 #define DMA_ENABLE 0x80000000
 
 #define EEPROM_BLOCK       8    /* EEPROM erisim birimi (byte)           */
-#define EEPROM_BLOCK_MASK  7    /* blok ici byte ofseti                  */
-#define EEPROM_BLOCK_SHIFT 3    /* byte ofseti -> blok indeksi           */
-#define EEPROM_DEVICE_TYPE 4    /* tanimlama rutinine verilen tip kodu   */
+#define EEPROM_BLOCK_MASK  7    /* byte offset inside a block            */
+#define EEPROM_BLOCK_SHIFT 3    /* byte offset -> block index            */
+#define EEPROM_DEVICE_TYPE 4    /* type code passed to the ID routine    */
 
-/* 0x02000EB8: sifirdan farkliyken EEPROM tanimli ve erisim surüyor. */
+/* 0x02000EB8: while nonzero, the EEPROM is identified and access is live. */
 extern u32 gEepromAvailable;
 
-/* Kayit G/C bolgesine giris/cikis (WAITCNT ve benzeri kurulum); adlari
- * data/functions.csv'de henuz cozulmedi. */
+/* Entry to and exit from the save I/O region (WAITCNT and similar setup);
+ * their names are not yet resolved in data/functions.csv. */
 extern void StopAudioDmaOnCartFlag(void);
 extern void FUN_08033b74(void);
 
-/* EEPROM tanimlama ve tek blok okuma; ikisi de sifirdan farkli bir u16 ile
- * hata bildirir. */
+/* EEPROM identification and single-block read; both report an error with a
+ * nonzero u16. */
 extern u16 FUN_0806bd34(u32 deviceType);
 extern u16 FUN_0806bdfc(u16 block, void *dest);
 
-/* Sekiz kopya acik yazilir (kural 14): bir byte, atlama sayaci bittikten
- * sonra ve hedefte yer kaldigi surece aktarilir. `skip` isaretli olmali —
- * ROM `ble` (isaretli) uretiyor, isaretsiz olsaydi `bls` cikardi (kural 9). */
+/* The eight copies are written out explicitly (rule 14): a byte is
+ * transferred once the skip counter is exhausted and while room remains in the
+ * destination. `skip` must be signed -- the ROM emits `ble` (signed); if it
+ * were unsigned, `bls` would come out (rule 9). */
 #define COPY_EEPROM_BYTE(index)  \
     if (skip > 0)                \
         skip--;                  \
@@ -56,9 +58,10 @@ u32 ReadEepromRange(u32 offset, u8 *dest, s32 length)
 
     StopAudioDmaOnCartFlag();
 
-    /* Ofset yerinde blok indeksine cevrilir. Ayri bir `block` degiskeni
-     * kullanilinca agbcc onu once r4'e alip r8'e kopyaliyor; ROM ofseti
-     * bastan r8'de tutuyor (kural 11'in tersi yonu). */
+    /* The offset is converted to a block index in place. With a separate
+     * `block` variable agbcc first takes it into r4 and copies it to r8; the
+     * ROM keeps the offset in r8 from the start (the inverse direction of
+     * rule 11). */
     skip = offset & EEPROM_BLOCK_MASK;
     offset >>= EEPROM_BLOCK_SHIFT;
 
@@ -70,14 +73,16 @@ u32 ReadEepromRange(u32 offset, u8 *dest, s32 length)
 
     if (FUN_0806bd34(EEPROM_DEVICE_TYPE) == 0) {
         i = 0;
-        /* Elle yazilmis dongu dondurmesi: ROM cikis testini once bir kez
-         * yapip govdeye giriyor, geri dal govdenin sonunda. `for` ya da
-         * `while` yazimi bunun yerine alttaki teste `b` ile atliyor ve
-         * okuma cagrisini dongunun sonuna tasiyor. */
+        /* A hand-written loop rotation: the ROM performs the exit test once
+         * up front and then enters the body, with the back branch at the end
+         * of the body. A `for` or `while` form instead jumps with a `b` to the
+         * test at the bottom and moves the read call to the end of the
+         * loop. */
         if (length != 0) {
             do {
-                /* Okuma hatasi tum islemi bitirir; `break` yeterli degil,
-                 * cunku o zaman derleyici blok siralamasini degistiriyor. */
+                /* A read error ends the whole operation; `break` is not
+                 * enough, because the compiler then changes the block
+                 * ordering. */
                 if (FUN_0806bdfc((u16)(offset + i), buffer) != 0)
                     goto finish;
 

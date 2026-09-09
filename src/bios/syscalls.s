@@ -1,21 +1,21 @@
-@ BIOS syscall thunk'lari — 0x0806B84C-0x0806B88B
+@ BIOS syscall thunks — 0x0806B84C-0x0806B88B
 @
-@ GBA BIOS cagrilari Thumb `swi` komutuyla yapiliyor. Bunlar C'ye
-@ cevrilemez: inline asm projede yasak (docs/WORKFLOW.md), asm'siz de
-@ `swi` uretilemez. Bu yuzden agb_main.s ve intr_main.s gibi KALICI
-@ assembly kaynagi.
+@ GBA BIOS calls are made with the Thumb `swi` instruction. These cannot be
+@ converted to C: inline asm is forbidden in this project (docs/WORKFLOW.md),
+@ and `swi` cannot be produced without it. So this is PERMANENT assembly
+@ source, like agb_main.s and intr_main.s.
 @
-@ TAM KAPSAMA: ROM tarandi, `swi` + `bx lr` bicimindeki gercek thunk'lar
-@ yalnizca bunlar. Oyunun BIOS'a tum temas yuzeyi bu on fonksiyon; baska
-@ hicbir yerde swi kullanilmiyor.
+@ FULL COVERAGE: the ROM was scanned, and these are the only real thunks of
+@ the `swi` + `bx lr` shape. These ten functions are the game's entire contact
+@ surface with the BIOS; swi is used nowhere else.
 @
-@ Ozellikle: `swi 6` ardindan `adds r0, r1, #0` gelen bir thunk YOK, yani
-@ oyun BIOS Div'in kalanini (r1) hic kullanmiyor ve C tarafinda
-@ `int Div(int, int)` bildirimi eksiksiz. BIOS uc deger dondurur
-@ (r0 bolum, r1 kalan, r3 mutlak bolum); C cagrisi yalnizca r0'i alabilir,
-@ ama burada gerekli degil.
+@ In particular: there is NO thunk where `swi 6` is followed by
+@ `adds r0, r1, #0`, so the game never uses the remainder (r1) of the BIOS
+@ Div, and the `int Div(int, int)` declaration on the C side is complete.
+@ The BIOS returns three values (r0 quotient, r1 remainder, r3 absolute
+@ quotient); a C call can only take r0, but that is not needed here.
 @
-@ Dogrulama:  make bios-match
+@ Verification:  make bios-match
 
 	.text
 	.thumb
@@ -63,8 +63,8 @@ RegisterRamReset:               @ 0x0806B864
 	swi 1
 	bx lr
 
-	@ Kesmeleri kapatip yigini IWRAM'in tepesine kurar, RAM'i sifirlar
-	@ ve yumusak sifirlama yapar. Geri donmez.
+	@ Disables interrupts, sets the stack to the top of IWRAM, clears RAM
+	@ and performs a soft reset. Does not return.
 	.global SoftResetSystem
 	.thumb_func
 SoftResetSystem:                @ 0x0806B868

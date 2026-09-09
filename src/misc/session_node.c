@@ -1,29 +1,29 @@
-/* Oturum dugumu sifirlama — 0x0803C798-0x0803C7B9
+/* Session node reset — 0x0803C798-0x0803C7B9
  *
- * ESLESIYOR (byte-matching, 34 byte).
+ * MATCHES (byte-matching, 34 bytes).
  *
- * Cozum: bayrak alani `u8` degil `s8`. ROM maskeyi 32 bit olarak kuruyor
- * (`movs r0,#5 / negs r0,r0` = -5), bayta daraltmiyor (`movs r0,#251`
- * degil). Sebep: agbcc/gcc `and`'in sabitini yalnizca AND'lanan degerin
- * ust bitlerinin sifir oldugunu BILDIGINDE daraltiyor. Alan `u8` iken
- * yukleme sifir-genisletme sayildigi icin nonzero_bits = 0xFF cikiyor ve
- * -5 -> 0xFB'ye iniyor. Alan isaretli oldugunda ust bitler bilinmiyor,
- * maske 32 bit kaliyor; deger geri `strb` ile yazildigi icin yukleme yine
- * `ldrb` olarak kaliyor.
+ * The solution: the flag field is `s8`, not `u8`. The ROM builds the mask as
+ * 32 bits (`movs r0,#5 / negs r0,r0` = -5) and does not narrow it to a byte
+ * (it is not `movs r0,#251`). The reason: agbcc/gcc only narrows the constant
+ * of an `and` when it KNOWS the upper bits of the ANDed value are zero. With a
+ * `u8` field the load counts as a zero-extension, so nonzero_bits = 0xFF and
+ * -5 drops to 0xFB. With a signed field the upper bits are unknown and the
+ * mask stays 32 bits; because the value is written back with `strb`, the load
+ * still stays `ldrb`.
  *
- * Ayni ciktiyi veren esdeger yazim: alani bitfield yapmak
- * (`u8 f0:2; u8 f2:1; u8 f3:5;` + `gSessionPtr->f2 = 0;`) — bitfield
- * ekleme/cikarma da maskeyi kelime kipinde kuruyor. Diger bitlerin anlami
- * bilinmedigi icin tek alanli isaretli bicim tercih edildi.
+ * An equivalent form giving the same output: making the field a bitfield
+ * (`u8 f0:2; u8 f2:1; u8 f3:5;` + `gSessionPtr->f2 = 0;`) -- bitfield
+ * insertion/extraction also builds the mask in word mode. Since the meaning of
+ * the other bits is unknown, the single signed field was preferred.
  *
- * Denenip TUTMAYANLAR (hepsi `movs r0,#251` uretti): `u8` alanda ~4, -5,
- * 0xFFFFFFFB maskeleri; `(u8)((s32)flags & ~4)` cast'i; u32 yerel uzerinden
- * okuma. `volatile u8` alan maskeyi daraltmakla kalmayip fazladan bir
- * `ldrb` de ekliyor. `s32` yerel maske dogru sabiti uretiyor ama araya
- * `add r0, r2, #0` kopyasi sokuyor.
+ * Tried and REJECTED (all produced `movs r0,#251`): the masks ~4, -5 and
+ * 0xFFFFFFFB on a `u8` field; the cast `(u8)((s32)flags & ~4)`; reading
+ * through a u32 local. A `volatile u8` field not only narrows the mask but
+ * also adds an extra `ldrb`. An `s32` local mask produces the right constant
+ * but inserts an `add r0, r2, #0` copy in between.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/session_node.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/misc/session_node.c
  */
 
 #include "gba_types.h"

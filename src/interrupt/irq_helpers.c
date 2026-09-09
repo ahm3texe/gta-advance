@@ -1,26 +1,27 @@
 /* IRQ yardimcilari — 0x08000730-0x080007B3
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Dogrulama:  make c-match FILE=src/interrupt/irq_helpers.c
  */
 
 #include "gba_io.h"
 
-/* volatile SART: kaldirilinca agbcc sabiti bellekten once yukluyor ve
- * ROM'dan sapiyor. Ayni erisim bicimi gBiosIrqFlags'te tam tersini
- * gerektiriyordu; volatile burada semantik degil siralama dugmesi. */
+/* volatile is REQUIRED: without it agbcc loads the constant before the memory
+ * access and diverges from the ROM. The same access pattern required exactly
+ * the opposite in gBiosIrqFlags; here volatile is not a semantic marker but an
+ * ordering switch. */
 #define FRAME_DELAY_MAX 5
 
 extern volatile u8 gVBlankState;
 extern u32 gAsyncState;
 extern u8  gGameState[16];
-/* IWRAM adresleri sabit cast olarak yazilir, extern sembol olarak degil:
- * ROM 0x03000000'i kaydirmayla uretiyor (movs #0xc0 / lsls #18), sembol
- * olsaydi literal havuzdan okunurdu. */
+/* The IWRAM addresses are written as constant casts, not as extern symbols:
+ * the ROM produces 0x03000000 by shifting (movs #0xc0 / lsls #18); as symbols
+ * they would be read from the literal pool. */
 #define gFrameDelay        (*(u32 *)0x03000000)
 #define gIwramFrameCounter (*(u32 *)0x03000004)
 
-/* VBlank sirasinda calisan aktarim adimlari; henuz adlandirilmadi. */
+/* The transfer steps that run during VBlank; not named yet. */
 extern void FlushSpriteList(void);
 extern void FUN_080133a8(void);
 extern void FUN_080130f4(void);
