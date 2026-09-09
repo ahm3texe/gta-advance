@@ -68,11 +68,11 @@ address,name,size,status,module,notes
 0x08004F74,FUN_08004f74,3580,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary verified by the 2026-09-04 ROM flow review; boundary corrected against the ROM (audit_boundaries.py)
 0x08005D70,FUN_08005d70,284,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08005E8C,FUN_08005e8c,208,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08005F5C,FUN_08005f5c,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08005F74,FUN_08005f74,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08005FA8,FUN_08005fa8,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08005F5C,FUN_08005f5c,24,matching,bootstrap,Clears gUnk02001428 and sets gUnk02010C60[1] and [2] to 3; decompiled in src/bootstrap/clear_pending_code.c
+0x08005F74,FUN_08005f74,52,matching,bootstrap,Answers 1 only when gUnk02000EA8[0..1] and gUnk02000CD8[0..1] are all zero; decompiled in src/bootstrap/both_pairs_zero.c
+0x08005FA8,FUN_08005fa8,28,matching,bootstrap,"Sets gUnk02001428 to 8 between FUN_0803379C and FUN_0803378C(8, 1); decompiled in src/bootstrap/set_pending_code.c"
 0x08005FC4,FUN_08005fc4,10,matching,world,byte-matching from C (small function harvest)
-0x08005FE0,FUN_08005fe0,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
+0x08005FE0,FUN_08005fe0,72,matching,bootstrap,"Codes 8, 9 and 12 each set their own bit in gOuterState, 8 after calling FUN_08033BB4; decompiled in src/bootstrap/set_outer_state_bit.c"
 0x08006028,FUN_08006028,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0800607C,FUN_0800607c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08006090,FUN_08006090,18,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
@@ -1406,34 +1406,34 @@ address,name,size,status,module,notes
 0x08059818,FUN_08059818,388,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0805999C,FUN_0805999c,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08059A64,FUN_08059a64,126,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
-0x08059AE4,FUN_08059ae4,20,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059AE4,FUN_08059ae4,20,matching,script,Script handler: forwards two u16 operands to FUN_0805669C with a constant 64; decompiled in src/script/cmd_call_four_arg.c
 0x08059AF8,FUN_08059af8,96,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059B58,FUN_08059b58,56,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059B90,FUN_08059b90,182,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059C48,FUN_08059c48,60,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08059C84,FUN_08059c84,30,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059C84,FUN_08059c84,30,matching,script,Script handler: bit 0 of the +0x1A flags of the node FindRecordNodeEnd resolves to; decompiled in src/script/cmd_node_flag_bit0.c
 0x08059CA4,FUN_08059ca4,108,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059D10,FUN_08059d10,58,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059D4C,FUN_08059d4c,48,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059D7C,ForwardToGetAnchorUnk30,10,matching,world,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists
-0x08059D88,FUN_08059d88,12,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059D88,FUN_08059d88,12,matching,script,Script handler: calls FUN_0805063C and always answers 1; decompiled in src/script/cmd_call_and_succeed.c
 0x08059D94,FUN_08059d94,88,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059DEC,FUN_08059dec,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x08059E48,FUN_08059e48,32,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
-0x08059E68,FUN_08059e68,22,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059E48,FUN_08059e48,32,matching,script,Script handler: FUN_0805669C with its answer inverted; decompiled in src/script/cmd_forward_three_not.c
+0x08059E68,FUN_08059e68,22,matching,script,Script handler: forwards three u16 operands to FUN_0805669C; decompiled in src/script/cmd_forward_three.c
 0x08059E80,FUN_08059e80,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059EAC,FUN_08059eac,146,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08059F40,FUN_08059f40,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08059F64,FUN_08059f64,40,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08059F40,FUN_08059f40,36,matching,script,Script handler: sets flag 0x200 on the actor ResolveRecordNodeChain resolves to; decompiled in src/script/cmd_set_actor_flag.c
+0x08059F64,FUN_08059f64,40,matching,script,Script handler: clears flag 0x200 on the actor ResolveRecordNodeChain resolves to; decompiled in src/script/cmd_clear_actor_flag.c
 0x08059F8C,FUN_08059f8c,44,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08059FE8,FUN_08059fe8,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A024,FUN_0805a024,28,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0805A024,FUN_0805a024,28,matching,script,"Script handler: gRam02025810 +0x0C minus the operand, into FUN_08030AE4; decompiled in src/script/cmd_progress_minus.c"
 0x0805A070,FUN_0805a070,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A0AC,FUN_0805a0ac,18,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A0AC,FUN_0805a0ac,18,matching,script,Script handler: the operand straight into FUN_08030AE4; decompiled in src/script/cmd_progress_set.c
 0x0805A0C0,FUN_0805a0c0,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0805A0FC,FUN_0805a0fc,22,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A114,FUN_0805a114,22,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A12C,FUN_0805a12c,20,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A0FC,FUN_0805a0fc,22,matching,script,Script handler: (operand << 16) / 100 into ApplyTwoLevels slot 3; decompiled in src/script/cmd_percent_to_fixed.c
+0x0805A114,FUN_0805a114,22,matching,script,Script handler: GetAnchorUnk34 unless IsAnchorSmall; decompiled in src/script/cmd_anchor_unk34_unless_small.c
+0x0805A12C,FUN_0805a12c,20,matching,script,Script handler: the operand into FUN_0803ABC4 with a constant 3 and 0; decompiled in src/script/cmd_call_three_fixed.c
 0x0805A140,FUN_0805a140,104,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A1A8,FUN_0805a1a8,46,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A1D8,FUN_0805a1d8,26,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"

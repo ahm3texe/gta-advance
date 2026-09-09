@@ -1194,3 +1194,54 @@ assigned at its own point of use**:
   function (the ROM loads the second at its point of use),
 - if a single variable is assigned twice, agbcc derives the second as the first's
   +12 (`adds r4,#12`) — the same as rule 65.
+
+## Rule 71 — a two-armed `if` fixes the block order; an early return does not
+
+Rule 49 gets a rare body to the end of a function with a `goto`. It does not
+work in the other direction: when the ROM wants the *short* body FIRST, with the
+branch jumping over it into the main body, an early `return` will not produce it.
+
+The twelve script handlers at 0x08059AE4-0x0805A140 contain both layouts, a few
+hundred bytes apart, so the two were measured side by side:
+
+| ROM | source that produces it |
+|---|---|
+| `bne body / movs r0,#0 / b end / body: ... / end:` | `if (p == 0) { r = 0; } else { ...; r = 1; } return r;` |
+| `beq zero / ... / b end / zero: movs r0,#0 / end:` | `if (p != 0) { r = ...; } else { r = 0; } return r;` |
+
+agbcc lays a two-armed `if` out in **source order**: the `then` arm falls
+through where it is written, the `else` arm follows it. So the arm that has to
+come first in the ROM is simply the one written first.
+
+Written as an early exit instead — `if (p == 0) return 0;` followed by the body,
+or `if (p != 0) { ...; return r; } return 0;` — the optimiser is free to
+restructure, and in every one of the four functions measured here it chose the
+*same* layout regardless of which way the test was spelled. Only the explicit
+two-armed form with a single `return` at the end controls the order.
+
+`FUN_0805A114` shows the same thing without a pointer: the ROM calls
+`GetAnchorUnk34` on the fall-through path, so that call must be the `then` arm,
+which forces the test to be written `if (IsAnchorSmall() == 0)` rather than as an
+early exit on `!= 0`.
+
+## Rule 72 — a result variable declared before a call costs a callee-saved register
+
+Rule 48's result variable has to be introduced **after** the call whose answer it
+describes, not before it.
+
+`FUN_08059E48` inverts what `FUN_0805669C` returns:
+
+| source | ROM |
+|---|---|
+| `u32 r = 0; if (f(...) == 0) r = 1; return r;` | `push {r4,lr}` … `movs r4,#0` before the `bl` |
+| `u32 a = f(...); u32 r = 0; if (a == 0) r = 1; return r;` | **match** |
+
+Declared ahead of the call, the variable is live across it, so agbcc gives it a
+callee-saved register and the function pays for a `push {r4}` / `pop {r4}` pair
+it does not have in the ROM. Introduced after the call, it lands in a scratch
+register and the zero is written once the call has returned.
+
+The give-away in the ROM is the prologue: a leaf-ish function that only forwards
+a call and adjusts its answer pushes `{lr}` alone. Any `push {r4, lr}` in a
+function that short means a value was made live across the call that should not
+have been.

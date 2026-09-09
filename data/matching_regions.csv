@@ -21,7 +21,11 @@ start,end,binary,module,notes
 0x08001A00,0x08001DC0,build/ui/menu_loop.bin,ui,"Menu loop: hierarchy, input and redraw"
 0x08001DC0,0x08001E30,build/ui/menu_helpers.bin,ui,Menu state helpers
 0x08001E30,0x08001F04,build/ui/menu_graphics.bin,ui,Menu graphics and display helpers
+0x08005F5C,0x08005F74,build/bootstrap/clear_pending_code.bin,bootstrap,Clears gUnk02001428 and sets gUnk02010C60[1..2] to 3
+0x08005F74,0x08005FA8,build/bootstrap/both_pairs_zero.bin,bootstrap,Answers 1 only when both halfword pairs are zero; ldrsh has no immediate form
+0x08005FA8,0x08005FC4,build/bootstrap/set_pending_code.bin,bootstrap,"Sets gUnk02001428 to 8 between FUN_0803379C and FUN_0803378C(8, 1)"
 0x08005FC4,0x08005FD0,build/world/wrap_08005fc4.bin,world,small function harvest
+0x08005FE0,0x08006028,build/bootstrap/set_outer_state_bit.bin,bootstrap,"Codes 8, 9 and 12 each set their own bit in gOuterState; agbcc binary-search switch"
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; shifts the 31-entry history queue
 0x08008094,0x080080A4,build/world/set_index.bin,world,wrapper around SetTableIndex
 0x08008108,0x0800811C,build/core/zero_history.bin,core,zeroing the history buffer with Memset
@@ -261,9 +265,21 @@ start,end,binary,module,notes
 0x0805643C,0x08056508,build/core/reset_runtime_globals.bin,core,Zeroes the runtime global state fields
 0x08058140,0x080581B4,build/world/p1_58140.bin,world,Phase 1: natural C matching the ROM exactly
 0x080581B4,0x08058228,build/world/p1_581b4.bin,world,Phase 1: natural C matching the ROM exactly
+0x08059AE4,0x08059AF8,build/script/cmd_call_four_arg.bin,script,Handler: forwards two u16 operands to FUN_0805669C with a constant 64
+0x08059C84,0x08059CA4,build/script/cmd_node_flag_bit0.bin,script,Handler: bit 0 of the chain end's +0x1A flags (rule 33)
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,wrapper/accessor harvest
+0x08059D88,0x08059D94,build/script/cmd_call_and_succeed.bin,script,Handler: calls FUN_0805063C and always answers 1
+0x08059E48,0x08059E68,build/script/cmd_forward_three_not.bin,script,Handler: FUN_0805669C inverted; result variable born after the call
+0x08059E68,0x08059E80,build/script/cmd_forward_three.bin,script,Handler: forwards three u16 operands to FUN_0805669C
+0x08059F40,0x08059F64,build/script/cmd_set_actor_flag.bin,script,Handler: sets flag 0x200 on the resolved actor
+0x08059F64,0x08059F8C,build/script/cmd_clear_actor_flag.bin,script,Handler: clears flag 0x200 on the resolved actor
 0x08059FE8,0x0805A024,build/world/p1_59fe8.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805A024,0x0805A040,build/script/cmd_progress_minus.bin,script,"Handler: gRam02025810 +0x0C minus the operand, into FUN_08030AE4"
 0x0805A070,0x0805A0AC,build/world/p1_5a070.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805A0AC,0x0805A0C0,build/script/cmd_progress_set.bin,script,Handler: the operand straight into FUN_08030AE4
+0x0805A0FC,0x0805A114,build/script/cmd_percent_to_fixed.bin,script,Handler: (operand << 16) / 100 into ApplyTwoLevels slot 3
+0x0805A114,0x0805A12C,build/script/cmd_anchor_unk34_unless_small.bin,script,Handler: GetAnchorUnk34 unless IsAnchorSmall
+0x0805A12C,0x0805A140,build/script/cmd_call_three_fixed.bin,script,Handler: operand into FUN_0803ABC4 with a constant 3 and 0
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,forwarding wrapper
 0x0805AB90,0x0805ABDC,build/world/p1_5ab90.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805ABDC,0x0805AC10,build/world/p1_5abdc.bin,world,Phase 1: natural C matching the ROM exactly
