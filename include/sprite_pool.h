@@ -1,12 +1,13 @@
-/* Sprite dugumlerinin ROM'dan dogrulanan ortak bellek yerlesimi. */
+/* Shared sprite-node memory layout established from the ROM. */
 #ifndef GUARD_SPRITE_POOL_H
 #define GUARD_SPRITE_POOL_H
 
 #include "gba_types.h"
 
-/* 0x0201CEC0: 128 adet 16 baytlik OAM dugumu ve liste basliklari.
- * Alanlar 0x08012B20 / 0x08012B9C / 0x08012C74 ROM kodundan olculdu.
- * priority, ayni attr2 & 0x0C00 degerindeki dugumlerin ikincil anahtari.
+/* 0x0201CEC0: a pool of 128 16-byte OAM nodes, followed by list metadata.
+ * The layout was established from ROM code at 0x08012B20, 0x08012B9C, and
+ * 0x08012C74. The priority field is the secondary sort key for nodes with
+ * equal values of `attr2 & 0x0C00`.
  */
 #define NODE_COUNT 128
 

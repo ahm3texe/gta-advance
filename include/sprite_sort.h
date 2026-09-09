@@ -1,14 +1,16 @@
-/* Sprite ekleme ve liste siralama icin ortak, C'den eslesen govde. */
+/* Shared byte-matching C implementation for sprite insertion and sorting. */
 #ifndef GUARD_SPRITE_SORT_H
 #define GUARD_SPRITE_SORT_H
 
 #include "sprite_pool.h"
 
-/* 0x08012C74'te bagimsiz, 0x08012A00'da dongu icine acilmis ayni
- * kararli ekleme islemi. old_agbcc her iki bicimi byte-matching uretir.
- * Etiketli dolasim + ayri mask &= field deyimleri 30/98 fark birakti.
- * Yapisal for dongusu + dogrudan maskeler birlikte ROM'un paylasilan
- * 0x0C00 sabitini ve register dagitimini uretir; tek baslarina yetmezler.
+/* The same stable insertion operation is used by the standalone routine
+ * at 0x08012C74 and inlined into the loop at 0x08012A00. old_agbcc produces
+ * byte-matching output in both cases.
+ * A label-based traversal with separate `mask &= field` statements left
+ * 30 of 98 bytes different. A structured for loop combined with direct masks
+ * reproduces the ROM's shared 0x0C00 constant and register allocation;
+ * neither change was sufficient on its own.
  */
 static inline void InsertSortedSprite(Node *node, Node **head)
 {

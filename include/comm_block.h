@@ -3,17 +3,18 @@
 
 #include "gba_types.h"
 
-/* Baglanti (SIO) blogu — gRam02036338'in gosterdigi yapi.
+/* Serial link (SIO) state block pointed to by gRam02036338.
  *
- * Dort kaynak bu blogu kullaniyor ve her biri farkli alanlarini goruyor:
- *   src/world/comm_flag.c      byte0, ready06
+ * Shared users access different parts of this block:
+ *   src/world/comm_flag.c      byte0 and ready06
  *   src/world/link_hw_reset.c  ready06
- *   src/world/link_init.c      +0x14..0x2C kurulum alanlari ve tamponlar
- *   src/world/link_packet.c    baslik alanlari ve paket
- * Ayni sembol icin farkli struct govdeleri tanimlamak tutarlilik
- * denetimini hakli olarak durduruyor; tek tanim burada.
+ *   src/world/link_init.c      setup fields at +0x14..+0x2C and buffers
+ *   src/world/link_packet.c    header fields and packet data
+ * A single definition avoids conflicting struct layouts for the same symbol,
+ * which are rejected by the consistency check.
  *
- * Blok toplam 464 bayt: kurulum CpuSet ile tam bu kadarini sifirliyor.
+ * The block occupies 464 bytes; initialization clears exactly this many bytes
+ * with CpuSet.
  */
 
 typedef struct LinkPacket {
@@ -23,12 +24,12 @@ typedef struct LinkPacket {
     u8  payload[16];                    /* +0x04 */
 } LinkPacket;
 
-/* 0x02036330'daki 8 baytlik sayac blogu. Boyut 0x08066144'teki
- * Memset cagrisindan OLCULDU. Iki kaynak kullaniyor:
- *   src/world/link_session_reset.c  +0x02'yi sifirliyor
- *   src/world/sio_driver.c          +0x00'i yaziyor
- * Ayni sembol icin farkli extern turleri tutarlilik denetimini
- * durduruyor; tek tanim burada. */
+/* Eight-byte counter block at 0x02036330. Its size was established from
+ * the Memset call at 0x08066144. Users include:
+ *   src/world/link_session_reset.c  clears the field at +0x02
+ *   src/world/sio_driver.c          writes the field at +0x00
+ * This shared definition avoids conflicting extern types for the same symbol,
+ * which are rejected by the consistency check. */
 typedef struct LinkCounters {
     u16 half00;                         /* +0x00 */
     u16 half02;                         /* +0x02 */

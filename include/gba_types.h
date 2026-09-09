@@ -1,12 +1,12 @@
 #ifndef GUARD_GBA_TYPES_H
 #define GUARD_GBA_TYPES_H
 
-/* Tum kaynaklarin kullandigi temel tipler.
+/* Base types shared by the project.
  *
- * Isaretlilik decomp'ta anlamli bir tercihtir, kozmetik degil: dar bir
- * parametrenin isaretli olmasi agbcc'nin giriste normalizasyon komutu
- * uretmesine yol acar (docs/COMPILER.md kural 15). Bu yuzden s8/s16 tipleri
- * de burada tanimli. */
+ * Signedness affects code generation: a narrow signed parameter can cause
+ * agbcc to emit normalization instructions on entry (docs/COMPILER.md,
+ * rule 15). The s8 and s16 types are provided so declarations can express
+ * the signedness needed to reproduce the ROM instructions. */
 
 typedef unsigned char  u8;
 typedef unsigned short u16;

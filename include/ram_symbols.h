@@ -4,10 +4,10 @@
 #include "gba_types.h"
 
 /*
- * Türü henüz kesinleşmemiş, farklı sistemlerce farklı görünümlerle kullanılan
- * RAM depoları. Semboller burada yalnız ham depolama olarak bildirilir; her
- * translation unit kendi yerel struct görünümüne açıkça cast eder. Böylece
- * linker'daki tek nesne için çelişkili extern C türleri oluşmaz.
+ * RAM storage whose types have not yet been fully established and which is
+ * accessed through different views by different subsystems. Declare only raw
+ * storage here; each translation unit explicitly casts it to its local struct
+ * view. This avoids conflicting extern C declarations for one linker symbol.
  */
 extern u8 gRam02000F10[];
 extern u8 gRam02001450[];

@@ -3,12 +3,12 @@
 
 #include "gba_types.h"
 
-/* Oturum blogu — gRam02026DF0 (0x02026DF0).
+/* Session state block: gRam02026DF0 at 0x02026DF0.
  *
- * Iki kaynak kullaniyor ve ayni sembol icin farkli struct govdeleri
- * tutarlilik denetimini durduruyor; tek tanim burada.
- *   src/world/area_cleanup_b1.c   tum blogu goruyor
- *   src/world/band_a_30f78.c      yalnizca +0x00 etkinlik bayragini siliyor
+ * This shared definition avoids conflicting struct layouts for the same
+ * symbol, which are rejected by the consistency check. Users include:
+ *   src/world/area_cleanup_b1.c  accesses the full block
+ *   src/world/band_a_30f78.c     only clears the activity flag at +0x00
  */
 typedef struct Snapshot {
     u32 word[9];
@@ -19,7 +19,7 @@ typedef struct Record {
 } Record;
 
 typedef struct Session {
-    u8       unk00;             /* +0x00 — etkinlik bayragi */
+    u8       unk00;             /* +0x00: activity flag */
     u8       pad01[3];
     u32      unk04;             /* +0x04 */
     Record   unk08;             /* +0x08 */

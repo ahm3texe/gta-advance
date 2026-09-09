@@ -1,7 +1,8 @@
 #ifndef PHASE1_TYPES_H
 #define PHASE1_TYPES_H
 #include "gba_types.h"
-/* Iki hedefli eylem kaydinin ikiz kurulum/adim fonksiyonlarinda olculen alanlari. */
+/* Fields observed in the paired initialization and step routines for
+ * target-action records. */
 typedef struct Phase1Action Phase1Action;
 struct Phase1Action {
     void *owner;
@@ -77,10 +78,11 @@ typedef struct Phase1Readiness { u8 pad00[52]; s16 value; } Phase1Readiness;
 typedef struct Phase1ReadinessActor { u8 pad00[24]; Phase1Readiness *state; } Phase1ReadinessActor;
 typedef struct Phase1LinkedActor { u8 pad00[44]; Phase1GroupedActor *linked; } Phase1LinkedActor;
 
-/* --- src/world/band_0803afbc.c'den BIREBIR kopyalanan govdeler ---------
- * gRam02000F08 orada `Ctx *` olarak bildirili; tutarlilik kapisi ayni
- * sembol icin ayni struct govdesini sart kostugu icin govdeler aynen
- * alindi. (Faz 3'te bu tipler tek bir paylasilan baslikta toplanacak.) */
+/* Struct layouts copied verbatim from src/world/band_0803afbc.c.
+ * gRam02000F08 is declared there as `Ctx *`. These definitions are kept
+ * identical because the consistency check requires the same struct layout
+ * for each use of a shared symbol. Consolidating these duplicate definitions
+ * into one shared header is planned for Phase 3. */
 typedef struct Vec3 {
     u32 x;
     u32 y;
