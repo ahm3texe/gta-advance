@@ -1028,18 +1028,18 @@ address,name,size,status,module,notes
 0x0803F74C,SetActorIdle,24,matching,world,Entity state setter; src/world/actor_states.c size measured including the tail pool (byte-matching evidence)
 0x0803F764,ReleaseActor,40,matching,world,Entity state setter; src/world/actor_states.c size measured including the tail pool (byte-matching evidence)
 0x0803F78C,FUN_0803f78c,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0803F7D4,FUN_0803f7d4,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0803F7D4,FUN_0803f7d4,36,matching,actor,"Clears bit 23 of the record's +0x0C flags, drops the +0x08 step and raises the +0x81 flag; a null argument does nothing; decompiled in src/actor/detach_actor.c"
 0x0803F7F8,FUN_0803f7f8,36,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0803F81C,FUN_0803f81c,64,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0803F85C,FUN_0803f85c,36,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0803F880,FUN_0803f880,28,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
-0x0803F89C,FUN_0803f89c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0803F8BC,FUN_0803f8bc,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0803F880,FUN_0803f880,28,matching,actor,"Sets the +0x32 timer to 300, raises the +0x80 flag and ADDS 0x2000000 to the +0x0C flags of the record at +0x04; decompiled in src/actor/arm_actor_timer.c"
+0x0803F89C,FUN_0803f89c,32,matching,actor,"Raises the +0x83 flag and stores its two arguments at +0x84 and +0x88, r2 first; decompiled in src/actor/set_actor_pair.c"
+0x0803F8BC,FUN_0803f8bc,32,matching,actor,Hands the +0x24 handle to FUN_0800C804 with gRam020110C0 and clears it; decompiled in src/actor/release_actor_handle.c
 0x0803F8DC,FUN_0803f8dc,50,matching,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
 0x0803F910,FUN_0803f910,50,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0803F944,FUN_0803f944,90,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0803F9A0,FUN_0803f9a0,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0803F9CC,FUN_0803f9cc,16,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0803F9A0,FUN_0803f9a0,44,matching,actor,"Sets bit 23 and clears bit 24 of the record's flags, installs FUN_0803D4E8 as the +0x08 step, stores the argument at +0x2C and lowers the +0x81 flag; decompiled in src/actor/attach_actor_step.c"
+0x0803F9CC,FUN_0803f9cc,16,matching,actor,Clears bits 23 and 24 of the record's +0x0C flags together; decompiled in src/actor/clear_record_flag23.c
 0x0803FA38,FUN_0803fa38,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803FA80,FUN_0803fa80,74,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0803FACC,FUN_0803facc,26,matching,world,Tests flag 0x400 in the +0x1E halfword of the record at +0x2C; decompiled in src/world/record_flag_test.c
@@ -1639,20 +1639,20 @@ address,name,size,status,module,notes
 0x0806360C,FUN_0806360c,144,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0806369C,FUN_0806369c,264,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080638A0,FUN_080638a0,650,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
-0x08063B2C,FUN_08063b2c,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08063B2C,FUN_08063b2c,12,matching,boot,"Queues an event, forwarding its two arguments and supplying a zero third; decompiled in src/boot/queue_event_zero.c"
 0x08063B38,FUN_08063b38,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x08063B74,FUN_08063b74,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08063B98,FUN_08063b98,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08063BA4,FUN_08063ba4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08063B74,FUN_08063b74,36,matching,boot,"Clears gRam02036110 and resets BLDCNT to 0xFF, BLDALPHA to 0 and BLDY to 31. BLDY is reached by advancing the BLDCNT pointer, which needs it to be volatile or agbcc folds the advance away; decompiled in src/boot/reset_blend.c"
+0x08063B98,FUN_08063b98,12,matching,boot,Sets the melody flag gRam0201AA90 to 6; decompiled in src/boot/set_melody_flag.c
+0x08063BA4,FUN_08063ba4,38,decompiled,boot,"The +0x10 word of the 28-byte record gRom08852A2C[index], plus 111 when it falls in 244..395. NOT BYTE-MATCHING at 12/19: agbcc folds the +0x10 into the pool constant and loads it after the stride, where the ROM keeps the table base and adds 16 at run time. Six spellings measured; same class as 0x08061F34. src/boot/record_field_adjusted.c"
 0x08063BCC,FUN_08063bcc,10,matching,world,"forwarding wrapper; found with tools/find_wrappers.py, byte-matching from C"
-0x08063BD8,FUN_08063bd8,14,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08063BD8,FUN_08063bd8,14,matching,boot,"Stops the audio DMA on the cart flag, then rebuilds the work buffers; decompiled in src/boot/reset_audio_and_buffers.c"
 0x08063BE8,FUN_08063be8,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08063C88,FUN_08063c88,28,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08063CA4,FUN_08063ca4,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08063CF0,FUN_08063cf0,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08063D3C,FUN_08063d3c,28,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
-0x08063DAC,FUN_08063dac,32,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08063DCC,FUN_08063dcc,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08063DAC,FUN_08063dac,32,matching,boot,"Restarts six subsystems in order, only the first with an argument; decompiled in src/boot/restart_subsystems.c"
+0x08063DCC,FUN_08063dcc,28,matching,boot,Queues event 51 when gRam02025800 selects a record; decompiled in src/boot/queue_event_51.c
 0x08063DE8,FUN_08063de8,44,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
 0x08063E38,ForwardU16WithFlag0,16,matching,unknown,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists
 0x08063E48,ForwardU16WithFlag1,16,matching,unknown,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists

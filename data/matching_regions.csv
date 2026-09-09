@@ -233,10 +233,16 @@ start,end,binary,module,notes
 0x0803F69C,0x0803F6D8,build/world/rearm_slot.bin,world,rebuilding the slot
 0x0803F6D8,0x0803F6F8,build/world/retarget_if_kind4.bin,world,replacing the handler when the kind is 4
 0x0803F6F8,0x0803F78C,build/world/actor_states.bin,world,Four entity state setters
+0x0803F7D4,0x0803F7F8,build/actor/detach_actor.bin,actor,"Clears bit 23, drops the step, raises the +0x81 flag"
 0x0803F7F8,0x0803F81C,build/world/p1_3f7f8.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F85C,0x0803F880,build/world/p1_3f85c.bin,world,Phase 1: natural C matching the ROM exactly
+0x0803F880,0x0803F89C,build/actor/arm_actor_timer.bin,actor,"Timer to 300, +0x80 flag up, and ADDS 0x2000000 to the other record"
+0x0803F89C,0x0803F8BC,build/actor/set_actor_pair.bin,actor,"Raises the +0x83 flag and stores the two arguments, swapped"
+0x0803F8BC,0x0803F8DC,build/actor/release_actor_handle.bin,actor,Releases the +0x24 handle through FUN_0800C804 and clears it
 0x0803F8DC,0x0803F910,build/world/p1_3f8dc.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F910,0x0803F944,build/world/p1_3f910.bin,world,Phase 1: natural C matching the ROM exactly
+0x0803F9A0,0x0803F9CC,build/actor/attach_actor_step.bin,actor,"Sets bit 23, clears bit 24, installs the step and lowers +0x81"
+0x0803F9CC,0x0803F9DC,build/actor/clear_record_flag23.bin,actor,Clears bits 23 and 24 of the record's flags together
 0x0803FACC,0x0803FAE8,build/world/record_flag_test.bin,world,Flag 0x400 test on the record at +0x2C; mask built first (rule 33)
 0x08041E98,0x08041EC8,build/map/get_tile_field_c.bin,map,Bits 0x380 of the tile at a 22-bit fractional position
 0x08041ED4,0x08041EE0,build/map/clear_map_data.bin,map,Drops the map context's data pointer
@@ -383,9 +389,15 @@ start,end,binary,module,notes
 0x0806262C,0x08062654,build/session/mark_distant_by_phase.bin,session,"Two marking passes, each skipped for its own phase"
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,leaf accessor
 0x0806269C,0x080626BC,build/session/slot_first_byte.bin,session,"First byte of the owner's slot record, -1 when missing"
+0x08063B2C,0x08063B38,build/boot/queue_event_zero.bin,boot,Queues an event with a zero third argument
+0x08063B74,0x08063B98,build/boot/reset_blend.bin,boot,"Resets BLDCNT, BLDALPHA and BLDY; volatile pointer keeps the advance"
+0x08063B98,0x08063BA4,build/boot/set_melody_flag.bin,boot,Sets the melody flag to 6
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,forwarding wrapper
+0x08063BD8,0x08063BE8,build/boot/reset_audio_and_buffers.bin,boot,"Stops the audio DMA, then rebuilds the work buffers"
 0x08063C88,0x08063CA4,build/world/p1_63c88.bin,world,Phase 1: natural C matching the ROM exactly
 0x08063D3C,0x08063D58,build/world/p1_63d3c.bin,world,Phase 1: natural C matching the ROM exactly
+0x08063DAC,0x08063DCC,build/boot/restart_subsystems.bin,boot,Restarts six subsystems in order
+0x08063DCC,0x08063DE8,build/boot/queue_event_51.bin,boot,Queues event 51 when a record is selected
 0x0806434C,0x08064590,build/text/draw_text.bin,text,"Text drawing: three alignments, glyph and string width"
 0x080646AC,0x080646F8,build/world/random_below_count.bin,world,0x080646AC RandomBelowCount
 0x08064F24,0x08065130,build/world/band_08064f24.bin,world,Turns off the actor tracking kind and processes the distance/drop score.
