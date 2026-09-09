@@ -29,10 +29,13 @@
  *   base = TABLE; offset = index * 28; base += 0x10; value = *(u32 *)(base + offset);
  *   table = (const Record *)TABLE; value = table[index].field10;   (both orders)
  *   field = (const u32 *)((const u8 *)TABLE + 0x10); value = *(u32 *)((u8 *)field + index * 28);
+ *   the same with the base `const volatile u8 *`, and with the load volatile too
+ *   the same with the stride computed after the +0x10 rather than before
  *
- * Rule 65's lever does not reach it: there the base is a SYMBOL and the offset
- * a variable, while here both are constants and the fold happens before the
- * pointer becomes a value. src/session/lookup_type_word.c is parked on the same
+ * Neither rule 65 nor rule 74 reaches it. Rule 65's base is a SYMBOL and its
+ * offset a variable; rule 74's `volatile` defeats the fold only when the
+ * ACCESS goes through the volatile pointer, and here the pointer is only
+ * arithmetic and the fold happens before it becomes a value. Both were tried. src/session/lookup_type_word.c is parked on the same
  * class. Left in place as a record; functions.csv keeps it as decompiled.
  *
  * Rule 73 IS reproduced: the plain answer falls through and the adjusted one

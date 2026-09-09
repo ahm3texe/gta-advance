@@ -1306,3 +1306,36 @@ both, so rule 71 applies and the `goto` form is not needed.
 `mvns / lsrs #31`; in `FUN_080420F8` it hoists the default above the test and
 overwrites it, which is rule 48's shape and one instruction shorter than the
 ROM's. Both are further from the ROM than the plain `goto`, not closer.
+
+## Rule 74 — `volatile` defeats the fold of a constant-address pointer's advance
+
+A pointer that starts at a constant address is itself a constant, so agbcc folds
+any advance of it into the next access's displacement:
+
+```c
+    u16 *reg = (u16 *)0x04000050;
+    *reg = 0xFF;
+    reg += 2;
+    *reg = 31;              /* becomes strh r0,[r1,#4]; the advance vanishes */
+```
+
+The ROM keeps the advance:
+
+```
+    ldr r1,=0x04000050 / movs r0,#255 / strh r0,[r1,#0]
+    ... / adds r1,#4 / movs r0,#31 / strh r0,[r1,#0]
+```
+
+Declaring the pointer `volatile` is what produces it. Rule 64 is about keeping a
+base constant's LIFETIME short once the advance exists; this rule is about the
+advance existing at all, and it comes first.
+
+Measured in `FUN_08063B74` (`src/boot/reset_blend.c`), six spellings: a plain
+`u16 *`, a byte-cast advance, two separate pointers, an address local for the
+symbol, and the `volatile` form, which is the only one that matches.
+
+**Where it does NOT reach.** The `volatile` has to be on the pointer the ACCESS
+goes through. When the pointer is only address arithmetic and the load is a
+plain one, the fold happens before the pointer becomes a value and the qualifier
+changes nothing. `FUN_08063BA4` and `FUN_08061F34` are both parked on that, and
+both were tried with the base `volatile` and with the load `volatile` as well.
