@@ -12,12 +12,12 @@
 #define MODE_READY 2
 #define MODE_DONE  4
 
-extern u8 gRam02036050;
+extern u8 gRam02036050[];
 
 /* 0x0806233C */
 u32 IsModeReady(void)
 {
-    if (gRam02036050 == MODE_READY)
+    if (gRam02036050[0] == MODE_READY)
         return 1;
     return 0;
 }
@@ -25,7 +25,7 @@ u32 IsModeReady(void)
 /* 0x08062350 */
 u32 IsModeDone(void)
 {
-    if (gRam02036050 == MODE_DONE)
+    if (gRam02036050[0] == MODE_DONE)
         return 1;
     return 0;
 }

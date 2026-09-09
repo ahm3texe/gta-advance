@@ -22,6 +22,10 @@ typedef struct RamBlock {
     u8  byte14;                 /* +0x14 */
     u8  pad15[1];
     u16 word16;                 /* +0x16 */
+    u8  pad18[4];
+    u16 word1C;                 /* +0x1C */
+    u16 word1E;                 /* +0x1E */
+    u8  pad20[4];               /* out to the 36 bytes 0x08061D34 clears */
 } RamBlock;
 
 extern RamBlock gRam02035EA0;

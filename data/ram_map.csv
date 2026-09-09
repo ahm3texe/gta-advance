@@ -139,6 +139,7 @@ address,size,name,source,status,notes
 0x02026C10,0,gRam02026C10,decomp,provisional,u32 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
 0x02026C90,0,gRam02026C90,decomp,provisional,u16 [N][8]; 0x08031C98 (the ReleaseEntry... tail) indexes it as [n][8]; N is UNKNOWN; it must be declared as an ARRAY.
 0x02026CD0,80,gRam02026CD0,decomp,provisional,"+2 u16 field, +76 u32 field"
+0x02026D1C,4,gRam02026D1C,decomp,provisional,A word 0x080621B8 tests before it clears gRam02035ED0; when it is non-zero the clear is skipped. No writer is known.
 0x02026D90,4,gRam02026D90,decomp,provisional,u32 gate; 0x08031294 routes the HUD redraw through this value
 0x02026DA0,4,gRam02026DA0,decomp,provisional,"0x08031388 uses it; the nearest recorded symbols (0x02026CD0, 0x02026DF0) do not cover this address"
 0x02026DF0,132,gRam02026DF0,decomp,provisional,used in FUN_08030E10; it was measured to be at least 0x84 bytes; its upper bound is UNKNOWN. Details in the header of src/world/area_cleanup_b1.c.
@@ -223,9 +224,10 @@ address,size,name,source,status,notes
 0x02035B90,196,gJobTable,decomp,provisional,"7-entry, 28-byte job table; +0 state, +4 active flag, +5 sub, +12 u16, +24 pointer, +28 an extra field past the row"
 0x02035CA8,4,gFrameCounterLate,decomp,provisional,Second frame counter referenced by GameInit
 0x02035CC0,4,gLanguage,decomp,verified,"Language selection (0..4, five languages). The setter 0x0805E6C4 clamps it; the reader 0x0805E6E0 selects a block of 618 strings per language in the text table. See docs/TEXT_MAP.md  TRACE (language screen, session 7): THE ORDER IS PROVEN. 0->1->2->3->4 as the cursor moves down, and back as it moves up. Menu order: 0=English, 1=Spanish, 2=French, 3=Italian, 4=German. SetLanguage is called ON CURSOR MOVEMENT, NOT ON CONFIRMATION -- the menu does a live preview."
-0x02035EA0,24,gRam02035EA0,decomp,provisional,+0x16 u16 id
+0x02035CF0,416,gRam02035CF0,decomp,provisional,"SIZE EVIDENCE: 0x080621D8 calls Memset(gRam02035CF0, 0, 416); 0x02035CF0 + 416 = 0x02035E90, which clears the next mapped symbol at 0x02035EA0. Nothing else about its contents is known."
+0x02035EA0,36,gRam02035EA0,decomp,provisional,"+0x00 word, +0x08 type, +0x09 mode, +0x14 byte, +0x16 u16 id, +0x1C and +0x1E u16. SIZE EVIDENCE: 0x08061D34 calls Memset(gRam02035EA0, 0, 36), so 36 is a lower bound and the next mapped symbol at 0x02035ED0 makes it an upper one. It was recorded as 24 before, from the fields known then."
 0x02035ED0,36,gRam02035ED0,decomp,provisional,MEASURED: twelve u16 IDs and twelve u8 values; 0806245C
-0x02036050,1,gRam02036050,decomp,provisional,mode byte; IsModeReady reads it (byte-matching evidence)
+0x02036050,180,gRam02036050,decomp,provisional,"Record whose byte 0 is the mode IsModeReady reads (byte-matching evidence) and whose +0xA8 word 0x08061F9C tests. SIZE EVIDENCE: 0x08061DD4 calls Memset(gRam02036050, 0, 180). It was recorded as 1 before, from the mode byte alone."
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
 0x02036110,4,gRam02036110,decomp,provisional,0x08063C88/63D3C: ldr/str 32-bit state; allocation size undetermined

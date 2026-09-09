@@ -331,13 +331,23 @@ start,end,binary,module,notes
 0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x080611CC,0x0806149C,build/world/mark_distant_actors.bin,world,0x080611CC MarkDistantActors + 0x08061334 MarkDistantActorsB (the 0x0202F2C0 list)
+0x08061D34,0x08061D58,build/session/reset_ram_block.bin,session,Clears the 36-byte RAM block; and the setter for its two ids
+0x08061DD4,0x08061DEC,build/session/reset_mode_record.bin,session,"Clears the 180-byte mode record, then the stat table"
+0x08061F9C,0x08061FBC,build/session/notify_when_pending.bin,session,Notifies the active slot when the record's +0xA8 word is set (rule 65)
+0x08061FBC,0x08061FE0,build/session/owner_ready.bin,session,1 when the record's +0x32 byte is set or FindEntryByOwnerState says so
+0x08062134,0x08062164,build/session/mark_actors_flag400.bin,session,Sets flag 0x400 down the actor list where mask 0x00400010 is clear
+0x080621B8,0x080621D8,build/session/reset_stat_table.bin,session,Clears the stat table unless gRam02026D1C is set
+0x080621D8,0x080621F0,build/session/reset_large_block.bin,session,Clears the 416-byte block at 0x02035CF0
 0x08062294,0x080622C0,build/world/ram_state.bin,world,Mode category + two field writers
 0x0806233C,0x08062364,build/world/is_mode_two.bin,world,query for the 0x02036050 mode byte == 2
 0x0806245C,0x080624B8,build/world/p1_6245c.bin,world,Phase 1: natural C matching the ROM exactly
 0x080624B8,0x08062514,build/world/p1_624b8.bin,world,Phase 1: natural C matching the ROM exactly
 0x08062514,0x08062530,build/world/ram_flags.bin,world,gRam02035EA0.type query
 0x08062530,0x0806254C,build/world/is_ram_mode.bin,world,IsRamModeWanted; RAM active-flag and mode query
+0x080625A0,0x080625D0,build/session/arm_ram_block.bin,session,Arms the RAM block when nothing is pending
+0x0806262C,0x08062654,build/session/mark_distant_by_phase.bin,session,"Two marking passes, each skipped for its own phase"
 0x08062654,0x08062660,build/world/get_ram_word16.bin,world,leaf accessor
+0x0806269C,0x080626BC,build/session/slot_first_byte.bin,session,"First byte of the owner's slot record, -1 when missing"
 0x08063BCC,0x08063BD8,build/world/wrap_08063bcc.bin,world,forwarding wrapper
 0x08063C88,0x08063CA4,build/world/p1_63c88.bin,world,Phase 1: natural C matching the ROM exactly
 0x08063D3C,0x08063D58,build/world/p1_63d3c.bin,world,Phase 1: natural C matching the ROM exactly

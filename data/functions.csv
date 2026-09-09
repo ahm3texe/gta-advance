@@ -1588,23 +1588,23 @@ address,name,size,status,module,notes
 0x08061930,FUN_08061930,576,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08061B70,FUN_08061b70,220,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08061C4C,FUN_08061c4c,230,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08061D34,FUN_08061d34,20,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08061D48,FUN_08061d48,16,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08061D34,FUN_08061d34,20,matching,session,Clears the 36-byte RAM block at 0x02035EA0. The Memset size is what fixes that block's extent; decompiled in src/session/reset_ram_block.c
+0x08061D48,FUN_08061d48,16,matching,session,Writes the RAM block's +0x1C and +0x1E ids and answers 1; no prologue; decompiled in src/session/reset_ram_block.c
 0x08061D58,FUN_08061d58,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08061DD4,FUN_08061dd4,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08061DD4,FUN_08061dd4,24,matching,session,"Clears the 180-byte mode record at 0x02036050, then calls the stat-table clear. The Memset size is what fixes that record's extent; decompiled in src/session/reset_mode_record.c"
 0x08061DF0,FUN_08061df0,104,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08061EC0,FUN_08061ec0,4,discovered,unknown,"It was MISSING from the map; reported by the agent working on FUN_080552D4. verified from the ROM: `movs r0,#1; bx lr` -- a four-byte leaf returning the constant 1. It has a single `bl` caller. What precedes it (0x08061EB8-0x08061EBF) is a literal pool; what follows at 0x08061EC4 is a separate function."
 0x08061EC4,FUN_08061ec4,110,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08061F34,FUN_08061f34,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08061F34,FUN_08061f34,32,decompiled,session,"One word from the ROM table at 0x08EC79D4, indexed by the RAM block's +0x08 type, and only for id 65. NOT BYTE-MATCHING at 12/16: agbcc schedules the table's pool load after the index shift, where the ROM has both pool loads up front. Seven spellings measured; rule 44 scheduling class. src/session/lookup_type_word.c"
 0x08061F54,FUN_08061f54,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08061F9C,FUN_08061f9c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08061FBC,FUN_08061fbc,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08061F9C,FUN_08061f9c,32,matching,session,Notifies the active slot with id 0x112 when the mode record's +0xA8 word is set; decompiled in src/session/notify_when_pending.c
+0x08061FBC,FUN_08061fbc,34,matching,session,"1 when the owner's +0x18 record has a non-zero +0x32 byte, or FindEntryByOwnerState answers non-zero; decompiled in src/session/owner_ready.c"
 0x08061FE0,FUN_08061fe0,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0806206C,FUN_0806206c,200,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08062134,FUN_08062134,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08062134,FUN_08062134,48,matching,session,Walks the actor list from GetUnk02028290 and sets flag 0x400 on each actor whose +0x0C flags have none of mask 0x00400010; decompiled in src/session/mark_actors_flag400.c
 0x08062164,FUN_08062164,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x080621B8,FUN_080621b8,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x080621D8,FUN_080621d8,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080621B8,FUN_080621b8,32,matching,session,Clears the 36-byte stat table at 0x02035ED0 unless gRam02026D1C is set; decompiled in src/session/reset_stat_table.c
+0x080621D8,FUN_080621d8,24,matching,session,Clears the 416-byte block at 0x02035CF0. The Memset size is what fixes that block's extent; decompiled in src/session/reset_large_block.c
 0x080621F0,FUN_080621f0,82,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08062244,FUN_08062244,78,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08062294,GetModeCategory,30,matching,world,gRam02035EA0 state; src/world/ram_state.c
@@ -1613,19 +1613,19 @@ address,name,size,status,module,notes
 0x08062350,IsModeDone,20,matching,world,byte-matching from a C source (MATCH-014 batch group)
 0x08062370,NoOp08062370,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x080623AC,FUN_080623ac,56,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x080623E4,FUN_080623e4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x080623E4,FUN_080623e4,38,decompiled,session,"1 for ids 105, 106, 107, 113, 108 and 109, tested in that order. NOT BYTE-MATCHING at 10/19, two bytes: the ROM copies the narrowed id into a second register and runs the last comparison against the copy, and agbcc propagates that copy away in every form that produces it. Register-copy class, rule 44. src/session/is_special_id.c"
 0x0806240C,FUN_0806240c,80,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0806245C,FUN_0806245c,92,matching,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
 0x080624B8,FUN_080624b8,92,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08062514,GetRamType,28,matching,world,gRam02035EA0 query; src/world/ram_flags.c
 0x08062530,IsRamModeWanted,28,matching,world,RAM active-flag and mode query; src/world/is_ram_mode.c
 0x0806254C,FUN_0806254c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x080625A0,FUN_080625a0,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080625A0,FUN_080625a0,48,matching,session,"Arms the RAM block with 75 at +0x14 and 617 at +0x16, when its first word is set and the progress block's +0x04 halfword is clear; decompiled in src/session/arm_ram_block.c"
 0x080625D0,FUN_080625d0,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x0806262C,FUN_0806262c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0806262C,FUN_0806262c,40,matching,session,"Runs MarkDistantActors and MarkDistantActorsB, each skipped when the low two bits of gRam02000224 name its own phase; decompiled in src/session/mark_distant_by_phase.c"
 0x08062654,GetRamWord16,12,matching,world,"leaf accessor; found with tools/find_accessors.py, byte-matching from C"
 0x08062660,FUN_08062660,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0806269C,FUN_0806269c,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0806269C,FUN_0806269c,32,matching,session,"First byte of the record at +0x1C of the slot GetOwnerSlot selects, -1 when the slot or the record is missing; decompiled in src/session/slot_first_byte.c"
 0x080626BC,FUN_080626bc,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08062720,FUN_08062720,64,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08062760,FUN_08062760,60,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
