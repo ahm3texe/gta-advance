@@ -1436,30 +1436,30 @@ address,name,size,status,module,notes
 0x0805A12C,FUN_0805a12c,20,matching,script,Script handler: the operand into FUN_0803ABC4 with a constant 3 and 0; decompiled in src/script/cmd_call_three_fixed.c
 0x0805A140,FUN_0805a140,104,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A1A8,FUN_0805a1a8,46,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A1D8,FUN_0805a1d8,26,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A1F4,FUN_0805a1f4,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0805A220,FUN_0805a220,40,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A248,FUN_0805a248,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A274,FUN_0805a274,34,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A1D8,FUN_0805a1d8,26,matching,script,"Script handler: 1 when GetBase is above the operand, signed comparison; decompiled in src/script/cmd_base_above.c"
+0x0805A1F4,FUN_0805a1f4,38,matching,script,Script handler: calls FUN_08057A04 unless bit 19 of the +0x18 flags of the record gRam020272C8 points at is set; decompiled in src/script/cmd_call_unless_flag.c
+0x0805A220,FUN_0805a220,40,matching,script,Script handler: sets flag 0x200 on the actor's owner at +0x28; a missing owner still answers 1; decompiled in src/script/cmd_set_owner_flag.c
+0x0805A248,FUN_0805a248,44,matching,script,Script handler: the actor's owner and a second u16 operand into FUN_08036338; decompiled in src/script/cmd_owner_call_arg.c
+0x0805A274,FUN_0805a274,34,matching,script,Script handler: the actor's owner into FUN_080362E4; decompiled in src/script/cmd_owner_call.c
 0x0805A298,FUN_0805a298,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A2F4,FUN_0805a2f4,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A318,FUN_0805a318,34,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A2F4,FUN_0805a2f4,36,matching,script,"Script handler: resets the area node, writes 5 into its +0x16 byte and clears slot 0; decompiled in src/script/cmd_area_reset.c"
+0x0805A318,FUN_0805a318,34,matching,script,"Script handler: IsEntityFlagSet on the node's +0x18 entry, falling back to its +0x17 byte; decompiled in src/script/cmd_area_ready.c"
 0x0805A450,FUN_0805a450,68,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A494,FUN_0805a494,96,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A4F4,ForwardToHalvesEqual,10,matching,world,"forwarding wrapper; found with tools/find_wrappers.py, byte-matching from C"
-0x0805A500,FUN_0805a500,12,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A500,FUN_0805a500,12,matching,script,Script handler: calls FUN_08030DD8 and always answers 1; decompiled in src/script/cmd_call_08030dd8.c
 0x0805A50C,FUN_0805a50c,82,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A78C,FUN_0805a78c,20,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed"
+0x0805A78C,FUN_0805a78c,20,matching,script,Script handler: the operand into FUN_08041EF8 with a constant -1; decompiled in src/script/cmd_call_minus_one.c
 0x0805A7A0,FUN_0805a7a0,132,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A824,FUN_0805a824,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A880,FUN_0805a880,168,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A928,FUN_0805a928,76,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805A974,FUN_0805a974,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A9A8,FUN_0805a9a8,114,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805AA1C,FUN_0805aa1c,20,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AA1C,FUN_0805aa1c,20,matching,script,Script handler: FUN_08030D0C's answer straight into ReleaseSlot; decompiled in src/script/cmd_release_slot.c
 0x0805AA30,FUN_0805aa30,120,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805AAA8,FUN_0805aaa8,52,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805AB04,FUN_0805ab04,16,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AB04,FUN_0805ab04,16,matching,script,Script handler: the operand into FUN_080351AC; decompiled in src/script/cmd_call_080351ac.c
 0x0805AB18,FUN_0805ab18,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AB44,FUN_0805ab44,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AB78,NoOp0805AB78,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
