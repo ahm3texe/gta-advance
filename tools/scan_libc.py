@@ -53,7 +53,7 @@ def relocation_offsets(obj: Path) -> list[tuple[int, int]]:
             offset = int(parts[0], 16)
         except ValueError:
             continue
-        # Thumb BL 4 byte, ABS32 literal 4 byte; hepsini 4 byte kabul et.
+        # A Thumb BL is 4 bytes and an ABS32 literal is 4; treat them all as 4.
         spans.append((offset, 4))
     return spans
 
@@ -217,15 +217,15 @@ def main() -> None:
 
     detail = ", ".join(f"{k}: {v}" for k, v in per_lib.items())
     print(f"{checked} functions searched ({masked} of them masked)")
-    print(f"ROM'da bulunan: {len(found)}  ({detail})\n")
+    print(f"Found in the ROM: {len(found)}  ({detail})\n")
     for address, name, size, was_masked, aliases, lib_name in found:
         flags = []
         if aliases:
-            flags.append(f"belirsiz: {'/'.join([name] + aliases)}")
+            flags.append(f"ambiguous: {'/'.join([name] + aliases)}")
         if was_masked:
-            flags.append("maskeli")
+            flags.append("masked")
         if address not in known:
-            flags.append("Ghidra kacirmis")
+            flags.append("missed by Ghidra")
         flags.append(lib_name)
         tail = f"   <- {', '.join(flags)}"
         print(f"  0x{address:08X}  {name:20} {size:>4}B{tail}")

@@ -7,7 +7,7 @@ hash_file="$repo_dir/config/rom.sha1"
 
 verify_rom() {
     test -f "$rom_path" || {
-        echo "Eksik: $rom_path" >&2
+        echo "Missing: $rom_path" >&2
         return 1
     }
     (cd "$repo_dir" && shasum -a 1 -c "$hash_file")

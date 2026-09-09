@@ -82,7 +82,7 @@ public class ExportDecompileBatch extends GhidraScript {
                                 ctx.setValue(tmode, address, end,
                                     java.math.BigInteger.ONE);
                                 disassemble(address);
-                                println("THUMB ONARILDI " + addrText);
+                                println("THUMB REPAIRED " + addrText);
                             }
                         }
 
@@ -94,7 +94,7 @@ public class ExportDecompileBatch extends GhidraScript {
                                 fail++;
                                 continue;
                             }
-                            println("OLUSTURULDU " + addrText);
+                            println("CREATED " + addrText);
                         }
                         String name = want != null ? want : function.getName();
 
@@ -102,7 +102,7 @@ public class ExportDecompileBatch extends GhidraScript {
                             decompiler.decompileFunction(function, 240, monitor);
                         if (!result.decompileCompleted()
                                 || result.getDecompiledFunction() == null) {
-                            println("BASARISIZ " + addrText + ": " + result.getErrorMessage());
+                            println("FAILED " + addrText + ": " + result.getErrorMessage());
                             fail++;
                             continue;
                         }

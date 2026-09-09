@@ -354,7 +354,7 @@ def parse_greg(block: str) -> dict:
 
 
 # --------------------------------------------------------------------------
-# ROM tarafi (istege bagli)
+# ROM side (optional)
 # --------------------------------------------------------------------------
 def rom_view(func: str):
     """Disassemble the function in the ROM and return

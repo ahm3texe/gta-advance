@@ -97,7 +97,7 @@ def main() -> None:
         tag = "  <- JOIN" if preds.get(b, 0) > 1 else ""
         arrow = " ".join(f"0x{s:08X}" for s in succs) or "(return)"
         print(f"  B{i:<2} 0x{b:08X}..0x{stop:08X}  {kind:<6} -> {arrow}"
-              f"   onceller={preds.get(b, 0)}{tag}")
+              f"   preds={preds.get(b, 0)}{tag}")
 
 
 if __name__ == "__main__":

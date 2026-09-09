@@ -43,7 +43,7 @@ def main() -> None:
         row = {
             "address": address,
             "name": override["name"] if override else detected["name"],
-            # Override boyutu Ghidra'nin gecici sinirini ezer.
+            # The override size supersedes Ghidra's provisional boundary.
             "size": (override or {}).get("size") or detected["size"],
             "status": override["status"] if override else "candidate",
             "module": override["module"] if override else "unknown",
@@ -71,9 +71,10 @@ def main() -> None:
         })
         added += 1
 
-    # --- KAYIP KAPISI ---------------------------------------------------
-    # The map to be produced is compared against the current one; records, human
-    # a human-given name or a `matching` state would be lost, nothing is written.
+    # --- LOSS GATE ------------------------------------------------------
+    # The map about to be produced is compared against the current one; if any
+    # record, human-given name or `matching` state would be lost, nothing is
+    # written.
     if TRACKED.exists() and "--force" not in sys.argv:
         current = {r["address"].upper(): r for r in read_rows(TRACKED)}
         produced = {r["address"].upper(): r for r in merged}

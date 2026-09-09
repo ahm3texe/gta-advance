@@ -132,8 +132,8 @@ button, input, select { font: inherit; }
 .leaf-selected { stroke: #fff !important; stroke-width: 2.5 !important; filter: brightness(1.16); }
 .leaf-label { fill: #f3fff7; font: 650 10px var(--font-geist-mono); pointer-events: none; text-shadow: 0 1px 3px #001; }
 .leaf-meta { fill: rgba(237,255,244,.66); font: 9px var(--font-geist-mono); pointer-events: none; }
-/* Kucuk kutularda kisaltilmis ad: tam ad sigmadigi icin isimler hic
-   gorunmuyordu. 8px ve daha soluk, buyuk etiketlerle karismasin diye. */
+/* Short names for small boxes where full names did not fit. Use 8px and a
+   muted color to distinguish them from large labels. */
 .leaf-label-small { font: 600 8px var(--font-geist-mono); fill: rgba(243,255,247,.82); letter-spacing: -.2px; }
 .legend { min-height: 47px; display: flex; align-items: center; flex-wrap: wrap; gap: 15px; padding: 11px 16px; border-top: 1px solid var(--border); color: #82968e; font-size: 10px; }
 .legend span { display: flex; align-items: center; gap: 6px; }

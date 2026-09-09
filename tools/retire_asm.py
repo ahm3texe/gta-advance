@@ -28,7 +28,7 @@ def main() -> None:
     region = rom_bytes()[start:end]
     if blob != region:
         sys.exit(f"ERROR: the region does not match ({len(blob)} vs {len(region)} bytes). "
-                 f"Hicbir sey silinmedi.")
+                 f"Nothing was deleted.")
 
     makefile = ROOT / "Makefile"
     text = makefile.read_text()

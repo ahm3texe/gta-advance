@@ -72,7 +72,7 @@ def main() -> None:
         int(r["end"], 16) - int(r["address"], 16)
         for r in csv.DictReader(REGIONS.open(newline="", encoding="utf-8"))
     )
-    print(f"LIBC REGION: {ok}/{total} parca, {verified} ROM byte")
+    print(f"LIBC REGION: {ok}/{total} pieces, {verified} ROM bytes")
     sys.exit(0 if ok == total else 1)
 
 

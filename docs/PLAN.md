@@ -57,7 +57,7 @@ in `make check`.
 instructions, 93 of which are real switch tables (2,393 entries, 734 unique
 targets). For 89 of the 93 tables the dispatch instruction is inside a known
 function; 4 are unowned. Table entries landing in no known function: 20.
-**5 new function candidates** emerged, all three with the same profile: no `push`
+**5 new function candidates** emerged, all five with the same profile: no `push`
 prologue (leaf), and no caller anywhere in the ROM — they were structurally
 invisible because all three of our discovery methods rest on exactly those
 conditions.

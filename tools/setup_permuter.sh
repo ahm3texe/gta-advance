@@ -40,7 +40,7 @@ p = pathlib.Path(sys.argv[1]); s = p.read_text()
 old = 'cpp_cmd = homebrew_gcc_cpp() if is_macos else "cpp"\nmake_cmd = "gmake" if is_macos else "make"'
 new = 'cpp_cmd = "arm-none-eabi-cpp"\nmake_cmd = "make"'
 if old in s:
-    p.write_text(s.replace(old, new, 1)); print("  import.py yamalandi")
+    p.write_text(s.replace(old, new, 1)); print("  import.py patched")
 PY
 
 echo "Setup complete."
@@ -51,7 +51,7 @@ echo "     THE MAPPING SYMBOLS ARE CRITICAL: code body \$t, literal pool \$d."
 echo "     Leaving the pool inside \$t makes objdump decode it as CODE; the target"
 echo "     then shows 66 instructions (really 61) and the permuter chases the WRONG target."
 echo "     Where the pool starts is in build/cmatch/<name>.s: after the last `bx`"
-echo "     komutundan sonraki .align + .word blogu."
+echo "     it is the .align + .word block after the last instruction."
 echo "  2) cd tools/external/permuter && ../venv/bin/python import.py \\"
 echo "       <source.c> <target.o> <FunctionName>"
 echo "  3) AFTER THE IMPORT two manual fixes are needed:"

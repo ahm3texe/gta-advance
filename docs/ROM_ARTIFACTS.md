@@ -111,8 +111,8 @@ attempted; it did not work.
 `make libc-align FUNC=remap_handle ADDR=0x0807180C` demonstrates it:
 
 ```
-findslot                     0x080717EC     30  26/26 TAM
-remap_handle                 0x0807180C     76  60/60 TAM
+findslot                     0x080717EC     30  26/26 EXACT
+remap_handle                 0x0807180C     76  60/60 EXACT
 initialise_monitor_handles   0x08071858    112  86/92
 get_errno                    0x080718C8     18  1/18
 wrap                         0x080718F0     24  0/24

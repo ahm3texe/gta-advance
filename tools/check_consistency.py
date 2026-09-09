@@ -6,7 +6,7 @@ in this project, and each time it was only noticed at the end of the `make rom`
 chain. Duplicate records, overlapping ranges and ODD sizes impossible in Thumb
 had also accumulated in functions.csv, and no check caught them.
 
-Denetlenenler:
+What is checked:
   functions.csv   duplicate address, overlapping range, odd size,
                   invalid status, several names for one address
   c_sources.csv   is the address in functions.csv, does the name agree, is the
@@ -53,7 +53,7 @@ def main() -> None:
         crlf = data.count(b"\r\n")
         bare_lf = data.count(b"\n") - crlf
         if crlf and bare_lf:
-            bad("bicim", f"{name} MIXED line endings ({crlf} CRLF, "
+            bad("format", f"{name} MIXED line endings ({crlf} CRLF, "
                          f"{bare_lf} bare LF) - something outside the tools wrote it")
 
     # --- functions.csv ---
@@ -147,8 +147,8 @@ def main() -> None:
         size = int(row["size"] or 0)
         for lo, hi, label in RAM_REGIONS:
             if lo <= address < hi and address + size > hi:
-                bad("ram_map", f"{row['name']} {label} sonunu "
-                               f"overflows by {address + size - hi} bytes")
+                bad("ram_map", f"{row['name']} overflows the end of "
+                               f"{label} by {address + size - hi} bytes")
 
     # --- ARM review table: covers the whole overlay range without gaps ---
     arm_review_path = ROOT / "data/arm_boundary_review.csv"
@@ -282,7 +282,7 @@ def main() -> None:
             continue
         if STALE_NOTE in (row.get("notes") or ""):
             bad(
-                "bayat-not",
+                "stale-note",
                 f"{row['name']} is byte-matching but its note still says the "
                 f"boundary/mode is 'provisional'",
             )

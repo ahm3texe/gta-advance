@@ -86,12 +86,12 @@ def main() -> None:
     print(f"{'address':12} {'size':>5} {'calls':>6} {'unresolved':>11}  module")
     print("-" * 62)
     for calls, unresolved, size, row, targets in results[:limit]:
-        tag = "YAPRAK" if calls == 0 else f"{calls} cagri"
+        tag = "LEAF" if calls == 0 else f"{calls} calls"
         print(f"{row['address']} {size:>5} {tag:>10} {unresolved:>7}   {row['module']}")
     leaves = sum(1 for r in results if r[0] == 0)
     print("-" * 62)
     print(f"{len(results)} candidates examined (8-{max_size} bytes): "
-          f"{leaves} yaprak, {len(results) - leaves} cagri iceren")
+          f"{leaves} leaves, {len(results) - leaves} containing calls")
     if fragments:
         print(f"{len(fragments)} candidates rejected: they do not start with `push` "
               f"yet contain `pop`/`add sp`, i.e. they are tails of larger functions "

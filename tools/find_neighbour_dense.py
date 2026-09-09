@@ -98,7 +98,7 @@ def main() -> None:
           f"drafts {'INCLUDED' if args.include_drafts else 'EXCLUDED'}, "
           f"ARM {'INCLUDED' if args.include_arm else 'EXCLUDED'}")
     print(f"{len(picks)} candidates / {bytes_total} bytes "
-          f"({100 * bytes_total / 454258:.2f}% ROM kodu)\n")
+          f"({100 * bytes_total / 454258:.2f}% of ROM code)\n")
     print(f"{'address':<12} {'bytes':>5} {'neigh':>6}  name")
     print("-" * 62)
     for near, size, row in picks[:args.limit]:

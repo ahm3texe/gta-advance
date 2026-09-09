@@ -27,7 +27,7 @@ address,size,name,source,status,notes
 0x020004BC,4,gDisplayState,decomp,provisional,Zeroed during display reset and in GameInit; exact role unconfirmed
 0x020004C0,2,gRam020004C0,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
 0x020004D0,4,gIntrMainEwram,decomp,provisional,EWRAM copy target of the IRQ dispatcher
-0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour  TRACE: a 16-byte block; 0. byte increases by 1 every frame from f52 onwards (counter behaviour).  PROVISIONAL BIRAKILDI -- AD SUPHELI: 0. byte increases every frame, so counter behaviour; the name ""state"" is not supported."
+0x02000CE0,16,gGameState,decomp,provisional,"Game state block; byte 12 selects the VBlank frame-delay behaviour  TRACE: a 16-byte block; byte 0 increases by 1 every frame from f52 onwards (counter behaviour).  LEFT PROVISIONAL -- THE NAME IS DOUBTFUL: byte 0 increases every frame, so counter behaviour; the name ""state"" is not supported."
 0x02000CF8,4,gFrameStateSource,decomp,provisional,Source of the per-frame state copy
 0x02000D08,4,gVBlankEnabled,decomp,provisional,Nonzero while VBlank processing is enabled
 0x02000D0C,2,gRam02000D0C,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
@@ -213,7 +213,7 @@ address,size,name,source,status,notes
 0x02036050,1,gRam02036050,decomp,provisional,mode byte; IsModeReady reads it (byte-matching evidence)
 0x020360F2,1,vigilante_arrests,libretro_cheat,provisional,
 0x020360F5,1,vigilante_arrests_copy,libretro_cheat,provisional,
-0x02036308,4,gGlyphTiles,decomp,provisional,SetTextContext (0x0806430C) writes it; the call passes 0x08831880 (ROM). the 0xE000 bytes between it and the 0x0883F880 that gGlyphWidths takes -> the glyph bitmaps. Ad GECICI.
+0x02036308,4,gGlyphTiles,decomp,provisional,SetTextContext (0x0806430C) writes it; the call passes 0x08831880 (ROM). the 0xE000 bytes between it and the 0x0883F880 that gGlyphWidths takes -> the glyph bitmaps. The name is provisional.
 0x0203630C,4,gTextRowStride,decomp,provisional,Row stride in tiles used when clearing a text area
 0x02036310,4,gTextVramBase,decomp,provisional,Base VRAM address of the text layer
 0x02036314,4,gGlyphWidths,decomp,provisional,"Pointer to the per-glyph width table, indexed from space (0x20)"

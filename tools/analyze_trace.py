@@ -23,7 +23,7 @@ SUPPRESSION_MARKERS = ("SUPPRESSED", "SUSTURULDU")
 DIAGNOSTIC_MARKERS = ("ERROR", "warning", "WORKED", "error",
                       "HATA", "uyari", "CALISTI", "hata")
 
-REGIONS = {0x02: "EWRAM", 0x03: "IWRAM", 0x05: "PALET",
+REGIONS = {0x02: "EWRAM", 0x03: "IWRAM", 0x05: "PALETTE",
            0x06: "VRAM", 0x07: "OAM", 0x08: "ROM"}
 
 

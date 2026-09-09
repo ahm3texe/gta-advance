@@ -22,8 +22,9 @@ README does not become a second, outdated source of numbers.
 Public progress reporting on **decomp.dev** is planned. The repository's local
 reports remain the current way to track progress.
 
-The project is moving to English. Some source comments, tool messages, and
-research documents are still in Turkish; the existing commit history is preserved.
+The project was written in Turkish and has been translated to English: source
+comments, tool messages and research documents are now English throughout. The
+existing commit history is preserved and its messages are still Turkish.
 
 ## What this project reconstructs
 
@@ -223,9 +224,8 @@ requests are the place for code and documentation changes. The current
 
 ## Documentation
 
-Some linked documents remain in Turkish during the English transition. Research
-logs and roadmap snapshots contain historical measurements; use the status report
-for current figures.
+Research logs and roadmap snapshots contain historical measurements; use the
+status report for current figures.
 
 | Document | Contents |
 |---|---|

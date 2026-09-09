@@ -364,7 +364,7 @@ times.
 
 **RAM map.** Most of the 231 symbols are still `provisional`. Most sizes are
 estimates. The measured ones are those derived from `Memset`/`CpuSet` calls; their
-notes say "OLCULDU". Before correcting a symbol's size, look at the ROM's literal
+notes identify them as measured. Before correcting a symbol's size, look at the ROM's literal
 pool: is a base + offset being loaded, or an absolute address? That distinction
 misled me on `gRam02025810` (I thought it was 8 bytes; it turned out to be at least
 0x137E).

@@ -44,9 +44,9 @@ def main() -> None:
             address = int(rows[name]["address"], 16)
             mapped_size = int(rows[name]["size"], 0)
             start = address - ROM_BASE
-            # A short prefix produced by the compiler happening to agree is not
-            # is not a function match. The symbol must cover at least the body
-            # kapsamiyorsa matching terfisi yasaktir.
+            # A short prefix produced by the compiler happening to agree is
+            # not a function match. The symbol must cover at least the body;
+            # if it does not, promotion to matching is forbidden.
             complete = size >= mapped_size
             matched = complete and blob[offset:offset + size] == rom[start:start + size]
             records.append({
@@ -60,7 +60,7 @@ def main() -> None:
 
     if failures:
         print(f"\nSTOPPED: {len(failures)} sources failed to compile; "
-              f"{OUTPUT.relative_to(ROOT)} DEGISTIRILMEDI.", file=sys.stderr)
+              f"{OUTPUT.relative_to(ROOT)} UNCHANGED.", file=sys.stderr)
         for source, error in failures:
             print(f"  {source.relative_to(ROOT)}: {error}", file=sys.stderr)
         sys.exit(1)

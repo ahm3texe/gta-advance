@@ -5,7 +5,7 @@ The output is written under build/ and does not enter the repository
 (docs/ROADMAP.md: assets extracted from the ROM are not shared).
 
 Usage:
-    python3 tools/dump_text.py            # ozet
+    python3 tools/dump_text.py            # summary
     python3 tools/dump_text.py --lang 4   # write one language's strings
 """
 import argparse

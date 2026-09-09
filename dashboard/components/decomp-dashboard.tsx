@@ -38,9 +38,8 @@ type FunctionStatus =
   | 'decompiled'
   | 'matching';
 
-/* Haritada gosterilen durum. C'den byte-matching olan fonksiyonlar
-   assembly transkripsiyonundan ayrilir: ikisi de ROM'u uretir ama yalnizca
-   ilki okunabilir kaynak uretir. */
+/* Display status distinguishes matching C from assembly transcription:
+   both reproduce the ROM, but only the former provides readable C source. */
 type DisplayStatus = FunctionStatus | 'cMatching';
 
 function displayStatus(fn: FunctionRecord): DisplayStatus {
@@ -50,9 +49,9 @@ function displayStatus(fn: FunctionRecord): DisplayStatus {
 type SourceType = 'c' | 'asm' | 'none';
 
 const SOURCE_LABELS: Record<SourceType, string> = {
-  c: 'C kaynağı',
+  c: 'C source',
   asm: 'Assembly',
-  none: 'Kaynak yok',
+  none: 'No source',
 };
 
 export type FunctionRecord = {
@@ -118,35 +117,34 @@ const STATUS_META: Record<
   DisplayStatus,
   { label: string; color: string; glow: string }
 > = {
-  // Alti durum ayri TON almali: yesil -> turkuaz -> mavi -> kehribar ->
-  // mor -> gri. Daha once iki yesil, sonra iki mavi cakisti; ayrimin
-  // parlaklikta degil TONDA olmasi gerekiyor.
-  cMatching: { label: "C'den eşleşiyor", color: '#6cff9e', glow: '#1aa757' },
-  matching: { label: 'Assembly eşleşiyor', color: '#2ee6c8', glow: '#0d7d6b' },
-  decompiled: { label: 'Yazıldı, eşleşmedi', color: '#4aa8ff', glow: '#1560a8' },
-  documented: { label: 'Belgeli', color: '#f0ae3c', glow: '#7f4d0d' },
-  discovered: { label: 'Keşfedildi', color: '#a777ff', glow: '#4c288e' },
-  candidate: { label: 'Dokunulmadı', color: '#243441', glow: '#161f28' },
+  // Give all six states distinct HUES: green, turquoise, blue, amber, purple,
+  // gray. Two greens and then two blues were previously confused; distinguish
+  // states by hue rather than brightness.
+  cMatching: { label: "Matching C", color: '#6cff9e', glow: '#1aa757' },
+  matching: { label: 'Matching assembly', color: '#2ee6c8', glow: '#0d7d6b' },
+  decompiled: { label: 'Non-matching C', color: '#4aa8ff', glow: '#1560a8' },
+  documented: { label: 'Documented', color: '#f0ae3c', glow: '#7f4d0d' },
+  discovered: { label: 'Discovered', color: '#a777ff', glow: '#4c288e' },
+  candidate: { label: 'Untouched', color: '#243441', glow: '#161f28' },
 };
 
 const MODULE_LABELS: Record<string, string> = {
-  bootstrap: 'Başlangıç',
-  interrupt: 'Kesme sistemi',
-  save: 'Kayıt sistemi',
+  bootstrap: 'Startup',
+  interrupt: 'Interrupts',
+  save: 'Save system',
   sdk: 'GBA SDK',
-  serialization: 'Serileştirme',
-  ui: 'Arayüz',
-  libc: 'C kitaplığı',
-  unknown: 'Sınıflandırılmamış',
+  serialization: 'Serialization',
+  ui: 'Interface',
+  libc: 'C library',
+  unknown: 'Unclassified',
 };
 
 const GROUP_LABEL_MIN_WIDTH = 108;
 const GROUP_LABEL_MIN_HEIGHT = 52;
 
-// Bir grup kutusu basligini tasiyabiliyor mu? Dolgu payi, baslik metni VE
-// yaprak etiketleri bu TEK kosula bagli. Ayri esikler kullanildiginda
-// aradaki bantta kalan gruplar basliksiz kaliyor ama icindeki en buyuk
-// fonksiyonun adi ciziliyordu; o ad baslik gibi okunuyordu.
+// Use one size condition for header padding, header text AND leaf labels.
+// Separate thresholds left some groups without headers while displaying the
+// largest function name, which readers mistook for the group title.
 function hasGroupHeader(node: { x0: number; x1: number; y0: number; y1: number }) {
   return node.x1 - node.x0 >= GROUP_LABEL_MIN_WIDTH
     && node.y1 - node.y0 >= GROUP_LABEL_MIN_HEIGHT;
@@ -157,9 +155,9 @@ type Grouping = 'unit' | 'cluster' | 'module' | 'bank';
 function groupKey(fn: FunctionRecord, grouping: Grouping) {
   if (grouping === 'module') return fn.module;
   if (grouping === 'bank') return bankFor(fn.address);
-  // Decomp projelerinde asil birim CEVIRI BIRIMIDIR (.c dosyasi).
-  // Kaynagi olmayan fonksiyon henuz bir birime ait DEGILDIR; modulunu
-  // tahmin etmek yerine ROM bankasina gore gruplanir.
+  // The primary unit in a decompilation is the translation unit (.c file).
+  // Functions without source have no assigned unit; group by ROM bank
+  // instead of guessing their module.
   if (grouping === 'unit') return fn.sourcePath ? `u:${fn.sourcePath}` : `x:${bankFor(fn.address)}`;
   return fn.cluster;
 }
@@ -170,25 +168,24 @@ function groupLabel(key: string, grouping: Grouping, functions: FunctionRecord[]
 
   if (grouping === 'unit') {
     if (key.startsWith('u:')) return key.slice(2).replace(/^src\//, '');
-    return `Decomp edilmemis · ${key.slice(2)}`;
+    return `Not decompiled · ${key.slice(2)}`;
   }
 
   const members = functions.filter((fn) => fn.cluster === key);
   const raw = members[0]?.clusterLabel ?? key;
-  // Anlamli bir kume adi varsa onu kullan.
+  // Use a meaningful cluster name when available.
   if (!/^0x/i.test(raw)) return MODULE_LABELS[raw] ?? raw;
 
-  // Adres etiketli kumeler: 25 kumenin 11'i boyle ve hepsinin uyeleri
-  // 'unknown' modulunde. Ciplak adres yerine baskin modulu ve buyuklugu
-  // goster; modul de bilinmiyorsa bunu ACIKCA soyle (uydurma).
+  // Address-labeled clusters: 11 of 25 had only 'unknown' members. Prefer
+  // the dominant module and size to a bare address; explicitly represent
+  // unknown modules rather than inventing a classification.
   const counts = new Map<string, number>();
   for (const fn of members) counts.set(fn.module, (counts.get(fn.module) ?? 0) + 1);
   const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
   if (top && top[0] !== 'unknown') return MODULE_LABELS[top[0]] ?? top[0];
 
-  // Henuz decomp edilmemis bolge: modulunu TAHMIN ETME. Decomp
-  // yakinsaminda bilinmeyen bolge adres araligiyla gosterilir; bu bir
-  // eksiklik degil, bilinenin ta kendisi.
+  // Do not guess the module of an undecompiled region. Show its address
+  // range, which accurately represents what is currently known.
   const starts = members.map((fn) => Number.parseInt(fn.address, 16));
   const lo = Math.min(...starts);
   const hi = Math.max(...starts.map((a, i) => a + members[i].size));
@@ -196,8 +193,8 @@ function groupLabel(key: string, grouping: Grouping, functions: FunctionRecord[]
   return `${hex(lo)}–${hex(hi)}`;
 }
 
-// Grup etiketi 10px mono: karakter başına ölçülen genişlik 6.6px.
-// Sondaki " ↗" iki karakterlik yer kapladığı için bütçeden düşülür.
+// Group labels use 10px monospace, measured at 6.6px per character.
+// Reserve two character widths for the trailing " ↗".
 const LABEL_CHAR_WIDTH = 6.6;
 
 function truncateToWidth(text: string, pixels: number) {
@@ -205,10 +202,9 @@ function truncateToWidth(text: string, pixels: number) {
   return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
 }
 
-// Kucuk kutulara tam ad sigmiyordu ve isimler hic gorunmuyordu.
-// Iki kademe: buyuk kutuda tam ad, orta kutuda kisa bicim.
-// FUN_0802bdf0 -> 802bdf0 (bastaki sifir da atilir), adlandirilmislarda
-// ise adin kendisi kisaltilir.
+// Full names did not fit small boxes and disappeared. Use full labels
+// in large boxes and short labels in medium boxes. FUN_0802bdf0 becomes
+// 802bdf0 (also dropping the leading zero); truncate descriptive names.
 function shortLabel(name: string) {
   const m = /^FUN_0?([0-9a-f]+)$/i.exec(name);
   if (m) return m[1];
@@ -337,86 +333,86 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             <h1>Decomp Map</h1>
           </div>
         </div>
-        <div className="live-state"><span /> {formatBytes(data.summary.verifiedRomBytes)} kaynak doğrulandı</div>
+        <div className="live-state"><span /> {formatBytes(data.summary.verifiedRomBytes)} of source verified</div>
       </header>
 
-      <section className="summary-grid" aria-label="Proje özeti">
+      <section className="summary-grid" aria-label="Project summary">
         <article className="stat-card">
           <Boxes aria-hidden="true" />
-          <div><strong>{data.summary.functionCount.toLocaleString('tr-TR')}</strong><span>Fonksiyon haritası</span></div>
+          <div><strong>{data.summary.functionCount.toLocaleString('en-US')}</strong><span>Function map</span></div>
         </article>
         <article className="stat-card">
           <CheckCircle2 aria-hidden="true" />
-          <div><strong>{data.summary.matchingCount}</strong><span>Byte-eşleşen fonksiyon</span></div>
+          <div><strong>{data.summary.matchingCount}</strong><span>Byte-matching functions</span></div>
         </article>
         <article className="stat-card">
           <FolderOpen aria-hidden="true" />
-          <div><strong>{data.summary.cSourceCount}</strong><span>C kaynağı · {data.summary.cMatchingCount} eşleşen</span></div>
+          <div><strong>{data.summary.cSourceCount}</strong><span>C source · {data.summary.cMatchingCount} matching</span></div>
         </article>
         <article className="stat-card stat-card-accent">
           <Crosshair aria-hidden="true" />
-          <div><strong>%{data.summary.matchingCodePercent.toFixed(2)}</strong><span>Fonksiyon gövdesi eşleşmesi</span></div>
+          <div><strong>{data.summary.matchingCodePercent.toFixed(2)}%</strong><span>Function body matching</span></div>
         </article>
         <article className="stat-card">
           <Database aria-hidden="true" />
-          <div><strong>{formatBytes(data.summary.verifiedRomBytes)}</strong><span>Doğrulanmış ROM bölgesi</span></div>
+          <div><strong>{formatBytes(data.summary.verifiedRomBytes)}</strong><span>Verified ROM regions</span></div>
         </article>
         <article className="stat-card stat-card-warning">
           <ShieldAlert aria-hidden="true" />
-          <div><strong>{data.summary.boundaryDebtCount}</strong><span>Açık sınır bulgusu</span></div>
+          <div><strong>{data.summary.boundaryDebtCount}</strong><span>Open boundary findings</span></div>
         </article>
       </section>
 
-      <section className="queue-panel" aria-label="Aktif çalışma kuyruğu">
+      <section className="queue-panel" aria-label="Active work queue">
         <div className="queue-heading">
-          <div><ClipboardList aria-hidden="true" /><span>Tek aktif iş</span></div>
-          <strong>{activeTask?.id ?? 'Aktif iş yok'}</strong>
+          <div><ClipboardList aria-hidden="true" /><span>Active task</span></div>
+          <strong>{activeTask?.id ?? 'No active task'}</strong>
         </div>
         {activeTask ? (
           <div className="active-task">
             <div><Badge variant="outline">{activeTask.priority}</Badge><h2>{activeTask.title}</h2></div>
-            <p>Bitti sayılması için: {activeTask.acceptance}</p>
+            <p>Acceptance criteria: {activeTask.acceptance}</p>
           </div>
-        ) : <p className="queue-empty">Yeni işe başlamadan önce kuyruktan tek bir kayıt aktif yapılmalı.</p>}
+        ) : <p className="queue-empty">Activate one queue item before starting new work.</p>}
         {nextTasks.length > 0 && (
           <div className="next-tasks">
-            <span>Sıradaki işler</span>
+            <span>Up next</span>
             <ol>{nextTasks.map((task) => <li key={task.id}><b>{task.id}</b><span>{task.title}</span><small>{task.priority}</small></li>)}</ol>
           </div>
         )}
       </section>
 
-      <section className="control-panel" aria-label="Harita filtreleri">
+      <section className="control-panel" aria-label="Map filters">
         <div className="search-wrap">
           <Search aria-hidden="true" />
           <Input
-            aria-label="Fonksiyon ara"
+            aria-label="Search functions"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Fonksiyon, adres veya not ara…"
+            placeholder="Search functions, addresses or notes…"
           />
         </div>
-        <NativeSelect value={moduleFilter} onChange={(event) => setModuleFilter(event.target.value)} aria-label="Modül filtresi">
-          <NativeSelectOption value="all">Tüm modüller</NativeSelectOption>
+        <NativeSelect value={moduleFilter} onChange={(event) => setModuleFilter(event.target.value)} aria-label="Module filter">
+          <NativeSelectOption value="all">All modules</NativeSelectOption>
           {modules.map((module) => <NativeSelectOption value={module} key={module}>{MODULE_LABELS[module] ?? module}</NativeSelectOption>)}
         </NativeSelect>
-        <NativeSelect value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Durum filtresi">
-          <NativeSelectOption value="all">Tüm durumlar</NativeSelectOption>
+        <NativeSelect value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Status filter">
+          <NativeSelectOption value="all">All statuses</NativeSelectOption>
           {Object.entries(STATUS_META).map(([status, meta]) => <NativeSelectOption value={status} key={status}>{meta.label}</NativeSelectOption>)}
         </NativeSelect>
-        <NativeSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)} aria-label="Kaynak türü filtresi">
-          <NativeSelectOption value="all">Tüm kaynak türleri</NativeSelectOption>
-          <NativeSelectOption value="c">C kaynağı</NativeSelectOption>
+        <NativeSelect value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)} aria-label="Source type filter">
+          <NativeSelectOption value="all">All source types</NativeSelectOption>
+          <NativeSelectOption value="c">C source</NativeSelectOption>
           <NativeSelectOption value="asm">Assembly</NativeSelectOption>
-          <NativeSelectOption value="none">Kaynak yok</NativeSelectOption>
+          <NativeSelectOption value="none">No source</NativeSelectOption>
         </NativeSelect>
-        <NativeSelect value={grouping} onChange={(event) => { setGrouping(event.target.value as Grouping); setFocusGroup(null); }} aria-label="Gruplama">
-          <NativeSelectOption value="cluster">Bitişik bloğa göre grupla</NativeSelectOption>
-          <NativeSelectOption value="unit">Kaynak dosyasına (unit) göre grupla</NativeSelectOption>
-          <NativeSelectOption value="module">Modüle göre grupla</NativeSelectOption>
-          <NativeSelectOption value="bank">ROM bankına göre grupla</NativeSelectOption>
+        <NativeSelect value={grouping} onChange={(event) => { setGrouping(event.target.value as Grouping); setFocusGroup(null); }} aria-label="Grouping">
+          <NativeSelectOption value="cluster">Group by contiguous block</NativeSelectOption>
+          <NativeSelectOption value="unit">Group by source file (unit)</NativeSelectOption>
+          <NativeSelectOption value="module">Group by module</NativeSelectOption>
+          <NativeSelectOption value="bank">Group by ROM bank</NativeSelectOption>
         </NativeSelect>
-        <Button variant="outline" onClick={resetFilters}><RotateCcw aria-hidden="true" /> Sıfırla</Button>
+        <Button variant="outline" onClick={resetFilters}><RotateCcw aria-hidden="true" /> Reset</Button>
       </section>
 
       <section className="workspace-grid">
@@ -424,14 +420,14 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
           <div className="map-heading">
             <div>
               <span>ROM / ARM7TDMI</span>
-              <h2>{focusGroup ? <button className="breadcrumb-button" onClick={() => setFocusGroup(null)}>Tüm harita</button> : 'Fonksiyon treemap’i'}{focusGroup && <> / {groupLabel(focusGroup, grouping, data.functions)}</>}</h2>
+              <h2>{focusGroup ? <button className="breadcrumb-button" onClick={() => setFocusGroup(null)}>Full map</button> : 'Function treemap'}{focusGroup && <> / {groupLabel(focusGroup, grouping, data.functions)}</>}</h2>
             </div>
-            <Badge variant="outline">{visibleFunctions.length.toLocaleString('tr-TR')} / {data.summary.functionCount.toLocaleString('tr-TR')}</Badge>
+            <Badge variant="outline">{visibleFunctions.length.toLocaleString('en-US')} / {data.summary.functionCount.toLocaleString('en-US')}</Badge>
           </div>
 
           <div className="treemap-wrap" ref={mapRef}>
             {visibleFunctions.length ? (
-              <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Fonksiyonların byte büyüklüğüne göre alan haritası">
+              <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Treemap sized by function bytes">
                 <defs>
                   {Object.entries(STATUS_META).map(([status, meta]) => (
                     <radialGradient id={`fill-${status}`} key={status} cx="50%" cy="42%" r="70%">
@@ -447,14 +443,13 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                     key={node.data.name}
                     role="button"
                     tabIndex={0}
-                    aria-label={`${node.data.name} grubuna gir`}
+                    aria-label={`Enter the ${node.data.name} group`}
                     onClick={() => setFocusGroup(node.data.name)}
                     onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setFocusGroup(node.data.name); }}
                   >
-                    {/* Kutuya sigmayacak kadar kucuk gruplar basliksiz kalir
-                        (olculdu: en buyugu 69x64, 24px baslik yuksekligin
-                        %37'sini yerdi). Adi yine de ogrenilebilsin diye her
-                        gruba yerel ipucu eklendi -- her boyutta calisir. */}
+                    {/* Omit headers in small groups (largest measured: 69x64; a 24px
+                        header would consume 37% of the height). A native tooltip
+                        exposes each group name at any size. */}
                     <title>{groupLabel(node.data.name, grouping, visibleFunctions)}</title>
                     <rect className="group-rect" x={node.x0} y={node.y0} width={node.x1 - node.x0} height={node.y1 - node.y0} />
                     {hasGroupHeader(node) && (
@@ -473,8 +468,8 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                   const cellWidth = node.x1 - node.x0;
                   const cellHeight = node.y1 - node.y0;
                   const active = selected.address === fn.address;
-                  // Grubu basliksizsa fonksiyon adini da cizme: aksi halde
-                  // ad, grup basligi sanilir (kullanici bildirimi).
+                  // Hide function labels when the group has no header; otherwise
+                  // users mistake the name for the group title.
                   const parent = node.parent as HierarchyRectangularNode<TreeDatum> | null;
                   const labelAllowed = !parent || parent.depth !== 1 || hasGroupHeader(parent);
                   return (
@@ -502,38 +497,38 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
                   );
                 })}
               </svg>
-            ) : <div className="empty-map">Bu filtrelerle eşleşen fonksiyon yok.</div>}
+            ) : <div className="empty-map">No matching functions for these filters.</div>}
           </div>
 
           <div className="legend">
             {Object.entries(STATUS_META).map(([status, meta]) => <span key={status}><i style={{ background: meta.color }} />{meta.label}</span>)}
-            <small>Dikdörtgen alanı = fonksiyon byte büyüklüğü</small>
+            <small>Rectangle area = function size in bytes</small>
           </div>
         </article>
 
         <aside className="detail-card" aria-live="polite">
-          <div className="detail-kicker"><Binary aria-hidden="true" /> Seçili fonksiyon</div>
+          <div className="detail-kicker"><Binary aria-hidden="true" /> Selected function</div>
           <h2>{selected.name}</h2>
           <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
-          <div className="detail-progress"><div><span>Byte eşleşmesi</span><strong>%{selected.matchPercent.toFixed(2)}</strong></div><div className="progress-track"><i style={{ width: `${selected.matchPercent}%` }} /></div></div>
+          <div className="detail-progress"><div><span>Byte matching</span><strong>{selected.matchPercent.toFixed(2)}%</strong></div><div className="progress-track"><i style={{ width: `${selected.matchPercent}%` }} /></div></div>
           <dl>
-            <div><dt>ROM adresi</dt><dd>{selected.address}</dd></div>
-            <div><dt>Boyut</dt><dd>{formatBytes(selected.size)} ({selected.size} byte)</dd></div>
-            <div><dt>Kaynak türü</dt><dd>{SOURCE_LABELS[selected.sourceType]}</dd></div>
-            <div><dt>Kaynak yolu</dt><dd>{selected.sourcePath || '—'}</dd></div>
-            <div><dt>Modül</dt><dd>{MODULE_LABELS[selected.module] ?? selected.module}</dd></div>
-            <div><dt>Durum</dt><dd>{STATUS_META[displayStatus(selected)].label}</dd></div>
+            <div><dt>ROM address</dt><dd>{selected.address}</dd></div>
+            <div><dt>Size</dt><dd>{formatBytes(selected.size)} ({selected.size} bytes)</dd></div>
+            <div><dt>Source type</dt><dd>{SOURCE_LABELS[selected.sourceType]}</dd></div>
+            <div><dt>Source path</dt><dd>{selected.sourcePath || '—'}</dd></div>
+            <div><dt>Module</dt><dd>{MODULE_LABELS[selected.module] ?? selected.module}</dd></div>
+            <div><dt>Status</dt><dd>{STATUS_META[displayStatus(selected)].label}</dd></div>
           </dl>
-          <div className="detail-note"><span>Analiz notu</span><p>{selected.notes || 'Henüz açıklama eklenmedi.'}</p></div>
-          <Button className="inspect-button" onClick={() => setInspectorOpen(true)}><FolderOpen aria-hidden="true" /> Fonksiyonun içine gir</Button>
+          <div className="detail-note"><span>Analysis note</span><p>{selected.notes || 'No description yet.'}</p></div>
+          <Button className="inspect-button" onClick={() => setInspectorOpen(true)}><FolderOpen aria-hidden="true" /> Inspect function</Button>
           <div className="project-progress">
             <div className="project-note">
-              {formatBytes(data.summary.matchingRegionBytes)} kaynaktan yeniden üretiliyor,
-              {' '}{formatBytes(data.summary.libcRegionBytes)} standart kütüphaneye karşı doğrulandı
+              {formatBytes(data.summary.matchingRegionBytes)} reproduced from source,
+              {' '}{formatBytes(data.summary.libcRegionBytes)} verified against the standard library
             </div>
-            <div><span>Toplam kaynak ilerlemesi</span><strong>%{data.summary.matchingCodePercent.toFixed(2)}</strong></div>
+            <div><span>Overall source progress</span><strong>{data.summary.matchingCodePercent.toFixed(2)}%</strong></div>
             <div className="project-track"><i style={{ width: `${data.summary.matchingCodePercent}%` }} /></div>
-            <small>{formatBytes(data.summary.matchingCodeBytes)} / {formatBytes(data.summary.totalCodeBytes)} fonksiyon gövdesi</small>
+            <small>{formatBytes(data.summary.matchingCodeBytes)} / {formatBytes(data.summary.totalCodeBytes)} function bodies</small>
           </div>
         </aside>
       </section>
@@ -543,19 +538,19 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         <div className="inspector-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setInspectorOpen(false); }}>
           <section className="function-inspector" role="dialog" aria-modal="true" aria-labelledby="inspector-title">
             <header>
-              <div><span>Fonksiyon görünümü</span><h2 id="inspector-title">{selected.name}</h2><p>{selected.address} · {formatBytes(selected.size)} · {MODULE_LABELS[selected.module] ?? selected.module}</p></div>
-              <Button variant="ghost" size="icon" onClick={() => setInspectorOpen(false)} aria-label="Fonksiyon görünümünü kapat"><X aria-hidden="true" /></Button>
+              <div><span>Function view</span><h2 id="inspector-title">{selected.name}</h2><p>{selected.address} · {formatBytes(selected.size)} · {MODULE_LABELS[selected.module] ?? selected.module}</p></div>
+              <Button variant="ghost" size="icon" onClick={() => setInspectorOpen(false)} aria-label="Close function view"><X aria-hidden="true" /></Button>
             </header>
             <div className="inspector-toolbar">
               <Badge className={`status-${displayStatus(selected)}`}>{STATUS_META[displayStatus(selected)].label}</Badge>
-              <span>{selected.sourcePath || selected.analysisPath || 'Kaynak veya Ghidra çıktısı henüz yok'}</span>
+              <span>{selected.sourcePath || selected.analysisPath || 'No source or Ghidra output yet'}</span>
             </div>
             {selected.sourceCode ? (
               <pre><code>{selected.sourceCode}</code></pre>
             ) : selected.analysisCode ? (
               <pre><code>{selected.analysisCode}</code></pre>
             ) : (
-              <div className="no-analysis"><ExternalLink aria-hidden="true" /><h3>Bu fonksiyon henüz açılmadı</h3><p>GBA bir engel değil. Fonksiyon Ghidra’da analiz edilip C çıktısı dışa aktarıldığında kod burada görünecek. Şimdilik adresi ve sınırı otomatik analizden geliyor.</p></div>
+              <div className="no-analysis"><ExternalLink aria-hidden="true" /><h3>This function has not been analyzed yet</h3><p>Code will appear here once the function is analyzed in Ghidra and its C output is exported. Its current address and boundary come from automated analysis.</p></div>
             )}
           </section>
         </div>

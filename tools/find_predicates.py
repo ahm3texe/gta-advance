@@ -63,7 +63,7 @@ def main() -> None:
             continue
         if (h[2] & 0xF800) != 0x2800:                # cmp rD, #imm
             continue
-        if (h[3] & 0xF000) != 0xD000:                # kosullu dal
+        if (h[3] & 0xF000) != 0xD000:                # conditional branch
             continue
         cond = (h[3] >> 8) & 0xF
         if cond not in CONDS:

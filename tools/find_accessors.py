@@ -4,7 +4,7 @@
 The pattern (a 6-byte core, followed by alignment + pool):
     ldr rN, [pc, #imm]      <- base address from the pool
     ldr|ldrb|ldrh rD, [rN, #ofs]      (getter)
-      ya da
+      or
     str|strb|strh rD, [rN, #ofs]      (setter; the value arrives in r0, so the
                                        base is loaded into r1 because r0 is taken)
     bx lr

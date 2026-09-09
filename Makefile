@@ -70,12 +70,12 @@ c-review:
 	@python3 tools/review_c_source.py $(FILE)
 
 # Show a single function's ROM form beside its compiled form.
-# Ornek: make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE
+# Example: make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE
 diff: verify-rom
 	@python3 tools/diff_function.py $(FILE) $(FUNC)
 
 # Produce the disassembly of a function in the ROM (source: the ROM, not the repo).
-# Ornek: make disasm FUNC=EraseSaveSlot
+# Example: make disasm FUNC=EraseSaveSlot
 disasm: verify-rom
 	@python3 tools/disasm_function.py $(FUNC)
 
@@ -2561,7 +2561,7 @@ misc-id-compatibility-match: verify-rom build/misc/id_compatibility.bin
 
 matching: misc-id-compatibility-match
 
-# --- permuter kancasi -------------------------------------------------
+# --- permuter hook ----------------------------------------------------
 # decomp-permuter, `make --always-make --dry-run --debug=j PERMUTER=1`
 # output for a build command mentioning the source file. The rule is defined
 # ONLY under PERMUTER=1 so that it cannot affect a normal build, and it does NOT

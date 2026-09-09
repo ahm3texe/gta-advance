@@ -40,7 +40,7 @@ def artifact_check(lock: dict) -> bool:
 
     print("toolchain identity CHANGED:", file=sys.stderr)
     for relative, expected, actual in failures:
-        print(f"  {relative}\n    beklenen {expected}\n    bulunan  {actual}", file=sys.stderr)
+        print(f"  {relative}\n    expected {expected}\n    found    {actual}", file=sys.stderr)
     return False
 
 
@@ -84,9 +84,9 @@ def main() -> int:
     expected_count = compiler["corpusFunctionCount"]
     expected = compiler["corpusSha256"]
     if count != expected_count or actual != expected:
-        print("toolchain C-corpus parmak izi TUTMUYOR:", file=sys.stderr)
+        print("toolchain C-corpus fingerprint MISMATCH:", file=sys.stderr)
         print(f"  functions: {count} (expected {expected_count})", file=sys.stderr)
-        print(f"  parmak izi: {actual}\n  beklenen:   {expected}", file=sys.stderr)
+        print(f"  fingerprint: {actual}\n  expected:    {expected}", file=sys.stderr)
         return 1
     print(f"toolchain C-corpus: CLEAN ({count} functions, {actual[:12]}...)")
     if not identity_ok:

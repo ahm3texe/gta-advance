@@ -217,7 +217,7 @@ def main():
             print(f"  {tname}: no sites"); continue
         if len(sites) > a.max_sites:
             print(f"  {tname}: {len(sites)} sites -> limited to the first {a.max_sites} "
-                  f"(KAPSAM DUSURULDU)")
+                  f"(SCOPE REDUCED)")
             sites = sites[:a.max_sites]
         n = len(sites)
         print(f"  {tname}: {n} sites, {2**n} combinations")

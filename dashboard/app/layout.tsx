@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'GTA Advance Decomp Map',
   description:
-    'Grand Theft Auto Advance tersine mühendislik ve byte-matching ilerleme haritası.',
+    'Grand Theft Auto Advance reverse engineering and byte-matching progress map.',
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

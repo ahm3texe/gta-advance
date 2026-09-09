@@ -35,7 +35,7 @@ def describe(value: int, names: dict[int, str]) -> str:
     if 0x04000000 <= value < 0x04000400:
         return f"{value:#010x}  I/O"
     if 0x05000000 <= value < 0x07000000:
-        return f"{value:#010x}  palet/VRAM"
+        return f"{value:#010x}  palette/VRAM"
     return f"{value:#010x}  ({value if value < 0x80000000 else value - (1 << 32)})"
 
 

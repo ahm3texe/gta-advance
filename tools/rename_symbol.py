@@ -68,7 +68,7 @@ def main():
     if old_name is None:
         sys.exit(f"{address} is in no data table")
     if old_name == new_name:
-        sys.exit(f"{address} zaten {new_name}")
+        sys.exit(f"{address} is already {new_name}")
 
     # Stop if the new name is used at another address: a silent clash is the worst case.
     for table in TABLES:
@@ -107,7 +107,7 @@ def main():
             if not args.dry_run:
                 path.write_text(pattern.sub(new_name, text), encoding="utf-8")
 
-    prefix = "[deneme] " if args.dry_run else ""
+    prefix = "[dry-run] " if args.dry_run else ""
     print(f"{prefix}{address}: {old_name} -> {new_name}  ({len(touched)} files)")
     for rel in touched:
         print(f"  {rel}")

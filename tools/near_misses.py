@@ -56,7 +56,7 @@ def main():
         except SystemExit as e:
             for e2 in entries:
                 rows.append((None, e2["name"], e2["address"], 0, 0,
-                             f"derlenmedi: {e}", src))
+                             f"did not compile: {e}", src))
             continue
         for e in entries:
             name = e["name"]

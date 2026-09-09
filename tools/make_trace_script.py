@@ -59,7 +59,7 @@ __ENTRIES__
 
 local prev    = {}
 local nchg    = {}   -- number of changes per symbol
-local noisy   = {}   -- gurultulu diye susturulanlar
+local noisy   = {}   -- the ones suppressed for being noisy
 local frame   = 0
 local fh      = nil
 local keys_ok = true
@@ -85,7 +85,7 @@ local function readN(addr, size)
 end
 
 -- Reading the key state differs between versions; on failure
--- izlemeye tussuz devam et, cokme.
+-- keep tracing without keys rather than crashing.
 local function keyString()
   if not keys_ok then return "" end
   local ok, mask = pcall(function() return emu:getKeys() end)
@@ -133,11 +133,11 @@ local function probeApi()
   end
   if winner == nil then
     out("[ERROR] no read form worked. Report the error texts above")
-    out("       Claude'a gonder; dogru API bicimi oradan cikar.")
+    out("       Send them to Claude; the right API form follows from them.")
   else
     out("selected API form: " .. winner)
   end
-  out("--- yoklama sonu ---")
+  out("--- end of probe ---")
   return winner ~= nil
 end
 
