@@ -1,0 +1,109 @@
+name: Progress report
+
+# Publishes the decompilation progress figures to decomp.dev.
+#
+# decomp.dev does not receive a push from us. It polls this repository's
+# completed workflow runs on the default branch and downloads an artifact whose
+# name matches `<version>_report`, so the artifact name below is the contract.
+# The file inside must have the stem `report`.
+#
+# This job deliberately needs no ROM. The report is derived from
+# data/functions.csv, which `make check` regenerates and re-verifies against the
+# ROM on every build run, so the published figure can never exceed the last
+# verified state. Keeping the two apart means progress stays public even when
+# the ROM secret is unavailable, and forks can run this workflow unchanged.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    name: Generate progress report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Generate report.json
+        run: |
+          set -euo pipefail
+          python3 tools/gen_report.py --check
+          python3 tools/gen_report.py -o report.json
+
+      # gen_report.py checks its own arithmetic before writing. This step is a
+      # separate reading of the file that was actually produced, in the same
+      # terms decomp.dev will read it, so a serialisation fault cannot slip
+      # through as a published number.
+      - name: Validate the artifact against the objdiff report schema
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("report.json").read_text(encoding="utf-8"))
+
+          assert report["version"] == 2, report["version"]
+          assert isinstance(report["units"], list) and report["units"]
+          assert isinstance(report["categories"], list)
+
+          measures = report["measures"]
+          for key in (
+              "fuzzy_match_percent", "total_code", "matched_code",
+              "matched_code_percent", "total_functions", "matched_functions",
+              "matched_functions_percent", "complete_code", "total_units",
+              "complete_units",
+          ):
+              assert key in measures, f"missing measure: {key}"
+
+          assert measures["total_code"] >= measures["matched_code"] > 0
+          assert measures["total_functions"] >= measures["matched_functions"] > 0
+          assert measures["total_units"] == len(report["units"])
+
+          code = functions = 0
+          for unit in report["units"]:
+              unit_measures = unit["measures"]
+              assert unit_measures["total_code"] >= unit_measures["matched_code"], unit["name"]
+              code += unit_measures["total_code"]
+              functions += unit_measures["total_functions"]
+              for item in unit["functions"]:
+                  assert item["size"] >= 0, item["name"]
+                  assert 0.0 <= item["fuzzy_match_percent"] <= 100.0, item["name"]
+
+          # Every mapped function must sit in exactly one unit. If any were
+          # dropped, the totals would shrink and the percentage would rise
+          # without a single new function matching.
+          assert code == measures["total_code"], (code, measures["total_code"])
+          assert functions == measures["total_functions"]
+
+          print(f"version   : {report['version']}")
+          print(f"units     : {measures['complete_units']}/{measures['total_units']} complete")
+          print(f"functions : {measures['matched_functions']}/{measures['total_functions']}")
+          print(f"code      : {measures['matched_code']}/{measures['total_code']} bytes "
+                f"({measures['matched_code_percent']:.2f}%)")
+          PY
+
+      # The artifact name carries the ROM version and is what decomp.dev matches
+      # on. `eu` is the European release documented in README.md (game code
+      # BGTP). Renaming it starts a separate version tab on the site.
+      - name: Upload the progress report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eu_report
+          path: report.json
+          if-no-files-found: error
+          retention-days: 90

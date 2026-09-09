@@ -1,4 +1,4 @@
-.PHONY: check check-full status status-update status-check queue-check sibling-check boundary-check boundary-baseline toolchain-check toolchain-corpus consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build dashboard-lint analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: check check-full report status status-update status-check queue-check sibling-check boundary-check boundary-baseline toolchain-check toolchain-corpus consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build dashboard-lint analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -95,6 +95,12 @@ check: toolchain-check rom
 	@python3 tools/generate_dashboard_data.py
 	@python3 tools/check_generated_views.py
 	@python3 tools/project_status.py --check
+	@python3 tools/gen_report.py --check
+
+# Progress report for decomp.dev, in the objdiff report schema. Needs no ROM:
+# it is derived from data/functions.csv, which `check` has just verified.
+report:
+	@python3 tools/gen_report.py -o report.json
 
 # Milestone/merge gate: every matching target is rebuilt without the cache, and
 # the C corpus fingerprint and the dashboard production sources are verified too.

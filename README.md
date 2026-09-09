@@ -19,8 +19,10 @@ recorded in the generated [status report](docs/STATUS.md) and
 [work queue](data/work_queue.csv). Progress figures are maintained there so this
 README does not become a second, outdated source of numbers.
 
-Public progress reporting on **decomp.dev** is planned. The repository's local
-reports remain the current way to track progress.
+Every push to `main` publishes the same figures to **decomp.dev** as an objdiff
+progress report. The report is derived from the verified function map rather
+than from a separate count, so it cannot disagree with `make check`. See
+[continuous integration](docs/CI.md).
 
 This project was originally written in Turkish and has since been translated
 into English: source comments, tool messages, and research documents are now
@@ -240,6 +242,7 @@ status report for current figures.
 | [Save system](docs/SAVE_SYSTEM.md) | EEPROM and save-system research |
 | [Prior research](docs/PRIOR_ART.md) | Related work and reference material |
 | [Work log](docs/WORKLOG.md) | Historical experiments and findings |
+| [Continuous integration](docs/CI.md) | Workflows, progress publishing, and ROM access in CI |
 
 ## Repository layout
 

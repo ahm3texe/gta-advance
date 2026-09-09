@@ -5,12 +5,25 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 rom_path="$repo_dir/baserom.gba"
 hash_file="$repo_dir/config/rom.sha1"
 
+# macOS ships `shasum`, most Linux distributions ship `sha1sum`. Both read the
+# same digest file format, so either satisfies the check.
+sha1_check() {
+    if command -v shasum >/dev/null 2>&1; then
+        shasum -a 1 -c "$1"
+    elif command -v sha1sum >/dev/null 2>&1; then
+        sha1sum -c "$1"
+    else
+        echo "ERROR: neither shasum nor sha1sum is available." >&2
+        return 1
+    fi
+}
+
 verify_rom() {
     test -f "$rom_path" || {
         echo "Missing: $rom_path" >&2
         return 1
     }
-    (cd "$repo_dir" && shasum -a 1 -c "$hash_file")
+    (cd "$repo_dir" && sha1_check "$hash_file")
 }
 
 if test "${1-}" = "--verify"; then

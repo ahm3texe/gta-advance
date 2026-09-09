@@ -36,3 +36,6 @@ dashboard/app/decomp-data.json
 tools/external/
 build/permuter/
 tools/trace.lua
+
+# Generated progress report for decomp.dev (produced in CI).
+report.json

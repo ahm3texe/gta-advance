@@ -21,7 +21,11 @@ fi
 
 if ! command -v arm-none-eabi-as >/dev/null 2>&1 || ! command -v arm-none-eabi-ar >/dev/null 2>&1; then
     echo "ERROR: arm-none-eabi binutils not found." >&2
-    echo "  brew install arm-none-eabi-binutils" >&2
+    if [ "$(uname -s)" = "Darwin" ]; then
+        echo "  brew install arm-none-eabi-binutils" >&2
+    else
+        echo "  apt-get install binutils-arm-none-eabi   (or your distribution's equivalent)" >&2
+    fi
     exit 1
 fi
 

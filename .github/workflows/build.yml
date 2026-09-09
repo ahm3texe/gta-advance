@@ -1,0 +1,141 @@
+name: Build
+
+# Two jobs, split by whether the ROM is needed.
+#
+#   checks  runs everywhere, including pull requests from forks. It covers the
+#           consistency gates that read only the repository's own data, so a
+#           contributor without the ROM still gets real feedback.
+#
+#   verify  rebuilds every matching function with agbcc and compares it against
+#           the ROM. This is the gate that decides whether the recorded figures
+#           are true, and it needs the ROM, so it is skipped when the ROM is not
+#           reachable and never runs for a fork.
+#
+# The ROM is not in this repository and must not be. It is fetched from a
+# release asset in a private repository the maintainer owns. See
+# docs/CI.md for the one-time setup.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Consistency checks (no ROM)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Check that every tool parses
+        run: |
+          set -euo pipefail
+          for script in tools/*.py; do python3 -m py_compile "$script"; done
+          for script in tools/*.sh; do sh -n "$script"; done
+
+      - name: Run the checks that need no ROM
+        run: |
+          set -euo pipefail
+          python3 tools/check_consistency.py
+          python3 tools/check_work_queue.py
+          python3 tools/check_sibling_band.py
+          python3 tools/review_c_source.py
+          python3 tools/gen_report.py --check
+
+  verify:
+    name: Rebuild and verify against the ROM
+    runs-on: ubuntu-latest
+    # Secrets are not exposed to workflows triggered by a fork's pull request,
+    # so the ROM could not be fetched there anyway. Skipping explicitly keeps
+    # the run green instead of failing a contributor's pull request.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      ROM_ASSETS_TOKEN: ${{ secrets.ROM_ASSETS_TOKEN }}
+      ROM_ASSETS_REPO: ${{ vars.ROM_ASSETS_REPO }}
+      ROM_ASSETS_TAG: ${{ vars.ROM_ASSETS_TAG }}
+      ROM_ASSETS_FILE: ${{ vars.ROM_ASSETS_FILE }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Decide whether the ROM is reachable
+        id: rom
+        run: |
+          set -euo pipefail
+          if [ -n "${ROM_ASSETS_TOKEN:-}" ] && [ -n "${ROM_ASSETS_REPO:-}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ROM access is not configured; skipping the rebuild." \
+                 "Progress reporting is unaffected. See docs/CI.md."
+          fi
+
+      - name: Install the ARM toolchain and the host compiler
+        if: steps.rom.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          # clang, because tools/agbcc_host_cc.sh passes clang-specific warning
+          # switches. Using it here keeps CI and the maintainer's machine on one
+          # code path rather than two that can drift apart.
+          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi clang
+
+      - name: Set up Python
+        if: steps.rom.outputs.available == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Restore the agbcc build
+        if: steps.rom.outputs.available == 'true'
+        id: agbcc-cache
+        uses: actions/cache@v4
+        with:
+          path: tools/agbcc
+          # agbcc is pinned by revision in the lock file, so the cache is only
+          # valid for that exact revision and for these wrapper flags.
+          key: agbcc-${{ runner.os }}-${{ hashFiles('config/toolchain.lock.json', 'tools/agbcc_host_cc.sh') }}
+
+      - name: Build agbcc
+        if: steps.rom.outputs.available == 'true' && steps.agbcc-cache.outputs.cache-hit != 'true'
+        run: make agbcc
+
+      - name: Fetch the ROM
+        if: steps.rom.outputs.available == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ROM_ASSETS_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release download "$ROM_ASSETS_TAG" \
+            --repo "$ROM_ASSETS_REPO" \
+            --pattern "$ROM_ASSETS_FILE" \
+            --output rom.zip
+          make prepare-rom ROM_ZIP=rom.zip
+          rm -f rom.zip
+
+      # prepare-rom already verifies the SHA-1 in config/rom.sha1 and fails if
+      # it does not match, so a wrong or corrupted asset stops here rather than
+      # producing a run whose comparisons are all meaningless.
+      - name: Rebuild every matching function and run the full checks
+        if: steps.rom.outputs.available == 'true'
+        run: make check
+
+      - name: Verify the libc regions against agbcc's libc.a
+        if: steps.rom.outputs.available == 'true'
+        run: make libc-verify
