@@ -336,6 +336,7 @@ start,end,binary,module,notes
 0x0805A220,0x0805A248,build/script/cmd_set_owner_flag.bin,script,Handler: sets flag 0x200 on the actor's owner; missing owner is still success
 0x0805A248,0x0805A274,build/script/cmd_owner_call_arg.bin,script,Handler: owner and a second operand into FUN_08036338; both operands u16
 0x0805A274,0x0805A298,build/script/cmd_owner_call.bin,script,Handler: owner into FUN_080362E4
+0x0805A298,0x0805A2F4,build/script/cmd_reset_area_full.bin,script,"Long-form area reset: clear, nibble the flags, three uses of the +0x18 entry"
 0x0805A2F4,0x0805A318,build/script/cmd_area_reset.bin,script,"Handler: resets the area node, writes 5 at +0x16 and clears slot 0"
 0x0805A318,0x0805A33C,build/script/cmd_area_ready.bin,script,"Handler: IsEntityFlagSet, falling back to the node's +0x17 byte"
 0x0805A450,0x0805A4F4,build/script/cmd_set_timer.bin,script,"Sets the timer from an operand, and from the clock plus an operand"
@@ -440,6 +441,7 @@ start,end,binary,module,notes
 0x080672FC,0x08067370,build/misc/format_decimal.bin,misc,Decimal digit writer; repeated subtraction with the powers-of-ten table.
 0x08067374,0x080673AC,build/world/more_counters_2.bin,world,overflow-protected u16 and u8 counters
 0x080673C4,0x080673FC,build/world/more_counters_3.bin,world,overflow-protected u8 counters
+0x080673FC,0x08067404,build/stub/gap_stubs.bin,stub,Two four-byte stubs no map entry covered; found by following the bl at 0x0805A2C8
 0x08067404,0x080674B0,build/world/is_kind20.bin,world,0x08067404 IsKind20 (36-entry jump table)
 0x080674B0,0x08067524,build/misc/format_decimal_dup.bin,misc,The second copy of the decimal digit writer in the ROM; md5 equality verified.
 0x0806B84C,0x0806B88C,build/bios/syscalls.bin,bios,"BIOS syscall thunk'lari (swi); cannot be converted to C, permanent assembly"

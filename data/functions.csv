@@ -1441,7 +1441,7 @@ address,name,size,status,module,notes
 0x0805A220,FUN_0805a220,40,matching,script,Script handler: sets flag 0x200 on the actor's owner at +0x28; a missing owner still answers 1; decompiled in src/script/cmd_set_owner_flag.c
 0x0805A248,FUN_0805a248,44,matching,script,Script handler: the actor's owner and a second u16 operand into FUN_08036338; decompiled in src/script/cmd_owner_call_arg.c
 0x0805A274,FUN_0805a274,34,matching,script,Script handler: the actor's owner into FUN_080362E4; decompiled in src/script/cmd_owner_call.c
-0x0805A298,FUN_0805a298,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A298,FUN_0805a298,92,matching,script,"Script handler: the long form of 0x0805A2F4. Clears the area node with a 1, raises its +0x17 byte, keeps only the low nibble of the +0x0B flags, then hands the +0x18 entry's kind and its neighbour to the stub at 0x080673FC, zeroes the history unless the kind is 6, and copies the save buffer's byte 8 to 9 for kinds 0 and 1 whose handle resolves. FUN_08031FF0 is called with the ENTRY, not the node. Decompiled in src/script/cmd_reset_area_full.c"
 0x0805A2F4,FUN_0805a2f4,36,matching,script,"Script handler: resets the area node, writes 5 into its +0x16 byte and clears slot 0; decompiled in src/script/cmd_area_reset.c"
 0x0805A318,FUN_0805a318,34,matching,script,"Script handler: IsEntityFlagSet on the node's +0x18 entry, falling back to its +0x17 byte; decompiled in src/script/cmd_area_ready.c"
 0x0805A450,FUN_0805a450,68,matching,script,"Script handler: turns the operand into minutes and seconds and sets the timer, then clears the HUD time and notifies the active slot with id 355; decompiled in src/script/cmd_set_timer.c"
@@ -1733,6 +1733,8 @@ address,name,size,status,module,notes
 0x08067390,BumpCount84,28,matching,world,Additional counter; src/world/more_counters_2.c size measured including the tail pool (byte-matching evidence)
 0x080673C4,BumpCount70,28,matching,world,Additional counter; src/world/more_counters_3.c size measured including the tail pool (byte-matching evidence)
 0x080673E0,BumpCount80,28,matching,world,Additional counter; src/world/more_counters_3.c size measured including the tail pool (byte-matching evidence)
+0x080673FC,FUN_080673fc,2,matching,stub,"Empty stub: `bx lr` alone, two bytes. The two bytes after it are alignment padding before 0x08067400, not part of the function; they were counted as its body until the C source measured it. Its only caller in the ROM is the bl at 0x0805A2C8, which is how it was found; it fell in the 8-byte gap between BumpCount80 and IsKind20 that no map entry covered. Decompiled in src/stub/gap_stubs.c"
+0x08067400,FUN_08067400,4,matching,stub,"Answers 0 and returns. NO CALLER: every Thumb bl in the ROM was scanned and none targets it, so it is reached through a pointer or is dead. Decompiled in src/stub/gap_stubs.c"
 0x08067404,IsKind20,172,matching,world,"verified from a byte-matching C source; IsKind20; 36-entry jump table, 1 only for kind 20"
 0x080674B0,FormatDecimalDup,116,matching,misc,116 bytes IDENTICAL to FormatDecimal (0x080672FC); second copy in the ROM; src/misc/format_decimal_dup.c
 0x08067524,FUN_08067524,82,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)

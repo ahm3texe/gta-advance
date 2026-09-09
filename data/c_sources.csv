@@ -593,6 +593,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805A220,FUN_0805a220,src/script/cmd_set_owner_flag.c,40,40,yes
 0x0805A248,FUN_0805a248,src/script/cmd_owner_call_arg.c,44,44,yes
 0x0805A274,FUN_0805a274,src/script/cmd_owner_call.c,34,34,yes
+0x0805A298,FUN_0805a298,src/script/cmd_reset_area_full.c,92,92,yes
 0x0805A2F4,FUN_0805a2f4,src/script/cmd_area_reset.c,36,36,yes
 0x0805A318,FUN_0805a318,src/script/cmd_area_ready.c,34,34,yes
 0x0805A450,FUN_0805a450,src/script/cmd_set_timer.c,68,68,yes
@@ -759,6 +760,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08067390,BumpCount84,src/world/more_counters_2.c,28,28,yes
 0x080673C4,BumpCount70,src/world/more_counters_3.c,28,28,yes
 0x080673E0,BumpCount80,src/world/more_counters_3.c,28,28,yes
+0x080673FC,FUN_080673fc,src/stub/gap_stubs.c,2,2,yes
+0x08067400,FUN_08067400,src/stub/gap_stubs.c,4,4,yes
 0x08067404,IsKind20,src/world/is_kind20.c,172,172,yes
 0x080674B0,FormatDecimalDup,src/misc/format_decimal_dup.c,116,116,yes
 0x0806A77C,FUN_0806a77c,src/arm/plane_test.c,188,196,no
