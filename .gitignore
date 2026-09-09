@@ -39,3 +39,9 @@ tools/trace.lua
 
 # Generated progress report for decomp.dev (produced in CI).
 report.json
+
+# objdiff: the target objects are synthesised from baserom.gba (make expected)
+# and the manifest is derived from data/c_sources.csv (make objdiff). Both are
+# generated, and expected/ is material derived from the ROM.
+expected/
+objdiff.json

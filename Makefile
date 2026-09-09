@@ -1,4 +1,4 @@
-.PHONY: check check-full report status status-update status-check queue-check sibling-check boundary-check boundary-baseline toolchain-check toolchain-corpus consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build dashboard-lint analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
+.PHONY: check check-full report expected objdiff status status-update status-check queue-check sibling-check boundary-check boundary-baseline toolchain-check toolchain-corpus consistency rom agbcc c-match c-status c-review diff disasm scan-libc libc-align libc-verify dashboard-watch prepare-rom verify-rom doctor progress dashboard-data dashboard-dev dashboard-build dashboard-lint analyze sync-functions bootstrap-match intr-match init-interrupts-match game-init-match vblank-match irq-helpers-match reset-display-match init-save-system-match read-eeprom-match write-eeprom-match save-slots-match save-wrappers-match save-manager-match read-eeprom-range-match write-eeprom-range-match save-helpers-match menu-layout-match draw-menu-match init-menu-screen-match menu-helpers-match menu-graphics-match matching
 
 ROM_ZIP ?=
 
@@ -101,6 +101,19 @@ check: toolchain-check rom
 # it is derived from data/functions.csv, which `check` has just verified.
 report:
 	@python3 tools/gen_report.py -o report.json
+
+# objdiff's "target" objects, synthesised from the ROM. Needs the ROM and the
+# base objects: the code/pool split of a matching function is read out of
+# build/cmatch/<stem>.o rather than guessed, so `make matching` first gives the
+# best split. Every object is byte-compared against the ROM before it is
+# written; one that does not reproduce the cartridge is skipped, not shipped.
+expected: verify-rom
+	@python3 tools/gen_expected.py
+
+# The objdiff manifest, derived from data/c_sources.csv. Only translation units
+# whose target object survived that byte comparison are listed.
+objdiff: expected
+	@python3 tools/gen_objdiff.py
 
 # Milestone/merge gate: every matching target is rebuilt without the cache, and
 # the C corpus fingerprint and the dashboard production sources are verified too.
