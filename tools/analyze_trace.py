@@ -17,11 +17,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 LOG = ROOT / "build" / "trace.log"
 LINE = re.compile(r"^f(\d+)\s+(\S+)\s+(.*)$")
 
-# Keep the original Turkish markers readable in logs saved before translation.
-SESSION_MARKERS = ("new session", "yeni oturum")
-SUPPRESSION_MARKERS = ("SUPPRESSED", "SUSTURULDU")
-DIAGNOSTIC_MARKERS = ("ERROR", "warning", "WORKED", "error",
-                      "HATA", "uyari", "CALISTI", "hata")
+SESSION_MARKER = "new session"
+SUPPRESSION_MARKER = "SUPPRESSED"
+DIAGNOSTIC_MARKERS = ("ERROR", "error", "warning", "WORKED")
 
 REGIONS = {0x02: "EWRAM", 0x03: "IWRAM", 0x05: "PALETTE",
            0x06: "VRAM", 0x07: "OAM", 0x08: "ROM"}
@@ -43,7 +41,7 @@ def classify(value, syms):
 def sessions(lines):
     """The log holds several sessions; each is returned separately."""
     marks = [i for i, l in enumerate(lines)
-             if any(marker in l for marker in SESSION_MARKERS)]
+             if SESSION_MARKER in l]
     if not marks:
         return [lines]
     bounds = marks + [len(lines)]
@@ -108,10 +106,10 @@ def main(argv):
         return 0
 
     suppressed = [(f, n) for f, n, r in events
-                  if any(marker in r for marker in SUPPRESSION_MARKERS)]
+                  if SUPPRESSION_MARKER in r]
     counts, first = defaultdict(int), {}
     for f, n, r in events:
-        if any(marker in r for marker in SUPPRESSION_MARKERS):
+        if SUPPRESSION_MARKER in r:
             continue
         counts[n] += 1
         first.setdefault(n, f)

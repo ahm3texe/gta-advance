@@ -1,8 +1,7 @@
 # Glossary
 
 Terminology used throughout the project. The documentation uses these terms
-consistently. Trace logs recorded before the English translation still contain
-Turkish markers; `tools/analyze_trace.py` deliberately accepts both.
+consistently.
 
 ## Workflow terms
 
