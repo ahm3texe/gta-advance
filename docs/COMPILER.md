@@ -1272,3 +1272,37 @@ The give-away in the ROM is the prologue: a leaf-ish function that only forwards
 a call and adjusts its answer pushes `{lr}` alone. Any `push {r4, lr}` in a
 function that short means a value was made live across the call that should not
 have been.
+
+## Rule 73 — in the `goto` form, the body after the label lands FIRST
+
+Rule 71 controls block order through a two-armed `if`. When the two answers are
+unrelated — they come from different places, and there is no result variable to
+hold either — that lever is not available, and a `goto` is the only one left.
+
+Its direction is the opposite of what the source reads like:
+
+```c
+    if (cond) goto other;
+    return A;               /* written first, emitted SECOND */
+other:
+    return B;               /* written second, emitted FIRST */
+```
+
+Measured in four functions, each of which was tried both ways round:
+
+| function | file |
+|---|---|
+| `FUN_0805A318` | `src/script/cmd_area_ready.c` |
+| `FUN_080380B4` | `src/entity/is_lookup_nonnegative.c` |
+| `FUN_080420F8` | `src/map/map_mode.c` |
+| `FUN_0805A114` | `src/script/cmd_anchor_unk34_unless_small.c` (two-armed if instead) |
+
+The last one is the exception that shows where the boundary is. Its two answers
+are a call and a constant, and a two-armed `if` with a result variable holds
+both, so rule 71 applies and the `goto` form is not needed.
+
+**Do not reach for a result variable when the two answers are unrelated.** In
+`FUN_080380B4` it makes agbcc drop the comparison altogether and answer with
+`mvns / lsrs #31`; in `FUN_080420F8` it hoists the default above the test and
+overwrites it, which is rule 48's shape and one instruction shorter than the
+ROM's. Both are further from the ROM than the plain `goto`, not closer.
