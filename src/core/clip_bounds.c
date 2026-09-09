@@ -18,24 +18,27 @@
  *
  * Rule 35: `pop {r0}; bx r0` -> a void return type.
  *
- * DOES NOT MATCH YET: our output is 96 bytes, the ROM 100. The obstacle comes
- * down to a SINGLE structural reason: we use ONE MORE callee-saved register.
+ * BYTE-MATCHING (100/100).  It stayed open for a long time at 96 bytes against
+ * the ROM's 100, and the obstacle came down to a SINGLE structural reason: we
+ * used ONE MORE callee-saved register.
  *     ROM  : push {r4,r5,lr}       -- it loads every component into r0 AFRESH
- *     ours : push {r4,r5,r6,lr}    -- the loaded values live in r5/r6
- * Every difference derives from that (+0x14 ldr r5 vs r0, +0x20 ldr r6 vs r0,
- * +0x22/+0x24 the constant and addition registers).
+ *     ours : push {r4,r5,r6,lr}    -- the loaded values lived in r5/r6
+ * Every difference derived from that (+0x14 ldr r5 vs r0, +0x20 ldr r6 vs r0,
+ * +0x22/+0x24 the constant and addition registers): in the ROM every `box->`
+ * read is a short-lived temporary, while the compiler kept ours as common
+ * subexpressions and lengthened their lifetimes.
  *
- * So in the ROM every `box->` read is a short-lived temporary; for us the
- * compiler keeps them as common subexpressions and lengthens their lifetimes.
+ * Tried and rejected at the time: `+ (s32)0xFFF80000` instead of `- 0x80000`
+ * (it produced the pool load correctly but did not change the register count);
+ * taking the negative constant into a separate `zlo` local (no effect).  Both
+ * gave 96 bytes.
  *
- * What was tried: `+ (s32)0xFFF80000` instead of `- 0x80000` (it produced the
- * pool load correctly but did not change the register count); taking the
- * negative constant into a separate `zlo` local (no effect). Both give 96
- * bytes.
- *
- * The next idea: shorten the lifetime of the reads by handling each component
- * inside its own block, or split pass 1 / pass 2 into separate helper functions
- * and have them inlined.
+ * WHAT SOLVED IT (rule 69): each component was put into its own block, so the
+ * reads became six independent short-lived temporaries and r6 was freed, and
+ * the repeated memory reads were done through a narrow volatile view so the
+ * compiler could not cache them as a common subexpression.  Together those
+ * took a difference of 26 to 0.  WARNING: the technique is LOCAL, not general
+ * -- the same move made CleanupAreaTiles worse (7 -> 85).
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/core/clip_bounds.c

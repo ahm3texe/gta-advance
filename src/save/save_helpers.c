@@ -23,14 +23,19 @@ extern SaveSlotHeader gSaveSlotHeaders[SAVE_SLOT_COUNT];
 extern void *Memset(void *dest, int value, u32 count);
 extern u32 WriteEepromRange(u32 offset, const void *src, u32 size);
 
-/* 0x08001094 — DOES NOT MATCH YET (15 of 62 bytes differ)
+/* 0x08001094 — byte-matching
  *
- * The structure and every instruction are correct; the difference is in when
- * the base address is loaded. The ROM loads the base first, then computes the
- * index:
+ * This one stayed open for a long time (15 of the 62 bytes differed). The
+ * structure and every instruction were already correct; the difference was in
+ * when the base address is loaded. The ROM loads the base first, then computes
+ * the index:
  *     ldr r1, =0x02000460 ; lsls r0, r4, #1 ; adds r0, r0, r4 ; lsls r0, r0, #2
- * agbcc does the opposite: index first, then ldr. The same difference is
- * present in GetSaveSlotHeader, so it is systematic. */
+ * agbcc did the opposite: index first, then ldr. The same difference was
+ * present in GetSaveSlotHeader, so it was systematic — and so was the cause:
+ * the RAM address was a cast macro, which agbcc folds into a literal, instead
+ * of an extern symbol, which it cannot. That single change made this function
+ * match immediately. See "RAM addresses must be extern symbols" in
+ * docs/COMPILER.md. */
 u32 EraseSaveSlot(u32 slot)
 {
     u8 buffer[8];
@@ -43,22 +48,27 @@ u32 EraseSaveSlot(u32 slot)
     return WriteEepromRange(slot * SAVE_SLOT_STRIDE, buffer, sizeof(buffer));
 }
 
-/* 0x080010D4 — DOES NOT MATCH YET (11 of 36 bytes differ)
+/* 0x080010D4 — byte-matching
  *
- * All eight instructions are correct; the order and register allocation
- * differ:
+ * This one stayed open for a long time (11 of the 36 bytes differed). All
+ * eight instructions were already correct; only the order and the register
+ * allocation differed:
  *     ROM   : adds r2, r0, #0 ... ldr r0, [pc] ; lsls r1, r2, #1 ; ...
  *     agbcc : adds r1, r0, #0 ... lsls r0, r1, #1 ; ... ldr r2, [pc]
  *
- * Tried and REJECTED: the number and order of locals (five different
- * arrangements), pointer arithmetic vs array indexing, taking the base into a
- * separate variable, an inverted condition (if(marker) return h), a void*
- * return type, a constant cast instead of the extern array symbol and vice
- * versa, and agbcc instead of old_agbcc and vice versa.
- * ALL FIVE arrangements produced byte-for-byte identical output: agbcc is
- * insensitive to the C form in this function. The remaining possible cause is
- * the compiler version or a flag not yet found; it does not look solvable by
- * tinkering with the C. */
+ * Tried and rejected at the time: the number and order of locals (FIVE
+ * different arrangements -- all five produced byte-for-byte identical output),
+ * pointer arithmetic vs array indexing, taking the base into a separate
+ * variable, an inverted condition (if(marker) return h), a void* return type,
+ * a constant cast instead of the extern array symbol and vice versa, and agbcc
+ * instead of old_agbcc and vice versa.
+ *
+ * The conclusion drawn from that -- "the cause is the compiler version or a
+ * flag not yet found, the C form is irrelevant" -- WAS WRONG. The cause was on
+ * the C side: the RAM address must be an extern symbol instead of a cast macro
+ * that agbcc folds, and the header must be reached by DIRECT MEMBER ACCESS
+ * rather than through a local. See "RAM addresses must be extern symbols" in
+ * docs/COMPILER.md. */
 SaveSlotHeader *GetSaveSlotHeader(u32 slot)
 {
     if (slot >= SAVE_SLOT_COUNT)

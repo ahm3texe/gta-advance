@@ -178,7 +178,7 @@ Both show the **same systematic difference**: the ROM loads the base address
 before the index computation, agbcc after. For `GetSaveSlotHeader`, five
 different local variable arrangements, pointer arithmetic, an inverted condition,
 a `void*` return, an extern array symbol, and two compiler variants were tried —
-**every one of them produced byte-for-byte identical output.** agbcc is
+**all five arrangements produced byte-for-byte identical output.** agbcc is
 insensitive to the C form in this function, so it is not a problem that can be
 solved by tinkering with the C. The remaining possibilities: a difference between
 pret/agbcc's rebuilt version and the original SDK version, or a compiler flag not
