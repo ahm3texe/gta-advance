@@ -541,6 +541,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08055054,FUN_08055054,src/core/nodelist_b7.c,312,312,no
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x080552D4,IsProgressThresholdMet,src/core/nodelist_b8.c,492,492,yes
+0x080556C0,FUN_080556c0,src/table/lookup_default_value.c,64,64,yes
 0x08055954,FindFreeNode,src/core/find_free_node.c,28,28,yes
 0x08055970,ProbeNearbyPosition,src/core/probe_nearby_position.c,144,144,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
@@ -607,6 +608,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805AA1C,FUN_0805aa1c,src/script/cmd_release_slot.c,20,20,yes
 0x0805AAA8,FUN_0805aaa8,src/script/cmd_open_menu.c,52,52,yes
 0x0805AB04,FUN_0805ab04,src/script/cmd_call_080351ac.c,16,16,yes
+0x0805AB14,FUN_0805ab14,src/table/always_one.c,4,4,yes
 0x0805AB18,FUN_0805ab18,src/script/cmd_set_node_flag400.c,44,44,yes
 0x0805AB78,NoOp0805AB78,src/misc/empty_stubs.c,2,2,yes
 0x0805AB7C,FUN_0805ab7c,src/script/cmd_maybe_reset.c,20,20,yes

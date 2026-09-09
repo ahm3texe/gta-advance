@@ -294,6 +294,7 @@ start,end,binary,module,notes
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Frame step of the world object: counter, teardown, slot allocation, record setup."
 0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
 0x08054F1C,0x08055054,build/world/is_near_any_actor.bin,world,0x08054F1C IsNearAnyActor (+2 padding)
+0x080556C0,0x08055700,build/table/lookup_default_value.bin,table,"The value carried by the default handler's entry, by kind"
 0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
 0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Tests the position at four neighbouring offsets
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Ordered node lookup and id classification
@@ -348,6 +349,7 @@ start,end,binary,module,notes
 0x0805AA1C,0x0805AA30,build/script/cmd_release_slot.bin,script,Handler: FUN_08030D0C's answer straight into ReleaseSlot
 0x0805AAA8,0x0805AADC,build/script/cmd_open_menu.bin,script,Opens the menu; mode 0 needs the +0x54 gate above 15
 0x0805AB04,0x0805AB14,build/script/cmd_call_080351ac.bin,script,Handler: operand into FUN_080351AC
+0x0805AB14,0x0805AB18,build/table/always_one.bin,table,"Four-byte default table handler; 27 pointer references, no bl caller"
 0x0805AB18,0x0805AB44,build/script/cmd_set_node_flag400.bin,script,"Handler: sets flag 0x400 on the record node, only when it was clear"
 0x0805AB7C,0x0805AB90,build/script/cmd_maybe_reset.bin,script,Handler: FUN_08059818(0) when FUN_08061F54 says so; the only void handler in the block
 0x0805AB90,0x0805ABDC,build/world/p1_5ab90.bin,world,Phase 1: natural C matching the ROM exactly

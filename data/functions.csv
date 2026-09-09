@@ -1311,7 +1311,7 @@ address,name,size,status,module,notes
 0x0805564C,FUN_0805564c,18,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08055674,FUN_08055674,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0805569C,FUN_0805569c,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x080556C0,FUN_080556c0,64,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x080556C0,FUN_080556c0,64,matching,table,"Scans the owner's 20-byte entry table for one whose +0x00 handler is 0x0805AB14 and whose +0x06 halfword matches the operand, and answers that entry's +0x08 halfword; 0 when nothing matches or the owner has no table. Decompiled in src/table/lookup_default_value.c"
 0x08055720,FUN_08055720,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08055768,FUN_08055768,12,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08055774,FUN_08055774,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
@@ -1460,6 +1460,7 @@ address,name,size,status,module,notes
 0x0805AA30,FUN_0805aa30,120,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805AAA8,FUN_0805aaa8,52,matching,script,"Script handler: opens the menu; mode 0 only while the word at +0x54 through gRam02000F10 is above 15, every other mode unconditionally; decompiled in src/script/cmd_open_menu.c"
 0x0805AB04,FUN_0805ab04,16,matching,script,Script handler: the operand into FUN_080351AC; decompiled in src/script/cmd_call_080351ac.c
+0x0805AB14,FUN_0805ab14,4,matching,table,"Answers 1 and returns; the tables' default handler. NO bl caller anywhere in the ROM: its Thumb-tagged address 0x0805AB15 appears 27 times, once in the pool of 0x080556C0 and 26 times as the +0x00 field of 20-byte entries in the tables at 0x08CFAF04, 0x08D0D99C and 0x08D13DBC. It fell in the 4-byte gap between 0x0805AB04 and 0x0805AB18 that no map entry covered. Decompiled in src/table/always_one.c"
 0x0805AB18,FUN_0805ab18,44,matching,script,"Script handler: sets flag 0x400 on the record node, and only when it was clear; decompiled in src/script/cmd_set_node_flag400.c"
 0x0805AB44,FUN_0805ab44,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AB78,NoOp0805AB78,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
