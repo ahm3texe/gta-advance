@@ -774,6 +774,33 @@ expressions differently — do not "tidy" them into one shape. Second, in the tw
 interchangeable: `table[i].field` reintroduces the early load and is 6 off,
 while `(table + i)->field` matches.
 
+### Corollary: C89 forces the declaration up, but the ASSIGNMENT is what counts
+
+`FUN_08059F8C` needs both halves of rule 70 at once. The base has to go through
+a local, or the cast folds the field offset into the pool constant and the load
+loses its displacement:
+
+| spelling | pool | load |
+|---|---|---|
+| `((u32 *)gRam02025810)[3]` | `0x0202581C` | `ldr r0,[r0,#0]` |
+| `p = (u32 *)gRam02025810; p[3]` | `0x02025810` | `ldr r0,[r0,#12]` |
+
+But a local assigned at the top of the function pulls its pool load ahead of the
+work before it, and the ROM loads it late. C89 will not allow the declaration to
+move down, so only the assignment does:
+
+```c
+    u32 *progress;              /* declared at the top, as C89 requires */
+    ...
+    if (scale != 0)
+        value = scale * value;
+    progress = (u32 *)gRam02025810;   /* assigned at the point of use */
+    FUN_08030ae4(progress[3] + value, 1);
+```
+
+The sibling at `0x0805A024` wants the load early and assigns at the top, so the
+two spellings sit side by side in `src/script/`.
+
 ## Rule 67 — address locals look unnecessary but determine register allocation
 
 When the three independent `u16` globals in `ResetRuntimeGlobals` were zeroed

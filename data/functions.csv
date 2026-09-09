@@ -1414,18 +1414,18 @@ address,name,size,status,module,notes
 0x08059C84,FUN_08059c84,30,matching,script,Script handler: bit 0 of the +0x1A flags of the node FindRecordNodeEnd resolves to; decompiled in src/script/cmd_node_flag_bit0.c
 0x08059CA4,FUN_08059ca4,108,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059D10,FUN_08059d10,58,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08059D4C,FUN_08059d4c,48,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059D4C,FUN_08059d4c,48,matching,script,"Script handler: bit 18 of the node's +0x18 flags, unless the owner at +0x28 exists and FUN_0803CA58 answers non-zero; decompiled in src/script/cmd_flag18_unless_busy.c"
 0x08059D7C,ForwardToGetAnchorUnk30,10,matching,world,missed by Ghidra; found with tools/discover_functions.py. Body RESOLVED and a byte-matching C source exists
 0x08059D88,FUN_08059d88,12,matching,script,Script handler: calls FUN_0805063C and always answers 1; decompiled in src/script/cmd_call_and_succeed.c
 0x08059D94,FUN_08059d94,88,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059DEC,FUN_08059dec,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08059E48,FUN_08059e48,32,matching,script,Script handler: FUN_0805669C with its answer inverted; decompiled in src/script/cmd_forward_three_not.c
 0x08059E68,FUN_08059e68,22,matching,script,Script handler: forwards three u16 operands to FUN_0805669C; decompiled in src/script/cmd_forward_three.c
-0x08059E80,FUN_08059e80,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08059E80,FUN_08059e80,44,matching,script,Script handler: flag 0x100 two links down the +0x28 chain; decompiled in src/script/cmd_owner_chain_flag.c
 0x08059EAC,FUN_08059eac,146,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08059F40,FUN_08059f40,36,matching,script,Script handler: sets flag 0x200 on the actor ResolveRecordNodeChain resolves to; decompiled in src/script/cmd_set_actor_flag.c
 0x08059F64,FUN_08059f64,40,matching,script,Script handler: clears flag 0x200 on the actor ResolveRecordNodeChain resolves to; decompiled in src/script/cmd_clear_actor_flag.c
-0x08059F8C,FUN_08059f8c,44,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08059F8C,FUN_08059f8c,44,matching,script,"Script handler: progress +0x0C plus the operand, scaled by gRam02035AC4 when that is non-zero; decompiled in src/script/cmd_progress_plus_scaled.c"
 0x08059FE8,FUN_08059fe8,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A024,FUN_0805a024,28,matching,script,"Script handler: gRam02025810 +0x0C minus the operand, into FUN_08030AE4; decompiled in src/script/cmd_progress_minus.c"
 0x0805A070,FUN_0805a070,58,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
@@ -1435,7 +1435,7 @@ address,name,size,status,module,notes
 0x0805A114,FUN_0805a114,22,matching,script,Script handler: GetAnchorUnk34 unless IsAnchorSmall; decompiled in src/script/cmd_anchor_unk34_unless_small.c
 0x0805A12C,FUN_0805a12c,20,matching,script,Script handler: the operand into FUN_0803ABC4 with a constant 3 and 0; decompiled in src/script/cmd_call_three_fixed.c
 0x0805A140,FUN_0805a140,104,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805A1A8,FUN_0805a1a8,46,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A1A8,FUN_0805a1a8,46,matching,script,"Script handler: slot 1 ready, or slot 2 ready when gGameState[12] is set; decompiled in src/script/cmd_either_slot_ready.c"
 0x0805A1D8,FUN_0805a1d8,26,matching,script,"Script handler: 1 when GetBase is above the operand, signed comparison; decompiled in src/script/cmd_base_above.c"
 0x0805A1F4,FUN_0805a1f4,38,matching,script,Script handler: calls FUN_08057A04 unless bit 19 of the +0x18 flags of the record gRam020272C8 points at is set; decompiled in src/script/cmd_call_unless_flag.c
 0x0805A220,FUN_0805a220,40,matching,script,Script handler: sets flag 0x200 on the actor's owner at +0x28; a missing owner still answers 1; decompiled in src/script/cmd_set_owner_flag.c
@@ -1460,7 +1460,7 @@ address,name,size,status,module,notes
 0x0805AA30,FUN_0805aa30,120,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805AAA8,FUN_0805aaa8,52,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805AB04,FUN_0805ab04,16,matching,script,Script handler: the operand into FUN_080351AC; decompiled in src/script/cmd_call_080351ac.c
-0x0805AB18,FUN_0805ab18,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AB18,FUN_0805ab18,44,matching,script,"Script handler: sets flag 0x400 on the record node, and only when it was clear; decompiled in src/script/cmd_set_node_flag400.c"
 0x0805AB44,FUN_0805ab44,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AB78,NoOp0805AB78,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0805AB7C,FUN_0805ab7c,20,matching,script,"Script handler: calls FUN_08059818(0) when FUN_08061F54 answers non-zero; returns void, the only handler in the block that does; decompiled in src/script/cmd_maybe_reset.c"
@@ -1473,10 +1473,10 @@ address,name,size,status,module,notes
 0x0805AD10,FUN_0805ad10,86,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0805AD68,FUN_0805ad68,86,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805ADC0,FUN_0805adc0,70,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805AE08,FUN_0805ae08,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805AE2C,FUN_0805ae2c,34,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805AE50,FUN_0805ae50,38,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0805AE78,FUN_0805ae78,38,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805AE08,FUN_0805ae08,36,matching,script,Script handler: sets flag 0x100000 on the free node unconditionally; decompiled in src/script/cmd_set_free_node_flag.c
+0x0805AE2C,FUN_0805ae2c,34,matching,script,Script handler: sets bit 1 in the record's +0x1E state; decompiled in src/script/cmd_record_state_bits.c
+0x0805AE50,FUN_0805ae50,38,matching,script,Script handler: sets bit 9 in the record's +0x1E state; decompiled in src/script/cmd_record_state_bits.c
+0x0805AE78,FUN_0805ae78,38,matching,script,Script handler: clears bit 9 in the record's +0x1E state; decompiled in src/script/cmd_record_state_bits.c
 0x0805AEA0,FUN_0805aea0,46,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AED0,FUN_0805aed0,42,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AEFC,FUN_0805aefc,76,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)

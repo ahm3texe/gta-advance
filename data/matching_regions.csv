@@ -267,12 +267,15 @@ start,end,binary,module,notes
 0x080581B4,0x08058228,build/world/p1_581b4.bin,world,Phase 1: natural C matching the ROM exactly
 0x08059AE4,0x08059AF8,build/script/cmd_call_four_arg.bin,script,Handler: forwards two u16 operands to FUN_0805669C with a constant 64
 0x08059C84,0x08059CA4,build/script/cmd_node_flag_bit0.bin,script,Handler: bit 0 of the chain end's +0x1A flags (rule 33)
+0x08059D4C,0x08059D7C,build/script/cmd_flag18_unless_busy.bin,script,Handler: bit 18 of the node flags unless the owner is busy
 0x08059D7C,0x08059D88,build/world/wrap_08059d7c.bin,world,wrapper/accessor harvest
 0x08059D88,0x08059D94,build/script/cmd_call_and_succeed.bin,script,Handler: calls FUN_0805063C and always answers 1
 0x08059E48,0x08059E68,build/script/cmd_forward_three_not.bin,script,Handler: FUN_0805669C inverted; result variable born after the call
 0x08059E68,0x08059E80,build/script/cmd_forward_three.bin,script,Handler: forwards three u16 operands to FUN_0805669C
+0x08059E80,0x08059EAC,build/script/cmd_owner_chain_flag.bin,script,Handler: flag 0x100 two links down the +0x28 chain
 0x08059F40,0x08059F64,build/script/cmd_set_actor_flag.bin,script,Handler: sets flag 0x200 on the resolved actor
 0x08059F64,0x08059F8C,build/script/cmd_clear_actor_flag.bin,script,Handler: clears flag 0x200 on the resolved actor
+0x08059F8C,0x08059FB8,build/script/cmd_progress_plus_scaled.bin,script,Handler: progress +0x0C plus the operand scaled by gRam02035AC4
 0x08059FE8,0x0805A024,build/world/p1_59fe8.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805A024,0x0805A040,build/script/cmd_progress_minus.bin,script,"Handler: gRam02025810 +0x0C minus the operand, into FUN_08030AE4"
 0x0805A070,0x0805A0AC,build/world/p1_5a070.bin,world,Phase 1: natural C matching the ROM exactly
@@ -280,6 +283,7 @@ start,end,binary,module,notes
 0x0805A0FC,0x0805A114,build/script/cmd_percent_to_fixed.bin,script,Handler: (operand << 16) / 100 into ApplyTwoLevels slot 3
 0x0805A114,0x0805A12C,build/script/cmd_anchor_unk34_unless_small.bin,script,Handler: GetAnchorUnk34 unless IsAnchorSmall
 0x0805A12C,0x0805A140,build/script/cmd_call_three_fixed.bin,script,Handler: operand into FUN_0803ABC4 with a constant 3 and 0
+0x0805A1A8,0x0805A1D8,build/script/cmd_either_slot_ready.bin,script,"Handler: slot 1, or slot 2 when gGameState[12] is set"
 0x0805A1D8,0x0805A1F4,build/script/cmd_base_above.bin,script,Handler: 1 when GetBase is above the operand (signed); rule 72
 0x0805A1F4,0x0805A21C,build/script/cmd_call_unless_flag.bin,script,Handler: FUN_08057A04 unless bit 19 of gRam020272C8->flags is set
 0x0805A220,0x0805A248,build/script/cmd_set_owner_flag.bin,script,Handler: sets flag 0x200 on the actor's owner; missing owner is still success
@@ -292,6 +296,7 @@ start,end,binary,module,notes
 0x0805A78C,0x0805A7A0,build/script/cmd_call_minus_one.bin,script,Handler: operand into FUN_08041EF8 with a constant -1
 0x0805AA1C,0x0805AA30,build/script/cmd_release_slot.bin,script,Handler: FUN_08030D0C's answer straight into ReleaseSlot
 0x0805AB04,0x0805AB14,build/script/cmd_call_080351ac.bin,script,Handler: operand into FUN_080351AC
+0x0805AB18,0x0805AB44,build/script/cmd_set_node_flag400.bin,script,"Handler: sets flag 0x400 on the record node, only when it was clear"
 0x0805AB7C,0x0805AB90,build/script/cmd_maybe_reset.bin,script,Handler: FUN_08059818(0) when FUN_08061F54 says so; the only void handler in the block
 0x0805AB90,0x0805ABDC,build/world/p1_5ab90.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805ABDC,0x0805AC10,build/world/p1_5abdc.bin,world,Phase 1: natural C matching the ROM exactly
@@ -301,6 +306,8 @@ start,end,binary,module,notes
 0x0805AC94,0x0805AD10,build/world/link_objects.bin,world,Object linking and state bits; natural byte-matching C.
 0x0805AD10,0x0805AD68,build/world/p1_5ad10.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805AD68,0x0805ADC0,build/world/p1_5ad68.bin,world,Phase 1: natural C matching the ROM exactly
+0x0805AE08,0x0805AE2C,build/script/cmd_set_free_node_flag.bin,script,"Handler: sets flag 0x100000 on the free node, unconditionally"
+0x0805AE2C,0x0805AEA0,build/script/cmd_record_state_bits.bin,script,"Handlers: set bit 1, set bit 9, clear bit 9 in the record's +0x1E state"
 0x0805AEFC,0x0805AF48,build/world/p1_5aefc.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805B0C4,0x0805B0EC,build/script/cmd_call_kind.bin,script,Handlers: the operand into FUN_0803ABC4 with kind 1 and 2
 0x0805B11C,0x0805B134,build/script/cmd_bump_counts.bin,script,"Handlers: BumpCount70 and BumpCount80, always answering 1"
