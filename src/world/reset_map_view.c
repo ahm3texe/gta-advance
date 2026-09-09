@@ -1,13 +1,13 @@
-/* Harita gorunumunu sifirlama — 0x08030F90-0x08031003
+/* Reset the map view — 0x08030F90-0x08031003
  *
- * ClearMapWindow'dan sonra gRam02025810 blogunun +0x1358 ve +0x1368
- * sozlerini sifirlar; +0x137C bayti kuruluysa gRam02027280 nesnesini
- * ReleaseObject ile birakip bayragi siler; +0x1364 = 1; FUN_08029918;
- * +0x136C sifir degilse +0x112C degeriyle FUN_0802b01c ve +0x1130 = 0.
- * Blok icin release_slot.c'deki bayt-uzaklik yazimi kullanildi.
+ * After ClearMapWindow, clear words +0x1358/+0x1368 in gRam02025810. If byte
+ * +0x137C is set, release gRam02027280 through ReleaseObject and clear the
+ * flag. Set +0x1364 = 1 and call FUN_08029918. If +0x136C is nonzero, call
+ * FUN_0802b01c with +0x112C and set +0x1130 = 0. Uses the byte-offset block
+ * access form from release_slot.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/reset_map_view.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/reset_map_view.c
  */
 
 #include "gba_types.h"

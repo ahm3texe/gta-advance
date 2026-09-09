@@ -1,16 +1,16 @@
-/* Sayaci artir ya da tetikle — 0x08050108-0x0805012F
+/* Increment the counter or trigger — 0x08050108-0x0805012F
  *
- * Alt nesnenin +0xA5 baytini ISARETLI olarak sinayip pozitifse
- * FUN_08055674'u cagiriyor ve 1 donuyor; degilse bayti artirip 0 donuyor.
+ * Test the sub-object's byte at +0xA5 as SIGNED. If positive, call FUN_08055674
+ * and return 1; otherwise increment the byte and return 0.
  *
- * ROM ayni bayti IKI KEZ okuyor: once `ldrb` (artirma icin), sonra
- * `ldrsb` (isaretli sinama icin). Iki farkli tur gerektigi icin kaynakta
- * da iki ayri okuma var.
+ * The ROM reads the same byte TWICE: ldrb for the increment, then ldrsb for
+ * the signed test. The source also uses two reads because different types
+ * are needed.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Rule 35: `pop {r1}; bx r1` means r0 carries a return value; the return type is u32.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bump_or_trigger.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bump_or_trigger.c
  */
 
 #include "gba_types.h"

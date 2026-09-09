@@ -1,90 +1,98 @@
-/* Cokgen / nokta ic-disinda sinamasi - 0x0800BDF8-0x0800BEBD (198 bayt)
+/* Polygon / point inside-outside test - 0x0800BDF8-0x0800BEBD (198 bytes)
  *
- * DURUM: BYTE-MATCHING (198/198, fark 0).
- *        Onceki durum: 188 bayt, fark 181 (elle sarmalamali calisma kopyasi).
+ * STATUS: BYTE-MATCHING (198/198, 0 differences).
+ *        Previously: 188 bytes, 181 differences (a working copy with the
+ *        wrap-around written by hand).
  *
- * !!! DERLEME ONKOSULU !!!
- * ROM 0x0800BE6E'de `bl 0x0806C18C` yapiyor; orasi agbcc'nin Thumb
- * __modsi3 rutini (0x0806C188'deki `mov pc,lr` onun sifira-bolme
- * kuyrugu).  Yani `%` operatoru bu fonksiyonda ZORUNLU.  data/functions.csv
- * bu adresi yalnizca __modsi3 adiyla taniyor; agbcc'nin urettigi
- * cagri sembolu ise `__modsi3`.  Bu dosyanin linklenmesi icin
- * ***0x0806C18C ADRESI ICIN `__modsi3` ADLI BIR functions.csv KAYDI
- * GEREKIYOR*** (mevcut __modsi3 satirinin adi degistirilebilir ya da
- * takma ad eklenebilir).  Kayit olmadan build_c.py
- * "'__modsi3' data/functions.csv veya data/ram_map.csv'de yok" diyor.
- * Kaydi ben eklemedim; data/ altina dokunmak bu goreve kapali.
- * Olcum, bellekte gecici olarak bu satiri ekleyen bir yardimci ile
- * yapildi ve 198 baytin TAMAMI ROM ile ayni cikti.
+ * !!! A BUILD PRECONDITION !!!
+ * At 0x0800BE6E the ROM does `bl 0x0806C18C`; that is agbcc's Thumb __modsi3
+ * routine (the `mov pc,lr` at 0x0806C188 is its divide-by-zero tail).  So the
+ * `%` operator is MANDATORY in this function.  data/functions.csv knows this
+ * address only under the name __modsi3, while the call symbol agbcc emits is
+ * `__modsi3`.  For this file to link, ***A functions.csv RECORD NAMED
+ * `__modsi3` IS NEEDED FOR THE ADDRESS 0x0806C18C*** (the existing __modsi3
+ * line can be renamed, or an alias added).  Without the record build_c.py says
+ * "'__modsi3' is not in data/functions.csv or data/ram_map.csv".
+ * I did not add the record; touching anything under data/ was closed to this
+ * task.
+ * The measurement was made with a helper that adds that line temporarily in
+ * memory, and ALL 198 bytes came out identical to the ROM.
  *
- * NE YAPIYOR
- * ----------
- * Kapali bir cokgenin (`count` koseli, kose basina 20.12 sabit noktali
- * {x, y, z}) icinde `point` var mi diye bakiyor.
- *   1. Once kenar kenar gezip son kenarin iki ucundaki z degerlerinden
- *      buyugunu maxZ'ye, kucugunu minZ'ye koyuyor.  Dongu her adimda
- *      ustune yazdigi icin geriye SON kenarin degerleri kaliyor; ROM'da
- *      da boyle, yani bu bir yukseklik araligi biriktirmesi degil, son
- *      kenarin z sinirlari.
- *   2. `tolerance << 7` payiyla z araligini test ediyor; disarda kalirsa 0.
- *   3. Her kenar icin 2B capraz carpim (isaretli alan) hesaplayip
- *      `<< 8` ile olcekliyor ve tolerans ekliyor; negatif cikan ilk
- *      kenarda 0 donuyor.  Hepsi gecerse 1.
- * `>> 12` / `<< 8` cifti kardes dosyadaki (quad_edge_test.c) ile ayni
- * 20.12 sabit noktali kaliptir.
+ * WHAT IT DOES
+ * ------------
+ * It checks whether `point` lies inside a closed polygon (`count` corners, each
+ * a 20.12 fixed-point {x, y, z}).
+ *   1. It first walks edge by edge, putting the larger of the two z values at
+ *      the ends of the last edge into maxZ and the smaller into minZ.  Because
+ *      the loop overwrites them on every step, what remains are the LAST edge's
+ *      values; the ROM does the same, so this is not a height-range
+ *      accumulation but the last edge's z bounds.
+ *   2. It tests the z range with a margin of `tolerance << 7`; if outside, 0.
+ *   3. For every edge it computes the 2D cross product (the signed area),
+ *      scales it with `<< 8` and adds the tolerance; at the first edge that
+ *      comes out negative it returns 0.  If all pass, 1.
+ * The `>> 12` / `<< 8` pair is the same 20.12 fixed-point pattern as in the
+ * sibling file (quad_edge_test.c).
  *
- * KAPANISI SAGLAYAN IKI OLCUM
- * ---------------------------
- * (1) `%` AYRI BIR DEYIME ALINMAMALI, IFADENIN ICINDE KALMALI
- *     (fark 127 -> 2; ikinci dongu bayt bayt ROM ile ayni oldu)
- *     `j = (i + 1) % count;` yazimi cagriyi dongu govdesinin BASINA
- *     tasiyor.  ROM'da cagri ortada:
+ * THE TWO MEASUREMENTS THAT CLOSED IT
+ * -----------------------------------
+ * (1) `%` MUST NOT BE TAKEN INTO A SEPARATE STATEMENT; IT MUST STAY INSIDE THE
+ *     EXPRESSION
+ *     (127 -> 2 differences; the second loop became byte-for-byte the ROM's)
+ *     Writing `j = (i + 1) % count;` moves the call to the TOP of the loop
+ *     body.  In the ROM the call is in the middle:
  *       ldr r5,[point,#4] / ldr r3,[poly_i,#4] / mov r9,r3
- *       subs r5,r5,r3 / asrs r5,#12      <- A once hesaplaniyor
+ *       subs r5,r5,r3 / asrs r5,#12      <- A is computed first
  *       adds r6,r0,#1 / adds r0,r6,#0 / mov r1,r8 / bl __modsi3
- *     Yani `(point[1]-poly[i][1])>>12` cagridan ONCE uretiliyor; bu
- *     ancak modulo carpimin SAG operandinin icindeyken olur.
- *     Zincirleme etkisi dagitima kadar iniyor: A cagriyi asmak zorunda
- *     oldugu icin poly[i][1] callee-saved r9'u tutuyor, bu da `point`i
- *     yazmactan atip sp#4 yuvasina dusuruyor ve `tolerance` sl'ye
- *     yerlesiyor.  ROM'un `sub sp,#8` + `str r2,[sp,#4]` prologu tam
- *     olarak bu.  Ayri deyimli halde `sub sp,#4` cikiyordu.
- *     Iki ayri `(i + 1) % count` yazimi CSE ile tek cagriya iniyor
- *     (libcall const kabul ediliyor), ROM'da da tek `bl` var.
+ *     That is, `(point[1]-poly[i][1])>>12` is produced BEFORE the call, which
+ *     only happens while the modulo is inside the multiplication's RIGHT
+ *     operand.
+ *     The knock-on effect reaches the allocation: because A has to cross the
+ *     call, poly[i][1] holds callee-saved r9, which in turn evicts `point` from
+ *     a register into the sp#4 slots and settles `tolerance` into sl.  The ROM's
+ *     `sub sp,#8` + `str r2,[sp,#4]` prologue is exactly that.  With the
+ *     separate statement, `sub sp,#4` came out instead.
+ *     The two separate `(i + 1) % count` writings collapse to a single call
+ *     under CSE (a libcall is treated as const), and the ROM has a single `bl`
+ *     as well.
  *
- * (2) BIRINCI DONGUDE SATIR ISARETCILERI SART   (fark 2 -> 0)
- *     Dogrudan `poly[i][2]` / `poly[i+1][2]` yazildiginda gcc'nin
- *     dongu-guclendirmesi taban givi +8 ile ONYUKLUYOR:
+ * (2) ROW POINTERS ARE REQUIRED IN THE FIRST LOOP   (2 -> 0 differences)
+ *     Written directly as `poly[i][2]` / `poly[i+1][2]`, gcc's loop strength
+ *     reduction PRELOADS the base giv with +8:
  *       ldr r3,[sp,#0] / adds r3,#8 / ldr r2,[r3,#0] / ldr r1,[r3,#12]
- *     ROM ise tabani ONYUKSUZ tutup ofsetleri mem'de birakiyor:
+ *     The ROM instead keeps the base UNPRELOADED and leaves the offsets in the
+ *     memory operands:
  *       ldr r3,[sp,#0] / ldr r2,[r3,#8] / ldr r1,[r3,#20]
- *     Fark tam 2 bayt.  Taban givin add_val'inin 0 olmasi icin dongude
- *     add_val = 0 olan bir giv BULUNMASI gerekiyor; `poly[i]` satir
- *     adresini bir yerele almak (`cur = poly[i];`) o givi uretiyor,
- *     `next = poly[i+1];` de onunla birlesip +12 ofsetine katlaniyor.
- *     Boylece `[r3,#8]` ve `[r3,#20]` cikiyor, `adds r3,#8` kayboluyor.
+ *     Exactly 2 bytes of difference.  For the base giv's add_val to be 0, a giv
+ *     with add_val = 0 must EXIST in the loop; taking the `poly[i]` row address
+ *     into a local (`cur = poly[i];`) produces that giv, and
+ *     `next = poly[i+1];` merges with it and folds into the +12 offset.
+ *     That yields `[r3,#8]` and `[r3,#20]`, and `adds r3,#8` disappears.
  *
- * ELENEN YOLLAR - BUNLARI TEKRAR DENEMEYIN
- * ----------------------------------------
- * Onceki oturumdan devralinan not (DUZELTILDI, yanlisti):
- *   - "`%` OPERATORU YASAK: agbcc __modsi3'e ceviriyor, sembol yok,
- *     dosya HIC derlenmiyor" -> sembolun YOKLUGU bir csv eksigiydi,
- *     dilin kisiti degil.  Elle sarmalama (`j = i+1; if (j>=count) j=0;`)
- *     188 bayt / fark 181 veriyordu; ROM gercekten cagri yapiyor.
- * Bu oturumda olculen ve elenen yollar:
- *   - `j = (i + 1) % count;` ayri deyim: 196 bayt, fark 127.
- *     Prolog `sub sp,#4` ile ciktigi icin dagitim bastan sapiyor.
- *   - Birinci donguyu tek satir isaretcisiyle yazmak (`a[2]` ve `a[5]`):
- *     200 bayt, fark 146 -- `a[5]` ayri bir giv uretmiyor, onyukleme
- *     geri geliyor.
- *   - `const s32 (*edge)[3] = &poly[i];` + `edge[0][2]`/`edge[1][2]`:
- *     200 bayt, fark 146.  Satir dizisi isaretcisi giv uretmiyor.
- *   - Isaretcileri bildirimde ilklendirmek ile ayri atamak arasinda
- *     FARK YOK (ikisi de 0); okunakli olan secildi.
+ * PATHS ELIMINATED - DO NOT RETRY THESE
+ * -------------------------------------
+ * A note inherited from an earlier session (CORRECTED; it was wrong):
+ *   - "THE `%` OPERATOR IS FORBIDDEN: agbcc turns it into __modsi3, the symbol
+ *     does not exist, the file does not compile AT ALL" -> the ABSENCE of the
+ *     symbol was a missing csv record, not a restriction of the language.
+ *     Wrapping by hand (`j = i+1; if (j>=count) j=0;`) gave 188 bytes / 181
+ *     differences; the ROM really does make a call.
+ * Paths measured and eliminated in this session:
+ *   - `j = (i + 1) % count;` as a separate statement: 196 bytes, 127
+ *     differences.  Because the prologue comes out as `sub sp,#4`, the
+ *     allocation diverges from the start.
+ *   - Writing the first loop with a single row pointer (`a[2]` and `a[5]`):
+ *     200 bytes, 146 differences -- `a[5]` does not produce a separate giv and
+ *     the preload comes back.
+ *   - `const s32 (*edge)[3] = &poly[i];` with `edge[0][2]`/`edge[1][2]`:
+ *     200 bytes, 146 differences.  A row-array pointer produces no giv.
+ *   - There is NO DIFFERENCE between initialising the pointers in their
+ *     declaration and assigning them separately (both give 0); the more
+ *     readable form was chosen.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/quad_edge_b1.c
- *             (yukaridaki __modsi3 kaydi eklendikten sonra)
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/quad_edge_b1.c
+ *             (after the __modsi3 record above has been added)
  */
 
 #include "gba_types.h"
@@ -100,15 +108,16 @@ s32 IsPointInPolygon(const s32 poly[][3], u16 count, const s32 *point, s32 toler
     minZ = 0;
     tolerance <<= 7;
 
-    /* Kenar kenar gezip SON kenarin z sinirlarini birakiyor: dongu her
-     * adimda maxZ/minZ'nin ustune yaziyor, biriktirme yok.  ROM ayni. */
+    /* Walks edge by edge and leaves the LAST edge's z bounds: the loop
+     * overwrites maxZ/minZ on every step, with no accumulation.  The ROM does
+     * the same. */
     for (i = 0; i < count - 1; i++) {
         const s32 *cur;
         const s32 *next;
 
-        /* Satir adresleri YEREL OLMAK ZORUNDA: dogrudan poly[i][2]
-         * yazimi taban givi +8 onyukluyor ve 2 fazla bayt uretiyor
-         * (basliktaki olcum 2). */
+        /* The row addresses MUST BE LOCALS: writing poly[i][2] directly
+         * preloads the base giv with +8 and produces 2 extra bytes
+         * (measurement 2 in the header). */
         cur = poly[i];
         next = poly[i + 1];
         if (cur[2] > next[2]) {
@@ -120,15 +129,16 @@ s32 IsPointInPolygon(const s32 poly[][3], u16 count, const s32 *point, s32 toler
         }
     }
 
-    /* Yukseklik penceresi disindaysa kenarlara hic bakilmiyor. */
+    /* If it is outside the height window, the edges are not examined at all. */
     if (maxZ < point[2] - tolerance) return 0;
     if (minZ > point[2] + tolerance) return 0;
 
     for (i = 0; i < count; i++) {
-        /* `(i + 1) % count` IFADENIN ICINDE kalmali: ayri bir deyime
-         * alinirsa __modsi3 cagrisi dongu basina kayiyor ve dagitim
-         * ROM'dan ayriliyor (basliktaki olcum 1).  Iki yazim CSE ile
-         * tek `bl`ye iniyor, ROM'da da tek cagri var. */
+        /* `(i + 1) % count` must stay INSIDE THE EXPRESSION: taken into a
+         * separate statement, the __modsi3 call moves to the top of the loop
+         * and the allocation diverges from the ROM (measurement 1 in the
+         * header).  The two writings collapse to a single `bl` under CSE, and
+         * the ROM has a single call as well. */
         side = ((((point[1] - poly[i][1]) >> 12)
                 * ((poly[(i + 1) % count][0] - poly[i][0]) >> 12)
                 - ((point[0] - poly[i][0]) >> 12)

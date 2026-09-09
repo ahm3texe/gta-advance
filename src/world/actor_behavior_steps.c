@@ -1,34 +1,38 @@
-/* Aktor davranis adimlari — 0x08017E3C-0x08018B73, 12 fonksiyon
+/* Actor behaviour steps — 0x08017E3C-0x08018B73, 12 functions
  *
- * TEK SABLONUN 12 KOPYASI.  tools/find_twins.py bandi %98.5 benzerlikle
- * isaret etti; ROM govdeleri komut komut karsilastirilinca dokuz 272
- * baytlik uyenin YALNIZCA BIR SABIT'te (FUN_080198e4'e verilen kimlik),
- * uc 312 baytlik uyenin de yalnizca "harman varken kullanilan sinir"
- * degerinde (3 ya da 4) ayrildigi gorildu.  Yontem: docs/WORKFLOW.md §10.
+ * 12 COPIES OF A SINGLE TEMPLATE.  tools/find_twins.py flagged the band at
+ * 98.5% similarity; comparing the ROM bodies instruction by instruction showed
+ * that the nine 272-byte members differ in only ONE CONSTANT (the id passed to
+ * FUN_080198e4), and the three 312-byte members only in the "limit used when a
+ * blend is present" value (3 or 4).  Method: docs/WORKFLOW.md section 10.
  *
- * IKI SABLON ARASINDAKI TEK YAPISAL FARK, 312 baytlik surumde her yolun
- * FUN_080198e4'e KENDI kimligini vermesi (125/126/127/128/123); 272
- * baytlik surumde hepsi ayni kimligi verdigi icin derleyici kuyruklari
- * birlestiriyor.
+ * THE ONLY STRUCTURAL DIFFERENCE BETWEEN THE TWO TEMPLATES is that in the
+ * 312-byte version each path passes its OWN id to FUN_080198e4
+ * (125/126/127/128/123); in the 272-byte version they all pass the same id, so
+ * the compiler merges the tails.
  *
- * 272 SURUMUNDE BELIRLEYICI OLAN (1 bayt farkla tikanmisti):
- *   - `!=0` yolunun IKI DALI DA kendi FUN_080198e4 cagrisini tasimali
- *     (312 surumundeki gibi), ama switch'inki TEK ORTAK cagri olmali.
- *     Ikisi de ortak yazilirsa 264 bayt cikiyor (8 bayt fazla birlestirme);
- *     ikisi de ayri yazilirsa 0x08017FFC'deki dal case 3'un kuyruguna
- *     baglaniyor, ROM'da case 1'in kuyruguna bagli (tam olarak 1 BAYT).
+ * WHAT WAS DECISIVE IN THE 272 VERSION (it had been stuck 1 byte off):
+ *   - BOTH BRANCHES of the `!=0` path must carry their own FUN_080198e4 call
+ *     (as in the 312 version), but the switch's must be a SINGLE SHARED call.
+ *     Written as shared in both places it comes out at 264 bytes (8 bytes of
+ *     over-merging); written separately in both, the branch at 0x08017FFC
+ *     links to case 3's tail, whereas in the ROM it links to case 1's tail
+ *     (exactly 1 BYTE).
  *
- * OLCULEN DIGER UC AYRINTI:
- *   - Sayac `gRam020230B4++ > limit` yazilmali; ayri yerelle okuyup geri
- *     yazmak ROM'un `lsls #24 / lsrs #24` sifir genisletmesini ve
- *     isaretsiz `bls` karsilastirmasini vermiyor (limit de u32 olmali).
- *   - `SelectWordSource` ve `FUN_0803c708` ayri yerellere alinmali; tek
- *     ifadede `x & y` yazilirsa `ands` hedefi ters donuyor.
- *   - Yon hesabinda ONCE bayrak, SONRA +0x0C okunmali; tek ifadede
- *     yazilirsa +0x0C yuklemesi cagrinin ARDINA kayiyor.
+ * THREE OTHER MEASURED DETAILS:
+ *   - The counter must be written `gRam020230B4++ > limit`; reading into a
+ *     separate local and writing back does not give the ROM's
+ *     `lsls #24 / lsrs #24` zero-extension or its unsigned `bls` comparison
+ *     (the limit must be u32 as well).
+ *   - `SelectWordSource` and `FUN_0803c708` must be taken into separate
+ *     locals; written as `x & y` in a single expression, the `ands`
+ *     destination is reversed.
+ *   - In the direction computation the flag must be read FIRST and +0x0C
+ *     SECOND; written as a single expression the +0x0C load moves AFTER the
+ *     call.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_behavior_steps.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_behavior_steps.c
  */
 
 #include "gba_types.h"
@@ -74,7 +78,7 @@ extern s32  FlagsToAngle(u32 flags);
 extern void RequestActorAction(Actor *self, s32 a, s32 b, s32 c);
 extern void FUN_080198e4(Actor *self, s32 a, s32 b, s32 c);
 
-/* 0x08017E3C — 312 bayt */
+/* 0x08017E3C — 312 bytes */
 void StepActorBehaviorB3(Actor *self)
 {
     Owner  *owner;
@@ -138,7 +142,7 @@ void StepActorBehaviorB3(Actor *self)
     }
 }
 
-/* 0x08017F74 — 272 bayt */
+/* 0x08017F74 — 272 bytes */
 void StepActorBehavior136(Actor *self)
 {
     Owner  *owner;
@@ -200,7 +204,7 @@ void StepActorBehavior136(Actor *self)
     }
 }
 
-/* 0x08018084 — 272 bayt */
+/* 0x08018084 — 272 bytes */
 void StepActorBehavior155(Actor *self)
 {
     Owner  *owner;
@@ -262,7 +266,7 @@ void StepActorBehavior155(Actor *self)
     }
 }
 
-/* 0x08018194 — 272 bayt */
+/* 0x08018194 — 272 bytes */
 void StepActorBehavior139(Actor *self)
 {
     Owner  *owner;
@@ -324,7 +328,7 @@ void StepActorBehavior139(Actor *self)
     }
 }
 
-/* 0x080182A4 — 272 bayt */
+/* 0x080182A4 — 272 bytes */
 void StepActorBehavior142(Actor *self)
 {
     Owner  *owner;
@@ -386,7 +390,7 @@ void StepActorBehavior142(Actor *self)
     }
 }
 
-/* 0x080183B4 — 272 bayt */
+/* 0x080183B4 — 272 bytes */
 void StepActorBehavior149(Actor *self)
 {
     Owner  *owner;
@@ -448,7 +452,7 @@ void StepActorBehavior149(Actor *self)
     }
 }
 
-/* 0x080184C4 — 272 bayt */
+/* 0x080184C4 — 272 bytes */
 void StepActorBehavior152(Actor *self)
 {
     Owner  *owner;
@@ -510,7 +514,7 @@ void StepActorBehavior152(Actor *self)
     }
 }
 
-/* 0x080185D4 — 272 bayt */
+/* 0x080185D4 — 272 bytes */
 void StepActorBehavior146(Actor *self)
 {
     Owner  *owner;
@@ -572,7 +576,7 @@ void StepActorBehavior146(Actor *self)
     }
 }
 
-/* 0x080186E4 — 312 bayt */
+/* 0x080186E4 — 312 bytes */
 void StepActorBehaviorB4a(Actor *self)
 {
     Owner  *owner;
@@ -636,7 +640,7 @@ void StepActorBehaviorB4a(Actor *self)
     }
 }
 
-/* 0x0801881C — 312 bayt */
+/* 0x0801881C — 312 bytes */
 void StepActorBehaviorB4b(Actor *self)
 {
     Owner  *owner;
@@ -700,7 +704,7 @@ void StepActorBehaviorB4b(Actor *self)
     }
 }
 
-/* 0x08018954 — 272 bayt */
+/* 0x08018954 — 272 bytes */
 void StepActorBehavior130(Actor *self)
 {
     Owner  *owner;
@@ -762,7 +766,7 @@ void StepActorBehavior130(Actor *self)
     }
 }
 
-/* 0x08018A64 — 272 bayt */
+/* 0x08018A64 — 272 bytes */
 void StepActorBehavior133(Actor *self)
 {
     Owner  *owner;

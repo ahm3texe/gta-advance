@@ -1,11 +1,11 @@
-/* Ek istatistik sayaclari (2) — 0x08067374-0x080673A5
+/* Additional statistics counters (2) — 0x08067374-0x080673A5
  *
- * gSaveBuffer'in +0x7A (u16) ve +0x84 (u8) alanlarina tasma korumali
- * artirim. u16 icin src/world/stat_counters.c'nin desenin aynisi;
- * u8 icin de ayni yapi (bu sefer `lsls #24` sifir-genisletme yeter).
+ * Overflow-protected increments at gSaveBuffer +0x7A (u16) and +0x84 (u8).
+ * The u16 case uses the stat_counters.c pattern; u8 uses the same structure
+ * with lsls #24 sufficient for the zero test.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/more_counters_2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/more_counters_2.c
  */
 
 #include "gba_types.h"

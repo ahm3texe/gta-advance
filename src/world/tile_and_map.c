@@ -1,11 +1,11 @@
-/* Karo alan getirici (2. deger) ve harita boyutlari — 0x080424A8-0x080424E5
+/* Tile field getter (second value) and map dimensions — 0x080424A8-0x080424E5
  *
- * Ilk fonksiyon src/world/map_tile_fields.c'deki GetTileFieldA'nin
- * kardesi (ayni yapi, farkli konum). Ikincisi harita baglaminin ilk
- * iki u16'sini (genislik/yukseklik olabilir) iki dest'e yaziyor.
+ * The first is a sibling of GetTileFieldA in map_tile_fields.c (same structure,
+ * different position). The second writes the map context's first two u16
+ * values, possibly width/height, to two destinations.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/tile_and_map.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/tile_and_map.c
  */
 
 #include "gba_types.h"

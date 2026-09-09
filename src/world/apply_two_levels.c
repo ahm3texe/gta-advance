@@ -1,24 +1,25 @@
-/* Iki seviyeyi kirpip uygulama — 0x0803C0E4-0x0803C177
+/* Clamping and applying two levels — 0x0803C0E4-0x0803C177
  *
- * Bayragin 0. biti kuruluysa gRam02000F10 +0x0C'ye, 1. biti kuruluysa
- * (ve oyun durumu etkinse) gRam02001140 +0x0C'ye degeri yaziyor. Her
- * ikisinde de deger [0, 0x10000] araligina kirpiliyor, sonra secici
- * uygun degerdeyse FUN_08030A60'a olceklenmis hali veriliyor.
+ * If bit 0 of the flag is set it writes the value to gRam02000F10 +0x0C; if
+ * bit 1 is set (and the game state is active) to gRam02001140 +0x0C.  In both
+ * cases the value is clamped to [0, 0x10000], and if the selector holds the
+ * right value the scaled form is passed to FUN_08030A60.
  *
- * ONEMLI ASIMETRI: secici (gSlotSelector) BIRINCI blokta ISARETLI
- * okunuyor (`ldrsh`, != 0 sinamasi), IKINCI blokta ISARETSIZ (`ldrh`,
- * == 1 sinamasi). Ikisini ayni yazmak farkli yukleme komutu uretir.
+ * AN IMPORTANT ASYMMETRY: the selector (gSlotSelector) is read SIGNED in the
+ * FIRST block (`ldrsh`, a != 0 test) and UNSIGNED in the SECOND (`ldrh`, a
+ * == 1 test).  Writing the two the same way produces a different load
+ * instruction.
  *
- * Ust sinir `0x80 << 9` ile kuruluyor; duz 0x10000 havuz yuklemesi
- * uretirdi.
+ * The upper bound is built as `0x80 << 9`; a plain 0x10000 would have produced
+ * a pool load.
  *
- * gRam02000F10 ve gRam02001140 paylasilan ham depolama
- * (include/ram_symbols.h); yerelde cast ediliyor.
+ * gRam02000F10 and gRam02001140 are shared raw storage
+ * (include/ram_symbols.h); they are cast in a local.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` indicates a void return type.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/apply_two_levels.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/apply_two_levels.c
  */
 
 #include "gba_types.h"
@@ -41,12 +42,12 @@ typedef struct GameState {
 
 extern u16 gSlotSelector;
 
-/* Ayni sembol bu fonksiyonda IKI FARKLI isaretlilikle okunuyor: birinci
-   blokta `ldrsh` (isaretli), ikincide `ldrh` (isaretsiz). Satir ici
-   `(s16)` cast'i ve volatile okuma AGBCC TARAFINDAN ATILIYOR (sifirla
-   karsilastirmada isaret gereksiz sayiliyor, 144 bayt cikiyor); ayri bir
-   makro bildirimi korunuyor ve `movs r2,#0` + `ldrsh r0,[r0,r2]` ciftini
-   uretiyor. */
+/* The same symbol is read with TWO DIFFERENT SIGNEDNESSES in this function:
+   `ldrsh` (signed) in the first block, `ldrh` (unsigned) in the second.  An
+   inline `(s16)` cast and a volatile read are BOTH DISCARDED BY AGBCC (the
+   sign is treated as irrelevant in a comparison against zero, and 144 bytes
+   come out); a separate macro declaration survives and produces the
+   `movs r2,#0` + `ldrsh r0,[r0,r2]` pair. */
 #define gSlotSelectorSigned (*(s16 *)&gSlotSelector)
 extern GameState gGameState;
 

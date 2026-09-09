@@ -1,10 +1,10 @@
-/* Kip sorgulari — 0x0806233C-0x08062363
+/* Mode queries — 0x0806233C-0x08062363
  *
- * 0x02036050'deki bayti 2 ile karsilastirip 1/0 donduruyor; yapi
- * IsStateReady ile ozdes, yalnizca alan bayt ve ofset +0.
+ * Compare the byte at 0x02036050 with 2 and return 1/0. The structure is
+ * identical to IsStateReady, except that the field is a byte at offset +0.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_mode_two.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_mode_two.c
  */
 
 #include "gba_types.h"

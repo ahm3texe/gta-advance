@@ -1,12 +1,12 @@
-/* Sayac tamponundan ayirma — 0x0803385C-0x0803388F
+/* Allocate from the counter buffer — 0x0803385C-0x0803388F
  *
- * AddToCounter (src/world/add_to_counter.c) ile ayni baslik (gRom08CA6A08);
- * burada +0x00 doluluk alani kullaniliyor: baslik + 4 + eski doluluk
- * adresi doner, yeni doluluk (u16) 0xBA8'i asarsa geri alip 0 doner.
- * Isaretci `c + (cur + 4)` seklinde yazilmali (ROM once cur+4 hesapliyor).
+ * Uses the same header (gRom08CA6A08) as AddToCounter in add_to_counter.c, but
+ * uses the count at +0x00. Return header + 4 + the previous count; if the new
+ * u16 count exceeds 0xBA8, roll back and return 0. Write the pointer as
+ * `c + (cur + 4)` because the ROM computes cur+4 first.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/alloc_from_counter.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/alloc_from_counter.c
  */
 
 #include "gba_types.h"

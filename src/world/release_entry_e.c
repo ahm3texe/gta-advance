@@ -1,12 +1,11 @@
-/* Havuz girisini birakma (E havuzu) — 0x080294B4-0x080294E3
+/* Release a pool entry (pool E) — 0x080294B4-0x080294E3
  *
- * ReleaseEntryD (src/world/release_entry_d.c) ile KOMUT KOMUT ayni;
- * tek fark taban tablo (gRam020254D0). tools/find_twins.py bunu
- * %95.8 benzerlikle isaret etti, kardesin kaynagi kopyalanip taban
- * degistirildi (docs/WORKFLOW.md §10).
+ * Instruction-for-instruction identical to ReleaseEntryD (release_entry_d.c)
+ * except for the base table gRam020254D0. tools/find_twins.py reported 95.8%
+ * similarity; copied the sibling source and changed the base (WORKFLOW.md §10).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/release_entry_e.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/release_entry_e.c
  */
 
 #include "gba_types.h"
@@ -15,11 +14,11 @@ typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 timer;                  /* +0x02 */
-    u8  sub[38];                /* +0x04, ReleaseObject'ye verilir */
-    u8  pad2a[106];             /* toplam 148 = 0x94 */
+    u8  sub[38];                /* +0x04, passed to ReleaseObject */
+    u8  pad2a[106];             /* total 148 = 0x94 */
 } Entry;
 
-extern Entry gRam020254D0[];    /* 5 giris */
+extern Entry gRam020254D0[];    /* 5 entries */
 
 extern void ReleaseObject(u8 *sub);
 

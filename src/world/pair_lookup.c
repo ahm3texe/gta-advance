@@ -1,11 +1,11 @@
-/* Cift indekslemeli lookup — 0x0802392C-0x08023973
+/* Pair-index lookup — 0x0802392C-0x08023973
  *
- * Iki fonksiyon. Ilki bir u32'yi sifirliyor. Ikincisi (a, b) ciftinden
- * bir index (0..7) donuyor: her a icin b'nin belli bir degerle esitligi
- * ciftin daha kucuk indeksini, degilse buyugunu donuyor.
+ * Two functions. The first clears a u32. The second maps (a,b) to an index
+ * 0..7: for each a, equality of b with a particular value selects the lower
+ * index of the pair; otherwise select the higher one.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/pair_lookup.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/pair_lookup.c
  */
 
 #include "gba_types.h"

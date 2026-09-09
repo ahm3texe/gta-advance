@@ -1,38 +1,40 @@
-/* Hedefe yonelme denemesi — 0x0803F4BC-0x0803F62F
+/* Trying to engage a target — 0x0803F4BC-0x0803F62F
  *
- * Iki nesneyi cozup bayraklarini sinar, aralarindaki mesafeyi SEKIZGEN
- * YAKLASIMLA olcer (|dx|+|dy| - min/2 - min/4 + min/16) ve esikleri
- * gecerse FUN_0803CE64 ile bildirim yapar.
+ * Resolves two objects and tests their flags, measures the distance between
+ * them by an OCTAGONAL APPROXIMATION (|dx|+|dy| - min/2 - min/4 + min/16) and,
+ * if it passes the thresholds, notifies via FUN_0803CE64.
  *
- * Konum secimi: +0x08 baytinin 0x30 maskesi doluysa (+0x20)+4, degilse
- * +0x18 kullaniliyor -- iki nesne icin de ayni kalip.
+ * The position selection: if mask 0x30 of the +0x08 byte is set, (+0x20)+4 is
+ * used, otherwise +0x18 -- the same pattern for both objects.
  *
- * Kural 33: maskeler AYRI sonuc yereline konup yerinde `&=` yapiliyor
- * (ROM `movs r0,#48` ile maskeyi ONCE kuruyor).
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Rule 33: the masks go into SEPARATE result locals and are updated in place
+ * with `&=` (the ROM builds the mask FIRST with `movs r0,#48`).
+ * Rule 35: `pop {r1}; bx r1` -> r0 carries a return value, so the signature is
+ * u32.
  *
- * ORTA BOY OLCEKLENDIRME DENEYI (372 bayt). Sonuc: 211/372.
+ * A MID-SIZE SCALING EXPERIMENT (372 bytes).  Result: 211/372.
  *
- * NE OLCEKLENDI: yapisal cozumleme. Boyut TAM DOGRU (372/372), prolog
- * birebir, ilk 10 halfword birebir, cagri dizisi birebir. Yani ROM'un ne
- * yaptigini okumak ve C'ye cevirmek 372 baytta da calisiyor.
+ * WHAT SCALED: the structural analysis.  The size is EXACTLY right (372/372),
+ * the prologue is identical, the first 10 halfwords are identical, the call
+ * sequence is identical.  So reading what the ROM does and translating it into
+ * C works at 372 bytes too.
  *
- * NE OLCEKLENMEDI: register dagitimi. +0x14'ten itibaren kaydiriyor --
- * ROM ilk sonucu r5'e, ctx->obj'i r6'ya koyuyor; bizimki r4 ve r5
- * kullaniyor. Tek register'lik bu kayma fonksiyonun geri kalanina
- * yayiliyor ve 130 halfword'u birden bozuyor.
+ * WHAT DID NOT SCALE: the register allocation.  From +0x14 onwards it drifts
+ * -- the ROM puts the first result in r5 and ctx->obj in r6; ours uses r4 and
+ * r5.  That single-register shift propagates through the rest of the function
+ * and breaks 130 halfwords at once.
  *
- * Denendi: yerel sayisini azaltmak (depth ve angle yerellerini dist ile
- * paylastirmak) -- cikti KISALDI, daha kotu.
+ * Tried: reducing the number of locals (sharing the depth and angle locals
+ * with dist) -- the output got SHORTER, which is worse.
  *
- * TESHIS: bu, kucuk fonksiyonlarda 88-100 baytta karsilastigim "bir fazla
- * canli deger" sinifinin ta kendisi (bkz. ClipBounds, CleanupAreaTiles,
- * UpdateFocusPoint). Fark su: 100 baytta tek bir yerde cikiyor ve
- * kovalanabiliyor; 372 baytta r8/r9'a tasan alti canli deger var ve
- * kayma her yere yayiliyor.
+ * DIAGNOSIS: this is exactly the "one live value too many" class met at 88-100
+ * bytes in small functions (see ClipBounds, CleanupAreaTiles,
+ * UpdateFocusPoint).  The difference: at 100 bytes it appears in a single
+ * place and can be chased down; at 372 bytes there are six live values
+ * spilling into r8/r9 and the drift spreads everywhere.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/try_engage_target.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/try_engage_target.c
  */
 
 #include "gba_types.h"

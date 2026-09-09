@@ -1,10 +1,10 @@
-/* Iletisim bayragi — 0x08066A40-0x08066A53
+/* Communication flag — 0x08066A40-0x08066A53
  *
- * `gRam02036328`'in isaret ettigi struct (bkz. 0x08066A40 ROM) icinde
- * byte0 != 0 iken byte6'yi 1 yapiyor.
+ * In the structure pointed to by gRam02036328 (see the ROM at 0x08066A40),
+ * set byte6 to 1 when byte0 != 0.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/comm_flag.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/comm_flag.c
  */
 
 #include "gba_types.h"

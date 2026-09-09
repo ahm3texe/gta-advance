@@ -1,60 +1,65 @@
-/* Baglanti raporundan yuzde skoru — 0x08067014-0x08067183
+/* The percentage score from the link report — 0x08067014-0x08067183
  *
- * Rapor kaydindaki alanlar uzerinde bir dizi esik kontrolu yapip kac
- * tanesinin tuttugunu sayiyor, sonra `(100 * (bas + sayi)) / (basAlt + 23)`
- * yuzdesini dondururuyor. Sonuc 99'da kirpiliyor; esik zaten asilmissa
- * dogrudan 100 doner.
+ * Runs a series of threshold checks over the fields of the report record,
+ * counts how many hold, then returns the percentage
+ * `(100 * (base + count)) / (baseLow + 23)`.  The result is clipped at 99; if
+ * the threshold has already been exceeded it returns 100 directly.
  *
- * Istatistik blogu 0x08066AA8'de kayit tamponunun +0x64'unden kopyalanan
- * 36 bayt. Icindeki 5 bitlik sayaclar BumpRankCounter (0x08066C94) ile
- * ayni yerlesim: rapor +0x2E, gSaveBuffer +0x7E'nin ta kendisi.
+ * The statistics block is the 36 bytes copied at 0x08066AA8 from the record
+ * buffer's +0x64.  The 5-bit counters inside it have the same layout as in
+ * BumpRankCounter (0x08066C94): the report's +0x2E is gSaveBuffer's +0x7E
+ * itself.
  *
- * Bolme dogrudan __divsi3 cagrisi olarak yazildi; `/` operatoru
- * baska bir yardimci uretiyor (src/text/text_f5.c'deki olcum).
+ * The division is written as a direct __divsi3 call; the `/` operator produces
+ * a different helper (measured in src/text/text_f5.c).
  *
- * DURUM: PARK — 332/368 bayt, 85/183 komut ayni. Yapisi ve esik zinciri
- * dogru; kalan fark yazmac dagitimi.
+ * STATUS: PARKED — 332/368 bytes, 85/183 instructions the same.  Its structure
+ * and threshold chain are right; the remaining difference is register
+ * allocation.
  *
- * SON TURDA KAPATILAN IKI SINIF:
- *   - `rankA/B/C > 19` ISARETSIZ olmali (`> (u32)19`). Alan `u32 : 5`
- *     olmasina ragmen `int`'e yukseldigi icin duz `> 19` ISARETLI `ble`
- *     uretiyordu; ROM'da `bls` var (kural 56'nin doyum satiri). lapA/B/C
- *     ayni yazimla zaten `bls` uretiyor, cast gerekmiyor.
- *   - Kuyruk blogunun SIRASI: `if (total >= limit) return 100;` sonra duz
- *     hesap. Onceki `if (total < limit) { hesap } return 100;` yazimi
- *     hesabi one aliyordu; ROM once 100 donusunu yerlestiriyor
- *     (`blt <hesap> / movs r0,#100 / b <son>`). Kuyruk artik tam ayni.
+ * TWO CLASSES CLOSED IN THE LAST ROUND:
+ *   - `rankA/B/C > 19` must be UNSIGNED (`> (u32)19`).  Even though the field
+ *     is `u32 : 5`, it promotes to `int`, so a plain `> 19` produced a SIGNED
+ *     `ble`; the ROM has `bls` (rule 56's saturation row).  lapA/B/C already
+ *     produce `bls` with the same spelling and need no cast.
+ *   - THE ORDER of the tail block: `if (total >= limit) return 100;` then the
+ *     plain computation.  The earlier
+ *     `if (total < limit) { computation } return 100;` put the computation
+ *     first; the ROM places the 100 return first
+ *     (`blt <computation> / movs r0,#100 / b <end>`).  The tail is now exactly
+ *     the same.
  *
- * KALAN TEK SINIF (36 bayt = ~18 komut): ROM `report` isaretcisini
- * `ip`'de (r12) tutup her erisimden once dusuk bir yazmaca kopyaliyor
- * (`mov r0, ip`); biz onu r3'te tutuyoruz ve o 15 kopya komutu hic
- * uretmiyoruz. Sebep dagitim tablosunda gorunuyor (dump_alloc):
- *   - lap ucllusunde biz de ROM gibi `<<` ARA sonucunu canli tutuyoruz
- *     (109/114/121 -> r6/r5/r4) ve toplamlarda `lsrs`i yeniden uretiyoruz;
- *     bu blok ROM ile bire bir ayni.
- *   - rank ucllusunde ise CSE `(x<<k)>>27` ifadesinin TAMAMINI birlestirip
- *     CIKARILMIS degeri canli tutuyor (95/98/103 -> r12/r8/r1) ve iki
- *     toplam testini de tek hesaba indiriyor; ROM her ikisini yeniden
- *     hesapliyor. Fark kabin genisliginden geliyor: lap alanlari `u16`
- *     kapta (HImode ara donusumleri CSE'yi kiriyor), rank alanlari `u32`
- *     kapta. rankB 13-17. bitleri kapsadigi icin kap `u32` OLMAK ZORUNDA
- *     (kural 61; ROM `ldr r0,[r1,#32]` yapiyor), yani bu kolu kaynak
- *     tarafindan cevirmek mumkun degil. Dusuk yazmaclar bosaldigi icin
- *     `report` r3'te kaliyor ve ROM'un `ip` bicimi cikmiyor.
+ * THE ONE REMAINING CLASS (36 bytes = ~18 instructions): the ROM keeps the
+ * `report` pointer in `ip` (r12) and copies it into a low register before
+ * every access (`mov r0, ip`); we keep it in r3 and never emit those 15 copy
+ * instructions.  The reason shows up in the allocation table (dump_alloc):
+ *   - In the lap triple we, like the ROM, keep the INTERMEDIATE `<<` result
+ *     live (109/114/121 -> r6/r5/r4) and re-emit the `lsrs` in the sums; that
+ *     block is identical to the ROM's.
+ *   - In the rank triple, however, CSE merges the WHOLE `(x<<k)>>27`
+ *     expression and keeps the EXTRACTED value live (95/98/103 -> r12/r8/r1),
+ *     reducing both sum tests to a single computation; the ROM recomputes both.
+ *     The difference comes from the container width: the lap fields are in a
+ *     `u16` container (the HImode intermediate conversions break CSE) while the
+ *     rank fields are in a `u32` one.  Because rankB spans bits 13-17 the
+ *     container MUST be `u32` (rule 61; the ROM does `ldr r0,[r1,#32]`), so
+ *     this lever cannot be turned from the source side.  With the low registers
+ *     freed up, `report` stays in r3 and the ROM's `ip` form does not appear.
  *
- * BULUNAN KOL (uygulandi): bir `u8` alani birden fazla ifadede
- * kullaniyorsan ONCE YERELE al. Dogrudan uye erisimi agbcc'ye gereksiz
- * `lsls #24 / lsrs #24` sifir-genisletme cifti urettiriyor; yerel bunu
- * kaldiriyor. queryA ikilisinde olculdu.
+ * THE LEVER FOUND (applied): if you use a `u8` field in more than one
+ * expression, take it into a LOCAL FIRST.  Direct member access makes agbcc
+ * emit a redundant `lsls #24 / lsrs #24` zero-extension pair; a local removes
+ * it.  Measured on the queryA pair.
  *
- * ELENEN YAZIMLAR (bu turda olculdu):
- *   - Ayni kolu queryB dortlusune uygulamak (curB/altB yerelleri):
- *     85 -> 59 komut. ROM +0x06 ve +0x07'yi YENIDEN OKUDUGU icin orada
- *     dogrudan uye erisimi sart — kural 55'in ters yonu dogrulandi.
- *   - Toplam testlerinden `(s32)` cast'ini kaldirmak: degisiklik yok (85).
+ * SPELLINGS RULED OUT (measured this round):
+ *   - Applying the same lever to the queryB quadruple (curB/altB locals):
+ *     85 -> 59 instructions.  Because the ROM RE-READS +0x06 and +0x07, direct
+ *     member access is required there -- the reverse direction of rule 55,
+ *     confirmed.
+ *   - Removing the `(s32)` cast from the sum tests: no change (85).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_score.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_score.c
  */
 
 #include "gba_types.h"

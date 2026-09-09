@@ -1,10 +1,10 @@
-/* Yuvaya dogma sarmalayicisi — 0x08028CE8-0x08028D43
+/* Spawn-at-slot wrapper — 0x08028CE8-0x08028D43
  *
- * SelectSlotAB/SelectSlotCD ile secilen yuvadan nesneyi ve tur baytini
- * alip FUN_08024cd8'e sekiz argumanla gecirir; sonucun u8'i doner.
+ * Obtain the object and type byte from the slot selected by SelectSlotAB/
+ * SelectSlotCD, pass eight arguments to FUN_08024cd8, and return its u8 result.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/spawn_at_slot.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/spawn_at_slot.c
  */
 
 #include "gba_types.h"

@@ -1,20 +1,20 @@
-/* Yuvanin tuttugu nesneyi birakma — 0x08031658-0x08031683
+/* Release the object held by a slot — 0x08031658-0x08031683
  *
- * ReleaseSlotSub (src/video/blit_strip_plain.c, 0x08031684) ile KOMUT
- * KOMUT ayni; iki fark var: bayrak eleman ici +0xB0 (blok basi +0xEC)
- * ve birakilan alan eleman ici +0x1C (blok basi +0x58).
- * tools/find_twins.py %90.9 benzerlikle isaret etti.
+ * Instruction-for-instruction equivalent to ReleaseSlotSub
+ * (src/video/blit_strip_plain.c, 0x08031684), with two offset differences:
+ * flag at entry +0xB0 (block +0xEC), released field at entry +0x1C
+ * (block +0x58). tools/find_twins.py reported 90.9% similarity.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/release_slot_held.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/release_slot_held.c
  */
 
 #include "gba_types.h"
 #include "ram_symbols.h"
 
 #define SLOT_STRIDE  180            /* 0xB4 */
-#define OFF_HELD     0x58           /* blok basi; eleman ici +0x1C */
-#define OFF_FLAG     0xEC           /* blok basi; eleman ici +0xB0 */
+#define OFF_HELD     0x58           /* relative to block; entry +0x1C */
+#define OFF_FLAG     0xEC           /* relative to block; entry +0xB0 */
 
 extern void ReleaseObject(u8 *sub);
 

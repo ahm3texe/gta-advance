@@ -1,101 +1,109 @@
-/* Iki katmanli varlik listesinde her dugum icin cizim gonderimi
- * 0x0801515C-0x080151BF, 100 bayt  [ESLESTI]
+/* Draw submission for every node of the two-layer entry list
+ * 0x0801515C-0x080151BF, 100 bytes  [MATCHED]
  *
- * ROM'un yaptigi is (kardes ReleaseEntryResources ile ayni gezinme iskeleti):
- *   0x020230A0'daki bas isaretcisinden baslayarak +0x3C ile bagli dis
- *   listeyi geziyor.  Her dis dugum ayni zamanda +0x44 ile bagli ic
- *   listenin BASI oluyor.  Ic listedeki her dugum icin, +0x30 alani
- *   doluysa:
+ * What the ROM does (the same traversal skeleton as the sibling
+ * ReleaseEntryResources):
+ *   Starting from the head pointer at 0x020230A0, it walks the outer list
+ *   linked through +0x3C.  Each outer node is at the same time the HEAD of
+ *   the inner list linked through +0x44.  For every node in the inner list,
+ *   if the +0x30 field is non-empty:
  *     node->unk1c = AllocDrawEntry(node->unk10, (w * h) >> 1,
  *                                w >> 3, h >> 3, node->flags20);
  *     if (node->kind27 == 1) node->flags20 |= 0x2000;
- *   Burada w = +0x14, h = +0x15 bayt alanlari; piksel olcusu gibi
- *   davraniyorlar: 8'e bolununce karo sayisi, carpilip ikiye bolununce
- *   4bpp bayt boyutu cikiyor.  Kardes dosyadan farkli olarak +0x30
- *   burada ARALIK suzgecinden gecmiyor, sadece sifir mi diye bakiliyor.
+ *   Here w = the +0x14 and h = the +0x15 byte fields; they behave like pixel
+ *   dimensions: divided by 8 they give the tile count, multiplied together
+ *   and halved they give the 4bpp byte size.  Unlike in the sibling file,
+ *   +0x30 does not go through a RANGE filter here, it is only checked for
+ *   zero.
  *
- * ROM'DAN OKUNAN AYRINTILAR
+ * DETAILS READ FROM THE ROM
  * -------------------------
- * (1) +0x30 KONTROLU carpimdan SONRA geliyor: r6/r2/r3 yuklemeleri ve
- *     `muls`/`asrs` dalin ustunde duruyor.  Bu yuzden yuklemeler ve
- *     yarim-boyut hesabi kaynakta da `if`ten ONCE ayri deyimler.
- *     Olculdu: `half`i `if`in icine almak 20, `src`i icine almak 26
- *     bayt fark birakiyor -- agbcc yuklemeleri dalin ustune tasimiyor.
- * (2) W VE H YERELLERI u8 OLMALI -- ESLESMEYI ACAN TEK OLCUM.
- *     u32 yazildiginda komut akisi HARFI HARFINE ayni cikiyor, sadece
- *     r5 ile r6 yer degistiriyor (8 bayt): `outer` r6'ya, `src` r5'e
- *     dusuyor, ROM'da tersi.  Yani kural 50 kaldiraci burada dogrudan
- *     `outer`/`src` uzerinden degil, dar tipli iki komsu pseudo'nun
- *     omru uzerinden calisiyor; dar tip dagitim sirasini ceviriyor ve
- *     `outer` once dagitilip r5'i aliyor.  u8/u32 karisimi (biri dar,
- *     oteki genis) yine 8 bayt, s32 ise 10 bayt fark veriyor.
- * (3) Isaretlilik cakismasi gorunustedir: ayni r2/r3 icin ROM hem
- *     `asrs r1,r0,#1` (isaretli) hem `lsrs r2,r2,#3` (isaretsiz)
- *     kullaniyor.  u8 yerel int'e yukseldigi icin `(w * h) >> 1`
- *     isaretli kaydirma verirken, degerin ust bitleri sifir bilindigi
- *     icin `w >> 3` mantiksal kaydirmaya sadelestiriliyor.  Kaynakta
- *     zorlama gerekmiyor: `(s32)` donusumu ve `/ 2` yazimi da ayni
- *     baytlari veriyor, en yalin olan birakildi.
- * (4) Besinci arguman yigittan geciyor (`sub sp,#4` + `str r0,[sp,#0]`),
- *     ldrh ile okunup 32 bit yaziliyor: imza son parametreyi u16 aliyor
- *     (u32 yazmak da ayni baytlari veriyor, dar tip ROM'a daha sadik).
- * (5) +0x27 ofseti ldrb immediate sinirini (#31) astigi icin agbcc
- *     adresi kendiliginden ayri yazmaca aliyor; kaynakta isaretci
- *     yereli YOK (kardes dosyada da boyle olculmustu).
- * (6) Iki dongu de GIRIS KORUMALI + alttan donen bicim; ic dongunun
- *     korumasi dis degiskeni (r5) test ediyor, cunku `node = outer;`
- *     kopyasindan sonra kosul CSE ile outer uzerinden yaziliyor.
- *     Kural 49: fonksiyonun sonunda seyrek govde yok.
+ * (1) The +0x30 CHECK comes AFTER the multiplication: the r6/r2/r3 loads and
+ *     the `muls`/`asrs` sit above the branch.  That is why the loads and the
+ *     half-size computation are separate statements BEFORE the `if` in the
+ *     source too.  Measured: moving `half` inside the `if` leaves 20 bytes
+ *     off and moving `src` inside leaves 26 bytes off -- agbcc does not move
+ *     the loads above the branch.
+ * (2) THE W AND H LOCALS MUST BE u8 -- THE ONE MEASUREMENT THAT OPENED THE
+ *     MATCH.  When they are written as u32 the instruction stream comes out
+ *     LITERALLY the same, only r5 and r6 swap places (8 bytes): `outer` falls
+ *     into r6 and `src` into r5, the reverse of the ROM.  So the rule 50
+ *     lever works here not directly through `outer`/`src` but through the
+ *     lifetimes of two neighbouring narrow-typed pseudos; the narrow type
+ *     flips the allocation order and `outer` gets allocated first and takes
+ *     r5.  A mixture of u8/u32 (one narrow, the other wide) is again 8 bytes,
+ *     and s32 gives 10 bytes off.
+ * (3) The signedness conflict is only apparent: for the same r2/r3 the ROM
+ *     uses both `asrs r1,r0,#1` (signed) and `lsrs r2,r2,#3` (unsigned).
+ *     Because the u8 local promotes to int, `(w * h) >> 1` gives a signed
+ *     shift, while `w >> 3` is simplified to a logical shift since the upper
+ *     bits of the value are known to be zero.  No forcing is needed in the
+ *     source: an `(s32)` cast and writing `/ 2` give the same bytes as well,
+ *     and the plainest one was kept.
+ * (4) The fifth argument goes through the stack (`sub sp,#4` +
+ *     `str r0,[sp,#0]`), is read with ldrh and written as 32 bits: the
+ *     signature takes the last parameter as u16 (writing u32 gives the same
+ *     bytes too, but the narrow type is more faithful to the ROM).
+ * (5) Since the +0x27 offset exceeds the ldrb immediate limit (#31), agbcc
+ *     takes the address into a separate register on its own; there is NO
+ *     pointer local in the source (it had been measured this way in the
+ *     sibling file too).
+ * (6) Both loops are ENTRY-GUARDED + bottom-testing in shape; the inner
+ *     loop's guard tests the outer variable (r5), because after the
+ *     `node = outer;` copy the condition is written through outer via CSE.
+ *     Rule 49: there is no cold body at the end of the function.
  *
- * DENENIP ELENEN YAZIMLAR
+ * WRITINGS TRIED AND REJECTED
  * -----------------------
- * - `u32 w, h` (ve u8/u32 karisimi, `s32`): komut akisi ayni, r5<->r6
- *   ters, 8-10 bayt fark.  Yukarida (2).
- * - Kural 33 bicimi (`bits = 0x2000; bits |= flags20; flags20 = bits;`):
- *   ROM'daki sabit kopyasini (`adds r0,r1,#0`) SILIYOR, 96 bayt cikiyor.
- *   Bu fonksiyonda dogru yazim duz `|=`; kural 33 evrensel degil.
- * - `src`i `if`in icine almak (26 bayt), `half`i icine almak (20 bayt).
- * - Etkisiz kalanlar (yine 8 bayt, yani dagitimi cevirmiyorlar):
- *   bildirim sirasi permutasyonlari, `for` bicimli iki dongu, ic dongu
- *   icin acik `if (outer != 0)` korumasi, ayri `head` yereli (kural 22
- *   denemesi), `src`in `u8 *` yazilmasi.
+ * - `u32 w, h` (and the u8/u32 mixture, `s32`): the instruction stream is the
+ *   same, r5<->r6 are reversed, 8-10 bytes off.  See (2) above.
+ * - The rule 33 shape (`bits = 0x2000; bits |= flags20; flags20 = bits;`):
+ *   it DELETES the constant copy in the ROM (`adds r0,r1,#0`), giving
+ *   96 bytes.  In this function the correct writing is a plain `|=`; rule 33
+ *   is not universal.
+ * - Moving `src` inside the `if` (26 bytes), moving `half` inside (20 bytes).
+ * - Ones that had no effect (again 8 bytes, i.e. they do not flip the
+ *   allocation): permutations of the declaration order, the two loops in
+ *   `for` shape, an explicit `if (outer != 0)` guard for the inner loop, a
+ *   separate `head` local (a rule 22 attempt), writing `src` as `u8 *`.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/level_step_b2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/level_step_b2.c
  */
 
 #include "gba_types.h"
 
-/* Gonderim yordami: kaynak, 4bpp bayt boyutu, karo olcusu ve bayraklar.
-   Imza ROM'un cagri kurulumundan okundu; fonksiyonun kendisi
-   (0x08012E78) henuz cozulmedi. */
+/* Submission routine: source, 4bpp byte size, tile dimensions and flags.
+   The signature was read from the ROM's call setup; the function itself
+   (0x08012E78) has not been decompiled yet. */
 void *AllocDrawEntry(void *src, s32 size, u32 tilesX, u32 tilesY, u16 flags);
 
 typedef struct Entry {
     u8            pad00[0x10];
-    void         *unk10;        /* +0x10 AllocDrawEntry'in ilk argumani */
-    u8            width14;      /* +0x14 piksel genisligi */
-    u8            height15;     /* +0x15 piksel yuksekligi */
+    void         *unk10;        /* +0x10 first argument of AllocDrawEntry */
+    u8            width14;      /* +0x14 pixel width */
+    u8            height15;     /* +0x15 pixel height */
     u8            pad16[6];
-    void         *unk1c;        /* +0x1C cagrinin donusu buraya yaziliyor */
+    void         *unk1c;        /* +0x1C the return of the call is written here */
     u16           flags20;      /* +0x20 */
     u8            pad22[5];
     u8            kind27;       /* +0x27 */
     u8            pad28[8];
-    u32           unk30;        /* +0x30 dolu olma kontrolu */
+    u32           unk30;        /* +0x30 non-empty check */
     u8            pad34[8];
-    struct Entry *next3c;       /* +0x3C dis liste baglantisi */
+    struct Entry *next3c;       /* +0x3C outer list link */
     u8            pad40[4];
-    struct Entry *next44;       /* +0x44 ic liste baglantisi */
+    struct Entry *next44;       /* +0x44 inner list link */
 } Entry;
 
-/* +0x20'ye kurulan bayrak; anlami cozulmedi, deger ROM'dan alindi. */
+/* The flag set at +0x20; its meaning is unresolved, the value came from the ROM. */
 #define FLAG_SUBMITTED 0x2000
 
-/* 0x020230A0: dis listenin bas isaretcisi.  Kardes dosyadaki gerekce
-   ayni: ofset 0 oldugu icin kural 1'in katlama sorunu olusmuyor, ROM da
-   adresi havuzdan tek parca okuyup `ldr r5,[r0,#0]` yapiyor.  Bu adres
-   icin data/ram_map.csv kaydi gerekiyor; sembol tanimlama yetkim yok. */
+/* 0x020230A0: the head pointer of the outer list.  The rationale is the same
+   as in the sibling file: since the offset is 0, rule 1's folding problem does
+   not arise, and the ROM likewise reads the address from the pool in one piece
+   and does `ldr r5,[r0,#0]`.  A data/ram_map.csv record is needed for this
+   address; I do not have the authority to define symbols. */
 #define gListHead020230A0 (*(Entry **)0x020230A0)
 
 /* 0x0801515C */
@@ -104,7 +112,7 @@ void LoadEntryTileData(void)
     Entry *outer;
     Entry *node;
     void *src;
-    u8 w;                       /* dar tip zorunlu -- baslikta (2) */
+    u8 w;                       /* narrow type is mandatory -- header item (2) */
     u8 h;
     s32 half;
 

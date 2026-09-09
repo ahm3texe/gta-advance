@@ -1,13 +1,13 @@
-/* Oturum bayraklarini sifirlama — 0x08066540-0x08066567
+/* Reset session flags — 0x08066540-0x08066567
  *
- * Dort ayri yeri sifirliyor: gSlotSelector (yarim soz), gGameState +12
- * (bayt), gVBlankEnabled (yarim soz) ve gRam02036328 (bayt).
+ * Clear four locations: gSlotSelector (halfword), gGameState +12 (byte),
+ * gVBlankEnabled (halfword), and gRam02036328 (byte).
  *
- * ROM yarim soz yazarken IKI ayri sifir register'i kullaniyor (r1 ve r2);
- * ucuncu yazmadan once `movs r2,#0` ile ikincisini kuruyor.
+ * The ROM uses TWO zero registers for the halfword stores (r1/r2),
+ * initializing the second with movs r2,#0 before the third write.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/reset_session_flags.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/reset_session_flags.c
  */
 
 #include "gba_types.h"

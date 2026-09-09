@@ -1,63 +1,62 @@
-/* gEntriesA'da bos yuva bulup yeni giris kurma — 0x08028A88-0x08028B29
+/* Finding a free slot in gEntriesA and setting up a new entry — 0x08028A88-0x08028B29
  *
- * gEntriesA tablosunda (15 giris, 148 bayt stride) +0x00 alani sifir olan
- * ilk bos yuvayi ariyor. Bos yuva yoksa hicbir sey yapmadan donuyor.
- * Buldugunda yuvayi dolduruyor: aktif bayragi 1, tur (+0x64) 34,
- * +0x90 = phase, +0x84 = owner, +0x4c'ye cagiranin verdigi 12 baytlik
- * uclu kopyalaniyor, +0x68 = arg1 << 16, +0x8c = 0. Ardindan
- * FUN_08014ffc(&e->sub, 3, &e->payload, &e->unk68) cagriliyor;
- * phase 51 ise +0x2a'ya 1, degilse 64 yaziliyor; son olarak
- * FUN_08015038(&e->sub) ve AdvanceEntryFrame(e) cagriliyor.
+ * Looks for the first free slot in the gEntriesA table (15 entries, 148-byte
+ * stride) whose +0x00 field is zero.  If there is no free slot it returns
+ * without doing anything.  When it finds one it fills the slot in: the active
+ * flag 1, the kind (+0x64) 34, +0x90 = phase, +0x84 = owner, the 12-byte
+ * triple supplied by the caller copied to +0x4c, +0x68 = arg1 << 16, +0x8c = 0.
+ * Then FUN_08014ffc(&e->sub, 3, &e->payload, &e->unk68) is called; +0x2a gets
+ * 1 if the phase is 51 and 64 otherwise; finally FUN_08015038(&e->sub) and
+ * AdvanceEntryFrame(e) are called.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * Kural 32: `ldmia r0!,{r3,r6,r7}` / `stmia r1!,{r3,r6,r7}` ucluyu
- *   struct atamasi olarak yazmayi gerektiriyor (`Triple`), `*d++ = *s++`
- *   degil.
- * Kural 9/31: `cmp r4,#14` + `bgt` isaretli dal -> sayac `s32`.
- * Kural 42: ROM dongude isaretci yurutuyor ama C'de artan indeksli
- *   `for` yazildi; agbcc guclendirmeyle isaretci yurutucusunu kendisi
- *   uretiyor, dongu sonrasi `&gEntriesA[i]` ise `muls #148` ile
- *   yeniden kuruluyor -- ROM'un tam yaptigi.
+ * Rule 35: `pop {r0}; bx r0` indicates a void return type.
+ * Rule 32: `ldmia r0!,{r3,r6,r7}` / `stmia r1!,{r3,r6,r7}` requires writing
+ *   the triple as a struct assignment (`Triple`), not as `*d++ = *s++`.
+ * Rules 9/31: `cmp r4,#14` + a signed `bgt` branch -> the counter is `s32`.
+ * Rule 42: the ROM walks a pointer in the loop, but an ascending indexed `for`
+ *   was written in C; agbcc produces the pointer walker itself by strength
+ *   reduction, while `&gEntriesA[i]` after the loop is rebuilt with
+ *   `muls #148` -- exactly what the ROM does.
  *
- * Dongu cikis dali dogrudan epiloga gidiyor (0x8028AA8 -> 0x8028B20),
- * cunku agbcc jump-threading ile ayni kosulu (`i > 14`) tekrar test eden
- * blogu atliyor; kaynakta ayri `break` + `if (i > 14) return;` yazmak
- * bu ikili `cmp`/`bgt` desenini uretiyor.
+ * The loop's exit branch goes straight to the epilogue (0x8028AA8 ->
+ * 0x8028B20), because agbcc's jump threading skips the block that retests the
+ * same condition (`i > 14`); writing a separate `break` + `if (i > 14) return;`
+ * in the source produces that doubled `cmp`/`bgt` pattern.
  *
- * Taban havuzdan DUZ yukleniyor (0x02023A00) ve tum alan ofsetleri
- * `adds` ile ayri kuruluyor -> dizi aritmetigi degil, yapi uyesi erisimi;
- * bu yuzden yuva isaretcisi `Entry *e` olarak tutuldu.
+ * The base is loaded from the pool PLAIN (0x02023A00) and every field offset
+ * is built separately with `adds` -> struct member access, not array
+ * arithmetic; that is why the slot pointer is held as an `Entry *e`.
  *
- * ESLESME: 162/162 bayt.
+ * MATCH: 162/162 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a5.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a5.c
  */
 
 #include "gba_types.h"
 
-#define ENTRY_COUNT_MAX  14      /* i <= 14, yani 15 giris */
+#define ENTRY_COUNT_MAX  14      /* i <= 14, i.e. 15 entries */
 #define WANTED_KIND      34      /* +0x64 */
-#define PHASE_SPECIAL    51      /* phase == 51 ayrik dal */
+#define PHASE_SPECIAL    51      /* the separate phase == 51 branch */
 #define MODE_SPECIAL     1       /* +0x2a */
 #define MODE_DEFAULT     64      /* +0x2a */
-#define SUB_ARG          3       /* FUN_08014ffc ikinci argumani */
+#define SUB_ARG          3       /* FUN_08014ffc's second argument */
 
-/* +0x4c'deki 12 baytlik ucluyu tek `ldmia`/`stmia` ciftiyle tasitmak icin
- * (kural 32). */
+/* So the 12-byte triple at +0x4c is moved by a single `ldmia`/`stmia` pair
+ * (rule 32). */
 typedef struct Triple {
     u32 a;
     u32 b;
     u32 c;
 } Triple;
 
-/* Kardes dosyalarla (entries_a1.c, entries_a3.c, entries_a4.c,
- * kind_scan.c) ayni yerlesim; bu fonksiyonun dokundugu alanlar eklendi.
- * Toplam boyut 148 = 0x94. */
+/* The same layout as in the sibling files (entries_a1.c, entries_a3.c,
+ * entries_a4.c, kind_scan.c); the fields this function touches were added.
+ * The total size is 148 = 0x94. */
 typedef struct Entry {
     u8     active;              /* +0x00 */
     u8     pad01[3];
-    u8     sub[38];             /* +0x04, FUN_08014ffc/FUN_08015038'e verilir */
+    u8     sub[38];             /* +0x04, passed to FUN_08014ffc/FUN_08015038 */
     u8     mode;                /* +0x2a */
     u8     pad2b[33];
     Triple payload;             /* +0x4c */

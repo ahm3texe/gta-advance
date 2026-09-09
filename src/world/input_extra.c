@@ -1,78 +1,80 @@
-/* Baglanti kablosu bekleme ekrani — 0x0806620C-0x0806634B
+/* Link cable waiting screen — 0x0806620C-0x0806634B
  *
- * Iki metin satiri cizip iki ayri bekleme dongusune giriyor. Ilk dongu
- * her karede VBlank bekleyip KEYINPUT'un 1. bitini (B) izliyor: bit once
- * SET gorulunce (tus BIRAKILMIS) 0. bit (A) armed'a yaziliyor; sonra bit
- * CLEAR olunca (B basili) gBiosIrqFlags'in 0. biti temizlenip 1 donuyor.
- * A hala basili degilse dongu suruyor, aksi halde ikinci ekrana geciliyor.
+ * Draws two lines of text and enters two separate wait loops. The first loop
+ * waits for VBlank on every frame and watches bit 1 (B) of KEYINPUT: once the
+ * bit is first seen SET (button RELEASED), bit 0 (A) is written into armed;
+ * then when the bit goes CLEAR (B pressed) bit 0 of gBiosIrqFlags is cleared
+ * and it returns 1. If A is still not pressed the loop keeps going, otherwise
+ * it moves on to the second screen.
  *
- * Ikinci dongu ResetLinkSession sonrasi ayni tus mantigini kosturuyor ama
- * her turda FUN_080657d8(0) ile suruculeri adimliyor ve MaybeAdvance ile
- * ayni kosulu (gVBlankEnabled == 2 && gRam0200048C > 1) satir ici
- * tekrarliyor; kosul saglaninca dongu bitip 0 donuyor. Iptal yolunda
- * gBiosIrqFlags maskeleniyor, ResetLinkHardware cagriliyor, oturum durumu
- * sifirlaniyor ve 1 donuyor.
+ * The second loop runs the same button logic after ResetLinkSession, but on
+ * every turn it steps the drivers with FUN_080657d8(0) and repeats inline the
+ * same condition as MaybeAdvance (gVBlankEnabled == 2 && gRam0200048C > 1);
+ * when the condition holds the loop ends and it returns 0. On the cancel path
+ * gBiosIrqFlags is masked, ResetLinkHardware is called, the session state is
+ * cleared and it returns 1.
  *
- * DURUM: PARK — 12/320 bayt farkli (%96.3). Kalan fark TEK SINIF:
- * dongu ONCESI (preheader) yapilan degismez-ifade kaldirmalarinin SIRASI.
- * Uretilen komutlarin hepsi ayni, yazmac atamalari da ayni; yalnizca iki
- * yerde iki komutun (ve buna bagli literal havuz sozcuklerinin) sirasi
- * ters:
+ * STATUS: PARKED — 12/320 bytes off (96.3%). The remaining difference is a
+ * SINGLE CLASS: the ORDER of the invariant-expression hoists done BEFORE the
+ * loop (in the preheader). Every emitted instruction is the same, and so are
+ * the register assignments; in just two places two instructions (and the
+ * literal pool words that go with them) are in reversed order:
  *
  *   0x08066238  ROM: mov r6,#2 / ldr r7,=gBiosIrqFlags / mov r4,#1
- *               biz: mov r6,#2 / mov r4,#1 / ldr r7,=gBiosIrqFlags
+ *               us:  mov r6,#2 / mov r4,#1 / ldr r7,=gBiosIrqFlags
  *   0x080662C4  ROM: ldr r7,=gVBlankEnabled / ldr r6,=gBiosIrqFlags
- *               biz: ldr r6,=gBiosIrqFlags / ldr r7,=gVBlankEnabled
- *               (havuz sozcukleri de ayni sirayla yer degistiriyor)
+ *               us:  ldr r6,=gBiosIrqFlags / ldr r7,=gVBlankEnabled
+ *               (the pool words swap places in the same order too)
  *
- * OLCULEN MEKANIZMA: kaldirma sirasi kaynak metnindeki KULLANIM sirasini
- * izliyor; kaynak dizilisi ise ROM'un blok yerlesimini zorunlu kiliyor ve
- * ikisi celisiyor:
- *   - `if (armed == 0) {B} else {A}` -> ROM'un blok yerlesimi DOGRU
- *     (cmp/bne A, B ortada, A sonda) ama sira 2,1,flags.
- *   - `if (armed != 0) {A} else {B}` -> sira 2,flags,1 (ROM) ama derleyici
- *     B'yi dongunun ustune tasiyip giris dali ekliyor: 316 bayt, yerlesim
- *     bozuluyor.
+ * MEASURED MECHANISM: the hoist order follows the order of USE in the source
+ * text; but the source arrangement is what forces ROM's block layout, and the
+ * two conflict:
+ *   - `if (armed == 0) {B} else {A}` -> ROM's block layout is CORRECT
+ *     (cmp/bne A, B in the middle, A at the end) but the order is 2,1,flags.
+ *   - `if (armed != 0) {A} else {B}` -> the order is 2,flags,1 (ROM) but the
+ *     compiler moves B above the loop and adds an entry branch: 316 bytes,
+ *     the layout breaks.
  *
- * DENENIP ELENENLER (hepsi olculdu):
- *   - Dongu 2 icin `while (again)` + `if (!again) break` (WaitLinkSettle
- *     bicimi): fazladan bir `cmp/beq` kaliyor ve `again` cagri boyunca
- *     yasadigi icin callee-saved yazmac tutuyor -> 328 bayt, 124 fark.
- *   - Dongu 2 icin do/while'a `goto` ile girmek: dogru kuyruk, ama dongu
- *     dogal olmadigi icin adres kaldirmalari tamamen kayboluyor (324/235).
- *   - Dongu 2 govdesini `if (again != 0) {...} continue; break;` ile
- *     sarmak: 316, dondurme kayboluyor.
- *   - Dongu 1 icin bfirst/bfirst+continue/bfirst+goto/else-if: dordu de
- *     ayni ikiliyi uretiyor (12).
+ * TRIED AND REJECTED (all measured):
+ *   - For loop 2, `while (again)` + `if (!again) break` (the WaitLinkSettle
+ *     form): an extra `cmp/beq` remains, and because `again` lives across the
+ *     call it holds a callee-saved register -> 328 bytes, 124 off.
+ *   - Entering loop 2's do/while with a `goto`: correct tail, but because the
+ *     loop is not natural the address hoists disappear entirely (324/235).
+ *   - Wrapping loop 2's body with `if (again != 0) {...} continue; break;`:
+ *     316, the rotation disappears.
+ *   - For loop 1, bfirst/bfirst+continue/bfirst+goto/else-if: all four
+ *     produce the same pair (12).
  *   - `gBiosIrqFlags = gBiosIrqFlags & 0xFFFE`, `&= ~1`, armed u32/u16,
- *     again u32, held s32, sabiti sola alma, extern bildirim sirasi:
- *     hicbiri sirayi degistirmiyor (12).
- *   - Isaretci/yerel degisken ile ELLE kaldirma (`bit1 = 2; irq =
- *     &gBiosIrqFlags;`) dongu 1'i TAM eslestiriyor (8 bayta iniyor):
- *     kaynak duzeyi degiskenlerin baslatmasi loop.c'nin kaldirmalarindan
- *     ONCE yaziliyor. Ayni numara dongu 2'de basarisiz: serbest kalan
- *     yazmac yuzunden sabit 2 de kaldiriliyor, r8'e tasma olusuyor
- *     (336/344). Uydurma degisken oldugu icin REDDEDILDI — 8 bayt icin
- *     savunulamayan kaynak yazmaktansa temiz kaynakla 12 bayt.
+ *     again u32, held s32, moving the constant to the left, the order of the
+ *     extern declarations: none of them change the order (12).
+ *   - Hoisting BY HAND with a pointer/local variable (`bit1 = 2; irq =
+ *     &gBiosIrqFlags;`) makes loop 1 match EXACTLY (it drops to 8 bytes):
+ *     the initialisation of source-level variables is emitted BEFORE loop.c's
+ *     hoists. The same trick fails in loop 2: because of the register that
+ *     frees up, the constant 2 gets hoisted as well and a spill into r8
+ *     appears (336/344). REJECTED because it is a made-up variable — rather
+ *     than writing indefensible source for 8 bytes, 12 bytes with clean
+ *     source.
  *
- * KURAL 54-61 TURU (hepsi olculdu, hicbiri iyilestirmedi):
- *   - Dongu 1'i A-onculu + `continue` ile yazmak: 316 bayt (kural 58'in
- *     belgeledigi yerlesim bozulmasinin aynisi).
- *   - Kural 54 (kaydi iki yerele bolmek): `armed`i iki ayri yerele
- *     (armed/armed2) bolmek 12 -> 17 bayt, kotulesiyor. Burada tek
- *     degisken dogru: iki dongu de ayni yazmaci (r5) istiyor.
- *   - Dongu 2 kosulunu ic ice `if` ile yazmak (kural 60 bicimi): 12,
- *     degisiklik yok.
- *   - Kural 57: `gBiosIrqFlags`i volatile gorunumle yazmak 12 -> 24 bayt.
- *     `gVBlankEnabled`i volatile yapmak: 12, degisiklik yok.
+ * RULE 54-61 KIND (all measured, none of them improved anything):
+ *   - Writing loop 1 A-first + with `continue`: 316 bytes (the very same
+ *     layout breakage that rule 58 documents).
+ *   - Rule 54 (splitting the record into two locals): splitting `armed` into
+ *     two separate locals (armed/armed2) goes 12 -> 17 bytes, worse. A single
+ *     variable is the right call here: both loops want the same register (r5).
+ *   - Writing loop 2's condition with a nested `if` (rule 60 form): 12, no
+ *     change.
+ *   - Rule 57: writing `gBiosIrqFlags` through a volatile view goes 12 -> 24
+ *     bytes. Making `gVBlankEnabled` volatile: 12, no change.
  *
- * PERMUTER KOSTURULDU (1222 yineleme): temel 80 -> en iyi 20, sifir yok.
- * En iyi aday REDDEDILDI: VBlankIntrWait'i iki kez cagiriyor (davranis
- * degisikligi), `held` degiskenini alakasiz bir deger icin yeniden
- * kullaniyor ve `do{...}while(0)` sarmalayicisi ekliyor.
+ * PERMUTER RUN (1222 iterations): base 80 -> best 20, no zero. The best
+ * candidate was REJECTED: it calls VBlankIntrWait twice (a behaviour change),
+ * reuses the `held` variable for an unrelated value, and adds a
+ * `do{...}while(0)` wrapper.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/input_extra.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/input_extra.c
  */
 
 #include "gba_types.h"

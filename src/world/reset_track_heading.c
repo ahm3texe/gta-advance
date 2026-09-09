@@ -1,20 +1,20 @@
-/* Iz baslangic acisini kurma — 0x0800AAF4-0x0800AB2F
+/* Setting the track's initial heading — 0x0800AAF4-0x0800AB2F
  *
- * gRam02011030'un +0x3C/+0x40/+0x44/+0x10'unu sifirlayip +0x04'teki
- * dugumun acisini +0x0C'ye (<<16) yaziyor: +0x08 bayraginda 0x30
- * kuruluysa +0x20'deki kaydin +0x1F baytindaki 2 BITLIK alan <<8,
- * degilse +0x18'deki kaydin +0x0E acisi & 0x3FF.
+ * Zeroes gRam02011030's +0x3C/+0x40/+0x44/+0x10 and writes the angle of the
+ * node at +0x04 into +0x0C (<<16): if bit 0x30 is set in the +0x08 flags, the
+ * 2-BIT field in the +0x1F byte of the record at +0x20, shifted left by 8;
+ * otherwise the +0x0E angle of the record at +0x18, & 0x3FF.
  *
- * UC OLCUM: 2 bitlik alan BITFIELD olarak bildirilmeli (`u8 quad : 2`);
- * `(x & 3) << 8` ands/lsls uretiyor, ROM lsls#30/lsrs#22 (kural 61).
- * Yerel bir `t = &g` isaretcisi r1/r2 dagitimini ters ceviriyor; erisim
- * makro uzerinden (`TRACK->`) olmali. Sembol alti eslesen dosyayla
- * paylasilan CoordBlock govdesiyle bildirilmeli (tutarlilik kapisi);
- * bu fonksiyonun alanlari o govdede dolgu icinde kaldigi icin Track
- * gorunumu makroyla ustune bindiriliyor.
+ * THREE MEASUREMENTS: the 2-bit field must be declared as a BITFIELD
+ * (`u8 quad : 2`); `(x & 3) << 8` produces ands/lsls, the ROM has
+ * lsls#30/lsrs#22 (rule 61).  A local `t = &g` pointer reverses the r1/r2
+ * allocation; the access must go through the macro (`TRACK->`).  The symbol
+ * must be declared with the CoordBlock body shared with six matching files
+ * (the consistency gate); because this function's fields fall inside padding
+ * in that body, the Track view is overlaid on it with a macro.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/reset_track_heading.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/reset_track_heading.c
  */
 
 #include "gba_types.h"

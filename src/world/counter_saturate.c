@@ -1,10 +1,10 @@
-/* Kopyalama — 0x0805AC44-0x0805AC4F
+/* Copy a field — 0x0805AC44-0x0805AC4F
  *
- * gRam02025810 blogunda +20'yi +12'ye kopyaliyor.
- * Kardesi BumpOrReset ayri dosyada: src/world/bump_or_reset.c
+ * Copy +20 to +12 in the gRam02025810 block.
+ * Its sibling BumpOrReset is in src/world/bump_or_reset.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/counter_saturate.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/counter_saturate.c
  */
 
 #include "gba_types.h"

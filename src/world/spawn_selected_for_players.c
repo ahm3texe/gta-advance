@@ -1,20 +1,20 @@
-/* Secili dugumu iki oyuncu icin dogurma — 0x08054E40-0x08054F1B
+/* Spawning the selected node for both players — 0x08054E40-0x08054F1B
  *
- * Oyuncu 1 (0x020272C8) ve gGameState[12] kuruluysa oyuncu 2 (0x02026F34)
- * icin ayni is: secim etkinse ReleaseSelectedNode, kimlik 0x3FF degilse
- * FindOrRecycleNode + FUN_08054870 ile konum kurulur, degilse secili
- * nesnenin 12 baytlik konumu (bayrak 0x30'a gore +0x20+4 ya da +0x18)
- * kopyalanir; sonra SpawnNodeObject.
+ * The same work for player 1 (0x020272C8) and, when gGameState[12] is set, for
+ * player 2 (0x02026F34): if the selection is active, ReleaseSelectedNode; if
+ * the id is not 0x3FF the position is set up with FindOrRecycleNode +
+ * FUN_08054870, otherwise the selected object's 12-byte position (from +0x20+4
+ * or +0x18 according to flag 0x30) is copied; then SpawnNodeObject.
  *
- * IKI OLCUM: FindOrRecycleNode sonucu AYRI YERELE alinmali (arguman icine
- * yazilinca agbcc global okumasini cagridan ONCE yapip r4'te sakliyor);
- * 12 baytlik struct kopyasinin HEDEF adresi (`dst = &pos`) bayrak
- * testinden once yerele alinmali, ROM `mov r1,sp`yi testten once uretiyor.
- * Global iki ayri u32 sembol olarak (node_search.c ile ayni tip) alinip
- * Sel* olarak cast ediliyor.
+ * TWO MEASUREMENTS: the FindOrRecycleNode result must be taken into a SEPARATE
+ * LOCAL (written inside the argument, agbcc does the global read BEFORE the
+ * call and keeps it in r4); the DESTINATION address of the 12-byte struct copy
+ * (`dst = &pos`) must be taken into a local before the flag test, since the
+ * ROM emits `mov r1,sp` before the test.  The global is taken as two separate
+ * u32 symbols (the same type as in node_search.c) and cast to Sel*.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/spawn_selected_for_players.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/spawn_selected_for_players.c
  */
 
 #include "gba_types.h"

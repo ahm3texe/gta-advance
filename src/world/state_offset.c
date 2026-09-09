@@ -1,63 +1,68 @@
-/* Duruma gore aktorun yonelim baytlarini ve 16.16 konum kaymasini hesaplar.
+/* Computes the actor's facing bytes and the 16.16 position offset from state.
  *
- * 0x080260A8, 1518 bayt.  Aktorun +0x90'daki DURUM degerine gore dallaniyor.
- * Her dalda ayni iskelet var:
+ * 0x080260A8, 1518 bytes.  Branches on the STATE value at the actor's +0x90.
+ * Every branch has the same skeleton:
  *
- *   1. Varliktan bir ACI okunur, 0x03FFFFFF ile maskelenir (26 bit) ve
- *      aktorun +0x68 alanina yazilir.  Aci >> 16 ile 10 bitlik indekse
- *      donusuyor; FUN_08029088 bunu bir donusturme yardimcisi gibi aliyor.
- *   2. Kayittan iki eksen icin orta nokta hesaplanir:
- *      (b6 + b4) - (b18 - 2), sonra `<< 23 >> 24` ile yarilanip 9 bitten
- *      isaret genisletilir.
- *   3. Donen iki bayt 41/32 ile olceklenip +0x26 ve +0x27'ye yazilir.
- *   4. Ikinci bir cagri sonucu 16.16 olarak +0x4C ve +0x50'ye EKLENIR.
+ *   1. An ANGLE is read from the entity, masked with 0x03FFFFFF (26 bits) and
+ *      written to the actor's +0x68 field.  The angle turns into a 10-bit
+ *      index via >> 16; FUN_08029088 takes it like a conversion helper.
+ *   2. A midpoint is computed from the record for the two axes:
+ *      (b6 + b4) - (b18 - 2), then halved with `<< 23 >> 24` and sign
+ *      extended from 9 bits.
+ *   3. The two returned bytes are scaled by 41/32 and written to +0x26 and +0x27.
+ *   4. The result of a second call is ADDED as 16.16 to +0x4C and +0x50.
  *
- * Dallar arasindaki tek fark: aciya 0x2000000 eklenip eklenmedigi, ikinci
- * cagriya giden ikinci deger ve sonda yazilan kip baytı.
+ * The only difference between the branches: whether 0x2000000 is added to the
+ * angle, the second value passed to the second call, and the mode byte written
+ * at the end.
  *
- * DURUM: PARK, 1430/1518, 88 bayt KISA.  Dagitim zinciri ROM ile BIREBIR ayni
- * (25, 35, 33, 8, 30, 31, 40, 50, 32, 7, 6, 47 sirasiyla), sondaki ortak
- * epilog ve varsayilan dal da oturdu.  Kalan fark hala blok birlesmesi:
- * ROM'da 0x03FFFFFF maskesi ALTI ayri havuz kelimesinde duruyor, yani alti
- * fiziksel blok var; bizde bes.
+ * STATUS: PARKED, 1430/1518, 88 bytes SHORT.  The allocation chain is EXACTLY
+ * the same as ROM (25, 35, 33, 8, 30, 31, 40, 50, 32, 7, 6, 47 in that order),
+ * and the shared epilogue at the end and the default branch fell into place
+ * too.  The remaining difference is still block merging: in ROM the 0x03FFFFFF
+ * mask sits in SIX separate pool words, so there are six physical blocks; we
+ * have five.
  *
- * KAZANIM 1 -- 7 ve 6 AYRI dallar.  Ikisini `state == 7 || state == 6`
- * diye birlestirmistim; ROM'da ayri iki kopya.  Ayirmak 1172 -> 1312.
+ * WIN 1 -- 7 and 6 are SEPARATE branches.  I had merged the two as
+ * `state == 7 || state == 6`; in ROM there are two separate copies.  Splitting
+ * them: 1172 -> 1312.
  *
- * KAZANIM 2 -- HER DALIN KENDI YERELLERI VAR.  Bu belirleyiciydi.  Once
- * tum dallara ortak `bias`/`shift` vermistim; govdeler birebir ayni olunca
- * agbcc case 8'in blogunu tamamen 0x1f/0x28 ile birlestirdi (bizde `cmp #8`
- * ile `cmp #30` arasi 4 bayt, ROM'da 156).  ROM'un yigin gozleri dallarin
- * ayri yereller kullandigini soyluyor: case 8 sp+8/12/16, case 0x1f
- * sp+32/36/40.  Dal basina ucer yerel acmak 1312 -> 1428.
+ * WIN 2 -- EVERY BRANCH HAS ITS OWN LOCALS.  This was the decisive one.  At
+ * first I gave all the branches a shared `bias`/`shift`; once the bodies were
+ * byte-for-byte identical, agbcc merged case 8's block entirely with 0x1f/0x28
+ * (on our side 4 bytes between `cmp #8` and `cmp #30`, in ROM 156).  ROM's
+ * stack slots say the branches use separate locals: case 8 sp+8/12/16, case
+ * 0x1f sp+32/36/40.  Opening three locals per branch: 1312 -> 1428.
  *
- * KAZANIM 3 -- varsayilan dal.  ROM `adds r0, r7, #4` ile aktorun +4
- * adresini kurup sifira karsi siniyor, sonra oradan +34/+35'e yaziyor.
- * Ghidra bunu anlamsiz gorunen `param_1 == -4` diye gosteriyordu.
+ * WIN 3 -- the default branch.  ROM sets up the actor's +4 address with
+ * `adds r0, r7, #4` and tests it against zero, then writes to +34/+35 from
+ * there.  Ghidra was showing this as the seemingly meaningless
+ * `param_1 == -4`.
  *
- * DENENEN VE GERI ALINAN IKI FIKIR (olculdu, ikisi de KOTULESTIRDI):
+ * TWO IDEAS TRIED AND REVERTED (measured, both made it WORSE):
  *
- *   1. Kaydirmalari cagri argumanina tasimak.  ROM once iki eksenin HAM
- *      toplamini cikariyor, `<<23 >>24` kaydirmalarini sonra ucunu pes pese
- *      yapiyor; bu, kaynagin kaydirmayi yerele degil dogrudan argumana
- *      yazdigini dusundurdu.  Oyle yazinca 1430 -> 1178.  Yerelleri dal
- *      basina ayirinca daha da kotu: 1164.  Fikir yanlis.
+ *   1. Moving the shifts into the call argument.  ROM first computes the RAW
+ *      sum of the two axes and only afterwards does the `<<23 >>24` shifts,
+ *      three of them back to back; that suggested the source writes the shift
+ *      directly into the argument rather than into a local.  Written that way:
+ *      1430 -> 1178.  With the locals split per branch it was even worse:
+ *      1164.  The idea is wrong.
  *
- *   2. `- (rec->ox - 2)` ifadesini ayri yerelde tutmak.  ROM `ox`i yukleyip
- *      ayrica `-2` yapiyor, derleyici bizde `+2 - ox` diye yeniden
- *      birlestiriyor.  Ayri yerel vermek tek basina ise yaramadi; yukaridaki
- *      1 numarali degisiklikle birlikte olculdugu icin tek basina etkisi
- *      ayrica olculmeli.
+ *   2. Keeping the `- (rec->ox - 2)` expression in a separate local.  ROM
+ *      loads `ox` and does the `-2` separately, while on our side the compiler
+ *      recombines it as `+2 - ox`.  Giving it a separate local did not help on
+ *      its own; since it was measured together with change 1 above, its
+ *      standalone effect still has to be measured separately.
  *
- * Kalan 88 bayt bloklara dagilmis durumda (0x28/0x32 blogu +44, case 8 +24,
- * 0x1e +20, 0x1f +16) ve son blok 40 bayt UZUN.  ROM'un cakisma-atlamasi
- * (cross-jumping) bloklari farkli derinliklerden ortak kuyruga baglamis;
- * case 8 cagri kurulumunu kendi icinde yapip kuyruga DAHA ILERIDEN atliyor,
- * 0x1f ise kurulumun basina atliyor.  Bunu kaynaktan yonlendirecek bilinen
- * bir kaldirac bulamadim.
+ * The remaining 88 bytes are spread across the blocks (the 0x28/0x32 block
+ * +44, case 8 +24, 0x1e +20, 0x1f +16) and the last block is 40 bytes LONG.
+ * ROM's cross-jumping has tied the blocks into a common tail from different
+ * depths; case 8 does the call setup inside itself and jumps into the tail
+ * FURTHER ALONG, while 0x1f jumps to the start of the setup.  I found no known
+ * lever to steer this from the source.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/state_offset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/state_offset.c
  */
 
 #include "gba_types.h"
@@ -72,14 +77,14 @@ typedef struct Owner {
     u8 kind;              /* +0x09 */
 } Owner;
 
-/* Aktorun +0x04'unden baslayan alt yapi; yonelim baytlari onun icinde
- * +34 ve +35'te.  ROM once `adds r0, r7, #4` ile bu adresi kuruyor ve
- * sifira karsi siniyor -- Ghidra'nin `param_1 == -4` diye gosterdigi sey
- * tam olarak budur. */
+/* Sub-structure starting at the actor's +0x04; the facing bytes are at +34
+ * and +35 inside it.  ROM first sets up this address with `adds r0, r7, #4`
+ * and tests it against zero -- what Ghidra shows as `param_1 == -4` is
+ * exactly this. */
 typedef struct Slot {
     u8 pad0[34];
-    s8 fx;                /* +0x22 (aktorda +0x26) */
-    s8 fy;                /* +0x23 (aktorda +0x27) */
+    s8 fx;                /* +0x22 (actor's +0x26) */
+    s8 fy;                /* +0x23 (actor's +0x27) */
 } Slot;
 
 typedef struct Facing {

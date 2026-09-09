@@ -3,15 +3,15 @@
 #include "gba_types.h"
 #include "phase1_types.h"
 
-/* table_entries.c / step_entry_timer.c ile BIREBIR AYNI govde (tutarlilik
- * kapisi ayni sembol icin ayni struct govdesini sart kosuyor). Phase1Entry
- * ile ayni 148 baytlik yerlesim: timer=unk02, object[136]=+0x04..+0x8B,
- * state=unk8C, key=phase. */
+/* An IDENTICAL body to table_entries.c / step_entry_timer.c (the consistency
+ * gate requires the same struct body for the same symbol).  The same 148-byte
+ * layout as Phase1Entry: timer=unk02, object[136]=+0x04..+0x8B, state=unk8C,
+ * key=phase. */
 typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 unk02;                  /* +0x02 */
-    u32 unk04;                  /* +0x04 (serbest birakilacak blok) */
+    u32 unk04;                  /* +0x04 (the block to be released) */
     u8  pad08[0x22];
     u8  mark;                   /* +0x2A */
     u8  state;                  /* +0x2B */

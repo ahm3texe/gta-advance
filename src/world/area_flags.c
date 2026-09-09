@@ -1,31 +1,31 @@
-/* Alan bayraklari — 0x08030C4C-0x08030CB3
+/* Area flags — 0x08030C4C-0x08030CB3
  *
- * Kayit tamponunun 0x4C ofsetinde 192 bitlik (alti sozcuk) bir bayrak
- * dizisi var; indeks BIR TABANLI, 0 "yok" demek. src/world/entity_flags.c
- * ayni tampondaki 0x3C'deki 128 bitlik varlik bayraklarini isliyor --
- * oradaki `unk4C[80]` blogunun ilk 24 bayti burada cozuldu.
+ * At offset 0x4C of the record buffer there is a 192-bit (six word) flag
+ * array; the index is ONE-BASED, 0 meaning "none".  src/world/entity_flags.c
+ * handles the 128-bit entity flags at 0x3C of the same buffer -- the first 24
+ * bytes of the `unk4C[80]` block there are resolved here.
  *
- * Adres deyimi entity_flags.c'de olculdu: `ldr r0,=taban / adds r0,#N`
- * bicimini yalnizca STRUCT UYESI erisimi uretiyor.
+ * The address idiom was measured in entity_flags.c: only a STRUCT MEMBER
+ * access produces the `ldr r0,=base / adds r0,#N` form.
  *
- * Ayni kumedeki dorduncu fonksiyon (CleanupAreaTiles, 0x08030CB4) henuz
- * eslesmedigi icin ayri dosyada: src/world/area_cleanup.c
+ * The fourth function of the same set (CleanupAreaTiles, 0x08030CB4) is in a
+ * separate file because it does not match yet: src/world/area_cleanup.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/area_flags.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/area_flags.c
  */
 
 #include "gba_types.h"
 
 #define AREA_FLAG_MAX  192
 
-/* Kayit slotu calisma tamponu; 0x3C'deki varlik bayraklari icin
- * src/world/entity_flags.c'ye bakin. */
+/* The record slot working buffer; for the entity flags at 0x3C see
+ * src/world/entity_flags.c. */
 typedef struct SaveBuffer {
     u8  header[12];             /* 0x00 */
     u8  unk0C[48];              /* 0x0C */
-    u32 entityFlags[4];         /* 0x3C — 128 bit */
-    u32 areaFlags[6];           /* 0x4C — 192 bit */
+    u32 entityFlags[4];         /* 0x3C — 128 bits */
+    u32 areaFlags[6];           /* 0x4C — 192 bits */
     u8  unk64[56];              /* 0x64 */
     u8  complement;             /* 0x9C */
     u8  unk9D[3];
@@ -78,7 +78,7 @@ u32 SetAreaFlag(s32 index)
     return 1;
 }
 
-/* 0x08030CB0 — govdesi bos. */
+/* 0x08030CB0 — its body is empty. */
 void AreaFlagsNoop(void)
 {
 }

@@ -1,11 +1,11 @@
-/* Durum kurulumu ve degistirici — 0x0803F630-0x0803F67B
+/* State initialization and mutation — 0x0803F630-0x0803F67B
  *
- * Bir 132+ baytlik struct'in ilklendirilmesi (0x0803F630), bos `bx lr`
- * (0x0803F64C), alt nesne cagricisi (0x0803F650) ve 3 sozcuk kopyalayip
- * bayrak/durum sifirlayan degistirici (0x0803F65C).
+ * Initialize a 132+ byte structure (0x0803F630), return with an empty bx lr
+ * (0x0803F64C), call a sub-object (0x0803F650), and copy three words while
+ * resetting flags/state (0x0803F65C).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/state_init.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/state_init.c
  */
 
 #include "gba_types.h"

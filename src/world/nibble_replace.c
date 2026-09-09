@@ -1,10 +1,10 @@
-/* On alti 16-bit girdide secilen dort bitlik alanlari degistirir.
+/* Replace selected four-bit fields in sixteen 16-bit entries.
  *
- * Her kelimedeki dort nibble ayri ayri eski degerle karsilastirilir. Eslesen
- * alanlar ayni konuma kaydirilmis yeni degerle degistirilir.
+ * Compare each of a word's four nibbles separately against the old value.
+ * Replace matches with the new value shifted to the same position.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm
- * Dogrulama: make c-match FILE=src/world/nibble_replace.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm
+ * Verification: make c-match FILE=src/world/nibble_replace.c
  */
 
 #include "gba_types.h"

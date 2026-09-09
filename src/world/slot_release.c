@@ -1,11 +1,10 @@
-/* Yuva serbest birakma cagricisi — 0x080308A0-0x080308AB
+/* Slot release caller — 0x080308A0-0x080308AB
  *
- * Tek satirlik devretme. Asil is FUN_080308EC'de.
- * Kardesi ReleaseSlot ayri dosyada ve byte-matching:
- * src/world/release_slot.c
+ * One-line forwarding call; FUN_080308EC does the work. Its matching sibling
+ * ReleaseSlot is separate: src/world/release_slot.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_release.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_release.c
  */
 
 #include "gba_types.h"

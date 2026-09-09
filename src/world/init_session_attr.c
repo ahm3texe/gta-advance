@@ -1,15 +1,15 @@
-/* Oturum ozniteligini kurma — 0x08031388-0x080313DF
+/* Initialize session attributes — 0x08031388-0x080313DF
  *
- * gRam02026DA0 blogunu sifirlayip gRom083444E8 tablosundan 512/32/32 ile
- * dolduruyor, gRom08CA635C'yi bagliyor, +8/+10'a 200x8 yazip bitiriyor.
+ * Clear gRam02026DA0, populate it from gRom083444E8 using 512/32/32, link
+ * gRom08CA635C, and write 200x8 to +8/+10.
  *
- * OLCULEN: `if (attr != 0)` ROM'da GERCEKTEN var (cmp r4,#0). Adres
- * `((u8 *)0x02026DA0)` cast makrosuyla verilirse agbcc karsilastirmayi
- * katliyor; `extern u8 gRam02026DA0[]` dizi sembolu olarak verilince
- * kaliyor. Kaynakta muhtemelen bir isaretci donduren yardimci vardi.
+ * MEASURED: if (attr != 0) really exists in the ROM (cmp r4,#0). A cast macro
+ * ((u8 *)0x02026DA0) makes agbcc fold the comparison, whereas an extern u8
+ * gRam02026DA0[] symbol preserves it. The original source likely used a
+ * helper returning a pointer.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/init_session_attr.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/init_session_attr.c
  */
 
 #include "gba_types.h"

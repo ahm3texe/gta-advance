@@ -1,15 +1,15 @@
-/* Paketi kopyalayip aynalama — 0x0801D848-0x0801D869
+/* Copy and mirror a packet — 0x0801D848-0x0801D869
  *
- * Cagiranin 12 baytini nesnenin basina kopyaliyor, sonra nesnenin ilk 116
- * baytini +0x13C'ye aynaliyor ve FUN_0801A560'i cagiriyor.
+ * Copy the caller's 12 bytes to the start of the object, mirror its first
+ * 116 bytes to +0x13C, then call FUN_0801A560.
  *
- * Kural 32: struct atamasi ldmia/stmia cifti uretiyor.
- * ROM 0x13C ofsetini `movs r1,#158 / lsls r1,#1` ile kuruyor (316 ani
- * degere sigmiyor); duz sabit yazmak havuz yuklemesi uretirdi.
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 32: structure assignment emits an ldmia/stmia pair. The ROM constructs
+ * 0x13C with movs r1,#158 / lsls r1,#1 because 316 does not fit the immediate;
+ * a plain constant would produce a pool load.
+ * Rule 35: `pop {r0}; bx r0` indicates void.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/init_and_mirror.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/init_and_mirror.c
  */
 
 #include "gba_types.h"

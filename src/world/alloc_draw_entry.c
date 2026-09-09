@@ -1,23 +1,24 @@
-/* Cizim girisi ayirma — 0x08012E78-0x08012F87
+/* Allocating a draw entry — 0x08012E78-0x08012F87
  *
- * Anahtar ROM (0x08000000..0x08FFFFFF), EWRAM (0x02000000..0x0203FFFF) ya
- * da IWRAM (0x03000000..0x03007FFF) icinde ve bayraklar sifir degilse:
- * tur (4,8) ve extra bit15 kuruluysa bayraklar bir kaydirilir. Kuyrukta
- * (gRam02022AB0: +0 sayi, +4 girisler, +8 son indis) FUN_08032434 ile
- * anahtar aranir, bulunursa doner. Yoksa sayi 511'i asmissa kuyruk
- * sifirlanir, gRam0201F2B0 DMA3 ile (0xE00 soz) temizlenir ve
- * LoadEntryTileData cagrilir; ardindan yeni giris (28 bayt) doldurulur,
- * FUN_0803232c ile siralanir, sayi artirilir.
+ * If the key lies in ROM (0x08000000..0x08FFFFFF), EWRAM
+ * (0x02000000..0x0203FFFF) or IWRAM (0x03000000..0x03007FFF) and the flags
+ * are non-zero: for kinds (4,8) with extra bit15 set, the flags are shifted
+ * by one.  The key is looked up in the queue (gRam02022AB0: +0 count, +4
+ * entries, +8 last index) with FUN_08032434 and returned if found.  Otherwise,
+ * if the count has passed 511 the queue is reset, gRam0201F2B0 is cleared by
+ * DMA3 (0xE00 words) and LoadEntryTileData is called; then the new entry
+ * (28 bytes) is filled in, sorted with FUN_0803232c and the count is bumped.
  *
- * UC OLCUM: arama sonucu once `found`a KOPYALANIP sonra sinanmali
- * (sinamadan sonra kopyalanirsa agbcc found=0'i sabit olarak yayip fazla
- * `movs #0 / mov sl` uretiyor); fonksiyonun TEK donus noktasi olmali
- * (`if (e == 0) {...} return e;` -- erken `return found` dali ROM'un
- * ortak `adds r0,r4` cikisini kaciriyor, 1 komut); ayirma blogunda
- * `e->a = e->b = found` (sifir) yazimi ROM'daki r8 kopyasini veriyor.
+ * THREE MEASUREMENTS: the search result must be COPIED into `found` first and
+ * tested afterwards (copied after the test, agbcc propagates found=0 as a
+ * constant and emits a spurious `movs #0 / mov sl`); the function must have a
+ * SINGLE return point (`if (e == 0) {...} return e;` -- an early
+ * `return found` branch misses the ROM's shared `adds r0,r4` exit, 1
+ * instruction); in the allocation block, writing `e->a = e->b = found` (zero)
+ * gives the ROM's r8 copy.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/alloc_draw_entry.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/alloc_draw_entry.c
  */
 
 #include "gba_types.h"

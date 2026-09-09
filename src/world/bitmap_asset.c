@@ -1,28 +1,31 @@
-/* Kare ve palet yukleyici — 0x08065574-0x0806564F
+/* The frame and palette loader — 0x08065574-0x0806564F
  *
- * 0x08FD17C8'deki 20 baytlik kayitlardan birini alip paleti ve kare
- * verisini hedefe yaziyor. Her ikisi de bayraga gore ya RL acilimiyla ya
- * da DMA3 ile aktariliyor. DMA yollarinda IME kapatilip geri yukleniyor
- * ve denetim yazmaci bir kez bos okunuyor (donanimda yazimin oturmasi
- * icin).
+ * Takes one of the 20-byte records at 0x08FD17C8 and writes its palette and
+ * frame data to the destination.  Both are transferred either by RL
+ * decompression or by DMA3, according to a flag.  On the DMA paths IME is
+ * turned off and restored, and the control register is read once and discarded
+ * (so the write settles in hardware).
  *
- * Kare sayisi bolumu ISARETLI: ROM `cmp #0 / bge / adds #3 / asrs #2`
- * uretiyor, yani kaynak `(s32)(boy * en) / 4` yaziyor, `>> 2` degil.
+ * The frame-count division is SIGNED: the ROM emits
+ * `cmp #0 / bge / adds #3 / asrs #2`, so the source writes
+ * `(s32)(height * width) / 4`, not `>> 2`.
  *
- * Son dongu palet ofsetini her yarim kelimeye ekliyor; sinir her
- * yinelemede yeniden hesaplaniyor, yani `for` kosulunda yerinde yazili.
+ * The final loop adds the palette offset to every half-word; the bound is
+ * recomputed on each iteration, i.e. it is written in place in the `for`
+ * condition.
  *
- * IKI OLCUM:
- *  - IME kaydi IKI AYRI degiskende olmali. Tek degisken kullanilinca
- *    canli aralik iki blogu birden kapsiyor, `dest` yuksek yazmaca
- *    itiliyor ve fazladan push/pop 12 bayt ekliyor. ROM ikinci kaydi
- *    `ip`'de tutuyor -- kaydedilmesi gerekmeyen scratch.
- *  - Carpim operand sirasi: `en * boy` yazilmali. agbcc ikinci operandi
- *    ONCE yukluyor, yani kaynaktaki sira ROM'un yukleme sirasinin
- *    tersidir. Ters yazilinca 4 bayt sapiyor.
+ * TWO MEASUREMENTS:
+ *  - The IME save must be in TWO SEPARATE variables.  With a single variable
+ *    the live range spans both blocks, `dest` is pushed into a high register
+ *    and the extra push/pop adds 12 bytes.  The ROM keeps the second save in
+ *    `ip` -- scratch that need not be saved.
+ *  - The multiplication operand order: it must be written `width * height`.
+ *    agbcc loads the second operand FIRST, so the order in the source is the
+ *    reverse of the ROM's load order.  Written the other way it diverges by 4
+ *    bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bitmap_asset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bitmap_asset.c
  */
 
 #include "gba_types.h"

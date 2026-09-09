@@ -1,16 +1,16 @@
 /* CallWithOffset — 0x080509C4-0x080509DB
  *
- * Uc kucuk fonksiyon. Struct'in +0x10'undaki bir tabana offset ekleyip
- * FUN_080504B4 cagirici; +0x10 okuyucu; +0x2C yazici.
+ * Three small functions in the cluster: add offset to structure +0x10 and
+ * call FUN_080504B4; read +0x10; write +0x2C.
  *
- * BYTE-MATCHING. ROM `pop {r0}; bx r0` ile cagrilan fonksiyonun r0
- * sonucunu eziyor; bu sarmalayicinin donus tipi u32 degil void. Dogru
- * imza epilogu ve tum register dagitimini birebir uretiyor.
+ * BYTE-MATCHING. The ROM's pop {r0}; bx r0 overwrites the callee's r0 result,
+ * so the wrapper returns void, not u32. The correct signature reproduces
+ * the epilogue and all register allocation.
  *
- * Eslesen kardesler: src/world/gRam02030330_gets.c
+ * Matching siblings: src/world/gRam02030330_gets.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/offset_helpers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/offset_helpers.c
  */
 
 #include "gba_types.h"
@@ -19,7 +19,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

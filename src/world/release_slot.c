@@ -1,17 +1,15 @@
-/* Yuva serbest birakma — 0x080308AC-0x080308E3
+/* Release a slot — 0x080308AC-0x080308E3
  *
- * gRam02025810 blogunda +0x4C'de 24 girisli 180 baytlik yuva dizisi;
- * her giriste +0 nesne isaretcisi, +4 (blokta +0x50) yardimci alan.
- * Serbest birakirken nesnenin +0x0C bayragindan 0x02000000 temizleniyor.
+ * gRam02025810 +0x4C holds 24 slots of 180 bytes: +0 object pointer, +4
+ * (block +0x50) auxiliary field. Releasing clears 0x02000000 in object +0x0C.
  *
- * BYTE-MATCHING. `scaled = index * 180` tek ifadesi ile `heldBase` ve
- * `extraBase`i ayri yerellerde kurmak ROM'un bir kez hesaplanan r3 ofsetini
- * iki tabana ekleme desenini korur.
+ * BYTE-MATCHING. One scaled = index * 180 expression with separate heldBase
+ * and extraBase locals preserves the ROM's single r3 offset added to two bases.
  *
- * Eslesen kardesi: src/world/slot_release.c
+ * Matching sibling: src/world/slot_release.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/release_slot.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/release_slot.c
  */
 
 #include "gba_types.h"

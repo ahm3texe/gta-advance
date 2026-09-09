@@ -1,13 +1,12 @@
-/* 12 baytlik paketi gonderme — 0x0803C7D4-0x0803C7EB
+/* Submit a 12-byte packet — 0x0803C7D4-0x0803C7EB
  *
- * Cagiranin verdigi 12 bayti gRam0202F360'a kopyalayip FUN_08060db4'u
- * cagiriyor. Iki kural birlikte:
- *   - kural 32: struct atamasi ldmia/stmia ciftini uretiyor
- *   - kural 35: sondaki `pop {r0}; bx r0` donus tipinin void oldugunu
- *     soyluyor (u32 donusunde r0 canli kalirdi)
+ * Copy the caller's 12 bytes to gRam0202F360 and call FUN_08060db4.
+ * Rule 32: structure assignment emits the ldmia/stmia pair.
+ * Rule 35: the final pop {r0}; bx r0 indicates void; a u32 return would
+ * keep r0 live.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/submit_pack.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/submit_pack.c
  */
 
 #include "gba_types.h"

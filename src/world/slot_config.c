@@ -1,14 +1,14 @@
-/* Yuva yapilandirmasi — 0x0803C050-0x0803C0E3
+/* Slot configuration — 0x0803C050-0x0803C0E3
  *
- * Iki yuva blogu var: birincil 0x02000F10, ikincil 0x02001140. Her ikisi de
- * +0 deger, +4 tur, +12 alan ve +32 isleyici isaretcisi tutuyor. Ikincil
- * yuva yalnizca gGameState[12] kuruluyken gecerli.
+ * Primary block 0x02000F10 and secondary block 0x02001140 each hold +0 value,
+ * +4 type, +12 field, and +32 handler pointer. The secondary slot is valid
+ * only when gGameState[12] is set.
  *
- * Isleyici adresleri Thumb biti kurulu saklandigi icin #define ile tam
- * deger veriliyor (src/world/actor_states.c ile ayni gerekce).
+ * Handler addresses retain the Thumb bit, so exact-value #defines are used
+ * for the same reason as in actor_states.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_config.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_config.c
  */
 
 #include "gba_types.h"
@@ -25,9 +25,10 @@ typedef void (*SlotHandler)(void);
 #define SLOT_SECONDARY   2
 
 struct Slot {
-    /* +0x00 bir ISARETCIDIR: src/ui/menu_screen.c ayni sozcugu yukleyip
-     * dereference ediyor (`ldr r1,[r0]` + `ldrb r2,[r1,#8]`). u32 olarak
-     * yazmak ayni baytlari uretir ama anlami gizler. */
+    /* +0x00 is a POINTER: menu_screen.c loads and dereferences the same word
+ * (ldr r1,[r0] + ldrb r2,[r1,#8]). u32 would emit the same bytes but obscure
+ * the meaning.
+ */
     void       *entry;          /* +0x00 */
     u32         kind;           /* +0x04 */
     u8          pad08[4];

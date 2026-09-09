@@ -1,62 +1,63 @@
-/* Aktore yeni bir kimlik yukluyor; 12/13/15 ve 16 kimliklerinde bagli
- * yapinin sahibindeki kip baytini isaretliyor.
- * 0x0801686C, 292 bayt.  BYTE-MATCHING.
+/* Loads a new id into the actor; for ids 12/13/15 and 16 it marks the mode
+ * byte in the owner of the linked structure.
+ * 0x0801686C, 292 bytes.  BYTE-MATCHING.
  *
- * AKIS
- *   0x7FFF nobetci deger; kimlik 0x3FFF ustundeyse aktorun +0x38'deki
- *   cevrim tablosundan (id - 0x4000) girdisi okunup gercek kimlik
- *   bulunuyor.  Kimlik zaten yuruyorsa yalnizca varliga dokunulup
- *   cikiliyor.  Aksi halde sayac sifirlaniyor, kimlik/istek/yuva/rutbe
- *   yaziliyor, durum sifirlaniyor ve iki kimlik ailesi icin bagli
- *   yapinin sahibi isaretleniyor.
+ * THE FLOW
+ *   0x7FFF is the sentinel value; if the id is above 0x3FFF, its entry is read
+ *   from the translation table at the actor's +0x38 (id - 0x4000) to find the
+ *   real id.  If the id is already running it merely touches the entity and
+ *   returns.  Otherwise the counter is cleared, id/request/slot/rank are
+ *   written, the state is cleared, and for two id families the owner of the
+ *   linked structure is marked.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_b2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_b2.c
  *
- * OLCULEN UC KALIP (hepsi tek tek dogrulandi, degistirmeyin):
+ * THREE MEASURED PATTERNS (each verified individually, do not change them):
  *
- * 1) `t` GECICISI SART (kural 40).  ROM birlesme noktasinda iki kopya
- *    tutuyor: else dali `adds r0,r1,#0`, birlesme `adds r2,r0,#0`.
- *    `t` atilip dogrudan `value`ya yazilinca iki dal da value'nun
- *    yazmacina uretiyor, iki komut birden dusuyor (280/292).
+ * 1) THE `t` TEMPORARY IS REQUIRED (rule 40).  At the merge point the ROM
+ *    keeps two copies: `adds r0,r1,#0` on the else branch and `adds r2,r0,#0`
+ *    at the merge.  Dropping `t` and writing straight into `value` makes both
+ *    branches produce into value's register, and two instructions disappear
+ *    at once (280/292).
  *
- * 2) TABLO TESTI IC ICE IKI `if` OLMALI, `&&` DEGIL.  Iki ayri `t = id`
- *    yazimi gerekiyor: yeniden yerlestirme sonrasi ikisi capraz-atlama
- *    ile tek bloga kaynasiyor, yani URETILEN KOD AYNI; degisen tek sey
- *    `id`nin basvuru sayisi 11 -> 12.  Kural 50 onceligi bununla
- *    0.493'ten 0.522'ye cikip `value`nun 0.500'unu geciyor ve dagitim
- *    ROM'unki oluyor (id r1, value r2, slot r5).  `&&` yazimiyla sira
- *    tersine donuyor: id r5, value r1 -- govdenin yarisi kayiyor.
- *    Olcum: python3 tools/dump_alloc.py src/world/actor_b2.c RequestActorAction
+ * 2) THE TABLE TEST MUST BE TWO NESTED `if`s, NOT `&&`.  Two separate `t = id`
+ *    spellings are needed: after reordering, the two fuse into a single block
+ *    by cross-jumping, i.e. THE GENERATED CODE IS THE SAME; the only thing
+ *    that changes is `id`'s reference count, 11 -> 12.  That lifts the rule 50
+ *    priority from 0.493 to 0.522, past `value`'s 0.500, and the allocation
+ *    becomes the ROM's (id r1, value r2, slot r5).  With `&&` the order is
+ *    reversed: id r5, value r1 -- half the body drifts.
+ *    Measurement: python3 tools/dump_alloc.py src/world/actor_b2.c RequestActorAction
  *
- * 3) BAGLI YAPI KUYRUKTA YENIDEN OKUNUYOR.  ROM, `+0xAC` ADRESINI r3'te
- *    saklayip birlesme noktasinda isaretciyi TEKRAR yukluyor
- *    (`ldr r0,[r3,#0]`), oysa agbcc'nin CSE'si iki dalin birlestigi
- *    yerde bile yuklu degeri elde tutuyor.  Iki parca gerekiyor:
- *      - okuma `volatile` uzerinden yapilmali ki CSE elenmesin;
- *      - adres AYRI bir yerelde (`slotp`) tutulmali ve o yerel
- *        FONKSIYON KAPSAMINDA olmali.  Blok kapsaminda tek tanimi olunca
- *        local-alloc kopyayi eleyip adresi tek yazmaca indiriyor ve
- *        `adds r3,r0,#0` kayboluyor (288/292).  Iki case'te iki tanim
- *        olunca kopya ayakta kaliyor.
+ * 3) THE LINKED STRUCTURE IS RE-READ IN THE TAIL.  The ROM keeps the `+0xAC`
+ *    ADDRESS in r3 and RELOADS the pointer at the merge point
+ *    (`ldr r0,[r3,#0]`), whereas agbcc's CSE keeps the loaded value in hand
+ *    even where the two branches merge.  Two pieces are needed:
+ *      - the read must go through `volatile` so CSE cannot eliminate it;
+ *      - the address must be kept in a SEPARATE local (`slotp`) and that local
+ *        must be at FUNCTION SCOPE.  With a single definition at block scope,
+ *        local-alloc eliminates the copy, reduces the address to one register
+ *        and `adds r3,r0,#0` disappears (288/292).  With two definitions in
+ *        two cases the copy survives.
  *
- * ELENEN YOLLAR (tekrar denemeyin):
- *   - `value`yu dogrudan if/else'te uretmek           -> 280, 62/144
- *   - dal basina ayri yerel (`mapped`/`plain`)        -> value 5 basvuru,
- *                                                       oncelik 0.556, ters dagitim
- *   - `flags` yerelini atip `self->link->flags`       -> fark yok
- *   - `Link **held = &self->link;` (volatile'siz)     -> CSE yine eliyor
- *   - kuyrukta `owner` adli fonksiyon kapsamli yerel  -> adres kopyasi
- *                                                       fazladan cikiyor, 114/144
- *   - `mask` fonksiyon kapsamli yerel                 -> maske r2'ye dusuyor,
- *                                                       ROM r0 kullaniyor
- *   - iki ayri volatile okuma (yukle+sakla)           -> 302 bayt
+ * PATHS RULED OUT (do not try them again):
+ *   - producing `value` directly in the if/else     -> 280, 62/144
+ *   - a separate local per branch (`mapped`/`plain`) -> value has 5 references,
+ *                                                       priority 0.556, reversed allocation
+ *   - dropping the `flags` local for `self->link->flags` -> no difference
+ *   - `Link **held = &self->link;` (without volatile) -> CSE eliminates it again
+ *   - a function-scope local named `owner` in the tail -> an extra address
+ *                                                       copy appears, 114/144
+ *   - a function-scope `mask` local                 -> the mask lands in r2,
+ *                                                       the ROM uses r0
+ *   - two separate volatile reads (load+store)      -> 302 bytes
  */
 
 #include "gba_types.h"
 
-/* Aktorun +0x30'daki varligi; burada yalnizca adresi gecirildigi icin
- * ic yerlesimi acilmadi (kardes: src/world/actor_reset.c). */
+/* The entity at the actor's +0x30; only its address is passed here, so its
+ * internal layout has not been worked out (sibling: src/world/actor_reset.c). */
 typedef struct Entity {
     u8 pad0[4];
 } Entity;
@@ -100,25 +101,25 @@ extern void GetOwnerSlot(Entity *entity);
 
 void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
 {
-    u32 value;                /* cevrilmis kimlik */
-    u32 flags;                /* bagli yapinin +0x0C bayraklari */
-    Link *lnk;                /* bagli yapi, kapi testleri icin */
-    /* Kuyruktaki yeniden okumanin adresi.  Fonksiyon kapsaminda ve
-     * volatile: gerekcesi dosya basligindaki (3) numarali kalip. */
+    u32 value;                /* the translated id */
+    u32 flags;                /* the linked structure's +0x0C flags */
+    Link *lnk;                /* the linked structure, for the gate tests */
+    /* The address for the re-read in the tail.  Function scope and volatile:
+     * see pattern (3) in the file header for why. */
     Link *volatile *slotp;
 
-    if (id == 0x7fff) return;                 /* nobetci kimlik */
-    /* Rutbe karsilastirmasi ISARETSIZ (bcs); kural 31. */
+    if (id == 0x7fff) return;                 /* the sentinel id */
+    /* The rank comparison is UNSIGNED (bcs); rule 31. */
     if (self->rank < rank && self->state != 2) return;
     if (rank == 0 && self->rank == 0 && self->state != 2) return;
 
-    /* Kimlik cevrimi.  Ic ice iki `if` ve iki ayri `t = id` yazimi
-     * zorunlu; gerekcesi basliktaki (1) ve (2) numarali kaliplar. */
+    /* The id translation.  Two nested `if`s and two separate `t = id`
+     * spellings are mandatory; see patterns (1) and (2) in the header. */
     {
         u32 t;
         if (self->table != 0) {
             if (id > 0x3fff)
-                t = self->table[id - 0x4000];   /* girdi 0x4000 kaydirilmis */
+                t = self->table[id - 0x4000];   /* the entry is offset by 0x4000 */
             else
                 t = id;
         } else {
@@ -127,14 +128,14 @@ void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
         value = t;
     }
 
-    if (value == 0x7fff) return;              /* cevrim de nobetci verdi */
-    /* Kimlik zaten yuruyor: varliga haber verilip cikiliyor. */
+    if (value == 0x7fff) return;              /* the translation gave the sentinel too */
+    /* The id is already running: the entity is notified and we return. */
     if (self->current == value && self->state != 2) {
         GetOwnerSlot(self->entity);
         return;
     }
 
-    /* Yazma sirasi ROM'un: sayac, kimlik, istek, yuva, rutbe, durum. */
+    /* The write order is the ROM's: counter, id, request, slot, rank, state. */
     self->timer = 0;
     self->current = value;
     self->request = id;
@@ -146,41 +147,43 @@ void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
     case 12:
     case 13:
     case 15:
-        /* Adres once yakalaniyor, isaretci sonra tekrar okunuyor. */
+        /* The address is captured first, the pointer re-read afterwards. */
         lnk = self->link;
         slotp = &self->link;
         if (lnk == 0) return;
         flags = lnk->flags;
-        /* 0x80 biti kapiyi dogrudan aciyor; degilse ucu de tutmali. */
+        /* Bit 0x80 opens the gate directly; otherwise all three must hold. */
         if ((flags & 0x80) == 0) {
             if ((flags & 1) == 0) return;
             if ((flags & 0x800) != 0) return;
             if (lnk->holder->kind == 2) return;
         }
         {
-            /* `own` blok kapsaminda: fonksiyon kapsamli yerel adres
-             * kopyasini fazladan uretiyor (basliktaki elenen yollar). */
+            /* `own` is at block scope: a function-scope local would make the
+             * address
+             * produces an extra copy (see the rejected paths in the header). */
             Owner *own = (*slotp)->owner;
-            own->mode = (own->mode & 0x3f) | 0x80;   /* alt 6 bit korunuyor */
+            own->mode = (own->mode & 0x3f) | 0x80;   /* the low 6 bits are preserved */
         }
         break;
     case 16:
-        /* Adres once yakalaniyor, isaretci sonra tekrar okunuyor. */
+        /* The address is captured first, the pointer re-read afterwards. */
         lnk = self->link;
         slotp = &self->link;
         if (lnk == 0) return;
         flags = lnk->flags;
-        /* 0x80 biti kapiyi dogrudan aciyor; degilse ucu de tutmali. */
+        /* Bit 0x80 opens the gate directly; otherwise all three must hold. */
         if ((flags & 0x80) == 0) {
             if ((flags & 1) == 0) return;
             if ((flags & 0x800) != 0) return;
             if (lnk->holder->kind == 2) return;
         }
         {
-            /* `own` blok kapsaminda: fonksiyon kapsamli yerel adres
-             * kopyasini fazladan uretiyor (basliktaki elenen yollar). */
+            /* `own` is at block scope: a function-scope local would make the
+             * address
+             * produces an extra copy (see the rejected paths in the header). */
             Owner *own = (*slotp)->owner;
-            own->mode = (own->mode & 0x3f) | 0x40;   /* alt 6 bit korunuyor */
+            own->mode = (own->mode & 0x3f) | 0x40;   /* the low 6 bits are preserved */
         }
         break;
     }

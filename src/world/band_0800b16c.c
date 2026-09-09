@@ -1,68 +1,74 @@
-/* Dortgen ic sinamasi + en yakin kenarin indeksi - 0x0800B16C (280 bayt)
+/* The quad inside test + the index of the nearest edge - 0x0800B16C (280 bytes)
  *
- * DURUM: BYTE-MATCHING (280/280, fark 0; 140/140 komut).
+ * STATUS: BYTE-MATCHING (280/280, 0 off; 140/140 instructions).
  *
- * NE YAPIYOR
- * ----------
- * Bir dortgenin dort kenari icin noktanin isaretli determinantini (2B
- * capraz carpim) hesapliyor.  Herhangi bir kenarda deger negatifse nokta
- * disaridadir ve 0 donuyor.  Dortu de gecerse EN KUCUK degeri veren
- * kenarin indeksini bulup `(index << 8) | 1` donuyor: alt bit "iceride",
- * ust bayt "en yakin kenar".  `asrs #12` / `lsls #8` cifti 20.12 sabit
- * noktali aritmetik; prologdaki `(radius >> 12)^2 << 8` bir yaricap
- * karesi ve kenar degerlerine tolerans olarak ekleniyor.  Dortgen
- * kose basina {x, y, z} tutuyor (satir adimi 12 bayt).
+ * WHAT IT DOES
+ * ------------
+ * Computes the point's signed determinant (the 2D cross product) for each of
+ * a quad's four edges.  If the value is negative on any edge the point is
+ * outside and 0 is returned.  If it passes all four it finds the index of the
+ * edge with the SMALLEST value and returns `(index << 8) | 1`: the low bit
+ * means "inside", the high byte is "the nearest edge".  The `asrs #12` /
+ * `lsls #8` pair is 20.12 fixed-point arithmetic; the `(radius >> 12)^2 << 8`
+ * in the prologue is a squared radius added to the edge values as a tolerance.
+ * The quad holds {x, y, z} per corner (a row stride of 12 bytes).
  *
- * Kardes dosya: src/world/quad_edge_test.c (0x0800BF18, byte-matching).
- * Ayni dortgen kalibi, ayni kenar sirasi (3, 1, 0, 2), ayni sabit
- * nokta bicimi.  Bu dosya onun "tek nokta + indeks" varyanti.
+ * Sibling file: src/world/quad_edge_test.c (0x0800BF18, byte-matching).  The
+ * same quad pattern, the same edge order (3, 1, 0, 2), the same fixed-point
+ * form.  This file is its "single point + index" variant.
  *
- * ILK KENARDA `+= radiusSq` YOK - ROM'DA DA YOK
- * ---------------------------------------------
- * ROM 0x0800B1BA'da yalnizca `lsls r0,r2,#8 / cmp r0,#0` var; diger uc
- * kenarda ise `ldr r1,[sp,#0] / adds r0,r0,r1` ile yaricap karesi
- * ekleniyor.  Kaynakta da ilk blokta ekleme YOK.  Kardes dosyadaki
- * dortlu kopyala-yapistir yapisi dusunulunce bu, ozgun koddaki bir
- * unutma; eklendiginde 2 komut fazla cikiyor ve ROM'la uyusmuyor.
+ * THERE IS NO `+= radiusSq` ON THE FIRST EDGE - AND NONE IN THE ROM EITHER
+ * ------------------------------------------------------------------------
+ * At 0x0800B1BA the ROM has only `lsls r0,r2,#8 / cmp r0,#0`, while on the
+ * other three edges the squared radius is added with
+ * `ldr r1,[sp,#0] / adds r0,r0,r1`.  There is no addition in the first block
+ * of the source either.  Given the fourfold copy-paste structure in the
+ * sibling file, this is an omission in the original code; adding it produces 2
+ * extra instructions and does not agree with the ROM.
  *
- * KAPANISI SAGLAYAN IKI OLCUM
- * ---------------------------
- * (1) YARICAP KARESI TEK IFADE, ARA DEGISKENSIZ OLMALI  (142 -> 140 komut)
- *     ROM: asrs r2,r2,#12 / adds r0,r2,#0 / muls r0,r2 / lsls r0,r0,#8
- *     Yani carpim ve kaydirma AYNI pseudo (yerinde kaydirma), `radius>>12`
- *     ise ayri bir pseudo.  Olculen yazimlar:
+ * THE TWO MEASUREMENTS THAT CLOSED IT
+ * -----------------------------------
+ * (1) THE SQUARED RADIUS MUST BE ONE EXPRESSION, WITH NO INTERMEDIATE
+ *     VARIABLE  (142 -> 140 instructions)
+ *     The ROM: asrs r2,r2,#12 / adds r0,r2,#0 / muls r0,r2 / lsls r0,r0,#8
+ *     That is, the multiplication and the shift are THE SAME pseudo (shifted
+ *     in place) while `radius>>12` is a separate pseudo.  The spellings
+ *     measured:
  *       side = radius>>12; radiusSq = (side*side)<<8;   -> 111/142
- *          (fazla `adds r0,r2,#0` kopyasi: kaydirma ucuncu bir pseudo)
+ *          (an extra `adds r0,r2,#0` copy: the shift is a third pseudo)
  *       side = radius>>12; radiusSq = side*side; radiusSq <<= 8;
  *                                                      ->  91/142
- *          (dagitim takla atti: radiusSq sl'ye, minimum sp#0'a - ROM'un TERSI)
+ *          (the allocation flipped: radiusSq to sl, minimum to sp#0 - the
+ *          REVERSE of the ROM's)
  *       radius >>= 12; radiusSq = radius*radius; radiusSq <<= 8;  -> 96/142
  *       radiusSq = (radius>>12)*(radius>>12); radiusSq <<= 8;     -> 96/142
- *       radiusSq = ((radius>>12)*(radius>>12)) << 8;   -> 133/140  DOGRU
- *     Tek ifadede `radius>>12` CSE ile tek `asrs`a iniyor, carpim
- *     sonucu yerinde kaydiriliyor ve radiusSq sp#0 yuvasina, minimum
- *     sl'ye dusuyor - ROM'un dagitimi.
+ *       radiusSq = ((radius>>12)*(radius>>12)) << 8;   -> 133/140  CORRECT
+ *     In a single expression `radius>>12` collapses to one `asrs` by CSE, the
+ *     product is shifted in place, and radiusSq lands in the sp#0 slots with
+ *     the minimum in sl - the ROM's allocation.
  *
- * (2) `return 0` GOVDESI FONKSIYONUN SONUNDA OLMALI  (kural 49; 133 -> 140)
- *     Duz `if (side < 0) return 0;` yaziminda ilk uc kenar capraz
- *     atlama ile tek kuyruga birlesiyor ama DORDUNCUSU satir icinde
- *     kaliyor: `bge / movs r0,#0 / b` (3 komut), ROM'da ise tek `blt`.
- *     Dorduncu blogun basari yolu once yazilirsa kuyruk sona kayiyor.
- *     Kardes dosyadaki `} else return 0;` bicimi bunu sagliyor.
+ * (2) THE `return 0` BODY MUST BE AT THE END OF THE FUNCTION  (rule 49;
+ *     133 -> 140)
+ *     With a plain `if (side < 0) return 0;` the first three edges merge into
+ *     a single tail by cross-jumping, but THE FOURTH stays inline:
+ *     `bge / movs r0,#0 / b` (3 instructions), whereas the ROM has a single
+ *     `blt`.  Writing the fourth block's success path first moves the tail to
+ *     the end.  The sibling file's `} else return 0;` form achieves that.
  *
- * ELENEN / ESDEGER YAZIMLAR
- * -------------------------
- * Kuyruk yerlesimi icin OLCULEN ve HEPSI BYTE-MATCHING cikan bicimler:
- *   - dort blogun da `} else return 0;` ile sarilmasi  (secilen; kardes
- *     dosya ile ayni bicim)
- *   - yalniz son bir / iki / uc blogun sarilmasi
- *   - `goto outside;` + fonksiyon sonunda `outside: return 0;`
- * Bunlar ciktida ayirt edilemiyor; kardes dosyayla tutarli olan secildi.
- * ELENEN (eslesmeyen): dort blokta da duz `if (side < 0) return 0;`
- * (133/140), ve yukarida (1)'de listelenen dort yaricap yazimi.
+ * SPELLINGS RULED OUT / EQUIVALENT
+ * --------------------------------
+ * Forms MEASURED for the tail layout that ALL came out BYTE-MATCHING:
+ *   - wrapping all four blocks in `} else return 0;`  (the one chosen; the
+ *     same form as the sibling file)
+ *   - wrapping only the last one / two / three blocks
+ *   - `goto outside;` + `outside: return 0;` at the end of the function
+ * These are indistinguishable in the output; the one consistent with the
+ * sibling file was chosen.
+ * RULED OUT (does not match): a plain `if (side < 0) return 0;` in all four
+ * blocks (133/140), and the four radius spellings listed in (1) above.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_0800b16c.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_0800b16c.c
  */
 
 #include "gba_types.h"
@@ -74,12 +80,12 @@ s32 FUN_0800b16c(const s32 quad[4][3], const s32 *point, s32 radius)
     s32 side;
     s32 index;
 
-    /* Tek ifade olmak ZORUNDA; bkz. basliktaki olcum (1). */
+    /* It MUST be a single expression; see measurement (1) in the header. */
     radiusSq = ((radius >> 12) * (radius >> 12)) << 8;
     minimum = 0x1F400000;
     index = 0;
 
-    /* Kenar 3->0.  ROM burada yaricap karesini EKLEMIYOR. */
+    /* Edge 3->0.  The ROM DOES NOT add the squared radius here. */
     side = ((((point[1] - quad[3][1]) >> 12) * ((quad[0][0] - quad[3][0]) >> 12) - ((point[0] - quad[3][0]) >> 12) * ((quad[0][1] - quad[3][1]) >> 12)) << 8);
     if (side >= 0) {
         if (side < minimum) {

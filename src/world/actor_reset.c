@@ -1,17 +1,18 @@
-/* Aktoru yeniden kuruyor: gomulu alt yapiyi baglayip bayraklari temizliyor.
- * 0x08016768, 160 bayt.
+/* Re-initialises the actor: links the embedded sub-structure and clears the
+ * flags.  0x08016768, 160 bytes.
  *
- * +0x3C alanina aktorun KENDI +0x40'indaki gomulu yapinin adresi yaziliyor,
- * sonra o yapi FUN_08014ffc ile kuruluyor. Kurulum bayragi iki parcadan
- * olusuyor: varligin +0x0C bayraklarindaki 0x140000 maskesi SIFIR DEGILSE
- * 0x80 biti, ve belli kosullarda +0x3E alanindan cikarilan uc bitlik bir
- * alan 9 kaydirilarak ekleniyor. Sonuca 3 eklenip geciliyor.
+ * The address of the structure embedded at the actor's OWN +0x40 is written
+ * into the +0x3C field, and that structure is then set up by FUN_08014ffc.
+ * The setup flag is made of two parts: bit 0x80 if the 0x140000 mask of the
+ * entity's +0x0C flags is NON-ZERO, plus, under certain conditions, a
+ * three-bit field extracted from +0x3E and shifted left by 9.  3 is added to
+ * the result before it is passed on.
  *
- * Ghidra'nin sondaki "Could not recover jumptable" uyarisi yaniltici;
- * orada `pop {r0}; bx r0` interworking donusu var (kural 35 -> void).
+ * Ghidra's "Could not recover jumptable" warning at the end is misleading;
+ * what is there is a `pop {r0}; bx r0` interworking return (rule 35 -> void).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_reset.c
  */
 
 #include "gba_types.h"
@@ -66,9 +67,9 @@ void ResetActor(Actor *self)
 
     ent = self->entity;
     self->sub = &self->body;
-    /* ROM sonucu DEGISKENDE maddelestirip ayrica siniyor
-     * (`movs r0,#0 / ... / movs r0,#1 / cmp r0,#0`); kisa devreli
-     * `&&` yazimi dogrudan dallanma uretip alti bayt eksiltiyor. */
+    /* The ROM materialises the result IN A VARIABLE and tests it separately
+     * (`movs r0,#0 / ... / movs r0,#1 / cmp r0,#0`); the short-circuiting
+     * the `&&` spelling produces a direct branch and loses six bytes. */
     if (ent != 0) {
         s32 ok = 0;
         if (ent->kind == 4) ok = 1;
@@ -83,10 +84,10 @@ void ResetActor(Actor *self)
     FUN_08014ffc(self->sub, flags | 3, self->base, self->base + 0xc);
     FUN_08015038(self->sub);
     self->tag = 99;
-    /* ROM maskeyi `movs #16 / negs` ile -16 olarak kuruyor, 0xF0 olarak
-     * degil: kaynakta `~15` GENIS tipte bir yerelde tutuluyor.  Dogrudan
-     * `&= ~15` yazilinca alan u8 oldugu icin derleyici sabiti 0xF0'a
-     * indirgiyor ve `negs` komutu kayboluyor. */
+    /* The ROM builds the mask as -16 with `movs #16 / negs`, not as 0xF0:
+     * in the source `~15` is held in a local of WIDE type.  Written directly
+     * as `&= ~15` the field is u8, so the compiler narrows the constant to
+     * 0xF0 and the `negs` instruction disappears. */
     self->lowA &= ~15;
     self->lowB &= ~15;
     UpdateActorFrame(self);

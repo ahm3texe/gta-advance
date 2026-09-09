@@ -1,92 +1,103 @@
-/* ShiftRowsLeft -- 0x08023BB8-0x08023C3B (132 bayt)
+/* ShiftRowsLeft -- 0x08023BB8-0x08023C3B (132 bytes)
  *
- * Satir satir kaydirma. Kaynak tamponundan her satir icin bir bayt okuyup
- * `shift` kadar saga kaydiriyor; cikan `n` degeri o satirin kac bayt sola
- * kayacagini soyluyor. Satirin icinde baytlar BITISIK duruyor (adim 1),
- * satirdan satira `stride` bayt atlaniyor. Once (length - n) bayt sagdan
- * sola cekiliyor, sonra sagda kalan n bayt sifirlaniyor.
+ * Row-by-row shifting. For each row it reads one byte from the source buffer
+ * and shifts it right by `shift`; the resulting `n` says how many bytes that
+ * row will move to the left. Inside a row the bytes are CONTIGUOUS (stride 1),
+ * while from row to row `stride` bytes are skipped. First (length - n) bytes
+ * are pulled from right to left, then the n bytes left over on the right are
+ * zeroed.
  *
- * KARDESIYLE ILISKISI -- bu fonksiyon ShiftColumnsUp'nin (entries_b3.c)
- * EKSEN DEGISTIRILMIS ikizi. Ayni imza, ayni kontrol akisi; tek fark iki
- * adimin yer degistirmesi:
+ * RELATION TO ITS SIBLING -- this function is the AXIS-SWAPPED twin of
+ * ShiftColumnsUp (entries_b3.c). Same signature, same control flow; the only
+ * difference is that the two strides trade places:
  *
- *              satir ici adim      satirdan satira adim
- *   b3 (c3c)   stride              1        (sutun sutun)
- *   b6 (bb8)   1                   stride   (satir satir)
+ *              stride within a row   stride from row to row
+ *   b3 (c3c)   stride                1        (column by column)
+ *   b6 (bb8)   1                     stride   (row by row)
  *
- * Bu yuzden b3'te gereken `n * stride` carpimi burada YOK: ROM 0x8023BF6'da
- * dogrudan `adds r3, r2, r4` ile q = p + n hesapliyor. Kontrol akisini yine
- * de kardesten kopyalamadim, ROM'dan okudum (docs/COMPILER.md uyarisi);
- * bu ikisinde tesadufen ayni cikti.
+ * That is why the `n * stride` multiplication needed in b3 is ABSENT here: at
+ * ROM 0x8023BF6 it computes q = p + n directly with `adds r3, r2, r4`. Even
+ * so I did not copy the control flow from the sibling, I read it out of the
+ * ROM (see the warning in docs/COMPILER.md); the two happened to come out the
+ * same.
  *
- * IMZA ROM'DAN OKUNDU, TAHMIN DEGIL:
- *   r0            -> dest   (isaretci, normalize edilmiyor)
- *   r1,r2,r3      -> lsls#24/lsrs#24 cifti var => UCU DE u8
- *   [sp,#28]      -> ayni normalizasyon (0x8023BD6) => u8 (stride)
- *   [sp,#32]      -> normalizasyon yok, sifirla karsilastiriliyor => isaretci
- *   [sp,#36]      -> her turda yeniden okunuyor, asrs ile kullaniliyor => int
- * Prolog `push {r4-r7,lr}` + `mov r7,r9`/`mov r6,r8`/`push {r6,r7}`, yani
- * r8/r9 da kullaniliyor. Donus `pop {r0}; bx r0` ve r0 olu => void (kural 35).
+ * SIGNATURE READ FROM THE ROM, NOT GUESSED:
+ *   r0            -> dest   (pointer, not normalized)
+ *   r1,r2,r3      -> there is an lsls#24/lsrs#24 pair => ALL THREE are u8
+ *   [sp,#28]      -> same normalization (0x8023BD6) => u8 (stride)
+ *   [sp,#32]      -> no normalization, compared against zero => pointer
+ *   [sp,#36]      -> re-read every iteration, used with asrs => int
+ * Prologue `push {r4-r7,lr}` + `mov r7,r9`/`mov r6,r8`/`push {r6,r7}`, so
+ * r8/r9 are in use too. The return is `pop {r0}; bx r0` and r0 is dead =>
+ * void (rule 35).
  *
- * ROM'UN DAGITIMI (b3'unkinden farkli, teshis icin not):
- *   r4 dest (sonra n)  r5 i  r6 src  r7 next  r8 stride  r9 length  ip rows
- * b3'te stride iki ic dongude de kullanildigi icin r5'e, satir sayisi r8'e
- * dusuyordu. Burada stride'in tek referansi var (p + stride), o yuzden r8'de
- * kaliyor ve dis dongu siniri ip'e cikiyor. Yani dagitim farki kaynaktaki
- * bir tercihten degil, eksen degisiminin referans sayimlarini degistirmesinden
- * geliyor -- kural 50'nin formulu bunu kendiliginden veriyor, mudahale gerekmedi.
+ * THE ROM'S ALLOCATION (different from b3's, noted for diagnosis):
+ *   r4 dest (then n)  r5 i  r6 src  r7 next  r8 stride  r9 length  ip rows
+ * In b3 stride was used in both inner loops, so it fell into r5 and the row
+ * count fell into r8. Here stride has a single reference (p + stride), so it
+ * stays in r8 and the outer loop bound moves up into ip. That is, the
+ * allocation difference does not come from a choice in the source but from the
+ * axis swap changing the reference counts -- rule 50's formula gives this on
+ * its own, no intervention was needed.
  *
- * ROM'DAN OLCULEN AYRINTILAR:
+ * DETAILS MEASURED FROM THE ROM:
  *
- *  1. `n` u8: 0x8023BF0'daki lsls#24/lsrs#24 cifti. Kaydirma `asrs`
- *     (aritmetik) cunku ldrb'nin sonucu int'e yukseliyor ve `shift` int.
- *  2. Kopyalanacak bayt sayisi 0x8023BFC'de lsls#16/lsrs#16 ile 16 bite
- *     kirpiliyor AMA dongu icindeki azaltma duz `subs r1,#1` -- kirpma
- *     tekrarlanmiyor. Yani degisken u16 DEGIL; genis bir yerele yazilmis
- *     acik `(u16)` donusumu.
- *  3. Dis dongu sayaci isaretsiz: 0x8023BE6 `bcs` ve 0x8023C2E `bcc`
- *     (kural 31).
- *  4. Kopyalama dongusunde ROM once q'yu, sonra p'yi artiriyor
- *     (0x8023C0E `adds r3,#1` / 0x8023C10 `adds r2,#1`). Kaynaktaki artirim
- *     sirasi dogrudan buraya yansiyor -- kardeste sira tersti (p once).
- *  5. Satir ilerlemesi govdenin SONUNDA. ROM p+stride'i erken hesaplayip
- *     r7'de bekletiyor (0x8023C02) ve dongu dibinde `adds r4,r7,#0` ile geri
- *     yaziyor; bu, artirimi sona koyunca kendiliginden cikiyor.
+ *  1. `n` is u8: the lsls#24/lsrs#24 pair at 0x8023BF0. The shift is `asrs`
+ *     (arithmetic) because ldrb's result is promoted to int and `shift` is int.
+ *  2. The number of bytes to copy is truncated to 16 bits at 0x8023BFC with
+ *     lsls#16/lsrs#16, BUT the decrement inside the loop is a plain
+ *     `subs r1,#1` -- the truncation is not repeated. So the variable is NOT
+ *     u16; it is an explicit `(u16)` cast written into a wide local.
+ *  3. The outer loop counter is unsigned: `bcs` at 0x8023BE6 and `bcc` at
+ *     0x8023C2E (rule 31).
+ *  4. In the copy loop the ROM increments q first, then p
+ *     (0x8023C0E `adds r3,#1` / 0x8023C10 `adds r2,#1`). The increment order
+ *     in the source maps straight through to here -- in the sibling the order
+ *     was the other way round (p first).
+ *  5. The row advance is at the END of the body. The ROM computes p+stride
+ *     early and parks it in r7 (0x8023C02), then writes it back at the bottom
+ *     of the loop with `adds r4,r7,#0`; this falls out on its own once the
+ *     increment is placed at the end.
  *
- * DENENIP ELENEN YAZIMLAR (en degerli kisim, ayni duvara toslamayin):
+ * SPELLINGS TRIED AND REJECTED (the most valuable part, do not walk into the
+ * same wall):
  *
- *  - Kopyalama dongusunde `p++; q++;` sirasi (ROM'un tersi): 2/132 fark.
- *    Tek dugme artirimlarin KAYNAK SIRASI; baska hicbir sey degismiyor.
- *  - `int i` (isaretli dis sayac): 2/132 fark, iki dal `bcs/bcc` yerine
- *    `bge/blt` oluyor. Kural 31'in dogrudan dogrulanmasi.
- *  - Satir ilerlemesinin yeri, dort varyant olculdu (hepsi 132 hedefine
- *    karsi):
- *        `dest = p + stride;` govde ortasinda -> 128 bayt (4 eksik)
- *        `for (i = ...; i++, dest += stride)` -> 132, fark  6
- *        ayri `next = p + stride; ... dest = next` -> 132, fark 11
- *        `dest += stride;` govde SONUNDA      -> 132, fark  0  (dogru bicim)
- *    Ortadaki bicimde agbcc `dest`i dogrudan hedef yazmaca dagitip dongu
- *    dibindeki kopyayi eliyor; sona alinca kopya geri geliyor.
- *  - Sifirlama dongusune AYRI sayac yereli: 132 bayt, 20 fark. Kardeste de
- *    ayni sinif sorun cikmisti (orada 6 fark): ayri allocno onceligi
- *    yukseltip r0/r1 takasina yol aciyor. Iki ic dongunun TEK sayac
- *    degiskenini paylasmasi gerekiyor.
- *  - `u16 remain` (kirpmayi tipe birakmak): 140 bayt, 50 fark. Her
- *    `remain--` sonrasi lsls#16/lsrs#16 ekleniyor, ROM'da yok.
- *  - `(u16)` kirpmasini tumden atmak: 128 bayt (4 eksik). Kirpma gercekten
- *    kaynakta, tipte degil.
- *  - `int n`: 128 bayt. 0x8023BF0'daki daraltma cifti kayboluyor.
- *  - `int stride` (yani [sp,#28] genis parametre): 118 bayt. Girisdeki
- *    normalizasyon dortlusu ile birlikte 14 bayt gidiyor (kural 15).
+ *  - `p++; q++;` order in the copy loop (the reverse of the ROM's): 2/132 off.
+ *    The only knob is the SOURCE ORDER of the increments; nothing else changes.
+ *  - `int i` (signed outer counter): 2/132 off, the two branches become
+ *    `bge/blt` instead of `bcs/bcc`. A direct confirmation of rule 31.
+ *  - The placement of the row advance, four variants measured (all against the
+ *    132-byte target):
+ *        `dest = p + stride;` mid-body            -> 128 bytes (4 short)
+ *        `for (i = ...; i++, dest += stride)`     -> 132, off  6
+ *        separate `next = p + stride; ... dest = next` -> 132, off 11
+ *        `dest += stride;` at the END of the body -> 132, off  0  (correct form)
+ *    In the middle form agbcc allocates `dest` straight into the destination
+ *    register and eliminates the copy at the bottom of the loop; moving it to
+ *    the end brings the copy back.
+ *  - A SEPARATE counter local for the zeroing loop: 132 bytes, 20 off. The
+ *    same class of problem came up in the sibling as well (6 off there): the
+ *    separate allocno raises the priority and opens the way to an r0/r1 swap.
+ *    The two inner loops must share a SINGLE counter variable.
+ *  - `u16 remain` (leaving the truncation to the type): 140 bytes, 50 off. An
+ *    lsls#16/lsrs#16 is added after every `remain--`, which the ROM does not
+ *    have.
+ *  - Dropping the `(u16)` truncation altogether: 128 bytes (4 short). The
+ *    truncation really is in the source, not in the type.
+ *  - `int n`: 128 bytes. The narrowing pair at 0x8023BF0 disappears.
+ *  - `int stride` (that is, [sp,#28] as a wide parameter): 118 bytes. Along
+ *    with the normalization quartet in the prologue, 14 bytes go away
+ *    (rule 15).
  *
- * ESDEGER OLCULEN YAZIMLAR (ikisi de birebir eslesiyor, tercih uslup):
- *  - `*p++ = *q++;` tek deyim olarak -- ucluyu acik yazmakla ayni kod.
- *    Kardesle bicim birligi icin acik yazim tercih edildi.
- *  - `q = dest + n;` (p yerine dest tabani) -- o noktada p == dest oldugu
- *    icin CSE ikisini birlestiriyor.
+ * FORMS MEASURED AS EQUIVALENT (both match exactly, the choice is style):
+ *  - `*p++ = *q++;` as a single statement -- the same code as writing the
+ *    three steps out explicitly. The explicit spelling was preferred for
+ *    stylistic consistency with the sibling.
+ *  - `q = dest + n;` (dest as the base instead of p) -- since p == dest at
+ *    that point, CSE merges the two.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_b6.c  -> 132/132 eslesti
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_b6.c  -> 132/132 matched
  */
 
 #include "gba_types.h"
@@ -110,17 +121,17 @@ void ShiftRowsLeft(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
         src++;
         q = p + n;
 
-        /* Soldaki (length - n) bayti n bayt sagdan cekip sola kaydir.
-         * Kirpma acik: bkz. baslik, madde 2. */
+        /* Pull the left-hand (length - n) bytes n bytes in from the right and
+         * shift them left. The truncation is explicit: see header, item 2. */
         remain = (u16)(length - n);
         while (remain != 0) {
             *p = *q;
-            q++;      /* ROM once q'yu artiriyor; sira onemli (madde 4) */
+            q++;      /* the ROM increments q first; order matters (item 4) */
             p++;
             remain--;
         }
 
-        /* Bosalan sagdaki n bayti sifirla. Ayni sayac degiskeni: bkz. baslik. */
+        /* Zero the n bytes vacated on the right. Same counter variable: see header. */
         remain = n;
         while (remain != 0) {
             *p = 0;
@@ -128,6 +139,6 @@ void ShiftRowsLeft(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
             remain--;
         }
 
-        dest += stride;   /* satir ilerlemesi govdenin SONUNDA (madde 5) */
+        dest += stride;   /* row advance at the END of the body (item 5) */
     }
 }

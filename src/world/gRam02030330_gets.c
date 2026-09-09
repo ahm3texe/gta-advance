@@ -1,10 +1,10 @@
-/* gRam02030330 alan erisimi — 0x080509DC-0x080509ED
+/* gRam02030330 field access — 0x080509DC-0x080509ED
  *
- * `base` (+0x10) okuyucu ve `slot` (+0x2C) yazici.
- * Ayni kumedeki CallWithOffset ayri dosyada ve byte-matching.
+ * Getter for base (+0x10) and setter for slot (+0x2C). CallWithOffset from
+ * the same cluster is in a separate file and is byte-matching.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/gRam02030330_gets.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/gRam02030330_gets.c
  */
 
 #include "gba_types.h"
@@ -13,7 +13,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

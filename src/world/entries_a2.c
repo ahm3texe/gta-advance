@@ -1,54 +1,59 @@
-/* gEntriesA'da sahip + durum aramasi — 0x08028F4C-0x08028F97
+/* Searching gEntriesA by owner + state — 0x08028F4C-0x08028F97
  *
- * Once GetOwnerSlot ile parametreyi dogrular; sonuc 0 ise hemen 0 doner.
- * Gecerliyse gEntriesA'daki 15 girise (stride 148) bakar ve su ucluyu arar:
- * giris aktif (+0x00 sifir degil), +0x84 alani parametreye esit, +0x90 alani
- * 51 ya da 52. Bulursa 1, bulamazsa 0 doner.
+ * First validates the parameter with GetOwnerSlot; if the result is 0 it
+ * returns 0 immediately.  If valid it looks at the 15 entries in gEntriesA
+ * (stride 148) and searches for this triple: the entry is active (+0x00
+ * non-zero), the +0x84 field equals the parameter, and the +0x90 field is 51
+ * or 52.  It returns 1 if found and 0 if not.
  *
- * ROM'daki `subs #51 / cmp #1 / bls` tek bir aralik sinamasidir; agbcc bunu
- * `x == 51 || x == 52` yazimindan kendi uretiyor (aralik kanonikleştirmesi).
+ * The ROM's `subs #51 / cmp #1 / bls` is a single range test; agbcc produces
+ * it itself from the `x == 51 || x == 52` spelling (range canonicalisation).
  *
- * `pop {r4}; pop {r1}; bx r1` — r0 canli kaldigi icin donus adresi r1'e
- * aliniyor, yani fonksiyon DEGER donduruyor (kural 35'in tersi).
+ * `pop {r4}; pop {r1}; bx r1` — the return address is taken into r1 because r0
+ * stays live, i.e. the function returns a VALUE (the reverse of rule 35).
  *
- * BYTE-MATCHING (76/76). Uc sey birlikte gerekti; her biri olculdu:
+ * BYTE-MATCHING (76/76).  Four things were needed together; each was measured:
  *
- * 1) SAYAC `s32 i` ILE DIZI INDEKSLI `for` (kural 9/31/42). ROM disaridan
- *    bakinca saf isaretci yurumesi (`adds #148` + `cmp r1,r3`) gibi duruyor,
- *    ama dal ISARETLI (`ble`). Kardes kind_scan.c'nin elle yazilmis isaretci
- *    dongusu `bls` uretiyor. Isaretli dal ancak `i <= 14` karsilastirmasindan
- *    geliyor: agbcc guclendirme sonrasi biv'i eleyip testi giv uzerine
- *    tasirken karsilastirmanin isaretliligini KORUYOR.
+ * 1) A `for` WITH AN `s32 i` COUNTER AND ARRAY INDEXING (rules 9/31/42).  From
+ *    the outside the ROM looks like pure pointer walking (`adds #148` +
+ *    `cmp r1,r3`), but the branch is SIGNED (`ble`).  The hand-written pointer
+ *    loop in the sibling kind_scan.c produces `bls`.  A signed branch can only
+ *    come from an `i <= 14` comparison: after strength reduction agbcc
+ *    eliminates the biv and moves the test onto the giv while PRESERVING the
+ *    comparison's signedness.
  *
- * 2) +0x84 VE +0x90 ICIN TEK ISARETCI (EntryTail). Alanlari dogrudan
- *    `gEntriesA[i].unk84` / `gEntriesA[i].unk90` diye yazmak agbcc'ye UC ayri
- *    giv kurduruyor (base+0, base+132, base+144) ve `push {r4,r5,r6,lr}`
- *    veriyordu: 84 bayt / 63 fark. Iki alani tek alt-yapida toplayip
- *    `tail = &base[i].tail` demek ROM'un iki giv'ini (r1 = +0, r2 = +0x84)
- *    ve `ldr [r2,#0]` / `ldr [r2,#12]` erisimlerini uretti: 76 bayt / 46 fark.
+ * 2) A SINGLE POINTER FOR +0x84 AND +0x90 (EntryTail).  Writing the fields
+ *    directly as `gEntriesA[i].unk84` / `gEntriesA[i].unk90` makes agbcc build
+ *    THREE separate givs (base+0, base+132, base+144) and gives
+ *    `push {r4,r5,r6,lr}`: 84 bytes / 63 off.  Collecting the two fields into
+ *    one sub-structure and saying `tail = &base[i].tail` produced the ROM's
+ *    two givs (r1 = +0, r2 = +0x84) and its `ldr [r2,#0]` / `ldr [r2,#12]`
+ *    accesses: 76 bytes / 46 off.
  *
- * 3) `tail` ATAMASI `if`IN DISINDA. `if (active)` icine yazilinca giv her
- *    turda calismadigi icin agbcc guclendirmiyor, adresi dongu icinde
- *    `r3 + r5` diye yeniden kuruyordu. Kosulun onune alinca giv oldu.
+ * 3) THE `tail` ASSIGNMENT OUTSIDE THE `if`.  Written inside `if (active)`,
+ *    the giv does not run on every round so agbcc does not strength-reduce it
+ *    and rebuilds the address inside the loop as `r3 + r5`.  Moved ahead of
+ *    the condition it became a giv.
  *
- * 4) `base` AYRI YEREL (kural 1/37). `gEntriesA[i]` dogrudan yazilinca agbcc
- *    ikinci giv'in baslangicini `.word gEntriesA+0x84` olarak KATLIYOR ve
- *    tabani `subs #132` ile geri hesapliyordu (72 bayt, 16 komut farki).
- *    `base = gEntriesA;` ara yereli tabani register'da tutuyor; iki giv de
- *    ondan tureyince ROM'un `ldr r0,=base / adds r2,r0,#0 / adds r2,#132 /
- *    adds r1,r0,#0` dizisi cikiyor.
+ * 4) `base` AS A SEPARATE LOCAL (rules 1/37).  Written as `gEntriesA[i]`
+ *    directly, agbcc FOLDS the second giv's start into `.word gEntriesA+0x84`
+ *    and recomputes the base with `subs #132` (72 bytes, 16 instructions off).
+ *    The intermediate local `base = gEntriesA;` keeps the base in a register;
+ *    with both givs derived from it, the ROM's
+ *    `ldr r0,=base / adds r2,r0,#0 / adds r2,#132 / adds r1,r0,#0` sequence
+ *    comes out.
  *
- * Kardesleri: src/world/kind_scan.c (0x08028E3C, isaretsiz isaretci
- * dongusu) ve src/world/entries_a4.c (0x08029244, guclendirilmemis
- * `i * 148` carpimi). Ayni tablonun uc farkli derleme bicimi.
+ * Its siblings: src/world/kind_scan.c (0x08028E3C, an unsigned pointer loop)
+ * and src/world/entries_a4.c (0x08029244, an unreduced `i * 148`
+ * multiplication).  Three different compiled forms of the same table.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a2.c
  */
 
 #include "gba_types.h"
 
-#define ENTRY_COUNT_MAX  14         /* dongu 0..14, yani 15 tur */
+#define ENTRY_COUNT_MAX  14         /* the loop runs 0..14, i.e. 15 rounds */
 #define STATE_LOW        51
 #define STATE_HIGH       52
 

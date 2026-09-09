@@ -1,12 +1,11 @@
-/* Bant hesaplayici — 0x08023A0C-0x08023A67
+/* Compute a band — 0x08023A0C-0x08023A67
  *
- * Bir "olcek" struct'inda current'i max ile sinirlayip 4 shift'lik bir
- * banda gore state'i (bant numarasi) yaziyor: current oranina gore
- * `{max>>0, max>>1, max>>3, max>>32}` esiklerinden hangisinin altinda
- * kaldigini state'e yaziyor.
+ * Clamp current to max in a scale structure, then write the band number
+ * to state according to four shifted thresholds:
+ * {max>>0, max>>1, max>>3, max>>32}.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/threshold.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/threshold.c
  */
 
 #include "gba_types.h"
@@ -14,7 +13,7 @@
 #define BAND_COUNT   4
 
 typedef struct Meter {
-    u8  state;                  /* +0x00 (bant no) */
+    u8  state;                  /* +0x00 (band number) */
     u8  flag;                   /* +0x01 */
     u8  pad02[2];
     s32 max;                    /* +0x04 */

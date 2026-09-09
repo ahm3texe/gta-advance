@@ -1,18 +1,17 @@
-/* Nesne sorgusu — 0x080381F8-0x08038233
+/* Object query — 0x080381F8-0x08038233
  *
- * ROM'daki sabit bir dort sozcuklu yapiyi yerele
- * kopyalayip (ldmia/stmia cifti struct atamasindan geliyor) sinama
- * fonksiyonuna veriyor.
+ * Copy a constant four-word ROM structure to a local and pass it to the test
+ * function; structure assignment produces the ldmia/stmia pair.
  *
- * BYTE-MATCHING. Null kontrollerini acik erken `return 0` biciminde yazmak
- * ROM'daki sifir blogunu literal havuzundan once yerlestirir. Ic ice `if`
- * bicimi ayni semantige sahip olsa da blogu havuzdan sonraya tasiyordu.
+ * BYTE-MATCHING. Explicit early return-0 null checks put the zero block
+ * before the literal pool, as in the ROM. Equivalent nested if statements
+ * moved it after the pool.
  *
- * Bitişik iki eslesen fonksiyon ayri dosyalarda: SubmitObject ->
- * src/world/submit_object.c, GetInnerId -> src/world/get_inner_id.c.
+ * Two adjacent matching functions are separate: SubmitObject in
+ * submit_object.c and GetInnerId in get_inner_id.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/object_query.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/object_query.c
  */
 
 #include "gba_types.h"

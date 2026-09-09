@@ -1,13 +1,13 @@
-/* Oyuncu aktoru hazir mi — 0x0803C62C-0x0803C695
+/* Test player actor readiness — 0x0803C62C-0x0803C695
  *
- * gGameState[12] sifirsa oyuncu 1 secim blogu (gRam02000F10), degilse
- * gSessionPtr'in gosterdigi blok; +0'daki aktor FUN_08061fbc'ye
- * veriliyor, sifir degilse 1. Yoksa ayni secim yeniden yapilip aktorun
- * +0x18 kaydinin +0x30 kipi 2 ise 1, degilse 0 (kural 48: kosul once
- * `ok` degiskeninde maddelesiyor, ROM'daki `movs r1,#0 / movs r1,#1`).
+ * Select player 1's block (gRam02000F10) when gGameState[12] is zero, otherwise
+ * the block pointed to by gSessionPtr. Pass its actor at +0 to FUN_08061fbc;
+ * return 1 if nonzero. Otherwise repeat the selection and return whether
+ * mode +0x30 in the actor's +0x18 record equals 2. Rule 48: materialize the
+ * condition in ok first, matching the ROM's movs r1,#0 / movs r1,#1.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_player_actor_ready.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_player_actor_ready.c
  */
 
 #include "gba_types.h"
@@ -16,7 +16,7 @@ typedef struct Actor { u8 pad00[24]; Detail *detail; } Actor;
 typedef struct Sel { Actor *actor; } Sel;
 extern u8   gGameState[];
 extern Sel *gSessionPtr;
-#include "ram_symbols.h"   /* gRam02000F10: u8[] gorunumu, tutarlilik kapisi */
+#include "ram_symbols.h"   /* gRam02000F10: u8[] view required by the consistency check */
 extern u32  FUN_08061fbc(Actor *actor);
 u32 IsPlayerActorReady(void)
 {

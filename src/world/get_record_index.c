@@ -1,12 +1,12 @@
-/* Kayit indisi getirici — 0x080512B0-0x080512BB
+/* Record index getter — 0x080512B0-0x080512BB
  *
- * gRecordIndex'i dogrudan donduruyor. Sembol src/misc/record_table.c'de
- * `extern u32` olarak bildirili; ayni tur kullaniliyor (TYPES-001).
+ * Return gRecordIndex directly. The symbol is declared extern u32 in
+ * src/misc/record_table.c; use the same type (TYPES-001).
  *
- * tools/find_accessors.py ile bulundu.
+ * Found with tools/find_accessors.py.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_record_index.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_record_index.c
  */
 
 #include "gba_types.h"

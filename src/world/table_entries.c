@@ -1,11 +1,11 @@
-/* Tablo girdisi sorgu ve serbest birakma — 0x08028C48-0x08028CE7
+/* Query and release table entries — 0x08028C48-0x08028CE7
  *
- * Uc kucuk fonksiyon; her biri 148 baytlik girisli bir tabloya `index * 148`
- * ile erisiyor. Ilk fonksiyon aktiflik bayragini test ediyor; digerleri
- * girisi kapatiyor (bir bloku serbest birakip alan sifirliyor).
+ * Three small functions access 148-byte entries using index * 148. The first
+ * tests the active flag; the others close an entry by freeing a block and
+ * clearing fields.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/table_entries.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/table_entries.c
  */
 
 #include "gba_types.h"
@@ -19,7 +19,7 @@ typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 unk02;                  /* +0x02 */
-    u32 unk04;                  /* +0x04 (serbest birakilacak blok) */
+    u32 unk04;                  /* +0x04 (block to release) */
     u8  pad08[0x22];
     u8  mark;                   /* +0x2A */
     u8  state;                  /* +0x2B */

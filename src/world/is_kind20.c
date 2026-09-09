@@ -1,17 +1,16 @@
-/* Tur 20 sinamasi (atlama tablosu) — 0x08067404-0x080674AD
+/* Test kind 20 with a jump table — 0x08067404-0x080674AD
  *
- * Yalnizca tur 20 icin 1 doner; 0..35 arasindaki diger turler ve 35
- * ustu 0. Kaynak bunu `kind == 20` diye DEGIL, 36 girisli bir switch
- * olarak yazmis: ROM'da `cmp #35 / bhi` sonra 36 kelimelik ATLAMA
- * TABLOSU var, 35 girisi `return 0` blogunu gosteriyor.
+ * Return 1 only for kind 20; other values in 0..35 and values above 35 return
+ * 0. The source uses a 36-case switch, not kind == 20: the ROM has cmp #35 /
+ * bhi followed by a 36-word JUMP TABLE, with 35 entries targeting return 0.
  *
- * OLCULEN: tabloyu ancak her degerin KENDI `case` etiketi uretiyor;
- * GNU aralik yazimi (`case 0 ... 19:`) iki karsilastirmaya kokup tabloyu
- * kaldiriyor. Etiketlerin gruplu ya da tek tek, case 20'nin once ya da
- * sonra yazilmasi farketmiyor (bes yazim da birebir).
+ * MEASURED: each value needs its OWN case label to generate the table. GNU
+ * ranges (case 0 ... 19:) collapse to two comparisons and remove it. Grouped
+ * or individual labels, and placing case 20 first or last, make no difference:
+ * all five forms match exactly.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_kind20.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_kind20.c
  */
 
 #include "gba_types.h"

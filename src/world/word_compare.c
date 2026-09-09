@@ -1,9 +1,9 @@
-/* Kelime karsilastirici — 0x08050190-0x080501C7
+/* Word comparison — 0x08050190-0x080501C7
  *
- * Iki bagimsiz sozcugu karsilastirip esitlik testi (0 esit / 1 farkli).
+ * Compare two independent words: 0 means equal, 1 means different.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/word_compare.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/word_compare.c
  */
 
 #include "gba_types.h"

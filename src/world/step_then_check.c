@@ -1,11 +1,11 @@
-/* Adim atip bayrak sinama — 0x08031DB8-0x08031DDB
+/* Step and test a flag — 0x08031DB8-0x08031DDB
  *
- * Once FUN_0802EF3C cagriliyor, sonra gRam02025810+0x1358'deki soz sifir
- * degilse FUN_08029C20 cagriliyor. ROM taban ile 0x1358 ofsetini AYRI
- * yukleyip topluyor (ofset sekiz bitlik ani degere sigmiyor).
+ * Call FUN_0802EF3C, then call FUN_08029C20 if the word at
+ * gRam02025810+0x1358 is nonzero. The ROM loads base and offset SEPARATELY
+ * and adds them; 0x1358 does not fit an eight-bit immediate.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/step_then_check.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/step_then_check.c
  */
 
 #include "gba_types.h"

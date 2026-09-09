@@ -1,20 +1,22 @@
-/* Havuz dugumu ayirma — 0x08033674-0x080336EB (120 bayt)
+/* Allocating a pool node — 0x08033674-0x080336EB (120 bytes)
  *
- * DURUM: 27/57 komut, YAKIN ISKA (eslesmiyor).
+ * STATUS: 27/57 instructions, A NEAR MISS (does not match).
  *
- * FUN_08032cc4'ten dugum alinir (yoksa 0), +0x21 = 16. gAddrTable+0xB18'deki
- * 8 girisli tabloda dugum aranir; yoksa ayni tabloya (ROM'da 0x02027330 +
- * 0xB2C diye ikinci bir sembolden!) ilk bos yuvaya yazilir. Donus:
- * ((dugum - gAddrTable) / 44) << 24 | (dugumun +0'i & 0xFFFFFF).
+ * A node is taken from FUN_08032cc4 (0 if there is none), +0x21 = 16.  The
+ * node is looked up in the 8-entry table at gAddrTable+0xB18; if it is not
+ * there it is written into the first free slot of the same table (through a
+ * SECOND symbol in the ROM, 0x02027330 + 0xB2C!).  Return value:
+ * ((node - gAddrTable) / 44) << 24 | (the node's +0 & 0xFFFFFF).
  *
- * KALAN FARK, YERLESIM: ROM ikinci dongunun "bos yuva bulundu" blogunu
- * (`str r2,[r1]; b tail`) BIRINCI dongunun ONUNE koyuyor ve dugumun +0'ini
- * her dongu oncesi yeniden okuyor. Denenen: iki `for` + goto (27),
- * taban yerelleri (27), ic ice while (15). Blok yerlesimini veren kaynak
- * bicimi bulunamadi; muhtemelen ikinci arama ayri bir yardimci/makro.
+ * THE REMAINING DIFFERENCE IS LAYOUT: the ROM puts the second loop's "free
+ * slot found" block (`str r2,[r1]; b tail`) BEFORE the FIRST loop, and it
+ * re-reads the node's +0 before each loop.  Tried: two `for`s + goto (27),
+ * base locals (27), nested while (15).  No source form that gives that block
+ * layout was found; the second search is probably a separate helper or
+ * macro.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/alloc_pool_node.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/alloc_pool_node.c
  */
 
 #include "gba_types.h"

@@ -1,31 +1,36 @@
-/* Firlatma hizini uygulama — 0x08064DFC-0x08064F21 (294 bayt)
+/* Applying the launch velocity — 0x08064DFC-0x08064F21 (294 bytes)
  *
- * DURUM: 119/143 komut, YAKIN ISKA (eslesmiyor). 292/294 bayt: ROM 2 bayt uzun.
+ * STATUS: 119/143 instructions, A NEAR MISS (does not match).  292/294 bytes:
+ * the ROM is 2 bytes longer.
  *
- * NE YAPIYOR: yuvaya kip baytini yazar (+0x25); hiz ve 16.16 acidan
- * (aci >>16) ileri/geri kirpma yapar (ileri: aci 1..0x2FF ise cik,
- * geri: aci > 0x100 ise cik); ileriyse aciyi 0x400'den cikarip
- * gRom08CA30D8 sinus tablosundan (<<2, >>8) hizin mutlak degeriyle
- * (>>8) carpip <<8 ile +0x28'e yazar; +0x40 = 0; hiz negatifse +0x124'u
- * ters cevirir; +0x3C = +0x124'un yarisi (isaret ters); |+0x3C| <
- * (+0xE0 - +0xD4)/4 ise sifirlar; +0x18C..+0x19C zincirinden secim yapip
- * +0x120'ye ekler; hizi ScaleByDistanceBand ile olcekler; ses 472.
+ * WHAT IT DOES: writes the mode byte to the slot (+0x25); clamps forward and
+ * backward using the speed and the 16.16 angle (angle >>16) (forward: return
+ * if the angle is 1..0x2FF, backward: return if the angle is > 0x100); if
+ * forward, it subtracts the angle from 0x400, takes a value from the
+ * gRom08CA30D8 sine table (<<2, >>8), multiplies it by the absolute value of
+ * the speed (>>8) and writes it <<8 to +0x28; +0x40 = 0; if the speed is
+ * negative it negates +0x124; +0x3C = half of +0x124 (with the opposite sign);
+ * if |+0x3C| < (+0xE0 - +0xD4)/4 it zeroes it; makes a selection from the
+ * +0x18C..+0x19C chain and adds it to +0x120; scales the speed with
+ * ScaleByDistanceBand; sound 472.
  *
- * KALAN 24 KOMUT, UC KUME (hepsi yazmac atamasi / okuma sirasi):
- *  1. sinus r0 / mutlak-hiz r1 rolleri ters (bende r1 / r0).
- *  2. +0x3C ternary'si ROM'da dogrudan r0'a hesaplanip saklaniyor ve
- *     karsilastirma icin alan YENIDEN OKUNUYOR (`ldr r1,[r4,#60]`);
- *     bende deger r2'de kaliyor. Denenen: yerel v, dogrudan ternary,
- *     `*w` takma ad isaretcisi (26), d'yi once hesaplamak -- hicbiri.
- *  3. +0x18C/+0x190/+0x194 uclusunun adres sabitleri: ROM +0x194'u
- *     +0x18C sabitinden (+8) turetiyor, bende +0x190'dan (+4). Denenen:
- *     ayri yereller p0..p4 (118), `q = &b->unk18C; q[i]` (98),
- *     kaydirmalari satir ici yapmak (119, en iyi).
- * Bu uc kume kural 44 sinifi (yazmac atamasi); bilinen kaynak kaldiraci
- * yok. Yeni deneyen: docs/COMPILER.md kural 51/54'e bakip once 2'yi denesin.
+ * THE REMAINING 24 INSTRUCTIONS, THREE CLUSTERS (all register allocation /
+ * read order):
+ *  1. the sine r0 / absolute-speed r1 roles are swapped (r1 / r0 here).
+ *  2. the +0x3C ternary is computed directly into r0 and stored in the ROM,
+ *     and the field is RE-READ for the comparison (`ldr r1,[r4,#60]`); here
+ *     the value stays in r2.  Tried: a local v, the ternary directly, a `*w`
+ *     alias pointer (26), computing d first -- none of them.
+ *  3. the address constants of the +0x18C/+0x190/+0x194 triple: the ROM
+ *     derives +0x194 from the +0x18C constant (+8), here from +0x190 (+4).
+ *     Tried: separate locals p0..p4 (118), `q = &b->unk18C; q[i]` (98),
+ *     doing the shifts inline (119, the best).
+ * These three clusters are a rule 44 class (register allocation); there is no
+ * known source lever.  Whoever tries next: look at rules 51/54 in
+ * docs/COMPILER.md and start with cluster 2.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/apply_launch_velocity.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/apply_launch_velocity.c
  */
 
 #include "gba_types.h"

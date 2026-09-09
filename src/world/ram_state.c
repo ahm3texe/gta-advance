@@ -1,10 +1,10 @@
-/* gRam02035EA0 durum ve ayar — 0x08062294-0x080622BB
+/* gRam02035EA0 state and settings — 0x08062294-0x080622BB
  *
- * Iki fonksiyon: mode secici (unk00 null degilse mode==4 ise 2, degilse 1)
- * ve iki alan yazici (+20 u8, +22 u16).
+ * Two functions: a mode selector (when unk00 is non-null, return 2 for
+ * mode == 4, otherwise 1), and a setter for +20 u8 and +22 u16.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/ram_state.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/ram_state.c
  */
 
 #include "gba_types.h"

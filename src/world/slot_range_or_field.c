@@ -1,9 +1,9 @@
-/* Kip 2 ise yuva araligi, degilse alan — 0x08038044-0x0803805D
+/* Slot range in mode 2, otherwise a field — 0x08038044-0x0803805D
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Rule 35: `pop {r1}; bx r1` means r0 carries a value; the return type is u32.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_range_or_field.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_range_or_field.c
  */
 
 #include "gba_types.h"

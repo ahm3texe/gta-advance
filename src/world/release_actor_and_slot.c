@@ -1,60 +1,59 @@
-/* Band B — 0x08030B34 .. 0x08031D23 arasindan dokuz fonksiyon.
+/* Historical band B: nine functions from 0x08030B34 .. 0x08031D23.
  *
- * ONEMLI OLCUM NOTU — `make c-match FILE=src/world/band_b.c` CIKTISI YANILTICI
- * ----------------------------------------------------------------------------
- * tools/agbcc_build.py bir dosyadaki TUM fonksiyonlari PES PESE, en kucuk ROM
- * adresinden baslayarak linkliyor (`base = min(address)`, `SUBALIGN(1)`).  Bu
- * dokuz fonksiyon ROM'da BITISIK DEGIL; aralarinda baska ceviri birimlerine ait
- * fonksiyonlar var.  Sonuc: ilk fonksiyon (SendTextMode1) disindaki her fonksiyon
- * kendi ROM adresinden SABIT bir delta kadar kaymis olarak linkleniyor ve
- * govdesindeki her `bl` o delta kadar yanlis kodlaniyor.  Govde birebir dogru
- * olsa bile `bl` iceren fonksiyon "farkli: 2/N byte" gorunuyor.
+ * MEASUREMENT NOTE: results from the former src/world/band_b.c were misleading.
+ * agbcc_build.py links all functions consecutively from min(address), using
+ * SUBALIGN(1). These nine are not contiguous in the ROM: other translation
+ * units intervene. All but the first (SendTextMode1) were linked at a fixed
+ * displacement from their ROM addresses, making every bl offset wrong even
+ * for otherwise matching code (reported as 2/N differing bytes).
+ * Each was therefore measured separately at its own ROM address:
+ *   SendTextMode1 12 BYTE-MATCHING
+ *   LoadHudPalettes 124 BYTE-MATCHING
+ *   TriggerEvent39 12 BYTE-MATCHING
+ *   GetRecordNodeById 14 BYTE-MATCHING
+ *   ScaleMagnitude 132 BYTE-MATCHING
+ *   ClearHudRowsAB 72 BYTE-MATCHING
+ *   ReleaseActorAndSlot 64 BYTE-MATCHING
+ *   BlitStripClipLeft4bpp 470 NON-MATCHING
+ *   PushSlotQueueEntry 140 MISSING RAM SYMBOL
+ * These are historical results; detailed notes accompany the split sources.
  *
- * Bu yuzden her fonksiyon AYRICA tek fonksiyonluk bir dosyada (base = kendi ROM
- * adresi, `bl` dogru) olculdu.  Tek fonksiyonluk olcumler — dogru olanlar:
- *     SendTextMode1  12  BYTE-MATCHING
- *     LoadHudPalettes 124  BYTE-MATCHING
- *     TriggerEvent39  12  BYTE-MATCHING
- *     GetRecordNodeById  14  BYTE-MATCHING
- *     ScaleMagnitude 132  BYTE-MATCHING
- *     ClearHudRowsAB  72  BYTE-MATCHING
- *     ReleaseActorAndSlot  64  BYTE-MATCHING
- *     BlitStripClipLeft4bpp 470  eslesmedi (asagida ayrintili)
- *     PushSlotQueueEntry 140  RAM SEMBOLU EKSIK (asagida ayrintili)
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_b.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/world/release_actor_and_slot.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-/* ---- 0x08031618 — 64 bayt, BYTE-MATCHING --------------------------------
+/* ---- 0x08031618 — 64 bytes, BYTE-MATCHING -------------------------------
  *
- * Bir aktoru serbest birakiyor: +0x1E bayrak sozunde 2 biti kuruluysa biti
- * temizleyip +0x28'deki nesne yuvasini birakiyor, sonra +0x2C'deki sahibin
- * +0x18 kimligini FUN_08030d0c'ye sorup donen yuva -1 degilse ReleaseSlot
- * cagiriyor.
+ * Releases an actor: if bit 2 is set in the +0x1E flag word it clears the bit
+ * and releases the object slot at +0x28, then asks FUN_08030d0c for the +0x18
+ * id of the owner at +0x2C and calls ReleaseSlot unless the returned slot
+ * is -1.
  *
- * TEK ZOR NOKTA — MASKENIN GENISLIGI VE AND'IN HEDEFI:
- * ROM `ldr r0,=0xfffd / ands r0,r1 / strh r0,[r4,#30]` yaziyor; AND'in HEDEFI
- * MASKENIN yazmaci.  `actor->flags = flags & ACTOR_FLAG_CLEAR;` (ve maskeyi
- * u16 bir yerele alan her cesidi) sonucu `flags`in yazmaciyla birlestirip
- * `ands r1,r0` uretiyor — 2 bayt fark, kapanmiyor.  Olculen cozum: maske
- * 32-BIT bir yerel olacak ve AND'in hedefi O yerel olacak.  16-bit yerel ayni
- * sonucu VERMIYOR (`ands r1,r0`); genislik de belirleyici.  Ayni sonucu veren
- * esdegerler (hepsi olculdu, hepsi eslesti): u32/s32/int yerel, `next &= flags`
- * ya da `next = next & flags`, blok kapsamli ya da fonksiyon basinda bildirim.
- * Elenenler (hepsi 2 bayt fark): `flags & MASK`, `MASK & flags`, u16 maske
- * yereli, `flags &= MASK`, `flags & ~ACTOR_FLAG_HELD`, gecici sonuc degiskeni,
- * u32/s32 `flags`, maskeyi fonksiyon basina almak, held'i one almak.
+ * THE ONE HARD POINT — THE MASK'S WIDTH AND THE AND'S DESTINATION:
+ * the ROM has `ldr r0,=0xfffd / ands r0,r1 / strh r0,[r4,#30]`; the AND's
+ * DESTINATION is the MASK's register.  `actor->flags = flags & ACTOR_FLAG_CLEAR;`
+ * (and every variant that takes the mask into a u16 local) folds the result
+ * into `flags`'s register and produces `ands r1,r0` — 2 bytes off, and it does
+ * not close.  The measured solution: the mask must be a 32-BIT local and the
+ * AND's destination must be THAT local.  A 16-bit local DOES NOT give the same
+ * result (`ands r1,r0`); the width is decisive too.  Equivalents that give the
+ * same result (all measured, all matching): a u32/s32/int local,
+ * `next &= flags` or `next = next & flags`, declared at block scope or at the
+ * top of the function.  Ruled out (all 2 bytes off): `flags & MASK`,
+ * `MASK & flags`, a u16 mask local, `flags &= MASK`,
+ * `flags & ~ACTOR_FLAG_HELD`, a temporary result variable, u32/s32 `flags`,
+ * moving the mask to the top of the function, moving held first.
  *
- * -1 karsilastirmasi `movs r0,#1 / negs r0,r0 / cmp r1,r0` olarak cikiyor;
- * Thumb'da -1 dogrudan `cmp` immediate'i olamadigi icin bu duz yazimin sonucu.
+ * The -1 comparison comes out as `movs r0,#1 / negs r0,r0 / cmp r1,r0`; that
+ * is simply what the plain spelling gives, since -1 cannot be a `cmp`
+ * immediate in Thumb.
  */
 
 #define ACTOR_FLAG_HELD    2
-#define ACTOR_FLAG_CLEAR   0xFFFD       /* ~ACTOR_FLAG_HELD, 16 bit */
+#define ACTOR_FLAG_CLEAR   0xFFFD       /* ~ACTOR_FLAG_HELD, 16 bits */
 #define SLOT_NONE          (-1)
 
 typedef struct Obj Obj;

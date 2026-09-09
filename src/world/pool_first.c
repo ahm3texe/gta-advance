@@ -1,15 +1,14 @@
-/* Havuz +0 getirici — 0x08037F70-0x08037F7B
+/* Pool +0 getter — 0x08037F70-0x08037F7B
  *
- * gRam0202F300 havuzunun ILK alanini dondurur. Ayni sembolun +8 alanini
- * donduren dort kardesi src/world/pool_gets.c icindedir.
+ * Return the FIRST field of gRam0202F300. Four siblings reading +8 from pool
+ * symbols are in src/world/pool_gets.c.
  *
- * NEDEN AYRI DOSYA: bu fonksiyonu pool_gets.c'ye eklemek, ayni derleme
- * biriminin ORTAK literal havuzunu kaydirip zaten eslesen MarkAndClear'in
- * `ldr [pc,#imm]` degerini bozdu (34/34 -> 1/34). Bitisik olmayan adres
- * kumeleri ayri dosyada tutulmali.
+ * SEPARATE FILE: adding this to pool_gets.c moved the translation unit's
+ * shared literal pool and broke matching MarkAndClear's ldr [pc,#imm]
+ * (34/34 -> 1/34). Keep noncontiguous address clusters in separate files.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/pool_first.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/pool_first.c
  */
 
 #include "gba_types.h"

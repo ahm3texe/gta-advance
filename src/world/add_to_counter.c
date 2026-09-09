@@ -1,15 +1,15 @@
-/* Sayaca ekleme — 0x08033824-0x0803385B
+/* Add to the counter — 0x08033824-0x0803385B
  *
- * gRom08CA6A08'in gosterdigi basligin +0x02 dolulugunu amount kadar
- * artiriyor; u16 sonucu 3200'u asarsa geri alip 0, aksi halde
- * gRam02027320 + eski doluluk doner.
+ * Increase the used count at +0x02 in the header pointed to by gRom08CA6A08
+ * by amount. If the u16 result exceeds 3200, roll back and return 0; otherwise
+ * return gRam02027320 + the previous count.
  *
- * OLCULEN: gRam02027320'nin ADRESI once ayri bir yerele alinmali (kural 37
- * / release_slot.c olcutu); yoksa havuz sirasi ters donuyor ve yukleme
- * yer degistiriyor.
+ * MEASURED: first capture the ADDRESS of gRam02027320 in a separate local
+ * (rule 37 / release_slot.c). Otherwise the literal-pool order reverses and
+ * the load moves.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/add_to_counter.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/add_to_counter.c
  */
 
 #include "gba_types.h"

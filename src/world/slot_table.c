@@ -1,10 +1,10 @@
-/* Yuva tablosu — 0x08055D08-0x08055D8F
+/* Slot table — 0x08055D08-0x08055D8F
  *
- * 160 girisli u16 kimlik tablosu (0x02030C10). 0x7FEF bos demek. Ucuncu
- * fonksiyon bir bolgeyi DMA ile bu bos degerle dolduruyor.
+ * 160-entry u16 ID table at 0x02030C10; 0x7FEF means empty. The third
+ * function DMA-fills a region with this empty value.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_table.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_table.c
  */
 
 #include "gba_io.h"
@@ -30,8 +30,7 @@ u8 *GetEntrySlot(int index)
     return ENTRY_TABLE->entries + (index << ENTRY_SHIFT);
 }
 
-/* 0x08055D18 — ardisik `count` bos kimlik arar, bulursa dizinin basini
- * dondurur. */
+/* 0x08055D18 — find count consecutive empty IDs and return the run's start. */
 u16 *FindFreeSlotRun(int count)
 {
     int run;

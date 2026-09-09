@@ -1,86 +1,92 @@
-/* ShiftColumnsDown -- 0x08023B24-0x08023BB7 (148 bayt)
+/* ShiftColumnsDown -- 0x08023B24-0x08023BB7 (148 bytes)
  *
- * Sutun sutun ASAGI kaydirma. Kaynak tamponundan her sutun icin bir bayt
- * okuyup `shift` kadar saga kaydiriyor; cikan `n` degeri o sutunun kac
- * satir asagi kayacagini soyluyor. Hedefte satirlar `stride` bayt arayla
- * duruyor, sutundan sutuna 1 bayt ilerleniyor. Yurutucu sutunun EN ALT
- * satirindan basliyor (dest + (height-1)*stride), (height - n) satiri
- * yukaridan asagi cekiyor, sonra ustte bosalan n satiri sifirliyor.
+ * Column-by-column DOWNWARD shift. For each column it reads one byte from the
+ * source buffer and shifts it right by `shift`; the resulting `n` value tells
+ * how many rows that column will move down. In the destination the rows sit
+ * `stride` bytes apart, and moving from column to column advances by 1 byte.
+ * The walker starts at the BOTTOM row of the column
+ * (dest + (height-1)*stride), pulls the (height - n) rows down from above,
+ * then zeroes the n rows that are left empty at the top.
  *
- * AILE ILISKISI -- ucuzun ortasi:
+ * FAMILY RELATIONSHIP -- the middle one of the three:
  *
- *               sutun ici adim   sutundan sutuna   yon
- *   b3 (c3c)    +stride          +1                yukari (p artiyor)
- *   b6 (bb8)    +1               +stride           sola   (p artiyor)
- *   b7 (b24)    -stride          +1                asagi  (p AZALIYOR)
+ *               step within column   column to column   direction
+ *   b3 (c3c)    +stride              +1                 up    (p increases)
+ *   b6 (bb8)    +1                   +stride            left  (p increases)
+ *   b7 (b24)    -stride              +1                 down  (p DECREASES)
  *
- * b3'un ayna esi. Kontrol akisini yine de kardesten kopyalamadim, ROM'dan
- * okudum (docs/COMPILER.md kural 49 uyarisi); burada bir sey de degisiyor,
- * asagida madde 1.
+ * The mirror image of b3. Even so, I did not copy the control flow from the
+ * sibling; I read it from the ROM (the docs/COMPILER.md rule 49 warning);
+ * something does change here as well, item 1 below.
  *
- * Imza ROM'dan okundu, tahmin degil:
- *   r0            -> dest   (isaretci, normalize edilmiyor)
- *   r1,r2,r3      -> lsls#24/lsrs#24 cifti var => UCU DE u8
- *   [sp,#32]      -> ayni normalizasyon => u8 (stride)
- *   [sp,#36]      -> normalizasyon yok, sifirla karsilastiriliyor => isaretci
- *   [sp,#40]      -> her turda yeniden okunuyor, asrs ile kullaniliyor => int
- * Prolog `push {r4-r7,lr}` + `mov r7,sl` / `mov r6,r9` / `mov r5,r8` +
- * `push {r5,r6,r7}`: r8/r9/r10 da kullaniliyor, yani SEKIZ callee-saved.
- * Kardes b3'te yedi vardi; farki madde 1 acikliyor. Yigin arguman
- * ofsetlerinin 32/36/40 olmasi (b3'te 28/32/36) dogrudan bunun sonucu --
- * ofsetleri kardesten kopyalayan biri burada yanlis parametreleri okur.
- * Donus `pop {r0}; bx r0` ve r0 olu => void (kural 35).
+ * The signature was read from the ROM, not guessed:
+ *   r0            -> dest   (pointer, not normalized)
+ *   r1,r2,r3      -> there is an lsls#24/lsrs#24 pair => ALL THREE are u8
+ *   [sp,#32]      -> the same normalization => u8 (stride)
+ *   [sp,#36]      -> no normalization, compared against zero => pointer
+ *   [sp,#40]      -> re-read on every iteration, used with asrs => int
+ * The prologue `push {r4-r7,lr}` + `mov r7,sl` / `mov r6,r9` / `mov r5,r8` +
+ * `push {r5,r6,r7}`: r8/r9/r10 are used as well, so EIGHT callee-saved
+ * registers. The sibling b3 had seven; item 1 explains the difference. The
+ * stack argument offsets being 32/36/40 (28/32/36 in b3) is a direct
+ * consequence of this -- anyone copying the offsets from the sibling would
+ * read the wrong parameters here. The return is `pop {r0}; bx r0` and r0 is
+ * dead => void (rule 35).
  *
- * ROM'dan OLCULEN ayrintilar:
+ * Details MEASURED from the ROM:
  *
- *  1. 0x8023B54-5C dis dongu govdesinden ONCE bir kez calisiyor:
- *     `mov r0,r8` / `subs r0,#1` / `adds r1,r0,#0` / `muls r1,r5` ve sonuc
- *     sl'de bekliyor. Yani (height - 1) * stride dongu-degismezi olarak
- *     hoist edilmis. Kaynakta ifade dongunun ICINDE yazili; agbcc kendisi
- *     disari cikariyor. Sekizinci callee-saved yazmacin (sl) sebebi bu
- *     carpimin butun dongu boyunca canli kalmasi.
- *  2. `n` u8: 0x8023B68'deki lsls#24/lsrs#24 cifti. Kaydirma `asrs`
- *     (aritmetik) cunku ldrb'nin sonucu int'e yukseliyor ve `shift` int.
- *  3. Kopyalanacak satir sayisi 0x8023B78'de lsls#16/lsrs#16 ile 16 bite
- *     kirpiliyor AMA dongu icindeki azaltma duz `subs r1,#1` -- kirpma
- *     tekrarlanmiyor. Degisken u16 DEGIL; genis bir yerele yazilmis
- *     (u16) donusumu (olcum icin asagiya bak).
- *  4. Dis dongu sayaci `i` isaretsiz: 0x8023B52 `bcs` ve 0x8023BA8 `bcc`
- *     (kural 31). `int i` yazimi `bge`/`blt` verirdi.
- *  5. Yurume yonu azaliyor: `subs r2,r2,r5` / `subs r3,r3,r5`, yani
- *     p -= stride. Kaynak isaretcisi q = p - n*stride
+ *  1. 0x8023B54-5C runs once BEFORE the outer loop body:
+ *     `mov r0,r8` / `subs r0,#1` / `adds r1,r0,#0` / `muls r1,r5`, and the
+ *     result waits in sl. That is, (height - 1) * stride has been hoisted as
+ *     a loop invariant. In the source the expression is written INSIDE the
+ *     loop; agbcc lifts it out by itself. The reason for the eighth
+ *     callee-saved register (sl) is that this multiplication stays live
+ *     across the whole loop.
+ *  2. `n` is u8: the lsls#24/lsrs#24 pair at 0x8023B68. The shift is `asrs`
+ *     (arithmetic) because the result of ldrb promotes to int and `shift` is
+ *     an int.
+ *  3. The number of rows to copy is clipped to 16 bits at 0x8023B78 with
+ *     lsls#16/lsrs#16 BUT the decrement inside the loop is a plain
+ *     `subs r1,#1` -- the clipping is not repeated. The variable is NOT u16;
+ *     it is a (u16) cast written into a wide local (see the measurement
+ *     below).
+ *  4. The outer loop counter `i` is unsigned: `bcs` at 0x8023B52 and `bcc` at
+ *     0x8023BA8 (rule 31). Writing `int i` would have given `bge`/`blt`.
+ *  5. The walk direction decreases: `subs r2,r2,r5` / `subs r3,r3,r5`, that
+ *     is p -= stride. The source pointer is q = p - n*stride
  *     (0x8023B72 `subs r3,r2,r0`).
- *  6. `dest++` (0x8023B7C-7E `movs r0,#1` / `add ip,r0`) ve `i++` ic
- *     dongulerden ONCE cikiyor. Bu agbcc'nin kendi tasimasi, kaynagin
- *     bicimi degil; artirim govdenin SONUNDA (olculdu, asagida).
+ *  6. `dest++` (0x8023B7C-7E `movs r0,#1` / `add ip,r0`) and `i++` come out
+ *     BEFORE the inner loops. This is agbcc's own motion, not the shape of
+ *     the source; the increment is at the END of the body (measured, below).
  *
- * DENENIP ELENEN YAZIMLAR (hepsi 148 bayt hedefine karsi olculdu):
+ * WRITINGS TRIED AND REJECTED (all measured against the 148-byte target):
  *
- *  - `u16 remain` (kirpmayi tipe birakmak): 156 bayt, 50 fark. Her
- *    `remain--` sonrasi lsls#16/lsrs#16 ekleniyor, ROM'da yok. Genis
- *    yerel + acik (u16) donusumu sart (madde 3).
- *  - Sifirlama dongusune AYRI sayac (`u32 rows; rows = n; ... rows--`):
- *    148 bayt, 6 fark. Ayri yerel ikinci bir allocno uretip r0'i kapiyor
- *    ve sifir sabitini yerinden ediyor; ROM'da iki sayac da r1, sifir
- *    sabiti r0. Iki ic dongu TEK sayac degiskenini paylasmali. Kural
- *    50'nin tersten uygulanisi: bolmek degil, BIRLESTIRMEK.
- *  - `dest++` govde ORTASINDA (q hesabindan hemen sonra): 148 bayt,
- *    12 fark.
- *  - `for (i = 0; i < columns; i++, dest++)`: 148 bayt, 5 fark.
- *    Kural 43'un bicimi burada TUTMUYOR. ROM'un erken ip artirimi
- *    kaynakta for artirimindan degil, govde sonundaki ayri deyimden
- *    cikiyor -- derleyici onu kendisi one aliyor.
+ *  - `u16 remain` (leaving the clipping to the type): 156 bytes, 50 off. An
+ *    lsls#16/lsrs#16 is added after every `remain--`, which is not in the
+ *    ROM. A wide local + an explicit (u16) cast is required (item 3).
+ *  - A SEPARATE counter for the zeroing loop (`u32 rows; rows = n; ...
+ *    rows--`): 148 bytes, 6 off. The separate local produces a second allocno
+ *    that grabs r0 and displaces the zero constant; in the ROM both counters
+ *    are r1 and the zero constant is r0. The two inner loops must share a
+ *    SINGLE counter variable. Rule 50 applied in reverse: not splitting, but
+ *    MERGING.
+ *  - `dest++` in the MIDDLE of the body (right after the q computation):
+ *    148 bytes, 12 off.
+ *  - `for (i = 0; i < columns; i++, dest++)`: 148 bytes, 5 off.
+ *    Rule 43's shape does NOT hold here. The ROM's early ip increment comes
+ *    not from a for-increment in the source but from a separate statement at
+ *    the end of the body -- the compiler moves it forward itself.
  *
- * OLCUM SIRASINDA YASANAN CAKISMA (kayit icin): bu dosya yolu olcum
- * ortasinda baska bir ajan tarafindan uzerine yazildi ve iki varyant
- * kosusu (dest + height*stride - stride ile genis n) sanki 0x08023BB8'i
- * eslestiriyormus gibi gorundu. Oyle degil: derlenen sey o ajanin
- * ShiftRowsLeft taslagiydi. O iki varyant BURADA gecerli bir olcum DEGIL,
- * tekrar denenmeleri gerekir; yanlis kayit birakmamak icin yukaridaki
- * elenenler listesine almadim.
+ * A CLASH THAT OCCURRED DURING MEASUREMENT (for the record): this file path
+ * was overwritten by another agent in the middle of the measurement, and two
+ * variant runs (dest + height*stride - stride together with a wide n) looked
+ * as if they matched 0x08023BB8. They do not: what got compiled was that
+ * agent's ShiftRowsLeft draft. Those two variants are NOT a valid measurement
+ * HERE and need to be tried again; so as not to leave a false record, I did
+ * not add them to the rejected list above.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_b7.c  -> 148/148 eslesti
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_b7.c  -> 148/148 matched
  */
 
 #include "gba_types.h"
@@ -99,13 +105,13 @@ void ShiftColumnsDown(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
         return;
     src += index;
     for (i = 0; i < columns; i++) {
-        /* Sutunun en alt satiri. Carpimi agbcc dongu disina tasiyor. */
+        /* Bottom row of the column. agbcc moves the multiplication out of the loop. */
         p = dest + (height - 1) * stride;
         n = *src >> shift;
         src++;
         q = p - n * stride;
 
-        /* Alttaki (height - n) satiri n satir yukaridan cekip asagi kaydir. */
+        /* Pull the bottom (height - n) rows down from n rows above. */
         remain = (u16)(height - n);
         while (remain != 0) {
             *p = *q;
@@ -114,7 +120,7 @@ void ShiftColumnsDown(u8 *dest, u8 index, u8 columns, u8 height, u8 stride,
             remain--;
         }
 
-        /* Bosalan ustteki n satiri sifirla. Ayni sayac degiskeni: bkz. baslik. */
+        /* Zero the n rows left empty at the top. Same counter variable: see header. */
         remain = n;
         while (remain != 0) {
             *p = 0;

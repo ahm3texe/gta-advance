@@ -1,13 +1,13 @@
-/* Iletme sarmalayicisi — 0x08051480-0x08051489
+/* Forwarding wrapper — 0x08051480-0x08051489
  *
- * Govdesi yalnizca GetAnchorUnk04 cagrisi. tools/find_wrappers.py ile bulundu;
- * ilk taramada hedefi haritada olmadigi icin atlanmisti -- hedef bu tur
- * sayesinde KESFEDILDI ve haritaya eklendi.
+ * The body only calls GetAnchorUnk04. Found with tools/find_wrappers.py;
+ * the first scan skipped it because its target was unmapped. This pass
+ * DISCOVERED the target and added it to the map.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 DONUS DEGERI tasiyor.
+ * Rule 35: `pop {r1}; bx r1` means r0 carries a RETURN VALUE.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/wrap_08051480.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/wrap_08051480.c
  */
 
 #include "gba_types.h"

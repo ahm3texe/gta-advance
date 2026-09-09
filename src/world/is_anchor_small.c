@@ -1,12 +1,12 @@
-/* Anchor +0x38 <= 15 sorgusu — 0x08050A34-0x08050A47
+/* Test Anchor +0x38 <= 15 — 0x08050A34-0x08050A47
  *
- * Karsilastirma SIGNED (`ble`), bu yuzden alan s32 olarak okunuyor.
- * tools/find_predicates.py ile bulundu.
+ * The comparison is SIGNED (ble), so the field is read as s32.
+ * Found with tools/find_predicates.py.
  *
- * Anchor tanimi src/world/anchor_reset.c ile BIREBIR AYNI tutulmali.
+ * Keep Anchor IDENTICAL to src/world/anchor_reset.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_anchor_small.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_anchor_small.c
  */
 
 #include "gba_types.h"
@@ -17,7 +17,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

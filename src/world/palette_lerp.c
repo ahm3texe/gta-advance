@@ -1,10 +1,10 @@
-/* On alti BGR555 rengi 16.16 karisim katsayisiyla ara degerler.
+/* Interpolate sixteen BGR555 colors with a 16.16 blend factor.
  *
- * Her kanal ayri olarak 5 bite ayrilir, iki palet arasindaki fark katsayi
- * ile carpilir ve sonuc yeniden BGR555 kelimesine paketlenir.
+ * Extract each five-bit channel, multiply the difference between palettes
+ * by the factor, and repack the result into a BGR555 word.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm
- * Dogrulama: make c-match FILE=src/world/palette_lerp.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm
+ * Verification: make c-match FILE=src/world/palette_lerp.c
  */
 
 #include "gba_types.h"

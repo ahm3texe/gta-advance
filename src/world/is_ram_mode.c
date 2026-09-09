@@ -1,12 +1,12 @@
 /* IsRamModeWanted — 0x08062530-0x0806254B
  *
- * gRam02035EA0.unk00!=0 && .mode==8 ise 1, degilse 0.
+ * Return 1 if gRam02035EA0.unk00 != 0 && .mode == 8, otherwise 0.
  *
- * BYTE-MATCHING. Ilk kosulu ic ice blok yerine acik erken `return 0`
- * yapmak, ortak sifir blogunu literal havuzundan once yerlestiriyor.
+ * BYTE-MATCHING. Expressing the first condition as an explicit early return 0
+ * rather than nesting places the shared zero block before the literal pool.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_ram_mode.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_ram_mode.c
  */
 
 #include "gba_types.h"

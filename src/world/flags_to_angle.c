@@ -1,15 +1,16 @@
-/* Yon bayraklarini aciya cevirme — 0x08017D78-0x08017E39 (+2 dolgu)
+/* Convert direction flags to an angle — 0x08017D78-0x08017E39 (+2 padding)
  *
- * 0x2000/0x4000 dikey, 0x100/0x200 yatay bayraklarindan (dx,dy) cikarip
- * sekiz yonu 8.24 sabit noktali aciya esliyor; yon yoksa 0.
+ * Derive (dx,dy) from vertical flags 0x2000/0x4000 and horizontal flags
+ * 0x100/0x200; map eight directions to an 8.24 fixed-point angle, or return 0
+ * if no direction is set.
  *
- * OLCULEN: ic switch'lerin UCUNDE DE -1/0/1 case'lerinin hepsi yazilmali
- * (0 donenler dahil). Eksik case birakilinca agbcc iki caseli agac
- * kuruyor ve ROM'un `cmp #0 / beq` on testi kayboluyor (47/97 -> 97/97).
- * Ust dallarin ortak `return 0` kuyrugunu derleyici birlestiriyor.
+ * MEASURED: ALL THREE inner switches must explicitly include -1/0/1 cases,
+ * including those returning 0. Missing cases produce a two-case tree and
+ * remove the ROM's preliminary cmp #0 / beq (47/97 -> 97/97). The compiler
+ * merges the outer branches' shared return-0 tail.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/flags_to_angle.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/flags_to_angle.c
  */
 
 #include "gba_types.h"

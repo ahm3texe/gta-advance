@@ -1,20 +1,19 @@
-/* Varlik sorgusu — 0x08055AF8-0x08055B33
+/* Entity query — 0x08055AF8-0x08055B33
  *
- * Varligin +0x0B turune gore dallaniyor: 8 ise alt nesnenin degeri,
- * degilse +0x24 -> +0x14 -> +0x22 zincirindeki bayrak, o da yoksa
- * karo sorgusu.
+ * Branch on the type at entity +0x0B: for 8, return the sub-object's value;
+ * otherwise inspect the flag along +0x24 -> +0x14 -> +0x22, falling back to
+ * a tile query if absent.
  *
- * BYTE-MATCHING. Maske sabitini ayri bir u32 yerele atayip yerinde `&=`
- * yapmak, sonucu ROM'daki gibi sabitin register'inda (`r0`) tutuyor.
+ * BYTE-MATCHING. Assigning the mask constant to a separate u32 local and
+ * applying &= in place keeps the result in the constant's register (r0),
+ * as in the ROM. The first build differed by 36 bytes. Moving the special
+ * branch to the END by inverting the condition reduced that to 2. Replacing
+ * `flags & 3` with `mask = 3; mask &= flags` closed the remaining difference.
  *
- * Ilk derlemede 36 bayt farkliydi; ozel dali fonksiyonun SONUNA almak
- * (kosulu ters cevirerek) 2'ye indirdi. Kalan fark, `flags & 3` ifadesi
- * yerine `mask = 3; mask &= flags` ile kapandi.
+ * Four matching functions in the same cluster: src/world/node_search.c
  *
- * Ayni kumedeki eslesen dort fonksiyon: src/world/node_search.c
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entity_query.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entity_query.c
  */
 
 #include "gba_types.h"

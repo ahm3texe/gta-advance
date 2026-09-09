@@ -1,32 +1,35 @@
-/* Aktor davranis dagiticisi — 0x08017C28-0x08017D77 (336 bayt)
+/* The actor behaviour dispatcher — 0x08017C28-0x08017D77 (336 bytes)
  *
- * DURUM: 140/149 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 140/149 instructions, A NEAR MISS (does not match).  The size is
+ * right.
  *
- * 0x08017E3C-0x08018B73 ailesinin (src/world/actor_behavior_steps.c)
- * DAGITICISI: SelectSlotCD ile secilen yuvanin +0x1C bayti 0..11 ise
- * 12 girisli atlama tablosuyla ilgili adima gidiyor (>11 ve 0 icin
- * StepActorBehaviorB3). Oncesinde uc giris (+0xB0, +0xA7, +0x8D) 0xFF
- * degilse ClearEntry ile birakilip 0xFF yapiliyor; GetTileFieldA == 4 ise
- * +0xA8'de 0x20 kuruluyor, degilse siliniyor; 0x20 kuruluysa sahibin
- * +0x18'ine gore RequestActorAction(96,4,2) ya da (31,2,2) ile cikiliyor;
- * varligin +0x18 kaydinin +0x30 kipi 4 ise cikiliyor.
+ * THE DISPATCHER of the 0x08017E3C-0x08018B73 family
+ * (src/world/actor_behavior_steps.c): if the +0x1C byte of the slot selected
+ * by SelectSlotCD is 0..11 it goes to the corresponding step through a
+ * 12-entry jump table (StepActorBehaviorB3 for >11 and for 0).  Before that,
+ * any of three entries (+0xB0, +0xA7, +0x8D) that is not 0xFF is released with
+ * ClearEntry and set to 0xFF; if GetTileFieldA == 4, bit 0x20 is set at +0xA8,
+ * otherwise cleared; if 0x20 is set it returns via RequestActorAction(96,4,2)
+ * or (31,2,2) according to the owner's +0x18; and it returns if the +0x30 mode
+ * of the entity's +0x18 record is 4.
  *
- * OLCULEN: tablo case sirasi 0,1,2,3,5,4,6,...,11 (ROM govde yerlesimi
- * 155'ten once 142) ve `default:` case 0 govdesini paylasiyor.
+ * MEASURED: the case order of the table is 0,1,2,3,5,4,6,...,11 (the ROM's
+ * body layout has 142 before 155) and `default:` shares case 0's body.
  *
- * KALAN 9 KOMUT, TEK MEKANIZMA: 0x20 kurma/silme dalinda ROM `orrs r0,r2`
- * ve `movs r0,#33 / negs / ands r0,r2` uretiyor -- yani AND/OR'un HEDEFI
- * MASKENIN yazmaci ve maske -33 olarak 32 bit; ardindan tek ortak
- * `strb r0,[r1]`. Bende hedef deger yazmaci (`orrs r2,r0`). Denenen
- * (hepsi olcumlu): ternary + literal maske (40), 32 bit maske yerelleri +
- * ternary (9, EN IYI, asagidaki), iki adimli `v = M; v = v & f` ayri
- * store (46), ayni ama ortak store (20), maskeyi once secip sonra
- * uygulamak (51), (s32)/(u32)/-33 literal biçimleri (40), alani once
- * yerele okumak (52). band_b'deki kural (ReleaseActorAndSlot) burada
- * ternary icinde tutmuyor.
+ * THE REMAINING 9 INSTRUCTIONS, ONE MECHANISM: on the 0x20 set/clear branch
+ * the ROM emits `orrs r0,r2` and `movs r0,#33 / negs / ands r0,r2` -- that is,
+ * the AND/OR's DESTINATION is the MASK's register and the mask is 32-bit -33;
+ * then a single shared `strb r0,[r1]`.  Here the destination is the value's
+ * register (`orrs r2,r0`).  Tried (all measured): a ternary + a literal mask
+ * (40), 32-bit mask locals + a ternary (9, THE BEST, used below), a two-step
+ * `v = M; v = v & f` with separate stores (46), the same with a shared store
+ * (20), selecting the mask first and applying it afterwards (51), the
+ * (s32)/(u32)/-33 literal spellings (40), reading the field into a local first
+ * (52).  The rule from band_b (ReleaseActorAndSlot) does not hold inside a
+ * ternary here.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/dispatch_actor_behavior.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/dispatch_actor_behavior.c
  */
 
 #include "gba_types.h"

@@ -1,19 +1,20 @@
-/* Kimlik esleme sorgusu — 0x08019620-0x0801966F
+/* The id match query — 0x08019620-0x0801966F
  *
- * Tutucunun +0x1C'deki varligini iki alanindan (u32 +0x28 ve u16 +0x06)
- * verilen kimlige karsi sinar. Kimlik 0x3FFF'ten buyukse once
- * gRom08CA45CC[id - 0x4000] ile bir takma ada cevrilip o da denenir.
+ * Tests the entity at the holder's +0x1C against the given id through two of
+ * its fields (u32 +0x28 and u16 +0x06).  If the id is greater than 0x3FFF it
+ * is first turned into an alias via gRom08CA45CC[id - 0x4000] and that is
+ * tried as well.
  *
- * VARLIK IKI KEZ OKUNUYOR: ROM ikinci turda +0x1C'yi yeniden yukluyor
- * (ldr r1,[r4,#28]), yani kaynak ikinci turda AYRI bir yerel kullaniyor.
- * Tek yerelde tutulursa ayni yazmac (r2) yeniden kullaniliyor.
+ * THE ENTITY IS READ TWICE: on the second round the ROM reloads +0x1C
+ * (ldr r1,[r4,#28]), so the source uses a SEPARATE local on the second round.
+ * Held in a single local, the same register (r2) is reused.
  *
- * Ayrica erken "return 0" cikisi ic ice `if (e != 0) { ... }` olarak
- * yazilmali; ayri bir erken donusle blok sirasi tersine doniyor
- * (return 1 ve return 0 bloklari yer degistiriyor).
+ * The early "return 0" exit must also be written as a nested
+ * `if (e != 0) { ... }`; with a separate early return the block order is
+ * reversed (the return 1 and return 0 blocks swap places).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_id_matches.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_id_matches.c
  */
 
 #include "gba_types.h"

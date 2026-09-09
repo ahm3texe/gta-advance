@@ -1,31 +1,33 @@
-/* Uzaktaki aktorleri isaretleme — 0x080611CC-0x0806149B
+/* Marking distant actors — 0x080611CC-0x0806149B
  *
- * IKI FONKSIYON, AYNI GOVDE.  tools/find_twins.py %100 verdi; ROM
- * govdeleri komut komut ayni, yalnizca havuz adresleri kayik -- ayni
- * kaynak iki kez derlenmis (docs/WORKFLOW.md §10).
+ * TWO FUNCTIONS, ONE BODY.  tools/find_twins.py reported 100%; the ROM bodies
+ * are identical instruction by instruction, only the pool addresses are
+ * shifted -- the same source compiled twice (docs/WORKFLOW.md section 10).
  *
- * Listeyi UC KEZ geziyor.  Elverisli aktor: +0x0C'de 0x40 kurulu DEGIL,
- * +0x18'deki kaydin +0x30 kipi 2, ve +0x2C varsa onun +0x18'inde
- * 0x2000000 kurulu degil.  Herhangi bir elverisli aktorde 0x400000
- * kuruluysa fonksiyon hemen doner.
- *   1. gecis: elverisli aktorleri sayiyor; alti taneden az ise cikiyor.
- *   2. gecis: alti gozlu bir uzaklik dizisine SIRALI EKLEME yapiyor.
- *   3. gecis: uzakligi altinci degerden buyuk olanlara +0x0C'de 0x400
- *      bayragini kuruyor.
+ * It walks the list THREE TIMES.  An eligible actor: 0x40 NOT set at +0x0C,
+ * the +0x30 mode of the record at +0x18 equal to 2, and, if +0x2C exists,
+ * 0x2000000 not set at its +0x18.  If 0x400000 is set on any eligible actor
+ * the function returns immediately.
+ *   pass 1: counts the eligible actors; returns if there are fewer than six.
+ *   pass 2: does an INSERTION SORT into a six-slot distance array.
+ *   pass 3: sets flag 0x400 at +0x0C on those whose distance is greater than
+ *      the sixth value.
  *
- * DORT OLCUM:
- *   - Sirali ekleme dongusu do-while yazilmali; `for` yazimi ilerletme
- *     blogunu govdenin ONUNE koyuyor (ROM sonuna koyuyor, 10 komut).
- *   - Ic kaydirma dongusu ACIK ISARETCI YURUTMESI olmali (`q[1]=q[0]`);
- *     `prev[j+1]=prev[j]` yazimi `adds r1,r0,r6` uretiyor, ROM
- *     `adds r1,r6,r0` istiyor (taban once).
- *   - 0x7FFFFFFF doldurma sabiti AYRI YERELE alinmali; dogrudan
- *     yazilirsa adres hesabi sabitten once uretiliyor.
- *   - Doldurma dongusunun sinir karsilastirmasi ISARETLI olmali
- *     (ROM `bge`); isaretci karsilastirmasi `bcs` uretiyor.
+ * FOUR MEASUREMENTS:
+ *   - The insertion loop must be a do-while; written as a `for`, the increment
+ *     block goes BEFORE the body (the ROM puts it at the end, 10
+ *     instructions).
+ *   - The inner shifting loop must use EXPLICIT POINTER WALKING (`q[1]=q[0]`);
+ *     `prev[j+1]=prev[j]` produces `adds r1,r0,r6` while the ROM wants
+ *     `adds r1,r6,r0` (base first).
+ *   - The 0x7FFFFFFF fill constant must be taken into a SEPARATE LOCAL;
+ *     written directly, the address computation is emitted before the
+ *     constant.
+ *   - The fill loop's bound comparison must be SIGNED (the ROM has `bge`); a
+ *     pointer comparison produces `bcs`.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/mark_distant_actors.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/mark_distant_actors.c
  */
 
 #include "gba_types.h"
@@ -173,8 +175,8 @@ void MarkDistantActors(void)
     } while (actor != 0);
 }
 
-/* 0x08061334 — AYNI GOVDE; TEK FARK liste erisimi
- * GetUnk0202F310 yerine GetUnk0202F2C0 (0x0202F2C0 listesi). */
+/* 0x08061334 — THE SAME BODY; THE ONLY DIFFERENCE is the list access:
+ * GetUnk0202F2C0 (the 0x0202F2C0 list) instead of GetUnk0202F310. */
 void MarkDistantActorsB(void)
 {
     Actor *actor;

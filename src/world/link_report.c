@@ -1,13 +1,12 @@
-/* Baglanti ozet kaydini doldurur — 0x08066AA8-0x08066B3F
+/* Populate the link summary record — 0x08066AA8-0x08066B3F
  *
- * Yedi sorgu cagrisi; her biri hem donus degerini hem yigindaki tek
- * kelimelik cikti alanini kayda yaziyor. Ardindan kayit tamponunun
- * +0x64 alanindan 36 baytlik blok kopyalaniyor (agbcc bunu uc adet
- * uc yazmacli ldmia/stmia ciftine ceviriyor) ve son alan 0x08067014
- * cagrisiyla dolduruluyor.
+ * Seven query calls each store both their return value and one-word stack
+ * output in the record. Copy a 36-byte block from save buffer +0x64 (agbcc
+ * emits three three-register ldmia/stmia pairs), then fill the final field
+ * with a call to 0x08067014.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_report.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_report.c
  */
 
 #include "gba_types.h"
@@ -18,7 +17,7 @@
 #define GROUP_SEVEN   7
 
 typedef struct StatsBlock {
-    u32 words[9];               /* 36 bayt */
+    u32 words[9];               /* 36 bytes */
 } StatsBlock;
 
 typedef struct LinkReport {

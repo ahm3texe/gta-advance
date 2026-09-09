@@ -1,13 +1,12 @@
-/* Bayrak dizisi + tetikleyicileri — 0x08031D24-0x08031D7D
+/* Flag arrays and triggers — 0x08031D24-0x08031D7D
  *
- * Iki 8-girisli u8 bayrak dizisi: gFlagsA (0x02026F38) ve gFlagsB
- * (0x02026EF0). Ilk fonksiyon iki dizide ayni index'te ikisi de nonzero
- * mu diye tarar (herhangi biri varsa 1). Ikincisi gFlagsA nonzero olan
- * her indekste gBlockTable[i]'yi (72 bayt stride) FUN_08013ABC ile
- * temizler ve bayragi sifirlar.
+ * Two eight-entry u8 flag arrays: gFlagsA (0x02026F38) and gFlagsB
+ * (0x02026EF0). The first function returns 1 if both arrays have nonzero
+ * flags at any shared index. For each nonzero gFlagsA entry, the second
+ * clears gBlockTable[i] (72-byte stride) through FUN_08013ABC and clears the flag.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/flag_arrays.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/flag_arrays.c
  */
 
 #include "gba_types.h"

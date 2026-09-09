@@ -1,13 +1,13 @@
-/* Anchor sifirlama — 0x08050918-0x0805096F
+/* Reset the anchor — 0x08050918-0x0805096F
  *
- * gRam02030330 struct'inin alanlarini sifirliyor: ilk fonksiyon 7 alan
- * (+4/+8/+12/+16/+24/+28/+32/+40), ikincisi ek 4 (+24 ve +28 sirasi ters,
- * +36/+44/+48/+52). Yani ilki bir alt kume, ikinci tam sifirlama.
- * Ucuncusu (0x08050958) daha da dar bir alt kume: +8/+16/+24/+32/+40.
- * +12 = 40 (varsayilan boyut) ucunde de yaziliyor.
+ * Reset fields in gRam02030330: the first function handles
+ * +4/+8/+12/+16/+24/+28/+32/+40. The second adds +36/+44/+48/+52 and reverses
+ * the order of +24 and +28. Thus the first resets a subset and the second
+ * performs the full reset. The third (0x08050958) resets a smaller subset:
+ * +8/+16/+24/+32/+40. All three write +12 = 40 (the default size).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/anchor_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/anchor_reset.c
  */
 
 #include "gba_types.h"
@@ -18,7 +18,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

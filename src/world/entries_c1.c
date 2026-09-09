@@ -1,92 +1,106 @@
-/* Kayittaki iki eksenin orta noktasini aktorun acisiyla dondurup yonelim
- * baytlarina yazar -- 0x08029390-0x080293F7, 104 bayt, Thumb.  ESLESIYOR.
+/* Rotates the midpoint of the record's two axes by the actor's angle and writes
+ * it into the orientation bytes -- 0x08029390-0x080293F7, 104 bytes, Thumb.
+ * MATCHES.
  *
- * Islev, src/world/state_offset.c (0x080260A8) icindeki her dalin ilk
- * yarisiyla ayni iskelet:
+ * Functionally the same skeleton as the first half of each branch in
+ * src/world/state_offset.c (0x080260A8):
  *
- *   1. Kayittan (Record) iki eksen icin orta nokta cikarilir:
- *      (x1 + x0) - (ox - 2), sonra `<< 23 >> 24` ile 9 bitten isaret
- *      genisletilip ikiye bolunur.  Ayni sey y ekseni icin +0x07/+0x05
- *      ve +0x19 ile.
- *   2. Aktorun +0x68'deki 16.16 acisi >> 16 ile tablo indeksine cevrilip
- *      FUN_08029088'e verilir; yardimci iki isaretli bayti yigina yazar.
- *   3. Donen iki bayt 41/32 ile olceklenip aktorun +0x26 / +0x27
- *      yonelim baytlarina yazilir.
+ *   1. The midpoint of the two axes is extracted from the Record:
+ *      (x1 + x0) - (ox - 2), then sign-extended from 9 bits with
+ *      `<< 23 >> 24` and halved.  The same for the y axis with +0x07/+0x05
+ *      and +0x19.
+ *   2. The actor's 16.16 angle at +0x68 is converted to a table index with
+ *      >> 16 and passed to FUN_08029088; the helper writes two signed bytes to
+ *      the stack.
+ *   3. The two returned bytes are scaled by 41/32 and written into the actor's
+ *      +0x26 / +0x27 orientation bytes.
  *
- * state_offset.c'nin dallarindan farki: aci MASKELENMIYOR ve aktore geri
- * YAZILMIYOR, ikinci FUN_08029088 cagrisi ve +0x2A kip bayti yok.  Yani bu,
- * o ailenin cikarilmis ortak cekirdegi gibi duruyor.
+ * The difference from state_offset.c's branches: the angle is NOT MASKED and
+ * NOT WRITTEN BACK to the actor, and there is no second FUN_08029088 call and
+ * no +0x2A mode byte.  So this looks like the extracted common core of that
+ * family.
  *
- * ROM'DAN OLCULEN AYRINTILAR
+ * DETAILS MEASURED FROM THE ROM
  *
- *  - Donus tipi void (kural 35): epilog `pop {r4,r5}; pop {r0}; bx r0`,
- *    r0 cagri sonrasi olu.
- *  - Iki parametre: r0 aktor (+0x26/+0x27/+0x68), r1 kayit (+4..+7, +0x18,
- *    +0x19).  Ikisi de ham kelime olarak geliyor, giris daraltmasi yok.
- *  - Sinir alanlari `ldrb` ile okunuyor, isaret genisletme yok -> u8.
- *    Aci `ldr` + `asrs #16` -> isaretli 16.16 kelime.
- *  - Cikti yuvalari sp+4 ve sp+5, yani BITISIK iki bayt -- entries_b4.c ve
- *    state_offset.c'deki ayni cagri kalibi.  `movs r1,#0; ldrsb r1,[r0,r1]`
- *    Thumb'da s8 okumanin tek bicimi (LDRSB'nin immediate ofseti yok).
- *  - 41/32 olcegi shift zincirinden okundu: lsls#2 / adds / lsls#3 / adds
- *    = x*41, sonra asrs#5.  state_offset.c ve entries_b4.c ile ayni sabit.
- *  - `adds r1,r4,#38; strb r0,[r1,#0]`: STRB'nin 5 bitlik immediate ofseti
- *    31'de bittigi icin 38/39 adresleri ayrica kuruluyor.  Kaynakta bir
- *    kaldirac degil, sonuc.
+ *  - The return type is void (rule 35): the epilogue is
+ *    `pop {r4,r5}; pop {r0}; bx r0`, and r0 is dead after the call.
+ *  - Two parameters: r0 the actor (+0x26/+0x27/+0x68) and r1 the record
+ *    (+4..+7, +0x18, +0x19).  Both arrive as raw words, with no entry
+ *    narrowing.
+ *  - The bound fields are read with `ldrb` and there is no sign extension ->
+ *    u8.  The angle is `ldr` + `asrs #16` -> a signed 16.16 words.
+ *  - The output slots are sp+4 and sp+5, i.e. two ADJACENT bytes -- the same
+ *    call pattern as in entries_b4.c and state_offset.c.
+ *    `movs r1,#0; ldrsb r1,[r0,r1]` is the only form of an s8 read in Thumb
+ *    (LDRSB has no immediate offset).
+ *  - The 41/32 scale was read from the shift chain: lsls#2 / adds / lsls#3 /
+ *    adds = x*41, then asrs#5.  The same constant as in state_offset.c and
+ *    entries_b4.c.
+ *  - `adds r1,r4,#38; strb r0,[r1,#0]`: because STRB's 5-bit immediate offset
+ *    ends at 31, the addresses 38/39 are built separately.  Not a lever in the
+ *    source but a consequence.
  *
- * ESLESMEYI SAGLAYAN UC OLCUM (41 -> 17 -> 15 -> 0 bayt fark)
+ * THE THREE MEASUREMENTS THAT PRODUCED THE MATCH (41 -> 17 -> 15 -> 0 bytes
+ * of difference)
  *
- *  1. KAYDIRMALAR CAGRI ARGUMANINDA, YERELDE DEGIL.  ROM once iki eksenin
- *     HAM toplamini cikariyor, aciyi yukluyor, `<<23 >>24` ciftlerini
- *     ANCAK ONDAN SONRA pes pese yapiyor.  Toplami ve kaydirmayi tek yerel
- *     atamasinda birlestirmek (`dx = (s32)((...) << 23) >> 24;`)
- *     kaydirmalari toplamlarin arasina sokuyor: 41 bayt fark.  Kaydirmayi
- *     argumana tasiyinca 17'ye iniyor.
- *     NOT: state_offset.c'nin basligi ayni degisikligin ORADA kotulestirdigini
- *     yaziyor (1430 -> 1178).  Celiski degil: orada aci ayrica maskelenip
- *     aktore geri yaziliyor, yani kaydirmalarin arasina baska is giriyor.
- *     Kardesin bicimini kopyalama, ROM'dan oku.
+ *  1. THE SHIFTS GO IN THE CALL ARGUMENT, NOT IN A LOCAL.  The ROM first
+ *     computes the RAW sums of the two axes, loads the angle, and only THEN
+ *     performs the `<<23 >>24` pairs back to back.  Combining the sum and the
+ *     shift in a single local assignment
+ *     (`dx = (s32)((...) << 23) >> 24;`) inserts the shifts between the sums:
+ *     41 bytes of difference.  Moving the shift into the argument brings it
+ *     down to 17.
+ *     NOTE: the header of state_offset.c records that the same change made
+ *     things WORSE THERE (1430 -> 1178).  Not a contradiction: there the angle
+ *     is additionally masked and written back to the actor, so other work
+ *     comes between the shifts.
+ *     Do not copy the sibling's form; read it from the ROM.
  *
- *  2. TOPLAMA OPERANDLARININ SIRASI TERS YAZILIR.  agbcc toplamanin IKINCI
- *     operandini ONCE yukluyor.  ROM `ldrb [r1,#6]` (x1) ile basliyor, yani
- *     kaynakta `rec->x0 + rec->x1` yazili.  Duz sira 2 bayt daha birakiyor.
+ *  2. THE ADDITION OPERANDS ARE WRITTEN IN REVERSE.  agbcc loads the SECOND
+ *     operand of an addition FIRST.  The ROM starts with `ldrb [r1,#6]` (x1),
+ *     so the source reads `rec->x0 + rec->x1`.  The plain order leaves 2 more
+ *     bytes.
  *
- *  3. `-2` SABITI YERELE ALINIR (kural 44).  Bu belirleyiciydi.
- *     `(x0 + x1) - (rec->ox - 2)` yazildiginda agbcc fold asamasinda
- *     ifadeyi yeniden birlestiriyor: `adds r3,#2`, sonra `ldrb`, sonra
- *     `subs`.  ROM'un sirasi tersi -- `ldrb r0,[r1,#24]; subs r0,#2;
- *     subs r3,r3,r0` -- yani cikarma YUKLENEN degere uygulaniyor.  Sabiti
- *     `two` yereline alinca fold atlaniyor, sabit yine immediate olarak
- *     yayiliyor ve ROM'un dizilimi birebir cikiyor: 15 -> 0.
- *     Bu, state_offset.c'nin basliginda "tek basina etkisi ayrica
- *     olculmeli" diye birakilan 2 numarali fikrin cevabidir: ara YEREL
- *     ise yaramiyor, ara SABIT yariyor.
+ *  3. THE `-2` CONSTANT IS TAKEN INTO A LOCAL (rule 44).  This was decisive.
+ *     Written as `(x0 + x1) - (rec->ox - 2)`, agbcc reassociates the expression
+ *     during fold: `adds r3,#2`, then `ldrb`, then `subs`.  The ROM's order is
+ *     the opposite -- `ldrb r0,[r1,#24]; subs r0,#2; subs r3,r3,r0` -- i.e. the
+ *     subtraction is applied to the LOADED value.  Taking the constant into a
+ *     `two` local skips the fold, the constant is still emitted as an
+ *     immediate, and the ROM's sequence comes out exactly: 15 -> 0.
+ *     This is the answer to idea number 2 that state_offset.c's header left as
+ *     "its effect on its own should be measured separately": an intermediate
+ *     LOCAL does not help; an intermediate CONSTANT does.
  *
- * DENENIP ELENEN YAZIMLAR (silme, ekle)
+ * FORMS TRIED AND ELIMINATED (do not delete; add to this list)
  *
- *  - `t = rec->ox - 2; dx = toplam - t;` ara yereli: 22 bayt.  Ayri deyim
- *    fold'u ENGELLEMIYOR, ustelik t'nin omru dagitimi da kaydiriyor.
- *    `two` ile birlikte kullanmak da 22'de kaliyor -- `t` yereli zararli.
- *  - `dx = toplam + (2 - rec->ox);` : 15, yani duz cikarma ile ayni.
- *    Fold her iki yazimi da ayni agaca indiriyor.
- *  - Kaydirmalari ayri deyimde yapmak (`dx = (dx << 23) >> 24;`): 28 bayt.
- *  - Aciyi once `ang` yereline almak: 17'de degisiklik yok (fark 2 ve 3
- *    hala acikken olculdu); esleseme ulasildigi icin tekrar denenmedi.
- *  - `two` yerine iki ayri yerel (`twox`/`twoy`) da 0 veriyor; tek yerel
- *    daha sade oldugu icin o tutuldu.
+ *  - The intermediate local `t = rec->ox - 2; dx = sum - t;`: 22 bytes.  A
+ *    separate statement does NOT PREVENT the fold, and t's lifetime also shifts
+ *    the allocation.
+ *    Using it together with `two` still stays at 22 -- the `t` local is
+ *    harmful.
+ *  - `dx = sum + (2 - rec->ox);`: 15, the same as the plain subtraction.
+ *    Fold reduces both forms to the same tree.
+ *  - Doing the shifts in a separate statement (`dx = (dx << 23) >> 24;`): 28
+ *    bytes.
+ *  - Taking the angle into an `ang` local first: no change at 17 (measured
+ *    while differences 2 and 3 were still open); it was not retried once the
+ *    match was reached.
+ *  - Two separate locals (`twox`/`twoy`) instead of `two` also give 0; the
+ *    single local was kept because it is simpler.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_c1.c   -> 104/104
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_c1.c   -> 104/104
  */
 
 #include "gba_types.h"
 
-#define SCALE_NUM  41           /* 41/32 ~ 1.28, state_offset.c ile ayni */
+#define SCALE_NUM  41           /* 41/32 ~ 1.28, the same as state_offset.c */
 #define SCALE_SH   5
 
-/* state_offset.c'deki Record gorunumunun aynisi: iki eksen icin sinir
- * cifti (+0x04..+0x07) ve iki origin bayti (+0x18/+0x19).  Aradaki 16
- * bayt bu ceviri biriminde okunmuyor, pad birakildi. */
+/* The same Record view as in state_offset.c: a bound pair for the two axes
+ * (+0x04..+0x07) and two origin bytes (+0x18/+0x19).  The 16 bytes in between
+ * are not read in this translation unit and were left as padding. */
 typedef struct Record {
     u8 pad0[4];
     u8 x0;                /* +0x04 */
@@ -98,8 +112,8 @@ typedef struct Record {
     u8 oy;                /* +0x19 */
 } Record;
 
-/* state_offset.c ve entries_b4.c ile ayni ofsetler; bu ceviri biriminde
- * yalnizca yonelim baytlari ve aci okunuyor. */
+/* The same offsets as in state_offset.c and entries_b4.c; in this translation
+ * unit only the orientation bytes and the angle are read. */
 typedef struct Actor {
     u8  pad0[0x26];
     s8  fx;               /* +0x26 */
@@ -108,7 +122,7 @@ typedef struct Actor {
     s32 angle;            /* +0x68, 16.16 */
 } Actor;
 
-/* Imza state_offset.c'de ROM'dan dogrulandi. */
+/* The signature was confirmed from the ROM in state_offset.c. */
 extern void FUN_08029088(s32 angle, s32 dx, s32 dy, s8 *outX, s8 *outY);
 
 /* 0x08029390 */
@@ -120,13 +134,14 @@ void SetActorOffsetFromRecord(Actor *actor, Record *rec)
     s8  ox;
     s8  oy;
 
-    /* Kural 44: sabit yerele alinmazsa agbcc `- (ox - 2)` ifadesini
-     * `+ 2 - ox` diye yeniden birlestiriyor ve komut sirasi kayiyor. */
+    /* Rule 44: unless the constant is taken into a local, agbcc reassociates
+     * `- (ox - 2)` into `+ 2 - ox` and the instruction order shifts. */
     two = 2;
     dx = (rec->x0 + rec->x1) - (rec->ox - two);
     dy = (rec->y0 + rec->y1) - (rec->oy - two);
 
-    /* Kaydirmalar bilerek argumanda: ROM ham toplamlari once cikariyor. */
+    /* The shifts are deliberately in the arguments: the ROM subtracts the raw
+       sums first. */
     FUN_08029088(actor->angle >> 16, (dx << 23) >> 24, (dy << 23) >> 24,
                  &ox, &oy);
 

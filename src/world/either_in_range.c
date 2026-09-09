@@ -1,15 +1,14 @@
-/* Iki alandan biri aralikta mi — 0x080195F4-0x0801961F
+/* Is either field in range — 0x080195F4-0x0801961F
  *
- * 12-13 ya da 15-16 araliklarini sinayan iki kapi. Birinci alan ISARETLI
- * karsilastiriliyor (blt/ble/bgt/bge), ikincisi ISARETSIZ (bcc/bls/bhi).
+ * Two gates testing the ranges 12-13 and 15-16.  The first field is compared
+ * SIGNED (blt/ble/bgt/bge), the second UNSIGNED (bcc/bls/bhi).
  *
- * ALAN u16 OLMALI, s16 DEGIL. ROM `ldrh` ile ISARETSIZ yukluyor ama
- * karsilastirmalar isaretli: bu, C'nin dogal davranisi -- u16 alan
- * karsilastirmada `int`e yukseltilir. s16 yazmak `ldrsh` uretiyordu
- * (2 bayt fazla). Ikinci alan u32 oldugu icin karsilastirmalari
- * isaretsiz kaliyor.
+ * THE FIELD MUST BE u16, NOT s16.  The ROM loads it UNSIGNED with `ldrh` yet
+ * the comparisons are signed: that is C's natural behaviour -- a u16 field is
+ * promoted to `int` in a comparison.  Writing s16 produced `ldrsh` (2 bytes
+ * too many).  The second field is u32, so its comparisons stay unsigned.
  *
- * ESLESTI (44/44) -- bkz. fonksiyon ustundeki MEKANIZMA notu.
+ * MATCHED (44/44) -- see the MECHANISM note above the function.
  */
 
 #include "gba_types.h"
@@ -18,16 +17,16 @@ typedef struct Entry {
     u8  pad00[6];
     u16 kind;                   /* +0x06 */
     u8  pad08[32];
-    u32 alt;                    /* +0x28 (isaretsiz) */
+    u32 alt;                    /* +0x28 (unsigned) */
 } Entry;
 
 /* 0x080195F4 */
-/* MEKANIZMA (permuter + elle, 2026-09-05): karsilastirma sabiti bir
- * DEGISKENE alininca agbcc `x < 15`i `x <= 14`e KANONIKLESTIREMIYOR ve
- * ROM'un `cmp #15 / bcc` biciminin aynisini uretiyor.  Literal yazimin
- * hicbir cesidi (< 15, <= 14, > 14 ...) bunu vermiyordu: hepsi ayni
- * kanonik forma cokuyor.  Uc sinir da boyle tasindi.  docs/COMPILER.md
- * kural 44. */
+/* MECHANISM (permuter + by hand, 2026-09-05): once the comparison constant is
+ * taken into a VARIABLE, agbcc CANNOT CANONICALISE `x < 15` into `x <= 14`,
+ * and it produces exactly the ROM's `cmp #15 / bcc` form.  No variety of the
+ * literal spelling (< 15, <= 14, > 14 ...) gave this: they all collapse to the
+ * same canonical form.  All three bounds were moved this way.
+ * docs/COMPILER.md rule 44. */
 u32 EitherInRange(Entry *entry)
 {
     s32 lowBound;

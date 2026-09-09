@@ -1,70 +1,72 @@
-/* Izleme turunu kapatan puanlama adimi — 0x08064F24-0x0806512F, 524 bayt
+/* The scoring step that closes a tracking round — 0x08064F24-0x0806512F, 524 bytes
  *
- * src/world/actor_tracking.c ile AYNI aktor yapisi uzerinde calisiyor:
- * ResetActorTracking (0x08065378) turu baslatiyor, AccumulateActorMotion
- * (0x080653D4) her karede birikimleri artiriyor, bu fonksiyon da turu
- * kapatiyor. Sirasiyla:
+ * It works on the SAME actor structure as src/world/actor_tracking.c:
+ * ResetActorTracking (0x08065378) starts the round, AccumulateActorMotion
+ * (0x080653D4) grows the accumulations every frame, and this function closes
+ * the round. In order:
  *
- *   1. Sahibin oyuncu yuvasindaki +0x25 isaretini okuyup TEMIZLIYOR.
- *      Isaret kuruluysa tur puanlaniyor, degilse hicbir sey yapilmiyor.
- *   2. Aktorun yon bayti (+0x138) 0..3 ise kat edilen mesafe o eksende
- *      isaretli olarak olculuyor ((fark * 10) >> 6), yon bayti gecersizse
- *      (tur kapaliysa 0xFF) x ekseninde mutlak fark >> 11 kullaniliyor.
- *   3. Zemin degeri (+0x60) baslangic z'sinin altindaysa en buyuk dusus
- *      (+0x128) aradaki farkla azaltiliyor.
- *   4. Mesafe, dusus ve uc hiz birikimi (>>10) agirlikli toplam
- *      yardimcisina (FUN_080627ec) veriliyor.
- *   5. Mesafe pozitifse sahibin sayaci (+0x30 -> +0x08) mesafeye gore
- *      1/4, 2/4 ya da 3/4 adim kadar dusuruluyor ve 0x10000 tabaninda
- *      tutuluyor; sahibin dugumune (+0x2C) 0x1000 biti ekleniyor, dugumun
- *      alt kaydi 3 turundeyse ayni sayac 0x10000 TAVANINA cekiliyor.
- *   6. PlaceProbeEntries dortten fazla giris uretirse sayac yine tavana
- *      cekiliyor.
- *   7. Son olarak izleme sifirlaniyor (ResetActorTracking'in govdesinin
- *      birebir ayni satirlari) ve olculen mesafe yuvanin +0x4C alanina
- *      yaziliyor.
+ *   1. Reads and CLEARS the +0x25 marker in the owner's player slot.
+ *      If the marker is set the round is scored, otherwise nothing happens.
+ *   2. If the actor's direction byte (+0x138) is 0..3, the distance covered is
+ *      measured signed on that axis ((diff * 10) >> 6); if the direction byte
+ *      is invalid (0xFF once the round is closed), the absolute difference on
+ *      the x axis >> 11 is used.
+ *   3. If the ground value (+0x60) is below the starting z, the largest drop
+ *      (+0x128) is decreased by the difference between them.
+ *   4. Distance, drop and the three speed accumulations (>>10) are handed to
+ *      the weighted-sum helper (FUN_080627ec).
+ *   5. If the distance is positive, the owner's counter (+0x30 -> +0x08) is
+ *      lowered by 1/4, 2/4 or 3/4 of a step depending on the distance and is
+ *      held at a floor of 0x10000; the 0x1000 bit is added to the owner's node
+ *      (+0x2C), and if the node's sub-record is of kind 3 the same counter is
+ *      pulled to the 0x10000 CEILING.
+ *   6. If PlaceProbeEntries produces more than four entries the counter is
+ *      pulled to the ceiling again.
+ *   7. Finally the tracking is reset (line for line the same as the body of
+ *      ResetActorTracking) and the measured distance is written into the
+ *      slot's +0x4C field.
  *
- * OLCULEN YAZIM KURALLARI (hepsi bu fonksiyonda denendi, hepsi gerekli):
+ * MEASURED SPELLING RULES (all of them were tried in this function, all needed):
  *
- * A. switch govdeleri ROM'daki blok sirasina gore yazildi: 0, 2, 1, 3
- *    (kural 61 eki). Kaynak sirasi 0,1,2,3 olsa bloklar ters cikiyor.
+ * A. The switch bodies were written in ROM's block order: 0, 2, 1, 3
+ *    (rule 61 addendum). With source order 0,1,2,3 the blocks come out reversed.
  *
- * B. 2 ve 1 numarali durumlarda ROM ONCE baslangic konumunu yukluyor.
- *    `pos.y - startPos.y` yazimi once `pos.y`'yi yukluyor (249/251).
- *    `-startPos.y + pos.y` yazimi ROM'un sirasini veriyor. Elenen: unary
- *    `-(startPos.y - pos.y)` (agbcc agac duzeyinde katliyor, fark yok),
- *    `10 * (...)` (fark yok), `(startPos.y - pos.y) * -10` (532 bayt),
- *    `/ (1 << 6)` (548 bayt), her durumda ara `diff` yereli (221/251).
+ * B. In cases 2 and 1 ROM loads the starting position FIRST.
+ *    The spelling `pos.y - startPos.y` loads `pos.y` first (249/251).
+ *    The spelling `-startPos.y + pos.y` gives ROM's order. Ruled out: the unary
+ *    `-(startPos.y - pos.y)` (agbcc folds it at the tree level, no difference),
+ *    `10 * (...)` (no difference), `(startPos.y - pos.y) * -10` (532 bytes),
+ *    `/ (1 << 6)` (548 bytes), an intermediate `diff` local in every case (221/251).
  *
- * C. FUN_080627ec'in 6. argumani DEGISKEN olmali. Dogrudan `0` yazarsan
- *    agbcc sabiti yigin yazimindan SONRA uretiyor, boylece besinci
- *    arguman yazmacta beklemiyor, blok bir yazmac az istiyor ve TUM
- *    fonksiyonun dagitimi kayiyor (actor r4'e dusuyor, ROM'da r6):
- *    115/251. Degisken olunca ROM gibi r0-r5'in alti da dolu oluyor.
- *    Ayni gerekce ile ucuncu/dorduncu/besinci arguman da yerel:
- *    hepsi satir ici yazilinca 2. arguman once hesaplaniyor (89/251).
+ * C. The 6th argument of FUN_080627ec must be a VARIABLE. If you write `0`
+ *    directly, agbcc emits the constant AFTER the stack write, so the fifth
+ *    argument is not waiting in a register, the block asks for one register
+ *    less, and the allocation of the WHOLE function shifts (actor drops to r4,
+ *    ROM has r6): 115/251. With a variable, all six of r0-r5 are occupied just
+ *    like in ROM. For the same reason the third/fourth/fifth arguments are
+ *    locals too: written inline, the 2nd argument is computed first (89/251).
  *
- * D. Sayac blogunda ARA ISARETCI KULLANILMAMALI. `counter = owner->counter`
- *    yerelini her kola yazmak 194/251 veriyor; `owner->counter->` diye
- *    dogrudan yazmak 225/251 ve ROM'un yazmac dagitimini
- *    (counter r1, tavan r2, dusus r3) getiriyor. Elenen: tek ortak
- *    `counter` yereli (192), her kolda tam guncelleme (207).
+ * D. NO INTERMEDIATE POINTER MAY BE USED IN THE COUNTER BLOCK. Writing a
+ *    `counter = owner->counter` local in every branch gives 194/251; writing
+ *    `owner->counter->` directly gives 225/251 and brings ROM's register
+ *    allocation (counter r1, ceiling r2, drop r3). Ruled out: a single shared
+ *    `counter` local (192), a full update in every branch (207).
  *
- * E. 0x02035B10 durum sozcugu ROM'da OKUNUP ATILIYOR: `ldr r0,=..` /
- *    `ldr r0,[r0]` sonrasi r0 hemen eziliyor. Olu yuklemeyi ayakta
- *    tutmanin tek yolu volatile gorunum (ram_symbols.h'nin "her
- *    translation unit kendi gorunumunu bildirir" kuralina uygun).
- *    Ayrica bu okuma r0'i tuttugu icin NoOp08067370'in argumani r1'de
- *    hesaplanip r0'a kopyalaniyor; cagriya AYNI degerin iki kez
- *    verilmesi (r0 ve r1) ROM'un `adds r0,r1,#0` kopyasini veren tek
- *    yazim. Elenen: tek argumanli cagri (250/251, bir komut eksik),
- *    `NoOp08067370(gRam02035B10, dist>>16)` (249), ucuncu arguman `0`
- *    (250), virgul operatoru, ara `scaled` yereli.
+ * E. THE 0x02035B10 STATUS WORD IS READ AND DISCARDED IN ROM: after `ldr r0,=..` /
+ *    `ldr r0,[r0]` r0 is immediately overwritten. The only way to keep the dead
+ *    load alive is a volatile view (in line with ram_symbols.h's "each
+ *    translation unit declares its own view" rule).
+ *    Also, because this read holds r0, NoOp08067370's argument is computed in
+ *    r1 and copied into r0; passing the SAME value twice to the call (r0 and
+ *    r1) is the only spelling that produces ROM's `adds r0,r1,#0` copy. Ruled
+ *    out: a single-argument call (250/251, one instruction short),
+ *    `NoOp08067370(gRam02035B10, dist>>16)` (249), a third argument of `0`
+ *    (250), the comma operator, an intermediate `scaled` local.
  *
- * ESLESME: 524/524 bayt.
+ * MATCH: 524/524 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_08064f24.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_08064f24.c
  */
 
 #include "gba_types.h"
@@ -88,8 +90,8 @@ typedef struct Vec3 {
     s32 z;                              /* +0x08 */
 } Vec3;
 
-/* SelectSlotAB'nin dondurdugu oyuncu yuvasi; +0x25 isareti
- * src/world/actor_tracking.c ile ayni alan. */
+/* The player slot returned by SelectSlotAB; the +0x25 marker is the
+ * same field as in src/world/actor_tracking.c. */
 typedef struct PlayerSlot {
     u8  pad00[0x25];
     u8  marked;                         /* +0x25 */
@@ -97,8 +99,8 @@ typedef struct PlayerSlot {
     s32 distance;                       /* +0x4C */
 } PlayerSlot;
 
-/* src/world/spawn_slot_effect.c'deki SlotCounter; orada yalnizca +0x08
- * kullaniliyordu, burada +0x04 adimi da okunuyor. */
+/* The SlotCounter from src/world/spawn_slot_effect.c; there only +0x08
+ * was used, here the +0x04 step is read as well. */
 typedef struct SlotCounter {
     u8  pad00[4];
     s32 step;                           /* +0x04 */
@@ -117,16 +119,16 @@ typedef struct Node {
     SubNode *sub;                       /* +0x2C */
 } Node;
 
-/* Aktorun +0x64 sahibi: src/world/spawn_slot_effect.c'deki ActiveSlot
- * (orada da +0x30 sayaci ayni 0x10000 sinirina cekiliyor). */
+/* The actor's +0x64 owner: the ActiveSlot from src/world/spawn_slot_effect.c
+ * (there too the +0x30 counter is pulled to the same 0x10000 limit). */
 typedef struct ActiveSlot {
     u8           pad00[0x2C];
     Node        *node;                  /* +0x2C */
     SlotCounter *counter;               /* +0x30 */
 } ActiveSlot;
 
-/* src/world/actor_tracking.c'deki TrackedActor; ek olarak +0x60 zemin
- * degeri ve sahibin alt yapilari kullaniliyor. */
+/* The TrackedActor from src/world/actor_tracking.c; in addition the +0x60
+ * ground value and the owner's sub-structures are used. */
 typedef struct TrackedActor {
     Vec3        pos;                    /* +0x000 */
     u8          pad0C[0x60 - 0x0C];
@@ -150,12 +152,12 @@ extern void  FUN_080627ec(s32 dist, s32 drop, s32 rateB, s32 rateC,
                           s32 rateA, s32 rateD);
 extern s32   PlaceProbeEntries(void *actor, s32 mode);
 
-/* Bkz. dosya basi, madde E: bu sozcuk okunup atiliyor, olu yuklemenin
- * kalmasi icin bu TU'da volatile gorunum bildiriliyor. */
-/* Tur, src/core/reset_runtime_globals.c ile AYNI olmali (tutarlilik
- * denetimi ayni sembol icin celiskili extern turlerini durduruyor).
- * ROM buradaki olu okumayi yapiyor; volatile ifade duzeyinde
- * veriliyor -- src/world/link_service.c ile ayni kalip. */
+/* See the top of the file, item E: this word is read and discarded; a
+ * volatile view is declared in this TU so the dead load survives. */
+/* The type must be the SAME as in src/core/reset_runtime_globals.c (the
+ * consistency check stops contradictory extern types for the same symbol).
+ * ROM performs the dead read here; volatile is applied at the expression
+ * level -- the same pattern as src/world/link_service.c. */
 extern u32 gRam02035B10;
 
 /* 0x08064F24 */

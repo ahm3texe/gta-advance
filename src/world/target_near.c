@@ -1,87 +1,95 @@
-/* Hedefe yakinlik sinamasi -- 0x08045AA4-0x08045CBF (540 bayt)
+/* The target proximity test -- 0x08045AA4-0x08045CBF (540 bytes)
  *
- * DURUM: ESLESTI -- 0/540 fark.  Onceki durum 12/540 idi.
+ * STATUS: MATCHED -- 0/540 off.  It was previously 12/540.
  *
- * KALAN 12 BAYT NEYDI
- *   ROM  : ldr r0,[pc]+4 / mov ip,r0 / ldr r7,[pc]+8   sonra ldr r1,[r0] / ldr r0,[r7]
- *   bizim: ldr r7,[pc]+4 / ldr r0,[pc]+8 / mov ip,r0   sonra ldr r1,[r7] / ldr r0,[r0]
- * Havuz sirasi iki tarafta da ayni (3D8, 224, 3D0, 3DC); yalnizca
- * gRam02000224 ile gRam0202F3D0 ADRESLERI ters yazmaclara dusuyordu:
- * ROM ip<-224 / r7<-3D0, bizde r7<-224 / ip<-3D0.
+ * WHAT THE REMAINING 12 BYTES WERE
+ *   the ROM: ldr r0,[pc]+4 / mov ip,r0 / ldr r7,[pc]+8   then ldr r1,[r0] / ldr r0,[r7]
+ *   ours   : ldr r7,[pc]+4 / ldr r0,[pc]+8 / mov ip,r0   then ldr r1,[r7] / ldr r0,[r0]
+ * The pool order is the same on both sides (3D8, 224, 3D0, 3DC); only the
+ * ADDRESSES of gRam02000224 and gRam0202F3D0 landed in the opposite registers:
+ * the ROM has ip<-224 / r7<-3D0, we had r7<-224 / ip<-3D0.
  *
- * OLCULEN MEKANIZMA (yeni kural adayi -- rapora da yazildi)
- *   Bu iki adres, gcse'nin urettigi iki pseudo (bizde 147 = &gRam02000224,
- *   148 = &gRam0202F3D0).  .greg dokumu:
+ * THE MEASURED MECHANISM (a candidate for a new rule -- also written up in the
+ * report)
+ *   These two addresses are two pseudos produced by gcse (147 = &gRam02000224
+ *   and 148 = &gRam0202F3D0 for us).  The .greg dump:
  *       Register 147, refs = 5, live_length = 484
  *       Register 148, refs = 5, live_length = 484
- *   Kural 50 onceligi IKISINDE DE ESIT: floor_log2(5)*5/484 -> 206.
- *   Esitlikte global.c kucuk allocno'yu (= kucuk pseudo numarasini) once
- *   isler, ilk islenen en kucuk bos yazmaci (r7) alir, ikincisi r12'ye
- *   duser.  Yani bu farkta OMUR/REFS kaldiraci YOK; is pseudo NUMARASINDA.
+ *   The rule 50 priority is EQUAL FOR BOTH: floor_log2(5)*5/484 -> 206.
+ *   On a tie, global.c processes the smaller allocno (= the smaller pseudo
+ *   number) first, and whichever is processed first takes the lowest free
+ *   register (r7) while the second falls to r12.  So there is NO
+ *   LIFETIME/REFS lever in this difference; it is all in the pseudo NUMBER.
  *
- *   148'in omru 147'ninkinden ASLA kisa olamaz (147 `ldr`de, 148 bir sonraki
- *   `str`de oluyor), refs de esit; dolayisiyla 148 onceligi ile one gecemez.
- *   Geriye tek yol kaliyor: pseudo NUMARALARINI takas etmek.
+ *   148's lifetime can NEVER be shorter than 147's (147 dies at an `ldr`, 148
+ *   at the following `str`) and the refs are equal, so 148 cannot get ahead on
+ *   priority.  One route remains: swapping the pseudo NUMBERS.
  *
- *   Numaralari gcse'nin ifade tablosundaki KOVA (bucket) sirasi belirliyor.
- *   Kova, adresin literal havuzu etiketinin (.LCn) adindan hesaplaniyor ve
- *   OLCULDU (probe ile n=7..34 tarandi):
- *       tek haneli n : kova = n + 100      (.LC7=107 .LC8=108 .LC9=109)
- *       iki haneli n : kova = n + 11       (.LC10=21 .LC11=22 ... .LC34=45)
- *   Yani .LCn -> .LC(n+1) her zaman kovayi +1 yapar, TEK ISTISNA .LC9->.LC10
- *   (109 -> 21).  Kucuk kova once islenir, once islenen kucuk pseudo alir.
+ *   The numbers are decided by the BUCKET order in gcse's expression table.
+ *   The bucket is computed from the name of the address's literal pool label
+ *   (.LCn) and was MEASURED (probed for n=7..34):
+ *       single-digit n : bucket = n + 100      (.LC7=107 .LC8=108 .LC9=109)
+ *       two-digit n    : bucket = n + 11       (.LC10=21 .LC11=22 ... .LC34=45)
+ *   So .LCn -> .LC(n+1) always adds 1 to the bucket, with the SINGLE EXCEPTION
+ *   .LC9->.LC10 (109 -> 21).  The smaller bucket is processed first, and
+ *   whichever is processed first gets the smaller pseudo.
  *
- *   Bizim TU'da nearest() satir disi da derlendigi icin (baslikta static
- *   __inline__; .rtl dokumunde ";; Function nearest" var) .LC0-.LC6'yi o
- *   yiyor, IsTargetNear .LC7'den basliyordu:
+ *   Because nearest() is also compiled out of line in our TU (it is
+ *   static __inline__ in the header; the .rtl dump has ";; Function nearest"),
+ *   it eats .LC0-.LC6 and IsTargetNear started at .LC7:
  *       .LC7=gGameState .LC8=gRam02000F10 .LC9=gRam0202F3D8
- *       .LC10=gRam02000224(kova 21) .LC11=gRam0202F3D0(kova 22)
- *   21 < 22 -> 224 once -> 224 r7'yi kapiyor.  ROM'un istedigi tersi.
+ *       .LC10=gRam02000224(bucket 21) .LC11=gRam0202F3D0(bucket 22)
+ *   21 < 22 -> 224 first -> 224 takes r7.  The reverse of what the ROM wants.
  *
- * COZUM: gRam02000224'un havuz etiketini ONE ALMAK.  Fonksiyonun basinda
- * OLU bir gonderme, RTL uretimi sirasinda .LC7'yi (kova 107) ona verdiriyor;
- * gRam0202F3D0 .LC11'de (kova 22) kaliyor.  22 < 107 oldugu icin bu kez 3D0
- * once isleniyor ve r7'yi aliyor -- ROM ile birebir.  `if(z)` govdesi
- * jump/cse tarafindan silindigi icin TEK BAYT kod uretmiyor: boyut 540'ta
- * kaldi, 12 fark 0'a indi.
+ * THE SOLUTION: MOVE gRam02000224's pool label EARLIER.  A DEAD reference at
+ * the top of the function makes RTL generation give it .LC7 (bucket 107),
+ * while gRam0202F3D0 stays at .LC11 (bucket 22).  Since 22 < 107, 3D0 is now
+ * processed first and takes r7 -- exactly as in the ROM.  Because the `if(z)`
+ * body is deleted by jump/cse it produces NOT ONE BYTE of code: the size
+ * stayed at 540 and the 12 differences went to 0.
  *
- * ELENEN -- olu gondermenin CALISMAYAN bicimleri:
- *   (void)gRam02000224;        -> parse'ta katlaniyor, .LC hic uretilmiyor,
- *                                 12 fark aynen kaliyor
- *   u32 pre=gRam02000224;      -> yuk DCE'ye takiliyor ama ADRES yasiyor,
- *                                 cse sonraki kullanimlarla birlestiriyor,
- *                                 adres bastan r4'te duruyor: 538 bayt/286 fark
- *   return'den SONRA olu blok  -> .LC etiketi gec uretiliyor, sira degismiyor
- *   fonksiyondan ONCE olu statik yardimci (1..5 adet denendi) -> etiketleri
- *                                 YUKARI kaydiriyor, gereken YON ASAGI:
- *                                 12 -> 14 fark
- * CALISAN bicimlerin hepsi ayni (0 fark): `if(z) separation=gRam02000224;`,
- * `if(z) tick=&gRam02000224;`, `separation=0; if(separation) ...`.  Adres mi
- * deger mi okundugu fark etmiyor; onemli olan .LC'nin ERKEN uretilmesi.
+ * RULED OUT -- forms of the dead reference that DO NOT WORK:
+ *   (void)gRam02000224;        -> folded at parse time, no .LC is ever
+ *                                 produced, the 12 differences remain
+ *   u32 pre=gRam02000224;      -> the load is caught by DCE but the ADDRESS
+ *                                 survives, cse merges it with the later uses
+ *                                 and the address sits in r4 from the start:
+ *                                 538 bytes/286 off
+ *   a dead block AFTER the return -> the .LC label is produced late, the order
+ *                                 does not change
+ *   a dead static helper BEFORE the function (1..5 of them tried) -> it shifts
+ *                                 the labels UP, and the direction needed is
+ *                                 DOWN: 12 -> 14 off
+ * All the forms that DO work are equivalent (0 off):
+ * `if(z) separation=gRam02000224;`, `if(z) tick=&gRam02000224;`,
+ * `separation=0; if(separation) ...`.  Whether the address or the value is
+ * read makes no difference; what matters is that the .LC is produced EARLY.
  *
- * ELENEN -- kural 50'nin normal kaldiraclari (hepsi ETKISIZ, 12'de kaldi):
- *   yerel bildirim sirasini takas, result'i fonksiyon basina alma,
- *   result'i u32 yapma, if(result)/if(!result) takasi, 4==kind,
- *   GetBaseAlt()==0, GetBaseAlt()>=2, target==0, if/else kolunu cevirme,
- *   result'i else ile yazma.  Hepsi ayni RTL'i uretiyor: 12/540.
- *   distance()'i if(!target)'tan ONCE cagirma -> 40 fark.
- *   `separation<=DIST_NEAR goto yes` yerine `>DIST_NEAR goto no` -> 528 bayt.
+ * RULED OUT -- rule 50's usual levers (all INEFFECTIVE, it stayed at 12):
+ *   swapping the local declaration order, moving result to the top of the
+ *   function, making result u32, swapping if(result)/if(!result), 4==kind,
+ *   GetBaseAlt()==0, GetBaseAlt()>=2, target==0, inverting the if/else branch,
+ *   writing result with an else.  They all produce the same RTL: 12/540.
+ *   Calling distance() BEFORE if(!target) -> 40 off.
+ *   `>DIST_NEAR goto no` instead of `separation<=DIST_NEAR goto yes` -> 528
+ *   bytes.
  *
- * PAYLASILAN BASLIK DOGRU -- kanit: ayni satir-ici nearest() kodu
- * target_follow.c (0x0804B088) ve target_repeat.c (0x08047600) icinde
- * BIREBIR tutuyor.  Baslik DEGISTIRILMEDI.
+ * THE SHARED HEADER IS RIGHT -- the evidence: the same inlined nearest() code
+ * holds EXACTLY in target_follow.c (0x0804B088) and target_repeat.c
+ * (0x08047600).  The header was NOT CHANGED.
  *
- * ELENEN -- baslik degisiklikleri (hepsi diger IKI eslesmeyi KIRDI):
- *   karsilastirma operandlarini takas  -> 45aa4=11 ama 4b088/47600=13
- *   karsilastirma sirasini degistir    -> ucu de 36
- *   damga icin yerel degisken          -> 45aa4=11 ama digerleri=3
- *   tick icin yerel degisken           -> degisiklik yok
+ * RULED OUT -- header changes (all of them BROKE the other TWO matches):
+ *   swapping the comparison operands  -> 45aa4=11 but 4b088/47600=13
+ *   changing the comparison order     -> all three at 36
+ *   a local variable for the stamp    -> 45aa4=11 but the others=3
+ *   a local variable for the tick     -> no change
  *
- * ELENEN -- bu dosyanin yeniden yapilandirilmasi (hepsi DAHA KOTU):
- *   GetBaseAlt() yereline alma  -> 528 bayt, 240 fark
- *   olu `result` yapisini kaldirma -> 528 bayt, 75 fark
- *   kind'i canli tutma / target on-atamasi -> 528 bayt, 75 fark
- * Olu `result` yapisi YUK TASIYOR: fonksiyonu tam 540 bayta getiriyor.
+ * RULED OUT -- restructuring this file (all WORSE):
+ *   taking GetBaseAlt() into a local  -> 528 bytes, 240 off
+ *   removing the dead `result` structure -> 528 bytes, 75 off
+ *   keeping kind live / pre-assigning target -> 528 bytes, 75 off
+ * The dead `result` structure CARRIES WEIGHT: it brings the function to
+ * exactly 540 bytes.
  *
  */
 

@@ -1,11 +1,11 @@
-/* Kayit sozunu bulup iletme — 0x08030C0C-0x08030C27
+/* Look up a record word and forward — 0x08030C0C-0x08030C27
  *
- * Iki argumani CAGRI BOYUNCA saklayip GetTextString sonucuyla birlikte
- * FUN_0802DF18'e veriyor. ROM ikisini de r4/r5'e kopyaliyor (kural 37:
- * cagri boyunca yasamasi gereken degerler ayri yerellerde).
+ * Preserve both arguments ACROSS THE CALL and pass them with GetTextString's
+ * result to FUN_0802DF18. The ROM copies them to r4/r5 (rule 37: values that
+ * must survive a call need separate locals).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/lookup_then_call.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/lookup_then_call.c
  */
 
 #include "gba_types.h"

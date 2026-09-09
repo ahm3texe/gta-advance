@@ -1,57 +1,58 @@
-/* Gonderilecek paketi kurar — 0x0806673C-0x08066797
+/* Builds the packet to be sent — 0x0806673C-0x08066797
  *
- * Basliga kimlik baytini ve iki alanin XOR'unu yaziyor, sağlama alanini
- * sifirliyor, 16 baytlik yuku CpuSet ile kopyaliyor, sonra paketin on
- * yarim kelimesini toplayip sağlamayi `~toplam - 12` olarak yaziyor ve
- * "hazir" bayragini kaldiriyor.
+ * Writes the id byte and the XOR of two fields into the header, clears the
+ * checksum field, copies the 16-byte payload with CpuSet, then sums the
+ * packet's ten half words, writes the checksum as `~total - 12` and raises the
+ * "ready" flag.
  *
- * Sağlama alani toplama DAHIL: once sifirlandigi icin sonuc etkilenmiyor.
+ * The checksum field is INCLUDED in the sum: since it is cleared beforehand,
+ * the result is unaffected.
  *
- * Global her erisimde yeniden okunuyor cunku yazimlar paketin isaretcisi
- * uzerinden gidiyor ve isaretcinin kendisiyle ortusebilir; agbcc bu
- * yuzden CSE yapmiyor.
+ * The global is re-read on every access because the writes go through the
+ * packet's pointer and may alias the pointer itself; that is why agbcc does
+ * not apply CSE.
  *
- * DURUM: PARK — 92/92 boyut, 20 bayt fark, tek komutluk sapma.
+ * STATUS: PARKED — 92/92 in size, 20 bytes off, a one-instruction divergence.
  *
- * Kalan tek fark: ROM dongu sonrasi `gRam02036338` adresini r4'te
- * TUTUYOR (`ldr r2, [r4, #0]`), bizim derleme onu havuzdan yeniden
- * yukluyor (`ldr r0, [pc]; ldr r2, [r0, #0]`).
+ * The one remaining difference: after the loop the ROM KEEPS the
+ * `gRam02036338` address in r4 (`ldr r2, [r4, #0]`), while our build reloads
+ * it from the pool (`ldr r0, [pc]; ldr r2, [r0, #0]`).
  *
- * Olculdu (dump_alloc --function BuildLinkPacket): agbcc ayni adres
- * sabiti icin IKI ayri pseudo uretiyor --
- *     27  mem[.LC0]  refs 5  omur 46  oncelik 0,217  -> r4
- *     74  mem[.LC0]  refs 2  omur  4  oncelik 0,500  -> r0
- * ROM'da tek canli aralik var. CSE dongu blogunu asmadigi icin ikinci
- * pseudo doguyor; bu, kural 50'nin belgelenmis sinirinin tersi yonu ve
- * kaynak tarafinda BIRLESTIRME kolu yok.
+ * Measured (dump_alloc --function BuildLinkPacket): agbcc produces TWO
+ * separate pseudos for the same address constant --
+ *     27  mem[.LC0]  refs 5  live 46  priority 0.217  -> r4
+ *     74  mem[.LC0]  refs 2  live  4  priority 0.500  -> r0
+ * In the ROM there is a single live range.  The second pseudo is born because
+ * CSE does not cross the loop block; this is the opposite direction of rule
+ * 50's documented limit, and there is NO MERGING lever on the source side.
  *
- * NEDEN KAYNAK TARAFINDA KOL YOK (yeniden olculdu): iki pseudo, CSE'nin
- * temel-blok sinirindan doguyor. p27 L0'da (dongu oncesi), p74 L2'de
- * (dongu sonrasi); arada dongu blogu L1 var ve geri kenari oldugu icin
- * CSE'nin genisletilmis temel blok yolu orada kesiliyor. Sabit havuz
- * yuklemesi her basvuruda yeniden uretiliyor, L0'daki degeri L2'de
- * kullandirtacak bir kaynak ifadesi yok: L2'nin tek oncelli L1 ve L1 iki
- * oncelli. Tek bilinen kol, adresi yerel bir degiskende tutmak
- * (`CommBlock **slot = &gRam02036338;`) — input_extra.c'de ayni sinif
- * (`irq = &gBiosIrqFlags`) uydurma degisken oldugu icin reddedilmisti,
- * burada da REDDEDILDI.
+ * WHY THERE IS NO SOURCE-SIDE LEVER (re-measured): the two pseudos are born at
+ * a CSE basic-block boundary.  p27 is in L0 (before the loop) and p74 in L2
+ * (after it); the loop block L1 sits between them and, because it has a back
+ * edge, CSE's extended basic block path is cut there.  The constant pool load
+ * is re-emitted at every reference, and there is no source expression that
+ * would let L2 use L0's value: L2's only predecessor is L1, and L1 has two
+ * predecessors.  The one known lever is to hold the address in a local
+ * variable (`CommBlock **slot = &gRam02036338;`) -- the same class was
+ * rejected in input_extra.c (`irq = &gBiosIrqFlags`) as an invented variable,
+ * and it is REJECTED here too.
  *
- * Kural 54-61 gozden gecirildi: hicbiri bu fonksiyona uygulanmiyor
- * (bitfield yok, u8 alan yok, volatile yok, aralik korumasi yok).
+ * Rules 54-61 were reviewed: none of them applies to this function (no
+ * bitfields, no u8 fields, no volatile, no range guard).
  *
- * ELENEN YAZIMLAR (hepsi ayni 20 baytta kaldi):
- *   - sayaci s32/u32, do-while/while/for, indeksli erisim  (5 yazim)
- *   - kuyruk blogunu yerel `CommBlock *`e almak
- *   - iki kuyruk atamasinin sirasini degistirmek (36 bayta kotulesti)
- *   - `total` turunu u32 yapmak
- *   - paket isaretcisini dongu ONCESI yerele alip kuyrukta kullanmak
- *     (`LinkPacket *pkt`): 32 bayta kotulesti — ROM kuyrukta
- *     `ldr r1,[r2,#28]` ile paketi YENIDEN okuyor.
- * Sayaci u32 yapmak 29 -> 20 bayta indirdi; digerleri hicbir sey
- * degistirmedi.
+ * SPELLINGS RULED OUT (all stayed at the same 20 bytes):
+ *   - the counter as s32/u32, do-while/while/for, indexed access  (5 spellings)
+ *   - taking the tail block into a local `CommBlock *`
+ *   - swapping the order of the two tail assignments (got worse, 36 bytes)
+ *   - making `total` u32
+ *   - taking the packet pointer into a local BEFORE the loop and using it in
+ *     the tail (`LinkPacket *pkt`): got worse, 32 bytes -- in the tail the ROM
+ *     RE-READS the packet with `ldr r1,[r2,#28]`.
+ * Making the counter u32 took it from 29 to 20 bytes; nothing else changed
+ * anything.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_packet.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_packet.c
  */
 
 #include "gba_types.h"
@@ -59,7 +60,7 @@
 
 #define PACKET_HALFWORDS  10
 #define CHECKSUM_BIAS     12
-#define CPUSET_COPY_16    0x04000004   /* 32 bit, dort kelime */
+#define CPUSET_COPY_16    0x04000004   /* 32-bit, four words */
 
 extern void CpuSet(const void *src, void *dst, u32 control);
 

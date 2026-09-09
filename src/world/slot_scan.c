@@ -1,14 +1,14 @@
-/* Yuva tarayici ve DMA silici — 0x08055C8C-0x08055CFD
+/* Slot scanner and DMA clear — 0x08055C8C-0x08055CFD
  *
- * Ilk fonksiyon 128 girisli 60 baytlik yuva dizisinde `count`inci bos
- * yuvayi (yani `+0x28` sozcugu 0 olan) bulup isaretcisini donduruyor.
- * Ikincisi 15 sozcuk (60 bayt) uzunlugundaki blogu DMA3 32-bit transferi
- * ile temizliyor.
+ * The first finds the count-th empty slot (word +0x28 == 0) in a 128-entry
+ * array of 60-byte slots and returns its pointer. The second clears slots
+ * with DMA3 32-bit transfers, 15 words (60 bytes) per slot.
  *
- * DMA kontrolu: 0x85000000 = 32-bit transfer bayrak; alt 16 bit uzunluk.
+ * DMA control 0x85000000 supplies the 32-bit transfer flags; low 16 bits
+ * hold the length.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_scan.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_scan.c
  */
 
 #include "gba_io.h"
@@ -20,13 +20,13 @@
 
 typedef struct Slot {
     u8  pad00[0x28];
-    u32 mark;                   /* +0x28: 0 ise bos */
+    u32 mark;                   /* +0x28: zero means empty */
     u8  pad2C[0x10];            /* stride 60 */
 } Slot;
 
 extern Slot gSlotArray[SLOT_COUNT];
 
-/* 0x08055C8C — `count`inci bos yuvanin ptr'si, yoksa 0. */
+/* 0x08055C8C — pointer to the count-th empty slot, or 0. */
 Slot *FindNthFreeSlot(u32 count)
 {
     Slot *slot;
@@ -55,8 +55,7 @@ Slot *FindNthFreeSlot(u32 count)
     return 0;
 }
 
-/* 0x08055CC8 — dest'e count adet yuvayi (15*count sozcuk) sifir dolduran
- * DMA transferi. */
+/* 0x08055CC8 — DMA zero-fill count slots at dest (15*count words). */
 void ClearSlots(void *dest, u32 count)
 {
     volatile u32 fill;

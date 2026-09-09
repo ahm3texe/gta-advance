@@ -1,29 +1,31 @@
-/* Aktoru devreye alma — 0x08055B34-0x08055B7D
+/* Engaging the actor — 0x08055B34-0x08055B7D
  *
- * Iki kapi: +0x0B baytinin 12 maskesi 8 olmali, ve GetEntityKind sonucunun
- * 0. biti kurulu olmali. Ikisi de saglanirsa hedefin bayraklarinda bit 9
- * kurulup bit 0 siliniyor, SetActorEngage cagriliyor, sonra bit 7 de
- * kuruluyor ve 1 donuluyor.
+ * Two gates: mask 12 of the +0x0B byte must be 8, and bit 0 of GetEntityKind's
+ * result must be set.  If both hold, bit 9 is set and bit 0 cleared in the
+ * target's flags, SetActorEngage is called, then bit 7 is set as well and 1 is
+ * returned.
  *
- * Kural 33: sabiti AYRI sonuc yereline koyup yerinde `&=` kullanmak
- * gerekiyor. ROM `movs r0,#12` ile maskeyi ONCE kuruyor, sonra alani
- * okuyup maskeyi kendi register'inda guncelliyor; `alan & 12` yazmak
- * sonucu alanin register'inda tutar ve farkli kod uretir.
+ * Rule 33: the constant must go into a SEPARATE result local and be updated
+ * in place with `&=`.  The ROM builds the mask FIRST with `movs r0,#12`, then
+ * reads the field and updates the mask in its own register; writing
+ * `field & 12` keeps the result in the field's register and produces different
+ * code.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Rule 35: `pop {r1}; bx r1` -> r0 carries a return value, so the signature
+ * is u32.
  *
- * BLOK SIRASI ONEMLI: ROM'un basarisizlik blogu IKI kontrolun ARASINA
- * dusuyor -- ilk kontrol basarisizlikta ileri atliyor, ikinci kontrol
- * BASARIDA atliyor ve basarisizlik yoluna DUSEREK giriliyor. Iki ayri
- * `return 0` yazmak farkli dal mesafeleri uretiyordu (bne +0x32 yerine
- * ROM'da +0x0C). Etiketli bicim ROM'un kontrol akisini dogrudan ifade
- * ediyor; ayni cozum src/world/bump_or_reset.c'de de kullanilmisti.
+ * THE BLOCK ORDER MATTERS: the ROM's failure block falls BETWEEN the TWO
+ * checks -- the first check branches forward on failure, the second branches
+ * on SUCCESS and the failure path is entered by FALLING THROUGH.  Writing two
+ * separate `return 0`s produced different branch distances (bne +0x32 instead
+ * of the ROM's +0x0C).  The labelled form expresses the ROM's control flow
+ * directly; the same solution was used in src/world/bump_or_reset.c.
  *
- * ROM cagridan SONRA +0x28'i YENIDEN okuyor; cagri onu degistirmis
- * olabilecegi icin bu dogal davranis.
+ * The ROM RE-READS +0x28 AFTER the call; that is natural behaviour, since the
+ * call may have changed it.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/engage_actor.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/engage_actor.c
  */
 
 #include "gba_types.h"

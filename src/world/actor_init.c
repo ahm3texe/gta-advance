@@ -1,26 +1,28 @@
-/* Varlik ilklendirme — 0x080154D8-0x0801558F
+/* Entity initialisation — 0x080154D8-0x0801558F
  *
- * Bir varlik yapisini varsayilan degerlere kuruyor. 0x88'den sonraki bayt
- * alanlari 0xFF ile dolduruluyor (muhtemelen "atanmamis" isaretcisi);
- * 0x8A ve 0xA8'in dusuk dort biti temizleniyor.
+ * Sets an entity structure to its default values.  The byte fields after 0x88
+ * are filled with 0xFF (probably an "unassigned" marker); the low four bits
+ * of 0x8A and 0xA8 are cleared.
  *
- * Thumb'da ldrb/strb yalnizca 0-31 ofseti alabildigi icin 0x88 ve sonrasina
- * erisirken derleyici yeni bir taban hesapliyor; ROM'daki `adds r1, #40`
- * zincirleri bundan.
+ * Because ldrb/strb in Thumb only take offsets 0-31, the compiler computes a
+ * new base when reaching 0x88 and beyond; that is where the ROM's
+ * `adds r1, #40` chains come from.
  *
- * BYTE-MATCHING. 0x90 kuyruk isaretcisini `i = 0` atamasindan once acikca
- * hesaplamak, ROM'daki adres-hazirlama / sifir-sabiti sirasini koruyor.
+ * BYTE-MATCHING.  Computing the 0x90 tail pointer explicitly before the
+ * `i = 0` assignment preserves the ROM's address-preparation /
+ * zero-constant order.
  *
- * Cozulen: 0x8A ve 0xA8 alanlari s8 olmali. u8 iken derleyici maskeyi
- * 8 bite daraltip `mov r1,#0xF0` yaziyor; ROM ise 32 bitlik -16'yi
- * `mov r1,#0x10; neg r1,r1` ile kuruyor. Bu tek degisiklik 40 -> 14.
+ * Resolved: the 0x8A and 0xA8 fields must be s8.  As u8 the compiler narrows
+ * the mask to 8 bits and writes `mov r1,#0xF0`; the ROM instead builds the
+ * 32-bit -16 with `mov r1,#0x10; neg r1,r1`.  That single change took it from
+ * 40 to 14.
  *
- * Son iki adim: dongu sayacini maskeden sonra sifir degeri olarak yeniden
- * kullanmak farki 14'ten tek komut tasinmasina indirdi; `tail` isaretcisini
- * once hesaplamak o son farki da kapatti.
+ * The last two steps: reusing the loop counter as the zero value after the
+ * mask reduced the difference from 14 to a single instruction being moved;
+ * computing the `tail` pointer first closed that last difference too.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_init.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_init.c
  */
 
 #include "gba_types.h"

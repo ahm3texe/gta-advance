@@ -1,15 +1,14 @@
-/* Ilk tablo girdisini isle — 0x08029014-0x08029051
+/* Process the first table entry — 0x08029014-0x08029051
  *
- * ROM'daki dongu kosulu ilk artirimdan sonra yalniz `i == 0` iken geri
- * donuyor. i sifirdan basladigi icin pratikte sadece 0 numarali girdi
- * isleniyor; bu fonksiyon 65536 girdiyi taramiyor. Ilk girdi aktifse
- * subActive degerine gore NoOp080289B8 veya NoOp080289B4 cagriliyor.
+ * After incrementing, the ROM loops back only if i == 0. Since i starts at
+ * zero, only entry 0 is processed; this does not scan 65536 entries. If the
+ * first entry is active, subActive selects NoOp080289B8 or NoOp080289B4.
  *
- * BYTE-MATCHING: carpimi isaretci tabanindan once yazan acik tamsayi
- * toplami, agbcc'nin ROM'daki `adds r1, r0, r5` operand sirasini korur.
+ * BYTE-MATCHING: an explicit integer addition placing the product before
+ * the pointer base preserves the ROM's adds r1,r0,r5 operand order.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/scan_all.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/scan_all.c
  */
 
 #include "gba_types.h"
@@ -36,7 +35,7 @@ void ProcessFirstEntry(void)
     i = 0;
     tbl = gRam02024650;
     do {
-        /* Operand sirasi byte eslesmesi icin anlamlidir. */
+        /* Operand order matters for byte matching. */
         e = (Entry *)((u32)i * sizeof(Entry) + (u32)tbl);
         if (e->active != 0) {
             if (e->subActive == 0)

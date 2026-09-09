@@ -1,92 +1,97 @@
-/* FUN_0803afbc — 0x0803AFBC-0x0803B19B (480 bayt)
+/* FUN_0803afbc — 0x0803AFBC-0x0803B19B (480 bytes)
  *
- * ESLESIYOR (byte-matching, 480/480 bayt, 231/231 komut ayni).
+ * MATCHES (byte-matching, 480/480 bytes, 231/231 instructions identical).
  *
- * NE YAPIYOR: gRam02000F08'in gosterdigi baglam icin "sahne gecisi"
- * adimi.  Once bes kapi var (bayrak +0xAE bit 1, mesgul bayragi +0x08 ve
- * uc ActorIdMatches sorgusu 0x400C / 0x4009 / 0x400B); herhangi biri
- * tutarsa hicbir sey yapmadan cikiyor.  Ardindan dugumun (+0x1C)
- * durumuna gore bir bekleme esigi seciyor (durum 8/9 -> 18, 10 -> 24) ve
- * +0xB8'deki adim sayaci sifirdan buyuk ama esigin altindaysa yine
- * cikiyor.  Kapilar gecilince: dugumun +0x02 bayragi hala sifirsa
- * GetRamType()'a bakip bayragi kuruyor; kurulamadiysa duruma gore
- * FUN_08035058 ile 348 ya da 349 bildirimini yollayip cikiyor.  Bayrak
- * kuruluysa iki yol var: durum 13 ise +0xB4'teki nesnenin konumunu
- * (bayrak 0x30'a gore +0x18 ya da +0x20'nin +4'u) baglamin +0x10'una 12
- * bayt olarak kopyalayip etkin yuvayla FUN_08035f1c'i cagiriyor; degilse
- * evreyi 2 yapip +0xBC'yi sifirliyor, dugumun dizideki indeksini
- * ((node - slots) >> 3) ve oyuncu hizinin mutlak degerini FUN_0803a554'e
- * verip, gRam02000F00 == gSlotSelector + 1 ise FUN_08030a3c'yi cagiriyor
- * ve son olarak +0x06 zamanlayicisini 900, +0xB8 adimini 1 yapiyor.
- *
- * ---------------------------------------------------------------------
- * ROM'DAN OKUNAN AYRINTILAR
- *
- *  1. `node` (+0x1C) YEREL DEGISKEN, geri kalan her sey global uzerinden
- *     okunuyor.  0x803AFC2'de `ldr r5,[r2,#28]` ile en basta aliniyor ve
- *     r5 uc `bl`'yi asarak 0x803B176'ya kadar yasiyor.  Cagrilar
- *     bellegi bozdugu icin bu ancak GERCEK bir yerelse mumkun; buna
- *     karsilik durum baytini okuyan uc yer (0x803B00E, 0x803B06A,
- *     0x803B0C8) her seferinde `gRam02000F08->node->state` zincirini
- *     bastan yukluyor.  Iki yazim bilerek ayri tutuldu: `node->state`
- *     yazilirsa r5 kullanilir ve uc `ldr` cifti kaybolur.
- *
- *  2. ESIK SECIMI SWITCH, if/else DEGIL.  0x803B014'te `cmp #8 / blt`,
- *     `cmp #9 / ble`, `cmp #10 / bne` var: bu agbcc'nin seyrek switch
- *     karar agaci (kural 46).  `if (s == 8 || s == 9)` yazimi kural 60
- *     geregi aralik testine (`subs #8 / cmp #1 / bhi`) katlanirdi.
- *     `default:` dogrudan `goto ready;` -- ROM'un `blt L_b050`'si bu.
- *     CASE SIRASI onemli: ROM'da `movs r2,#24` govdesi agacin hemen
- *     ardinda (duse gecisle), `movs r2,#18` govdesi ortak koddan hemen
- *     once duruyor; yani kaynakta once `case 10`, sonra `case 8/9`.
- *
- *  3. +0xB8 IKI KERE OKUNUYOR (kural 55).  `ldrb r0,[r1,#0] / cmp #0 /
- *     beq` ve hemen ardindan yine `ldrb r1,[r1,#0] / cmp r1,r2 / bge`.
- *     Yerele kopyalamak bu ikinci `ldrb`'yi siler.  Adres (p + 0xB8)
- *     ise CSE ile paylasiliyor -- ikisi de tek `gRam02000F08->step`
- *     yazimindan cikiyor.
- *
- *  4. ASIL SWITCH ATLAMA TABLOSU URETIYOR: durum - 3, `cmp #8 / bls`,
- *     `lsls #2` ve 0x0803B08C'deki 9 sozcukluk tablo.  Tablo bu
- *     fonksiyonun kendi literal havuzunun icinde, veri sembolu degil.
- *     Case 8 ve 9 kaynakta YOK; tablodaki karsiliklari default etiketine
- *     (0x803B18A) bakiyor -- tablo min..max araligini doldurdugu icin.
- *     Case 3/5 govdesi ROM'da AYRI DURMUYOR: agbcc'nin capraz atlamasi
- *     onu 0x803B0DC'deki ozdes blokla (item == 0 dalindaki ayni
- *     FUN_08035058(..., 349) cagrisi) birlestirip tablo girdilerini
- *     dogrudan oraya yonlendirmis.  Kaynakta iki cagri ayri ayri
- *     yazili; birlestirme derleyicinin isi.
- *
- *  5. INDEKS HESABI: ROM `subs r0,#36 / subs r0,r0,r1 / lsrs r2,r0,#3`.
- *     Sabitin ONCE cikarilmasi, gcc'nin `A - (B + sabit)` -> `(A -
- *     sabit) - B` katlamasindan geliyor; yani kaynak
- *     `((u32)node - (u32)slots) >> 3` (slots dizisi +0x24).  `lsrs`
- *     ISARETSIZ, bu yuzden isaretci farki (`node - slots`, ptrdiff_t)
- *     KULLANILAMAZ -- o `asrs` uretirdi.
- *
- *  6. 0x803B112'deki blok GetActiveSlotValue (0x0803C090,
- *     src/world/slot_config.c) ile BIREBIR ayni ama `bl` yok: kaynakta
- *     ayni secim elle yazilmis.  Bu yuzden burada da acik yazildi.
- *
- *  7. FUN_08035f1c TEK ARGUMANLI (0x08035F1C r1'i hic okumuyor).
- *     Cagri oncesi r1 = p + 0x1C degeri, 12 baytlik `ldmia/stmia`
- *     kopyasinin geride biraktigi artik; kaynakta ikinci arguman YOK.
- *
- *  8. `ldrh` (isaretsiz) => +0x02 alani u16; `ldrsh` (0x803B16E) =>
- *     gSlotSelector s16; `blt/ble/bge` isaretli dallar => u8 alanlar
- *     int'e yukseliyor, karsilastirma int sabitleriyle.
+ * WHAT IT DOES: a "scene transition" step for the context pointed at by
+ * gRam02000F08.  There are five gates first (the +0xAE flag bit 1, the busy
+ * flag +0x08 and three ActorIdMatches queries 0x400C / 0x4009 / 0x400B); if any
+ * of them holds, it returns without doing anything.  It then selects a wait
+ * threshold according to the node's (+0x1C) state (state 8/9 -> 18, 10 -> 24)
+ * and returns again if the step counter at +0xB8 is greater than zero but below
+ * the threshold.  Once the gates are passed: if the node's +0x02 flag is still
+ * zero it consults GetRamType() and sets the flag; if it could not be set, it
+ * sends notification 348 or 349 with FUN_08035058 according to the state and
+ * returns.  With the flag set there are two paths: if the state is 13 it copies
+ * the position of the object at +0xB4 (either +0x18 or +4 of +0x20, depending on
+ * flag 0x30) into the context's +0x10 as 12 bytes and calls FUN_08035f1c with
+ * the active slot; otherwise it sets the phase to 2, clears +0xBC, passes the
+ * node's index in the array ((node - slots) >> 3) and the absolute value of the
+ * player's speed to FUN_0803a554, calls FUN_08030a3c if
+ * gRam02000F00 == gSlotSelector + 1, and finally sets the +0x06 timer to 900 and
+ * the +0xB8 step to 1.
  *
  * ---------------------------------------------------------------------
- * KULLANILAN SEMBOLLER (hepsi data/ram_map.csv'de kayitli)
- *   0x02000F08 gRam02000F08  — baglam isaretcisi (Ctx *)
- *   0x02000F04 gSessionPtr   — yuva isaretcisi (Slot *)
- *   0x02000F10 gRam02000F10  — birincil yuva govdesi
- *   0x02000CE0 gGameState    — [12] ikincil yuva secici
+ * DETAILS READ FROM THE ROM
+ *
+ *  1. `node` (+0x1C) IS A LOCAL VARIABLE; everything else is read through the
+ *     global.  It is taken at the very start at 0x803AFC2 with
+ *     `ldr r5,[r2,#28]`, and r5 lives across three `bl`s up to 0x803B176.
+ *     Because the calls clobber memory, that is only possible if it is a REAL
+ *     local; by contrast the three places that read the state byte (0x803B00E,
+ *     0x803B06A, 0x803B0C8) reload the whole `gRam02000F08->node->state` chain
+ *     each time.  The two forms are kept apart deliberately: writing
+ *     `node->state` would use r5 and the three `ldr` pairs would disappear.
+ *
+ *  2. THE THRESHOLD SELECTION IS A SWITCH, NOT AN if/else.  At 0x803B014 there
+ *     are `cmp #8 / blt`, `cmp #9 / ble` and `cmp #10 / bne`: agbcc's sparse
+ *     switch decision tree (rule 46).  Writing `if (s == 8 || s == 9)` would
+ *     fold into a range test (`subs #8 / cmp #1 / bhi`) under rule 60.
+ *     `default:` is a direct `goto ready;` -- the ROM's `blt L_b050`.
+ *     THE CASE ORDER matters: in the ROM the `movs r2,#24` body sits right
+ *     after the tree (as a fall-through) and the `movs r2,#18` body right
+ *     before the shared code; so the source has `case 10` first, then
+ *     `case 8/9`.
+ *
+ *  3. +0xB8 IS READ TWICE (rule 55).  `ldrb r0,[r1,#0] / cmp #0 / beq` and
+ *     immediately afterwards `ldrb r1,[r1,#0] / cmp r1,r2 / bge` again.
+ *     Copying it into a local deletes that second `ldrb`.  The address
+ *     (p + 0xB8), on the other hand, is shared by CSE -- both come out of a
+ *     single `gRam02000F08->step` writing.
+ *
+ *  4. THE MAIN SWITCH DOES PRODUCE A JUMP TABLE: state - 3, `cmp #8 / bls`,
+ *     `lsls #2` and the 9-word table at 0x0803B08C.  The table is inside this
+ *     function's own literal pool, not a data symbol.
+ *     Cases 8 and 9 are ABSENT from the source; their table entries point at
+ *     the default label (0x803B18A) -- because the table fills the min..max
+ *     range.
+ *     The body of case 3/5 DOES NOT STAND SEPARATELY in the ROM: agbcc's
+ *     cross-jumping merged it with the identical block at 0x803B0DC (the same
+ *     FUN_08035058(..., 349) call on the item == 0 branch) and pointed the
+ *     table entries straight there.  The two calls are written separately in
+ *     the source; the merge is the compiler's work.
+ *
+ *  5. THE INDEX COMPUTATION: the ROM has `subs r0,#36 / subs r0,r0,r1 /
+ *     lsrs r2,r0,#3`.
+ *     Subtracting the constant FIRST comes from gcc's
+ *     `A - (B + constant)` -> `(A - constant) - B` folding; so the source is
+ *     `((u32)node - (u32)slots) >> 3` (the slots array is at +0x24).  The
+ *     `lsrs` is UNSIGNED, so a pointer difference (`node - slots`, ptrdiff_t)
+ *     CANNOT BE USED -- that would emit `asrs`.
+ *
+ *  6. The block at 0x803B112 is BYTE-FOR-BYTE the same as GetActiveSlotValue
+ *     (0x0803C090, src/world/slot_config.c) but there is no `bl`: the same
+ *     selection is written out by hand in the source.  So it is written out
+ *     here as well.
+ *
+ *  7. FUN_08035f1c TAKES ONE ARGUMENT (0x08035F1C never reads r1).  The r1
+ *     before the call is the p + 0x1C value, a leftover from the 12-byte
+ *     `ldmia/stmia` copy; there is NO second argument in the source.
+ *
+ *  8. `ldrh` (unsigned) => the +0x02 field is u16; `ldrsh` (0x803B16E) =>
+ *     gSlotSelector is s16; the signed `blt/ble/bge` branches => the u8 fields
+ *     promote to int, and the comparison is against int constants.
+ *
+ * ---------------------------------------------------------------------
+ * THE SYMBOLS USED (all recorded in data/ram_map.csv)
+ *   0x02000F08 gRam02000F08  — the context pointer (Ctx *)
+ *   0x02000F04 gSessionPtr   — the slot pointer (Slot *)
+ *   0x02000F10 gRam02000F10  — the primary slot body
+ *   0x02000CE0 gGameState    — [12] the secondary slot selector
  *   0x02000D40 gSlotSelector — s16
  *   0x02000F00 gRam02000F00  — u8
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_0803afbc.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_0803afbc.c
  */
 
 #include "gba_types.h"
@@ -110,14 +115,14 @@ typedef struct Vec3 {
     u32 z;
 } Vec3;
 
-/* +0x1C'deki dugum */
+/* the node at +0x1C */
 typedef struct Node {
     u8  state;                  /* +0x00 */
     u8  pad01[1];
     u16 pending;                /* +0x02 */
 } Node;
 
-/* +0x20'deki isaretcinin hedefi: konum +0x04'te */
+/* The target of the pointer at +0x20: the position is at +0x04 */
 typedef struct AltBody {
     u32  pad00;
     Vec3 pos;                   /* +0x04 */
@@ -133,7 +138,7 @@ typedef struct Item {
     AltBody *alt;               /* +0x20 */
 } Item;
 
-/* Ctx->slots dizisinin elemani; adim 8 (ROM: fark >> 3) */
+/* An element of the Ctx->slots array; stride 8 (the ROM: difference >> 3) */
 typedef struct NodeSlot {
     u8 raw[8];
 } NodeSlot;

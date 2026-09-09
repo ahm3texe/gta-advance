@@ -1,16 +1,16 @@
-/* Isleyici ve paket kurma — 0x0803F67C-0x0803F69B
+/* Setting up the handler and the pack — 0x0803F67C-0x0803F69B
  *
- * Isleyici isaretcisini +0x08'e yaziyor, cagiranin 12 baytini +0x20'ye
- * kopyaliyor, +0x1C'ye degeri koyuyor ve +0x81'deki bayti sifirliyor.
+ * Writes the handler pointer to +0x08, copies 12 bytes from the caller to
+ * +0x20, puts the value at +0x1C and clears the byte at +0x81.
  *
- * Uc kural birlikte:
- *   - kural 32: struct atamasi ldmia/stmia cifti uretiyor
- *   - kural 37: ROM hedef adresi `adds r3,r0,#32` ile AYRI register'a
- *     aliyor; kaynakta da ayri bir isaretci yereli gerekiyor
- *   - kural 35: `pop {r0}; bx r0` -> donus tipi void
+ * Three rules at once:
+ *   - rule 32: a struct assignment produces an ldmia/stmia pair
+ *   - rule 37: the ROM takes the destination address into a SEPARATE register
+ *     with `adds r3,r0,#32`; the source needs a separate pointer local too
+ *   - rule 35: `pop {r0}; bx r0` -> a void return type
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/init_handler_pack.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/init_handler_pack.c
  */
 
 #include "gba_types.h"
@@ -36,10 +36,11 @@ typedef struct Slot {
     u8     ready;               /* +0x81 */
 } Slot;
 
-/* Saklanan fonksiyon isaretcisinde THUMB BITI (bit 0) kurulu olmali.
-   `__thumb` sonekli sembol, adresi | 1 olarak cozumlenir
-   (tools/agbcc_build.py). `bl` hedefinde bit eklemek dal ofsetini
-   bozacagi icin ayri sembol kullaniliyor. */
+/* The THUMB BIT (bit 0) must be set in a stored function pointer.
+   a symbol with the `__thumb` suffix; its address resolves as | 1
+   (tools/agbcc_build.py).  Adding the bit at a `bl` target would corrupt the
+   branch offset,
+   would break, a separate symbol is used. */
 extern u8 FUN_0803d13c__thumb[];
 
 /* 0x0803F67C */

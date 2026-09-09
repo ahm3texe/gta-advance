@@ -1,15 +1,15 @@
-/* Harita karosu alan getiricileri — 0x08042058-0x080420AF
+/* Map tile field getters — 0x08042058-0x080420AF
  *
- * `map_tiles.c`'deki IsTileTypeInRange ile ayni yapi: gRam0202F3E0
- * baglami (+0 karo verisi, +0x38 satir kaydirmasi), 22-bit kesirli
- * (x, y) konum, isaretci aritmetigi `*(tiles + x + (y << shift))`.
+ * Same structure as IsTileTypeInRange in map_tiles.c: gRam0202F3E0 context
+ * (+0 tile data, +0x38 row shift), positions with 22 fractional bits, and
+ * pointer arithmetic *(tiles + x + (y << shift)).
  *
- * Bu iki fonksiyon karonun farkli bit alanlarini cikariyor:
- *   0x08042058: (karo & 0x380) >> 7  — orta 3 bit
- *   0x08042088: karo & 0x0F         — dusuk 4 bit (tur)
+ * The functions extract different fields:
+ *   0x08042058: (tile & 0x380) >> 7 — middle three bits
+ *   0x08042088: tile & 0x0F — low four bits (type)
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/map_tile_fields.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/map_tile_fields.c
  */
 
 #include "gba_types.h"
@@ -19,7 +19,7 @@
 #define TYPE_MASK       0x000F
 
 typedef struct MapPos {
-    s32 x;                      /* +0  22 bit kesirli */
+    s32 x;                      /* +0, 22 fractional bits */
     s32 y;                      /* +4 */
 } MapPos;
 

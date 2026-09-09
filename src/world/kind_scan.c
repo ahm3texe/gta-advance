@@ -1,17 +1,16 @@
 /* HasWantedEntry — 0x08028E3C-0x08028E6B
  *
- * Ilk fonksiyon gEntriesA'da 14 giriste (148 stride) +0 aktif ve
- * +100 == 101 olan var mi diye tariyor. Ikincisi bes fonksiyonluk
- * kare zinciri.
+ * The first function scans 14 gEntriesA entries (stride 148) for active +0
+ * and +100 == 101. The second is a five-function frame chain.
  *
- * BYTE-MATCHING. `base` yerelini `kind` ve `cur`dan ayri tutmak ROM'daki
- * r0 taban yuklemesi ile iki ayri isaretci yasam araligini korur; bu ayni
- * zamanda literal havuzunu dogru konuma yerlestirir.
+ * BYTE-MATCHING. Keeping base separate from kind and cur preserves the ROM's
+ * r0 base load and two separate pointer live ranges, also placing the literal
+ * pool correctly.
  *
- * Kardesi FrameChain: src/world/frame_chain.c
+ * Sibling FrameChain: src/world/frame_chain.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/kind_scan.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/kind_scan.c
  */
 
 #include "gba_types.h"

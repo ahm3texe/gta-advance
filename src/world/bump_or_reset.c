@@ -1,16 +1,16 @@
-/* Doyan sayac — 0x0805AC50-0x0805AC83
+/* Saturating counter — 0x0805AC50-0x0805AC83
  *
- * gRam02000F10.kind == 2 iken iki sorgu zinciri calisiyor; sonuc 0 ise
- * sayaci 254'te DOYURARAK artiriyor, degilse sifirliyor.
+ * When gRam02000F10.kind == 2, run two chained queries. If the result is zero,
+ * increment the counter with saturation at 254; otherwise clear it.
  *
- * BYTE-MATCHING. ROM'un `reset`, `increment` ve ortak `store` bloklarini
- * C etiketleriyle acik kurmak iki ayri sayac-adresi yuklemesini ve tek
- * paylasilan `strb`yi aynen uretir.
+ * BYTE-MATCHING. Explicit C labels for the ROM's reset, increment and shared
+ * store blocks reproduce the two separate counter-address loads and the
+ * single shared strb.
  *
- * Eslesen kardesi: src/world/counter_saturate.c
+ * Matching sibling: src/world/counter_saturate.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bump_or_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bump_or_reset.c
  */
 
 #include "gba_types.h"

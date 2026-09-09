@@ -1,55 +1,56 @@
-/* Band B — 0x08030B34 .. 0x08031D23 arasindan dokuz fonksiyon.
+/* Historical band B: nine functions from 0x08030B34 .. 0x08031D23.
  *
- * ONEMLI OLCUM NOTU — `make c-match FILE=src/world/band_b.c` CIKTISI YANILTICI
- * ----------------------------------------------------------------------------
- * tools/agbcc_build.py bir dosyadaki TUM fonksiyonlari PES PESE, en kucuk ROM
- * adresinden baslayarak linkliyor (`base = min(address)`, `SUBALIGN(1)`).  Bu
- * dokuz fonksiyon ROM'da BITISIK DEGIL; aralarinda baska ceviri birimlerine ait
- * fonksiyonlar var.  Sonuc: ilk fonksiyon (SendTextMode1) disindaki her fonksiyon
- * kendi ROM adresinden SABIT bir delta kadar kaymis olarak linkleniyor ve
- * govdesindeki her `bl` o delta kadar yanlis kodlaniyor.  Govde birebir dogru
- * olsa bile `bl` iceren fonksiyon "farkli: 2/N byte" gorunuyor.
+ * MEASUREMENT NOTE: results from the former src/world/band_b.c were misleading.
+ * agbcc_build.py links all functions consecutively from min(address), using
+ * SUBALIGN(1). These nine are not contiguous in the ROM: other translation
+ * units intervene. All but the first (SendTextMode1) were linked at a fixed
+ * displacement from their ROM addresses, making every bl offset wrong even
+ * for otherwise matching code (reported as 2/N differing bytes).
+ * Each was therefore measured separately at its own ROM address:
+ *   SendTextMode1 12 BYTE-MATCHING
+ *   LoadHudPalettes 124 BYTE-MATCHING
+ *   TriggerEvent39 12 BYTE-MATCHING
+ *   GetRecordNodeById 14 BYTE-MATCHING
+ *   ScaleMagnitude 132 BYTE-MATCHING
+ *   ClearHudRowsAB 72 BYTE-MATCHING
+ *   ReleaseActorAndSlot 64 BYTE-MATCHING
+ *   BlitStripClipLeft4bpp 470 NON-MATCHING
+ *   PushSlotQueueEntry 140 MISSING RAM SYMBOL
+ * These are historical results; detailed notes accompany the split sources.
  *
- * Bu yuzden her fonksiyon AYRICA tek fonksiyonluk bir dosyada (base = kendi ROM
- * adresi, `bl` dogru) olculdu.  Tek fonksiyonluk olcumler — dogru olanlar:
- *     SendTextMode1  12  BYTE-MATCHING
- *     LoadHudPalettes 124  BYTE-MATCHING
- *     TriggerEvent39  12  BYTE-MATCHING
- *     GetRecordNodeById  14  BYTE-MATCHING
- *     ScaleMagnitude 132  BYTE-MATCHING
- *     ClearHudRowsAB  72  BYTE-MATCHING
- *     ReleaseActorAndSlot  64  BYTE-MATCHING
- *     BlitStripClipLeft4bpp 470  eslesmedi (asagida ayrintili)
- *     PushSlotQueueEntry 140  RAM SEMBOLU EKSIK (asagida ayrintili)
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_b.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/world/scale_magnitude.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-/* ---- 0x08031414 — 132 bayt, BYTE-MATCHING -------------------------------
+/* ---- 0x08031414 — 132 bytes, BYTE-MATCHING ------------------------------
  *
- * Isaretli 16.16 sabit noktali bir buyuklugu parcali-dogrusal bir egriyle
- * esliyor.  Girdinin mutlak degeri alinip bes banda bolunuyor; her bant
- * `((v - bant_basi) * egim >> 16) + taban` biciminde ve bantlar sinirlarda
- * surekli (20 / 60 / 100 / 200).
+ * Maps a signed 16.16 fixed-point magnitude through a piecewise-linear curve.
+ * The input's absolute value is taken and split into five bands; each band has
+ * the form `((v - band_start) * slope >> 16) + base`, and the bands are
+ * continuous at their boundaries (20 / 60 / 100 / 200).
  *
- * IKI OLCUM:
- *  - MUTLAK DEGER YAZIMI.  ROM `adds r1,r0,#0 / cmp r1,#0 / bge / negs r0,r1 /
- *    adds r1,r0,#0` uretiyor: negatiflemenin HEDEFI parametrenin yazmaci, sonra
- *    geri kopya.  Duz `if (value < 0) value = -value; v = value;` yazimi tek
- *    `negs r1,r1` veriyor (71/132 bayt fark).  Asagidaki uc satirlik bicim —
- *    v'yi once kopyala, negatiflemeyi PARAMETREYE yaz, v'yi tazele — ROM'un
- *    besli dizisini birebir uretiyor.  Elenen esdegerler (hepsi 71 fark):
- *    ucluk operatoru, `0 - value`, tek degiskenli yazim, iki gecici degisken.
- *  - SON IKI BANDIN SIRASI.  `if (v > BAND4_END) return ...+200; return ...+100;`
- *    yazimi agbcc'de ters cevriliyor ve +100 govdesi one geciyor (30 bayt fark).
- *    ROM'un `ble` + govde sirasi ancak `if (v <= BAND4_END) return ...+100;`
- *    ile cikiyor — yani ilk uc bantla AYNI kalip.  `else` eklemek etkisiz.
- *  - Egimler kaynakta duz carpim: agbcc 10/20/40'i `(v<<2)+v` + kaydirma olarak
- *    sentezliyor, 50'yi ise `movs r0,#50 / muls r0,r1` yapiyor (kural 53).
+ * TWO MEASUREMENTS:
+ *  - THE SPELLING OF THE ABSOLUTE VALUE.  The ROM emits
+ *    `adds r1,r0,#0 / cmp r1,#0 / bge / negs r0,r1 / adds r1,r0,#0`: the
+ *    negation's DESTINATION is the parameter's register, then it is copied
+ *    back.  The plain `if (value < 0) value = -value; v = value;` gives a
+ *    single `negs r1,r1` (71/132 bytes off).  The three-line form below --
+ *    copy v first, write the negation INTO THE PARAMETER, refresh v -- gives
+ *    the ROM's five-instruction sequence exactly.  Equivalents ruled out (all
+ *    71 off): the ternary operator, `0 - value`, a single-variable spelling,
+ *    two temporaries.
+ *  - THE ORDER OF THE LAST TWO BANDS.
+ *    `if (v > BAND4_END) return ...+200; return ...+100;` gets inverted by
+ *    agbcc and the +100 body moves ahead (30 bytes off).  The ROM's `ble` plus
+ *    body order comes out only with `if (v <= BAND4_END) return ...+100;` --
+ *    that is, the SAME pattern as the first three bands.  Adding `else` has no
+ *    effect.
+ *  - The slopes are plain multiplications in the source: agbcc synthesises
+ *    10/20/40 as `(v<<2)+v` plus a shift, and does 50 as
+ *    `movs r0,#50 / muls r0,r1` (rule 53).
  */
 
 #define FRAC_BITS  16

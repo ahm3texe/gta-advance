@@ -1,10 +1,9 @@
-/* Tablo indeksi ayarlama — 0x08008094-0x080080A1
+/* Set the table index — 0x08008094-0x080080A1
  *
- * Ikinci argumani SetLanguage'e verip 1 donduruyor; ilk arguman
- * kullanilmiyor.
+ * Pass argument two to SetLanguage and return 1; argument one is unused.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/set_index.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/set_index.c
  */
 
 #include "gba_types.h"

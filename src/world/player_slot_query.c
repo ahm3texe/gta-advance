@@ -1,12 +1,11 @@
-/* Oyuncu yuvasi sorgulari — 0x0806543C-0x08065499
+/* Player slot queries — 0x0806543C-0x08065499
  *
- * Iki sorgu. Ikisi de once varligin hangi oyuncuya ait oldugunu
- * GetOwnerSlot ile bulup SelectSlotAB'dan o oyuncunun yuvasini aliyor,
- * sonra yuvadaki +0x25 bayrağina bakiyor.  Ikincisi ondan once varligin
- * kendi +0x14 blogundaki +0x138 tur baytini sinayip erken 1 donuyor.
+ * Both queries use GetOwnerSlot to determine the entity's player, obtain that
+ * player's slot from SelectSlotAB, then inspect flag +0x25. The second first
+ * tests type byte +0x138 in the entity's own +0x14 block and may return 1 early.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/player_slot_query.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/player_slot_query.c
  */
 
 #include "gba_types.h"
@@ -49,8 +48,9 @@ s32 IsEntityEngaged(Entity *entity)
 
     slot = (PlayerSlot *)SelectSlotAB(GetOwnerSlot(entity));
 
-    /* ROM sifir govdesini once koyuyor (kural 49), bu yuzden kosul
-     * "engaged degil" bicimindedir; 1 dalinin kuyrukta kalmasi sarttir. */
+    /* The ROM places the zero block first (rule 49), so the condition tests
+ * not engaged; the return-1 branch must remain at the tail.
+ */
     if ((entity == 0 || entity->block == 0 || entity->block->kind > 3) &&
         (slot == 0 || slot->marked == 0))
         result = 0;

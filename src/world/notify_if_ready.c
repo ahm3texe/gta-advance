@@ -1,19 +1,20 @@
-/* Hazirsa bildir — 0x08030884-0x0803089F
+/* Notify if ready — 0x08030884-0x0803089F
  *
- * Nesne bos degilse ve +0x18 alani sifirdan farkliysa FUN_0802B2B4'u
- * (nesne, 0, 1) ile cagiriyor.
+ * If the object is not null and its +0x18 field is non-zero, calls
+ * FUN_0802B2B4 with (object, 0, 1).
  *
- * Iki kural birlikte:
- *   - kural 34: ic ice `if` yerine ERKEN DONUS zinciri ROM'un blok
- *     sirasini uretiyor
- *   - kural 35: `pop {r0}; bx r0` -> donus tipi void
+ * Two rules at once:
+ *   - rule 34: a chain of EARLY RETURNS rather than nested `if`s produces the
+ *     ROM's block order
+ *   - rule 35: `pop {r0}; bx r0` -> a void return type
  *
- * ROM ayrica argumani `adds r1, r0, #0` ile ayri bir register'a kopyaliyor
- * (kural 37); bu, kaynakta ayri bir yerel gerektirmiyor cunku parametre
- * zaten hem sorgu hem cagri argumani olarak iki rolde kullaniliyor.
+ * The ROM also copies the argument into a separate register with
+ * `adds r1, r0, #0` (rule 37); that does not require a separate local in the
+ * source, because the parameter is already used in two roles -- as the query
+ * subject and as the call argument.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/notify_if_ready.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/notify_if_ready.c
  */
 
 #include "gba_types.h"

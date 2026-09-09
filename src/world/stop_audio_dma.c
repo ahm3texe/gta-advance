@@ -1,45 +1,44 @@
-/* Kart bayragi kurulunca ses DMA'sini durdurma — 0x080337A8-0x0803381F
+/* Stopping the audio DMA when the cart flag is set — 0x080337A8-0x0803381F
  *
- * gCartFlag'in degeri once gRam02027314'e kopyalaniyor; 1 degilse hicbir
- * sey yapilmiyor. 1 ise bayrak sifirlanip DMA1 ve DMA2 (GBA'da ses FIFO
- * kanallari) iki adimda kapatiliyor: once 0xC5FF ile denetim bitleri,
- * sonra 0x7FFF ile etkinlestirme biti temizleniyor; her yazimin ardindan
- * ROM'da bir geri okuma var. Son olarak gRam02027310'daki tampon
- * biraktiriliyor.
+ * gCartFlag's value is first copied into gRam02027314; if it is not 1 nothing
+ * happens.  If it is 1 the flag is cleared and DMA1 and DMA2 (the audio FIFO
+ * channels on the GBA) are shut down in two steps: first the control bits with
+ * 0xC5FF, then the enable bit with 0x7FFF; the ROM has a read-back after each
+ * write.  Finally the buffer at gRam02027310 is released.
  *
- * UC AYRINTI OLCULDU:
+ * THREE DETAILS WERE MEASURED:
  *
- * 1) Kosul YEREL bir u8'e degil, gRam02027314'un KENDISINE bakiyor.
- *    Yerel kullanilirsa ROM'daki `lsls #24 / lsrs #24` sifir genisletmesi
- *    cikmiyor (ldrb zaten genisletilmis oluyor).
+ * 1) The condition looks at gRam02027314 ITSELF, not at a LOCAL u8.  With a
+ *    local, the ROM's `lsls #24 / lsrs #24` zero-extension does not appear
+ *    (the ldrb is already extended).
  *
- * 2) Denetim yazmaci `vu16 *` TABAN + INDIS ile yazilmali. gba_io.h'daki
- *    `REG_DMA1.control` struct gorunumu her yazimdan once fazladan bir
- *    volatile OKUMA uretiyor (kanal basina iki fazla ldrh). Mutlak
- *    makro (`((vu16 *)0x040000BC)[5]`) ise +10 uzakligini adres sabitine
- *    katlayip havuza 0x040000C6 koyuyor; ROM'da taban 0x040000BC ve
- *    uzaklik 10.
+ * 2) The control register must be written through a `vu16 *` BASE + INDEX.
+ *    The `REG_DMA1.control` struct view from gba_io.h produces an extra
+ *    volatile READ before every write (two extra ldrh per channel).  An
+ *    absolute macro (`((vu16 *)0x040000BC)[5]`), on the other hand, folds the
+ *    +10 offset into the address constant and puts 0x040000C6 in the pool; in
+ *    the ROM the base is 0x040000BC and the offset is 10.
  *
- * 3) IKINCI taban kendi kullanim yerinde atanmali. Ikisi de basta
- *    atanirsa iki havuz yuklemesi de basa toplaniyor; tek degiskene iki
- *    kez atanirsa agbcc ikinciyi birincinin +12'si diye ortak altifadeye
- *    cikariyor (`adds r4,#12`).
+ * 3) The SECOND base must be assigned at its own point of use.  Assigned both
+ *    at the top, the two pool loads gather at the top; assigned twice to a
+ *    single variable, agbcc pulls the second out as a common subexpression of
+ *    the first plus 12 (`adds r4,#12`).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/stop_audio_dma.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/stop_audio_dma.c
  */
 
 #include "gba_types.h"
 
 #define DMA1_BASE       0x040000BC
 #define DMA2_BASE       0x040000C8
-#define DMA_CNT_H       5           /* +0x0A, u16 adimlarla */
+#define DMA_CNT_H       5           /* +0x0A, in u16 steps */
 #define DMA_CTRL_MASK   0xC5FF      /* ~0x3A00 */
 #define DMA_ENABLE_MASK 0x7FFF      /* ~0x8000 */
 
 extern u8   gCartFlag;
 extern u8   gRam02027314;
-extern u32  gRam02027310;   /* zero_three_flags.c ile ayni gorunum: SAYI, isaretci degil */
+extern u32  gRam02027310;   /* the same view as in zero_three_flags.c: a COUNT, not a pointer */
 extern u8   gBufferBase02014ED0[];
 
 extern void FUN_0800c804(u32 *dest, u32 value);

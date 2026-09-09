@@ -1,20 +1,20 @@
-/* Butun giris tablolarini DMA ile sifirlama — 0x08023CC4-0x08023DEF
+/* Clearing all the entry tables by DMA — 0x08023CC4-0x08023DEF
  *
- * Dokuz ayri giris tablosunu (hepsi 148 baytlik girislerden olusuyor)
- * DMA3 ile sifirliyor, sonunda iki kucuk durum degiskenini de sifirliyor.
- * Her blok ayni kalibi tekrarliyor: IME'yi kaydet, kesmeleri kapat,
- * yigindaki sifir sozcugunu kaynak yapip sabit adrese DMA fill (0x85000000
- * = etkin + 32 bit + kaynak sabit), kontrol yazmacini olu okuyup DMA'yi
- * bekle, IME'yi geri yukle. Kalip src/text/clear_text_area.c ve
- * src/world/dma_flush.c ile ayni.
+ * Zeroes nine separate entry tables (all made of 148-byte entries) with DMA3,
+ * and clears two small state variables at the end.  Every block repeats the
+ * same pattern: save IME, disable interrupts, use the zero word on the stack
+ * as the source and DMA-fill to a fixed address (0x85000000 = enable + 32-bit
+ * + fixed source), do a dead read of the control register to wait for the DMA,
+ * restore IME.  The pattern is the same as in src/text/clear_text_area.c and
+ * src/world/dma_flush.c.
  *
- * Sozcuk sayilari 148'in katlarina denk geliyor, yani her hedef bir giris
- * tablosu:  555=15 giris, 148=4, 37=1, 740=20, 37=1, 148=4, 185=5, 185=5,
- * 37=1.  Ilki gEntriesA (0x02023A00, 15 giris x 148 = 2220 bayt) — yani
- * bu fonksiyon gEntriesA ailesinin toplu ilklendiricisi.
+ * The word counts are multiples of 148, i.e. every destination is an entry
+ * table:  555=15 entries, 148=4, 37=1, 740=20, 37=1, 148=4, 185=5, 185=5,
+ * 37=1.  The first is gEntriesA (0x02023A00, 15 entries x 148 = 2220 bytes) --
+ * so this function is the bulk initialiser of the gEntriesA family.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_b2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_b2.c
  */
 
 #include "gba_io.h"
@@ -22,19 +22,19 @@
 #define ENTRY_STRIDE   148
 #define ENTRIES_A_LEN  15
 
-/* DMA3 kontrol: etkin | 32 bit | kaynak sabit; alt 16 bit sozcuk sayisi. */
+/* DMA3 control: enable | 32-bit | fixed source; the low 16 bits are the word count. */
 #define DMA_FILL_32    0x85000000
 
-#define WORDS_A        555      /* 15 giris */
-#define WORDS_B        148      /*  4 giris */
-#define WORDS_C         37      /*  1 giris */
-#define WORDS_D        740      /* 20 giris */
-#define WORDS_E        185      /*  5 giris */
+#define WORDS_A        555      /* 15 entries */
+#define WORDS_B        148      /*  4 entries */
+#define WORDS_C         37      /*  1 entry   */
+#define WORDS_D        740      /* 20 entries */
+#define WORDS_E        185      /*  5 entries */
 
-/* Bu adreslerin data/ram_map.csv'de karsiligi YOK; ekleme yetkim olmadigi
- * icin sabit cast olarak yazildilar (adres tek basina kullaniliyor, taban
- * + ofset katlanmasi soz konusu degil — kural 1'in gerekcesi burada yok).
- * Karsiligi olanlar yorumda gosterildi. */
+/* These addresses have NO entry in data/ram_map.csv; since I am not authorised
+ * to add any, they are written as constant casts (each address is used on its
+ * own, so there is no base + offset folding -- rule 1's rationale does not
+ * apply here).  The ones that do have entries are shown in comments. */
 #define TABLE_02025280 ((void *)0x02025280)     /* gRam02025280 */
 #define TABLE_020245B0 ((void *)0x020245B0)
 #define TABLE_020246F0 ((void *)0x020246F0)     /* gRam020246F0 */
@@ -47,8 +47,8 @@
 #define STATE_020245A0 (*(u8 *)0x020245A0)
 #define STATE_02024344 (*(u16 *)0x02024344)
 
-/* Bu ceviri biriminin gEntriesA gorunumu: icerigi kullanilmiyor, yalnizca
- * DMA hedefi ve boyutu gerekiyor (bkz. src/world/entries_a1.c). */
+/* This translation unit's view of gEntriesA: its contents are not used, only
+ * the DMA destination and size are needed (see src/world/entries_a1.c). */
 typedef struct Entry {
     u8 pad00[ENTRY_STRIDE];
 } Entry;

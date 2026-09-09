@@ -1,11 +1,11 @@
-/* Kaynak secip yarim soz okuma — 0x0803C45C-0x0803C47B
+/* Select a source and read a halfword — 0x0803C45C-0x0803C47B
  *
- * Kip 2 ise EWRAM'daki, kip 1 ise IWRAM'daki yarim sozu donduruyor;
- * baska kipte 0. ROM iki dalda da AYNI `ldrh`'a birlesiyor, bu yuzden
- * kaynakta ortak bir isaretci yereli uzerinden okunuyor.
+ * Return the EWRAM halfword for mode 2, the IWRAM halfword for mode 1, or
+ * 0 otherwise. Both ROM branches share one ldrh, so the source reads
+ * through a shared local pointer.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/select_word_source.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/select_word_source.c
  */
 
 #include "gba_types.h"

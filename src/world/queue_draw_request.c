@@ -1,24 +1,27 @@
-/* Cizim istegini kuyruga alma — 0x08012F88-0x08013097
+/* Queueing a draw request — 0x08012F88-0x08013097
  *
- * IKI FONKSIYON, AYNI GOVDE.  tools/find_twins.py %100 benzerlik verdi;
- * ROM govdeleri komut komut ayni, yalnizca havuz adresleri ve dal
- * hedefleri kayik -- ayni kaynak iki kez derlenmis (docs/WORKFLOW.md §10).
+ * TWO FUNCTIONS, ONE BODY.  tools/find_twins.py reported 100% similarity; the
+ * ROM bodies are identical instruction by instruction, only the pool addresses
+ * and branch targets are shifted -- the same source compiled twice
+ * (docs/WORKFLOW.md section 10).
  *
- * Istek once FUN_080089b0'a veriliyor; sifir donmezse is bitti sayilip 1
- * doner.  Sonra FUN_08008a28'den bir tutamac aliniyor; tutamac 0 ise 0
- * doner.  Tur 8'i asiyorsa ya da kuyruk 128 girisi doldurmussa yine 1.
- * Aksi halde IME kapatilip 12 bayt adimli kuyruga bir giris yazilip
- * sayac artiriliyor ve IME geri aciliyor.
+ * The request is handed to FUN_080089b0 first; if that returns non-zero the
+ * work is considered done and 1 is returned.  Then a handle is taken from
+ * FUN_08008a28; if the handle is 0 it returns 0.  If the kind exceeds 8, or
+ * the queue has filled its 128 entries, it returns 1 as well.  Otherwise IME
+ * is turned off, an entry is written into the queue (12-byte stride), the
+ * counter is bumped and IME is turned back on.
  *
- * IKI OLCUM:
- *   - `tag` parametresi u16 DEGIL, tam soz.  u16 yazilirsa girise
- *     ROM'da olmayan bir `lsls #16 / lsrs #16` sifir genisletmesi
- *     ekleniyor; daralma zaten sondaki `strh`de oluyor.
- *   - +0x04 alani AYRI BIR TABAN yerelinden yazilmali (release_slot.c
- *     ile ayni olcut): ROM bir kez hesaplanan olcegi iki tabana ekliyor.
+ * TWO MEASUREMENTS:
+ *   - The `tag` parameter is NOT u16 but a full word.  Written as u16, a
+ *     `lsls #16 / lsrs #16` zero-extension that is not in the ROM is added at
+ *     the entry; the narrowing already happens in the final `strh`.
+ *   - The +0x04 field must be written from a SEPARATE BASE local (the same
+ *     criterion as in release_slot.c): the ROM adds the scale it computed once
+ *     to two bases.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/queue_draw_request.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/queue_draw_request.c
  */
 
 #include "gba_types.h"
@@ -95,7 +98,7 @@ u32 QueueDrawRequest(Req *req, u32 tag)
     return 1;
 }
 
-/* 0x08013010 — ROM'da QueueDrawRequest'in birebir ikinci kopyasi. */
+/* 0x08013010 — an exact second copy of QueueDrawRequest in the ROM. */
 u32 QueueDrawRequestDup(Req *req, u32 tag)
 {
     s32   rc;

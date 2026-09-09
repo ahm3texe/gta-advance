@@ -1,12 +1,12 @@
-/* Iletme sarmalayicisi — 0x0804FF98-0x0804FFA1
+/* Forwarding wrapper — 0x0804FF98-0x0804FFA1
  *
- * Govdesi yalnizca FUN_080457f8 cagrisi. Ne yaptigi bilinmedigi icin ad
- * degistirilmedi. tools/find_wrappers.py ile bulundu.
+ * The body only calls FUN_080457f8. Its purpose is unknown, so its name
+ * is unchanged. Found with tools/find_wrappers.py.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 DONUS DEGERI tasiyor.
+ * Rule 35: `pop {r1}; bx r1` means r0 carries a RETURN VALUE.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/wrap_0804ff98.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/wrap_0804ff98.c
  */
 
 #include "gba_types.h"

@@ -1,23 +1,23 @@
-/* Aktor tanimini cozumleme — 0x0801952C-0x0801958F
+/* Resolve an actor descriptor — 0x0801952C-0x0801958F
  *
- * gRam03000078 yerel oyuncunun yuvasini (0 ya da 1) tutuyor. Aktorun +0x20
- * dizisindeki o yuva 0xFDFD ("bos") ise digerine geciliyor; iki oyunculu
- * kip disinda tek girdi doludur.
+ * gRam03000078 holds the local player's slot (0 or 1). If that slot in the
+ * actor's +0x20 array is 0xFDFD (empty), use the other slot; only one entry is
+ * populated outside two-player mode.
  *
- * Secilen kimlik gRom08BD3448 kokunden ROM dugumune cozumleniyor, dugum
- * aktorun +0x24'une yaziliyor; dugumun ilk bayti 16 bit kaydirilip +0x0C'ye
- * konuyor ve +0x12'deki isaretli evre ile son alt dugumun +0x14 alani
- * donduruluyor.
+ * Resolve the selected ID to a ROM node through the gRom08BD3448 root and store
+ * the node at actor +0x24. Shift the node's first byte by 16 and store it at
+ * +0x0C; use the signed phase at +0x12 to select the final child node and return
+ * its +0x14 field.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_desc_resolve.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_desc_resolve.c
  */
 
 #include "gba_types.h"
 
 #define SLOT_EMPTY  0xFDFD
 
-/* 0x08BD3448'deki ROM koku; entries_b1.c ile ayni gorunum. */
+/* ROM root at 0x08BD3448; same view as entries_b1.c. */
 typedef struct RomNode {
     u32             pad00;
     struct RomNode **slots;     /* +0x04 */

@@ -1,34 +1,37 @@
-/* Aktorun yuva girisini guncelleme — 0x08015834-0x0801599D (362 bayt)
+/* Updating the actor's slot entry — 0x08015834-0x0801599D (362 bytes)
  *
- * DURUM: 150/167 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 150/167 instructions, A NEAR MISS (does not match).  The size is
+ * right.
  *
- * Varlik turu 35 ise FUN_080284d0 + (bB1 != 0xFF) FUN_08027ae8 ile cikar.
- * Degilse yuva (GetOwnerSlot) alinip SelectSlotAB/CD ile nesne ve kayit
- * secilir. Kaydin +0xA8'inde 0x20 kurulu DEGILSE ve +0x04 turu on
- * degerlik kumede (56,32,149,150,151,16,15,12,13,31) DEGILSE:
- *   varligin +0x08'inde 4 kuruluysa gRom08342A50[tur] 0x7FFF degilken
- *   +0x89 = deger+8 ve IsEntryActive'e gore FUN_08027548 / FUN_080276ac;
- *   degilse gRom08342A14[tur] ile FUN_08027150 / FUN_080272c8 (once
- *   +0x0C son tur degistiyse ReleaseEntry). Diger her durumda
- *   ReleaseEntry(self, yuva-1).
+ * If the entity kind is 35 it returns via FUN_080284d0 + (when bB1 != 0xFF)
+ * FUN_08027ae8.  Otherwise the slot is taken (GetOwnerSlot) and the object and
+ * record are selected with SelectSlotAB/CD.  If 0x20 is NOT set at the
+ * record's +0xA8 and the +0x04 kind is NOT in the ten-value set
+ * (56,32,149,150,151,16,15,12,13,31):
+ *   if bit 4 is set at the entity's +0x08 and gRom08342A50[kind] is not
+ *   0x7FFF, then +0x89 = value+8 and, according to IsEntryActive,
+ *   FUN_08027548 / FUN_080276ac; otherwise gRom08342A14[kind] with
+ *   FUN_08027150 / FUN_080272c8 (with ReleaseEntry first if the +0x0C last
+ *   kind changed).  In every other case, ReleaseEntry(self, slot-1).
  *
- * KALAN 17 KOMUT, IKI MEKANIZMA:
- *  1. ROM'da ReleaseEntry(yuva-1)'in IKI kopyasi var: biri then-dalinin
- *     hemen ardinda (0x080158E0; on kosul zinciri VE v==0x7FFF oraya
- *     dusuyor), digeri fonksiyon sonunda (0x0801598A; yalnizca else
- *     dalinin w==0x7FFF'i). Bende zincir sondakine gidiyor (11 dal).
- *     Denenen: `ok` yereliyle iki ayri if (126), ic ice iki release
- *     (122), zincirin tersini alip erken release (121, zincir iki kez
- *     uretiliyor), bloga `goto release` (122). Kaynakta muhtemelen zincir
- *     basarisizligi ile then-dali ayni deyime akiyor; bicimi bulunamadi.
- *  2. v/indis yazmac rolleri (ROM indis*4 r1'de kaliyor, v r2; bende
- *     tersi); `i` yereli denendi (daha kotu).
- * Olculen dogru kararlar: ikinci parametre kullanilmiyor (FUN_080284d0'a
- * r1 = varlik gidiyor); v==0x7FFF then-dalinda KENDI release'iyle
- * donmeli (113 -> 150).
+ * THE REMAINING 17 INSTRUCTIONS, TWO MECHANISMS:
+ *  1. The ROM has TWO copies of ReleaseEntry(slot-1): one right after the then
+ *     branch (0x080158E0; both the precondition chain AND v==0x7FFF fall into
+ *     it), the other at the end of the function (0x0801598A; only the else
+ *     branch's w==0x7FFF).  Here the chain goes to the last one (11 branches).
+ *     Tried: two separate ifs with an `ok` local (126), two nested releases
+ *     (122), inverting the chain with an early release (121, the chain is
+ *     emitted twice), a `goto release` into the block (122).  In the source the
+ *     chain's failure and the then branch probably flow into the same
+ *     statement; the form was not found.
+ *  2. The v/index register roles (in the ROM index*4 stays in r1 and v in r2;
+ *     the other way round here); an `i` local was tried (worse).
+ * Decisions measured as correct: the second parameter is unused (r1 = the
+ * entity goes to FUN_080284d0); the v==0x7FFF case must return from the then
+ * branch with ITS OWN release (113 -> 150).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/update_actor_slot_entry.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/update_actor_slot_entry.c
  */
 
 #include "gba_types.h"

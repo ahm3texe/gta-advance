@@ -1,12 +1,13 @@
-/* Aktor durumunu bitirme — 0x0801979C-0x080197FB
+/* Finish an actor state — 0x0801979C-0x080197FB
  *
- * +0x28 durumu 0x7FFF (bos) degilse: +0xA5 (s8) sifir degilse +0x0A = 2
- * ve RequestActorAction(durum,15,2), degilse (durum,4,2); +0x3C gorunumu
- * varsa +0x26 kipi 33. Sonra durum 0x7FFF'e alinip FUN_08016990(0x10000).
- * Yerlesim src/world/actor_state_step.c ile ayni (STATE_IDLE, sub, visual).
+ * If state +0x28 is not 0x7FFF (empty): when +0xA5 (s8) is nonzero, set
+ * +0x0A = 2 and call RequestActorAction(state,15,2); otherwise use (state,4,2).
+ * If visual +0x3C exists, set its mode +0x26 to 33. Then set state to 0x7FFF
+ * and call FUN_08016990(0x10000). Layout matches actor_state_step.c
+ * (STATE_IDLE, sub, visual).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/finish_actor_state.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/finish_actor_state.c
  */
 
 #include "gba_types.h"

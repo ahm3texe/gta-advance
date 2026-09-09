@@ -1,11 +1,11 @@
-/* Cizim istegini dogrudan kuyruga alma — 0x08012E18-0x08012E77
+/* Queue a draw request directly — 0x08012E18-0x08012E77
  *
- * QueueDrawRequest (src/world/queue_draw_request.c) ile ayni kuyruk yazimi;
- * fark: havuz cagrilari yok, istegin +0x00 baglantisi ve onun hedefi
- * sifir degilse dogrudan giris yaziliyor. Donus degeri yok.
+ * Same queue writes as QueueDrawRequest (queue_draw_request.c), but without
+ * pool calls. Write the entry directly if request +0x00 and its target are
+ * both nonzero. No return value.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/queue_draw_request_direct.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/queue_draw_request_direct.c
  */
 
 #include "gba_types.h"

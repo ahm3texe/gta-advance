@@ -1,19 +1,20 @@
-/* DISPCNT bit 9 kurma — 0x0803084C-0x0803085D
+/* Setting DISPCNT bit 9 — 0x0803084C-0x0803085D
  *
- * REG_DISPCNT'e (0x80 << 2) bitini OR'luyor. Kardesi ClearBg1Enable
- * (0x08030860) byte-matching; bu ayri dosyada cunku eslesmiyor ve ayni
- * dosyada birakmak kardesinin bolgesini bozuyor.
+ * ORs the (0x80 << 2) bit into REG_DISPCNT.  Its sibling ClearBg1Enable
+ * (0x08030860) is byte-matching; this one sits in its own file because it
+ * does not match and leaving it in the same file breaks the sibling's region.
  *
- * Denenenler (ucu de 16 bayt): tek yerel; iki yerel (`mask = bit`, kural 37
- * — agbcc kopyayi birlestiriyor); once DISPCNT okuyup maskeyi sonra
- * hesaplamak (sirayi degistirmedi); maskeyi u32 yapmak.
+ * Tried (all three 16 bytes): a single local; two locals (`mask = bit`,
+ * rule 37 -- agbcc merges the copy); reading DISPCNT first and computing the
+ * mask afterwards (did not change the order); making the mask u32.
  *
- * Kardesi ClearBg1Enable AYNI adres kalibiyla (0x80 << 19) ILK denemede
- * eslesti; fark yalnizca oradaki islemin AND, buradakinin OR olmasi. Yani
- * engel adres kurulumunda degil, maske degerinin yasam araliginda.
+ * The sibling ClearBg1Enable matched on the FIRST attempt with the SAME
+ * address pattern (0x80 << 19); the only difference is that its operation is
+ * AND and this one's is OR.  So the obstacle is not in the address setup but
+ * in the live range of the mask value.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/set_bg1_enable.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/set_bg1_enable.c
  */
 
 #include "gba_types.h"

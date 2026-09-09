@@ -1,18 +1,16 @@
-/* Mesafe bandina gore olcekleme — 0x0806549C-0x08065517
+/* Scale by distance band — 0x0806549C-0x08065517
  *
- * Anahtari sekiz banda ayirip her banda 8.8 sabit noktali bir katsayi
- * veriyor (256 = 1.0): 281, 256, 230, 204, 179, 153, 128, 102 — yani
- * yaklasik 1.1'den 0.4'e duzgun dusen bir zayiflama egrisi.
+ * Divide the key into eight bands with 8.8 fixed-point factors (256 = 1.0):
+ * 281, 256, 230, 204, 179, 153, 128, 102, an attenuation curve descending
+ * roughly from 1.1 to 0.4.
  *
- * Son iki band ROM'da TERS sirali: 102 once yukleniyor, sinir asilmazsa
- * 128 uzerine yaziliyor. Bu, `else if (key <= 0x4FFFF) 128 else 102`
- * zincirinin dogal ciktisi.
+ * The ROM reverses the last two bands: load 102 first, then overwrite with
+ * 128 if the bound is not exceeded. This naturally follows from
+ * else if (key <= 0x4FFFF) 128 else 102. Comparisons are unsigned (bhi),
+ * but the product shifts arithmetically (asrs): key is u32, value is s32.
  *
- * Karsilastirmalar isaretsiz (ROM `bhi`), carpim sonucu isaretli
- * kaydiriliyor (`asrs`), yani anahtar u32 deger s32.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/scale_by_band.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/scale_by_band.c
  */
 
 #include "gba_types.h"

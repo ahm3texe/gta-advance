@@ -1,6 +1,7 @@
-/* Dort duzleme gore noktanin negatif/sinir taraflarini bitlerle siniflar.
- * PARK: yardimci fonksiyonlu ve acik dort bloklu bicimler denendi. En iyi
- * dogal C 166/174 bayt; kalan fark yerel/yazmac yasam araligi dagitimi. */
+/* Classify a point's negative/boundary sides against four planes as bits.
+ * PARKED: tried helper-function and four-explicit-block forms. Best natural
+ * C is 166/174 bytes; the remaining difference is local/register live-range allocation.
+ */
 
 #include "gba_types.h"
 

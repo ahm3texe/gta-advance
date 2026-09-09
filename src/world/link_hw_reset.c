@@ -1,22 +1,21 @@
-/* Baglanti donanimini sifirlar — 0x08066A54-0x08066AA7
+/* Reset link hardware — 0x08066A54-0x08066AA7
  *
- * Timer3 ve seri kesmelerini (IE bit 6-7) kapatiyor, SIOCNT'yi yeniden
- * kuruyor, Timer3'u tek 32-bit yazimla durdurup yeniden yukleme degerini
- * yaziyor, bekleyen IF bitlerini onayliyor ve baglanti kaydinin +0x06
- * alanini siliyor.
+ * Disable Timer3 and serial interrupts (IE bits 6-7), reinitialize SIOCNT,
+ * stop Timer3 and set its reload value with one 32-bit write, acknowledge
+ * pending IF bits, and clear +0x06 in the link record.
  *
- * IE yazimlari IME kapaliyken yapiliyor; sira ROM'dan okundu.
+ * IE writes occur with IME disabled; ordering was read from the ROM.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_hw_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_hw_reset.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 #include "comm_block.h"
 
-#define IE_KEEP_MASK   0xFF3F   /* Timer3 ve seri disindaki her sey */
-#define IF_ACK_LINK    0xC0     /* Timer3 | seri */
+#define IE_KEEP_MASK   0xFF3F   /* Everything except Timer3 and serial */
+#define IF_ACK_LINK    0xC0     /* Timer3 | serial */
 #define SIOCNT_RESET   0x2003
 #define TM3_RELOAD     0x0000ABFB
 

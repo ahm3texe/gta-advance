@@ -1,77 +1,81 @@
-/* Aktorun durum degerine gore bir kare ilerletir.  0x08017628, 1536 bayt.
+/* Advances the actor by one frame according to its state value.  0x08017628,
+ * 1536 bytes.
  *
- * Iskelet: +0x28'deki DURUM 0x7FFF (bos) degilse, 0x3FFF ustu degerler bir
- * yeniden esleme tablosundan gecirilir, sonra duruma gore buyuk bir switch
- * calisir ve durum 0x7FFF'e geri alinir.  Ardindan ortak bir kuyruk var.
+ * The skeleton: if the STATE at +0x28 is not 0x7FFF (empty), values above
+ * 0x3FFF are passed through a remapping table, a large switch then runs on the
+ * state, and the state is set back to 0x7FFF.  A shared tail follows.
  *
- * gcc switch'i IKILI ARAMA AGACINA ceviriyor (`cmp #0x38 / bhi`, sonra
- * `cmp #0x18 / bhi` ...), bu yuzden ROM'da 26 farkli deger ve 35 halkalik
- * bir karsilastirma zinciri gorunuyor -- kaynakta bunlarin hepsi duz `case`.
+ * gcc turns the switch into a BINARY SEARCH TREE (`cmp #0x38 / bhi`, then
+ * `cmp #0x18 / bhi` ...), which is why the ROM shows 26 distinct values and a
+ * 35-link comparison chain -- in the source they are all plain `case`s.
  *
- * KURAL 45 UYGULANDI (docs/COMPILER.md): asagidaki yardimci kalip DOKUZ
- * ayri case icinde geciyor ve ROM'da her biri KENDI havuz kelimesinden
- * 0x020303C4'u yukluyor -- yani dokuz ayri fiziksel blok.  Ortak yerel
- * verilirse agbcc bunlari capraz atlamayla birlestirir ve bloklar kaybolur;
- * o yuzden her case'in KENDI yerelleri var.
+ * RULE 45 WAS APPLIED (docs/COMPILER.md): the helper pattern below appears in
+ * NINE separate cases, and in the ROM each of them loads 0x020303C4 from ITS
+ * OWN pool word -- that is, nine separate physical blocks.  Given a shared
+ * local, agbcc merges them by cross-jumping and the blocks disappear; so every
+ * case has ITS OWN locals.
  *
- * Not: Ghidra fonksiyonun sonundaki `bx r0`i "cozulemeyen atlama tablosu"
- * sandi.  Degil; `pop {r4,r5,r6}; pop {r0}; bx r0` sirasi sadece void
- * donusun interworking bicimi.
+ * Note: Ghidra mistook the `bx r0` at the end of the function for an
+ * "unrecoverable jump table".  It is not; the `pop {r4,r5,r6}; pop {r0}; bx r0`
+ * sequence is simply the interworking form of a void return.
  *
- * Ghidra bu adreste fonksiyon bile tanimlayamamisti: otomatik analiz burayi
- * ARM kipinde cozmeye calisip "bad instruction data" ile birakmis.  TMode
- * yazmaci elle 1 yapilip bolge yeniden sokuldu (tools/ghidra/
- * ExportDecompileBatch.java).
+ * Ghidra could not even define a function at this address: the automatic
+ * analysis tried to decode it in ARM mode and gave up with "bad instruction
+ * data".  The TMode register was set to 1 by hand and the region was
+ * re-disassembled (tools/ghidra/ExportDecompileBatch.java).
  *
- * DURUM: 1494/1536, 42 bayt kisa.  Prolog, dagitim agaci ve havuz sayisi
- * oturdu; kalan fark case GOVDELERINDE.
+ * STATUS: 1494/1536, 42 bytes short.  The prologue, the dispatch tree and the
+ * pool count have settled; the remaining difference is in the case BODIES.
  *
- *   prolog          push {r4,r5,r6,lr}  BIREBIR
- *   agac koku       0x38                BIREBIR
- *   karsilastirma   91/92, 78'i dogru sirada
- *   `mov pc,rX`     iki tarafta da 0 (atlama tablosu yok)
- *   0x020303C4      havuz 9/9
+ *   prologue        push {r4,r5,r6,lr}  IDENTICAL
+ *   tree root       0x38                IDENTICAL
+ *   comparisons     91/92, 78 in the right order
+ *   `mov pc,rX`     0 on both sides (no jump table)
+ *   0x020303C4      pool 9/9
  *
- * AGACI OTURTAN UC DEGISIKLIK, sirasiyla:
+ * THE THREE CHANGES THAT SETTLED THE TREE, in order:
  *
- *   1. `case STATE_IDLE` eklendi -> KOK 0x38 OLDU.  agbcc'nin
- *      balance_case_nodes'u pivotu `(case + aralik + 1) / 2` ile seciyor;
- *      40 case'te pivot 19. indeks = 0x36 cikiyordu.  Yeniden esleme
- *      tablosu STATE_IDLE uretebildigi icin ROM'da bunun BOS govdeli bir
- *      case'i var (Ghidra'da `uVar2 != uVar6` dali).  41 case ile pivot
- *      20. indeks = 0x38, yani ROM'un koku.
+ *   1. `case STATE_IDLE` was added -> THE ROOT BECAME 0x38.  agbcc's
+ *      balance_case_nodes picks the pivot as `(case + range + 1) / 2`; with 40
+ *      cases the pivot came out as index 19 = 0x36.  Because the remapping
+ *      table can produce STATE_IDLE, the ROM has an EMPTY-bodied case for it
+ *      (the `uVar2 != uVar6` branch in Ghidra).  With 41 cases the pivot is
+ *      index 20 = 0x38, which is the ROM's root.
  *
- *   2. Uc kume GNU ARALIK bicimiyle yazildi (0x21...0x29, 0x2f...0x30,
- *      0x4e...0x51).  Aralik dugumu ROM'da YUKSEK-sonra-DUSUK iki TEK
- *      karsilastirma uretiyor (41 sonra 33); ayri case yazilinca deger
- *      CIFT geciyor (33, 33).  Sirali eslesme 58 -> 72.
+ *   2. Three groups were written in GNU RANGE form (0x21...0x29, 0x2f...0x30,
+ *      0x4e...0x51).  A range node produces two SINGLE comparisons in the ROM,
+ *      HIGH then LOW (41 then 33); written as separate cases the value appears
+ *      TWICE (33, 33).  Ordered matching went 58 -> 72.
  *
- *   3. Case'ler ROM'un GOVDE YERLESIMINE gore siralandi: gcc govdeleri
- *      kaynak sirasinda yayiyor, ROM'da ilk govde ortak "9,1" blogu
- *      (0x08017824), en sonda varsayilan (0x08017b40).  72 -> 78.
+ *   3. The cases were ordered according to the ROM's BODY LAYOUT: gcc emits the
+ *      bodies in source order, and in the ROM the first body is the shared
+ *      "9,1" block (0x08017824) with the default last (0x08017b40).  72 -> 78.
  *
- * Prologu oturtan: ROM sabit 0x20'yi r6'da tutuyor ve {r4,r5,r6,lr} itiyor.
- * Deger dort yerde yaziliyor, agbcc onu callee-saved yazmaca kaldiriyor.
- * Yerele almak ayni etkiyi verdi (ortak onek 0 -> 5 bayt).
+ * What settled the prologue: the ROM keeps the constant 0x20 in r6 and pushes
+ * {r4,r5,r6,lr}.  The value is written in four places, and agbcc lifts it into
+ * a callee-saved register.  Taking it into a local had the same effect (the
+ * common prefix went 0 -> 5 bytes).
  *
- * KALAN 42 BAYT.  Ortak "9,1" govdesi tek kopya yazilinca (ROM'da da tek
- * havuz kelimesi var) 28 bayt eksildi; ROM o bolgede 28 bayt daha tasiyor,
- * yani sekiz sicrama saplamasinin bicimi henuz tam degil.  Ayrica bir
- * karsilastirma eksik (91/92) ve iki govde yer degistirmis.
+ * THE REMAINING 42 BYTES.  Writing the shared "9,1" body as a single copy (the
+ * ROM has a single pool word for it too) removed 28 bytes; the ROM carries
+ * 28 more bytes in that region, so the shape of the eight jump stubs is not
+ * quite right yet.  There is also one comparison missing (91/92) and two bodies
+ * have swapped places.
  *
- * BELIRLEYICI BULGU -- 0x4005/0x4026/0x4027/0x4028 DE CASE.
- * Ghidra bunlari havuz sabiti gibi gosteriyor (_DAT_080177d0 ve komsulari)
- * ama karsilastirma agacinin dugumleri.  Onlarsiz yazinca case kumesi
- * 1..0x97 arasinda YOGUN kaliyor ve agbcc ATLAMA TABLOSU uretiyor: 1814 bayt
- * (296 FAZLA), 45 karsilastirma, bir `mov pc,r0`.  Dordu eklenince aralik
- * 1..0x4028'e aciliyor, gcc mecburen agac uretiyor: 1510 bayt, 92
- * karsilastirma, sifir `mov pc`.  Tek degisiklik, 304 bayt.
+ * THE DECISIVE FINDING -- 0x4005/0x4026/0x4027/0x4028 ARE ALSO CASES.
+ * Ghidra shows them as pool constants (_DAT_080177d0 and its neighbours), but
+ * they are nodes of the comparison tree.  Written without them, the case set
+ * stays DENSE between 1 and 0x97 and agbcc produces a JUMP TABLE: 1814 bytes
+ * (296 TOO MANY), 45 comparisons, one `mov pc,r0`.  With the four added, the
+ * range opens to 1..0x4028 and gcc is forced to produce a tree: 1510 bytes, 92
+ * comparisons, zero `mov pc`.  A single change worth 304 bytes.
  *
- * 0x0E case'i ROM'da `cmp #14` olarak GORUNMUYOR; agac (0x0D, 0x0F) araligina
- * tek deger kaldigi icin `< 0x0F` ile ayiriyor.  Eksik case sanip cikarmayin.
+ * Case 0x0E DOES NOT APPEAR as `cmp #14` in the ROM; because it is the only
+ * value left in the tree's (0x0D, 0x0F) range, it is separated with `< 0x0F`.
+ * Do not remove it thinking it is a missing case.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_state_step.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_state_step.c
  */
 
 #include "gba_types.h"
@@ -150,12 +154,12 @@ extern void FUN_08016990(Actor *self, s32 a);
 extern void DispatchActorBehavior(Actor *self);
 extern void FUN_08019260(Actor *self);
 
-/* KURAL 45: her case bu kalibi KENDI yerelleriyle yazmali.  Makro her
- * genislemede yeni adlar uretmedigi icin yereller cagri yerinde bildirilir
- * ve makroya isimleriyle verilir. */
-/* Makro parametresi `task` OLAMAZ: onislemci onu `->task` uye adinin
- * icinde de degistirir ve `->t` cikar.  Parametre adlari uye adlariyla
- * cakismamali. */
+/* RULE 45: every case must write this pattern with ITS OWN locals.  Because
+ * the macro does not generate fresh names on each expansion, the locals are
+ * declared at the call site and passed to the macro by name. */
+/* A macro parameter CANNOT be `task`: the preprocessor would substitute it
+ * inside the `->task` member name too and `->t` would come out.  Parameter
+ * names must not collide with member names. */
 #define NUDGE(NENT, NTSK)                                                   \
     do {                                                                    \
         (NTSK) = ((Holder *)*(u8 **)gRam020303C4)->task;                    \
@@ -167,12 +171,13 @@ extern void FUN_08019260(Actor *self);
 
 void FUN_08017628(Actor *self)
 {
-    u8 *slot;   /* SelectSlotCD sonucu; +0x1C'de tablo indeksi tasiyor */
+    u8 *slot;   /* SelectSlotCD's result; carries the table index at +0x1C */
     u32 state;
     s32 nine;
-    /* ROM sabit 0x20'yi r6'da (callee-saved) tutuyor ve prologda
-     * {r4,r5,r6,lr} itiyor: deger fonksiyon boyunca DORT yerde yaziliyor,
-     * agbcc de onu yazmaca kaldiriyor.  Yerele almak ayni etkiyi veriyor. */
+    /* The ROM keeps the constant 0x20 in r6 (callee-saved) and pushes
+     * {r4,r5,r6,lr} in the prologue: the value is written in FOUR places
+     * across the function, so agbcc lifts it into a register.  Taking it
+     * into a local has the same effect. */
     u8 mode20;
 
     mode20 = 0x20;
@@ -187,14 +192,14 @@ void FUN_08017628(Actor *self)
         }
         state = self->state;
         switch (state) {
-        /* Gövde sirasi ROM'un yerlesimine gore: gcc case govdelerini KAYNAK
-         * sirasinda yayiyor.  ROM'da ilk govde ortak "9,1" blogu (0x08017824),
-         * en sonda varsayilan (0x08017b40) duruyor. */
+        /* The body order follows the ROM's layout: gcc emits case bodies in
+         * SOURCE order.  In the ROM the first body is the shared "9,1" block
+         * (0x08017824) and the default is last (0x08017b40). */
 
-        /* ORTAK GOVDE: sekiz case bunu paylasiyor ve degeri yazmacta
-         * tasiyor.  ROM'da TEK fiziksel kopya var (havuz kelimesi
-         * _DAT_08017858), o yuzden burada da tek kopya yazilir -- kural 45
-         * ancak ROM'da AYRI kopyalar varsa gecerlidir. */
+        /* THE SHARED BODY: eight cases share it and carry the value in a
+         * register.  The ROM has a SINGLE physical copy (the pool word
+         * _DAT_08017858), so a single copy is written here too -- rule 45
+         * only applies when the ROM has SEPARATE copies. */
         case 0x02: nine = 0x02; goto body_nine;
         case 0x03: nine = 0x03; goto body_nine;
         case 0x2c: nine = 0x2c; goto body_nine;
@@ -207,9 +212,9 @@ void FUN_08017628(Actor *self)
             RequestActorAction(self, nine, 9, 1);
             e = self->entity; NUDGE(e, t); break; }
 
-        /* Asagidaki sekiz case'in HER BIRI ROM'da kendi havuz kelimesinden
-         * 0x020303C4'u yukluyor -- ayri fiziksel bloklar, kural 45 geregi
-         * her birine kendi yerelleri veriliyor. */
+        /* EACH of the eight cases below loads 0x020303C4 from its own pool
+         * word in the ROM -- separate physical blocks, so under rule 45 each
+         * is given its own locals. */
         case 0x01: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);
                      FUN_080198e4(self, 0x87, 1, 0x0f); break; }
         case 0x2b: { Entity *e; Task *t; e = self->entity; NUDGE(e, t);

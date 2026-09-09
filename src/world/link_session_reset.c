@@ -1,17 +1,16 @@
-/* Baglanti oturumunu bastan kurar — 0x08066144-0x0806620B
+/* Reinitialize the link session — 0x08066144-0x0806620B
  *
- * Once baglanti blogunu kuruyor, sonra sekiz ayri calisma tamponunu
- * sifirliyor (boyutlar Memset cagrilarindan OLCULDU: 8, 64, 64, 32, 32,
- * 32, 32, 32) ve oturum durumu alanlarini baslangic degerlerine cekiyor.
+ * Initialize the link block, clear eight work buffers (sizes MEASURED from
+ * Memset calls: 8, 64, 64, 32, 32, 32, 32, 32), then initialize session fields.
  *
- * ZINCIRLI ATAMA SART (kural 52). Iki bayt hedefi ayri ifadelerle
- * yazilinca yerel dagitici her adresi sirayla ayni yazmaca koyuyor ve
- * ROM'dan 8 bayt sapiyoruz; `a = (b = 0)` bicimi tek sifir degeri uretip
- * iki adresi ES ZAMANLI canli tutuyor, ROM da oyle yapiyor.
- * Bu bicimi permuter buldu (build/permuter/ResetLinkSession).
+ * CHAINED ASSIGNMENT REQUIRED (rule 52). Separate byte stores let the local
+ * allocator reuse one register for each address, producing an 8-byte mismatch.
+ * `a = (b = 0)` creates one zero value and keeps both addresses live together,
+ * as in the ROM. The permuter found this form
+ * (build/permuter/ResetLinkSession).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_session_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_session_reset.c
  */
 
 #include "gba_types.h"

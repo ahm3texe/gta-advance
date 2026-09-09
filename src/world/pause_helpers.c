@@ -1,13 +1,13 @@
-/* Duraklatma yardimcilari — 0x080664A4-0x080664EF
+/* Pause helpers — 0x080664A4-0x080664EF
  *
- * Dort kucuk fonksiyon. gVBlankEnabled (u16) durum kelimesi;
- * gGameState[12] duraklatma bayragi; 0x02036328 ek bayrak.
+ * Four small functions in the cluster. gVBlankEnabled (u16) is a state word;
+ * gGameState[12] is the pause flag; 0x02036328 is an additional flag.
  *
- * Ayni kumedeki dorduncu fonksiyon (MaybeAdvance, 0x080664F0) 1 bayt
- * farkli ve ayri dosyada: src/world/maybe_advance.c
+ * The fourth (MaybeAdvance, 0x080664F0) was separated with a one-byte
+ * difference: src/world/maybe_advance.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/pause_helpers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/pause_helpers.c
  */
 
 #include "gba_types.h"

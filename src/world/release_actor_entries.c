@@ -1,12 +1,12 @@
-/* Aktorun girislerini birakma — 0x08016808-0x08016869 (+2 dolgu)
+/* Release an actor's entries — 0x08016808-0x08016869 (+2 padding)
  *
- * +0x3C nesnesi yoksa cikar. Dort giris bayti (+0x8B ReleaseEntryD ile,
- * +0xB0/+0xA7/+0x8D ClearEntry ile) 0xFF degilse birakilip 0xFF yapilir;
- * sonra nesne ReleaseObject ile birakilip +0x3C sifirlanir. Ayni uclu
- * DispatchActorBehavior'da da var (dispatch_actor_behavior.c).
+ * Exit if object +0x3C is absent. Release each of four entry bytes unless
+ * 0xFF, then set it to 0xFF: +0x8B through ReleaseEntryD; +0xB0/+0xA7/+0x8D
+ * through ClearEntry. Release the object with ReleaseObject and clear +0x3C.
+ * The same triple occurs in DispatchActorBehavior (dispatch_actor_behavior.c).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/release_actor_entries.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/release_actor_entries.c
  */
 
 #include "gba_types.h"

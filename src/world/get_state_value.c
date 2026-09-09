@@ -1,26 +1,28 @@
-/* Durum degeri tablosu — 0x08024044-0x0802418B (328 bayt)
+/* The state value table — 0x08024044-0x0802418B (328 bytes)
  *
- * DURUM: 92/162 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 92/162 instructions, A NEAR MISS (does not match).  The size is
+ * right.
  *
- * Nesnenin +0x64 durumuna gore gRom08CA6138 (alt != 0 ise gRom08CA617C)
- * tablosundan bir u32 secip <<16 doner. 51 -> [9], 76 -> [8], 101 ->
- * +0x84 alt nesnesinin +0x09 turu 35 ise [15] degilse [10], 34 -> +0x90
- * evresine gore 35 girisli atlama tablosu (12..46): 12/38/39 -> [7],
- * 22 -> 101 ile ayni secim, 28 -> +0x8C > 0x3FFFF ise 0 degilse [4],
- * 36 -> 0, 46 -> [8]; diger her sey (18 dahil) FUN_0804fb3c(alt)
- * sonucunun u16'siyla indisler.
+ * According to the object's +0x64 state it selects a u32 from the gRom08CA6138
+ * table (gRom08CA617C when the sub-object is non-null) and returns it <<16.
+ * 51 -> [9], 76 -> [8], 101 -> [15] if the +0x09 kind of the +0x84 sub-object
+ * is 35 and [10] otherwise, 34 -> a 35-entry jump table on the +0x90 phase
+ * (12..46): 12/38/39 -> [7], 22 -> the same selection as 101, 28 -> 0 if +0x8C
+ * > 0x3FFFF and [4] otherwise, 36 -> 0, 46 -> [8]; everything else (18
+ * included) indexes with the u16 of FUN_0804fb3c(sub)'s result.
  *
- * KALAN FARK, TEK MEKANIZMA: agbcc bende ozdes govdeleri BIRLESTIRIYOR
- * (dis case 76 `[8]` ile ic case 46 `[8]`, dis 101 ile ic 22, ic default
- * ile dis default) -- ROM'da bunlar AYRI bloklar (0x08024086/0x08024172,
- * 0x0802408A/0x0802415C). Oysa ayni ROM iki `return 0`u birlestirmis
- * (0x08024150). Denenen: her case'e kendi `return x << 16` (85), ic
- * case'leri ROM govde sirasina dizmek (91), ic default'u goto ile dis
- * default'a baglamak (79). Birlestirmeyi engelleyen kaynak bicimi
- * bulunamadi; muhtemelen ic switch ayri bir deyim/yardimci.
+ * THE REMAINING DIFFERENCE, ONE MECHANISM: here agbcc MERGES identical bodies
+ * (outer case 76 `[8]` with inner case 46 `[8]`, outer 101 with inner 22,
+ * the inner default with the outer default) -- in the ROM these are SEPARATE
+ * blocks (0x08024086/0x08024172, 0x0802408A/0x0802415C).  Yet the same ROM did
+ * merge the two `return 0`s (0x08024150).  Tried: its own `return x << 16` in
+ * every case (85), ordering the inner cases by the ROM's body layout (91),
+ * linking the inner default to the outer one with a goto (79).  No source form
+ * that prevents the merge was found; the inner switch is probably a separate
+ * statement or helper.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_state_value.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_state_value.c
  */
 
 #include "gba_types.h"

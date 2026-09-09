@@ -1,68 +1,76 @@
-/* Varlik animasyon dugumu secimi ve alt kurulum dagitimi -- 0x08015598-0x080157B7
+/* Selecting the entity's animation node and dispatching the rest of the setup
+ * -- 0x08015598-0x080157B7
  *
- * InitActor (src/world/actor_init.c) ile kurulan Actor yapisini alip ROM'daki
- * tanim agacindan (0x08BD3448 koku) bir dugum secip varliga bagliyor, sonra
- * kurulumun geri kalanini alti ayri fonksiyona dagitiyor.
+ * Takes the Actor structure set up by InitActor (src/world/actor_init.c),
+ * selects a node from the definition tree in the ROM (rooted at 0x08BD3448)
+ * and attaches it to the entity, then dispatches the rest of the setup to six
+ * separate functions.
  *
- * ROM'dan okunan akis:
- *   1. gRam03000078 -> yerel "idx" (0 veya 1). a->slots[idx] 0xFDFD ise
- *      (InitActor'un yazdigi "atanmamis" degeri) oteki yuvaya geciliyor.
- *   2. Kok -> grup -> giris -> dugum: uc kademe isaretci tablosu. Ayni uc
- *      kademeli erisim src/world/entries_a8.c'de de var, oradaki `desc` ile
- *      buradaki `node` ayni seviyedeki nesne (ikisi de FUN_08013cfc'ye ve
- *      FUN_08014ee4'e +0x14 alaniyla gidiyor).
- *   3. Ust baglam kurulumu engelliyorsa dugum yerine sabit bir ROM dugumu.
- *   4. a->attr bayraklari ve FUN_08014ee4 secimi, sonra alti alt cagri.
+ * The flow as read from the ROM:
+ *   1. gRam03000078 -> the local "idx" (0 or 1).  If a->slots[idx] is 0xFDFD
+ *      (the "unassigned" value written by InitActor) it moves to the other
+ *      slot.
+ *   2. Root -> group -> entry -> node: a three-level pointer table.  The same
+ *      three-level access is in src/world/entries_a8.c; the `desc` there and
+ *      the `node` here are objects at the same level (both go to FUN_08013cfc
+ *      and to FUN_08014ee4 with the +0x14 field).
+ *   3. If the parent context blocks the setup, a fixed ROM node is used
+ *      instead of the node.
+ *   4. The a->attr flags and the FUN_08014ee4 selection, then the six
+ *      sub-calls.
  *
  * BYTE-MATCHING.
  *
- * OLCULEN NOKTALAR:
- *   - 0x12'deki `ldrsh`: a->pos 16.16 sabit nokta, tamsayi kismi ayri bir s16
- *     alan olarak okunuyor. `(s16)(raw >> 16)` yazmak `asrs` uretiyor, ROM
- *     `ldrsh` yaziyor -- birlesim (union) sart, kaydirma ile olmuyor.
- *   - Isaretci gecerlilik testleri `(u32)p - taban <= uzunluk` biciminde:
- *     agbcc bunu `movs #0xFE; lsls #24; adds; cmp; bls` olarak kuruyor.
- *     Aralik sirasi ROM'dan: `a` icin EWRAM,IWRAM; node->unk10 icin
- *     ROM,EWRAM,IWRAM. Sirayi degistirmek fark birakiyor.
- *   - DAL SIRASI: iki yerde kosulu TERS yazmak gerekti. ROM'un ic (dusen)
- *     dali `IsEntityEngaged(...) == 0` ve `a->unk98 == 0` tarafi; dogru
- *     tarafini once yazinca 542 -> 538 -> 544 gitti. `!= 0` yazimi ayni
- *     komutlari uretiyor ama bloklari ters diziyor.
- *   - `self` KOPYASI GEREKLI (ROM: `mov r9, r4` girişte, `mov r0, r9` besinci
- *     cagrida). Kopya tabanli bolme genelde eleniyor; BURADA ELENMIYOR, cunku
- *     kopya 5. cagriya kadar hicbir yerde kullanilmiyor ve fonksiyonun geri
- *     kalani zaten r4-r7'yi doldurmus durumda, yani ikinci allocno r8/r9'a
- *     tasiniyor. `self` cikarilinca 544 -> 538 (prolog/epilog 4 bayt + hizalama).
+ * THE MEASURED POINTS:
+ *   - The `ldrsh` at 0x12: a->pos is 16.16 fixed point and its integer part is
+ *     read as a separate s16 field.  Writing `(s16)(raw >> 16)` produces
+ *     `asrs` while the ROM has `ldrsh` -- a union is required, a shift does
+ *     not do it.
+ *   - The pointer validity tests take the form `(u32)p - base <= length`:
+ *     agbcc builds that as `movs #0xFE; lsls #24; adds; cmp; bls`.  The range
+ *     order is from the ROM: EWRAM,IWRAM for `a`; ROM,EWRAM,IWRAM for
+ *     node->unk10.  Changing the order leaves a difference.
+ *   - THE BRANCH ORDER: in two places the condition had to be written
+ *     INVERTED.  The ROM's inner (fall-through) branch is the
+ *     `IsEntityEngaged(...) == 0` and `a->unk98 == 0` side; writing the right
+ *     side first went 542 -> 538 -> 544.  The `!= 0` spelling produces the
+ *     same instructions but lays the blocks out in reverse.
+ *   - THE `self` COPY IS REQUIRED (the ROM: `mov r9, r4` at entry, `mov r0, r9`
+ *     at the fifth call).  Copy-based splitting is usually eliminated; IT IS
+ *     NOT ELIMINATED HERE, because the copy is used nowhere until the 5th call
+ *     and the rest of the function has already filled r4-r7, so the second
+ *     allocno moves to r8/r9.  Removing `self` gives 544 -> 538 (4 bytes of
+ *     prologue/epilogue + alignment).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_b3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_b3.c
  */
 
 #include "gba_types.h"
 
-/* Bellek bolgeleri: isaretcinin gercekten okunabilir bir alana bakip
- * bakmadigi boylece sinaniyor (ROM'daki uc ardisik aralik testi). */
+/* The memory regions: this is how a pointer is tested for actually pointing
+ * at a readable area (the three consecutive range tests in the ROM). */
 #define IN_ROM(p)    ((u32)(p) - 0x08000000 <= 0x00FFFFFF)
 #define IN_EWRAM(p)  ((u32)(p) - 0x02000000 <= 0x0003FFFF)
 #define IN_IWRAM(p)  ((u32)(p) - 0x03000000 <= 0x00007FFF)
 #define IS_RAM_PTR(p)    (IN_EWRAM(p) || IN_IWRAM(p))
 #define IS_LOADED_PTR(p) (IN_ROM(p) || IN_EWRAM(p) || IN_IWRAM(p))
 
-/* a->unk30->unk0C bayraklari */
+/* the a->unk30->unk0C flags */
 #define CTX_BLOCKED   0x00000400
 #define CTX_ENABLED   0x00000001
 #define CTX_OVERRIDE  0x00008000
 
-/* Varsayilan dugum; ust baglam kurulumu engelledigi zaman kullaniliyor. */
+/* The default node; used when the parent context blocks the setup. */
 #define FALLBACK_NODE ((RomNode *)0x08CA45A8)
 
-#define SLOT_UNSET    0xFDFD    /* InitActor'un yazdigi "atanmamis" degeri */
+#define SLOT_UNSET    0xFDFD    /* the "unassigned" value written by InitActor */
 #define MODE_SPECIAL  15
 #define MODE_BIT      4
 #define ATTR_BIT      8
 #define NODE_KIND_MAX 2
 
-/* 16.16 sabit nokta; tamsayi kismi ayrica s16 olarak okunuyor. */
+/* 16.16 fixed point; the integer part is also read as an s16. */
 typedef union Fixed16 {
     s32 raw;                    /* +0x00 */
     struct {
@@ -71,17 +79,18 @@ typedef union Fixed16 {
     } part;
 } Fixed16;
 
-/* --- ROM tanim agaci: her kademede +0x00 sayac, +0x04 isaretci tablosu --- */
+/* --- The ROM definition tree: +0x00 a count and +0x04 a pointer table at
+   each level --- */
 
 typedef struct RomNode {
     u8   pad00[0x0C];
-    u8   kind;                  /* +0x0C  1 veya 2 olmali */
-    void *unk10;                /* +0x10  yuklenmis bir alana bakmali */
+    u8   kind;                  /* +0x0C  must be 1 or 2 */
+    void *unk10;                /* +0x10  must point at a loaded area */
     u32  unk14;                 /* +0x14 */
 } RomNode;
 
 typedef struct RomEntry {
-    u8        count;            /* +0x00  cerceve sayisi */
+    u8        count;            /* +0x00  the frame count */
     u8        pad01[3];
     RomNode **nodes;            /* +0x04 */
 } RomEntry;
@@ -100,10 +109,10 @@ extern RomRoot gRom08BD3448;
 
 /* --- RAM --- */
 
-extern u32 gRam03000078;        /* secilecek yuva indisi (0/1) */
-extern u32 gRam02000224;        /* genel kip bayraklari */
+extern u32 gRam03000078;        /* the index of the slot to pick (0/1) */
+extern u32 gRam02000224;        /* the global mode flags */
 
-/* --- Baglam ve gorunum yapilari --- */
+/* --- The context and view structures --- */
 
 typedef struct Context {
     u8  pad00[0x0C];
@@ -124,17 +133,17 @@ typedef struct Attr {
 
 typedef struct Actor {
     u32      unk00;             /* +0x00 */
-    u16      unk04;             /* +0x04  giris indisi */
+    u16      unk04;             /* +0x04  the entry index */
     u16      unk06;             /* +0x06 */
     u8       unk08;             /* +0x08 */
     u8       mode;              /* +0x09 */
     u8       pad0A[2];
-    s32      unk0C;             /* +0x0C  cerceve sayisi << 16 */
+    s32      unk0C;             /* +0x0C  the frame count << 16 */
     Fixed16  pos;               /* +0x10 */
     u32      unk14;             /* +0x14 */
     u8       pad18[4];
     u32      unk1C;             /* +0x1C */
-    u16      slots[2];          /* +0x20  0xFDFD = atanmamis */
+    u16      slots[2];          /* +0x20  0xFDFD = unassigned */
     RomGroup *group;            /* +0x24 */
     u32      unk28;             /* +0x28 */
     u8       pad2C[4];
@@ -176,7 +185,8 @@ void UpdateActorFrame(Actor *a)
     u32 kind;
     Actor *self;
 
-    self = a;               /* bkz. baslik: 5. cagri ROM'da r9 uzerinden */
+    self = a;               /* see the header: the 5th call goes through r9
+                               in the ROM */
     idx = gRam03000078;
 
     if (a->ctx->flags & CTX_BLOCKED)

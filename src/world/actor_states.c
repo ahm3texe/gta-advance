@@ -1,14 +1,14 @@
-/* Varlik durum ayarlayicilari — 0x0803F6F8-0x0803F78B
+/* Entity state setters — 0x0803F6F8-0x0803F78B
  *
- * Dort kucuk yaprak: her biri varligin +8'deki isleyici isaretcisini ve
- * +0x80..0x82'deki durum baytlarini kuruyor.
+ * Four small leaf functions set the entity's handler pointer at +8 and state
+ * bytes at +0x80..0x82.
  *
- * Isleyici adresleri Thumb biti kurulu (tek sayi) olarak saklaniyor, bu
- * yuzden `extern` fonksiyon adi yerine tam degerli #define kullanildi:
- * agbcc_build .equ ile cift adres uretir ve son bit tutmaz.
+ * Handler addresses are stored with the Thumb bit set (odd addresses), hence
+ * the exact-value #defines instead of extern function names: agbcc_build's
+ * .equ symbols produce even addresses and would lose the low bit.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_states.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_states.c
  */
 
 #include "gba_types.h"
@@ -16,7 +16,7 @@
 typedef struct Actor Actor;
 typedef void (*ActorHandler)(Actor *actor);
 
-/* Isleyiciler; ucu de Ghidra'nin kacirdigi fonksiyonlar. */
+/* Handlers; three of these functions were missed by Ghidra. */
 #define HANDLER_IDLE     ((ActorHandler)0x0803DF35)   /* 0x0803DF34 */
 #define HANDLER_RELEASE  ((ActorHandler)0x0803DEA9)   /* 0x0803DEA8 */
 #define HANDLER_ENGAGE   ((ActorHandler)0x0803E281)   /* 0x0803E280 */

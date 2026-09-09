@@ -1,15 +1,15 @@
-/* Konum herhangi bir aktore yakin mi — 0x08054F1C-0x08055051
+/* Test proximity to any actor — 0x08054F1C-0x08055051
  *
- * Maskenin 14/12/128 bitlerine gore uc listeyi (0x0202F2C0, 0x0202F310,
- * 0x02028290) geziyor; +0x0C'de 0x40 kurulu olmayan her aktorun +0x18
- * konumuna Manhattan benzeri yaklasik uzaklik (|dx|+|dy| - m/2 - m/4 +
- * m/16, m = min) hesaplaniyor. Ilk listede uzaklik <= 0x800000 (isaretsiz),
- * diger ikisinde <= 0x3FFFFF (isaretli) ise 0 doner; hicbiri yakin degilse
- * 1. Ilk dongudeki `best` en kucugu tutuyor ama hic kullanilmiyor -- ROM'da
- * da oyle (r4), kaynakta kalintisi var.
+ * Mask bits 14/12/128 select three lists (0x0202F2C0, 0x0202F310, 0x02028290).
+ * For each actor without bit 0x40 at +0x0C, compute an approximate distance
+ * to its position at +0x18: |dx|+|dy| - m/2 - m/4 + m/16, where m is the
+ * minimum. Return 0 for a distance <= 0x800000 (unsigned) in the first list
+ * or <= 0x3FFFFF (signed) in the other two; return 1 if none is near.
+ * The first loop tracks an unused minimum in best, just as the ROM does
+ * in r4; the source retains it.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_near_any_actor.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_near_any_actor.c
  */
 
 #include "gba_types.h"

@@ -1,24 +1,28 @@
-/* Aktor serit alanini guncelleme — 0x080159A0-0x08015A83
+/* Updating the actor's lane field — 0x080159A0-0x08015A83
  *
- * Her 4 karede bir (gRam02000224+5 & 3 == 0): varligin +0x1C sahibi varsa
- * onun +0x3C nesnesi yoksa cikilir, varsa +0x27 sahiplik bayti; sahip yoksa
- * gecerli. +0x08'de 4 kurulu degilse cikilir. Yuva (GetOwnerSlot ->
- * SelectSlotAB) varsa +0x58 sifir degil mi (has). +0x14 kaydinin +0x32'si
- * kuruluysa cikilir; +0x31 sifir ve has sifirsa cikilir. +0x18 govdesinin
- * +0x18'i >> 15 pozitifse gFrameDelay ile carpilip (sifirsa ve yuva varsa 1)
- * +0x8A'nin 6-7. bit alanina eklenir; alan > 1 ise FUN_08026e04 iki kez
- * (0 ve 1), degilse yuva yoksa alan sifirlanir.
+ * Every 4 frames (gRam02000224+5 & 3 == 0): if the entity's +0x1C owner
+ * exists, the function returns when that owner's +0x3C object is missing and
+ * otherwise takes its +0x27 ownership byte; with no owner it proceeds.  It
+ * returns if bit 4 is not set at +0x08.  If there is a slot (GetOwnerSlot ->
+ * SelectSlotAB), `has` is whether its +0x58 is non-zero.  It returns if +0x32
+ * of the +0x14 record is set; and it returns if +0x31 is zero and `has` is
+ * zero.  If the +0x18 of the +0x18 body, >> 15, is positive, it is multiplied
+ * by gFrameDelay (or by 1 when that is zero and a slot exists) and added to
+ * the bit 6-7 field of +0x8A; if that field is > 1, FUN_08026e04 is called
+ * twice (0 and 1), otherwise the field is cleared when there is no slot.
  *
- * UC OLCUM: `has = (slot != 0 && slot->w58 != 0)` TEK IFADE yazilmali;
- * `if (slot) has = w58 != 0` biciminde agbcc dalli kod uretiyor, ROM
- * dalsiz `negs/orrs/lsrs #31` (`has |= ...` de esit). Sahip testi
- * `self->entity->owner` uzerinden once, `ent` yereli SONRA alinmali (ROM
- * varligi once gecici r0'a yukleyip testten sonra r2'ye kopyaliyor).
- * gFrameDelay `(*(u32 *)0x03000000)` mutlak makro (kural 65). 2 bitlik
- * alan bitfield (`u8 lane : 2`), `+=` RMW'yi derleyici uretiyor.
+ * THREE MEASUREMENTS: `has = (slot != 0 && slot->w58 != 0)` must be written as
+ * a SINGLE EXPRESSION; spelled as `if (slot) has = w58 != 0`, agbcc emits
+ * branching code, while the ROM is branchless `negs/orrs/lsrs #31`
+ * (`has |= ...` is equivalent).  The owner test must go through
+ * `self->entity->owner` first and the `ent` local must be taken AFTERWARDS
+ * (the ROM loads the entity into a temporary r0 first and copies it to r2
+ * after the test).  gFrameDelay is the absolute macro `(*(u32 *)0x03000000)`
+ * (rule 65).  The 2-bit field is a bitfield (`u8 lane : 2`); the compiler
+ * generates the `+=` read-modify-write.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/update_actor_lane.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/update_actor_lane.c
  */
 
 #include "gba_types.h"

@@ -1,18 +1,20 @@
-/* Aktoru firlatmayi deneme — 0x080157B8-0x08015833
+/* Trying to launch the actor — 0x080157B8-0x08015833
  *
- * Varligin +0x08'inde 4 kurulu, +0x30 alt nesnesi ve +0x18 kaydi dolu,
- * aktorun +0xA8 baytinin alt 4 bitinde bit0 kurulu ve alt nesnenin +0x0A
- * (s16) degeri pozitifse: kare sayacinin (gRam02000224) alt 4 biti sifir
- * oldugunda +0xA6 geri sayimi bir azaltilir; sifira ulasmadan cikilir.
- * Sonra alt nesnenin +0x08'ine 0x10000, +0xA5'e 45 yazilip +0x18 kaydi
- * 0x400000 ile SubmitPack'e verilir.
+ * If bit 4 is set at the entity's +0x08, its +0x30 sub-object and +0x18
+ * record are both present, bit0 of the low 4 bits of the actor's +0xA8 byte
+ * is set and the sub-object's +0x0A (s16) value is positive: whenever the
+ * low 4 bits of the frame counter (gRam02000224) are zero, the +0xA6
+ * countdown is decremented by one; the function returns before it reaches
+ * zero.  Then 0x10000 is written to the sub-object's +0x08 and 45 to +0xA5,
+ * and the +0x18 record is handed to SubmitPack with 0x400000.
  *
- * IKI OLCUM: +0xA8'in alt 4 biti BITFIELD (`u8 low : 4`) -- ROM
- * `lsls #28 / lsrs #28` (kural 61). Alt nesnede +0x08 u16 ve +0x0A s16
- * ayri alanlar; 0x10000 yazimi ise 32 bit (`*(u32 *)&sub->h08`).
+ * TWO MEASUREMENTS: the low 4 bits of +0xA8 are a BITFIELD (`u8 low : 4`) --
+ * the ROM has `lsls #28 / lsrs #28` (rule 61).  In the sub-object, +0x08 (u16)
+ * and +0x0A (s16) are separate fields; the 0x10000 store, however, is 32 bits
+ * wide (`*(u32 *)&sub->h08`).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/try_launch_actor.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/try_launch_actor.c
  */
 
 #include "gba_types.h"

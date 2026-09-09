@@ -1,9 +1,9 @@
-/* Anchor +0x34 getirici — 0x08050A00-0x08050A0B
+/* Anchor +0x34 getter — 0x08050A00-0x08050A0B
  *
- * Anchor tanimi src/world/anchor_reset.c ile BIREBIR AYNI tutulmali.
+ * Keep Anchor IDENTICAL to src/world/anchor_reset.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_anchor_unk34.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_anchor_unk34.c
  */
 
 #include "gba_types.h"
@@ -12,7 +12,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

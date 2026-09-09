@@ -1,17 +1,16 @@
-/* gEntriesA'da dortlu esleme bulup zamanlayici tazeleme — 0x0802929C-0x080292EB
+/* Refresh timers for four-condition matches in gEntriesA — 0x0802929C-0x080292EB
  *
- * Once parametreyi FUN_0803535C'ye iletiyor, sonra gEntriesA'daki 15 giriste
- * (stride 148) su dortlu kosulu ariyor: giris aktif (+0x00), +0x84 alani
- * parametreye esit, +0x64 turu 34, +0x90 alani 39. Uyan her giriste +0x02
- * yarim sozune 20 yaziyor. Erken cikis yok, tum tabloyu geziyor.
+ * Forward the parameter to FUN_0803535C, then scan all 15 gEntriesA entries
+ * (stride 148): active at +0x00, +0x84 equals the parameter, type +0x64 is 34,
+ * and +0x90 is 39. Write 20 to the +0x02 halfword of every matching entry;
+ * there is no early exit.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * Kardesi FindEntryByQuad (src/world/entries_a4.c) ayni dongu iskeletini
- * kullaniyor; `gEntriesA[i].alan` dizi-indeks bicimi ROM'un
- * (taban+ofset)+i*148 adres iliskilendirmesini uretiyor.
+ * Rule 35: `pop {r0}; bx r0` indicates void. Its sibling FindEntryByQuad
+ * (entries_a4.c) uses the same loop skeleton. Array indexing `gEntriesA[i].field`
+ * produces the ROM's (base+offset)+i*148 address association.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a3.c
  */
 
 #include "gba_types.h"

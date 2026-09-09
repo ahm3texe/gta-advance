@@ -1,13 +1,12 @@
-/* Gecikmeyle cevrelenmis kayit sayaci — 0x08067184-0x080671B7
+/* Save counter bracketed by delays — 0x08067184-0x080671B7
  *
- * stat_counters.c'deki tasma korumali artirimin aynisi, bu kez kayit
- * tamponunun +0x82 alaninda ve iki bos dongu gecikmesinin arasinda.
- * SpinDelay govdesinde argumani KULLANMIYOR (0x08030EA0 byte-matching,
- * src/world/spin_delay.c), ama cagri yerinde r0'a sabit yukleniyor;
- * bu yuzden burada argumanli bildirim sart.
+ * The same overflow-protected increment as stat_counters.c, applied to +0x82
+ * in the save buffer between two empty-loop delays. SpinDelay does NOT use
+ * its argument (0x08030EA0, byte-matching, src/world/spin_delay.c), but the
+ * call site loads a constant into r0, so its declaration here needs an argument.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bump_count_82.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bump_count_82.c
  */
 
 #include "gba_types.h"

@@ -1,15 +1,14 @@
 /* MaybeAdvance — 0x080664F0-0x08066519
  *
- * Yalniz gVBlankEnabled tam COUNTER_MIN (=2) ve sayac 1'den buyukse 0
- * donuyor; diger tum durumlarda 1. Ayni kumedeki uc kardesi
- * src/world/pause_helpers.c'de.
+ * Return 0 only when gVBlankEnabled is exactly COUNTER_MIN (=2) and the
+ * counter exceeds 1; return 1 otherwise. Three siblings are in pause_helpers.c.
  *
- * BYTE-MATCHING. Onceki `<= 1 ise 0` yorumu ve C kosulu ROM'daki `bls`
- * dalinin hedefini ters okumustu. Kosulu ROM davranisiyla ayni kurmak
- * dogal C'den birebir dal yonunu uretiyor.
+ * BYTE-MATCHING. The previous comment and C condition (return 0 for <= 1)
+ * misread the ROM's bls target. Matching the actual condition reproduces
+ * the exact branch direction in natural C.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/maybe_advance.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/maybe_advance.c
  */
 
 #include "gba_types.h"

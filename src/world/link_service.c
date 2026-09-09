@@ -1,83 +1,92 @@
-/* Baglanti kare servisi — 0x0806686C-0x08066903
+/* Link frame service — 0x0806686C-0x08066903
  *
- * Blok hazirsa gonderme/alma tamponlarini takas edip yeni bir cok
- * oyunculu aktarim baslatiyor: SIOCNT'nin hata bitini kaydediyor,
- * gonderilecek kelimeyi yaziyor, aktarimi baslatiyor ve zaman asimi icin
- * Timer3'u kesmeyle birlikte aciyor.
+ * If the block is ready, it swaps the send/receive buffers and starts a new
+ * multiplayer transfer: it records SIOCNT's error bit, writes the word to be
+ * sent, starts the transfer, and turns Timer3 on together with its interrupt
+ * for the timeout.
  *
- * Blok hazir degilse dort kareye kadar bekliyor; dorduncuden sonra BIOS
- * kesme bayragini kaldirip pes ediyor. Bu nadir yol ROM'da fonksiyonun
- * SONUNDA duruyor (kural 49), o yuzden kaynakta da `else` dali.
+ * If the block is not ready it waits up to four frames; after the fourth it
+ * raises the BIOS interrupt flag and gives up. This rare path sits at the
+ * END of the function in ROM (rule 49), which is why it is the `else` branch
+ * in the source as well.
  *
- * SIOCNT burada 32 BIT okunuyor: hata biti ust yarim kelimeyle birlikte
- * tek `ldr` ile aliniyor, sonra 25 sola + 31 saga kaydirmayla ayikliyor.
+ * SIOCNT is read 32 BITS wide here: the error bit is fetched together with
+ * the upper halfword by a single `ldr`, then extracted with a shift 25 left
+ * + 31 right.
  *
- * DURUM: PARK — 144/152 bayt. Komut dizisi ROM ile ayni; kalan fark
- * ROM'un global adresini r4'te (callee-saved) tutmasi, bizim r3'te
- * tutmamiz. Eksik 8 bayt o push/pop cifti ve hizalamasi:
+ * STATUS: PARKED — 144/152 bytes. The instruction sequence is identical to
+ * ROM; the remaining difference is that ROM keeps the global address in r4
+ * (callee-saved) while we keep it in r3. The missing 8 bytes are that
+ * push/pop pair and its alignment:
  *   ROM `push {r4,lr}` (2) + `pop {r4} / pop {r0} / bx r0` (6) = 8
- *   biz  push YOK        (0) + `bx lr`                        (2) = 2
- *   ustune ROM'un komut govdesi 2 bayt uzun oldugu icin ilk havuz
- *   4 hizasina 2 bayt dolgu aliyor.  59 komutluk govde birebir ayni.
+ *   us   NO push       (0) + `bx lr`                        (2) = 2
+ *   on top of that, because ROM's instruction body is 2 bytes longer, the
+ *   first pool takes 2 bytes of padding for 4-byte alignment.  The
+ *   59-instruction body is identical.
  *
- * SIO_PORT (volatile OLMAYAN gorunum) DOGRU bicim: ROM'da `send`
- * yaziminin oncesinde okuma YOK, gba_io.h'deki volatile REG_SIO ise olu
- * bir `ldrh` uretiyor. Bu bicim 0x08066904'te olculdu.
+ * SIO_PORT (the NON-volatile view) is the CORRECT form: in ROM there is NO
+ * read before the `send` write, whereas the volatile REG_SIO in gba_io.h
+ * produces a dead `ldrh`. This form was measured at 0x08066904.
  *
- * KURAL 57 BURADA DA GECERLI — ONCEKI "degisiklik yok" NOTU YANLISTI
- * (duzeltildi 2026-09-07): `gBiosIrqFlags`i `*(volatile u16 *)&...` ile
- * okuyup yazmak BOYUTU degistirmiyor (144) ama `else` dalini ROM'un
- * bicimine tam oturtuyor.  Volatile olmayan yazim sabiti once yukluyor
+ * RULE 57 APPLIES HERE TOO — THE EARLIER "no change" NOTE WAS WRONG
+ * (fixed 2026-09-07): reading and writing `gBiosIrqFlags` through
+ * `*(volatile u16 *)&...` does not change the SIZE (144) but it makes the
+ * `else` branch line up exactly with ROM's form.  The non-volatile spelling
+ * loads the constant first
  * (`ldr r1,=flags / mov r0,#0x80 / ldrh r3,[r1] / orr r0,r3 / strh r0,[r1]`);
- * volatile gorunum ROM'un sirasini veriyor
+ * the volatile view gives ROM's order
  * (`ldr r2,=flags / ldrh r0,[r2] / mov r1,#0x80 / orr r0,r1 / strh r0,[r2]`)
- * ve REG_IME adresini de ROM gibi r3'e itiyor.  Yani olcut yalniz bayt
- * sayisi degil, komut dizisi olmali.  Bu haliyle ROM'dan SAPAN tek yer
- * prolog/epilog ve `block`/takas gecicisinin yazmaclari kaldi.
+ * and it also pushes the REG_IME address into r3 the way ROM does.  So the
+ * criterion must not be the byte count alone, but the instruction sequence.
+ * In this state the only places left that DIVERGE from ROM are the
+ * prologue/epilogue and the registers of the `block`/swap temporaries.
  *
- * DAGITIM TESHISI (dump_alloc): global adres pseudo'su (p25, refs 3 /
- * omur 70 / oncelik 0.043) global dagiticinin SON allocno'su; r0-r3
- * bosta oldugu icin r3'u aliyor.  ROM'da r4'e dusmesi icin dordunun de
- * cakismasi gerekiyor.  Kilit nokta L4 blogundaki TAKAS GECICISI: ROM onu
- * r3'e, biz r1'e koyuyoruz.  Geciciyi r3'e itebilen her yazim ayni anda
- * `block`u da r2'den r3'e kaydiriyor, o yuzden hicbiri tam oturmuyor.
+ * ALLOCATION DIAGNOSIS (dump_alloc): the pseudo for the global address (p25,
+ * refs 3 / lifetime 70 / priority 0.043) is the LAST allocno of the global
+ * allocator; since r0-r3 are free it takes r3.  For it to land in r4 as in
+ * ROM, all four would have to be occupied.  The key point is the SWAP
+ * TEMPORARY in block L4: ROM puts it in r3, we put it in r1.  Every spelling
+ * that can push the temporary into r3 also shifts `block` from r2 to r3 at
+ * the same time, so none of them fits exactly.
  *
- * ELENEN: denetimi SIO_PORT.control ile oku-yaz (degisiklik yok), hata
- * bitini 32 bit yerine control uzerinden almak (148 bayt, ama ROM 32 bit
- * `ldr` yapiyor -- bicim yanlis).
+ * RULED OUT: read-modify-write the control through SIO_PORT.control (no
+ * change), taking the error bit through control instead of 32 bits (148
+ * bytes, but ROM does a 32-bit `ldr` -- wrong form).
  *
- * ELENEN YAZIMLAR (2026-09-07, hepsi 144 bayt / push YOK): ikinci bir
- * `CommBlock *live` yereli (blok icinde ve blogun basinda); `u8 flag` ile
- * byte0'i yerele almak (kural 55); `u8 retry` yereli; disardaki testi
- * `gRam02036338->byte0` ile yazmak; `SioPort *sio` yereli; errorBit'i ara
- * degiskene almak; `&&` yerine ic ice `if`; else dalini global uzerinden
- * yazmak; uc ayri bolge isaretcisi (kural 59); takasi acik iki adima
- * bolmek; iki geciciyi tek `void *` yapmak (block r1'e kayiyor); ikisini
- * de `LinkPacket *` / `void *` yapmak; paket takasini once yapmak;
- * `recvLen = -1`i takaslardan sonraya almak; TM3'u SIO_START'tan once
- * yazmak; bildirim sirasinin alti permutasyonu; `block` yerelini tamamen
- * kaldirip her seyi `gRam02036338->` ile yazmak.
+ * RULED-OUT SPELLINGS (2026-09-07, all 144 bytes / NO push): a second
+ * `CommBlock *live` local (inside the block and at the start of the block);
+ * taking byte0 into a local with `u8 flag` (rule 55); a `u8 retry` local;
+ * writing the outer test as `gRam02036338->byte0`; a `SioPort *sio` local;
+ * taking errorBit into an intermediate variable; nested `if` instead of
+ * `&&`; writing the else branch through the global; three separate region
+ * pointers (rule 59); splitting the swap into two explicit steps; making the
+ * two temporaries a single `void *` (block shifts to r1); making both of
+ * them `LinkPacket *` / `void *`; doing the packet swap first; moving
+ * `recvLen = -1` after the swaps; writing TM3 before SIO_START; the six
+ * permutations of the notification order; dropping the `block` local
+ * entirely and writing everything through `gRam02036338->`.
  *
- * IKI YAZIM 152 BAYTA ULASIYOR ama komut SIRASI ROM'a uymuyor, o yuzden
- * ALINMADI: (1) iki takasin okumalarini one alip yazmalarini arkaya
- * toplamak (`push {r4,lr}` cikiyor, 19/152 bayt fark) ve (2) `ready = 0`i
- * takaslardan once yazmak (39/152).  Ikisi de baskiyi bir artirip adresi
- * r4'e itiyor ama `block`u r2'den r3'e kaydiriyor; ROM'da `block` r2'de
- * ve takas gecicisi r3'te.  Yani eksik olan sey "bir fazla canli deger"
- * degil, gecicinin r3'e, `block`un r2'de kalmasi.
+ * TWO SPELLINGS REACH 152 BYTES but their instruction ORDER does not match
+ * ROM, so they were NOT TAKEN: (1) hoisting the reads of both swaps to the
+ * front and gathering their writes at the back (`push {r4,lr}` appears,
+ * 19/152 bytes off) and (2) writing `ready = 0` before the swaps (39/152).
+ * Both raise the pressure by one and push the address into r4, but they
+ * shift `block` from r2 to r3; in ROM `block` is in r2 and the swap
+ * temporary is in r3.  So what is missing is not "one more live value", but
+ * the temporary being in r3 while `block` stays in r2.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_service.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_service.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 #include "comm_block.h"
 
-/* SIOCNT + SIOMLT_SEND'in volatile OLMAYAN gorunumu. gba_io.h'deki
- * volatile SioRegs uzerinden `send` yazimi agbcc'ye olu bir `ldrh`
- * urettiriyor; volatile olmayan gorunum yalniz `strh` birakiyor.
- * 0x08066904'te olculdu. */
+/* NON-volatile view of SIOCNT + SIOMLT_SEND. Writing `send` through the
+ * volatile SioRegs in gba_io.h makes agbcc emit a dead `ldrh`; the
+ * non-volatile view leaves only the `strh`.
+ * Measured at 0x08066904. */
 typedef struct SioPort {
     u16 control;                /* +0x00 */
     u16 send;                   /* +0x02 */
@@ -86,7 +95,7 @@ typedef struct SioPort {
 #define SIO_PORT (*(SioPort *)REG_SIOCNT_ADDR)
 
 #define RETRY_LIMIT     3
-#define SIO_ERROR_SHIFT 25          /* bit 6'yi 32 bitin tepesine tasir */
+#define SIO_ERROR_SHIFT 25          /* moves bit 6 to the top of the 32 bits */
 #define SIO_START       0x0080
 #define SIO_SEND_IDLE   0xFEFE
 #define TM3_ON_WITH_IRQ 0x00C0

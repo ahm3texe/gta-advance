@@ -1,21 +1,22 @@
-/* Yuvayi yeniden kurma — 0x0803F69C-0x0803F6D7
+/* Re-arming the slot — 0x0803F69C-0x0803F6D7
  *
- * Ilk nesnenin +0x0C bayraklarinda bir biti kurup baskasini siliyor,
- * isleyici beklenenden farkliysa onu ayarlayip +0x32'yi sifirliyor,
- * degeri +0x2C'ye yaziyor ve +0x81'i sifirliyor.
+ * Sets one bit and clears another in the first object's +0x0C flags; if the
+ * handler differs from the expected one it installs it and zeroes +0x32;
+ * writes the value to +0x2C and clears +0x81.
  *
- * Uc kural birlikte:
- *   - kural 37: ROM hem `slot`u (r3) hem gelen degeri (r4) AYRI
- *     register'a kopyaliyor; ikisi de cagri boyunca degil ama coklu
- *     kullanim boyunca yasiyor
- *   - `__thumb` sonekli sembol: saklanan/karsilastirilan fonksiyon
- *     isaretcisinde bit 0 kurulu olmali (tools/agbcc_build.py)
- *   - kural 35: `pop {r0}; bx r0` -> donus tipi void
+ * Three rules at once:
+ *   - rule 37: the ROM copies both `slot` (r3) and the incoming value (r4)
+ *     into SEPARATE registers; neither lives across a call, but both live
+ *     across multiple uses
+ *   - a symbol with the `__thumb` suffix: bit 0 must be set in a stored or
+ *     compared function pointer (tools/agbcc_build.py)
+ *   - rule 35: `pop {r0}; bx r0` -> a void return type
  *
- * Slot tanimi src/world/init_handler_pack.c ile BIREBIR AYNI olmali.
+ * The Slot definition must be IDENTICAL to the one in
+ * src/world/init_handler_pack.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/rearm_slot.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/rearm_slot.c
  */
 
 #include "gba_types.h"

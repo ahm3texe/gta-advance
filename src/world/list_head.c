@@ -1,10 +1,10 @@
-/* Bagli liste basi ve zincir yardimcilari — 0x08013974-0x080139C9
+/* Linked-list head and chain helpers — 0x08013974-0x080139C9
  *
- * Bir tabloda 8 girisli (32 baytlik) giris arayan, listeyi tarayan ve
- * bir zincirdeki dugumleri isaretleyen uc yaprak.
+ * Three leaf functions: search an eight-entry table (32-byte entries), scan
+ * a list, and mark nodes along a chain.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/list_head.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/list_head.c
  */
 
 #include "gba_types.h"

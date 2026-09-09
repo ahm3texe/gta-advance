@@ -1,30 +1,31 @@
-/* Sirali sayac artirimi + uyari bayragi — 0x08066B40-0x08066C93
+/* Bumping the rank counter + the warning flag — 0x08066B40-0x08066C93
  *
- * bump_rank_counter.c'nin (0x08066C94) ikizi: ayni GetRecordIndex
- * anahtari, ayni "artir, 20'de doyur" kalibi. Fark, bu sayaclarin kayit
- * tamponunun +0x70'indeki tek u32 icinde durmasi ve her sayac icin iki
- * esik sinamasi (19 ve 9) bulunmasi — esiklerden birine denk gelirse
- * gRam02025810[0x137D] uyari bayragi 1 yapiliyor.
+ * The twin of bump_rank_counter.c (0x08066C94): the same GetRecordIndex key,
+ * the same "increment, saturate at 20" pattern.  The difference is that these
+ * counters live inside the single u32 at +0x70 of the record buffer and that
+ * there are two threshold tests (19 and 9) per counter -- if either threshold
+ * is hit, the gRam02025810[0x137D] warning flag is set to 1.
  *
- * Alanlarin bit yerlesimi agbcc'nin urettigi komutu belirliyor:
- *   bit 8-12  -> tek bayt  (ldrb/strb +0x71, maske 0x1F)
- *   bit 13-17 -> tam soz   (ldr/str  +0x70, bayt sinirini asiyor)
- *   bit 18-22 -> tek bayt  (ldrb/strb +0x72, maske 0x7C)
+ * The bit layout of the fields decides which instruction agbcc emits:
+ *   bits 8-12  -> a single byte  (ldrb/strb +0x71, mask 0x1F)
+ *   bits 13-17 -> a full word    (ldr/str  +0x70, crosses the byte boundary)
+ *   bits 18-22 -> a single byte  (ldrb/strb +0x72, mask 0x7C)
  *
- * ARTIRMA/DOYURMA bitfield yaziliyor; ESIK SINAMALARI ise kaydirmasiz
- * maske karsilastirmasi (bkz. ROM: "ands r0,#0x7C / cmp r0,#0x4C").
- * agbcc bitfield esitlik sinamasini maskeye cevirmiyor — alan int'e
- * yukseltildigi icin fold'un optimize_bit_field_compare yolu kapali,
- * `x.f == 19` her zaman lsl/lsr ile ayikliyor. Bu yuzden sinamalar
- * birlesimdeki ham gorunum (bytes[] / word) uzerinden yaziliyor;
- * ikisi ayni adresi gordugu icin agbcc taban adresini de tek yazmacta
- * paylasiyor, ROM'daki gibi.
+ * THE INCREMENT/SATURATION is written as a bitfield; THE THRESHOLD TESTS, on
+ * the other hand, are unshifted mask comparisons (see the ROM:
+ * "ands r0,#0x7C / cmp r0,#0x4C").  agbcc does not turn a bitfield equality
+ * test into a mask -- because the field is promoted to int, fold's
+ * optimize_bit_field_compare path is closed and `x.f == 19` always extracts
+ * with lsl/lsr.  So the tests are written through the union's raw view
+ * (bytes[] / word); since the two see the same address, agbcc shares the base
+ * address in a single register too, just as the ROM does.
  *
- * Doyurma karsilastirmasi ISARETSIZ (ROM: bls). 5 bitlik alan int'e
- * yukseldigi icin duz `> 20` isaretli `ble` uretir; sabit 20U yazildi.
+ * The saturation comparison is UNSIGNED (the ROM has bls).  Because a 5-bit
+ * field promotes to int, a plain `> 20` produces a signed `ble`; the constant
+ * was written as 20U.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_state_step.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_state_step.c
  */
 
 #include "gba_types.h"
@@ -33,7 +34,7 @@
 #define COUNTER_CAP  20
 #define WARN_FLAG    gRam02025810[0x137D]
 
-/* Esikler ham (kaydirilmis) bicimde: 19 ve 9 */
+/* The thresholds in raw (shifted) form: 19 and 9 */
 #define A_MASK       0x1F
 #define A_HIGH       (19 << 0)
 #define A_LOW        ( 9 << 0)

@@ -1,17 +1,17 @@
-/* Etkin yuva icin efekt uretimi — 0x08065130-0x080651DF
+/* Producing the effect for the active slot — 0x08065130-0x080651DF
  *
- * Yuvanin kip bayti 4 ise yalnizca bir sinama yapip bir sayaci ust
- * sinirda tutuyor. Degilse baglama sorgusu calistirip 0x10 bitini
- * bekliyor, sonra bir tetikleme cagrisi yapip 51 numarali girisi
- * uretiyor. Hedef tampon ve kimlik alani yuvanin +0x08 bayrak bitlerine
- * gore iki ayri yerden geliyor.
+ * If the slot's mode byte is 4 it only runs one test and holds a counter at
+ * its upper limit.  Otherwise it runs a binding query, waits for bit 0x10,
+ * then makes a trigger call and produces entry number 51.  The target buffer
+ * and the id field come from two different places according to the slot's
+ * +0x08 flag bits.
  *
- * Kip bayragi DEGISKENE aliniyor (kural 48): ROM `movs r5,#0 / cmp #4 /
- * movs r5,#1 / cmp r5,#0` uretiyor ve ayni degiskeni sonra +0x2C alanina
- * yaziyor.
+ * The mode flag is taken into a VARIABLE (rule 48): the ROM emits
+ * `movs r5,#0 / cmp #4 / movs r5,#1 / cmp r5,#0` and later writes that same
+ * variable into the +0x2C field.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/spawn_slot_effect.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/spawn_slot_effect.c
  */
 
 #include "gba_types.h"
@@ -32,7 +32,7 @@ typedef struct Triple {
 
 typedef struct AltBuffer {
     u8 pad00[0x1F];
-    u8 kind;                    /* +0x1F, alt iki bit kimligi tasiyor */
+    u8 kind;                    /* +0x1F, the low two bits carry the id */
 } AltBuffer;
 
 typedef struct SlotMark {

@@ -1,17 +1,17 @@
-/* Aktorun rota adimini alma — 0x080193C4-0x0801944D (+2 dolgu)
+/* Get an actor's route step — 0x080193C4-0x0801944D (+2 padding)
  *
- * Yuva yoksa 0. Aktorun +0x08'inde 4 kuruluysa kaydin +0xB4'u dogrudan.
- * Degilse kaydin +0x89 adimi 8'den kucukse 0; yoksa SelectSlotCD'nin
- * +0x1C tur baytiyla gRom08342A14'ten rota kumesi indisi alinip
- * gRom08BD3448.slots[..] kumesinden (adim-8). rota secilir (kume sayisini
- * asarsa 0); yuvanin +0xB0 indisi rotanin uzunlugunu asarsa son adim.
+ * Return 0 if there is no slot. If bit 4 at actor +0x08 is set, return record
+ * +0xB4 directly. Otherwise return 0 if step +0x89 is below 8. Use SelectSlotCD's
+ * type byte at +0x1C to look up a route-set index in gRom08342A14, then select
+ * route (step-8) from gRom08BD3448.slots[..]; return 0 if it exceeds the set
+ * count. If slot index +0xB0 exceeds the route length, use the last step.
  *
- * OLCULEN: kume secimi IKI DEYIME bolunmeli (`k = tablo[tur]; slots =
- * kok.slots; set = slots[k]`); tek ifadede yazilinca agbcc kok adresini
- * tablo yuklemesinden once cekiyor ve havuz sirasi ters donuyor.
+ * MEASURED: split set selection into separate statements
+ * (`k = table[type]; slots = root.slots; set = slots[k]`). A single expression
+ * makes agbcc load the root address before the table load, reversing pool order.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_actor_route_entry.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_actor_route_entry.c
  */
 
 #include "gba_types.h"

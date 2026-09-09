@@ -1,11 +1,10 @@
-/* Iki zinciri sonuna kadar yurume — 0x0805151C-0x0805153F
+/* Walk two chains to their ends — 0x0805151C-0x0805153F
  *
- * Iki getiriciden gelen zinciri bos degilse sonuna kadar takip ediyor;
- * sonuc kullanilmiyor. ROM her ikisinde de ONCE bos kontrolu, sonra
- * do/while yapisi kuruyor.
+ * Follow each chain returned by two getters to its end if nonempty; the result
+ * is unused. In both cases the ROM checks for null FIRST, then uses do/while.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/drain_two_chains.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/drain_two_chains.c
  */
 
 #include "gba_types.h"

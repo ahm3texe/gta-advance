@@ -1,47 +1,50 @@
-/* Iki yarim sozun esitligi — 0x08030BE8-0x08030C0B  (36 bayt, BYTE-MATCHING)
+/* Equality of two half words — 0x08030BE8-0x08030C0B  (36 bytes, BYTE-MATCHING)
  *
- * gRam02025810'un +0x04 ve +0x1C yarim sozlerini 0xFFFF ile suzup
- * karsilastiriyor. ROM taban isaretcisini ve maskeyi havuzdan yukluyor,
- * maskeyi `adds r2,r1,#0` ile kopyalayip sol tarafta kullaniyor; sag
- * tarafta maske olu oldugu icin yerinde `ands r1,r0` yapiyor.
+ * Filters the +0x04 and +0x1C half words of gRam02025810 through 0xFFFF and
+ * compares them.  The ROM loads the base pointer and the mask from the pool,
+ * copies the mask with `adds r2,r1,#0` and uses the copy on the left-hand
+ * side; on the right-hand side the mask is dead, so it does `ands r1,r0` in
+ * place.
  *
- * ROM (olculdu):
+ * The ROM (measured):
  *   ldr r0,[pc]   -> 0x02025810      ldr r1,[pc] -> 0x0000ffff
- *   adds r2,r1,#0                    <- maskenin kopyasi (sol taraf temp)
- *   ldrh r3,[r0,#4]  / ands r2,r3    <- sol taraf TAM olarak once
- *   ldrh r0,[r0,#28] / ands r1,r0    <- taban isaretcisi burada oluyor
- *   cmp r2,r1 / beq -> sona konmus `return 1` govdesi (kural 49)
- *   duserek: movs r0,#0 ; b epilog ; havuz ; movs r0,#1 ; bx lr
+ *   adds r2,r1,#0                    <- the mask's copy (the left-hand temp)
+ *   ldrh r3,[r0,#4]  / ands r2,r3    <- the left-hand side comes ENTIRELY first
+ *   ldrh r0,[r0,#28] / ands r1,r0    <- the base pointer dies here
+ *   cmp r2,r1 / beq -> the `return 1` body, moved to the end (rule 49)
+ *   falling through: movs r0,#0 ; b epilogue ; pool ; movs r0,#1 ; bx lr
  *
- * ESLESMEYI SAGLAYAN SEY -- MASKE AYRI BIR YERELDE OLMALI.
- * Alanlar u16 oldugu icin `& 0xFFFF` bir sabit olarak yazilirsa agbcc onu
- * gereksiz sayip siliyor ve cikti 24 bayta iniyor (fark 35). Maske bir
- * yerel degiskene alininca AND'ler ayakta kaliyor ve boyut 36'ya oturuyor.
+ * WHAT MAKES IT MATCH -- THE MASK MUST BE IN A SEPARATE LOCAL.
+ * Because the fields are u16, writing `& 0xFFFF` as a constant lets agbcc
+ * treat it as redundant and delete it, and the output drops to 24 bytes (35
+ * off).  Taken into a local variable, the ANDs survive and the size settles at
+ * 36.
  *
- * IKINCI VE ASIL AYRINTI -- TANIM SIRASI (yeni olculdu):
- * Isaretci ile maskenin ILK TANIM sirasi hem havuz sirasini hem yazmac
- * dagitimini belirliyor. Isaretci once tanimlanmali.
- *   b = ...; mask = 0xFFFF;   -> r0=taban, r1=maske, havuz [0x02025810,
- *                                0x0000ffff]  => fark 0
- *   mask = 0xFFFF; b = ...;   -> r0=maske, r2=taban, havuz TERS
- *                                (0x0000ffff once) => fark 15
- * Yani onceki turdaki "36 bayt / 15 fark" sonucu yanlis bir yazim degil,
- * yalnizca ters tanim siralamasiydi. Iki satirin yerini degistirmek
- * 15 farki 0'a indirdi.
+ * THE SECOND AND REAL DETAIL -- THE ORDER OF DEFINITION (newly measured):
+ * The order in which the pointer and the mask are FIRST DEFINED decides both
+ * the pool order and the register allocation.  The pointer must be defined
+ * first.
+ *   b = ...; mask = 0xFFFF;   -> r0=base, r1=mask, pool [0x02025810,
+ *                                0x0000ffff]  => 0 off
+ *   mask = 0xFFFF; b = ...;   -> r0=mask, r2=base, the pool REVERSED
+ *                                (0x0000ffff first) => 15 off
+ * So the earlier round's "36 bytes / 15 off" was not a wrong spelling, only a
+ * reversed definition order.  Swapping the two lines took 15 off to 0.
  *
- * DENENIP ELENEN YAZIMLAR:
- *  - `b->first & 0xFFFF` (sabit dogrudan): 24 bayt, fark 35. Maske atiliyor.
- *  - Alanlari u32 yapmak: 24 bayt; maske yine atildi, ustelik ldrh yerine
- *    ldr cikti.
- *  - Iki ayri maske yereli (m1, m2): 36 bayt / 17 fark. ROM tek maske
- *    yerelinden kopya uretiyor, iki ayri yerelden degil.
- *  - `mask` once tanimlanmis her yazim (bildirim sirasi da, atama sirasi
- *    da): 36 bayt / 15 fark. Tekrar denemeyin.
- * NOT: maskenin tipi u32 veya u16 olmasi fark etmiyor -- her ikisi de
- * fark 0 veriyor (olculdu). u32 birakildi.
+ * SPELLINGS TRIED AND REJECTED:
+ *  - `b->first & 0xFFFF` (the constant directly): 24 bytes, 35 off.  The mask
+ *    is dropped.
+ *  - Making the fields u32: 24 bytes; the mask was dropped again, and ldr came
+ *    out instead of ldrh.
+ *  - Two separate mask locals (m1, m2): 36 bytes / 17 off.  The ROM produces a
+ *    copy from a single mask local, not from two separate ones.
+ *  - Every spelling with `mask` defined first (both declaration order and
+ *    assignment order): 36 bytes / 15 off.  Do not try it again.
+ * NOTE: whether the mask's type is u32 or u16 makes no difference -- both give
+ * 0 off (measured).  u32 was kept.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/halves_equal.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/halves_equal.c
  */
 
 #include "gba_types.h"
@@ -62,10 +65,10 @@ u32 HalvesEqual(void)
     Block *b;
     u32 mask;
 
-    /* gRam02025810 paylasilan ham depolama (include/ram_symbols.h);
-       her ceviri birimi kendi gorunumune YERELDE cast eder. */
+    /* gRam02025810 is shared raw storage (include/ram_symbols.h);
+       each translation unit casts to its own view LOCALLY. */
     b = (Block *)gRam02025810;
-    mask = HALF_MASK;           /* SIRA ONEMLI: isaretciden SONRA */
+    mask = HALF_MASK;           /* THE ORDER MATTERS: AFTER the pointer */
     if ((b->first & mask) == (b->second & mask))
         return 1;
     return 0;

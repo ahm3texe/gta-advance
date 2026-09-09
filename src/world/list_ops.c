@@ -1,13 +1,12 @@
-/* Cift bagli listeye ekleme/cikarma — 0x0800DBE8-0x0800DC3F
+/* Doubly linked list insertion/removal — 0x0800DBE8-0x0800DC3F
  *
- * Dugumler baska bir struct'in icindeki alanlar: +20 next, +24 prev.
- * Bas isaretcisi 0x02016280'de.
+ * Nodes are fields within another structure: +20 next, +24 prev. The head
+ * pointer is at 0x02016280.
  *
- * src/core/linked_list.c'deki desenin varyanti: burada sayaс yok ve
- * push-front (basa ekle) kullaniyor.
+ * A variant of src/core/linked_list.c with no counter and push-front insertion.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/list_ops.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/list_ops.c
  */
 
 #include "gba_types.h"

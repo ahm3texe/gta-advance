@@ -1,39 +1,42 @@
-/* Gorev zamanlayicisi adimi — 0x080507F4-0x08050915 (290 bayt)
+/* One step of the mission timer — 0x080507F4-0x08050915 (290 bytes)
  *
- * DURUM: 129/138 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 129/138 instructions, A NEAR MISS (does not match).  The size is
+ * right.
  *
- * gRam02030330 blogu: +0x34 kuruluysa +0x38 sayaci artar; oyuncu 1
- * nesnesi FUN_0805b94c'ye gore gRam02030370 = 60 ya da geri sayilir;
- * +0x3C/+0x3E ve +0x3D/+0x3F cift sayaclari (ust bayt 128'den geri
- * sayip alttakini azaltir); +0x1C pozitifse gFrameDelay kadar azalir;
- * +0x2C sifir ve +0x10 == 1 ise +0x18 geri sayimi bitince +0x10 = 0,
- * FUN_0802a5b4(0,1), +0x18 = 1200, +0x10 <= 0 ise FUN_0805063c;
- * durum (+0x08) 1: (+0x04 sifirsa GetActiveSlotValue) FUN_080501c8,
- * 2: FUN_0805063c, 3: +0 = 0, +8 = 1, +0xC = 25, +0x28 = 2, +0x30 = 0.
+ * The gRam02030330 block: if +0x34 is set the +0x38 counter increments;
+ * according to FUN_0805b94c on the player 1 object, gRam02030370 is either set
+ * to 60 or counted down; the +0x3C/+0x3E and +0x3D/+0x3F counter pairs (the
+ * high byte counts down from 128 and decrements the low one); if +0x1C is
+ * positive it decreases by gFrameDelay; if +0x2C is zero and +0x10 == 1, then
+ * when the +0x18 countdown finishes +0x10 = 0, FUN_0802a5b4(0,1), +0x18 = 1200,
+ * and if +0x10 <= 0, FUN_0805063c; state (+0x08) 1: (GetActiveSlotValue when
+ * +0x04 is zero) FUN_080501c8, 2: FUN_0805063c, 3: +0 = 0, +8 = 1, +0xC = 25,
+ * +0x28 = 2, +0x30 = 0.
  *
- * OLCULEN: blok bir yerel isaretciyle DEGIL dogrudan global uyeleriyle
- * yazilmali (ROM adresi uc kez havuzdan yeniden yukluyor: 85 -> 115);
- * switch'e `case 0: break;` eklenmeli -- agac koku 2'den 1'e iniyor ve
- * `bcc default` cikiyor (115 -> 129). gFrameDelay `(*(u32*)0x03000000)`.
+ * MEASURED: the block must be written through the global's members directly,
+ * NOT through a local pointer (the ROM reloads the address from the pool three
+ * times: 85 -> 115); `case 0: break;` must be added to the switch -- the tree
+ * root drops from 2 to 1 and `bcc default` comes out (115 -> 129).
+ * gFrameDelay is `(*(u32*)0x03000000)`.
  *
- * KALAN 9 KOMUT: switch icin taban adresinin callee-saved r4'te tutulmasi
- * (bende r2) ve case 3'te `2` sabitinin sifirdan once r3'e alinmasi.
- * Denenen: yerel `state`, atama sirasi, sabit yerelleri, zincir atama --
- * hepsi 9-10. Kural 44 sinifi.
+ * THE REMAINING 9 INSTRUCTIONS: the switch's base address being kept in the
+ * callee-saved r4 (r2 here), and the constant `2` in case 3 being taken into
+ * r3 before the zero.  Tried: a local `state`, the assignment order, constant
+ * locals, chained assignment -- all 9-10.  A rule 44 class.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/step_mission_timer.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/step_mission_timer.c
  */
 
 #include "gba_types.h"
-/* gRam02030330 sekiz eslesen dosyada Anchor olarak bildirili (tutarlilik
- * kapisi); +0x3C..+0x3F baytlari govde disinda kaldigi icin bayt
- * uzakligiyla okunuyor. */
+/* gRam02030330 is declared as Anchor in eight matching files (the consistency
+ * gate); because bytes +0x3C..+0x3F fall outside that body, they are read at a
+ * byte offset. */
 typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

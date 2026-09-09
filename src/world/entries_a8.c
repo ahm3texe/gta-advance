@@ -1,4 +1,4 @@
-/* TASLAK -- gRam020242B0 tablosuna yeni giris kurma -- 0x08028894-0x080289AB */
+/* DRAFT — create an entry in gRam020242B0 — 0x08028894-0x080289AB */
 
 #include "gba_types.h"
 

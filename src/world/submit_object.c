@@ -1,14 +1,14 @@
-/* Nesne gonderme — 0x08038234-0x0803824B
+/* Submit an object — 0x08038234-0x0803824B
  *
- * FUN_08038608'in donusunu sabit 1 ve cagri argumaniyla FUN_08036cac'a
- * veriyor. Epilog `pop {r1}; bx r1` oldugu icin fonksiyon DEGER
- * DONDURUYOR: r0 canli kaliyor.
+ * Pass FUN_08038608's result, constant 1 and the caller's argument to
+ * FUN_08036cac. The epilogue pop {r1}; bx r1 leaves r0 live, so this
+ * function RETURNS A VALUE.
  *
- * Kardesleri src/world/object_query.c (henuz eslesmiyor) ve
- * src/world/object_value.c icinde.
+ * Siblings: object_query.c (non-matching when this note was written) and
+ * object_value.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/submit_object.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/submit_object.c
  */
 
 #include "gba_types.h"

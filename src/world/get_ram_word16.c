@@ -1,12 +1,12 @@
-/* RamBlock +0x16 getirici — 0x08062654-0x0806265F
+/* RamBlock +0x16 getter — 0x08062654-0x0806265F
  *
- * RamBlock tanimi src/world/ram_state.c ile BIREBIR AYNI tutulmali;
- * ayni sembole celiskili govde `make check`i kirar (TYPES-001).
+ * Keep RamBlock IDENTICAL to src/world/ram_state.c; conflicting definitions
+ * for the same symbol fail make check (TYPES-001).
  *
- * tools/find_accessors.py ile bulundu.
+ * Found with tools/find_accessors.py.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_ram_word16.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_ram_word16.c
  */
 
 #include "gba_types.h"

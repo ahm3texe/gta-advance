@@ -1,18 +1,19 @@
-/* Aktor kaymasini yon ekseninde izdusurme — 0x08023868-0x08023923
+/* Projecting the actor offset onto the facing axis — 0x08023868-0x08023923
  *
- * Kaydin +0x8A baytinin 4-5. bitleri (bitfield) cerek; govdenin +0x68/+0x6C
- * kaymalari 280/256 ile olceklenir; basligin +0x0E acisi ile
- * gRom08CA30D8 sinus tablosundan (aci+256 ve aci) iki deger alinir; cerek
- * 2 ise x kaymasi ters cevrilir ve tur 54 icin y'ye 0x100000 eklenir.
- * Cikis: govde konumu + dondurulmus kayma (8.8 carpimlar).
+ * Bits 4-5 of the record's +0x8A byte (a bitfield) are the quadrant; the
+ * body's +0x68/+0x6C offsets are scaled by 280/256; two values are taken from
+ * the gRom08CA30D8 sine table (at angle+256 and at angle) using the header's
+ * +0x0E angle; for quadrant 2 the x offset is negated, and for kind 54
+ * 0x100000 is added to y.  Result: body position + rotated offset (8.8
+ * multiplications).
  *
- * IKI OLCUM: tablo adresi once AYRI YERELE alinmali (ROM r3'e ilk indis
- * hesabindan once yukluyor); carpimlardaki >>8 kaydirmalar SATIR ICI
- * yazilmali -- ayri yerellere alininca kaydirmalarin sirasi carpimdan once
- * kayiyor (94/97).
+ * TWO MEASUREMENTS: the table address must be taken into a SEPARATE LOCAL
+ * first (the ROM loads it into r3 before the first index computation); the
+ * >>8 shifts in the multiplications must be written INLINE -- taken into
+ * separate locals, the shifts move ahead of the multiplication (94/97).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/project_actor_offset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/project_actor_offset.c
  */
 
 #include "gba_types.h"

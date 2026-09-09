@@ -1,65 +1,65 @@
-/* band_a.c'den AYRILDI: proje bolge modeli dosya basina TEK BITISIK
- * ROM araligi istiyor. Bu fonksiyonlar ROM'da dagitik oldugu icin ayni
- * dosyada tutulamazlar (add_c_region "bolge eslesmiyor" der). Ayrica
- * agbcc_build.py cevirim birimini min(adres)e linkledigi icin dis cagri
- * iceren fonksiyonlar yanlis adreste kalirdi.
+/* SPLIT OFF from band_a.c: the project's region model wants ONE CONTIGUOUS
+ * ROM range per file.  Because these functions are scattered in the ROM they
+ * cannot be kept in one file (add_c_region would say "region mismatch").
+ * Besides, since agbcc_build.py links the translation unit at min(address),
+ * functions containing external calls would end up at the wrong address.
  */
 
-/* Band A -- 0x080308EC .. 0x08031BF4 arasindan dokuz kucuk fonksiyon.
+/* Band A -- nine small functions from between 0x080308EC and 0x08031BF4.
  *
- * DOSYA ICINDE ALTI FONKSIYON VAR, DOKUZ DEGIL. Uc tanesi data/ram_map.csv'de
- * bulunmayan sembolleri, biri de gRam02025810 blogunu istiyor; gerekcesi
- * asagida her birinin yerinde yaziyor. Eksik sembollu bir govde yazmak
- * agbcc_build.py'yi sys.exit ettirip DOSYANIN TAMAMINI dogrulanamaz
- * yapardi, o yuzden yalnizca not birakildi.
+ * THE FILE HOLDS SIX FUNCTIONS, NOT NINE.  Three of them want symbols that are
+ * not in data/ram_map.csv and a fourth wants the gRam02025810 block; the
+ * reason is written in place for each of them below.  Writing a body with a
+ * missing symbol would make agbcc_build.py sys.exit and render THE WHOLE FILE
+ * unverifiable, so only a note was left.
  *
  * ---------------------------------------------------------------------
- * TEK DOSYA / DAGINIK ADRESLER: `bl` OFSETLERI HAKKINDA
+ * ONE FILE / SCATTERED ADDRESSES: ABOUT THE `bl` OFFSETS
  * ---------------------------------------------------------------------
- * agbcc_build.py ceviri biriminin TAMAMINI, iceride tanimli fonksiyonlarin
- * EN KUCUK ROM adresine linkliyor (`base = min(...)`) ve fonksiyonlari
- * kaynak sirasinda arka arkaya diziyor. Bu dosyadaki fonksiyonlar ROM'da
- * bitisik DEGIL (aralarinda baska fonksiyonlar var), dolayisiyla
- * ilkinden sonrakiler yanlis adrese dusuyor. Fonksiyon govdesi ROM ile
- * birebir olsa bile, iceride `bl` varsa bagil ofset kayiyor ve
- * `make c-match` o fonksiyonu "farkli" gosteriyor.
+ * agbcc_build.py links THE ENTIRE translation unit at the SMALLEST ROM address
+ * among the functions defined in it (`base = min(...)`) and lays the functions
+ * out back to back in source order.  The functions in this file are NOT
+ * contiguous in the ROM (there are other functions between them), so every one
+ * after the first lands at the wrong address.  Even when a function body is
+ * identical to the ROM's, any `bl` inside it has a shifted relative offset and
+ * `make c-match` reports that function as "different".
  *
- * Bu yuzden `bl` iceren iki fonksiyon TEK BASINA da olculdu (gecici bir
- * dosyada, kendi ROM adresine linklenerek):
- *     FUN_080315f8  -> tek basina BYTE-MATCHING (30/30)
- *     FUN_08031bf4  -> tek basina BYTE-MATCHING (28/28)
- * Bu dosyada ikisi de yalnizca 4'er bayt fark gosteriyor ve farkli olan
- * baytlarin hepsi `bl` komutlarinin bagil ofset alanlari; komut dizisi,
- * yazmac dagitimi ve sabitler ROM ile ayni (diff_function.py ile
- * dogrulandi). FUN_08030b50 en kucuk adresli fonksiyon oldugu icin
- * kaynakta BASA konuldu; boylece o base'e dusuyor ve `bl`leri dogru
- * kodlaniyor.
+ * So the two functions containing a `bl` were also measured ON THEIR OWN (in a
+ * temporary file, linked at their own ROM address):
+ *     FUN_080315f8  -> BYTE-MATCHING on its own (30/30)
+ *     FUN_08031bf4  -> BYTE-MATCHING on its own (28/28)
+ * In this file both show a difference of just 4 bytes, and every differing
+ * byte is part of a `bl` instruction's relative offset field; the instruction
+ * sequence, the register allocation and the constants are the same as the
+ * ROM's (verified with diff_function.py).  Because FUN_08030b50 has the
+ * smallest address it was put FIRST in the source; that way it lands on the
+ * base and its `bl`s are encoded correctly.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_a.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_a.c
  */
 
 #include "gba_types.h"
 
 
-/* --- 0x020307F0 hucre izgarasi (src/core/mark_area_cells.c ile ayni) ---- */
+/* --- the 0x020307F0 cell grid (the same as in src/core/mark_area_cells.c) - */
 typedef struct CellGrid {
     s32 originY;                /* 0x00 */
     s32 originX;                /* 0x04 */
-    u8  cells[1];               /* 0x08 -- satir adimi 0x10 */
+    u8  cells[1];               /* 0x08 -- row stride 0x10 */
 } CellGrid;
 
 extern CellGrid gRam020307F0;
 
-/* --- gRam02025810 +0x4C'deki 24 x 180 baytlik yuva dizisinin ogesi
+/* --- an element of the 24 x 180-byte slot array at gRam02025810 +0x4C
  *     (src/world/release_slot.c) ---------------------------------------- */
 typedef struct Held {
     u8  pad00[12];
     u32 flags;                  /* +0x0C */
 } Held;
 
-/* Sabit noktali konum: her iki eksen de 22 bit kaydirilarak hucreye
- * cevriliyor (bkz. FUN_08031534). */
+/* A fixed-point position: both axes are shifted right by 22 bits to become a
+ * cell (see FUN_08031534). */
 typedef struct Position {
     s32 x;                      /* 0x00 */
     s32 y;                      /* 0x04 */
@@ -72,25 +72,28 @@ extern u32  ReleaseSlot(u32 index);
 extern u8  *FUN_0806de10(u8 *dest, const u8 *src, u32 size);
 
 /* ======================================================================= */
-/* 0x080317F0 -- 84 bayt -- BYTE-MATCHING
+/* 0x080317F0 -- 84 bytes -- BYTE-MATCHING
  *
- * 8 bit/piksel bir kaynagi 4 bit/piksel karo satirlarina paketliyor: her
- * turda kaynaktan sekiz bayt okuyup iki yarim soz yaziyor, sonra kaynagi
- * 40 bayt ilerletiyor (satir adimi 48, 48 tur, hedefe 192 bayt).
+ * Packs an 8-bits-per-pixel source into 4-bits-per-pixel tile rows: on each
+ * round it reads eight bytes from the source and writes two half words, then
+ * advances the source by 40 bytes (row stride 48, 48 rounds, 192 bytes to the
+ * destination).
  *
- * IKI OLCULEN AYRINTI:
- *  - ROM'da sekizinci `*src++` artirimi GORUNMUYOR, onun yerine sondaki
- *    `adds r4,#41` var. Sebep: kaynaktaki sekizinci `src++` ile
- *    `src += 40` birlesiyor. Yani stride 48 = 8 okuma + 40 atlama;
- *    kaynakta asimetrik bir yazim (yedi `*src++` + bir `*src`) YOK.
- *  - Yazmac dagitimi ancak IKI AYRI GECICI KUMESI ile ROM'unki oluyor
- *    (kural 54). Tek kume (p0..p3'u iki blokta da kullanmak) src'yi
- *    r2'ye, biriktiriciyi r1'e dusuruyordu: 31/42 komut farkli.
- *    Ayrica denenip elenen: `for (i = 0; i < 48; i++)` bicimi (35 bayt
- *    fark; artan sayac maskeleme ve ters dongu testi uretiyor).
+ * TWO MEASURED DETAILS:
+ *  - The eighth `*src++` increment DOES NOT APPEAR in the ROM; there is an
+ *    `adds r4,#41` at the end instead.  The reason: the eighth `src++` in the
+ *    source merges with `src += 40`.  So the stride 48 = 8 reads + a 40-byte
+ *    skip; there is NO asymmetric spelling (seven `*src++` + one `*src`) in
+ *    the source.
+ *  - The register allocation only becomes the ROM's with TWO SEPARATE SETS OF
+ *    TEMPORARIES (rule 54).  A single set (using p0..p3 in both blocks) put
+ *    src in r2 and the accumulator in r1: 31/42 instructions different.
+ *    Also tried and rejected: the `for (i = 0; i < 48; i++)` form (35 bytes
+ *    off; an ascending counter produces masking and a reversed loop test).
  *
- * Ilk bes parametre kullanilmiyor; kaynak ve hedef isaretcileri yigindan
- * (sp+20 / sp+24) okundugu icin imzada YEDI parametre olmak zorunda. */
+ * The first five parameters are unused; because the source and destination
+ * pointers are read from the stack (sp+20 / sp+24), the signature must have
+ * SEVEN parameters. */
 void FUN_080317f0(u32 a, u32 b, u32 c, u32 d, u32 e, u16 *dst, const u8 *src)
 {
     s32 i;
@@ -118,6 +121,7 @@ void FUN_080317f0(u32 a, u32 b, u32 c, u32 d, u32 e, u16 *dst, const u8 *src)
 
 
 /* ======================================================================= */
-/* YAZILMAYAN DORT FONKSIYON -- gerekcesi ve ROM'dan cikarilan yapisi
+/* THE FOUR FUNCTIONS NOT WRITTEN -- the reason and the structure read from
+ * the ROM
  * ======================================================================= */
 

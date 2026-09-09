@@ -1,14 +1,14 @@
-/* Iletme sarmalayicisi — 0x08014FA0-0x08014FAB
+/* Forwarding wrapper — 0x08014FA0-0x08014FAB
  *
- * Govdesi yalnizca FUN_08014fac cagrisi. Ne yaptigi BILINMIYOR, bu yuzden ad
- * degistirilmedi: sahte semantik uydurmaktansa FUN_ adi korunuyor.
+ * The body only calls FUN_08014fac. Its purpose is UNKNOWN, so the
+ * FUN_ name is retained rather than inventing unsupported semantics.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
- * Argumanlar r0-r3'te zaten hazir oldugu icin sarmalayici onlara dokunmaz;
- * imza arguman almadan yazilsa da ayni baytlar cikar.
+ * Rule 35: `pop {r0}; bx r0` indicates a void return type.
+ * Arguments are already in r0-r3, so the wrapper does not touch them;
+ * declaring it without arguments would still produce the same bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/wrap_08014fa0.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/wrap_08014fa0.c
  */
 
 #include "gba_types.h"

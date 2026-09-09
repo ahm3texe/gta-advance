@@ -1,12 +1,11 @@
-/* Yuva isareti, deger araligi ve ROM bayt tablosu — 0x08065518-0x08065573
+/* Slot marker, value range and ROM byte table — 0x08065518-0x08065573
  *
- * Ucu de A yuvasi cevresinde donuyor.  Birincisi varligin sahibini bulup
- * yuvanin +0x25 isaretini yaziyor, ikincisi A yuvasindaki +0x4C degerinin
- * ust yarim kelimesinin verilen aralikta olup olmadigini soyluyor,
- * ucuncusu 0x08F72620 ROM tablosundan tek bayt okuyor.
+ * Three functions around slot A. The first finds an entity's owner and writes
+ * slot +0x25. The second checks whether the high halfword at A +0x4C lies in
+ * the supplied range. The third reads one byte from ROM table 0x08F72620.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_range_query.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_range_query.c
  */
 
 #include "gba_types.h"
@@ -17,7 +16,7 @@ typedef struct PlayerSlot {
     u8  pad00[0x25];
     u8  marked;                 /* +0x25 */
     u8  pad26[0x4c - 0x26];
-    u32 packed;                 /* +0x4C: ust yarim kelime konum degeri */
+    u32 packed;                 /* +0x4C: high halfword holds a position value */
 } PlayerSlot;
 
 typedef struct Actor {
@@ -46,11 +45,11 @@ s32 IsSlotValueInRange(s32 unused, u16 low, u16 high)
 {
     PlayerSlot *slot;
 
-    /* Erken cikisli zincir SART (kural 51): tek `&&` ifadesiyle yazilinca
-     * low ve high pseudo'lari ayni omru (13) ve ayni onceligi paylasip
-     * yazmaclari allocno sirasina gore aliyor ve r4/r5 ters dusuyor.
-     * Bu bicim low'un omrunu 14'e cikarip onceligini dusuruyor, boylece
-     * high once dagitiliyor ve ROM gibi r4'u aliyor. */
+    /* Early-exit chain REQUIRED (rule 51). A single && gives low and high the
+ * same lifetime (13) and priority, so allocno order swaps r4/r5. This form
+ * extends low's lifetime to 14 and lowers its priority: high is allocated
+ * first and receives r4, as in the ROM.
+ */
     slot = (PlayerSlot *)SelectSlotAB(SELECT_A);
     if (slot == 0)
         return 0;

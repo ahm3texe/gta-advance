@@ -1,14 +1,14 @@
-/* Uc bayragi sifirlama — 0x0803376C-0x0803378F
+/* Clear three flags — 0x0803376C-0x0803378F
  *
- * gCartFlag baytini, sonra 0x02027320 ve 0x02027310'daki sozleri sifirliyor.
+ * Clear gCartFlag, then the words at 0x02027320 and 0x02027310.
  *
- * ROM IKI ADRESI DE ONCE YUKLUYOR (ldr r2, ldr r1), sonra ters sirada
- * yaziyor. Tek tek yazmak her adresi kendi store'undan hemen once
- * yukletiyordu (10 bayt fark). Ayri taban yerelleri (kural 37) hem yukleme
- * sirasini hem havuz sirasini (0x02027310 once) uretiyor.
+ * The ROM loads BOTH ADDRESSES FIRST (ldr r2, ldr r1), then writes in reverse
+ * order. Separate writes loaded each address immediately before its store
+ * (10-byte difference). Separate base locals (rule 37) reproduce both load
+ * order and pool order (0x02027310 first).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/zero_three_flags.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/zero_three_flags.c
  */
 
 #include "gba_types.h"

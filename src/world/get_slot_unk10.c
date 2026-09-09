@@ -1,17 +1,16 @@
-/* Anchor erisim ve ilerletme — 0x08050994-0x080509C3
+/* Anchor access and advancement — 0x08050994-0x080509C3
  *
- * gRam02030330.base alanini dondurur; 0x080509DC'deki GetBase ile AYNI
- * alani okuyan ikinci bir erisimci (bu depoda GetPoolA..D gibi ozdes
- * kardes getiriciler yaygin).
+ * Return gRam02030330.base, the SAME field read by GetBase at 0x080509DC.
+ * Identical sibling getters such as GetPoolA..D are common in this repository.
  *
- * Anchor tanimi src/world/gRam02030330_gets.c ile birebir ayni tutulmali;
- * ayni sembole celiskili extern turu vermek `make check`i kirar (TYPES-001).
+ * Keep Anchor identical to gRam02030330_gets.c; conflicting extern types for
+ * the same symbol fail make check (TYPES-001).
  *
- * NEDEN AYRI DOSYA: kardeslerinin yanina eklemek ortak literal havuzunu
- * kaydirip zaten eslesen fonksiyonlari bozuyor (bkz. src/world/pool_first.c).
+ * SEPARATE FILE: adding this beside its siblings moves the shared literal
+ * pool and breaks existing matches (see src/world/pool_first.c).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_slot_unk10.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_slot_unk10.c
  */
 
 #include "gba_types.h"
@@ -20,7 +19,7 @@ typedef struct Anchor {
     u32 unk00;                  /* +0x00 */
     u32 unk04;                  /* +0x04 */
     u32 unk08;                  /* +0x08 */
-    u32 unk0C;                  /* +0x0C = boyut */
+    u32 unk0C;                  /* +0x0C = size */
     u32 base;                   /* +0x10 */
     u32 unk14;                  /* +0x14 */
     u32 unk18;                  /* +0x18 */

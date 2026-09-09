@@ -1,10 +1,10 @@
-/* Ek istatistik sayaclari (3) — 0x080673C4-0x080673F5
+/* Additional statistics counters (3) — 0x080673C4-0x080673F5
  *
- * gSaveBuffer'in +0x70 ve +0x80 alanlarina u8 tasma korumali artirim.
- * src/world/more_counters_2.c'deki BumpCount84 deseninin aynisi.
+ * Overflow-protected u8 increments at gSaveBuffer +0x70 and +0x80.
+ * Same pattern as BumpCount84 in src/world/more_counters_2.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/more_counters_3.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/more_counters_3.c
  */
 
 #include "gba_types.h"

@@ -1,13 +1,13 @@
-/* gSaveBuffer +0x66 doyuran sayac — 0x0806720C-0x08067227
+/* Saturating counter at gSaveBuffer +0x66 — 0x0806720C-0x08067227
  *
- * u16 sayaci artiriyor; sonuc sarip sifir olursa ESKI degeri geri yaziyor,
- * yani 0xFFFF'te doyuyor. ROM tasmayi `lsls r0,r0,#16` ile dusuk 16 biti
- * sinayarak olcuyor.
+ * Increment the u16 counter; if it wraps to zero, restore the OLD value,
+ * saturating at 0xFFFF. The ROM tests overflow by checking the low 16 bits
+ * with `lsls r0,r0,#16`.
  *
- * SaveBuffer tanimi src/world/copy_flag_byte.c ile BIREBIR AYNI tutulmali.
+ * Keep SaveBuffer IDENTICAL to its definition in src/world/copy_flag_byte.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bump_save_counter.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bump_save_counter.c
  */
 
 #include "gba_types.h"

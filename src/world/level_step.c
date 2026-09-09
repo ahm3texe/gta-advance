@@ -1,39 +1,41 @@
-/* Varlik turune gore isleyici + tanim tablosu secimi — 0x0801528C-0x080154D7
+/* Selecting the handler + definition table by entity kind — 0x0801528C-0x080154D7
  *
- * Iki parametre aliyor: bir varlik kaydi (r0) ve tur numarasi (r1).
- * Tur 0..27 araliginda ise 28 girisli atlama tablosuyla dallaniyor;
- * her dal kaydin +0x34 alanina bir isleyici fonksiyon isaretcisi,
- * ortak kuyruk ise +0x38 alanina ROM'daki tanim blogunun adresini
- * yaziyor.  Tanim blogu bos degilse ilk halfword'u +0x04'e kopyalaniyor
- * (tanimin ilk alani muhtemelen grafik/kimlik numarasi).
+ * Takes two parameters: an entity record (r0) and a kind number (r1).  If the
+ * kind is in the range 0..27 it branches through a 28-entry jump table; each
+ * branch writes a handler function pointer into the record's +0x34 field,
+ * while the shared tail writes the address of the definition block in the ROM
+ * into +0x38.  If the definition block is not null, its first halfword is
+ * copied to +0x04 (the definition's first field is probably a graphic or id
+ * number).
  *
- * Turlerin cogu (2..26) ayni isleyiciyi (FUN_08018b74) paylasiyor ve
- * yalnizca tanim blogu adresiyle ayriliyor — bloklar 0x08CA45CC'den
- * baslayan bir ROM tablosunda 0x54 bayt araliklarla duruyor.
- * Tur 0 ve 1 ozel isleyicilere gidiyor; tur 27 ve aralik disi degerler
- * ortak "bos" isleyiciye (FinishActorState) ve NULL tanima dusuyor.
+ * Most kinds (2..26) share the same handler (FUN_08018b74) and differ only in
+ * the definition block address -- the blocks sit at 0x54-byte intervals in a
+ * ROM table starting at 0x08CA45CC.  Kinds 0 and 1 go to special handlers;
+ * kind 27 and out-of-range values fall to the shared "empty" handler
+ * (FinishActorState) and a NULL definition.
  *
- * ROM'daki blok sirasi kaynak sirasini birebir yansitiyor: 0..25,
- * sonra `case 27` + `default` ortak blogu, en sonda `case 26`.
- * Bu yuzden `default` switch'in ORTASINDA yazildi — sona alinirsa
- * blok sirasi kayiyor.
+ * The block order in the ROM mirrors the source order exactly: 0..25, then the
+ * shared `case 27` + `default` block, and `case 26` last.  That is why
+ * `default` is written in the MIDDLE of the switch -- moved to the end, the
+ * block order shifts.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/big_a4.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/big_a4.c
  */
 
 #include "gba_types.h"
 
-/* Saklanan fonksiyon isaretcilerinde THUMB BITI kurulu olmali; `__thumb`
-   sonekli sembol adresi | 1 olarak cozumlenir (tools/agbcc_build.py). */
+/* The THUMB BIT must be set in stored function pointers; the `__thumb`
+   the suffixed symbol's address resolves as | 1 (tools/agbcc_build.py). */
 extern u8 FUN_08017628__thumb[];
 extern u8 FUN_080172a0__thumb[];
 extern u8 FUN_08018b74__thumb[];
 extern u8 FinishActorState__thumb[];
 
-/* Tanim bloklari salt-okunur ROM verisi; her biri tek basina kullaniliyor,
-   taban + ofset katlanmasi soz konusu degil (kural 1'in gerekcesi yok).
-   data/ altina sembol EKLEME yetkim olmadigi icin sabit cast yazildilar. */
+/* The definition blocks are read-only ROM data; each is used on its own, so
+   there is no base + offset folding (rule 1's rationale does not apply).
+   Since I am not authorised to ADD symbols under data/, they are written as
+   constant casts. */
 #define DEF(addr) ((const u16 *)(addr))
 
 #define DEF_00  DEF(0x08CA45CC)
@@ -65,7 +67,7 @@ extern u8 FinishActorState__thumb[];
 
 typedef struct Entity {
     u8         pad00[4];
-    u16        unk04;           /* +0x04 tanimin ilk halfword'u */
+    u16        unk04;           /* +0x04 the definition's first halfword */
     u8         pad06[0x2E];
     void      *handler;         /* +0x34 */
     const u16 *def;             /* +0x38 */
@@ -194,9 +196,9 @@ void SelectEntityHandler(Entity *entity, u32 kind)
         break;
     }
 
-    /* ROM alani yazdiktan SONRA yeniden okuyor (str, ldr, cmp). Kural 39:
-       volatile yalnizca bu okumaya uygulaniyor; alanin tamamini volatile
-       yapmak 28 dalin store'unu da etkilerdi. */
+    /* The ROM re-reads the field AFTER writing it (str, ldr, cmp).  Rule 39:
+       volatile is applied only to this read; making the whole field volatile
+       would have affected the stores of all 28 branches as well. */
     entity->def = def;
     cur = *(const u16 *volatile *)&entity->def;
     if (cur != 0)

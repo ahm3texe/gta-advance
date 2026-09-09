@@ -1,12 +1,12 @@
-/* Iletme sarmalayicisi — 0x08051464-0x0805146D
+/* Forwarding wrapper — 0x08051464-0x0805146D
  *
- * Govdesi yalnizca FUN_080504b4 cagrisi. Ne yaptigi bilinmedigi icin ad
- * degistirilmedi. tools/find_wrappers.py ile bulundu.
+ * The body only calls FUN_080504b4. Its purpose is unknown, so its name
+ * is unchanged. Found with tools/find_wrappers.py.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 35: `pop {r0}; bx r0` indicates a void return type.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/wrap_08051464.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/wrap_08051464.c
  */
 
 #include "gba_types.h"

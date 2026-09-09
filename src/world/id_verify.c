@@ -1,12 +1,11 @@
-/* Kimlik dogrulama ve tetikleme — 0x080336EC-0x0803376B
+/* Verify an ID and trigger — 0x080336EC-0x0803376B
  *
- * `id` bir kompozit deger: yuksek bayt = tablo indeksi, dusuk 24 bit =
- * ROM offset. Tablo girdisinin +0 alani, `0x08000000 | offset` olmali.
- * Ilk fonksiyon "kimlik dogru mu" testi (bool), ikincisi eslesirse
- * FUN_08032A54 tetikliyor.
+ * id is composite: high byte = table index, low 24 bits = ROM offset.
+ * The table entry's +0 field must equal 0x08000000 | offset. The first
+ * function tests validity (bool); the second triggers FUN_08032A54 on a match.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/id_verify.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/id_verify.c
  */
 
 #include "gba_types.h"

@@ -4,7 +4,7 @@
 #include "phase1_types.h"
 #include "ram_symbols.h"
 
-extern Ctx *gRam02000F08;   /* band_0803afbc.c ile ayni gorunum */
+extern Ctx *gRam02000F08;   /* the same view as in band_0803afbc.c */
 extern u8 gRam02000F00;
 extern void FUN_080384f0(void);
 extern u32 FUN_0803c320(s32,u32);

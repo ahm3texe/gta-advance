@@ -1,20 +1,21 @@
-/* Mesafe biriktirme ve tasma sayaci — 0x080672B8-0x080672FB
+/* Accumulating distance and the overflow counter — 0x080672B8-0x080672FB
  *
- * Gelen degerin mutlak degerinin 16 bit sagini biriktiriciye ekliyor;
- * birikim 0x1FFF'i asarsa tasan kismi gSaveBuffer +0x76'daki sayaca
- * aktarip biriktiriciyi maskeliyor. Sayac sararsa eski deger geri
- * yaziliyor (doyurma).
+ * Adds the low 16 bits of the incoming value's absolute value to the
+ * accumulator; if the accumulation exceeds 0x1FFF the overflowing part is
+ * carried into the counter at gSaveBuffer +0x76 and the accumulator is
+ * masked.  If the counter wraps, the old value is written back (saturation).
  *
- * ROM sayaci yazdiktan SONRA yeniden OKUYUP karsilastiriyor; bu yuzden
- * karsilastirmadaki okuma volatile gorunumden yapiliyor. Ayni cozum
- * src/world/distance_accum.c'de olculmustu: tum alani volatile yapmak
- * fazla gucludur ve ilk okumayi da bozar, yalnizca ikinci okuma dar
- * tutulmali.
+ * The ROM RE-READS the counter AFTER writing it and compares; that is why the
+ * read in the comparison goes through the volatile view.  The same solution
+ * was measured in src/world/distance_accum.c: making the whole field volatile
+ * is too strong and breaks the first read too, so only the second read must
+ * be kept narrow.
  *
- * SaveBuffer tanimi src/world/copy_flag_byte.c ile BIREBIR AYNI olmali.
+ * The SaveBuffer definition must be IDENTICAL to the one in
+ * src/world/copy_flag_byte.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/accumulate_distance.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/accumulate_distance.c
  */
 
 #include "gba_types.h"
@@ -47,9 +48,10 @@ void AccumulateDistance(s32 delta)
     u32 acc;
     u16 old;
 
-    /* ROM biriktirici tabanini mutlak deger hesabindan ONCE yukluyor
-       (ldr r4 en basta). Dogrudan gDistanceAccum yazmak yuklemeyi
-       kullanim yerine kaydiriyordu; ayri yerel sirayi sabitliyor. */
+    /* The ROM loads the accumulator base BEFORE the absolute value
+       computation (ldr r4 right at the top).  Writing gDistanceAccum
+       directly moves the load
+       to the point of use; a separate local pins the order down. */
     accum = &gDistanceAccum;
 
     if (delta < 0)

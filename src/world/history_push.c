@@ -1,20 +1,18 @@
-/* Gecmis kuyruguna ekleme — 0x08008064-0x08008093
+/* Push onto the history queue — 0x08008064-0x08008093
  *
- * gHistory'nin +0'inda guncel kayit, +0x78'de asagi dogru kaydirilan
- * 31 girisli gecmis var. Yeni kayit guncelden farkliysa kuyruk bir
- * eleman geriye kaydirilip guncel yenileniyor.
+ * gHistory holds the current record at +0 and a shifted 31-entry history at
+ * +0x78. If the new record differs, shift the queue by one and update current.
+ * The shift walks BACKWARDS from high to low addresses, overwriting the final
+ * entry as it proceeds.
  *
- * Kaydirma GERIYE dogru yuruyor (yuksek adresten alcaga), yani kuyruk
- * son elemani ezerek asagi iniyor.
+ * BYTE-MATCHING. Reading current separately and copying the base with h2 = h
+ * before comparison preserves the ROM's r0 -> r4 live range and prevents the
+ * equality branch from merging with the final store.
  *
- * BYTE-MATCHING. `current` degerini ayri okuyup `h2 = h` taban kopyasini
- * karsilastirmadan once yapmak ROM'daki r0 -> r4 yasam araligini korur ve
- * esitlik dalinin sondaki store ile birlestirilmesini engeller.
+ * Sibling SetIndexReturnOne: src/world/set_index.c
  *
- * Kardesi SetIndexReturnOne: src/world/set_index.c
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/history_push.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/history_push.c
  */
 
 #include "gba_types.h"

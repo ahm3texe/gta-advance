@@ -1,27 +1,28 @@
-/* Belirli turde rastgele karo arama — 0x080424EC-0x08042573
+/* Finding a random tile of a given kind — 0x080424EC-0x08042573
  *
- * gRam0202F3E0 baglaminin karo haritasindan (+0 baslik: u16 genislik, u16
- * yukseklik, +4 karo dizisi; baglam +0x38 satir kaydirmasi) en fazla 256
- * deneme ile, kenarlardan 8 karo iceride rastgele (x,y) secip karonun
- * 0x380 maskeli turu (>>7) istenene esitse konumu yazip 1 doner; yoksa 0.
+ * From the tile map of the gRam0202F3E0 context (+0 header: u16 width, u16
+ * height, +4 the tile array; the row shift at the context's +0x38), it picks a
+ * random (x,y) at least 8 tiles inside the edges, at most 256 attempts; if the
+ * tile's kind (masked with 0x380, >>7) equals the requested one it writes the
+ * position and returns 1, otherwise 0.
  *
- * IKI OLCUM: gRam0202F3E0 bir isaretci DEGIL, +0'i isaretci olan bir
- * baglam (kaydirma ayni bloktan +0x38'den her turda yeniden okunuyor);
- * MapData'nin +0/+2 u16 genislik/yukseklik alanlari paylasilan govdede
- * dolgu oldugu icin cast ile okunuyor.
- * Karo adresi `(&tiles[x])[y << shift]` diye IKI AYRI OLCEKLI TERIMLE
- * yazilmali; `tiles[x + (y << shift)]` toplami once birlestirip 17 komut
- * sapiyor. Maske yereli sart degil (ikisi de eslesiyor).
+ * TWO MEASUREMENTS: gRam0202F3E0 is NOT a pointer but a context whose +0 is a
+ * pointer (the shift is re-read from +0x38 of the same block on every round);
+ * MapData's +0/+2 u16 width/height fields are read through a cast because they
+ * are padding in the shared body.
+ * The tile address must be written as TWO SEPARATELY SCALED TERMS,
+ * `(&tiles[x])[y << shift]`; `tiles[x + (y << shift)]` folds the sum first and
+ * diverges by 17 instructions.  A mask local is not required (both match).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/find_random_tile_of_kind.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/find_random_tile_of_kind.c
  */
 
 #include "gba_types.h"
 #define TRIES     256
 #define KIND_MASK 0x380
-/* map_tiles.c ile ayni gorunum (tutarlilik kapisi): genislik/yukseklik
- * MapData'nin ilk dort baytinda, burada u16 dizisi olarak okunuyor. */
+/* The same view as in map_tiles.c (the consistency gate): the width and
+ * height are in MapData's first four bytes, read here as a u16 array. */
 typedef struct MapData {
     u8   pad0[4];
     u16 *tiles;             /* +4 */
@@ -29,7 +30,7 @@ typedef struct MapData {
 typedef struct MapContext {
     MapData *data;          /* +0 */
     u8       pad4[0x34];
-    int      tileShift;     /* +0x38  satir basina karo kaydirmasi */
+    int      tileShift;     /* +0x38  the tile shift per row */
 } MapContext;
 extern MapContext gRam0202F3E0;
 extern u32 FUN_08032548(void);

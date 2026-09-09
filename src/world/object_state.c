@@ -1,13 +1,13 @@
-/* Nesne durum sorgulari — 0x08019670-0x0801970F
+/* Object state queries — 0x08019670-0x0801970F
  *
- * Dort yardimci. Ilki bir olcegi moda gore 16/32/51 ile carpip 6 bit
- * kaydiriyor (51 = 3 * 17, agbcc bunu `(v<<1)+v` ve `x + (x<<4)` olarak
- * uretiyor). Digerleri +28'deki alt nesnenin +10 ve +167 baytlarina bakiyor.
+ * Four helpers. The first multiplies a scale by 16/32/51 according to mode,
+ * then shifts by 6 (51 = 3*17; agbcc emits (v<<1)+v and x+(x<<4)). The others
+ * inspect bytes +10 and +167 in the sub-object at +28.
  *
- * Son iki fonksiyon govde olarak ayni, yalnizca cagirdiklari sorgu farkli.
+ * The last two have identical bodies except for the query they call.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/object_state.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/object_state.c
  */
 
 #include "gba_types.h"

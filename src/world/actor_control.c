@@ -1,11 +1,10 @@
-/* Varlik denetimi — 0x08019450-0x0801952B
+/* Entity control — 0x08019450-0x0801952B
  *
- * Alti kucuk fonksiyon. Varligin +0x30'daki alt nesnesi bayraklari ve
- * turu tutuyor; +0x34 bir geri cagri isaretcisi (dolayli cagri
- * `_call_via_r1` veneer'inden geciyor).
+ * Six small functions. The entity's sub-object at +0x30 holds flags and type;
+ * +0x34 is a callback pointer, called indirectly through the `_call_via_r1` veneer.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/actor_control.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/actor_control.c
  */
 
 #include "gba_types.h"

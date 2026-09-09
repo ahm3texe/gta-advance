@@ -1,65 +1,69 @@
-/* Yuvanin dort noktasini haritada sinama ve giris uretme
- *      0x080651E0-0x08065377, 408 bayt
+/* Testing the slot's four points against the map and producing entries
+ *      0x080651E0-0x08065377, 408 bytes
  *
- * SpawnSlotEffect (0x08065130) bunu `PlaceProbeEntries(context, 1)` diye
- * cagiriyor; ikinci arguman KULLANILMIYOR (ROM r1'i ilk is olarak `mov r1,
- * sp` ile eziyor), donus degeri uretilen giris sayisi.
+ * SpawnSlotEffect (0x08065130) calls this as `PlaceProbeEntries(context, 1)`;
+ * the second argument is UNUSED (the ROM's first act is to clobber r1 with
+ * `mov r1, sp`), and the return value is the number of entries produced.
  *
- * Baglam +0x74'te 12 bayt adimli dort nokta tutuyor. Her noktanin x/y'si
- * 22 bit kaydirilarak (10.22 sabit nokta) harita gozune ceviriliyor.
- * Birinci dongu koordinatlari harita sinirlarina KIRPIYOR ve gozun 7..9
- * bitlerindeki alan 4 ise 52 evreli bir giris uretip sayaci artiriyor;
- * degilse `blocked` bayragini kuruyor. Bayrak kurulduysa yalnizca 471
- * numarali tetikleme yapiliyor. Kurulmadiysa ikinci dongu ayni sinamayi
- * kirpma YERINE eleme ile (sinir disi nokta atlanir) tekrarlayip 51 evreli
- * girisler uretiyor; dordunden fazlasi tutarsa sahibin +0x0A bayragina
- * 0x02 ekleniyor, ardindan baglamin kendi ucusu icin bir giris daha ve 470
- * numarali tetikleme geliyor.
+ * The context holds four points at +0x74 with a 12-byte stride.  Each point's
+ * x/y is shifted right by 22 bits (10.22 fixed point) to become a map cell.
+ * The first loop CLAMPS the coordinates to the map bounds and, if the field in
+ * bits 7..9 of the cell is 4, produces an entry with phase 52 and bumps the
+ * counter; otherwise it sets the `blocked` flag.  If the flag was set, only
+ * trigger number 471 is fired.  If it was not, the second loop repeats the
+ * same test with rejection INSTEAD OF clamping (an out-of-bounds point is
+ * skipped) and produces entries with phase 51; if more than four hold, 0x02 is
+ * added to the owner's +0x0A flag, then one more entry for the context's own
+ * end and trigger number 470 follow.
  *
- * ROM tablosu gRom08852A1C = { -128, 128, -384, 384 }: 16 bayt tek blokta
- * (`ldmia/stmia` + `ldr/str`) yerel diziye kopyalaniyor, yani kaynakta
- * yerel bir toplu atama var. Kimlik `(id + off.v[i]) & 0x3FF` ile
- * turetiliyor.
+ * The ROM table gRom08852A1C = { -128, 128, -384, 384 }: 16 bytes copied into
+ * a local array in a single block (`ldmia/stmia` + `ldr/str`), so the source
+ * has a local aggregate assignment.  The id is derived as
+ * `(id + off.v[i]) & 0x3FF`.
  *
- * Olculen dort kural (hepsi bu fonksiyonda kanitlandi):
+ * Four measured rules (all proved in this function):
  *
- * 1. Goz degeri MUTLAKA `u32` yerele alinmali. Dogrudan
- *    `(*p & 0x380) >> 7` yazimi ifadeyi HImode'da tutuyor: `movs #0xe0 /
- *    lsls #2 / adds r0,r2,#0` fazladan kopyasi + 16/23 kaydirma ciftleri,
- *    yani dongu basina 4 fazla RTL komutu. `s32` yerel 2 bayt saptiriyor.
- * 2. Bu 4 komut, dongunun geri sayan sayacini da belirliyor: agbcc'nin
- *    `check_dbra_loop` gecisi givleri indirgemek icin
- *    `omur * 15 * kazanc >= komut_sayisi` istiyor; `off.v[i]` givinin
- *    kazanci 4 (1*15*4 = 60), HImode yaziminda dongu 63 komut oldugu icin
- *    giv indirgenmiyor, biv olu kalmiyor ve dongu `movs #3 / negs` yerine
- *    yukari sayiyor (loop dump: "giv of insn 170 not worth while, 60 vs 63").
- * 3. `gRam0201AEE8` iki dongude ORTAK bir yerel isaretciye alinamaz:
- *    paylasilan degisken referans sayisini 16'ya cikarip onceligi 3.2'ye
- *    tasiyor ve isaretci r0'i kapiyor (ROM: birinci dongude r3, ikincide
- *    r2). Dogrudan global erisim -- ya da dongu basina AYRI yerel --
- *    dogru dagitimi veriyor (kural 59'un uc-ayri-isaretci notuyla ayni kol).
- * 4. Satir ofseti AYRI bir yerele alinmali:
+ * 1. The cell value MUST be taken into a `u32` local.  Writing
+ *    `(*p & 0x380) >> 7` directly keeps the expression in HImode: an extra
+ *    `movs #0xe0 / lsls #2 / adds r0,r2,#0` copy plus 16/23 shift pairs, i.e.
+ *    4 extra RTL instructions per loop.  An `s32` local diverges by 2 bytes.
+ * 2. Those 4 instructions also decide the loop's counting direction: agbcc's
+ *    `check_dbra_loop` pass wants `lifetime * 15 * benefit >= instruction
+ *    count` in order to reduce givs; the `off.v[i]` giv's benefit is 4
+ *    (1*15*4 = 60), and because the loop is 63 instructions in the HImode
+ *    spelling the giv is not reduced, the biv does not die, and the loop
+ *    counts up instead of using `movs #3 / negs` (loop dump: "giv of insn 170
+ *    not worth while, 60 vs 63").
+ * 3. `gRam0201AEE8` cannot be taken into a SHARED local pointer across the two
+ *    loops: a shared variable raises the reference count to 16, lifts the
+ *    priority to 3.2 and takes r0 for the pointer (the ROM: r3 in the first
+ *    loop, r2 in the second).  Direct global access -- or a SEPARATE local per
+ *    loop -- gives the right allocation (the same lever as rule 59's
+ *    three-separate-pointers note).
+ * 4. The row offset must be taken into a SEPARATE local:
  *      row = y * gRam0201AEE8->width;  tile = *(tiles + x + row);
- *    Tek ifadede `... + y * gRam...->width` yazarsan `muls` hedefi y'nin
- *    yazmacina bagleniyor (`muls r1,r0`); ROM `muls r0,r1` ile carpimi
- *    ENIN yazmacina koyuyor. Operandi ters cevirmek (`width * y`) hedefi
- *    duzeltiyor ama fazladan bir yukleme pseudo'su uretip en/isaretci/y
- *    dagitimini bozuyor (23 bayt fark). Ara degisken ikisini birden veriyor.
+ *    Written as a single expression, `... + y * gRam...->width` binds the
+ *    `muls` destination to y's register (`muls r1,r0`); the ROM puts the
+ *    product in the WIDTH's register with `muls r0,r1`.  Reversing the
+ *    operands (`width * y`) fixes the destination but produces an extra load
+ *    pseudo and breaks the width/pointer/y allocation (23 bytes off).  The
+ *    intermediate variable gives both at once.
  *
- * Toplam adres ifadesi `*(tiles + x + row)` iki AYRI olcekleme uretiyor
- * (ROM: `lsls #1` iki kez, ayri `adds`); `tiles[x + row]` dizi yazimi tek
- * olcekleme yapip 4 bayt saptiriyor.
+ * The summed address expression `*(tiles + x + row)` produces two SEPARATE
+ * scalings (the ROM: `lsls #1` twice, separate `adds`); the array spelling
+ * `tiles[x + row]` does a single scaling and diverges by 4 bytes.
  *
- * Elenen yazimlar: `tiles[y*w + x]` dizi indeksi; `tiles + y*w + x` ve
- * `tiles + w*y + x` toplama sirasi (34 bayt); `row = width * y` (171);
- * `cell = tiles + x; cell[y*w]` (boy tutmuyor); goz degeri `s32` (11);
- * en/boy icin `w`/`h` yerelleri (23); paylasilan `grid` yerel isaretcisi
- * (23); on bildirim sirasinin 72 permutasyonu (hicbiri etkilemiyor).
+ * Spellings ruled out: the `tiles[y*w + x]` array index; the `tiles + y*w + x`
+ * and `tiles + w*y + x` addition orders (34 bytes); `row = width * y` (171);
+ * `cell = tiles + x; cell[y*w]` (the size does not hold); the cell value as
+ * `s32` (11); `w`/`h` locals for the width and height (23); a shared `grid`
+ * local pointer (23); 72 permutations of the declaration order (none of them
+ * has any effect).
  *
- * ESLESME: 408/408 bayt.
+ * MATCH: 408/408 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_probe.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_probe.c
  */
 
 
@@ -90,7 +94,7 @@ typedef struct Owner {
 } Owner;
 
 typedef struct Probe {
-    Triple head;                /* +0x00, son cagrida kaynak uclu */
+    Triple head;                /* +0x00, the source triple in the last call */
     u8     pad0c[2];
     s16    id;                  /* +0x0E */
     u8     pad10[8];

@@ -1,14 +1,14 @@
-/* Istatistik sayaclari — 0x08067228-0x08067273
+/* Statistics counters — 0x08067228-0x08067273
  *
- * Uc sayac kayit tamponunun icinde duruyor (gSaveBuffer +0x6C, +0x6E,
- * +0x74), yani oyuna kaydediliyorlar. Ilk iki fonksiyon tasma korumali
- * artirim yapiyor: u16 sarmalanip 0 olursa eski deger geri yaziliyor.
+ * Three counters reside in gSaveBuffer at +0x6C/+0x6E/+0x74 and are therefore
+ * saved with the game. The first two perform overflow-protected increments:
+ * if u16 wraps to zero, restore the old value.
  *
- * Ayni kumedeki dorduncu fonksiyon AddDistance ayri dosyada ve
- * byte-matching: src/world/distance_accum.c
+ * The fourth cluster member, AddDistance, is separate and byte-matching:
+ * src/world/distance_accum.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/stat_counters.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/stat_counters.c
  */
 
 #include "gba_types.h"
@@ -17,8 +17,9 @@
 #define ACCUM_SHIFT  13
 #define DELTA_SHIFT  16
 
-/* Kayit tamponunun sayac alanlari; tam yapisi src/world/entity_flags.c
- * ve src/save/save_manager.c'de baska yonleriyle tanimli. */
+/* Save-buffer counter fields; other views of the complete layout are in
+ * src/world/entity_flags.c and src/save/save_manager.c.
+ */
 typedef struct SaveCounters {
     u8  pad00[0x6C];
     u16 countA;                 /* +0x6C */

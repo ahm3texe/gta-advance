@@ -1,54 +1,66 @@
-/* Hedef secimi + yakin-tehlike bildirimi — FUN_0804aeac @ 0x0804AEAC, 476 bayt
+/* Target selection + the near-danger notification — FUN_0804aeac @ 0x0804AEAC,
+ * 476 bytes
  *
- * Kardes fonksiyon AdvanceTargetAction (0x0804B088, eslesmis) ile ayni aileden:
- * `include/target_common.h` icindeki `linked` / `nearest` / `distance` satir ici
- * yardimcilarini oldugu gibi kullaniyor, struct'lar ve stil oradan geliyor.
+ * The same family as its sibling AdvanceTargetAction (0x0804B088, matched): it
+ * uses the `linked` / `nearest` / `distance` inline helpers from
+ * `include/target_common.h` as they are, and the structs and style come from
+ * there.
  *
- * Yapi:
- *   1. context->details->target doluysa hedef, o adayin link/owner/context
- *      zinciri (`linked`); bos ise iki global aday arasindan sekizgen yaklasik
- *      uzakliga gore en yakini (`nearest`).
- *   2. Binek (self->link) 0x100000 bayragini tasimiyorsa VE ilerleme sayaci
- *      (details +0x0A) sifirsa ve GetOwnerSlot hedefi dogruluyorsa FUN_080502f8
- *      31 koduyla cagriliyor (kilitlenme/uyari bildirimi).
- *   3. Her durumda FUN_0804b2bc(self) sonucu donuyor.
+ * The structure:
+ *   1. If context->details->target is set, the target is that candidate's
+ *      link/owner/context chain (`linked`); if it is empty, the nearest of two
+ *      global candidates by octagonal approximate distance (`nearest`).
+ *   2. If the mount (self->link) does not carry the 0x100000 flag AND the
+ *      progress counter (details +0x0A) is zero and GetOwnerSlot validates the
+ *      target, FUN_080502f8 is called with code 31 (the lockup/warning
+ *      notification).
+ *   3. In every case it returns the result of FUN_0804b2bc(self).
  *
- * OLCULEN IKI KAYNAK KALDIRACI (ikisi de byte-matching icin sart):
+ * TWO MEASURED SOURCE LEVERS (both required for byte-matching):
  *
- * (a) `actor = self` kopyasi. ROM girisde `adds r6,r0,#0 / adds r5,r6,#0` ile
- *     parametrenin IKI kopyasini tutuyor: r6 context/link/son cagri icin, r5
- *     `nearest` govdesindeki uzaklik olcumu ve gRam0202F3D8 yazimi icin.
- *     Tek degiskenle yazildiginda iki pseudo ayni yazmaca birlesiyor, kopya
- *     komutu kayboluyor ve kayma butun fonksiyona yayiliyor: 152/227.
- *     Ayri `actor` yereliyle 213/227. (Kardes AdvanceTargetAction'da bu kopya
- *     YOK — orada `self` tek pseudo; kural 37'nin "kopya yasamaz" siniri
- *     yazmac baskisina bagli, mutlak degil.)
+ * (a) The `actor = self` copy.  On entry the ROM keeps TWO copies of the
+ *     parameter with `adds r6,r0,#0 / adds r5,r6,#0`: r6 for the
+ *     context/link/final call, r5 for the distance measurement in the
+ *     `nearest` body and the gRam0202F3D8 write.  Written with a single
+ *     variable the two pseudos merge into one register, the copy instruction
+ *     disappears and the drift spreads through the whole function: 152/227.
+ *     With a separate `actor` local, 213/227.  (The sibling
+ *     AdvanceTargetAction does NOT have this copy -- there `self` is a single
+ *     pseudo; rule 37's "a copy does not survive" limit depends on register
+ *     pressure, it is not absolute.)
  *
- * (b) `node` yerelinin YENIDEN KULLANIMI. ROM `adds r2,r0,#0 / adds r2,#10`
- *     ile sayac isaretcisini gercekten kuruyor. Duz `phase=&details->phase`
- *     yazildiginda agbcc'nin cse gecisi adresi kullanim yerine katliyor
- *     (`ldrh r0,[r2,#10]`) ve iki bayt eksiliyor. Kok neden olculdu:
- *     `-fno-cse-skip-blocks` ile fark kayboluyor, yani cse binek kontrolunun
- *     blogunu ATLAYIP taban pseudo'yu hala canli goruyor. Kaynaktaki tek
- *     kaldirac, taban pseudo'yu ARADA YENIDEN ATAMAK: `node` once details'i,
- *     sonra binegi tutuyor; ikinci atama cse'nin denkligini gecersiz kiliyor
- *     ve ROM'un iki komutlu adres kurulumu geri geliyor.
+ * (b) The REUSE of the `node` local.  The ROM really does build the counter
+ *     pointer with `adds r2,r0,#0 / adds r2,#10`.  Written plainly as
+ *     `phase=&details->phase`, agbcc's cse pass folds the address into the
+ *     point of use (`ldrh r0,[r2,#10]`) and two bytes are lost.  The root
+ *     cause was measured: with `-fno-cse-skip-blocks` the difference
+ *     disappears, i.e. cse SKIPS the mount check's block and still sees the
+ *     base pseudo as live.  The only lever in the source is to REASSIGN the
+ *     base pseudo IN BETWEEN: `node` holds details first and the mount
+ *     afterwards; the second assignment invalidates cse's equivalence and the
+ *     ROM's two-instruction address setup comes back.
  *
- * ELENEN YAZIMLAR (hepsi olculdu, hicbiri (b)'yi acmadi — 213/227'de kaldi):
- *   phase'i erken/gec hesaplamak; `details` adinda ayri yerel; `&d->phase`
- *   yerine `(u16 *)((u8 *)d+10)`; ic ice / `||` / bayrak yereli ile yazilmis
- *   binek kontrolu; kuyrugu ayri bir `static __inline__` fonksiyona almak;
- *   phase'i `volatile u16 *` yapmak; iki ayri atama; dizi/alt-struct gorunumu;
- *   `*phase`i yerele okumak; bildirim sirasi degisimleri; `*phase=1` ile ikinci
- *   kullanim eklemek (cse yine katliyor, yani sorun kullanim SAYISI degil).
- *   `s16 *phase` (215/227) fold'u kirdi ama `ldrsh r0,[r2,r1]` uretti — yanlis
- *   komut; yine de geri kalan blogun ROM ile birebir oldugunu gosterdi.
- *   `phase=(u16 *)context->details; phase+=5;` (217/227) sihirli ofset, elendi.
- *   `node=(TargetNode *)self->link` ile binegi gec okumak: 168/227 (yukleme
- *   fonksiyon basindan kayiyor, ROM `mov r0,sl` ile onbellekten okuyor).
+ * SPELLINGS RULED OUT (all measured, none of them opened (b) -- it stayed at
+ * 213/227):
+ *   computing phase early/late; a separate local named `details`;
+ *   `(u16 *)((u8 *)d+10)` instead of `&d->phase`; the mount check written
+ *   nested / with `||` / with a flag local; moving the tail into a separate
+ *   `static __inline__` function; making phase a `volatile u16 *`; two
+ *   separate assignments; an array/sub-struct view; reading `*phase` into a
+ *   local; changes to the declaration order; adding a second use with
+ *   `*phase=1` (cse folds it anyway, so the problem is not the NUMBER of
+ *   uses).
+ *   `s16 *phase` (215/227) broke the fold but produced `ldrsh r0,[r2,r1]` --
+ *   the wrong instruction; it did show, though, that the rest of the block is
+ *   identical to the ROM.
+ *   `phase=(u16 *)context->details; phase+=5;` (217/227), a magic offset,
+ *   ruled out.
+ *   Reading the mount late with `node=(TargetNode *)self->link`: 168/227 (the
+ *   load moves away from the top of the function, whereas the ROM reads it
+ *   from the cache with `mov r0,sl`).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama: make c-match FILE=src/world/band_0804aeac.c  -> BYTE-MATCHING
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/world/band_0804aeac.c  -> BYTE-MATCHING
  */
 
 #include "target_common.h"
@@ -56,8 +68,8 @@
 #define MOUNT_BUSY  (0x80 << 13)    /* 0x00100000 */
 #define NOTIFY_KIND 31
 
-/* details (+0x24) ve binek (+0x2C) icin ortak gorunum: her ikisi de +0x0A'da
- * yarim kelime, +0x18'de tam kelime tasiyor. */
+/* A shared view for details (+0x24) and the mount (+0x2C): both carry a half
+ * word at +0x0A and a full word at +0x18. */
 typedef struct TargetNode {
     u8  pad0[10];
     u16 phase;                  /* +0x0A */

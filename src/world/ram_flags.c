@@ -1,9 +1,9 @@
-/* gRam02035EA0.type sorgusu — 0x08062514-0x0806252F
+/* Query gRam02035EA0.type — 0x08062514-0x0806252F
  *
- * Kardesi IsRamModeWanted ayri dosyada ve byte-matching.
+ * Its sibling IsRamModeWanted is separate and byte-matching.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/ram_flags.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/ram_flags.c
  */
 
 #include "gba_types.h"

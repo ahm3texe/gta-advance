@@ -1,15 +1,14 @@
-/* Durum sinayip bildirme — 0x08055BBC-0x08055BE7
+/* Test state and notify — 0x08055BBC-0x08055BE7
  *
- * FindOrInitAreaNode ile nesneyi alip +0x0B baytinin 0xF1 maskesi 17 ise
- * FUN_080536BC'yi cagiriyor, ardindan her durumda FUN_08055D90'i
- * cagiriyor.
+ * Get the object with FindOrInitAreaNode. If (+0x0B & 0xF1) == 17, call
+ * FUN_080536BC; then always call FUN_08055D90.
  *
- * Kural 33: maske AYRI sonuc yereline konup yerinde `&=` yapiliyor
- * (ROM `movs r0,#241` ile maskeyi ONCE kuruyor).
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Rule 33: put the mask in a SEPARATE result local and apply &= in place
+ * (the ROM constructs the mask FIRST with movs r0,#241).
+ * Rule 35: `pop {r0}; bx r0` indicates void.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/refresh_then_notify.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/refresh_then_notify.c
  */
 
 #include "gba_types.h"

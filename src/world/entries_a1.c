@@ -1,30 +1,30 @@
 /* HasActiveEntryOfKind — 0x08028DF4-0x08028E39
  *
- * gEntriesA tablosunu (15 giris, 148 bayt stride) bastan sona tariyor.
- * Bir giris etkinse (+0x00 sifirdan farkli) uc kosuldan biri tutuyor mu
- * diye bakiyor: tur alani (+0x64) 0x33 veya 0x4C mi, ya da +0x90'daki
- * kelime 46 mi. Herhangi biri tutarsa 1, hicbiri tutmazsa 0 donuyor.
+ * Scans the gEntriesA table (15 entries, 148-byte stride) from start to end.
+ * If an entry is active (+0x00 non-zero) it checks whether any of three
+ * conditions holds: is the kind field (+0x64) 0x33 or 0x4C, or is the word at
+ * +0x90 equal to 46.  If any holds it returns 1, if none does it returns 0.
  *
- * Kardesi HasWantedEntry (0x08028E3C, src/world/kind_scan.c) ile ayni
- * kalip: taban ayri yerelde tutulup ondan uc yurutucu isaretci
- * turetiliyor (kural 37). ROM'daki kurulum sirasi kaynak sirasiyla
- * birebir ayni: +0x90, +0x64, taban, bitis.
+ * The same pattern as its sibling HasWantedEntry (0x08028E3C,
+ * src/world/kind_scan.c): the base is held in its own local and three walking
+ * pointers are derived from it (rule 37).  The setup order in the ROM is
+ * exactly the source order: +0x90, +0x64, base, end.
  *
- * Bitis isaretcisi ROM'da `adds r4, r2, r0` ile TABANDAN kuruluyor
- * (havuz sabiti 0x8A8), karsilastirma ise +0x90 yurutucusuyle yapiliyor;
- * bu yuzden `end = cur + 0x8A8` yazildi.
+ * In the ROM the end pointer is built FROM THE BASE with `adds r4, r2, r0`
+ * (pool constant 0x8A8), while the comparison uses the +0x90 walker; hence
+ * `end = cur + 0x8A8`.
  *
- * Prolog `push {r4, lr}` -> bes canli deger (taban, uc yurutucu, bitis),
- * docs/COMPILER.md register tablosuyla uyumlu. Donus `pop {r4}; pop {r1};
- * bx r1` ve r0 canli -> DEGER donduruyor (kural 35'in tersi, alloc_node.c
- * ile ayni).
+ * The prologue `push {r4, lr}` -> five live values (the base, three walkers,
+ * the end), consistent with the register table in docs/COMPILER.md.  The
+ * return `pop {r4}; pop {r1}; bx r1` with r0 live -> it returns a VALUE (the
+ * reverse of rule 35, the same as alloc_node.c).
  *
- * ESLESME: 70/70 bayt, ilk denemede. Kardes fonksiyonun kalibi (kural 37 +
- * kaynak sirasinin korunmasi, kural 19) dogrudan uydu; ayrica bir varyant
- * denemesi gerekmedi.
+ * MATCH: 70/70 bytes, on the first attempt.  The sibling function's pattern
+ * (rule 37 + preserving the source order, rule 19) fitted directly; no variant
+ * attempts were needed.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a1.c
  */
 
 #include "gba_types.h"
@@ -36,8 +36,9 @@
 #define KIND_B        0x4C
 #define EXTRA_WANTED  46
 
-/* src/world/kind_scan.c'deki Entry ile ayni yerlesim; +0x90 alani burada
- * ilk kez gorunduyu icin eklendi (stride yine 148). */
+/* The same layout as Entry in src/world/kind_scan.c; the +0x90 field was
+ * added here because this is where it first appears (the stride is still
+ * 148). */
 typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01[99];

@@ -1,148 +1,161 @@
-/* StepEntryPhase — 0x08025518-0x080256E1 (458 bayt)
+/* StepEntryPhase — 0x08025518-0x080256E1 (458 bytes)
  *
- * Bir gEntriesA girisini turune (+0x64) ve evresine (+0x90) gore isliyor.
- * Uc is yapiyor:
- *   1. Tur 101 / 51 / 76 / 34 icin, evreye bakip iki sabitten birini
- *      (0x000E0000 ya da 0x00300000) secip FUN_08023df0 + FUN_08060db4
- *      ikilisine +0x4C'deki 12 baytlik ucluyle birlikte veriyor.  Dorduncu
- *      argumana gRom08CA61C0[e->owner] << 16 gidiyor.
- *   2. Tur 51/76 ya da evre 22/46 ise, ayni girisi sablon olarak verip
- *      CreateEntryFromTemplate (0x08025424, src/world/entries_b1.c) ile
- *      tur 34'ten yeni bir giris kuruyor; evre 47 + bildirim 461, ya da
- *      evre 7 + bildirim 258.  Ardindan gRam020245A0 = 1, gRam02024344 = 0.
- *   3. Evre 12 / 38 / 39 ise 1 dondurup girisi ayakta birakiyor; degilse
- *      ReleaseObject(e->sub) ile alt nesneyi birakip +0x00'i sifirliyor ve
- *      0 donduruyor.
+ * Processes a gEntriesA entry according to its kind (+0x64) and phase (+0x90).
+ * It does three things:
+ *   1. For kinds 101 / 51 / 76 / 34, it looks at the phase, picks one of two
+ *      constants (0x000E0000 or 0x00300000) and passes it to the
+ *      FUN_08023df0 + FUN_08060db4 pair together with the 12-byte triple at
+ *      +0x4C.  The fourth argument gets gRom08CA61C0[e->owner] << 16.
+ *   2. If the kind is 51/76 or the phase is 22/46, it passes the same entry as
+ *      a template and builds a new entry of kind 34 with
+ *      CreateEntryFromTemplate (0x08025424, src/world/entries_b1.c); either
+ *      phase 47 + notification 461, or phase 7 + notification 258.  It then
+ *      sets gRam020245A0 = 1 and gRam02024344 = 0.
+ *   3. If the phase is 12 / 38 / 39 it returns 1 and leaves the entry alive;
+ *      otherwise it releases the sub-object with ReleaseObject(e->sub), clears
+ *      +0x00 and returns 0.
  *
- * IMZA: tek parametre (r0), epilog `pop {r1}; bx r1` — donus adresi r1'e
- * aliniyor, yani r0 canli, fonksiyon DEGER donduruyor (kural 35'in tersi).
+ * SIGNATURE: a single parameter (r0); the epilogue `pop {r1}; bx r1` takes the
+ * return address into r1, so r0 is live and the function RETURNS A VALUE (the
+ * inverse of rule 35).
  *
- * STRUCT ve CAGRI IMZALARI kardes dosyalardan alindi: Entry yerlesimi
- * src/world/entries_b1.c ve entries_a6.c ile ayni (148 bayt); +0x4C'deki
- * `Triple` src/world/submit_pack.c'deki `Pack12` ile ayni nesne
- * (FUN_08060db4 orada da (Triple *, u32) imzasiyla cagriliyor).
- *
- * ---------------------------------------------------------------------
- * ROM'DAN OLCULEN AYRINTILAR (hepsi diff ile dogrulandi)
- *
- *  1. DIS SWITCH gercekten `switch`.  0x8025528'de `cmp #76 / beq` hemen
- *     ardindan `cmp #76 / bgt` var: bu, agbcc'nin hem case degeri hem
- *     bolme noktasi olan bir dugum icin urettigi kalip (kural 46'nin
- *     agac tarafi).  `bgt` ISARETLI, cunku `ldrb` int'e yukseliyor.
- *     Case kumesi {34,51,76,101} seyrek, atlama tablosu cikmiyor.
- *     Case govdeleri KAYNAK SIRASINDA yayiliyor; ROM'daki sira
- *     101, 51/76, 34 -- dosyada da o sirada yazildi.
- *
- *  2. IC SWITCH (`case 34`) evreye gore: `cmp #28 / beq`, `cmp #28 / bhi`
- *     -> ISARETSIZ dal, yani `phase` u32 (kural 31).  Case 28'in govdesi
- *     bos.  Ic case'lerin KAYNAK SIRASI 28, 46, 22 olmali: govdesi en
- *     sonda kalan case'in `b` komutu silinip duse gecince o blok capraz
- *     atlama adayi OLMAKTAN CIKIYOR ve ayri fiziksel kopya olarak
- *     kaliyor.  ROM'da ayri kalan kopya 22'ninki (0x8025604), bu yuzden
- *     22 en sona yazildi.  22 basa alininca 46'ninki ayri kaliyor ve
- *     blok yerlesimi tumuyle kayiyor.
- *
- *  3. KURAL 44 BURADA BELIRLEYICI OLDU.  `if (e->phase == 46 ||
- *     e->phase == 47)` yazimini agbcc'nin `fold`'u ARALIK TESTINE
- *     ceviriyor: `subs r0,#46 / cmp r0,#1 / bhi`.  ROM iki ayri
- *     `cmp #46` / `cmp #47` kullaniyor.  47'yi yerele almak (`c47 = 47;`)
- *     katlamayi atlatiyor ve sabit yine immediate olarak yayiliyor.
- *     Yan etkisi cok daha buyuk: aralik testi yuzunden case 101'in
- *     govdesi otekilerle CAPRAZ ATLAMAYLA birlesiyordu; ayrilinca ROM'un
- *     UC ayri cagri bloguna kavusuluyor.  Tek satir: 414 -> 458 bayt.
- *     (case 51/76 dalinda ayni katlama OLMUYOR, cunku `||` zincirinin
- *     basinda `e->kind == 76` var ve fold ikili agacta bitisik iki
- *     esitligi goremiyor -- bu yuzden orada c47 gerekmiyor.)
- *
- *  4. KURAL 45 -- HER DALA AYRI YERELLER.  Dort cagri dalinin her biri
- *     kendi `p / w / tbl` uclusunu kullaniyor.  Paylasilan yereller
- *     hem bloklari birlestiriyor hem de DAGITIMI ceviriyor: paylasilan
- *     `w` global dagiticiya girip `e`'den sonra siraya giriyor ve r6'yi
- *     aliyor, `e` r5'te kaliyor -- ROM'un TERSI.  Dala ozel yereller
- *     dogrudan-akisli case govdelerinde tek bloga sigdigi icin YEREL
- *     dagiticiya dusuyor, r5'i erken kapiyor ve `e` r6'ya iniyor.
- *     Olculdu (hepsi 458 bayt, yalnizca fark sayisi):
- *         hepsi ayri            -> fark  0   (ESLESME)
- *         `tbl` ortak           -> fark  6
- *         `p`   ortak           -> fark 28
- *         `w`   ortak           -> fark 39
- *         yalnizca 101 ayri     -> fark 85   (e/r5, w/r6 ters)
- *         hicbiri ayri          -> 402 bayt (uc kopya ikiye iniyor)
- *
- *  5. ARGUMAN SIRASI: ROM once `gRom08CA61C0[owner] << 16`'yi, sonra
- *     &e->payload'i, en son e->unk84'u kuruyor.  Bu ancak tablo okumasi
- *     AYRI DEYIM olup `p = &e->payload;`den ONCE gelirse cikiyor.
- *     `FUN_08023df0(&e->payload, w, e->unk84, TABLE[owner] << 16)` tek
- *     satirda yazilirsa sira sagdan sola olur ve payload/unk84 yer
- *     degistirir.
- *
- *  6. KURAL 1 -- TABLO EXTERN SEMBOL OLMALI.  Sabit cast (`((u32 *)
- *     0x08CA61C0)[i]`) agbcc'ye ONCE indeksi hesaplatip havuz sabitini
- *     SONRA yukletiyor:
- *         ldrb / lsl / ldr =taban / add
- *     ROM ise tabani ONCE yukluyor:
- *         ldr =taban / ldrb / lsl / add
- *     Izole deneyle dogrulandi (dort yazim: sabit cast, ara isaretci
- *     yereli, tam sayi aritmetigi, dizi-isaretcisi cast -- DORDU DE
- *     yanlis sira).  Yalnizca `extern u32 gRom08CA61C0[];` dogru sirayi
- *     veriyor.  Uc blokta 9 komut, son 20 baytlik farkin tamami buydu.
- *
- *  7. KURAL 49 -- SEYREK GOVDE SONDA.  Kuyrukta ROM `return 1`'i akisin
- *     icinde, temizlik blogunu (`ReleaseObject` + `+0x00 = 0`) en sonda
- *     tutuyor.  Duz `if (ok) return 1;` yazimi bunun TERSINI uretiyor
- *     (temizlik dusuyor, `return 1` sona atiliyor).  Uc cikisi da `goto
- *     keep;` ile ayni etikete yollayip etiketi temizlik blogundan ONCE
- *     koymak ROM'un sirasini veriyor: fark 47 -> 20.
- *
- *  8. KURAL 48 -- KOSULU DEGISKENDE MADDELESTIRME.  0x80256B4'te
- *     `movs r4,#0 / cmp #39 / bne / movs r4,#1 / cmp r4,#0 / beq`
- *     dizisi var; bu dogrudan dallanma degil, bayrak degiskeni.
- *     Ayrica sondaki `strb r4,[r6,#0]` o degiskenin sifir halini
- *     kullaniyor (cse dal kosulundan r4 == 0 oldugunu biliyor), yani
- *     kaynakta duz `e->active = 0;` yeterli.
+ * THE STRUCTS and CALL SIGNATURES were taken from sibling files: the Entry
+ * layout is the same as in src/world/entries_b1.c and entries_a6.c (148
+ * bytes); the `Triple` at +0x4C is the same object as `Pack12` in
+ * src/world/submit_pack.c (FUN_08060db4 is called there with the same
+ * (Triple *, u32) signature).
  *
  * ---------------------------------------------------------------------
- * DENENIP ELENEN YAZIMLAR (ayni duvara toslamayin)
+ * DETAILS MEASURED FROM THE ROM (all verified by diff)
  *
- *  - `if (e->phase == 46 || e->phase == 47)` (c47 yereli olmadan):
- *    414 bayt.  Aralik testi hem 2 bayt kisaltiyor hem case 101'in
- *    cagri blogunu otekilerle birlestiriyor.  Sirayi cevirmek
- *    (`47 || 46`) de kurtarmaz, fold yine bitisik araligi gorur.
- *  - Ic switch'i `22, 28, 46` sirasiyla yazmak: 458 yerine 394 bayt.
- *    Sondaki case'in duse gecmesi belirleyici (madde 2).
- *  - Tablo tabanini yerele almak (`tab = (u32 *)0x08CA61C0; tab[i]`):
- *    kopya eleniyor, komut sirasi degismiyor (fark 47'de kaliyor).
- *    Ayni sonuc `u32 tab = 0x08CA61C0; *(u32 *)(tab + (i << 2))` ve
- *    `#define TABLE (*(u32 (*)[])0x08CA61C0)` yazimlarinda da cikti.
- *    Sabit yuklemesi her zaman kullanildigi yere ceziliyor.
- *  - Kuyrukta `if (ok == 0) goto cleanup; return 1; cleanup: ...`:
- *    blok sirasi DEGISMIYOR (fark 47).  Uc cikisin da ayni etikete
- *    gitmesi gerekiyor (madde 7).
- *  - `FUN_08023df0(&e->payload, w, e->unk84, TABLE[owner] << 16)` tek
- *    satirda: arguman kurma sirasi ters (madde 5).
+ *  1. THE OUTER SWITCH really is a `switch`.  At 0x8025528 there is a
+ *     `cmp #76 / beq` immediately followed by `cmp #76 / bgt`: that is agbcc's
+ *     pattern for a node that is both a case value and a split point (the tree
+ *     side of rule 46).  The `bgt` is SIGNED, because the `ldrb` promotes to
+ *     int.
+ *     The case set {34,51,76,101} is sparse, so no jump table comes out.
+ *     The case bodies are emitted IN SOURCE ORDER; the ROM's order is
+ *     101, 51/76, 34 -- and that is the order used in this file.
+ *
+ *  2. THE INNER SWITCH (`case 34`) is on the phase: `cmp #28 / beq`,
+ *     `cmp #28 / bhi` -> an UNSIGNED branch, so `phase` is u32 (rule 31).
+ *     Case 28 has an empty body.  The SOURCE ORDER of the inner cases must be
+ *     28, 46, 22: the case left last has its `b` deleted and becomes a
+ *     fall-through, which takes that block OUT of the cross-jumping candidate
+ *     set and leaves it as a separate physical copy.  In the ROM the copy left
+ *     separate is case 22's (0x8025604), which is why 22 was written last.
+ *     Moving 22 to the front leaves case 46's separate instead and shifts the
+ *     whole block layout.
+ *
+ *  3. RULE 44 WAS DECISIVE HERE.  agbcc's `fold` turns the form
+ *     `if (e->phase == 46 || e->phase == 47)` into a RANGE TEST:
+ *     `subs r0,#46 / cmp r0,#1 / bhi`.  The ROM uses two separate `cmp #46` /
+ *     `cmp #47`.  Taking 47 into a local (`c47 = 47;`) dodges the folding, and
+ *     the constant is still emitted as an immediate.
+ *     The side effect is far larger: because of the range test, case 101's body
+ *     was being merged with the others by CROSS-JUMPING; once separated, the
+ *     ROM's THREE distinct call blocks appear.  A single line: 414 -> 458
+ *     bytes.
+ *     (The same folding does NOT happen in the 51/76 branch, because
+ *     `e->kind == 76` stands at the head of the `||` chain and fold cannot see
+ *     two adjacent equalities in the binary tree -- which is why c47 is not
+ *     needed there.)
+ *
+ *  4. RULE 45 -- SEPARATE LOCALS PER BRANCH.  Each of the four call branches
+ *     uses its own `p / w / tbl` triple.  Shared locals both merge the blocks
+ *     and INVERT THE ALLOCATION: a shared `w` enters the global allocator,
+ *     queues after `e` and takes r6, leaving `e` in r5 -- the INVERSE of the
+ *     ROM.  Branch-local variables fit in a single block in the
+ *     straight-line case bodies, so they drop to the LOCAL allocator, claim r5
+ *     early and push `e` down to r6.
+ *     Measured (all 458 bytes; only the difference count varies):
+ *         all separate          -> 0 differences  (MATCH)
+ *         `tbl` shared          -> 6 differences
+ *         `p`   shared          -> 28 differences
+ *         `w`   shared          -> 39 differences
+ *         only 101 separate     -> 85 differences (e/r5, w/r6 inverted)
+ *         none separate         -> 402 bytes (three copies collapse to two)
+ *
+ *  5. ARGUMENT ORDER: the ROM builds `gRom08CA61C0[owner] << 16` first, then
+ *     &e->payload, and e->unk84 last.  That only comes out if the table read is
+ *     a SEPARATE STATEMENT placed BEFORE `p = &e->payload;`.  Written on one
+ *     line as
+ *     `FUN_08023df0(&e->payload, w, e->unk84, TABLE[owner] << 16)`, the order
+ *     becomes right-to-left and payload/unk84 swap.
+ *
+ *  6. RULE 1 -- THE TABLE MUST BE AN EXTERN SYMBOL.  A constant cast
+ *     (`((u32 *)0x08CA61C0)[i]`) makes agbcc compute the index FIRST and load
+ *     the pool constant AFTERWARDS:
+ *         ldrb / lsl / ldr =base / add
+ *     while the ROM loads the base FIRST:
+ *         ldr =base / ldrb / lsl / add
+ *     Verified with an isolated experiment (four forms: constant cast, an
+ *     intermediate pointer local, integer arithmetic, and an array-pointer
+ *     cast -- ALL FOUR gave the wrong order).  Only
+ *     `extern u32 gRom08CA61C0[];` gives the right one.  Nine instructions
+ *     across three blocks; that accounted for the whole final 20-byte gap.
+ *
+ *  7. RULE 49 -- THE RARE BODY GOES LAST.  In the tail the ROM keeps
+ *     `return 1` in the flow and the cleanup block (`ReleaseObject` +
+ *     `+0x00 = 0`) at the very end.  A plain `if (ok) return 1;` produces the
+ *     INVERSE (the cleanup falls through and `return 1` is pushed to the end).
+ *     Sending all three exits to the same label with `goto keep;` and placing
+ *     that label BEFORE the cleanup block gives the ROM's order: 47 -> 20
+ *     differences.
+ *
+ *  8. RULE 48 -- MATERIALISING THE CONDITION IN A VARIABLE.  At 0x80256B4
+ *     there is the sequence
+ *     `movs r4,#0 / cmp #39 / bne / movs r4,#1 / cmp r4,#0 / beq`; that is not
+ *     direct branching but a flag variable.
+ *     The final `strb r4,[r6,#0]` also uses the zero state of that variable
+ *     (cse knows from the branch condition that r4 == 0), so a plain
+ *     `e->active = 0;` is enough in the source.
  *
  * ---------------------------------------------------------------------
- * YENI SEMBOL: 0x08CA61C0 (gRom08CA61C0) data/ram_map.csv'de YOK ve bu
- * oturumda o dosyaya yazmak yasakti, bu yuzden adres dosya kapsamli
- * `asm(".equ ...")` ile veriliyor.  Bu GECICI bir kacamak; ram_map'e
+ * FORMS TRIED AND ELIMINATED (do not walk into the same wall)
+ *
+ *  - `if (e->phase == 46 || e->phase == 47)` (without the c47 local):
+ *    414 bytes.  The range test both shortens it by 2 bytes and merges case
+ *    101's call block with the others.  Reversing the order (`47 || 46`) does
+ *    not save it either; fold still sees the adjacent range.
+ *  - Writing the inner switch in the order `22, 28, 46`: 394 bytes instead of
+ *    458.  The last case falling through is what decides it (point 2).
+ *  - Taking the table base into a local (`tab = (u32 *)0x08CA61C0; tab[i]`):
+ *    the copy is eliminated but the instruction order does not change (it
+ *    stays at 47 differences).
+ *    The same result came out of `u32 tab = 0x08CA61C0; *(u32 *)(tab + (i << 2))`
+ *    and `#define TABLE (*(u32 (*)[])0x08CA61C0)`.  The constant load is always
+ *    sunk to its use site.
+ *  - `if (ok == 0) goto cleanup; return 1; cleanup: ...` in the tail: the block
+ *    order DOES NOT CHANGE (47 differences).  All three exits have to go to the
+ *    same label (point 7).
+ *  - `FUN_08023df0(&e->payload, w, e->unk84, TABLE[owner] << 16)` on one line:
+ *    the argument setup order is reversed (point 5).
+ *
+ * ---------------------------------------------------------------------
+ * A NEW SYMBOL: 0x08CA61C0 (gRom08CA61C0) was NOT in data/ram_map.csv and
+ * writing to that file was forbidden in that session, so the address was given
+ * with a file-scoped `asm(".equ ...")`.  That was a TEMPORARY workaround; once
+ * the line
  *     0x08CA61C0,0,gRom08CA61C0,decomp,provisional,
- *     "ROM: u32 tablo, e->owner (+0x01) ile indeksleniyor; deger <<16
- *      ile FUN_08023df0'a gidiyor (0x08025518)."
- * satiri eklenince asagidaki `asm` satiri silinip yalnizca `extern`
- * birakilmali.  Ayni kacamak src/core/nodelist_c3.c'de de kullanilmisti
- * (bkz. oradaki dosya basi notu).  Sabit cast KULLANILAMAZ: kural 1
- * geregi taban register'da tutulmuyor ve komut sirasi kayiyor (madde 6).
+ *     "ROM: u32 table indexed by e->owner (+0x01); the value goes to
+ *      FUN_08023df0 shifted <<16 (0x08025518)."
+ * is added to ram_map, the `asm` line below should be deleted and only the
+ * `extern` kept.  The same workaround was used in src/core/nodelist_c3.c (see
+ * the file-header note there).  A constant cast CANNOT BE USED: under rule 1
+ * the base is not held in a register and the instruction order shifts
+ * (point 6).
  *
- * `make c-review` bu iki satir yuzunden UYARI veriyor ("inline assembly"
- * + "ciplak adres"); ram_map satiri eklenip `asm` silinince denetim
- * TEMIZ oluyor.  Uretilen assembly'nin `asm` satiri OLMADAN da BIREBIR
- * ayni oldugu olculdu (tek fark tekrarlanan bir `.code 16` yonergesi,
- * bayta etkisi yok), yani eslesme o silme sonrasi da korunur.
+ * `make c-review` warns because of those two lines ("inline assembly" +
+ * "bare address"); once the ram_map line is added and the `asm` deleted, the
+ * check comes out CLEAN.  The generated assembly was measured to be IDENTICAL
+ * without the `asm` line as well (the only difference is a repeated `.code 16`
+ * directive, with no effect on the bytes), so the match survives that deletion.
  *
- * ESLESME: 458/458 bayt.
+ * MATCH: 458/458 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_b5.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_b5.c
  */
 
 #include "gba_types.h"
@@ -152,7 +165,7 @@
 #define KIND_76    76
 #define KIND_101  101
 
-#define PHASE_7      7          /* CreateEntryFromTemplate'e verilen evre */
+#define PHASE_7      7          /* the phase passed to CreateEntryFromTemplate */
 #define PHASE_12    12
 #define PHASE_22    22
 #define PHASE_28    28
@@ -161,35 +174,37 @@
 #define PHASE_46    46
 #define PHASE_47    47
 
-/* FUN_08023df0 / FUN_08060db4 ikinci argumani; ROM ikisini de
- * imm8 << n olarak kuruyor (0xE0<<12 ve 0xC0<<14). */
+/* The second argument of FUN_08023df0 / FUN_08060db4; the ROM builds both as
+ * imm8 << n (0xE0<<12 and 0xC0<<14). */
 #define VALUE_A   0x000E0000
 #define VALUE_B   0x00300000
 
-#define NOTIFY_A   461          /* FUN_08035058 ikinci argumani */
+#define NOTIFY_A   461          /* the second argument of FUN_08035058 */
 #define NOTIFY_B   258
 
-/* ROM tablosu; adresi data/ram_map.csv'de kayitli, derleme katmani
- * (tools/agbcc_build.py) `.equ` bildirimini KENDISI uretiyor -- bu yuzden
- * burada inline assembly YOK.  Dizi bildirimi zorunlu: baska yazimlar
- * arguman sirasini bozuyor (bkz. dosya basindaki elenen yollar). */
+/* A ROM table; its address is recorded in data/ram_map.csv and the build layer
+ * (tools/agbcc_build.py) generates the `.equ` declaration ITSELF -- which is
+ * why there is NO inline assembly here.  The array declaration is mandatory:
+ * other forms break the argument order (see the eliminated paths at the top of
+ * the file). */
 extern u32 gRom08CA61C0[];
 
-/* +0x4C'deki 12 baytlik uclu; src/world/entries_b1.c'deki `Triple` ve
- * src/world/submit_pack.c'deki `Pack12` ile ayni nesne. */
+/* The 12-byte triple at +0x4C; the same object as `Triple` in
+ * src/world/entries_b1.c and `Pack12` in src/world/submit_pack.c. */
 typedef struct Triple {
     u32 a;
     u32 b;
     u32 c;
 } Triple;
 
-/* Kardes dosyalarla (entries_a5.c, entries_a6.c, entries_b1.c) ayni
- * yerlesim; bu fonksiyonun dokundugu alanlar acildi.  Toplam 148 = 0x94. */
+/* The same layout as the sibling files (entries_a5.c, entries_a6.c,
+ * entries_b1.c); the fields this function touches were expanded.  148 = 0x94
+ * in total. */
 typedef struct Entry {
     u8     active;              /* +0x00 */
-    u8     owner;               /* +0x01, ROM tablosuna indeks olarak da kullaniliyor */
+    u8     owner;               /* +0x01, also used as an index into the ROM table */
     u8     pad02[2];
-    u8     sub[38];             /* +0x04, ReleaseObject'ye verilir */
+    u8     sub[38];             /* +0x04, passed to ReleaseObject */
     u8     pad2a[34];
     Triple payload;             /* +0x4C */
     u8     pad58[12];
@@ -214,8 +229,9 @@ extern u32  CreateEntryFromTemplate(Entry *src, u32 unused1, u32 unused2,
 /* 0x08025518 */
 u32 StepEntryPhase(Entry *e)
 {
-    /* Kural 45: her cagri dalinin KENDI uclusu var.  Bildirim sirasi
-     * degistirilmemeli, dagitim sirasini belirliyor (bkz. dosya basi 4). */
+    /* Rule 45: every call branch has ITS OWN triple.  The declaration order
+     * must not be changed; it decides the allocation order (see point 4 in the
+     * file header). */
     Triple *p76;
     u32     w76;
     u32     tbl76;
@@ -223,7 +239,8 @@ u32 StepEntryPhase(Entry *e)
     Triple *p101;
     u32     w101;
     u32     tbl101;
-    u32     c47;                /* kural 44: aralik testini engelleyen yerel */
+    u32     c47;                /* rule 44: the local that prevents the range
+                                   test */
     Triple *p46;
     u32     w46;
     u32     tbl46;
@@ -265,7 +282,7 @@ u32 StepEntryPhase(Entry *e)
             FUN_08023df0(p46, w46, e->unk84, tbl46);
             FUN_08060db4(p46, w46);
             break;
-        case PHASE_22:          /* en sonda kalmali, bkz. dosya basi 2 */
+        case PHASE_22:          /* must stay last, see item 2 at the top */
             w22 = VALUE_B;
             tbl22 = gRom08CA61C0[e->owner] << 16;
             p22 = &e->payload;
@@ -289,12 +306,13 @@ u32 StepEntryPhase(Entry *e)
         gRam02024344 = 0;
     }
 
-    /* Kural 49: temizlik blogu SONDA; uc cikis da ayni etikete gidiyor. */
+    /* Rule 49: the cleanup block goes LAST; all three exits go to the same label. */
     if (e->phase == PHASE_12)
         goto keep;
     if (e->phase == PHASE_38)
         goto keep;
-    ok = 0;                     /* kural 48: kosul degiskende maddelesiyor */
+    ok = 0;                     /* rule 48: the condition is materialised in a
+                                   variable */
     if (e->phase == PHASE_39)
         ok = 1;
     if (ok == 0)

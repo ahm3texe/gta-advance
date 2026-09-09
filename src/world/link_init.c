@@ -1,21 +1,21 @@
-/* Baglanti blogunu kurar — 0x08066568-0x0806660B
+/* Initialize the link block — 0x08066568-0x0806660B
  *
- * Bloğu 464 bayt sifirliyor (CpuSet sabit kaynakli 116 kelime), seri
- * kesmeyi kapatip RCNT/SIOCNT'yi cok oyunculu kipe aliyor, blok icindeki
- * bes tamponun isaretcilerini yaziyor ve cikista seri kesmeyi aciyor.
+ * Clear 464 bytes (CpuSet, fixed source, 116 words), disable the serial
+ * interrupt, set RCNT/SIOCNT to multiplayer mode, assign five buffer pointers
+ * inside the block, then enable the serial interrupt on exit.
  *
- * IE yazimlari IME kapaliyken; sira ROM'dan okundu. Sabit 1 iki kez
- * kullanildigi icin agbcc onu yuksek yazmacta (r8) tutuyor.
+ * IE writes occur with IME disabled; ordering was read from the ROM. agbcc
+ * keeps constant 1 in a high register (r8) because it is used twice.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_init.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_init.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 #include "comm_block.h"
 
-#define CPUSET_FILL_WORDS  0x05000074   /* sabit kaynak + 32 bit + 116 kelime */
+#define CPUSET_FILL_WORDS  0x05000074   /* fixed source + 32-bit + 116 words */
 #define IE_KEEP_MASK       0xFF3F
 #define IE_SERIAL          0x0080
 #define RCNT_SIO           0x0000

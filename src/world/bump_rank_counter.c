@@ -1,18 +1,19 @@
-/* Sirali sayac artirimi — 0x08066C94-0x08066D53
+/* Bumping the rank counter — 0x08066C94-0x08066D53
  *
- * Kayit tamponunun +0x7E'sindeki tek u16 icinde uc adet 5 bitlik sayac
- * var. Hangi kaydin etkin oldugunu GetRecordIndex soyluyor ve o kaydin
- * sayaci bir artirilip 20'de doyuruluyor.
+ * Three 5-bit counters live inside the single u16 at +0x7E of the record
+ * buffer.  GetRecordIndex says which record is active, and that record's
+ * counter is incremented by one and saturated at 20.
  *
- * Ucu de AYNI kaynak kalibindan cikiyor; agbcc alanin bayt sinirini
- * asmasina gore farkli komut uretiyor:
- *   bit 1-5   -> tek bayt  (ldrb/strb +0x7E)
- *   bit 6-10  -> yarim soz (ldrh/strh +0x7E, siniri asiyor)
- *   bit 11-15 -> tek bayt  (ldrb/strb +0x7F)
- * Yani ucunu ayri ayri yazmaya gerek yok, bitfield bildirimi yeterli.
+ * All three come out of the SAME source pattern; agbcc emits different
+ * instructions depending on whether the field crosses the byte boundary:
+ *   bits 1-5   -> a single byte  (ldrb/strb +0x7E)
+ *   bits 6-10  -> a half word    (ldrh/strh +0x7E, it crosses the boundary)
+ *   bits 11-15 -> a single byte  (ldrb/strb +0x7F)
+ * So there is no need to write the three separately; the bitfield declaration
+ * is enough.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/bump_rank_counter.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/bump_rank_counter.c
  */
 
 #include "gba_types.h"

@@ -1,73 +1,79 @@
-/* gEntriesA'da bos yuva acip sablondan yeni giris kurma — 0x08025424-0x08025515
+/* Opening a free slot in gEntriesA and building a new entry from a template
+ * — 0x08025424-0x08025515
  *
- * Kardesi src/world/entries_a5.c (0x08028A88) ile ayni ailedendir: ikisi de
- * gEntriesA tablosunda (15 giris, 148 bayt stride) +0x00 alani sifir olan
- * ilk bos yuvayi arar. Bu surum farkli olarak
- *   - yuvayi ELDEKI BIR GIRISTEN (src) kopyalayarak doldurur,
- *   - ROM tablosundan (gRom08BD3448) uc asamali bir cozumleme yapip
- *     elde ettigi tanimlayiciyi alt nesneye baglar,
- *   - bos yuva bulamazsa 0, kurarsa 1 dondurur.
+ * The same family as its sibling src/world/entries_a5.c (0x08028A88): both
+ * search the gEntriesA table (15 entries, 148-byte stride) for the first free
+ * slot whose +0x00 field is zero.  This version differs in that it
+ *   - fills the slot by copying FROM AN EXISTING ENTRY (src),
+ *   - performs a three-level resolution through the ROM table (gRom08BD3448)
+ *     and attaches the descriptor it obtains to the sub-object,
+ *   - returns 0 if it finds no free slot and 1 if it builds one.
  *
- * Akis:
+ * The flow:
  *   desc = gRom08BD3448.slots[kind]->slots[phase]->slots[0]
- *   bos yuva yoksa 0 don
- *   e->kind/phase/+0x66 kurulur; src'den +0x4C ucusu, +0x68 ve +0x84 kopyalanir
- *   FUN_08014FFC / FUN_08013CFC / FUN_08014EE4 / FUN_08015038 alt nesneyi kurar
+ *   return 0 if there is no free slot
+ *   e->kind/phase/+0x66 are set; the +0x4C triple, +0x68 and +0x84 are copied
+ *     from src
+ *   FUN_08014FFC / FUN_08013CFC / FUN_08014EE4 / FUN_08015038 set up the
+ *     sub-object
  *   e->active=1, +0x8C=0, timer=125, owner=arg5
- *   phase 47 ise mod 64, degilse 16
+ *   mode 64 if the phase is 47, otherwise 16
  *
- * IMZA cagri yerinden dogrulandi (0x08025662 ve 0x0802568C): alti arguman
- * veriliyor (r0, 1, 0, 34, [sp,#0], [sp,#4]). Ikinci ve ucuncu arguman
- * cagrilanda HIC OKUNMUYOR; ROM daha girerken `adds r2,r0,#0` ile r0'i r2'ye
- * tasiyip r1/r2'yi eziyor. Bu yuzden imzada duruyorlar ama kullanilmiyorlar.
+ * THE SIGNATURE was confirmed from the call sites (0x08025662 and 0x0802568C):
+ * six arguments are passed (r0, 1, 0, 34, [sp,#0], [sp,#4]).  The second and
+ * third arguments are NEVER READ by the callee; on entry the ROM moves r0 into
+ * r2 with `adds r2,r0,#0` and clobbers r1/r2.  So they stay in the signature
+ * but are unused.
  *
- * PARAMETRE TIPLERI komut dizisinden okundu (kural 15): dorduncu ve altinci
- * arguman `lsls #24 / lsrs #24` ciftiyle daraltiliyor -> ISARETSIZ 8 bit;
- * besinci arguman ham kelime olarak kullaniliyor -> u32.
+ * THE PARAMETER TYPES were read from the instruction sequence (rule 15): the
+ * fourth and sixth arguments are narrowed with a `lsls #24 / lsrs #24` pair ->
+ * UNSIGNED 8-bit; the fifth is used as a raw word -> u32.
  *
- * Kural 35'in tersi: epilog `pop {r1}; bx r1` — donus adresi r1'e aliniyor,
- * yani r0 canli, fonksiyon DEGER donduruyor (u32).
+ * The reverse of rule 35: the epilogue `pop {r1}; bx r1` — the return address
+ * is taken into r1, so r0 is live and the function returns a VALUE (u32).
  *
- * Kural 32: +0x4C'deki 12 bayt `ldmia r0!,{r3,r4,r7}` / `stmia r1!,{...}`
- * ciftiyle tasiniyor; bu ancak struct atamasindan (Triple) cikiyor,
- * `*d++ = *s++` ucluleri uc ayri ldr/str veriyor.
+ * Rule 32: the 12 bytes at +0x4C are moved by an
+ * `ldmia r0!,{r3,r4,r7}` / `stmia r1!,{...}` pair; that only comes out of a
+ * struct assignment (Triple), while `*d++ = *s++` triples give three separate
+ * ldr/str.
  *
- * Kural 9/31: dongu ici dal `cmp #14` + `bgt`, yani ISARETLI -> sayac `s32`.
- * Dongu sonrasi dal ise `cmp #15` + `bne`; bu `i > 14` degil `i == 15`
- * yaziminin karsiligidir (`i > 14` yazilinca agbcc yine `cmp #14`/`bgt`
- * uretiyor ve blok sirasi kayiyor).
+ * Rules 9/31: the in-loop branch is `cmp #14` + `bgt`, i.e. SIGNED -> the
+ * counter is `s32`.  The branch after the loop, however, is `cmp #15` + `bne`;
+ * that corresponds to `i == 15`, not `i > 14` (written as `i > 14`, agbcc
+ * again produces `cmp #14`/`bgt` and the block order shifts).
  *
- * Kural 19: yuva doldurma sirasinda kaynak sirasi ROM'un `adds`/`subs`
- * zincirini belirliyor: +0x64 (adds #100), +0x90 (adds #44), +0x66
- * (subs #42). Sira degistirilirse ofset zinciri de degisiyor.
+ * Rule 19: while filling the slot, the source order decides the ROM's
+ * `adds`/`subs` chain: +0x64 (adds #100), +0x90 (adds #44), +0x66 (subs #42).
+ * Change the order and the offset chain changes too.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_b1.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_b1.c
  */
 
 #include "gba_types.h"
 
-#define ENTRY_COUNT     15      /* gEntriesA'daki yuva sayisi */
-#define SUB_ARG         131     /* FUN_08014FFC ikinci argumani (0x83) */
-#define TIMER_START     125     /* +0x02 baslangic degeri */
-#define PHASE_SPECIAL   47      /* +0x90 == 47 ayrik dal */
+#define ENTRY_COUNT     15      /* the number of slots in gEntriesA */
+#define SUB_ARG         131     /* FUN_08014FFC's second argument (0x83) */
+#define TIMER_START     125     /* the +0x02 initial value */
+#define PHASE_SPECIAL   47      /* the separate +0x90 == 47 branch */
 #define MODE_SPECIAL    64      /* +0x2A */
 #define MODE_DEFAULT    16      /* +0x2A */
 
-/* +0x4C'deki 12 baytlik ucluyu tek ldmia/stmia ciftiyle tasitmak icin
- * (kural 32); entries_a5.c'deki Triple ile ayni. */
+/* So the 12-byte triple at +0x4C is moved by a single ldmia/stmia pair
+ * (rule 32); the same as the Triple in entries_a5.c. */
 typedef struct Triple {
     u32 a;
     u32 b;
     u32 c;
 } Triple;
 
-/* 0x08BD3448'deki ROM koku ve ondan zincirlenen dugumler. Kok ve ara
- * dugumler AYNI seklde: +0x04'te bir isaretci dizisine isaretci. Bu yuzden
- * tek ozyinelemeli tip yeterli. Ayni sembol src/text/glyph_table_access.c'de
- * DAHA SIG bir gorunumle (GlyphRoot/GlyphEntry) bildirilmis; oradaki +0x14
- * alani burada da okunuyor, yani ayni fiziksel dugum. Bu ceviri biriminin
- * ihtiyaci olan derinlik farkli oldugu icin gorunum ayri tutuldu. */
+/* The ROM root at 0x08BD3448 and the nodes chained from it.  The root and the
+ * intermediate nodes have the SAME shape: a pointer to a pointer array at
+ * +0x04.  So a single recursive type is enough.  The same symbol is declared
+ * with a SHALLOWER view (GlyphRoot/GlyphEntry) in
+ * src/text/glyph_table_access.c; the +0x14 field there is read here too, so it
+ * is the same physical node.  Because this translation unit needs a different
+ * depth, the view is kept separate. */
 typedef struct RomNode {
     u32             pad00;
     struct RomNode **slots;     /* +0x04 */
@@ -77,13 +83,14 @@ typedef struct RomNode {
 
 extern RomNode gRom08BD3448;
 
-/* Kardes dosyalarla (entries_a1.c ... entries_a5.c, kind_scan.c) ayni
- * yerlesim; bu fonksiyonun dokundugu alanlar acildi. Toplam 148 = 0x94. */
+/* The same layout as in the sibling files (entries_a1.c ... entries_a5.c,
+ * kind_scan.c); the fields this function touches have been named.  The total
+ * is 148 = 0x94. */
 typedef struct Entry {
     u8     active;              /* +0x00 */
     u8     owner;               /* +0x01 */
     u16    timer;               /* +0x02 */
-    u8     sub[38];             /* +0x04, FUN_08014FFC/FUN_08015038'e verilir */
+    u8     sub[38];             /* +0x04, passed to FUN_08014FFC/FUN_08015038 */
     u8     mode;                /* +0x2A */
     u8     pad2b[33];
     Triple payload;             /* +0x4C */

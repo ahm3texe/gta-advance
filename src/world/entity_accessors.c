@@ -1,32 +1,32 @@
-/* Varlik erisimcileri — 0x08032090-0x080320BB
+/* Entity accessors — 0x08032090-0x080320BB
  *
- * Bes kucuk erisimci. Hepsi ayni yapiyi isaret eden bir isaretci aliyor;
- * alan adlari davranistan cikarildi, anlamlari henuz dogrulanmadi.
+ * Five small accessors taking pointers to the same structure. Field names
+ * were inferred from behavior; their meaning remains unverified.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entity_accessors.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entity_accessors.c
  */
 
 #include "gba_types.h"
 
-/* Alan ofsetleri ROM'dan okundu; isimler gecicidir. */
+/* Offsets were read from the ROM; names are provisional. */
 typedef struct {
-    u8  flags : 7;  /* 0x00 — yedi bitlik alan; ROM lsls/lsrs cifti uretiyor */
+    u8  flags : 7;  /* 0x00 — seven-bit field; the ROM emits an lsls/lsrs pair */
     u8  unk00_7 : 1;
     u8  unk01;
-    u8  kind;       /* 0x02 — ust nibble'i okunuyor */
+    u8  kind;       /* 0x02 — reads the high nibble */
     u8  unk03[3];
     u16 unk06;      /* 0x06 \                                        */
-    u16 unk08;      /* 0x08  } ucu de 16.16 sabit noktaya cevriliyor */
+    u16 unk08;      /* 0x08 — all three are converted to 16.16 fixed-point */
     u16 unk0A;      /* 0x0A /                                        */
     u16 unk0C;      /* 0x0C */
     u16 unk0E;
     u32 unk10;      /* 0x10 */
     u16 unk14;
-    u16 id;         /* 0x16 — bir tabanli; 0 "yok" demek */
+    u16 id;         /* 0x16 — one-based; 0 means none */
 } Entity;
 
-/* 0x08032090 — uc alani 16.16 sabit noktaya cevirip hedefe yazar. */
+/* 0x08032090 — convert three fields to 16.16 fixed-point and write to the destination. */
 void GetEntityFixedFields(const Entity *entity, u32 *out)
 {
     out[0] = entity->unk06 << 16;

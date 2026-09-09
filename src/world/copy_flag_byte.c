@@ -1,14 +1,14 @@
-/* gSaveBuffer bayt kopyalama ciftleri — 0x080320C8-0x080320DF
+/* gSaveBuffer byte-copy pair — 0x080320C8-0x080320DF
  *
- * ROM tek taban yuklemesiyle iki alana da erisiyor:
- *     ldrb r0, [r1, #8]  /  strb r0, [r1, #9]
+ * The ROM accesses both fields with a single base load:
+ *     ldrb r0, [r1, #8] / strb r0, [r1, #9]
  *
- * ANLAM DOGRULANMADI: alanlarin ne oldugu bilinmiyor, bu yuzden ad
- * davranisi tarif ediyor ("8'i 9'a kopyala"), islevi degil. gSaveBuffer
- * kayit yoneticisinin calisma tamponu (data/ram_map.csv).
+ * MEANING UNVERIFIED: the fields' purpose is unknown, so the name describes
+ * the operation (copy 8 to 9), not its purpose. gSaveBuffer is the save
+ * manager's working buffer (data/ram_map.csv).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/copy_flag_byte.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/copy_flag_byte.c
  */
 
 #include "gba_types.h"

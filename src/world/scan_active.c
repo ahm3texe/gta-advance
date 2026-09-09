@@ -1,7 +1,7 @@
-/* Ic ic zincir okuma — 0x08028FFC-0x08029013
+/* Read a nested chain — 0x08028FFC-0x08029013
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/scan_active.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/scan_active.c
  */
 
 #include "gba_types.h"

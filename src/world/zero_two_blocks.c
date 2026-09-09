@@ -1,11 +1,10 @@
-/* Iki blogu sifirlama — 0x08030C28-0x08030C4B
+/* Clear two blocks — 0x08030C28-0x08030C4B
  *
- * gFlagsA (0x02026F38) ve gFlagsB (0x02026EF0) sekizer baytini
- * Memset ile sifirliyor.
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * Memset clears eight bytes each at gFlagsA (0x02026F38) and gFlagsB
+ * (0x02026EF0). Rule 35: `pop {r0}; bx r0` indicates void.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/zero_two_blocks.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/zero_two_blocks.c
  */
 
 #include "gba_types.h"

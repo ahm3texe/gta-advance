@@ -1,10 +1,10 @@
-/* Ic nesne kimligi — 0x0803824C-0x0803825F
+/* Inner-object ID — 0x0803824C-0x0803825F
  *
- * Iki baglantiyi izler; zincirin herhangi bir halkasi yoksa sifir,
- * ikinci halkanin +0x18 alanini aksi halde dondurur.
+ * Follow two links. Return zero if either is missing; otherwise return the
+ * second object's +0x18 field.
  *
- * BYTE-MATCHING. Ilk null kontrolunu acik erken `return 0` biciminde
- * yazmak ROM'daki ortak sifir blogunu deger blogundan once yerlestirir.
+ * BYTE-MATCHING. An explicit early return 0 for the first null check places
+ * the shared zero block before the value block, as in the ROM.
  */
 
 #include "gba_types.h"

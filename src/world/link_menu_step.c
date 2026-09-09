@@ -1,12 +1,11 @@
-/* Link menusu adim numarasini (0..35) mesaj koduna cevirir: kod = 0xB0 + adim.
- * Aralik disi adimlar 0x93 dondurur. ROM 36 girisli bir atlama tablosu
- * (0x08066EF0) kullanir; her durum dogrudan kendi sabitini dondurur.
+/* Convert a link-menu step (0..35) to a message code: code = 0xB0 + step.
+ * Out-of-range steps return 0x93. The ROM uses a 36-entry jump table at
+ * 0x08066EF0; each case directly returns its own constant.
  *
- * Not: aralik kontrolu IKI AYRI `if` olmali. `if (step < 0 || step > 35)`
- * yazimi agbcc'de tek bir isaretsiz karsilastirmaya (`cmp #35 / bls`)
- * katlaniyor ve switch'in kendi aralik kontroluyle birlesip 312 bayt
- * uretiyor; iki ayri `if` ROM'un isaretli `cmp #0 / blt` + `cmp #35 / ble`
- * ciftini ve ardindan switch'in ayri `cmp #35 / bls` kontrolunu koruyor.
+ * The range check needs TWO SEPARATE if statements. `if (step < 0 || step > 35)`
+ * folds to one unsigned cmp #35 / bls in agbcc, merges with the switch range
+ * check, and produces 312 bytes. Separate checks preserve the ROM's signed
+ * cmp #0 / blt + cmp #35 / ble, followed by the switch's own cmp #35 / bls.
  */
 
 #include "gba_types.h"

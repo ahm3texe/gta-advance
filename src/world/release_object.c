@@ -1,23 +1,26 @@
-/* Nesneyi birakma (cift bagli listeden cikarma) — 0x08013ABC-0x08013B9B
+/* Releasing an object (unlinking it from the doubly linked list) —
+ * 0x08013ABC-0x08013B9B
  *
- * Projede en cok cagrilan yardimcilardan biri (eski adi FUN_08013abc).
- * +0x3C/+0x40 baglari 0xFDFDFDFD ise (bagli degil) hemen doner. +0x27
- * "sahipli" bayti 1 ise +0x18 dugumu UnlinkToFree ile serbest kalir,
- * +0x20 bayraginin bit0'i ve +0x34 doluysa FUN_08013308, +0x38 icin
- * FUN_0801362c. +0x44 alt nesnesi varsa onun icin de ayni is (once
- * +0x44'unun +0x44'u FUN_08015110) ve gRam020110C0 havuzuna FUN_0800c804
- * ile geri verilir. Sonra gRam020230A0 basli cift bagli listeden cikarilir,
- * baglar 0xFDFDFDFD, sahiplik 0.
+ * One of the most called helpers in the project (formerly FUN_08013abc).  If
+ * the +0x3C/+0x40 links are 0xFDFDFDFD (not linked) it returns immediately.
+ * If the +0x27 "owned" byte is 1, the +0x18 node is freed with UnlinkToFree;
+ * on bit0 of the +0x20 flag with +0x34 present, FUN_08013308, and for +0x38,
+ * FUN_0801362c.  If there is a +0x44 sub-object, the same work is done for it
+ * (its own +0x44's +0x44 goes to FUN_08015110 first) and it is handed back to
+ * the gRam020110C0 pool with FUN_0800c804.  Then it is unlinked from the
+ * doubly linked list headed at gRam020230A0, the links are set to 0xFDFDFDFD
+ * and ownership to 0.
  *
- * IKI OLCUM: alt nesne once alan uzerinden sinanip SONRA yerele alinmali
- * (`if (obj->child != 0) { child = obj->child; ...}`; ROM once r1'e
- * yukleyip testten sonra r5'e kopyaliyor). Liste cikarma DOGRUDAN ALAN
- * IFADELERIYLE yazilmali: ROM `obj->next->prev = obj->prev` icin iki
- * alani da YENIDEN okuyor (araya giren isaretci store'u CSE'yi bozuyor);
- * prev/next yerelleriyle yazilinca 7 komut sapiyor.
+ * TWO MEASUREMENTS: the sub-object must be tested through the field first and
+ * taken into a local AFTERWARDS (`if (obj->child != 0) { child = obj->child;
+ * ...}`; the ROM loads it into r1 first and copies it to r5 after the test).
+ * The unlinking must be written WITH DIRECT FIELD EXPRESSIONS: for
+ * `obj->next->prev = obj->prev` the ROM RE-READS both fields (the intervening
+ * pointer store defeats CSE); written with prev/next locals it diverges by 7
+ * instructions.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/release_object.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/release_object.c
  */
 
 #include "gba_types.h"

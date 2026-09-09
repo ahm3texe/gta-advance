@@ -1,97 +1,112 @@
-/* DURUM: PARK — 2352/2374 bayt, 669/1174 komut ayni (2026-09-07).
- * Onceki kaynak: 2356 bayt, 575/1174 komut. Tam byte-matching DEGIL.
+/* STATUS: PARKED — 2352/2374 bytes, 669/1174 instructions identical (2026-09-07).
+ * The previous source: 2356 bytes, 575/1174 instructions. NOT fully
+ * byte-matching.
  *
- * TX YAZMAC CAKISMASI GIDERILDI (docs/COMPILER.md, kural 64):
- * PackLocalLinkTag, iki paralel halkadan bir kaydin etiketini paketler.
- * Isaretci once halka tabanina kurulur, sonra istenen kayda ilerletilir.
- * `entry = taban + index` diye tek ifadeye indirmek AYNI anlami tasir,
- * fakat agbcc taban sabitini iki etiket arasinda r4'te canli tutar.
- * Iki adimli ilerleme tabani iki kisa omurlu pseudo'ya ayirir; r4 serbest
- * kalir ve k=r4, tx2=r5, cur=r6, tus halkasi tabani=r7 olur (ROM gibi).
+ * THE TX REGISTER CLASH WAS RESOLVED (docs/COMPILER.md, rule 64):
+ * PackLocalLinkTag packs the tag of one record from two parallel rings.
+ * The pointer is first set to the ring base, then advanced to the requested
+ * record.
+ * Reducing this to the single expression `entry = base + index` carries THE
+ * SAME meaning, but agbcc then keeps the base constant live in r4 between the
+ * two tags. Advancing in two steps splits the base into two short-lived
+ * pseudos; r4 is freed and the allocation becomes k=r4, tx2=r5, cur=r6, key
+ * ring base=r7 (as in the ROM).
  *
- * Kontrollu olcum (tools/probe_sio_tx.py):
- *   eski dogrudan iki ifade              575/1174, 2356 bayt
- *   yardimci, entry = taban + index      573/1174, 2356 bayt
- *   yardimci, entry = taban; entry += i  669/1174, 2352 bayt  <- KORUNAN
- * `static inline` yardimci iki cagri yerinde de acilir; yeni BL yoktur.
- * Saf taban takma-adiyla 677 veren tanisal aday alinmadi; entry ise
- * gercekten indekslenen kayda ilerleyen, tek amacli bir isaretcidir.
+ * A controlled measurement (tools/probe_sio_tx.py):
+ *   the old direct two expressions        575/1174, 2356 bytes
+ *   a helper, entry = base + index        573/1174, 2356 bytes
+ *   a helper, entry = base; entry += i    669/1174, 2352 bytes  <- KEPT
+ * The `static inline` helper is expanded at both call sites; there is no new
+ * BL.
+ * A diagnostic candidate that scored 677 through a pure base alias was not
+ * taken; `entry`, by contrast, is a single-purpose pointer that really does
+ * advance to the indexed record.
  *
- * Eski devir notundaki sembol yanlisti: baslangic derlemesinde r4'u
- * tutan gRam020003C0 idi; gRam02000E80 r3'teydi. Ilkinde p1012 (L79,
- * 6 referans / 20 omur) yerine korunan kaynakta p1005 ve p1032
- * (L79, her biri 8 referans / 8 omur, r1) var. k'nin p44 dagitimi
- * r5'ten r4'e dondu. Bunun tum govdeyi eslestirecegi hipotezi
- * DOGRULANMADI: net kazanc 94 komut, 505 komut farki suruyor.
+ * The symbol in the old handover note was wrong: in the starting build it was
+ * gRam020003C0 that held r4, while gRam02000E80 was in r3. Where the first had
+ * p1012 (L79, 6 references / 20 lifetime), the kept source has p1005 and p1032
+ * (L79, 8 references / 8 lifetime each, r1). k's allocation p44 moved back from
+ * r5 to r4. The hypothesis that this would match the whole body was NOT
+ * CONFIRMED: the net gain is 94 instructions, and 505 instructions differences
+ * remain.
  *
- * KALANLAR:
- * - Eski 0x08065834 yigin kopyasi artik eslesiyor. Ilk komut farki
- *   0x0806584C'de: epilogun yeri degistigi icin ic dalin hedefi farkli.
- * - RX adresleri ROM'da (blok+sabit)+i*16; bizde (blok+i*16)+sabit.
- * - Pencere/kuyruk bloklarinda baska dagitim ve ifade farklari var.
- * - TX etiket bolumunde iki taban yuklemesi artik ayri, fakat ROM'un
- *   r3->r1 / r0->r1 adres toplamalarina karsi biz r1'i yerinde ilerletiriz.
- * Dogrusal diff bloklari yaklasik hizalar; skor tam eslesme kaniti degil.
+ * WHAT REMAINS:
+ * - The old stack copy at 0x08065834 now matches. The first instruction
+ *   difference is at 0x0806584C: because the epilogue moved, the inner
+ *   branch's target differs.
+ * - The RX addresses are (block+constant)+i*16 in the ROM; ours are
+ *   (block+i*16)+constant.
+ * - There are other allocation and expression differences in the window/queue
+ *   blocks.
+ * - In the TX tag section the two base loads are now separate, but against the
+ *   ROM's r3->r1 / r0->r1 address additions we advance r1 in place.
+ * A linear diff aligns the blocks approximately; the score is not proof of an
+ * exact match.
  *
- * 2026-09-07 EK OLCUM (skor degismedi, 669'da kaldi):
+ * 2026-09-07 ADDITIONAL MEASUREMENTS (the score did not move; it stayed at 669):
  *
- * 1. ILK GERCEK FARK 0x08065A52'de ve BU BIR SONUC, SEBEP DEGIL.
- *    ROM orada `b.n 0x8065A6A` ile govdeye atliyor; zaman asimi testi
- *    (0x08065A5C) govdeden ONCE yerlesmis. Sebebi Thumb kosullu dal
- *    menzili: LIVE govdesi ~1232 bayt, test govdeden sonra olsaydi geri
- *    dal menzil disi kalirdi. Yani yerlesim, govde iceriginin boyutunun
- *    zorladigi bir sonuc; govde duzelmeden bu blok hizalanmaz.
+ * 1. THE FIRST REAL DIFFERENCE IS AT 0x08065A52 AND IT IS A CONSEQUENCE, NOT A
+ *    CAUSE.
+ *    There the ROM jumps into the body with `b.n 0x8065A6A`; the timeout test
+ *    (0x08065A5C) has been placed BEFORE the body. The reason is the Thumb
+ *    conditional branch range: the LIVE body is about 1232 bytes, and had the
+ *    test come after the body the backward branch would have been out of range.
+ *    So the layout is a consequence forced by the size of the body's contents;
+ *    this block will not align until the body is corrected.
  *
- * 2. DIS DONGU YAZIMI KOL DEGIL. Dort yazim BIREBIR ayni ciktiyi verdi
- *    (2352 bayt, 669/1174): `do {...} while (cond)`, `for (;;) {... if
- *    (!cond) break; }`, `while (1) {... break}`, ters kosullu do/while.
- *    agbcc hepsini ayni ic bicime indirgiyor.
+ * 2. THE OUTER LOOP FORM IS NOT A LEVER. Four forms gave BYTE-IDENTICAL output
+ *    (2352 bytes, 669/1174): `do {...} while (cond)`, `for (;;) {... if
+ *    (!cond) break; }`, `while (1) {... break}`, and an inverted-condition
+ *    do/while. agbcc reduces all of them to the same internal form.
  *
- * 3. RX ILISKILENDIRMESI YENIDEN YAZIMLA KAPANMIYOR. ROM her alan icin
- *    birlesik sabiti (0x190 + alan ofseti) kurup `taban + sabit`, sonra
- *    `+ i*16` ekliyor (0x08065A8E'de olculdu: movs #207 / lsls #1 /
- *    adds / adds). Biz `(taban + i*16) + sabit` uretiyoruz. Denenen ve
- *    ELENEN dort yeni yazim:
- *      FRAME(b)->rx           dizi bozunmasi ile RX_BASE   669 (ayni)
- *      (&FRAME(b)->rx[0])[i]                               602
- *      FRAME(b)->rx[0 + i]                                 669 (ayni)
- *      (mevcut) FRAME(b)->rx[i]                            669
- *    Ilk ve ucuncu bayt bayt ayni cikti veriyor; agbcc katliyor.
- *    Onceki turda elenenlerle birlikte sekiz yazim denendi.
+ * 3. THE RX ASSOCIATION DOES NOT CLOSE BY REWRITING. For every field the ROM
+ *    builds the combined constant (0x190 + the field offset), does
+ *    `base + constant`, and then adds `+ i*16` (measured at 0x08065A8E:
+ *    movs #207 / lsls #1 / adds / adds). We produce `(base + i*16) + constant`.
+ *    Four new forms were tried and ELIMINATED:
+ *      FRAME(b)->rx           with array decay to RX_BASE   669 (unchanged)
+ *      (&FRAME(b)->rx[0])[i]                                602
+ *      FRAME(b)->rx[0 + i]                                  669 (unchanged)
+ *      (current) FRAME(b)->rx[i]                            669
+ *    The first and third produce byte-for-byte identical output; agbcc folds
+ *    them.
+ *    Together with those eliminated in the previous round, eight forms have
+ *    been tried.
  *
- * ONCEKI KAZANIMLAR KORUNUYOR:
- * - TX/RX yapi uyeleri: yapi disi u16 store, skaler global okumalarini
- *   olduruyordu. LinkFrame gorunumu bu alias farkini kapatti (553->568).
- * - TX ikinci yarisi icin ayri tx2; iki RX penceresi icin ayri yereller
- *   (568->575). blk/tx yeniden kullanimi 569'a dusmustu.
+ * EARLIER GAINS ARE PRESERVED:
+ * - TX/RX struct members: a u16 store outside the struct was killing the scalar
+ *   global reads. The LinkFrame view closed that alias difference (553->568).
+ * - A separate tx2 for the second half of the record; separate locals for the
+ *   two RX windows (568->575). Reusing blk/tx had dropped it to 569.
  *
- * ELENENLER (baslangic 575 uzerinden): ters OR operandlari 567/568/569;
- * bayt/yarim-kelime/kelime etiket yerelleri en cok 580; indeks yerelleri
- * en cok 586; step'i bolmek ve unsigned genislikleri degistirmek 575.
- * Volatile taramasi ROM'da olmayan erisimler ekledi, alinmadi.
- * Eski RX bicimleri yeni 669 tabaninda tekrar olculdu: alan-adresi
- * uzerinden u16 erisimi 654; LinkSlot dizi/cast gorunumu 602.
+ * ELIMINATED (from a base of 575): reversed OR operands 567/568/569;
+ * byte/halfword/word tag locals at best 580; index locals at best 586;
+ * splitting step and changing the unsigned widths 575.
+ * A volatile sweep added accesses the ROM does not have and was not taken.
+ * The old RX forms were re-measured against the new base of 669: a u16 access
+ * through the field address gives 654; a LinkSlot array/cast view gives 602.
  *
- * Dogrulama:
+ * Verification:
  *   make c-match FILE=src/world/sio_driver.c
  *   python3 tools/diff_function.py src/world/sio_driver.c FUN_080657d8
  *   python3 tools/dump_alloc.py src/world/sio_driver.c FUN_080657d8 --conflicts
  *   python3 tools/probe_sio_tx.py
  */
 
-/* Baglanti (SIO) surucusunun ana dagiticisi — 0x080657D8-0x0806611D
+/* Main dispatcher of the link (SIO) driver — 0x080657D8-0x0806611D
  *
- * Yapi: tek `switch (gVBlankEnabled)`; dort durum.
- *   0 IDLE     : tus durumunu kopyalar, kenar maskelerini uretir, sifirlar.
- *   1 READY    : StepLinkFrame ile el sikisir; (status & 3) == 3 olunca
- *                yuva numarasini SIOCNT'ten cikarip LIVE'a gecer.
- *   2 LIVE     : asil dongu -- her turda StepLinkFrame, karsi tarafin
- *                iki penceresini (son ve guncel) halka tamponuna isler,
- *                onaya kadar yurur, kendi kaydini kurup gonderir.
- *                240 kareyi asarsa SETTLING'e duser.
- *   3 SETTLING : IDLE ile ayni temizlik.
+ * Structure: a single `switch (gVBlankEnabled)` with four states.
+ *   0 IDLE     : copies the key state, produces the edge masks, clears them.
+ *   1 READY    : handshakes with StepLinkFrame; once (status & 3) == 3 it
+ *                extracts the slot number from SIOCNT and moves to LIVE.
+ *   2 LIVE     : the main loop -- StepLinkFrame every iteration, processes the
+ *                other side's two windows (last and current) into the ring
+ *                buffer, walks up to the acknowledgement, then builds and sends
+ *                its own record.
+ *                Falls to SETTLING if it exceeds 240 frames.
+ *   3 SETTLING : the same cleanup as IDLE.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  */
 
 #include "gba_types.h"
@@ -111,22 +126,23 @@
 #define LINK_STATE_LIVE     2
 #define LINK_STATE_SETTLING 3
 
-/* Iletisim blogunun icindeki kare kayitlari. Gonderilecek kayit +0x180'de,
- * alinan kayitlar +0x190'dan itibaren oyuncu basina 16 bayt. */
+/* The frame records inside the communication block.  The record to be sent is
+ * at +0x180; the received records start at +0x190, 16 bytes per player. */
 #define LINK_TX_OFS 0x180
 #define LINK_RX_OFS 0x190
 
-/* Kare kaydinin alanlari. Erisim BLOK TABANINDAN yapiliyor: ofsetler
- * (0x180..0x19F) Thumb'in strh anlik alanina (0..62) sigmadigi icin ROM her
- * erisimde sabiti yazmaca kurup taban ile topluyor. Ara `LinkSlot *`
- * degiskeni kurmak taban adresi tek sefer hesaplatip `strh [r,#2]`
- * uretiyor -- o yuzden her erisim `FRAME(b)->tx.alan` seklinde.
+/* The fields of the frame record. Access goes THROUGH THE BLOCK BASE: because
+ * the offsets (0x180..0x19F) do not fit Thumb's strh immediate field (0..62),
+ * the ROM builds the constant in a register on every access and adds it to the
+ * base. Introducing an intermediate `LinkSlot *` variable makes the base
+ * address be computed once and produces `strh [r,#2]` -- which is why every
+ * access is written as `FRAME(b)->tx.field`.
  *
- * Alanlarin YAPI UYESI olarak yazilmasi sart: gcc 2.x'in takma-ad
- * cozumlemesinde yapi icindeki bir yazma, yapi disi bir skaler global
- * okumasini (gRam0200048C) gecersiz KILMIYOR; duz `*(u16 *)` yazmasi ise
- * kiliyor ve ROM'da tek kez hesaplanan `gRam0200048C & 31` bizde iki kez
- * hesaplaniyordu. */
+ * Writing the fields as STRUCT MEMBERS is required: in gcc 2.x's alias
+ * analysis, a write inside a struct does NOT invalidate a read of a scalar
+ * global outside it (gRam0200048C), whereas a plain `*(u16 *)` write does --
+ * and then the `gRam0200048C & 31` that the ROM computes once was being
+ * computed twice for us. */
 typedef struct LinkSlot {
     u16 index;                          /* +0x00 */
     u16 keys;                           /* +0x02 */
@@ -146,8 +162,8 @@ typedef struct LinkFrame {
 
 #define FRAME(b)      ((LinkFrame *)(b))
 
-/* Karsi tarafin bu karedeki kaydi. ROM her erisimde hem blok isaretcisini
- * hem de yuva numarasini YENIDEN okuyor; makro bunu koruyor. */
+/* The other side's record for this frame. The ROM RE-READS both the block
+ * pointer and the slot number on every access; the macro preserves that. */
 #define RX_SLOT       (FRAME(gRam02036338)->rx[gRam020004A4])
 
 
@@ -155,9 +171,10 @@ extern u16 gVBlankEnabled;              /* 0x02000D08 */
 extern u16 gRam0200048C;
 extern u16 gRam02000498;
 
-/* IWRAM'daki uc kelime bitisik; ROM birini digerinden `adds #8` / `adds #4`
- * ile turetiyor, yani derleme aninda ARALARINDAKI FARK BILINIYOR. Sembol
- * olarak yazilirsa bu tureme olusmuyor, o yuzden adres sabiti. */
+/* The three words in IWRAM are contiguous; the ROM derives one from another
+ * with `adds #8` / `adds #4`, so THE DIFFERENCE BETWEEN THEM IS KNOWN at
+ * compile time. Written as symbols that derivation does not happen, hence the
+ * address constants. */
 #define gRam03000098 (*(u32 *)0x03000098)
 #define gRam0300009C (*(u32 *)0x0300009C)
 #define gRam030000A0 (*(u32 *)0x030000A0)
@@ -173,8 +190,9 @@ extern u32 gFrameCounterLate;
 extern u8  gRam02036328;
 extern s16 gSlotSelector;               /* 0x02000D40 */
 
-/* Bu sembollerin adresleri data/ram_map.csv'den cozulur. Sembol
- * referanslari korunur; mutlak adresler sahte CSE turemeleri uretebilir. */
+/* The addresses of these symbols are resolved from data/ram_map.csv. The
+ * symbol references are kept; absolute addresses can produce spurious CSE
+ * derivations. */
 
 extern u16 gRam02000134;
 extern u16 gRam02000288;
@@ -191,8 +209,8 @@ extern u32  StepLinkFrame(u8 *dest);
 extern void MaybeSetCommByte6(void);
 extern void BuildLinkPacket(const void *payload);
 
-/* Dusuk bayt adim etiketini, yuksek bayt pencere basini tasir.
- * Halka imlecinin iki adimli ilerlemesi icin yukaridaki olcume bak. */
+/* The low byte carries the step tag and the high byte the window start.
+ * See the measurement above for the ring cursor's two-step advance. */
 static inline u16 PackLocalLinkTag(u32 index)
 {
     const u8 *entry;
@@ -207,10 +225,11 @@ static inline u16 PackLocalLinkTag(u32 index)
 void FUN_080657d8(u32 mode)
 {
     CommBlock *blk;
-    /* Kaydin ikinci yarisi (end* alanlari) icin AYRI isaretci: ROM ilk
-     * yariyi bir yazmacta (r3), ikinci yariyi baskasinda (r5) tutuyor,
-     * yani kaynakta iki degisken var. Tek degisken kullanmak ikisini de
-     * canli tutup dagitimi bir yazmac kaydiriyor. */
+    /* A SEPARATE pointer for the record's second half (the end*
+     * fields): the ROM keeps the first half in one register (r3)
+     * and the second in another (r5), so there are two variables
+     * in the source. Using a single variable keeps both live and
+     * shifts the allocation by one register. */
     CommBlock *tx2;
     CommBlock *tx;
     u32 status;
@@ -220,7 +239,7 @@ void FUN_080657d8(u32 mode)
     s32 base;
     s32 cur;
     s32 end;
-    s32 end2;    /* Bolum 2 kendi yerellerini kullanir (kural 59) */
+    s32 end2;    /* Part 2 uses its own locals (rule 59) */
     s32 hi;
     s32 hi2;
     s32 start;
@@ -320,7 +339,7 @@ void FUN_080657d8(u32 mode)
             gRam02036324 = status;
             if (((1 << gRam020004A4) & status) != 0
                     && RX_SLOT.magic == SLOT_MAGIC) {
-                /* Bolum 1: karsi tarafin "son" penceresi. */
+                /* Part 1: the peer's "last" window. */
                 if (RX_SLOT.index != RX_SLOT.endIndex) {
                     end = RX_SLOT.endIndex & RING_MASK;
                     if (((end - cur) & RING_MASK) <= WINDOW_HALF) {
@@ -361,7 +380,7 @@ void FUN_080657d8(u32 mode)
                     }
                 }
 
-                /* Bolum 2: karsi tarafin bu karedeki penceresi. */
+                /* Section 2: the other side's window for this frame. */
                 end2 = RX_SLOT.index & RING_MASK;
                 if (((end2 - cur) & RING_MASK) <= WINDOW_HALF) {
                     hi2 = (RX_SLOT.tag >> 8) & RING_MASK;
@@ -400,7 +419,7 @@ void FUN_080657d8(u32 mode)
                         cur = (cur + 1) & RING_MASK;
                 }
 
-                /* Bolum 3: karsi tarafin onayladigi noktadan ileri yuru. */
+                /* Part 3: walk forward from the point the peer acknowledged. */
                 if (RX_SLOT.ack == ACK_NONE) {
                     k = gRam0200048C & RING_MASK;
                 } else {
@@ -423,7 +442,8 @@ void FUN_080657d8(u32 mode)
                 }
             }
 
-            /* Yerel taraf onaya yetismisse geriye dogru sabit bandi ara. */
+            /* If the local side has caught up with the acknowledgement, search
+               backwards for the stable band. */
             if ((k & RING_MASK) == (s32)(gRam0200048C & RING_MASK)) {
                 step = gRam020003C0[k & RING_MASK];
                 for (;;) {

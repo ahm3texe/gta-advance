@@ -1,12 +1,12 @@
-/* Diger aktorlere bildirim — 0x08019710-0x0801979B
+/* Notify other actors — 0x08019710-0x0801979B
  *
- * Iki listeyi (0x0202F2C0, sonra 0x0202F310) geziyor; kendisi disindaki,
- * +0x2C ortagi mesgul olmayan ve 0x400000 kurulu olmayan aktorler icin
- * FUN_08037d98 cagiriyor. Ilk listede olcut +0x30 varliginin +0x08'i sifir,
- * ikincide +0x18 kaydinin +0x30 kipi 2 (MarkDistantActors ile ayni sozluk).
+ * Walk 0x0202F2C0 then 0x0202F310. Call FUN_08037d98 for other actors whose
+ * +0x2C partner is not busy and whose 0x400000 flag is clear. In the first
+ * list, entity +0x30 must have zero at +0x08; in the second, record +0x18
+ * must have mode 2 at +0x30 (same terminology as MarkDistantActors).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/ping_other_actors.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/ping_other_actors.c
  */
 
 #include "gba_types.h"

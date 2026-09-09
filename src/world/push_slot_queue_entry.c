@@ -1,22 +1,24 @@
-/* Yuva kuyruguna giris ekleme — 0x08031C98-0x08031D23
+/* Pushing an entry onto the slot queue — 0x08031C98-0x08031D23
  *
- * gFlagsB[slot] o yuvadaki giris sayisi; sayi 3'u gectiyse once
- * FUN_0802ebdc ile bosaltiliyor ve sayi yeniden okunuyor. Sonra alti
- * paralel tabloya [sayi][slot] konumundan yaziliyor (besi u16, biri u32)
- * ve sayac bir artiriliyor.
+ * gFlagsB[slot] is the number of entries in that slot; if the count has passed
+ * 3 the queue is first drained with FUN_0802ebdc and the count is re-read.
+ * The entry is then written into six parallel tables at [count][slot] (five
+ * u16, one u32) and the counter is incremented by one.
  *
- * Tablolar SUTUN duzeninde: satir adimi 8 giris, yani u16 tablolarda 16,
- * u32 tabloda 32 bayt. Satir sayisi (N) BILINMIYOR; bu yuzden semboller
- * ilk boyutu acik birakilmis dizi olarak bildiriliyor.
+ * The tables are in COLUMN order: the row stride is 8 entries, i.e. 16 bytes
+ * in the u16 tables and 32 in the u32 table.  The number of rows (N) is
+ * UNKNOWN, so the symbols are declared as arrays with the first dimension left
+ * open.
  *
- * KURAL 1 BURADA OLCULDU: tabanlar `((u16 (*)[8])0x02026BA0)` gibi cast
- * ile yazilirsa agbcc havuz yuklemesini adres hesabinin SONUNA koyuyor
- * (ROM ONUNE koyuyor); dusen yazmac baskisi `n`i callee-saved bir
- * yazmaca tasimiyor ve bir yazmac daha az saklaniyor -> 132 bayt (ROM
- * 140), 25/69 komut. Extern DIZI sembolleriyle fark sifir.
+ * RULE 1 WAS MEASURED HERE: written as casts such as
+ * `((u16 (*)[8])0x02026BA0)`, agbcc puts the pool load AFTER the address
+ * computation (the ROM puts it BEFORE); the reduced register pressure does not
+ * move `n` into a callee-saved register and one register fewer is saved ->
+ * 132 bytes (the ROM has 140), 25/69 instructions.  With extern ARRAY symbols
+ * the difference is zero.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/push_slot_queue_entry.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/push_slot_queue_entry.c
  */
 
 #include "gba_types.h"
@@ -24,7 +26,7 @@
 #define QUEUE_MAX 3
 #define SLOTS     8
 
-extern u8  gFlagsB[];               /* 0x02026EF0 — yuva basina giris sayaci */
+extern u8  gFlagsB[];               /* 0x02026EF0 — the entry counter per slot */
 extern u16 gRam02026BA0[][SLOTS];
 extern u16 gRam02027230[][SLOTS];
 extern u32 gRam02026C10[][SLOTS];

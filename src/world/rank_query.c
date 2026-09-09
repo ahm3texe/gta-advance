@@ -1,50 +1,50 @@
-/* Kayit alani sorgusu — 0x08066D54-0x08066ECD
+/* The record field query — 0x08066D54-0x08066ECD
  *
- * Ikinci parametre bir kayit yapisina isaretci, birincisi 0..35 arasi bir
- * alan kimligi. Kimlige gore o kaydin tek bir alanini okuyup donduruyor;
- * aralik disi kimlik icin 0.
+ * The second parameter is a pointer to a record structure, the first a field
+ * id between 0 and 35.  According to the id it reads and returns a single
+ * field of that record; 0 for an out-of-range id.
  *
- * 36 dal atlama tablosuna (0x08066D6C, fonksiyonun kendi literal havuzu)
- * ceviriliyor: `cmp r0,#35 / bls` + `lsls r0,#2 / ldr pc-goreli taban /
- * ldr / mov pc,r0`. Aralik 0..35 bitisik oldugu icin agbcc karsilastirma
- * agaci degil tablo uretiyor; case gövdeleri ROM'da KAYNAK SIRASINDA
- * diziliyor, bu yuzden case'ler tablo sirasiyla degil ROM blok sirasiyla
- * yazildi (case 2..7, sonra 1, sonra 8..20, 22..25, 21, 26..28, 29..34,
- * 0, 35).
+ * The 36 branches are turned into a jump table (0x08066D6C, the function's own
+ * literal pool): `cmp r0,#35 / bls` + `lsls r0,#2 / ldr a pc-relative base /
+ * ldr / mov pc,r0`.  Because the range 0..35 is contiguous, agbcc produces a
+ * table rather than a comparison tree; the case bodies are laid out in SOURCE
+ * ORDER in the ROM, so the cases are written in the ROM's block order rather
+ * than the table's (cases 2..7, then 1, then 8..20, 22..25, 21, 26..28,
+ * 29..34, 0, 35).
  *
- * Yapi bump_rank_counter.c / link_state_step.c'deki gSaveBuffer'in
- * +0x50'sinden baslayan kayit; oradaki alanlar burada su karsiliklara
- * geliyor:
- *   gSaveBuffer +0x70 sozcugu  == RecordData +0x20  (stepA/B/C, 5'er bit)
- *   gSaveBuffer +0x7E yarisozu == RecordData +0x2E  (rankA/B/C, 5'er bit)
+ * The structure is the record starting at +0x50 of gSaveBuffer in
+ * bump_rank_counter.c / link_state_step.c; the fields there correspond as
+ * follows:
+ *   the gSaveBuffer +0x70 word      == RecordData +0x20  (stepA/B/C, 5 bits each)
+ *   the gSaveBuffer +0x7E half word == RecordData +0x2E  (rankA/B/C, 5 bits each)
  *
- * ONEMLI: +0x2C'deki kap u16 DEGIL u32 olmali. `unk2C_11` alani 11-16
- * bitlerinde, yani 0x2D/0x2E bayt sinirini asiyor; ne 0x2C'deki ne de
- * 0x2E'deki yarisoz alani kapsiyor, bu yuzden agbcc tam sozcuk okuyor
- * (ROM: "ldr r0,[r2,#44] / lsls #15 / lsrs #26"). rankA/B/C bu kabin
- * 17-21, 22-26, 27-31 bitleri; agbcc her biri icin alani KAPSAYAN EN DAR
- * erisimi seciyor:
- *   17-21 -> 0x2E bayti          (ldrb, lsls #26 / lsrs #27)
- *   22-26 -> 0x2E yarisozu       (ldrh, bayt sinirini asiyor)
- *   27-31 -> 0x2F baytinin tepesi(ldrb, sadece lsrs #3)
- * bump_rank_counter.c ayni bitleri +0x7E'de u16 kap olarak yaziyor; iki
- * tarif ayni bit yerlesimini veriyor, orada 6 bitlik alan okunmadigi icin
- * u16 yetiyordu.
+ * IMPORTANT: the container at +0x2C must be u32, NOT u16.  The `unk2C_11`
+ * field is at bits 11-16, i.e. it crosses the 0x2D/0x2E byte boundary; neither
+ * the half word at 0x2C nor the one at 0x2E covers it, so agbcc reads a full
+ * word (the ROM: "ldr r0,[r2,#44] / lsls #15 / lsrs #26").  rankA/B/C are bits
+ * 17-21, 22-26 and 27-31 of that container; for each, agbcc picks the
+ * NARROWEST access that COVERS the field:
+ *   17-21 -> the 0x2E byte            (ldrb, lsls #26 / lsrs #27)
+ *   22-26 -> the 0x2E half word       (ldrh, it crosses the byte boundary)
+ *   27-31 -> the top of the 0x2F byte (ldrb, only lsrs #3)
+ * bump_rank_counter.c writes the same bits as a u16 container at +0x7E; the
+ * two descriptions give the same bit layout, and u16 was enough there because
+ * the 6-bit field is not read.
  *
- * 0x20 ve 0x2C'deki 8 ve 4 bitlik alanlar tek komut ile cikiyor:
- *   unk20_00 (0-7 bit)  -> duz ldrb, kaydirma yok
- *   unk2C_00 (0-3 bit)  -> ldrb + lsls #28 / lsrs #28
+ * The 8- and 4-bit fields at 0x20 and 0x2C come out in a single instruction:
+ *   unk20_00 (bits 0-7)  -> a plain ldrb, no shift
+ *   unk2C_00 (bits 0-3)  -> ldrb + lsls #28 / lsrs #28
  *
- * Bayt yuklemelerinde 0x20 ve uzeri ofsetler `adds r0,r2,#0 / adds r0,#N /
- * ldrb r0,[r0,#0]` seklinde: Thumb ldrb imm5 en fazla 31'e kadar gidiyor.
- * ldrh imm5*2 oldugu icin 0x32/0x2E gibi ofsetler dogrudan yukleniyor.
- * Yani bu uc komutluk kaliplar kaynaktaki bir tuhaflik degil, ofsetin
- * dogru olmasinin sonucu.
+ * In byte loads, offsets of 0x20 and above take the form
+ * `adds r0,r2,#0 / adds r0,#N / ldrb r0,[r0,#0]`: Thumb's ldrb imm5 only
+ * reaches 31.  Because ldrh is imm5*2, offsets such as 0x32/0x2E are loaded
+ * directly.  So these three-instruction patterns are not a quirk of the source
+ * but a consequence of the offsets being right.
  *
- * Anahtar degiskeni ISARETSIZ (ROM: bls).
+ * The switch variable is UNSIGNED (the ROM has bls).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/rank_query.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/rank_query.c
  */
 
 #include "gba_types.h"

@@ -1,82 +1,87 @@
-/* Alan temizligi -- 0x08030CB4-0x08030D0B, 88 bayt.  ESLESIYOR (fark 0).
+/* Area cleanup -- 0x08030CB4-0x08030D0B, 88 bytes.  MATCHES (0 off).
  *
- * Bekleyen temizlik bayragi kuruluysa iki VRAM satirina ucer yarim soz
- * dolduruyor, bir blogu serbest birakiyor ve bayragi temizliyor.
+ * If the pending-cleanup flag is set it fills three half words into each of
+ * two VRAM rows, releases a block and clears the flag.
  *
- * COZUM: dongu bicimi ISARETCI ARTIRIMI DEGIL, DIZI INDISLEME.
- * Isaretcileri (left/right) dongu oncesi yerellere yukleyen her yazim
- * 7 baytta takiliyordu; indisli yazim (TILE_ROW_LEFT[i] = ...) 0 verdi.
- * Uretilen kod ayni: iki isaretci yine 2'ser artiyor -- ama artik onlari
- * KAYNAK degil, agbcc'nin kuvvet indirgemesi (strength reduction) uretiyor.
- * Bunun tek gorunur farki KOMUT SIRASI ve o sira 7 baytin tamamiydi.
+ * THE SOLUTION: the loop form is ARRAY INDEXING, NOT POINTER INCREMENTS.
+ * Every spelling that loaded the pointers (left/right) into locals before the
+ * loop got stuck at 7 bytes; the indexed spelling (TILE_ROW_LEFT[i] = ...)
+ * gave 0.  The generated code is the same: the two pointers still advance by 2
+ * -- but now it is agbcc's strength reduction that produces them, not the
+ * SOURCE.  The only visible difference is INSTRUCTION ORDER, and that order
+ * was the whole 7 bytes.
  *
- * MEKANIZMA (olculdu, farki aciklayan tek sey bu):
- * ROM'un dongu oncesi sirasi soyle:
- *     movs r3, #0          i = 0            <- duz deyim
- *     ldr  r4, =0x02026E80 block            <- duz deyim
- *     ldr  r1, =0xF0E8     dolgu sabiti     <- DONGUDEN CIKARILMIS degismez
- *     adds r0, r1, #0      kopya            <- cse2'nin sabit yuklemeyi
- *                                              kopyaya cevirmesi
- *     ldr  r2, =0x06009858 right            <- KUVVET INDIRGEME baslangici
- *     ldr  r1, =0x06009818 left             <- KUVVET INDIRGEME baslangici
- * Kritik nokta: agbcc dongu optimizasyonunda ONCE degismezleri (movables)
- * loop_start'in onune yaziyor, SONRA kuvvet indirgemenin urettigi isaretci
- * baslangiclarini yine loop_start'in onune yaziyor. Ikinci ekleme birinciden
- * SONRA gelir. Yani hoist edilmis sabit + kopya, isaretci yuklemelerinin
- * ONUNDE cikar. Isaretcileri kaynakta duz deyim olarak yazarsan onlar
- * on-blokta (preheader) EN BASA gelir, hoist edilen sabit ise EN SONA --
- * ROM'un tam tersi. Bu sira farki asla kapanmiyordu.
+ * THE MECHANISM (measured; it is the only thing that explains the difference):
+ * The ROM's pre-loop order is this:
+ *     movs r3, #0          i = 0            <- a plain statement
+ *     ldr  r4, =0x02026E80 block            <- a plain statement
+ *     ldr  r1, =0xF0E8     the fill constant <- a HOISTED loop invariant
+ *     adds r0, r1, #0      a copy           <- cse2 turning the constant load
+ *                                              into a copy
+ *     ldr  r2, =0x06009858 right            <- a STRENGTH REDUCTION start
+ *     ldr  r1, =0x06009818 left             <- a STRENGTH REDUCTION start
+ * The critical point: in loop optimisation agbcc first writes the invariants
+ * (movables) before loop_start, and then writes the pointer starts produced by
+ * strength reduction, also before loop_start.  The second insertion comes
+ * AFTER the first.  So the hoisted constant + copy come BEFORE the pointer
+ * loads.  If you write the pointers as plain statements in the source, they
+ * come FIRST in the preheader and the hoisted constant LAST -- exactly the
+ * reverse of the ROM.  That order difference never closed.
  *
- * IKI YAN OLCUM, ayni mekanizmayi dogruluyor:
- *   - `ldr r1, =sabit` + `adds r0, r1, #0` ciftinin kaynagi bir C kopyasi
- *     DEGIL. Sabit dongu ICINDE satir ici yazilinca agbcc onu disari
- *     tasiyor; cse2 tasinan yuklemeyi (deger zaten bir yazmacta oldugu icin)
- *     kopyaya ceviriyor ve kopya artik silinemiyor. Kaynak seviyesinde
- *     `fill2 = fill;` yazmak BUNU URETMEZ -- cse1 sabiti yayar, kopya olur,
- *     cikti 84 bayt (ROM 88).  Iki fill'i de canli tutup kopyayi
- *     yasatmak ise fazladan bir callee-saved istiyor: push {r4,r5,lr}.
- *   - Iki yazim da (fill degiskeni / satir ici sabit) ayni sabiti kullanir
- *     ama havuz yeri farklidir; havuz sirasi ldr komut sirasini izliyor.
+ * TWO SIDE MEASUREMENTS confirming the same mechanism:
+ *   - The `ldr r1, =constant` + `adds r0, r1, #0` pair does NOT come from a C
+ *     copy.  Written inline INSIDE the loop, agbcc hoists the constant out;
+ *     cse2 turns the hoisted load into a copy (the value is already in a
+ *     register) and the copy can no longer be deleted.  Writing
+ *     `fill2 = fill;` at source level DOES NOT PRODUCE THIS -- cse1 propagates
+ *     the constant, the copy dies, and the output is 84 bytes (the ROM has
+ *     88).  Keeping both fills live to preserve the copy, on the other hand,
+ *     needs an extra callee-saved register: push {r4,r5,lr}.
+ *   - Both spellings (a fill variable / an inline constant) use the same
+ *     constant but its place in the pool differs; the pool order follows the
+ *     order of the ldr instructions.
  *
- * ELENEN YAZIMLAR (hepsi olculdu, tekrar denemeyin):
- *   Isaretci-artirimli dongu ailesi -- hicbiri 7'nin altina inmedi:
- *     fill + fill2 ikisi de canli (onceki en iyi)          7
- *     fill/fill2 kullanimini takas etmek                   7
- *     iki kopya zinciri (fill2=fill; fill=fill2)           7
- *     block atamasini i'den once almak                    10
- *     satir ici sabit + fill degiskeni karisik (iki yon)  12
- *     dongu icinde satir ici sabit, fill yok              21
- *     fill'i dongu oncesi yukleyip icerde satir ici       21
- *     her iki store da fill2 (kopya elenir, 84 bayt)      61
- *     kopyayi dongu icine almak                           61
- *     u32->u16 / u16->u32 / s16 kopya                     61
- *     uclu kopya zinciri, `register` anahtar sozcugu      61
- *     int fill, for-dongusu + satir ici                   61
- *     *right = *left = fill  /  *left = *right = fill  61/60
- *     kopyayi isaretci atamalarindan sonraya almak        64
- *     fill'i dongu icinde atamak                          64
- *   Indisli dongu ailesi -- yalnizca sira ayrintisi kaldi:
- *     RIGHT'i once yazmak                                  2
- *     for (i = 0; i <= 2; i++) bicimi                      4
- *     fill degiskeni kullanmak (sabit disari cikmiyor)    61
- *   Daha onceki turlardan (yapisi artik gecersiz ama not kalsin):
- *     kural 40 dar volatile ile fill2 okumasi             85
- *     blogu dongu oncesi yuklememek                       23
- *     sayaci s32 yapmak                                   22
- *   Bildirim sirasi bu fonksiyonda ETKISIZ (uc permutasyon da ayni).
- *   Permuter 8.871 yineleme kosturdu, 7'nin altina inmedi: skoru komut
- *   agirlikli sezgisel, bayt esitligi degil; ara skorlarina guvenmeyin.
+ * SPELLINGS RULED OUT (all measured, do not try them again):
+ *   The pointer-increment loop family -- none of them got below 7:
+ *     both fill and fill2 live (the previous best)          7
+ *     swapping the use of fill/fill2                        7
+ *     a two-copy chain (fill2=fill; fill=fill2)             7
+ *     moving the block assignment before i                 10
+ *     an inline constant + a fill variable mixed (both ways) 12
+ *     an inline constant inside the loop, no fill          21
+ *     loading fill before the loop and inline inside       21
+ *     fill2 in both stores (the copy dies, 84 bytes)       61
+ *     moving the copy inside the loop                      61
+ *     a u32->u16 / u16->u32 / s16 copy                     61
+ *     a three-copy chain, the `register` keyword           61
+ *     int fill, a for loop + inline                        61
+ *     *right = *left = fill  /  *left = *right = fill   61/60
+ *     moving the copy after the pointer assignments        64
+ *     assigning fill inside the loop                       64
+ *   The indexed loop family -- only an ordering detail remained:
+ *     writing RIGHT first                                   2
+ *     the for (i = 0; i <= 2; i++) form                     4
+ *     using a fill variable (the constant is not hoisted)  61
+ *   From earlier rounds (the structure is obsolete, but keep the note):
+ *     a rule 40 narrow volatile read of fill2              85
+ *     not loading the block before the loop                23
+ *     making the counter s32                               22
+ *   The declaration order has NO EFFECT in this function (all three
+ *   permutations are the same).
+ *   The permuter ran 8,871 iterations and did not get below 7: its score is an
+ *   instruction-weighted heuristic, not byte equality; do not trust its
+ *   intermediate scores.
  *
- * GENEL DERS (kural 49'un tamamlayicisi): ROM'da bir dongu isaretci
- * artiriyorsa bu KAYNAKTA isaretci artirildigi anlamina GELMEZ. Dongu
- * oncesi komut sirasina bakin: sabit yuklemeler isaretci yuklemelerinin
- * ONUNDEYSE isaretciler kuvvet indirgemeden geliyordur, yani kaynak
- * indisli yazilmistir.
+ * THE GENERAL LESSON (a complement to rule 49): if a loop in the ROM
+ * increments a pointer, that DOES NOT mean a pointer is incremented IN THE
+ * SOURCE.  Look at the pre-loop instruction order: if the constant loads come
+ * BEFORE the pointer loads, the pointers come from strength reduction, i.e.
+ * the source is written with indexing.
  *
- * Ayni kumedeki eslesen uc fonksiyon: src/world/area_flags.c
+ * The three matching functions in the same set: src/world/area_flags.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/area_cleanup.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/area_cleanup.c
  */
 
 #include "gba_types.h"

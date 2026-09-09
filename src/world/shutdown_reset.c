@@ -1,49 +1,49 @@
-/* Donanimi kapatip yumusak sifirlama — 0x08065650-0x080656F3
+/* Shutting the hardware down and soft-resetting — 0x08065650-0x080656F3
  *
- * Dort DMA kanalinin denetim alanini iki adimda temizliyor (once
- * tekrar/zamanlama bitleri, sonra etkinlestirme biti), her kanaldan sonra
- * bir defa OKUYOR -- donanimda yazimin oturmasi icin gereken bos okuma,
- * bu yuzden OKUMA gorunumu volatile olmali. Ardindan karisim, kesme,
- * ekran ve dort arka plan denetim yazmacini sifirlayip BIOS yumusak
- * sifirlamasini cagiriyor.
+ * Clears the control field of the four DMA channels in two steps (first the
+ * repeat/timing bits, then the enable bit), READING once after each channel --
+ * the dummy read needed for the write to settle in hardware, which is why the
+ * READ view must be volatile.  It then zeroes the mixer, interrupt, display
+ * and four background control registers and calls the BIOS soft reset.
  *
- * DURUM: BYTE-MATCHING — 164/164 bayt (0x08065650-0x080656F3).
+ * STATUS: BYTE-MATCHING — 164/164 bytes (0x08065650-0x080656F3).
  *
- * Iki kol kapatti (ikisi de yeni kural adayi):
+ * Two levers closed it (both candidates for new rules):
  *
- * 1) DMA denetim yazmacinda YAZIM gorunumu volatile OLMAMALI, OKUMA
- *    gorunumu volatile kalmali. `volatile` bir lvalue'ya yazarken agbcc
- *    `strh`den hemen once olu bir `ldrh` uretiyor; dort kanalda sekiz
- *    fazla komut (16 bayt) demekti. Ayni adresin iki gorunumu (DMAn_W
- *    yazim icin duz, REG_DMAn okuma ve bos okuma icin volatile) farki
- *    139 -> 4 bayta indirdi. Kural 57'nin SIOMLT_SEND satirinin ayni
- *    sinifi; burada DMA denetimi icin de dogrulandi.
+ * 1) On the DMA control register the WRITE view must NOT be volatile while the
+ *    READ view must stay volatile.  Writing to a `volatile` lvalue, agbcc
+ *    emits a dead `ldrh` right before the `strh`; across four channels that
+ *    meant eight extra instructions (16 bytes).  Two views of the same address
+ *    (DMAn_W plain for writing, REG_DMAn volatile for reads and dummy reads)
+ *    took the difference from 139 to 4 bytes.  The same class as rule 57's
+ *    SIOMLT_SEND row; verified here for DMA control as well.
  *
- * 2) `REG_IME = zero = 0;` ZINCIRLI atama. Ayri `zero = 0;` deyimi once
- *    sabiti uretiyor (`movs r5,#0 / ldr r0,=IME`), ROM ise once adresi
- *    yukluyor (`ldr r0,=IME / movs r5,#0 / strh`). Zincirli atamada sabit,
- *    disttaki atamanin SAG tarafi olarak — yani LHS adresi uretildikten
- *    SONRA — olusuyor ve ROM'un sirasi cikiyor. Son 4 bayti bu kapatti.
+ * 2) `REG_IME = zero = 0;` as a CHAINED assignment.  A separate `zero = 0;`
+ *    statement produces the constant first (`movs r5,#0 / ldr r0,=IME`),
+ *    whereas the ROM loads the address first (`ldr r0,=IME / movs r5,#0 /
+ *    strh`).  In a chained assignment the constant is formed as the RIGHT-hand
+ *    side of the outer assignment -- that is, AFTER the LHS address is
+ *    produced -- and the ROM's order comes out.  That closed the last 4 bytes.
  *
- * ELENEN YAZIMLAR: `&=` yerine acik oku-ve-yaz (degisiklik yok), bos
- * okumayi degiskene baglamak (degisiklik yok), tum sifirlari duz sabit
- * yazmak (168 bayt / 137 fark — sifir r5'te tutulmuyor, her yazimda
- * yeniden uretiliyor), sifiri tek uzun omurlu yerelde tutup ayri deyimle
- * ilklemek (139 fark).
+ * SPELLINGS RULED OUT: an explicit read-and-write instead of `&=` (no change),
+ * binding the dummy read to a variable (no change), writing all the zeroes as
+ * plain constants (168 bytes / 137 off -- the zero is not kept in r5 but
+ * regenerated at every write), keeping the zero in a single long-lived local
+ * initialised by a separate statement (139 off).
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/shutdown_reset.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/shutdown_reset.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-#define DMA_CLEAR_TIMING 0xC5FF   /* tekrar, gamepak ve zamanlama bitleri */
-#define DMA_CLEAR_ENABLE 0x7FFF   /* etkinlestirme biti */
+#define DMA_CLEAR_TIMING 0xC5FF   /* the repeat, gamepak and timing bits */
+#define DMA_CLEAR_ENABLE 0x7FFF   /* the enable bit */
 #define RESET_ALL        0xFF
 
-/* Yazim gorunumu volatile DEGIL (kural 57): volatile lvalue yazimdan once
- * olu bir `ldrh` uretiyor. Okuma ve bos okuma volatile kaliyor. */
+/* The write view is NOT volatile (rule 57): a volatile lvalue produces a dead
+ * `ldrh` before the write.  The read and the dummy read stay volatile. */
 #define DMA0_W (*(DmaRegs *)0x040000B0)
 #define DMA1_W (*(DmaRegs *)0x040000BC)
 #define DMA2_W (*(DmaRegs *)0x040000C8)

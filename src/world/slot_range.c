@@ -1,13 +1,13 @@
-/* Yuva menzil sabitleri — 0x0803C178-0x0803C1B3
+/* Slot range constants — 0x0803C178-0x0803C1B3
  *
- * Iki fonksiyon. Ilki slot_config.c'nin devami: which=1/2'ye gore
- * yuva blogunun +16'sindaki `range` alanini donuyor, yoksa 0x640000
- * (varsayilan menzil). Ikincisi sabit olarak 0x640000 donuyor.
+ * Two functions. Continuing slot_config.c, the first returns range at slot
+ * +16 for which=1/2, or default 0x640000 otherwise. The second always
+ * returns 0x640000.
  *
- * 0x640000 = 200 << 15 (ROM `movs #200; lsls #15`), yaklasik 100 metre.
+ * 0x640000 = 200 << 15 (ROM movs #200; lsls #15), approximately 100 meters.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_range.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_range.c
  */
 
 #include "gba_types.h"

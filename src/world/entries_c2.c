@@ -1,81 +1,95 @@
-/* Varliktan konum+aciyi aktore kopyalayip iki kayit arasindaki farki
- * dondurerek aktorun 16.16 konumuna ekler -- 0x080293F8-0x080294B1,
- * 186 bayt, Thumb.  ESLESIYOR (186/186).
+/* Copies the position + angle from the entity to the actor and adds the
+ * difference between two records, rotated, to the actor's 16.16 position --
+ * 0x080293F8-0x080294B1, 186 bytes, Thumb.  MATCHES (186/186).
  *
- * ISKELET (ROM'dan okundu, dort parametre: r0 varlik, r1 aktor, r2/r3 kayit)
+ * THE SKELETON (read from the ROM; four parameters: r0 entity, r1 actor,
+ * r2/r3 records)
  *
- *   1. entity->source (+0x18) uc kelimelik konumu aktorun +0x4C'sine
- *      KOPYALANIYOR (ldmia/stmia {r2,r4,r5}), ardindan +0x0C'deki aci
- *      aktorun +0x68'ine yaziliyor.
- *   2. Her iki Record icin orta nokta: (x0 + x1) - ox.  DIKKAT: kardeslerdeki
- *      `-2` ofseti ve `<<23 >>24` isaret genisletmesi BURADA YOK; ham fark
- *      kullaniliyor.  Kardesin bicimini kopyalamamak gerektiginin ornegi.
- *   3. Iki orta nokta farki (3. parametre eksi 4. parametre) FUN_0802915c'ye
- *      gidiyor.  Bu, entries_c1/entries_b4'teki FUN_08029088 DEGIL: yigina
- *      s8 degil TAM KELIME yaziyor (sonuclar `ldr` ile okunuyor), yigin
- *      gozleri de sp+4 / sp+8, yani bitisik degil ayri iki kelime.
- *      Imzasi 0x0802915C'den okundu: (aci, dx, dy, s32 *outX, s32 *outY),
- *      govdesi 0x08CA30D8'deki sinus tablosuyla dondurme yapiyor.
- *   4. Donen iki deger 328/256 ile olceklenip << 15 ile +0x4C/+0x50'ye
- *      EKLENIYOR (kopyalanan konumun ustune).
- *   5. Kuyruk, state_offset.c'nin VARSAYILAN dalinin birebir aynisi:
- *      nested->facing baytlari okunup aktorun +4 alt yapisina sifir
- *      denetimiyle yaziliyor.
+ *   1. The three-word position at entity->source (+0x18) is COPIED to the
+ *      actor's +0x4C (ldmia/stmia {r2,r4,r5}), then the angle at +0x0C is
+ *      written to the actor's +0x68.
+ *   2. The midpoint for each Record: (x0 + x1) - ox.  NOTE: the siblings' `-2`
+ *      offset and `<<23 >>24` sign extension are ABSENT HERE; the raw
+ *      difference is used.  An example of why the sibling's form must not be
+ *      copied.
+ *   3. The difference of the two midpoints (parameter 3 minus parameter 4)
+ *      goes to FUN_0802915c.  This is NOT the FUN_08029088 of
+ *      entries_c1/entries_b4: it writes FULL WORDS to the stack rather than s8
+ *      (the results are read with `ldr`), and its stack slots are sp+4 / sp+8,
+ *      i.e. two separate words rather than adjacent bytes.  Its signature was
+ *      read from 0x0802915C: (angle, dx, dy, s32 *outX, s32 *outY), and its
+ *      body rotates using the sine table at 0x08CA30D8.
+ *   4. The two returned values are scaled by 328/256 and ADDED << 15 to
+ *      +0x4C/+0x50 (on top of the copied position).
+ *   5. The tail is exactly the DEFAULT branch of state_offset.c: the
+ *      nested->facing bytes are read and written into the actor's +4
+ *      sub-structure with a zero check.
  *
- * ESLESMEYI SAGLAYAN UC OLCUM (184 kisa -> 24 fark -> 8 fark -> 0)
+ * THE THREE MEASUREMENTS THAT MADE IT MATCH (184, too short -> 24 off -> 8 off
+ * -> 0)
  *
- *  1. ACI YERELE ALINIR.  `FUN_0802915c(src->angle >> 16, ...)` yazildiginda
- *     agbcc kaydirmayi yutuyor ve `movs r5,#14; ldrsh r0,[r3,r5]` uretiyor --
- *     yani 16.16 kelimenin ust yarisini DOGRUDAN isaretli yarim soz olarak
- *     okuyor; src bu yuzden cagriya kadar canli kaliyor ve IKINCI bir yuksek
- *     yazmac (r9) aciliyor, prolog/epilog sisiyor.  `angle = src->angle;`
- *     yereli hem `asrs r0,r0,#16` uretiyor hem de src'yi erken olduruyor:
- *     ROM'un tek yuksek yazmaci (r8 varlik, ip gecici) geri geliyor.
- *     KURAL: dar okuma optimizasyonunu istemiyorsan degeri yerele al.
+ *  1. THE ANGLE GOES INTO A LOCAL.  Written as
+ *     `FUN_0802915c(src->angle >> 16, ...)`, agbcc swallows the shift and
+ *     produces `movs r5,#14; ldrsh r0,[r3,r5]` -- i.e. it reads the upper half
+ *     of the 16.16 words DIRECTLY as a signed half word; src therefore stays
+ *     live until the call, a SECOND high register (r9) is opened up and the
+ *     prologue/epilogue swell.  An `angle = src->angle;` local both produces
+ *     `asrs r0,r0,#16` and kills src early: the ROM's single high register
+ *     (r8 the entity, ip a temporary) comes back.
+ *     THE RULE: if you do not want the narrow-read optimisation, take the
+ *     value into a local.
  *
- *  2. FARKLAR AYRI DEYIM OLUR.  Cikarmalar cagri argumaninda yazilinca
- *     agbcc once 1. argumanin kaydirmasini, sonra cikarmalari yapiyor;
- *     ROM'un sirasi tersi (once iki cikarma, sonra `asrs #16`).  `dx`/`dy`
- *     yerelleri acmak kaydirmayi cagri yerine tasiyor: 8 -> 0 bayt.
- *     Bu, entries_c1'deki 1 numarali olcumun TERSI yonu; orada kaydirma
- *     argumanda kalmaliydi.  Kaynagi ROM'un sirasi belirliyor, kardes degil.
+ *  2. THE DIFFERENCES BECOME SEPARATE STATEMENTS.  Written inside the call
+ *     arguments, agbcc does the first argument's shift first and the
+ *     subtractions afterwards; the ROM's order is the reverse (the two
+ *     subtractions first, then `asrs #16`).  Opening `dx`/`dy` locals moves
+ *     the shift to the call site: 8 -> 0 bytes.
+ *     This is the REVERSE direction of measurement 1 in entries_c1; there the
+ *     shift had to stay in the argument.  The ROM's order decides the source,
+ *     not the sibling.
  *
- *  3. YONELIM YERELLERI s8 DEGIL s32.  `s8 fx` ile agbcc iki bayti de duz
- *     `ldrb` ile okuyup isaret genisletmiyor (depolama zaten strb).  ROM ise
- *     ikisini de isaretli okuyor: birinci icin `ldrb + lsls#24 + asrs#24`,
- *     ikinci icin `movs r2,#0; ldrsb r2,[r0,r2]`.  Asimetri kaynakta degil,
- *     adres kurulumunun yan etkisi (LDRSB'nin immediate ofseti yok, birinci
- *     okumada +34 adresi ayri yazmaca kuruldugu icin sifir yazmaci yok).
- *     s32 yerel her ikisini de isaretli okumaya cevirip farki kapatiyor.
+ *  3. THE FACING LOCALS ARE s32, NOT s8.  With `s8 fx`, agbcc reads both bytes
+ *     with a plain `ldrb` and does not sign-extend (the storage is strb
+ *     anyway).  The ROM, however, reads both signed: `ldrb + lsls#24 + asrs#24`
+ *     for the first and `movs r2,#0; ldrsb r2,[r0,r2]` for the second.  The
+ *     asymmetry is not in the source but a side effect of the address setup
+ *     (LDRSB has no immediate offset, and because the +34 address is built in
+ *     a separate register for the first read there is no zero register).  An
+ *     s32 local turns both into signed reads and closes the difference.
  *
- * DENENIP ELENEN YAZIMLAR (silme, ekle)
+ * SPELLINGS TRIED AND REJECTED (do not delete, add to them)
  *
- *  - `FUN_0802915c(src->angle >> 16, ...)`: 184 bayt, ROM'dan 2 KISA.
- *    Yukaridaki 1 numarali olcum; `ldrsh` kisayolu yuzunden.
- *  - `s8 fx, fy;` yerelleri: iki isaret genisletme komutu dusuyor.
- *  - Cikarmalari arguman icinde birakmak: 8 bayt fark, komut sirasi kayiyor.
- *  - Kayit sirasini ters yazmak DENENMEDI, gerek kalmadi: ROM once
- *    4. parametreyi (r3) isliyor, kaynak da oyle yazildi.
+ *  - `FUN_0802915c(src->angle >> 16, ...)`: 184 bytes, 2 SHORT of the ROM.
+ *    Measurement 1 above; caused by the `ldrsh` shortcut.
+ *  - `s8 fx, fy;` locals: two sign-extension instructions disappear.
+ *  - Leaving the subtractions inside the arguments: 8 bytes off, the
+ *    instruction order shifts.
+ *  - Writing the record order the other way round was NOT TRIED and was not
+ *    needed: the ROM processes the 4th parameter (r3) first, and the source is
+ *    written that way too.
  *
- * OLCULEN AYRINTILAR
+ * MEASURED DETAILS
  *
- *  - Toplamalarda agbcc IKINCI operandi ONCE yukluyor (entries_a3/c1 ile
- *    ayni): ROM `ldrb [r3,#6]` (x1) ile basliyor -> kaynakta `x0 + x1`.
- *  - Olcek carpani 41 DEGIL 328: lsls#2/adds/lsls#3/adds/lsls#3 zinciri
- *    41*8 uretiyor, ardindan `asrs #8`.  Kardeslerdeki 41/32 orani ayni,
- *    ama kaynaga 328/256 yazilmali; `41 >> 5` yazmak son lsls#3'u dusurur.
- *  - Uc kelimelik konum kopyasi struct atamasiyla (`actor->pos = src->pos;`)
- *    uretiliyor; agbcc 12 bayti ldmia/stmia ciftine ceviriyor.
- *  - Donus tipi void (kural 35): epilog `pop {r0}; bx r0`.
+ *  - In the additions agbcc loads the SECOND operand FIRST (the same as
+ *    entries_a3/c1): the ROM starts with `ldrb [r3,#6]` (x1) -> the source has
+ *    `x0 + x1`.
+ *  - The scale factor is 328, NOT 41: the lsls#2/adds/lsls#3/adds/lsls#3 chain
+ *    produces 41*8, followed by `asrs #8`.  The 41/32 ratio is the same as in
+ *    the siblings, but 328/256 must be written in the source; writing
+ *    `41 >> 5` drops the final lsls#3.
+ *  - The three-word position copy is produced by a struct assignment
+ *    (`actor->pos = src->pos;`); agbcc turns the 12 bytes into an ldmia/stmia
+ *    pair.
+ *  - The return type is void (rule 35): the epilogue is `pop {r0}; bx r0`.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_c2.c   -> 186/186
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_c2.c   -> 186/186
  */
 
 #include "gba_types.h"
 
-/* 41*8 = 328.  ROM lsls#2/adds/lsls#3/adds/lsls#3/asrs#8 uretiyor, yani
- * carpan 41 DEGIL 328; kardeslerdeki 41/32 olcegi burada 8 ile buyutulmus. */
+/* 41*8 = 328.  The ROM emits lsls#2/adds/lsls#3/adds/lsls#3/asrs#8, so the
+ * factor is 328, NOT 41; the siblings' 41/32 scale is multiplied by 8 here. */
 #define SCALE_NUM  328
 #define SCALE_SH   8
 #define POS_SH     15
@@ -86,11 +100,11 @@ typedef struct Vec3 {
     s32 z;
 } Vec3;
 
-/* state_offset.c'deki gorunumlerin aynisi. */
+/* The same views as in state_offset.c. */
 typedef struct Slot {
     u8 pad0[34];
-    s8 fx;                /* +0x22 (aktorda +0x26) */
-    s8 fy;                /* +0x23 (aktorda +0x27) */
+    s8 fx;                /* +0x22 (+0x26 in the actor) */
+    s8 fy;                /* +0x23 (+0x27 in the actor) */
 } Slot;
 
 typedef struct Facing {

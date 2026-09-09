@@ -1,11 +1,11 @@
-/* Bir nesneyi asil kokune baglar ve iki tarafin durum bitlerini gunceller.
+/* Link an object to its primary root and update state bits on both sides.
  *
- * Ikinci nesnenin +0x30 baglantisi varsa hedef olarak o kullanilir. Birinci
- * nesnenin kontrol blogundaki bayraklara gore hareket/etkilesim bitleri
- * temizlenir veya kurulur; son olarak bag +0x30 alanina yazilir.
+ * Use the second object's +0x30 link as the target if present. Clear or set
+ * movement/interaction bits according to the first object's control-block
+ * flags, then store the link at +0x30.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm
- * Dogrulama: make c-match FILE=src/world/link_objects.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm
+ * Verification: make c-match FILE=src/world/link_objects.c
  */
 
 #include "gba_types.h"

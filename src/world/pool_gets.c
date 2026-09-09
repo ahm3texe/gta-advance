@@ -1,11 +1,11 @@
-/* Havuz +8 getirici — 0x08037FAC-0x08037FFD
+/* Pool +8 getters — 0x08037FAC-0x08037FFD
  *
- * Dort ozdes yaprak (her biri farkli havuz sembolu) ile aktif nesne
- * durumunu 0x8000 bayragiyla isaretleyip alt nesne varsa temizleyen
- * FUN_08037FDC.
+ * Four identical leaf functions using different pool symbols, plus
+ * FUN_08037FDC, which marks the active object with flag 0x8000 and clears
+ * its sub-object if present.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/pool_gets.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/pool_gets.c
  */
 
 #include "gba_types.h"

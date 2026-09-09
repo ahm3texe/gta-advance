@@ -1,15 +1,15 @@
-/* Pencere ayarlarini yazma — 0x0801D7DC-0x0801D801
+/* Write window settings — 0x0801D7DC-0x0801D801
  *
- * Iki fonksiyon. Ilki 0x020230D0 blogundaki dort alanı ayarliyor:
- * +0 ve +4 sabit `0x01000000`, +12 ve +16 (arg<<16 | 0xFF000000).
- * Bu, tipik BGxHOFS/BGxVOFS gibi 24.8 sabit noktali ozelestik degerleri.
- * Ikincisi tek bir isaretci yaziyor.
+ * Two functions. The first sets four fields in 0x020230D0: +0/+4 to
+ * 0x01000000 and +12/+16 to (arg<<16 | 0xFF000000). These were interpreted
+ * as custom 24.8 fixed-point values resembling BGxHOFS/BGxVOFS settings.
+ * The second writes a single pointer.
  *
- * ROM sabitleri: `movs #128; lsls #17` = 0x01000000; `movs #255; lsls #24`
- * = 0xFF000000.
+ * ROM constants: movs #128; lsls #17 = 0x01000000;
+ * movs #255; lsls #24 = 0xFF000000.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/window_config.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/window_config.c
  */
 
 #include "gba_types.h"

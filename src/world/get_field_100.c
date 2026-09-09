@@ -1,11 +1,11 @@
-/* +0x100 alanini okuma — 0x0801D8B0-0x0801D8BB
+/* Read the field at +0x100 — 0x0801D8B0-0x0801D8BB
  *
- * ROM ofseti `0x80 << 1` ile kuruyor (movs #128 + lsls #1); 256 ani degere
- * sigmadigi icin kaydirmali bicim gerekiyor. Duz 256 yazmak havuz
- * yuklemesi uretirdi.
+ * The ROM constructs the offset with 0x80 << 1 (movs #128 + lsls #1).
+ * 256 does not fit the immediate, so the shifted form is required; writing
+ * 256 directly would produce a literal-pool load.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/get_field_100.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/get_field_100.c
  */
 
 #include "gba_types.h"

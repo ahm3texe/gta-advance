@@ -1,22 +1,24 @@
-/* Bakis konisindeki hedefi verme — 0x08017500-0x08017627
+/* Returning the target inside the facing cone — 0x08017500-0x08017627
  *
- * IKI FONKSIYON, AYNI GOVDE.  tools/find_twins.py ikisini %100 benzer
- * gosterdi; ROM govdeleri komut komut karsilastirilinca YALNIZCA dal
- * hedefleri farkli cikti, yani ayni kaynak iki kez derlenmis.
- * (docs/WORKFLOW.md §10)
+ * TWO FUNCTIONS, ONE BODY.  tools/find_twins.py reported them 100% similar;
+ * comparing the ROM bodies instruction by instruction, ONLY the branch
+ * targets differ, so the same source was compiled twice.
+ * (docs/WORKFLOW.md section 10)
  *
- * Davranis: baglamin +0x14'undeki kayit +0x114'te bir tur bayti tasiyor.
- * Tur 8 ise +0x100'daki soz dogrudan doner.  Tur 1 ise oradaki varlik
- * alinir; FUN_08019320 sifir donmezse hedef yok sayilir.  Sonra iki
- * nesnenin konumu -- +0x08'deki bayrakta 0x30 kuruluysa +0x20'den +4,
- * degilse +0x18'den -- farki alinip FUN_0800c180 ile ACIYA cevriliyor
- * (sonuc 0x3FF ile maskeleniyor, yani 1024 birimlik tam tur).  Aci,
- * baglamin +0x18'indeki kaydin +0x0E'sindeki isaretli bakis acisindan
- * cikariliyor; fark yarim turu asarsa ters yonden olculuyor.  Kalan fark
- * 255'i asmiyorsa varlik doner, asarsa 0.
+ * Behaviour: the record at the context's +0x14 carries a kind byte at +0x114.
+ * For kind 8 the word at +0x100 is returned directly.  For kind 1 the entity
+ * there is taken; if FUN_08019320 returns non-zero the target is discarded.
+ * Then the positions of the two objects -- from +0x20 plus 4 if bit 0x30 is
+ * set in the +0x08 flags, otherwise from +0x18 -- are subtracted and the
+ * difference is turned into an ANGLE by FUN_0800c180 (the result is masked
+ * with 0x3FF, i.e. a full turn of 1024 units).  The angle is subtracted from
+ * the signed facing angle at +0x0E of the record at the context's +0x18; if
+ * the difference exceeds half a turn it is measured the other way round.  If
+ * the remaining difference does not exceed 255 the entity is returned,
+ * otherwise 0.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/facing_target.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/facing_target.c
  */
 
 #include "gba_types.h"
@@ -41,7 +43,7 @@ typedef struct Node {
     u8   pad09[15];
     Pos *pos;                       /* +0x18 */
     u8   pad1c[4];
-    Pos *posAlt;                    /* +0x20, +4 kaydirilarak kullaniliyor */
+    Pos *posAlt;                    /* +0x20, used with a +4 offset */
 } Node;
 
 typedef struct Heading {
@@ -99,7 +101,7 @@ Node *GetFacingTarget(Node *ctx)
     return 0;
 }
 
-/* 0x08017594 — ROM'da GetFacingTarget'in birebir ikinci kopyasi. */
+/* 0x08017594 — an exact second copy of GetFacingTarget in the ROM. */
 Node *GetFacingTargetDup(Node *ctx)
 {
     u8   *record;

@@ -1,17 +1,17 @@
-/* Mesafe biriktirici — 0x08067274-0x080672B7
+/* Distance accumulator — 0x08067274-0x080672B7
  *
- * Her cagride |delta| >> 16 ekliyor; biriken deger 0x1FFF'i asinca tasan
- * kismi (>> 13) kayittaki sayaca aktarip biriktiriciyi maskeliyor.
- * Sondaki karsilastirma tasma korumasi.
+ * Add |delta| >> 16 on each call. When the accumulated value exceeds 0x1FFF,
+ * transfer the overflow (>> 13) to the save counter and mask the accumulator.
+ * The final comparison protects against overflow.
  *
- * BYTE-MATCHING. Ayrı `accum` isaretcisi tabani isaret duzeltmesinden once
- * r4'e yukletir. Yalniz tasma karsilastirmasindaki dar volatile gorunum,
- * yazilan distance alanini ROM'daki gibi bellekten yeniden okutur.
+ * BYTE-MATCHING. A separate accum pointer loads the base into r4 before sign
+ * correction. A narrow volatile view used only in the overflow comparison
+ * forces a memory reread of the stored distance field, as in the ROM.
  *
- * Ayni kumedeki eslesen uc sayac: src/world/stat_counters.c
+ * Three matching counters in the same cluster: src/world/stat_counters.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/distance_accum.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/distance_accum.c
  */
 
 #include "gba_types.h"

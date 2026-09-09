@@ -1,10 +1,10 @@
-/* Maskeli karsilastirma — 0x08023A80-0x08023A9B
+/* Masked comparison — 0x08023A80-0x08023A9B
  *
- * 0x02000224'teki sozu ve nesnenin +0x0C alanini ayni maskeyle suzup
- * FARKLIYSA 1, ayniysa 0 donduruyor.
+ * Apply the same mask to the word at 0x02000224 and object +0x0C. Return 1
+ * if DIFFERENT, otherwise 0.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/masked_compare.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/masked_compare.c
  */
 
 #include "gba_types.h"

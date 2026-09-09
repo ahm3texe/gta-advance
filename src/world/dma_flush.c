@@ -1,11 +1,11 @@
-/* Sabit parametreli cagri + DMA bosaltma — 0x08013A28-0x08013A6D
+/* Fixed-argument calls and DMA flush — 0x08013A28-0x08013A6D
  *
- * Ilki iki sabit cagri zinciri. Ikincisi kesmeleri kapatip DMA3 ile
- * gRam02022F60'in +4'undeki kaynagi gRam02022FA0'e kopyaliyor
- * (0x84000008 = 32-bit, 8 sozcuk), sonra bayragi sifirliyor.
+ * The first function makes two calls with fixed arguments. The second disables
+ * interrupts and uses DMA3 to copy from the source at gRam02022F60 +4 to
+ * gRam02022FA0 (0x84000008 = 32-bit, 8 words), then clears the flag.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/dma_flush.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/dma_flush.c
  */
 
 #include "gba_io.h"

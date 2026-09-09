@@ -1,12 +1,11 @@
-/* Ek istatistik sayaclari — 0x080671B8-0x08067205
+/* Additional statistics counters — 0x080671B8-0x08067205
  *
- * gSaveBuffer'in +0x64/+0x68/+0x6A ofsetlerindeki u16 sayaclara tasma
- * korumali artirim. src/world/stat_counters.c'deki desenin aynisi:
- * ara degisken `int` olmali (u16 iken agbcc gereksiz `lsls/lsrs` cifti
- * ekliyor).
+ * Overflow-protected increments of u16 counters at gSaveBuffer +0x64/+0x68/
+ * +0x6A. Same pattern as stat_counters.c: the intermediate must be int; u16
+ * makes agbcc add an unnecessary lsls/lsrs pair.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/more_counters.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/more_counters.c
  */
 
 #include "gba_types.h"

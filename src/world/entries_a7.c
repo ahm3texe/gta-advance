@@ -1,124 +1,134 @@
-/* gRam020245B0 tablosunda bos yuva acip yeni giris kurma — 0x08028B9C-0x08028C47
+/* Open a free slot in the gRam020245B0 table and set up a new entry — 0x08028B9C-0x08028C47
  *
- * Kardesi src/world/entries_a5.c (0x08028A88) ve src/world/entries_b1.c
- * (0x08025424) ile ayni ailedendir: 148 bayt stride'li bir tabloda +0x00
- * alani sifir olan ilk bos yuvayi arar, bulursa doldurup alt nesneyi
- * (sub, +0x04) kurar. Farklari:
- *   - tablo gEntriesA degil, TEK GIRISLIK gRam020245B0 (data/ram_map.csv:74),
- *   - tanimlayici ROM kokunden SABIT indislerle cozuluyor:
+ * Same family as its siblings src/world/entries_a5.c (0x08028A88) and
+ * src/world/entries_b1.c (0x08025424): it searches a table with a 148-byte
+ * stride for the first free slot whose +0x00 field is zero and, if one is
+ * found, fills it in and sets up the sub-object (sub, +0x04). The differences:
+ *   - the table is not gEntriesA but the SINGLE-ENTRY gRam020245B0
+ *     (data/ram_map.csv:74),
+ *   - the descriptor is resolved from the ROM root through CONSTANT indices:
  *       desc = gRom08BD3448.slots[64]->slots[0]->slots[0]
- *   - yuvanin +0x68 ve +0x4C alanlari cagiranin verdigi nesneden geliyor,
- *   - bos yuva bulunamazsa 0xFF, kurulursa YUVA INDISI donuyor.
+ *   - the slot's +0x68 and +0x4C fields come from the object supplied by the
+ *     caller,
+ *   - if no free slot is found it returns 0xFF, and on success THE SLOT INDEX.
  *
- * Akis:
+ * The flow:
  *   desc  = gRom08BD3448.slots[64]->slots[0]->slots[0]
- *   bos yuva yoksa 0xFF don
+ *   if there is no free slot, return 0xFF
  *   e->unk68   = h->unk18->unk0c
- *   e->payload = h->unk14->items[index]      (12 baytlik uclu)
+ *   e->payload = h->unk14->items[index]      (the 12-byte triple)
  *   FUN_08014FFC(e->sub, 7, &e->payload, &e->unk68)
  *   FUN_08013CFC(e->sub, desc, arg2)
  *   FUN_08014EE4(e->sub, desc->unk14)
  *   FUN_08015038(e->sub)
  *   e->active = 1;  return i;
  *
- * ROM'DAN OLCULEN AYRINTILAR
- * --------------------------
- * IMZA cagri yerinden DOGRULANAMADI: ROM'da 0x08028B9C'ye giden tek bir BL
- * yok ve fonksiyonun adresi (0x08028B9C / 0x08028B9D) hicbir veri
- * kelimesinde gecmiyor -- yani cagri, taranmamis bir tablodan dolayli
- * yapiliyor. Bu yuzden arity yalnizca GOVDEDEN okundu: r3 kullaniliyor,
- * dolayisiyla en az dort parametre var; r1 hic okunmadan 0x8028BB2'de
- * `movs r1,#128` ile eziliyor, yani IKINCI ARGUMAN KULLANILMIYOR.
- * entries_b1.c'de de iki olu argumanin bulunmasi bu ailede bunun olagan
- * oldugunu gosteriyor.
+ * DETAILS MEASURED FROM THE ROM
+ * -----------------------------
+ * THE SIGNATURE COULD NOT BE VERIFIED from a call site: there is no single BL
+ * to 0x08028B9C in the ROM, and the function's address (0x08028B9C /
+ * 0x08028B9D) does not appear in any data word -- so the call is made
+ * indirectly, from a table that has not been scanned. The arity was therefore
+ * read from THE BODY alone: r3 is used, so there are at least four parameters;
+ * r1 is overwritten at 0x8028BB2 with `movs r1,#128` without ever being read,
+ * so THE SECOND ARGUMENT IS UNUSED.
+ * That entries_b1.c also has two dead arguments shows this is normal in this
+ * family.
  *
- * PARAMETRE TIPLERI (kural 15): ucuncu ve dorduncu arguman giriste
- * `lsls #24 / lsrs #24` ciftiyle daraltiliyor -> ISARETSIZ 8 bit.
- * Birinci arguman ham isaretci, ikinci arguman olu (u32 birakildi).
+ * PARAMETER TYPES (rule 15): the third and fourth arguments are narrowed at
+ * entry with an `lsls #24 / lsrs #24` pair -> UNSIGNED 8-bit.
+ * The first argument is a raw pointer and the second is dead (left as u32).
  *
- * Kural 35'in tersi: epilog `pop {r1}; bx r1` -- donus adresi r1'e aliniyor
- * cunku r0 canli. Fonksiyon DEGER donduruyor. Basari yolunda `adds r0,r6,#0`
- * (dongu sayaci), hata yolunda `movs r0,#255`. Sayac s32 oldugu icin donus
- * tipi u32 birakildi; u8 yapmak donuse daraltma komutu ekletme riski tasir.
+ * The inverse of rule 35: the epilogue `pop {r1}; bx r1` takes the return
+ * address into r1 because r0 is live. The function RETURNS A VALUE. On the
+ * success path `adds r0,r6,#0` (the loop counter), on the failure path
+ * `movs r0,#255`. Because the counter is s32, the return type was left u32;
+ * making it u8 risks adding a narrowing instruction to the return.
  *
- * DONGU BICIMI ROM'DAN OKUNDU, KARDESTEN KOPYALANMADI:
- *   0x8028BD4  cmp r6,#0 / bgt   -> dongu kosulu `i < 1` (agbcc `<= 0`ya
- *                                   kanonikleştiriyor, kural 44'un tersi yonu)
- *   0x8028BDE  cmp r6,#1 / beq   -> dongu sonrasi kontrol `i == 1`
- * Yani sinir 1'dir; ram_map'teki "1 x 148 giris" notuyla birebir tutuyor.
- * Tek iterasyonluk olmasina ragmen agbcc dongu dondurmesini (rotation)
- * yapiyor: giris testi eleniyor, ilk `ldrb` govde disinda kaliyor, geri
- * kalani do/while oluyor.
+ * THE LOOP FORM WAS READ FROM THE ROM, NOT COPIED FROM THE SIBLING:
+ *   0x8028BD4  cmp r6,#0 / bgt   -> the loop condition `i < 1` (agbcc
+ *                                   canonicalises it to `<= 0`, the inverse
+ *                                   direction of rule 44)
+ *   0x8028BDE  cmp r6,#1 / beq   -> the post-loop check `i == 1`
+ * So the bound is 1, which agrees exactly with the "1 x 148 entries" note in
+ * ram_map. Even though there is only one iteration, agbcc still rotates the
+ * loop: the entry test is eliminated, the first `ldrb` stays outside the body,
+ * and the rest becomes a do/while.
  *
- * Kural 49: hata govdesi (`movs r0,#255`) fonksiyonun SONUNDA, literal
- * havuzdan sonra duruyor. Duz `if (i == ENTRY_COUNT) return FAIL;` yazimi
- * bunu kendiliginden veriyor, etiket gerekmedi.
+ * Rule 49: the failure body (`movs r0,#255`) sits at the END of the function,
+ * after the literal pool. A plain `if (i == ENTRY_COUNT) return FAIL;` produces
+ * that by itself; no label was needed.
  *
- * Kural 32: +0x4C'deki 12 bayt `ldmia r1!,{r2,r3,r4}` / `stmia r0!,{...}`
- * ciftiyle tasiniyor; bu ancak struct atamasindan (Triple) cikiyor.
- * `ldmia` r4'u (birinci arguman) eziyor, yani cagiranin nesnesi bu
- * noktadan sonra olu -- kaynakta da ondan sonra kullanilmiyor.
+ * Rule 32: the 12 bytes at +0x4C are moved with an
+ * `ldmia r1!,{r2,r3,r4}` / `stmia r0!,{...}` pair; that only comes out of a
+ * struct assignment (Triple).
+ * The `ldmia` clobbers r4 (the first argument), so the caller's object is dead
+ * from that point on -- and it is not used after that in the source either.
  *
- * KAYNAK INDISININ SEKILLENMESI (kural 28): 12 baytlik ogenin adresi
- * `lsls #1 / adds / lsls #2` ile ONCE indis*12 hesaplanip tabana ekleniyor,
- * sonra `adds r1,#116` geliyor. Bu, dizi indisi biciminin (`p->items[i]`)
- * imzasidir; her terimi ayri olcekleyen isaretci aritmetigi degil.
+ * THE SHAPE OF THE SOURCE INDEX (rule 28): the address of the 12-byte element
+ * is formed by computing index*12 FIRST with `lsls #1 / adds / lsls #2` and
+ * adding it to the base, followed by `adds r1,#116`. That is the signature of
+ * the array-index form (`p->items[i]`), not of pointer arithmetic that scales
+ * each term separately.
  *
- * SABIT INDISLI ROM ZINCIRI: 64 indisi word olarak 0x100 ediyor, Thumb
- * `ldr` immediate araligi disinda, bu yuzden `movs r1,#128 / lsls r1,#1 /
- * adds r0,r0,r1 / ldr r0,[r0]` cikiyor. Sonraki iki asama ofset 0 oldugu
- * icin `ldr r0,[r0,#4] / ldr r0,[r0,#0]` ciftlerine iniyor.
+ * THE CONSTANT-INDEX ROM CHAIN: index 64 is 0x100 as a word offset, outside
+ * Thumb's `ldr` immediate range, so `movs r1,#128 / lsls r1,#1 /
+ * adds r0,r0,r1 / ldr r0,[r0]` comes out. Because the next two stages have
+ * offset 0, they reduce to the pairs `ldr r0,[r0,#4] / ldr r0,[r0,#0]`.
  *
- * DENENIP ELENENLER (hepsi bu dosyada olculdu, asagidaki yazim eslesirken)
- * ----------------------------------------------------------------------
- * - Dongu sonrasi kontrolu `if (i > 0)` yazmak: 3/172 fark. agbcc bunu
- *   dongunun kendi `cmp #0`/`bgt` testiyle ayni kanonik bicime sokup
- *   birlestiriyor; ROM'da o noktada AYRI bir `cmp #1`/`beq` var. Kural 44'un
- *   ayni ailesi: sinir degeriyle yazilan esitlik testi kanonikleştirmeden
- *   kurtuluyor. entries_b1.c'de ayni sey `i == 15` ile cozulmustu.
- * - Dongu kosulunu `i <= 0` yazmak: ESLESIYOR, `i < ENTRY_COUNT` ile bire
- *   bir ayni kod. Yani kanonikleştirme dongu testinde gercekten oluyor;
- *   ayrimi yapan tek yer dongu SONRASI kontrol. Okunurluk icin `<` biraktim.
- * - Donus tipini `u8` yapmak: 176 bayt, 29 fark. agbcc her `return` yolunda
- *   `lsls #24 / lsrs #24` daraltmasi ekliyor; ROM'da yok. Sayac s32 olarak
- *   ham donuyor, o yuzden imza u32.
- * - Dorduncu argumani `u32 index` yapmak: 168 bayt (4 kisa). Giristeki
- *   `lsls r3,#24 / lsrs r3,#24` cifti kayboluyor -- kural 15'in dogrudan
- *   kaniti, arguman gercekten u8.
- * - Ucluyu `*(h->unk14->items + index)` ile almak: 6 fark. Kural 28'in
- *   karsi ornegi: isaretci biciminde `adds #116` ofseti carpimdan ONCE
- *   yayiliyor, ROM'da SONRA geliyor. Dizi indisi bicimi gerekiyor.
- * - Iki atamanin sirasini ters cevirmek (once payload, sonra unk68):
- *   182 bayt, 166 fark. Kural 19 bu fonksiyonda en sert etkiyi burada
- *   gosterdi: sira degisince ldmia'nin ezdigi r4 hala canli kaliyor,
- *   dagitim tumuyle kayiyor ve fazladan bir yigin gozu aciliyor.
- * - Olu ikinci argumani imzadan cikarmak (uc parametre): 5 fark. index r3
- *   yerine r2'ye dusuyor ve giristeki daraltma sirasi bozuluyor -- olu
- *   arguman gercekten imzada.
+ * TRIED AND ELIMINATED (all measured in this file, with the form below matching)
+ * ----------------------------------------------------------------------------
+ * - Writing the post-loop check as `if (i > 0)`: 3/172 differences. agbcc
+ *   pushes it into the same canonical form as the loop's own `cmp #0`/`bgt`
+ *   test and merges them; the ROM has a SEPARATE `cmp #1`/`beq` at that point.
+ *   The same family as rule 44: an equality test written with the bound value
+ *   escapes the canonicalisation. The same thing was solved with `i == 15` in
+ *   entries_b1.c.
+ * - Writing the loop condition as `i <= 0`: IT MATCHES, byte-for-byte the same
+ *   code as `i < ENTRY_COUNT`. So the canonicalisation really does happen in
+ *   the loop test; the only place that distinguishes them is the POST-loop
+ *   check. `<` was kept for readability.
+ * - Making the return type `u8`: 176 bytes, 29 differences. agbcc adds an
+ *   `lsls #24 / lsrs #24` narrowing on every `return` path; the ROM has none.
+ *   The counter is returned raw as s32, hence the u32 signature.
+ * - Making the fourth argument `u32 index`: 168 bytes (4 short). The
+ *   `lsls r3,#24 / lsrs r3,#24` pair at entry disappears -- direct evidence for
+ *   rule 15 that the argument really is u8.
+ * - Taking the triple with `*(h->unk14->items + index)`: 6 differences. The
+ *   counter-example to rule 28: in pointer form the `adds #116` offset is
+ *   emitted BEFORE the multiplication, while the ROM has it AFTER. The
+ *   array-index form is required.
+ * - Reversing the order of the two assignments (payload first, then unk68):
+ *   182 bytes, 166 differences. Rule 19 showed its sharpest effect in this
+ *   function here: with the order changed, the r4 that ldmia clobbers is still
+ *   live, the allocation shifts entirely and an extra stack slot opens.
+ * - Removing the dead second argument from the signature (three parameters):
+ *   5 differences. index falls to r2 instead of r3 and the narrowing order at
+ *   entry breaks -- the dead argument really is in the signature.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a7.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a7.c
  */
 
 #include "gba_types.h"
 
-#define ENTRY_COUNT   1     /* gRam020245B0'daki yuva sayisi */
-#define FAIL_INDEX    255   /* bos yuva yoksa donen deger */
-#define ROOT_SLOT     64    /* gRom08BD3448.slots[] icindeki sabit indis */
-#define SUB_ARG       7     /* FUN_08014FFC ikinci argumani */
+#define ENTRY_COUNT   1     /* the number of slots in gRam020245B0 */
+#define FAIL_INDEX    255   /* returned when there is no free slot */
+#define ROOT_SLOT     64    /* the fixed index into gRom08BD3448.slots[] */
+#define SUB_ARG       7     /* FUN_08014FFC's second argument */
 
-/* +0x4C'deki 12 baytlik ucluyu tek ldmia/stmia ciftiyle tasitmak icin
- * (kural 32); entries_a5.c / entries_b1.c'deki Triple ile ayni. */
+/* So that the 12-byte triple at +0x4C is moved with a single ldmia/stmia pair
+ * (rule 32); the same as the Triple in entries_a5.c / entries_b1.c. */
 typedef struct Triple {
     u32 a;
     u32 b;
     u32 c;
 } Triple;
 
-/* 0x08BD3448'deki ROM koku ve ondan zincirlenen dugumler; src/world/
- * entries_b1.c ve src/world/entries_a6.c'deki RomNode ile ayni yerlesim.
- * Bu ceviri birimi yalnizca +0x04 (alt dugum tablosu) ve +0x14 alanlarini
- * okuyor. */
+/* The ROM root at 0x08BD3448 and the nodes chained from it; the same layout as
+ * RomNode in src/world/entries_b1.c and src/world/entries_a6.c.
+ * This translation unit reads only the +0x04 (sub-node table) and +0x14
+ * fields. */
 typedef struct RomNode {
     u32             pad00;
     struct RomNode **slots;     /* +0x04 */
@@ -128,37 +138,38 @@ typedef struct RomNode {
 
 extern RomNode gRom08BD3448;
 
-/* Cagiranin verdigi nesnenin +0x18'inde duran kayit; yalnizca +0x0C
- * okunuyor, digerleri dolgu. */
+/* The record at +0x18 of the object supplied by the caller; only +0x0C is
+ * read, the rest is padding. */
 typedef struct SourceState {
     u8  pad00[12];
-    u32 unk0c;                  /* +0x0C -> yuvanin +0x68'i */
+    u32 unk0c;                  /* +0x0C -> the slot's +0x68 */
 } SourceState;
 
-/* Cagiranin verdigi nesnenin +0x14'unde duran kayit; +0x74'ten itibaren
- * 12 baytlik ogelerden olusan bir dizi tutuyor (stride ROM'da lsl/add/lsl
- * ile 12 olarak olculdu). Dizinin uzunlugu bilinmiyor, esnek birakildi. */
+/* The record held at +0x14 of the object supplied by the caller; from +0x74
+ * onwards it holds an array of 12-byte elements (the stride was measured as 12
+ * from the ROM's lsl/add/lsl). The array length is unknown, so it was left
+ * flexible. */
 typedef struct SourceTable {
     u8     pad00[116];
     Triple items[1];            /* +0x74 */
 } SourceTable;
 
-/* Fonksiyona verilen nesne. Yalnizca iki isaretci alani okunuyor; bu
- * ofsetler (0x14 / 0x18) alt nesne (sub) bolgesiyle ortusuyor ama bu
- * ceviri biriminde daha fazlasi kanitlanamadigi icin isim verilmedi. */
+/* The object passed to the function. Only two pointer fields are read; these
+ * offsets (0x14 / 0x18) overlap the sub-object (sub) region, but nothing more
+ * could be proven in this translation unit, so no names were given. */
 typedef struct Source {
     u8           pad00[20];
     SourceTable *unk14;         /* +0x14 */
     SourceState *unk18;         /* +0x18 */
 } Source;
 
-/* 0x020245B0'daki tek girislik tablo (data/ram_map.csv: 148 bayt).
- * Yerlesim kardes dosyalardaki Entry ile ayni; burada yalnizca dokunulan
- * alanlar acildi. Toplam 148 = 0x94. */
+/* The single-entry table at 0x020245B0 (data/ram_map.csv: 148 bytes).
+ * The layout is the same as Entry in the sibling files; only the fields
+ * touched here were expanded. 148 = 0x94 in total. */
 typedef struct Entry {
     u8     active;              /* +0x00 */
     u8     pad01[3];
-    u8     sub[38];             /* +0x04, FUN_08014FFC/FUN_08015038'e verilir */
+    u8     sub[38];             /* +0x04, passed to FUN_08014FFC/FUN_08015038 */
     u8     pad2a[34];
     Triple payload;             /* +0x4C */
     u8     pad58[16];

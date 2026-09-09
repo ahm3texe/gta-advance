@@ -1,65 +1,65 @@
-/* band_a.c'den AYRILDI: proje bolge modeli dosya basina TEK BITISIK
- * ROM araligi istiyor. Bu fonksiyonlar ROM'da dagitik oldugu icin ayni
- * dosyada tutulamazlar (add_c_region "bolge eslesmiyor" der). Ayrica
- * agbcc_build.py cevirim birimini min(adres)e linkledigi icin dis cagri
- * iceren fonksiyonlar yanlis adreste kalirdi.
+/* SPLIT OFF from band_a.c: the project's region model wants ONE CONTIGUOUS
+ * ROM range per file.  Because these functions are scattered in the ROM they
+ * cannot be kept in one file (add_c_region would say "region mismatch").
+ * Besides, since agbcc_build.py links the translation unit at min(address),
+ * functions containing external calls would end up at the wrong address.
  */
 
-/* Band A -- 0x080308EC .. 0x08031BF4 arasindan dokuz kucuk fonksiyon.
+/* Band A -- nine small functions from between 0x080308EC and 0x08031BF4.
  *
- * DOSYA ICINDE ALTI FONKSIYON VAR, DOKUZ DEGIL. Uc tanesi data/ram_map.csv'de
- * bulunmayan sembolleri, biri de gRam02025810 blogunu istiyor; gerekcesi
- * asagida her birinin yerinde yaziyor. Eksik sembollu bir govde yazmak
- * agbcc_build.py'yi sys.exit ettirip DOSYANIN TAMAMINI dogrulanamaz
- * yapardi, o yuzden yalnizca not birakildi.
+ * THE FILE HOLDS SIX FUNCTIONS, NOT NINE.  Three of them want symbols that are
+ * not in data/ram_map.csv and a fourth wants the gRam02025810 block; the
+ * reason is written in place for each of them below.  Writing a body with a
+ * missing symbol would make agbcc_build.py sys.exit and render THE WHOLE FILE
+ * unverifiable, so only a note was left.
  *
  * ---------------------------------------------------------------------
- * TEK DOSYA / DAGINIK ADRESLER: `bl` OFSETLERI HAKKINDA
+ * ONE FILE / SCATTERED ADDRESSES: ABOUT THE `bl` OFFSETS
  * ---------------------------------------------------------------------
- * agbcc_build.py ceviri biriminin TAMAMINI, iceride tanimli fonksiyonlarin
- * EN KUCUK ROM adresine linkliyor (`base = min(...)`) ve fonksiyonlari
- * kaynak sirasinda arka arkaya diziyor. Bu dosyadaki fonksiyonlar ROM'da
- * bitisik DEGIL (aralarinda baska fonksiyonlar var), dolayisiyla
- * ilkinden sonrakiler yanlis adrese dusuyor. Fonksiyon govdesi ROM ile
- * birebir olsa bile, iceride `bl` varsa bagil ofset kayiyor ve
- * `make c-match` o fonksiyonu "farkli" gosteriyor.
+ * agbcc_build.py links THE ENTIRE translation unit at the SMALLEST ROM address
+ * among the functions defined in it (`base = min(...)`) and lays the functions
+ * out back to back in source order.  The functions in this file are NOT
+ * contiguous in the ROM (there are other functions between them), so every one
+ * after the first lands at the wrong address.  Even when a function body is
+ * identical to the ROM's, any `bl` inside it has a shifted relative offset and
+ * `make c-match` reports that function as "different".
  *
- * Bu yuzden `bl` iceren iki fonksiyon TEK BASINA da olculdu (gecici bir
- * dosyada, kendi ROM adresine linklenerek):
- *     FUN_080315f8  -> tek basina BYTE-MATCHING (30/30)
- *     FUN_08031bf4  -> tek basina BYTE-MATCHING (28/28)
- * Bu dosyada ikisi de yalnizca 4'er bayt fark gosteriyor ve farkli olan
- * baytlarin hepsi `bl` komutlarinin bagil ofset alanlari; komut dizisi,
- * yazmac dagitimi ve sabitler ROM ile ayni (diff_function.py ile
- * dogrulandi). FUN_08030b50 en kucuk adresli fonksiyon oldugu icin
- * kaynakta BASA konuldu; boylece o base'e dusuyor ve `bl`leri dogru
- * kodlaniyor.
+ * So the two functions containing a `bl` were also measured ON THEIR OWN (in a
+ * temporary file, linked at their own ROM address):
+ *     FUN_080315f8  -> BYTE-MATCHING on its own (30/30)
+ *     FUN_08031bf4  -> BYTE-MATCHING on its own (28/28)
+ * In this file both show a difference of just 4 bytes, and every differing
+ * byte is part of a `bl` instruction's relative offset field; the instruction
+ * sequence, the register allocation and the constants are the same as the
+ * ROM's (verified with diff_function.py).  Because FUN_08030b50 has the
+ * smallest address it was put FIRST in the source; that way it lands on the
+ * base and its `bl`s are encoded correctly.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_a.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_a.c
  */
 
 #include "gba_types.h"
 
 
-/* --- 0x020307F0 hucre izgarasi (src/core/mark_area_cells.c ile ayni) ---- */
+/* --- the 0x020307F0 cell grid (the same as in src/core/mark_area_cells.c) - */
 typedef struct CellGrid {
     s32 originY;                /* 0x00 */
     s32 originX;                /* 0x04 */
-    u8  cells[1];               /* 0x08 -- satir adimi 0x10 */
+    u8  cells[1];               /* 0x08 -- row stride 0x10 */
 } CellGrid;
 
 extern CellGrid gRam020307F0;
 
-/* --- gRam02025810 +0x4C'deki 24 x 180 baytlik yuva dizisinin ogesi
+/* --- an element of the 24 x 180-byte slot array at gRam02025810 +0x4C
  *     (src/world/release_slot.c) ---------------------------------------- */
 typedef struct Held {
     u8  pad00[12];
     u32 flags;                  /* +0x0C */
 } Held;
 
-/* Sabit noktali konum: her iki eksen de 22 bit kaydirilarak hucreye
- * cevriliyor (bkz. FUN_08031534). */
+/* A fixed-point position: both axes are shifted right by 22 bits to become a
+ * cell (see FUN_08031534). */
 typedef struct Position {
     s32 x;                      /* 0x00 */
     s32 y;                      /* 0x04 */
@@ -72,22 +72,23 @@ extern u32  ReleaseSlot(u32 index);
 extern u8  *FUN_0806de10(u8 *dest, const u8 *src, u32 size);
 
 /* ======================================================================= */
-/* 0x08031534 -- 68 bayt -- BYTE-MATCHING
+/* 0x08031534 -- 68 bytes -- BYTE-MATCHING
  *
- * Sabit noktali bir konumu hucre izgarasina cevirip o hucrenin BOS olup
- * olmadigini donduruyor. Izgara gorunumu src/core/mark_area_cells.c ile
- * ayni (originY +0, originX +4, cells +8, satir adimi 0x10).
+ * Converts a fixed-point position into the cell grid and returns whether that
+ * cell is EMPTY.  The grid view is the same as in src/core/mark_area_cells.c
+ * (originY +0, originX +4, cells +8, row stride 0x10).
  *
- * ROM'DAN OKUNAN UC AYRINTI:
- *  - Sutun korumasi TEK isaretsiz test (`cmp #31 / bhi`): kural 60'a gore
- *    bu `if (column < 0 || column > 31)`in katlanmis hali, yani kaynakta
- *    `column` isaretsiz ve tek karsilastirma.
- *  - Satir korumasi IKI ayri isaretli test (`cmp #0 / blt`, `cmp #31 /
- *    bgt`): iki ayri `if`. Ayni satirda `&&` ile birlestirmek katlardi.
- *  - Sonuc bir yerelde maddelesiyor (`movs r4,#0` daha adres
- *    hesabindan ONCE, sonra `movs r4,#1`): kural 48.
- *  - `return 0` govdesi havuzun ARDINDA, fonksiyonun sonunda: kural 49,
- *    yani erken `return 0` degil sona `goto`. */
+ * THREE DETAILS READ FROM THE ROM:
+ *  - The column guard is a SINGLE unsigned test (`cmp #31 / bhi`): by rule 60
+ *    that is the folded form of `if (column < 0 || column > 31)`, so in the
+ *    source `column` is unsigned and there is one comparison.
+ *  - The row guard is TWO separate signed tests (`cmp #0 / blt`,
+ *    `cmp #31 / bgt`): two separate `if`s.  Joining them with `&&` on one line
+ *    would fold them.
+ *  - The result is materialised in a local (`movs r4,#0` even BEFORE the
+ *    address computation, then `movs r4,#1`): rule 48.
+ *  - The `return 0` body is AFTER the pool, at the end of the function: rule
+ *    49, i.e. a `goto` to the end rather than an early `return 0`. */
 u32 FUN_08031534(Position *pos)
 {
     u32 column;

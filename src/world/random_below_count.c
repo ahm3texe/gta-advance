@@ -1,12 +1,12 @@
-/* Tur sayisinin altinda rastgele indis — 0x080646AC-0x080646F7
+/* Random index below the kind count — 0x080646AC-0x080646F7
  *
- * gRom08BD3448.slots[kind]->count (+0x10) sifirsa 0 doner; degilse
- * sayiyi kapsayan en kucuk 2^k-1 maskesini secip FUN_0803258c()&maske
- * degeri sayinin altina dusene kadar cekiyor (bcs: isaretsiz).
- * gRom08BD3448 icin +0x10'u acan ayri bir gorunum (KindNode) tanimli.
+ * Return 0 if gRom08BD3448.slots[kind]->count (+0x10) is zero. Otherwise
+ * choose the smallest 2^k-1 mask covering the count and repeatedly draw
+ * FUN_0803258c() & mask until it is below the count (unsigned bcs).
+ * A separate KindNode view exposes +0x10 through gRom08BD3448.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/random_below_count.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/random_below_count.c
  */
 
 #include "gba_types.h"

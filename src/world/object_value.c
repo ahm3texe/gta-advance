@@ -1,13 +1,13 @@
-/* Nesne deger cozumu — 0x08038260-0x08038295
+/* Resolve an object value — 0x08038260-0x08038295
  *
- * Once bir sinama nesnesine bakiyor; sonucu sifir degilse onu 16 bit
- * kaydirip donduruyor. Degilse nesnenin turu 4 ise yuva dizisinden
- * dolayli, degilse ayrintidan dogrudan okuyor.
+ * Query a test object first; if nonzero, shift the result by 16 and return it.
+ * Otherwise read indirectly from the slot array for type 4, or directly from
+ * the detail object for other types.
  *
- * Ayni kumedeki diger uc fonksiyon: src/world/object_query.c
+ * Three other functions in this cluster: src/world/object_query.c
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/object_value.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/object_value.c
  */
 
 #include "gba_types.h"

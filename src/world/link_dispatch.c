@@ -1,61 +1,63 @@
-/* Seri (SIO) kesme isleyicisi — 0x08066904-0x08066A3F
+/* The serial (SIO) interrupt handler — 0x08066904-0x08066A3F
  *
- * Cok oyunculu aktarim bittiginde cagriliyor. Sirasiyla:
- *   - blok etkinse (byte0 == 1) SIOCNT'nin baslatma bitini indiriyor,
- *   - dort SIOMULTI yazmacini (0x04000120) sekiz baytlik tek bir kopyayla
- *     yigina aliyor,
- *   - SIOCNT'yi 32 bit okuyup hata bitini (bit 6) errorBit'e yaziyor,
- *   - 0. yuvadan 0xFEFE (bos/idle kelime) geldiyse ve alma sayaci
- *     tamamlandiysa kareyi kapatiyor: alma sayacini -1'e cekiyor,
- *     alma tamponlarini takas ediyor, gonderme bitmisse gonderme
- *     tamponlarini da takas edip sayaci sifirliyor ve IME kapaliyken
- *     BIOS kesme bayragina seri bitini ekliyor,
- *   - gonderme sayaci 9'u gecmediyse siradaki yarim kelimeyi
- *     SIOMLT_SEND'e koyup sayaci ilerletiyor,
- *   - alma sayaci negatif degilse dort yuvanin her birine (24 bayt
- *     adimla) o karenin kelimesini yaziyor; sayac 9 ise paketi hazir
- *     isaretliyor, sonra sayaci ilerletiyor,
- *   - blok etkinse Timer3'u durduruyor; gonderme sayaci 10'u gecmediyse
- *     baslatma bitini ve Timer3'u kesmeyle birlikte yeniden aciyor,
- *   - son olarak yeniden deneme sayacini sifirliyor.
+ * Called when a multiplayer transfer finishes.  In order:
+ *   - if the block is active (byte0 == 1) it lowers SIOCNT's start bit,
+ *   - takes the four SIOMULTI registers (0x04000120) onto the stack in a
+ *     single eight-byte copy,
+ *   - reads SIOCNT as 32 bits and writes the error bit (bit 6) into errorBit,
+ *   - if 0xFEFE (the idle word) came from slot 0 and the receive counter has
+ *     completed, it closes the frame: pulls the receive counter to -1, swaps
+ *     the receive buffers, and if the send has finished, swaps the send
+ *     buffers too, clears the counter and, with IME off, adds the serial bit
+ *     to the BIOS interrupt flag,
+ *   - if the send counter has not passed 9, it puts the next half word into
+ *     SIOMLT_SEND and advances the counter,
+ *   - if the receive counter is not negative, it writes that frame's word into
+ *     each of the four slots (24-byte stride); if the counter is 9 it marks
+ *     the packet ready, then advances the counter,
+ *   - if the block is active it stops Timer3; if the send counter has not
+ *     passed 10 it re-enables the start bit and Timer3 together with the
+ *     interrupt,
+ *   - finally it clears the retry counter.
  *
- * OLCULEN UC AYRINTI (hepsi eslesmeyi belirliyor):
+ * THREE MEASURED DETAILS (each of them decides the match):
  *
- * 1) SIOMULTI kopyasi 4 hizali OLMALI. `u16 data[4]` tek basina 2 hizali
- *    bir yapi uretiyor ve agbcc `memcpy` cagiriyor; `u32 word[2]` ile
- *    birlik yapinca ROM'daki `ldr [r0,#4] / ldr [r0,#0] / str / str`
- *    ciftine dusuyor.
+ * 1) The SIOMULTI copy MUST be 4-aligned.  A bare `u16 data[4]` produces a
+ *    2-aligned structure and agbcc calls `memcpy`; unioned with `u32 word[2]`
+ *    it drops to the ROM's `ldr [r0,#4] / ldr [r0,#0] / str / str` pair.
  *
- * 2) SIOMLT_SEND yazimi VOLATILE OLMAYAN yapi gorunumu istiyor.
- *    gba_io.h'deki `REG_SIO.send = x` (volatile SioRegs) agbcc'de
- *    yazimdan once gereksiz bir `ldrh [r2,#2]` uretiyor; ayni adresin
- *    volatile olmayan gorunumu yalniz `strh` biraktiriyor.
+ * 2) The SIOMLT_SEND write wants a NON-VOLATILE struct view.  `REG_SIO.send = x`
+ *    from gba_io.h (a volatile SioRegs) makes agbcc emit a redundant
+ *    `ldrh [r2,#2]` before the write; a non-volatile view of the same address
+ *    leaves only the `strh`.
  *
- * 3) Ilk SIOCNT okumasi VOLATILE OLMAMALI, BIOS bayragi ise VOLATILE
- *    OLMALI — ikisi de olculdu:
- *      - `cnt = REG_SIOCNT` (volatile) okumayi yerinde tutuyor ama
- *        `ldrh r0 / adds r2,r0,#0` cifti uretiyor (+2 komut, hizalamayla
- *        +4 bayt). Volatile olmayan `SIO_PORT.control` okumasi
- *        fonksiyon basina cekiliyor ve ROM'daki `ldrh r2,[r3]` cikiyor.
- *      - `gBiosIrqFlags | 0x80` (volatile degil) sabiti bellekten ONCE
- *        yukluyor ve o blogun tamamini baska yazmaclara dagitiyor;
- *        `*(vu16 *)&gBiosIrqFlags` ile ROM'daki `ldrh r0 / movs r1,#128
- *        / orrs r0,r1` sirasi ve sifir sabitinin r4'te durmasi geri
- *        geliyor. Tek fark buydu: 13 komut, 0 bayt boy farki.
+ * 3) The first SIOCNT read must NOT be volatile while the BIOS flag MUST be --
+ *    both measured:
+ *      - `cnt = REG_SIOCNT` (volatile) keeps the read in place but produces an
+ *        `ldrh r0 / adds r2,r0,#0` pair (+2 instructions, +4 bytes with
+ *        alignment).  A non-volatile `SIO_PORT.control` read is hoisted to the
+ *        top of the function and gives the ROM's `ldrh r2,[r3]`.
+ *      - `gBiosIrqFlags | 0x80` (non-volatile) loads the constant BEFORE the
+ *        memory read and redistributes that whole block across other
+ *        registers; with `*(vu16 *)&gBiosIrqFlags` the ROM's
+ *        `ldrh r0 / movs r1,#128 / orrs r0,r1` order comes back, and so does
+ *        the zero constant staying in r4.  That was the only difference: 13
+ *        instructions, 0 bytes of size difference.
  *
- * ELENEN YAZIMLAR (hepsi olculdu, hicbiri fark yaratmadi):
- *   cnt tipini u16/u32/s32 yapmak, bildirimini one almak, ic ice `if`,
- *   tanimda ilklemek; `gBiosIrqFlags |= ...`, `0x80 | gBiosIrqFlags`,
- *   once yerele almak, `(u16)` ile daraltmak. Sabiti `+` ile eklemek ve
- *   IME'yi volatile olmayan yazmak eslesmeyi BOZUYOR.
+ * SPELLINGS RULED OUT (all measured, none made a difference):
+ *   making cnt u16/u32/s32, moving its declaration up, nested `if`s,
+ *   initialising it at its definition; `gBiosIrqFlags |= ...`,
+ *   `0x80 | gBiosIrqFlags`, taking it into a local first, narrowing with
+ *   `(u16)`.  Adding the constant with `+` and writing IME non-volatile BREAK
+ *   the match.
  *
- * NOT (baska bir dosya, burada degistirilmedi): src/world/link_service.c
- * ayni iki tuzaga dusuyor — `REG_SIO.send` fazladan `ldrh` uretiyor ve
- * `gBiosIrqFlags | 0x80` volatile olmadigi icin o fonksiyon 148/152
- * baytta kaliyor. Yukaridaki iki yazim oraya da uygulanabilir.
+ * NOTE (a different file, not changed here): src/world/link_service.c falls
+ * into the same two traps -- `REG_SIO.send` produces an extra `ldrh`, and
+ * because `gBiosIrqFlags | 0x80` is not volatile that function stays at
+ * 148/152 bytes.  The two spellings above can be applied there too.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_dispatch.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_dispatch.c
  */
 
 #include "gba_types.h"
@@ -65,16 +67,17 @@
 #define SIO_START        0x0080
 #define SIO_START_CLEAR  0xFF7F
 #define SIO_SEND_IDLE    0xFEFE
-#define SIO_ERROR_SHIFT  25         /* bit 6'yi 32 bitin tepesine tasir */
+#define SIO_ERROR_SHIFT  25         /* moves bit 6 to the top of the word */
 #define TM3_ON_WITH_IRQ  0x00C0
 #define BIOS_IRQ_SERIAL  0x0080
 #define SLOT_COUNT       4
 #define SLOT_STRIDE      24
-#define SEND_LAST        9          /* tampondaki son yarim kelimenin indisi */
-#define FRAME_DONE       10         /* sayaclarin ust siniri */
+#define SEND_LAST        9          /* the index of the last half word in the buffer */
+#define FRAME_DONE       10         /* the counters' upper limit */
 
-/* Dort SIOMULTI yazmaci tek blok olarak okunuyor. Birligin u32 uyesi
- * hizalamayi 4'e cikariyor; onsuz agbcc kopyayi memcpy'ye ceviriyor. */
+/* The four SIOMULTI registers are read as a single block.  The union's u32
+ * member raises the alignment to 4; without it agbcc turns the copy into a
+ * memcpy. */
 typedef union SioMulti {
     u32 word[2];
     u16 data[SLOT_COUNT];
@@ -82,8 +85,8 @@ typedef union SioMulti {
 
 #define REG_SIOMULTI (*(volatile SioMulti *)0x04000120)
 
-/* SIOCNT + SIOMLT_SEND'in volatile OLMAYAN gorunumu: ilk denetim
- * okumasi ve gonderme yazimi bunu kullaniyor (bkz. bas yorum). */
+/* The NON-volatile view of SIOCNT + SIOMLT_SEND: the first control read and
+ * the send write use it (see the header comment). */
 typedef struct SioPort {
     u16 control;                    /* +0x00 */
     u16 send;                       /* +0x02 */

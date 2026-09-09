@@ -1,19 +1,18 @@
-/* Sirali dugum arama ve kimlik sorgulari — 0x08055A68-0x08055AF7
+/* Sorted-node search and ID queries — 0x08055A68-0x08055AF7
  *
- * Dugum listesi kimlige gore artan sirali: +0 sonraki dugum, +8 u16 kimlik.
- * Arama, kimlik asilinca 0 dondurup duruyor -- sirali listede daha ileride
- * bulunamayacagi icin.
+ * The node list is sorted by ascending ID: +0 next, +8 u16 ID. Stop and
+ * return 0 once the target ID is passed, since it cannot appear later.
  *
- * Ayni kumedeki besinci fonksiyon (QueryEntity, 0x08055AF8) henuz
- * eslesmedigi icin ayri dosyada: src/world/entity_query.c
+ * The fifth function in this cluster (QueryEntity, 0x08055AF8) was separated
+ * while non-matching: src/world/entity_query.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/node_search.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/node_search.c
  */
 
 #include "gba_types.h"
 
-#define COORD_KEEP_MASK  0xFFC00000     /* ust 10 bit korunur */
+#define COORD_KEEP_MASK  0xFFC00000     /* preserve the high 10 bits */
 #define COORD_SHIFT      6
 
 typedef struct Node {
@@ -34,14 +33,14 @@ extern u8    gGameState[];
 
 extern u32 FUN_08032548(void);
 
-/* 0x08055A68 — iki koordinatin alt 22 bitini yeniden kuruyor. */
+/* 0x08055A68 — reconstruct the low 22 bits of two coordinates. */
 void RandomizeCoords(Coords *coords)
 {
     coords->x = (coords->x & COORD_KEEP_MASK) | (FUN_08032548() << COORD_SHIFT);
     coords->y = (coords->y & COORD_KEEP_MASK) | (FUN_08032548() << COORD_SHIFT);
 }
 
-/* 0x08055A94 — verilen dugumden sonra kimligi arar. */
+/* 0x08055A94 — search for an ID after the supplied node. */
 Node *FindNodeAfter(Node *node, int id)
 {
     int found;
@@ -59,7 +58,7 @@ Node *FindNodeAfter(Node *node, int id)
     }
 }
 
-/* 0x08055AA8 — listenin basindan arar. */
+/* 0x08055AA8 — search from the list head. */
 Node *FindNode(int id)
 {
     Node *node;

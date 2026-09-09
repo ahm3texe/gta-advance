@@ -1,15 +1,15 @@
-/* Baglanti oturumu kapanis ve bekleme adimlari — 0x080663E8-0x080664A3
+/* Link-session shutdown and wait steps — 0x080663E8-0x080664A3
  *
- * Uc adim. Birincisi surucuye 15 kare boyunca 2 kodunu verip oturumu
- * kapatiyor, ikincisi durum 3'te ekrani karartip 60 kare bekliyor,
- * ucuncusu durum stabil olana ya da 240 kare gecene kadar surucuyu
- * 0 koduyla adimliyor.
+ * Three steps: the first sends driver code 2 for 15 frames and closes the
+ * session; the second darkens the screen in state 3 and waits 60 frames;
+ * the third steps the driver with code 0 until the state stabilizes or
+ * 240 frames elapse.
  *
- * gVBlankEnabled adi yaniltici: burada 0/2/3 alan bir OTURUM DURUMU.
- * Ad diger eslesmis kaynaklarda kullanildigi icin degistirilmedi.
+ * gVBlankEnabled is a misleading name: here it is a SESSION STATE taking
+ * 0/2/3. The name remains because other matching sources use it.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/link_session.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/link_session.c
  */
 
 #include "gba_types.h"
@@ -74,11 +74,12 @@ void WaitLinkSettle(void)
     s32 frames;
     s32 again;
 
-    /* Dongu bicimi ROM'dan okundu (kural 49). `for (;;)` + `if (!again)
-     * break` yazimi kontrol blogunu basa, bekleme blogunu sona koyuyor ve
-     * gRam02036328 adresini dongu disina tasiyor; ROM'da sira ters ve
-     * adres blogun icinde yukleniyor. Bayragi dongudan ONCE kurup
-     * `while (again)` yazmak dogru rotasyonu veriyor. */
+    /* Loop form was read from the ROM (rule 49). for (;;) with if (!again)
+ * break puts the control block first and the wait block last, and hoists
+ * gRam02036328 out of the loop. The ROM reverses that order and loads the
+ * address inside the block. Setting the flag BEFORE while (again) gives
+ * the correct rotation.
+ */
     frames = 0;
     again = 1;
     while (again != 0) {

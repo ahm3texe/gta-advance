@@ -1,58 +1,61 @@
-/* Varlik bayrak sorgusu — 0x08032058-0x0803208F
+/* The entity flag query — 0x08032058-0x0803208F
  *
- * BYTE-MATCHING.  Govde 56 bayt: 23 komut + 2 bayt hizalama dolgusu + 4 bayt
- * literal havuzu + 2 komut.  data/functions.csv bu satira 50 bayt yaziyor;
- * gercek govde bir sonraki fonksiyona (GetEntityFixedFields, 0x08032090)
- * kadar suruyor.
+ * BYTE-MATCHING.  The body is 56 bytes: 23 instructions + 2 bytes of alignment
+ * padding + a 4-byte literal pool + 2 instructions.  data/functions.csv
+ * records 50 bytes for this row; the real body runs up to the next function
+ * (GetEntityFixedFields, 0x08032090).
  *
- * Eslesmeyi saglayan iki ayrinti — ikisi de olculdu, ikisi de gerekli:
+ * The two details that make it match -- both measured, both necessary:
  *
- * 1. Bayrak sozcukleri tamponun 60. baytindan baslar ve ROM tabani AYRI
- *    yukleyip 60 EKLIYOR:  ldr r0,=gSaveBuffer / adds r0,#60 / adds r2,r2,r0
- *    Bu bicimi yalnizca STRUCT UYESI erisimi uretiyor.  `&gSaveBuffer[60]` ve
- *    `(u8 *)gSaveBuffer + 60` yazimlarinda agbcc ofseti literal havuzuna
- *    katliyor (`.word gSaveBuffer+0x3c`); yerel taban isaretcisi ise ofseti
- *    yukleme komutuna gomuyor (`ldr r0,[r0,#0x3c]`).  Ucu de 52 bayt uretir.
+ * 1. The flag words start at byte 60 of the buffer, and the ROM loads the base
+ *    SEPARATELY and ADDS 60:
+ *      ldr r0,=gSaveBuffer / adds r0,#60 / adds r2,r2,r0
+ *    Only a STRUCT MEMBER access produces this form.  With `&gSaveBuffer[60]`
+ *    or `(u8 *)gSaveBuffer + 60`, agbcc folds the offset into the literal pool
+ *    (`.word gSaveBuffer+0x3c`); a local base pointer instead buries the
+ *    offset in the load instruction (`ldr r0,[r0,#0x3c]`).  All three produce
+ *    52 bytes.
  *
- * 2. Ham id ile son indeks AYNI degiskende tutulmali.  Ayri degiskenlerle
- *    agbcc `id` ile `id - 1`'i tek register'da birlestirip `subs r0,#1`
- *    uretiyor; ROM'da `subs r0,r3,#1` var.  Tek degiskende `index`'in omru
- *    cikarma komutunu kapsiyor, iki miktar catisiyor ve register dagitimi
- *    ROM'unkine oturuyor: id/indeks r3'te, ara deger r0'da.
+ * 2. The raw id and the final index must be held in the SAME variable.  With
+ *    separate variables agbcc merges `id` and `id - 1` into one register and
+ *    produces `subs r0,#1`; the ROM has `subs r0,r3,#1`.  In a single variable
+ *    `index`'s lifetime covers the subtraction, the two quantities conflict,
+ *    and the register allocation settles onto the ROM's: id/index in r3, the
+ *    intermediate in r0.
  *
- * Ayrica indeks kaydirmasi ISARETLI (ROM `asrs`), sinir karsilastirmasi
- * ISARETSIZ (ROM `bhi`) olmali.
+ * The index shift must also be SIGNED (the ROM has `asrs`) and the bound
+ * comparison UNSIGNED (the ROM has `bhi`).
  *
- * Denenip tutmayanlar (hepsi struct uyesi bicimiyle olculdu):
- *   &gSaveBuffer[60] .......................... 52 bayt / 39 fark
- *   yerel u8 * taban + 60 ..................... 52 bayt / 39 fark
- *   extern u32 dizi + gSaveBuffer[word + 15] .. 56 bayt / 17 fark
- *   word/bit yerine tek satirlik ifade ........ 56 bayt / 21 fark
- *   ayri `mask` yereli ........................ 56 bayt / 22 fark
- *   `return (...) != 0;` ...................... 56 bayt / 47 fark
- *   ayri `id` yereli (u16/int/u32) ............ 56 bayt /  8 fark
+ * Tried and rejected (all measured in the struct-member form):
+ *   &gSaveBuffer[60] ............................ 52 bytes / 39 off
+ *   a local u8 * base + 60 ...................... 52 bytes / 39 off
+ *   an extern u32 array + gSaveBuffer[word + 15]  56 bytes / 17 off
+ *   a one-line expression instead of word/bit ... 56 bytes / 21 off
+ *   a separate `mask` local ..................... 56 bytes / 22 off
+ *   `return (...) != 0;` ........................ 56 bytes / 47 off
+ *   a separate `id` local (u16/int/u32) ......... 56 bytes /  8 off
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entity_flags.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entity_flags.c
  */
 
 #include "gba_types.h"
 
 typedef struct {
     u8  unk00[22];
-    u16 id;                 /* 0x16 — bir tabanli; 0 "yok" demek        */
+    u16 id;                 /* 0x16 — one-based; 0 means "none"        */
 } Entity;
 
-/* Kayit slotu calisma tamponu.  Baslik ve tumleyen alanlari save_manager.c
- * uzerinden biliniyor; aradaki bloklarin icerigi henuz cozulmedi.  Varlik
- * bayraklari 60. bayttan baslayan dort sozcukte duruyor. */
+/* The record slot working buffer.  Its header and complement fields are known
+ * through save_manager.c; the contents of the blocks in between have not been
+ * worked out yet.  The entity flags live in four words starting at byte 60. */
 typedef struct {
-    u8  header[12];         /* 0x00 — marker + slot basligi              */
-    u8  unk0C[48];          /* 0x0C — cozulmedi                          */
-    u32 entityFlags[4];     /* 0x3C — varlik basina bir bit, 128 bit     */
-    u8  unk4C[80];          /* 0x4C — cozulmedi                          */
-    u8  complement;         /* 0x9C — marker'in tumleyeni                */
-    u8  unk9D[3];           /* 0x9D — cozulmedi                          */
+    u8  header[12];         /* 0x00 — marker + slot header               */
+    u8  unk0C[48];          /* 0x0C — not worked out                     */
+    u32 entityFlags[4];     /* 0x3C — one bit per entity, 128 bits      */
+    u8  unk4C[80];          /* 0x4C — not worked out                     */
+    u8  complement;         /* 0x9C — the marker's complement            */
+    u8  unk9D[3];           /* 0x9D — not worked out                     */
 } SaveBuffer;
 
 #define ENTITY_ID_MAX 128
@@ -64,7 +67,8 @@ u32 IsEntityFlagSet(const Entity *entity)
 {
     s32 index, word, bit;
 
-    /* Ham id ve indeks bilerek tek degiskende; bkz. dosya basi, 2. madde. */
+    /* The raw id and the index share one variable deliberately; see item 2 at
+       the top of the file. */
     index = entity->id;
     if (index == 0)
         return 0;

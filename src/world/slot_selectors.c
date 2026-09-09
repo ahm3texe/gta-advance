@@ -1,16 +1,15 @@
-/* Yuva secicileri — 0x0803C49C-0x0803C507
+/* Slot selectors — 0x0803C49C-0x0803C507
  *
- * Uc kucuk secici. Arguman 1/2'ye gore uc ayri yuva blogundan (0x02000F10,
- * 0x02001140, 0x02001060, 0x02000F80) birini donduruyor. Ucuncusu ayrica
- * gGameState[12] duraklamasi kuruluyken +0x20 alt yapisindan +0x12 u16
- * cikariyor.
+ * Three small selectors use argument 1/2 to choose among slot blocks
+ * 0x02000F10, 0x02001140, 0x02001060, and 0x02000F80. The third also extracts
+ * u16 +0x12 from the +0x20 substructure when pause flag gGameState[12] is set.
  *
- * Isleyici adresleri gibi bu isaretciler de RAM'de tutuluyor; #define yerine
- * extern u32 kullanildi cunku ROM cast/toplama yerine dogrudan `ldr`
- * uretiyor.
+ * Like handler addresses, these pointers are stored in RAM. extern u32 is
+ * used instead of #define because the ROM loads them with ldr rather than
+ * constructing an address.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/slot_selectors.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/slot_selectors.c
  */
 
 #include "gba_types.h"

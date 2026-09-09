@@ -1,107 +1,114 @@
-/* SpawnFollowupEntry — 0x080291B8-0x0802922F (120 bayt)
+/* SpawnFollowupEntry — 0x080291B8-0x0802922F (120 bytes)
  *
- * Bir gEntriesA girisini sablon olarak verip ondan tur 34'ten yeni bir
- * giris kuruyor, sonra iki genel bayragi tazeliyor.  Evre secimi girisin
- * turune/evresine bagli:
+ * Takes a gEntriesA entry as a template, builds a new kind-34 entries from it,
+ * then refreshes two global flags.  The phase choice depends on the entry's
+ * kind/phase:
  *
- *   tur (+0x64) == 76  YA DA  evre (+0x90) == 46
+ *   kind (+0x64) == 76  OR  phase (+0x90) == 46
  *       -> CreateEntryFromTemplate(e, 1, 0, 34, 47, e->owner)
  *          FUN_08035058(GetActiveSlotValue(), 461)
- *   degilse
+ *   otherwise
  *       -> CreateEntryFromTemplate(e, 1, 0, 34, 7, e->owner)
  *          FUN_08035058(GetActiveSlotValue(), 258)
  *
- * Her iki durumda da sonunda gRam020245A0 = 1 ve gRam02024344 = 0.
+ * In both cases it ends with gRam020245A0 = 1 and gRam02024344 = 0.
  *
- * KARDES: bu govde, src/world/entries_b5.c (StepEntryPhase, 0x08025518)
- * icindeki ikinci is blogunun BIREBIR aynisi.  Struct yerlesimi, cagri
- * imzalari ve RAM sembolleri oradan alindi; orada zaten byte-matching
- * oldugu icin sabitlerin/argumanlarin dogrulugu ikinci kez kanitli.
+ * SIBLING: this body is EXACTLY the same as the second work block inside
+ * src/world/entries_b5.c (StepEntryPhase, 0x08025518).  The struct layout,
+ * the call signatures and the RAM symbols were taken from there; since that
+ * one is already byte-matching, the correctness of the constants/arguments is
+ * proven a second time.
  *
- * ROM'DAN OLCULEN AYRINTILAR
- * --------------------------
- *  1. Kural 35 -- DONUS TIPI void.  Epilog `add sp,#8; pop {r0}; bx r0`:
- *     donus adresi r0'a aliniyor, yani r0 canli DEGIL.  Deger dondurse
- *     (kardes StepEntryPhase'de oldugu gibi) `pop {r1}; bx r1` olurdu.
+ * DETAILS MEASURED FROM THE ROM
+ * -----------------------------
+ *  1. Rule 35 -- RETURN TYPE is void.  Epilogue `add sp,#8; pop {r0}; bx r0`:
+ *     the return address is taken into r0, so r0 is NOT live.  If it returned
+ *     a value (as in the sibling StepEntryPhase) it would be
+ *     `pop {r1}; bx r1`.
  *
- *  2. PROLOG `push {lr}` -- HIC callee-saved yazmac yok.  `e` yalnizca
- *     `adds r1,r0,#0` ile r1'e aliniyor ve son cagridan ONCE tuketiliyor
- *     (CreateEntryFromTemplate'in argumanlari kurulurken).  Sonraki iki
- *     cagri e'ye dokunmadigi icin agbcc onu caller-saved r1'de tutabiliyor.
- *     Bu, `e`nin kaynakta cagri sinirini asan bir yerele KOPYALANMAMASI
- *     gerektigini soyluyor -- dogrudan parametre kullanildi.
- *     `sub sp,#8` iki yigin argumani (5. ve 6.) icin.
+ *  2. PROLOGUE `push {lr}` -- NO callee-saved register at all.  `e` is only
+ *     taken into r1 with `adds r1,r0,#0` and is consumed BEFORE the last call
+ *     (while CreateEntryFromTemplate's arguments are being set up).  Because
+ *     the following two calls do not touch e, agbcc can keep it in the
+ *     caller-saved r1.  This says that in the source `e` must NOT be COPIED
+ *     into a local that crosses a call boundary -- the parameter was used
+ *     directly.  `sub sp,#8` is for the two stack arguments (the 5th and 6th).
  *
- *  3. ALAN ERISIMLERI `adds rX,#100` / `adds rX,#144` + ofset-0 yukleme
- *     olarak cikiyor; bu Thumb'in zorunlu bicimi (ldrb imm5 <= 31,
- *     ldr imm5*4 <= 124), yani burada kural 2'nin iki yazimi arasinda
- *     secim yok -- duz `e->kind` / `e->phase` dogru.
+ *  3. The FIELD ACCESSES come out as `adds rX,#100` / `adds rX,#144` plus an
+ *     offset-0 load; this is Thumb's mandatory form (ldrb imm5 <= 31,
+ *     ldr imm5*4 <= 124), so here there is no choice between rule 2's two
+ *     spellings -- plain `e->kind` / `e->phase` is correct.
  *
- *  4. `e->owner` (+0x01) `ldrb` ile okunup `str` ile yigina yaziliyor:
- *     dar alan, genis (u32) parametre yuvasi.  Kardesteki
- *     CreateEntryFromTemplate imzasinin son argumani `u8 owner`; ayni
- *     imza burada da tam bu ldrb/str ciftini uretiyor.
+ *  4. `e->owner` (+0x01) is read with `ldrb` and written to the stack with
+ *     `str`: a narrow field in a wide (u32) parameter slot.  The last argument
+ *     of the CreateEntryFromTemplate signature in the sibling is `u8 owner`;
+ *     that same signature produces exactly this ldrb/str pair here as well.
  *
- *  5. IKI BILDIRIM SABITI FARKLI YOLDAN KURULUYOR ve bu KENDILIGINDEN
- *     oluyor, kaynakta bir kaldirac gerekmiyor:
- *       461 = 0x1CD -> imm8<<n olarak kurulamiyor, havuzdan yukleniyor.
- *              Havuz 0x080291F0'ta, yani ilk dalin `b` komutundan HEMEN
- *              SONRA -- agbcc havuzu ilk erisilemez noktaya dokuyor.
+ *  5. THE TWO NOTIFICATION CONSTANTS ARE BUILT BY DIFFERENT ROUTES, and this
+ *     happens ON ITS OWN, no lever is needed in the source:
+ *       461 = 0x1CD -> cannot be built as imm8<<n, it is loaded from the pool.
+ *              The pool is at 0x080291F0, that is, IMMEDIATELY AFTER the first
+ *              branch's `b` instruction -- agbcc dumps the pool at the first
+ *              unreachable point.
  *       258 = 0x81<<1 -> `movs r1,#129; lsls r1,#1`.
- *     Kaynakta ikisi de duz `#define` sabiti; kural 44'e (sabiti yerele
- *     alma) GEREK YOK, cunku burada karsilastirma degil arguman.
+ *     In the source both are plain `#define` constants; rule 44 (moving the
+ *     constant into a local) is NOT NEEDED, because here it is an argument,
+ *     not a comparison.
  *
- *  6. KOSUL SIRASI kaynak sirasiyla ayni: once `cmp #76` (tur), sonra
- *     `cmp #46` (evre).  `||` zincirinin iki terimi bitisik esitlik
- *     OLMADIGI icin (farkli alanlar) kural 44'un aralik-katlamasi
- *     tetiklenmiyor; kardesteki 46/47 ciftinde gereken `c47` yereli
- *     burada gereksiz.
+ *  6. The CONDITION ORDER is the same as the source order: first `cmp #76`
+ *     (kind), then `cmp #46` (phase).  Because the two terms of the `||`
+ *     chain are NOT adjacent equalities (different fields), rule 44's range
+ *     folding is not triggered; the `c47` local that the 46/47 pair in the
+ *     sibling needs is unnecessary here.
  *
- *  7. `if/else` KORUNDU, kural 29'a gerek yok: ROM'da iki cagri blogu
- *     ayri ayri duruyor ve ortak kuyruk (iki store + epilog) 0x8029214'te
- *     bulusuyor -- yani agbcc'nin capraz atlamasi burada zaten ROM'un
- *     istedigi seyi yapiyor.  Ilk dal `b 0x8029214` ile kuyruga atliyor,
- *     ikinci dal kuyruga DUSUYOR (kural 49 ile uyumlu yerlesim).
+ *  7. The `if/else` was KEPT, rule 29 is not needed: in the ROM the two call
+ *     blocks stand separately and the common tail (two stores + epilogue)
+ *     meets at 0x8029214 -- that is, agbcc's cross-jumping already does what
+ *     the ROM wants here.  The first branch jumps to the tail with
+ *     `b 0x8029214`, the second branch FALLS THROUGH into the tail (a layout
+ *     consistent with rule 49).
  *
- * DENENIP ELENEN YOLLAR
- * ---------------------
- *  (YOK -- ILK DENEMEDE ESLESTI, tek varyant denenmedi.  Kardes
- *   entries_b5.c'nin ayni bloguna guvenmek yetti: struct yerlesimi,
- *   imzalar, sabitler ve if/else bicimi oradan degistirmeden alindi.
- *   Yeni denemeler BURAYA eklenmeli, mevcut notlar silinmemeli.)
+ * ROUTES TRIED AND REJECTED
+ * -------------------------
+ *  (NONE -- IT MATCHED ON THE FIRST ATTEMPT, not a single variant was tried.
+ *   Trusting the same block of the sibling entries_b5.c was enough: the
+ *   struct layout, the signatures, the constants and the if/else form were
+ *   taken from there unchanged.  New attempts must be added HERE, the
+ *   existing notes must not be deleted.)
  *
- * ESLESME: 120/120 bayt.
+ * MATCH: 120/120 bytes.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/entries_a9.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/entries_a9.c
  */
 
 #include "gba_types.h"
 
-#define KIND_34    34           /* yeni girisin turu, +0x64 */
-#define KIND_76    76           /* sablon girisin turu icin esik */
+#define KIND_34    34           /* kind of the new entry, +0x64 */
+#define KIND_76    76           /* threshold for the template entry's kind */
 
-#define PHASE_7     7           /* CreateEntryFromTemplate'e verilen evre */
-#define PHASE_46   46           /* sablon girisin evresi icin esik */
-#define PHASE_47   47           /* CreateEntryFromTemplate'e verilen evre */
+#define PHASE_7     7           /* phase passed to CreateEntryFromTemplate */
+#define PHASE_46   46           /* threshold for the template entry's phase */
+#define PHASE_47   47           /* phase passed to CreateEntryFromTemplate */
 
-#define NOTIFY_A  461           /* FUN_08035058 ikinci argumani */
+#define NOTIFY_A  461           /* second argument of FUN_08035058 */
 #define NOTIFY_B  258
 
-/* +0x4C'deki 12 baytlik uclu; src/world/entries_b5.c'deki `Triple` ve
- * src/world/submit_pack.c'deki `Pack12` ile ayni nesne.  Bu fonksiyon
- * icerigine dokunmuyor, yalnizca yerlesimi tamamlamak icin duruyor. */
+/* The 12-byte triple at +0x4C; the same object as `Triple` in
+ * src/world/entries_b5.c and `Pack12` in src/world/submit_pack.c.  This
+ * function does not touch its contents, it is here only to complete the
+ * layout. */
 typedef struct Triple {
     u32 a;
     u32 b;
     u32 c;
 } Triple;
 
-/* Kardes dosyalarla (entries_a5.c, entries_a6.c, entries_b1.c,
- * entries_b5.c) ayni yerlesim; toplam 148 = 0x94. */
+/* The same layout as the sibling files (entries_a5.c, entries_a6.c,
+ * entries_b1.c, entries_b5.c); 148 = 0x94 in total. */
 typedef struct Entry {
     u8     active;              /* +0x00 */
-    u8     owner;               /* +0x01, sablondan yeni girise tasiniyor */
+    u8     owner;               /* +0x01, carried from the template to the new entry */
     u8     pad02[2];
     u8     sub[38];             /* +0x04 */
     u8     pad2a[34];
@@ -114,8 +121,8 @@ typedef struct Entry {
     u32    phase;               /* +0x90, stride 148 */
 } Entry;
 
-/* Adresleri data/ram_map.csv'de kayitli (0x020245A0 ve 0x02024344);
- * derleme katmani `.equ` bildirimlerini kendisi uretiyor. */
+/* Their addresses are recorded in data/ram_map.csv (0x020245A0 and
+ * 0x02024344); the build layer generates the `.equ` declarations itself. */
 extern u8  gRam020245A0;
 extern u16 gRam02024344;
 

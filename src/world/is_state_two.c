@@ -1,18 +1,17 @@
-/* Durum == 2 sorgusu — 0x0805148C-0x0805149F
+/* Test state == 2 — 0x0805148C-0x0805149F
  *
- * 0x020303D0 blogunun +0x0C alanini 2 ile karsilastirip 1/0 donduruyor.
- * tools/find_predicates.py ile bulundu.
+ * Compare +0x0C in the 0x020303D0 block with 2 and return 1/0.
+ * Found with tools/find_predicates.py.
  *
- * ONCEDEN BLOKEYDI: adres haritada `gRecordIndex` adiyla ve `extern u32`
- * olarak kayitliydi, oysa ROM onu TABAN alip +0x0C okuyor. Cozum, sembolu
- * struct gorunumune cevirmek oldu: +0'daki indis `RecordBlock.index`,
- * +0x0C'deki durum `RecordBlock.state`. Sembol adi ve yerlesim degismedi,
- * bu yuzden src/misc/record_table.c bozulmadan kaldi.
+ * PREVIOUSLY BLOCKED: the map recorded the address as gRecordIndex, extern
+ * u32, but the ROM uses it as a BASE and reads +0x0C. A structure view solved
+ * this: index at +0 is RecordBlock.index; state at +0x0C is RecordBlock.state.
+ * The symbol name and layout stayed unchanged, preserving record_table.c.
  *
- * RecordBlock tanimi src/misc/record_table.c ile BIREBIR AYNI olmali.
+ * Keep RecordBlock IDENTICAL to src/misc/record_table.c.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/is_state_two.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/is_state_two.c
  */
 
 #include "gba_types.h"

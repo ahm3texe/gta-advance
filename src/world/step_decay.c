@@ -1,85 +1,92 @@
-/* StepDecay -- 0x08023974-0x08023A0B (152 bayt) -- ESLESTI
+/* StepDecay -- 0x08023974-0x08023A0B (152 bytes) -- MATCHED
  *
- * Uc kapidan gecerse degeri azaltip tabana kirpiyor, komsu bayrakliysa
- * ikinci bir esikle daha kirpiyor, sonra dort girisli ROM tablosunda
- * kaydirmali karsilastirma yapip etiketi guncelliyor.
+ * If it passes three gates it decrements the value and clamps it to the floor,
+ * if the peer is flagged it clamps once more with a second threshold, then it
+ * does a shifted comparison over a four-entry ROM table and updates the tag.
  *
- * ROM'DAN OKUNAN YERLESIM (esleseni dogruladi):
- *   r4 = obj, r5 = peer, r1 = delta, r3 = limit (taramada r6'ya kopya),
- *   r2 = kapida gRam adresi / uygulamadaki eski deger, r0 = gecici.
- *   Uc callee-saved: r4, r5, r6 -- `push {r4, r5, r6, lr}`.
+ * LAYOUT READ OFF THE ROM (the match confirmed it):
+ *   r4 = obj, r5 = peer, r1 = delta, r3 = limit (copied to r6 in the scan),
+ *   r2 = the gRam address at the gate / the old value in the apply step,
+ *   r0 = temporary.
+ *   Three callee-saved: r4, r5, r6 -- `push {r4, r5, r6, lr}`.
  *
- * Sabit kaliplari: 0x1000000 = `0x80 << 17`, 0x20000 = `0x80 << 10`
- * (movs+lsls); 0x0063FFFF ve 0x0001FFFF havuzdan.
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
- * Arg2 hicbir yerde okunmuyor (r2 hemen havuz adresiyle eziliyor) ama
- * arg3 node oldugu icin imzada yer tutucu olarak duruyor.
+ * Constant patterns: 0x1000000 = `0x80 << 17`, 0x20000 = `0x80 << 10`
+ * (movs+lsls); 0x0063FFFF and 0x0001FFFF come from the pool.
+ * Rule 35: `pop {r1}; bx r1` -> r0 carries the return value, signature u32.
+ * Arg2 is never read anywhere (r2 is immediately clobbered with the pool
+ * address) but since arg3 is node it stays in the signature as a placeholder.
  *
- * IKI GENISLIKLI OKUMALAR -- ikisi de kaynakta AYRI ifade olmali:
- *   gRam02000224: kapida `ldrb` (0x8023994), uygulamada `ldr` (0x80239a8).
- *   obj->stamp   : kapida `ldrb r6,[r4,#12]` (0x8023996) ama uygulamada
- *                  `str r0,[r4,#12]` (0x80239aa). Yani AYNI alan bayt
- *                  okunup soz yaziliyor; kapiya `*(u8 *)&obj->stamp`
- *                  yazmak sart, duz `obj->stamp` `ldr` uretir.
+ * THE TWO DIFFERENT-WIDTH READS -- both must be SEPARATE expressions in the
+ * source:
+ *   gRam02000224: `ldrb` at the gate (0x8023994), `ldr` in the apply step
+ *                 (0x80239a8).
+ *   obj->stamp   : `ldrb r6,[r4,#12]` at the gate (0x8023996) but
+ *                  `str r0,[r4,#12]` in the apply step (0x80239aa). So the
+ *                  SAME field is read as a byte and written as a word; writing
+ *                  `*(u8 *)&obj->stamp` at the gate is mandatory, a plain
+ *                  `obj->stamp` produces `ldr`.
  *
- * ESLESMEYI ACAN IKI KALDIRAC. Ikisi de saf DAGITIM meselesiydi: kontrol
- * akisi ve komut secimi bunlardan ONCE zaten dogruydu (152 bayt tutuyor,
- * 74 komuttan 65'i ayni), fark yalnizca hangi degerin hangi yazmaca
- * dustugundeydi.
+ * THE TWO LEVERS THAT OPENED THE MATCH. Both were pure ALLOCATION issues:
+ * control flow and instruction selection were already correct BEFORE them
+ * (the size came out at 152 bytes, 65 of the 74 instructions identical), the
+ * difference was only in which value landed in which register.
  *
- *  1. KURAL 45, obj->value uzerinde. Deger UC ayri yerde yukleniyor
- *     (0x8023984 kapi, 0x80239ac uygulama, 0x80239e4 tarama) ve ROM
- *     ucunu de AYRI yazmaca koyuyor: r0 / r2 / r5. Uc yuklemeyi TEK
- *     `old` yereline yazmak agbcc'de tek bir pseudo uretiyordu
- *     (p28: 9 ref, oncelik 0.844) ve bu pseudo sirasi geldiginde r3'u
- *     kapip limit'i callee-saved r6'ya suruyordu; oradan zincirleme
- *     peer r2'ye, gRam adresi r5'e kayiyordu. Uc ayri yerel
- *     (old / cur / val) farki 51 -> 38'e dusurdu ve peer, gRam,
- *     uygulama ve tarama yazmaclarinin HEPSI ayni anda ROM'a oturdu.
+ *  1. RULE 45, on obj->value. The value is loaded in THREE separate places
+ *     (0x8023984 gate, 0x80239ac apply, 0x80239e4 scan) and ROM puts all
+ *     three in SEPARATE registers: r0 / r2 / r5. Writing the three loads into
+ *     a SINGLE `old` local produced one single pseudo in agbcc
+ *     (p28: 9 refs, priority 0.844) and when that pseudo's turn came it took
+ *     r3 and pushed limit into the callee-saved r6; from there peer slid into
+ *     r2 and the gRam address into r5 in a chain. Three separate locals
+ *     (old / cur / val) brought the difference down from 51 to 38 and the
+ *     peer, gRam, apply and scan registers ALL fell into place against ROM at
+ *     once.
  *
- *  2. limit'in CANLI ARALIK BOLUNMESI. ROM taramanin girisinde
- *     `adds r6, r3, #0` ile limit'i r3'ten r6'ya kopyaliyor, cunku r3
- *     tablo isaretcisine gerekiyor. Tek yerelle yazildiginda agbcc
- *     limit'i bastan r6'ya koyup bu kopyayi hic uretmiyordu -- yani
- *     bizde bir komut EKSIK kaliyordu; boyutun yine de 152 cikmasini
- *     havuz hizalamasi icin eklenen `movs r0, r0` dolgusu maskeliyordu.
- *     Tarama oncesinde `base = limit;` yazmak kopyayi geri getiriyor.
+ *  2. LIVE-RANGE SPLITTING of limit. At the entry to the scan ROM copies limit
+ *     from r3 to r6 with `adds r6, r3, #0`, because r3 is needed for the table
+ *     pointer. Written with a single local, agbcc put limit in r6 from the
+ *     start and never produced this copy -- that is, we were MISSING one
+ *     instruction; the size still coming out as 152 was masked by the
+ *     `movs r0, r0` padding added for pool alignment. Writing `base = limit;`
+ *     before the scan brings the copy back.
  *
- *     >>> BU, "kopya tabanli bolme HER ZAMAN elenir" notunun BILINEN
- *     ILK ISTISNASI. Burada elenmiyor cunku iki aralik ARASINDA birlesme
- *     noktalari var: `base` yalnizca tarama dongusunde, `limit` yalnizca
- *     kapida canli, ortusme yok. Onceki elemeler (lst = list) aralilarin
- *     IC ICE gectigi durumlardi -- ayirt edici olcut ortusme.
- *     `base = obj->limit;` (ikinci yukleme) yazimi da AYNEN esliyor,
- *     cunku CSE ikinci `ldr`i ayni kopyaya ceviriyor. Kaynakta kopya
- *     bicimi tercih edildi: ROM'da tek `ldr [r4,#4]` var, ikinci bir
- *     bellek okumasi yazmak okuyucuyu yaniltirdi.
+ *     >>> THIS IS THE FIRST KNOWN EXCEPTION to the note "copy-based splitting
+ *     is ALWAYS ruled out". It is not ruled out here because there are merge
+ *     points BETWEEN the two ranges: `base` is live only in the scan loop,
+ *     `limit` only at the gate, no overlap. The earlier rejections
+ *     (lst = list) were cases where the ranges were NESTED inside one another
+ *     -- the distinguishing criterion is overlap.
+ *     Writing `base = obj->limit;` (a second load) matches EXACTLY as well,
+ *     because CSE turns the second `ldr` into the same copy. The copy form was
+ *     preferred in the source: ROM has a single `ldr [r4,#4]`, and writing a
+ *     second memory read would mislead the reader.
  *
- * TARAMA DONGUSU: tablo isaretcisi ROM'da tumevarim degiskeni
- * (`adds r3,#4`), indeks degil -- `TABLE[i]` yazimi lsls+ldr ikilisi
- * uretiyor, yuruyen isaretci sart (kural 37). Artirim sirasi ROM'un
- * sirasi: once isaretci (0x80239f4), sonra sayac (0x80239f6). Sayac
- * isaretli: `cmp r2,#3` + `ble` (kural 31), yani `s32 i` ve `i <= 3`;
- * `u32` yazimi `bls` verirdi. Onsoz deyim sirasi da ROM'un sirasi:
- * i, base, val, entry.
+ * SCAN LOOP: in ROM the table pointer is an induction variable
+ * (`adds r3,#4`), not an index -- writing `TABLE[i]` produces an lsls+ldr
+ * pair, a walking pointer is mandatory (rule 37). The increment order is
+ * ROM's order: pointer first (0x80239f4), then the counter (0x80239f6). The
+ * counter is signed: `cmp r2,#3` + `ble` (rule 31), i.e. `s32 i` and `i <= 3`;
+ * a `u32` spelling would give `bls`. The order of the prologue statements is
+ * ROM's order too: i, base, val, entry.
  *
- * DENENIP ELENEN YAZIMLAR (hedef 152 bayt / 74 komut):
- *  - Ilk kurulum (ic ice kosul tahmini): 156 bayt, 145 fark.
- *  - dump_cfg.py goto zinciri, `span` tek yerelde: 156 bayt, 145 fark,
- *    push {r4,r5,r6,r7,lr} -- bir fazla callee-saved.
- *  - Tek `old` yereli + yuruyen isaretci: 152 bayt, 51 fark.
- *  - `TABLE[i]` indeksleme (do/while): 56 fark. `for` bicimi: 58 fark.
- *  - Onsoz deyimlerinin ALTI permutasyonu: hepsi 25 farkli komut --
- *    deyim sirasi burada kaldirac DEGIL, dagitim kaldiracti.
- *  - `u32 *ram = &gRam02000224;` (adresi yerele almak): 53 fark.
- *  - Kapiyi ic ice `if`lere acmak: 51 fark (&& zinciriyle ayni cikti).
- *  - Yerel bildirim sirasini degistirmek: 51 fark (etkisiz).
- *  - `limit = obj->limit;` ile AYNI yerele yeniden atama (bolme degil,
- *    yeniden tanim): 48 fark -- yerelin AYRI olmasi sart.
- *  - `base = limit;` deyimini `entry = TABLE;`den SONRA koymak: 4 fark.
+ * SPELLINGS TRIED AND RULED OUT (target 152 bytes / 74 instructions):
+ *  - First setup (guessed nested conditions): 156 bytes, 145 off.
+ *  - The dump_cfg.py goto chain, `span` in a single local: 156 bytes, 145 off,
+ *    push {r4,r5,r6,r7,lr} -- one callee-saved too many.
+ *  - A single `old` local + walking pointer: 152 bytes, 51 off.
+ *  - `TABLE[i]` indexing (do/while): 56 off. The `for` form: 58 off.
+ *  - ALL SIX permutations of the prologue statements: all 25 instructions off
+ *    -- statement order is NOT the lever here, allocation was the lever.
+ *  - `u32 *ram = &gRam02000224;` (taking the address into a local): 53 off.
+ *  - Expanding the gate into nested `if`s: 51 off (same output as the &&
+ *    chain).
+ *  - Changing the order of the local declarations: 51 off (no effect).
+ *  - Reassigning to the SAME local with `limit = obj->limit;` (not a split, a
+ *    redefinition): 48 off -- the local has to be SEPARATE.
+ *  - Placing the `base = limit;` statement AFTER `entry = TABLE;`: 4 off.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/step_decay.c  -> 152/152 eslesti
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/step_decay.c  -> 152/152 matched
  */
 
 #include "gba_types.h"
@@ -91,11 +98,11 @@
 #define TABLE       ((s32 *)0x08342AC8)
 
 typedef struct Obj {
-    u8  tag;                    /* +0x00  strb, tarama sonucu */
+    u8  tag;                    /* +0x00  strb, result of the scan */
     u8  pad01[3];
-    s32 limit;                  /* +0x04  asrs ile kullaniliyor => isaretli */
+    s32 limit;                  /* +0x04  used with asrs => signed */
     s32 value;                  /* +0x08 */
-    u32 stamp;                  /* +0x0C  bayt okunur, soz yazilir */
+    u32 stamp;                  /* +0x0C  read as a byte, written as a word */
 } Obj;
 
 typedef struct Peer {
@@ -130,7 +137,7 @@ u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
     if (delta == 0)
         return 0;
 
-    /* Uc kapi; hepsi birden gecerse "henuz sirasi degil" deyip cikiyor. */
+    /* Three gates; if all of them pass it says "not its turn yet" and bails. */
     old = obj->value;
     limit = obj->limit;
     if (old < limit && delta <= DELTA_MAX
@@ -139,7 +146,7 @@ u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
 
     obj->stamp = gRam02000224;
 
-    /* Azaltip tabana kirp. Sifir zaten tabanda, ona dokunulmuyor. */
+    /* Decrement and clamp to the floor. Zero is already at the floor, untouched. */
     cur = obj->value;
     if (cur != 0) {
         next = cur - delta;
@@ -148,15 +155,15 @@ u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
             obj->value = 1;
     }
 
-    /* Komsu bayrakliysa ikinci esik: ust bolgeden dusenler tabana oturur.
-     * Karsilastirilan `cur` AZALTMADAN ONCEKI deger (ROM'da r2). */
+    /* If the peer is flagged, a second threshold: what falls from the upper
+     * region settles on the floor.  `cur` is the value BEFORE the decrement (r2 in ROM). */
     if (peer != 0 && (peer->flags & PEER_BIT) != 0
         && cur > SPAN_LIMIT && obj->value <= SPAN_LIMIT)
         obj->value = SPAN_RESET;
 
-    /* Dort girisli tabloda kaydirmali esik taramasi; en son gecen kazanir.
-     * `base` limit'in tarama omru: r3 tablo isaretcisine gerektiginden
-     * ROM burada `adds r6, r3, #0` kopyasini uretiyor (bkz. baslik, 2). */
+    /* Shifted threshold scan over the four-entry table; the last one to pass wins.
+     * `base` is limit's scan-time live range: since r3 is needed for the table
+     * pointer, ROM emits the `adds r6, r3, #0` copy here (see header, 2). */
     i = 0;
     base = limit;
     val = obj->value;

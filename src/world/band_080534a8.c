@@ -1,84 +1,88 @@
-/* Nesnenin kimlik/yuva kayitlarini kurup her turda ilerletme
- * 0x080534A8-0x0805364F  (424 bayt; son 12 bayt literal havuzu)
+/* Setting up the object's id/slot records and advancing them each round
+ * 0x080534A8-0x0805364F  (424 bytes; the last 12 are the literal pool)
  *
- * DURUM: BYTE-MATCHING (424/424 bayt, 203/203 komut) — ilk denemede.
+ * STATUS: BYTE-MATCHING (424/424 bytes, 203/203 instructions) — on the first
+ * attempt.
  *
- * Yapi ailesi nodelist_d1.c (ClearObjectIdsAndSlots) ve nodelist_d2.c
- * (ClearAreaIdArrays) ile AYNI; struct yerlesimleri oradan alindi.
- * Obj: +0x0B bitfield (dirty:1/pad:3/level:4 ISARETLI), +0x18 baslik,
- * +0x20 kimlik dizisi, +0x24 60 baytlik Area kayitlari (d1 ile birebir);
- * +0x0A/+0x16/+0x17 alanlari bu govdeden olculdu.
+ * The structure family is THE SAME as in nodelist_d1.c
+ * (ClearObjectIdsAndSlots) and nodelist_d2.c (ClearAreaIdArrays); the struct
+ * layouts were taken from there.  Obj: the +0x0B bitfield
+ * (dirty:1/pad:3/level:4, SIGNED), the +0x18 header, the +0x20 id array, the
+ * +0x24 60-byte Area records (identical to d1); the +0x0A/+0x16/+0x17 fields
+ * were measured from this body.
  *
- * ROM'DAN OKUNAN AKIS:
- *   1. header = obj->header ONCE okunuyor (`ldr r0,[r7,#24]` sayacin
- *      onunde), sonra +0x16 geri sayimi: `== 5` ise azalt ve DEVAM ET,
- *      `> 0` ise azalt ve DON. Deger `ldrb`, karsilastirma `ldrsb` ->
- *      alan `s8`, bitfield DEGIL.
- *   2. +0x17 sifir degilse ClearObjectIdsAndSlots ve don.
- *   3. Kirli degilse ve seviye > 0 ise: FindFreeSlotRun(idCount) ->
- *      obj->ids, FindNthFreeSlot(recordCount) -> obj->records. Iki NULL
- *      kontrolu de DONEN degeri sinaviyor (kural: cagri sonucu once
- *      yerele), ikinci basarisiz olursa obj->ids ALANDAN yeniden okunup
- *      FillSlotsWithNone cagriliyor.
- *   4. Kimlik kopyalama dongusu: `*dst = *src; LinkAreaEntryIfEligible(*dst)`
- *      — cagri argumani HEDEFTEN yeniden okunuyor (nodelist_a6.c ile ayni).
- *   5. Kayit kurma dongusu: her Area icin IME sakla/kapat + DMA3 ile 60
- *      bayti sifirla (0x8500000F = 15 kelime) + olu control okumasi + IME
- *      geri; sonra 20 baytlik AreaInfo struct atamasi (ldmia/stmia 3+2),
+ * THE FLOW AS READ FROM THE ROM:
+ *   1. header = obj->header is read FIRST (`ldr r0,[r7,#24]` ahead of the
+ *      counter), then the +0x16 countdown: if `== 5`, decrement and CONTINUE;
+ *      if `> 0`, decrement and RETURN.  The value uses `ldrb` and the
+ *      comparison `ldrsb` -> the field is `s8`, NOT a bitfield.
+ *   2. If +0x17 is non-zero, ClearObjectIdsAndSlots and return.
+ *   3. If not dirty and the level is > 0: FindFreeSlotRun(idCount) ->
+ *      obj->ids, FindNthFreeSlot(recordCount) -> obj->records.  Both NULL
+ *      checks test the RETURNED value (the rule: a call's result into a local
+ *      first), and if the second fails, obj->ids is re-read FROM THE FIELD and
+ *      FillSlotsWithNone is called.
+ *   4. The id copy loop: `*dst = *src; LinkAreaEntryIfEligible(*dst)` — the
+ *      call argument is re-read FROM THE DESTINATION (the same as in
+ *      nodelist_a6.c).
+ *   5. The record setup loop: for each Area, save/disable IME + zero 60 bytes
+ *      with DMA3 (0x8500000F = 15 words) + a dead control read + restore IME;
+ *      then a 20-byte AreaInfo struct assignment (ldmia/stmia 3+2),
  *      GetEntrySlot(area->info.id) -> +0x28, `area->level = 0`
  *      (`movs #15 / ands`).
- *   6. obj->dirty = 1, obj->slot = 0xFF. Kirli degilse don.
- *   7. FUN_08051d10(obj, header->table, header->mode), sonra her kayit
- *      icin FUN_08053030; seviye != 0 (`movs #240 / ands`, kural 24/26)
- *      ve listC != 0 ise listC[j] uzerinde FUN_08056048 dongusu.
+ *   6. obj->dirty = 1, obj->slot = 0xFF.  Return if not dirty.
+ *   7. FUN_08051d10(obj, header->table, header->mode), then FUN_08053030 for
+ *      each record; if the level is != 0 (`movs #240 / ands`, rules 24/26) and
+ *      listC is != 0, a FUN_08056048 loop over listC[j].
  *
- * TIP OLCUMLERI:
- *   - Dis dongu sayaclari `u32` (ROM `bcs`/`bcc`, ISARETSIZ).
- *   - Ic dongu sayaci `int` (ROM `bge`/`blt`, u16 countC int'e yukseliyor).
- *   - Kural 35'in TERSI: `pop {r1}; bx r1` + `movs r0,#0` -> donus tipi
- *     `int`, her cikis `return 0`.
- *   - REG_IME literali dongu disina cikiyor, REG_DMA3 tabani iceride
- *     kaliyor; bu gba_io.h'deki mevcut volatile nitelemeleriyle
- *     kendiliginden olusuyor, mudahale gerekmedi.
+ * TYPE MEASUREMENTS:
+ *   - The outer loop counters are `u32` (the ROM has `bcs`/`bcc`, UNSIGNED).
+ *   - The inner loop counter is `int` (the ROM has `bge`/`blt`; the u16 countC
+ *     promotes to int).
+ *   - The REVERSE of rule 35: `pop {r1}; bx r1` + `movs r0,#0` -> the return
+ *     type is `int` and every exit is `return 0`.
+ *   - The REG_IME literal is hoisted out of the loop while the REG_DMA3 base
+ *     stays inside; that falls out of the existing volatile qualifiers in
+ *     gba_io.h on its own, no intervention was needed.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_080534a8.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/band_080534a8.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-/* enable | 32-bit birim | kaynak sabit | 15 kelime = 60 bayt */
+/* enable | 32-bit unit | fixed source | 15 words = 60 bytes */
 #define DMA_CLEAR_AREA  0x8500000F
 
 #define OBJ_SLOT_INIT   0xFF
 #define TIMER_RELOAD    5
 
-/* nodelist_d2.c'deki SlotDesc ile ayni; buradan yalniz +0x0A okunuyor. */
+/* The same as SlotDesc in nodelist_d2.c; only +0x0A is read from it here. */
 typedef struct SlotDesc {
     u8  pad00[10];
     u16 countC;                 /* +0x0A */
 } SlotDesc;
 
-/* Tanim bankasindaki 20 baytlik kayit; Area'nin +0x14'une kopyalaniyor. */
+/* The 20-byte record in the definition bank; copied to the Area's +0x14. */
 typedef struct AreaInfo {
     u16 id;                     /* +0x00 */
     u8  pad02[18];
 } AreaInfo;
 
-/* nodelist_d2.c'deki Area (60 bayt yuva kaydi). */
+/* The Area from nodelist_d2.c (a 60-byte slot record). */
 typedef struct Area {
     u8        pad00[11];
     u8        pad0B : 4;        /* +0x0B bit 0..3 */
     s8        level : 4;        /* +0x0B bit 4..7 */
     u8        pad0C[8];
-    AreaInfo  info;             /* +0x14 (20 bayt) */
+    AreaInfo  info;             /* +0x14 (20 bytes) */
     SlotDesc *desc;             /* +0x28 */
     u8        pad2C[12];
     struct Area *listC;         /* +0x38 */
 } Area;
 
-/* nodelist_d1.c'deki ObjHeader'in genisi. */
+/* The wide form of ObjHeader from nodelist_d1.c. */
 typedef struct ObjHeader {
     u8        pad00[5];
     u8        idCount;          /* +0x05 */
@@ -89,7 +93,8 @@ typedef struct ObjHeader {
     AreaInfo *infos;            /* +0x10 */
 } ObjHeader;
 
-/* nodelist_d1.c'deki Obj; +0x0A/+0x16/+0x17 alanlari buradan olculdu. */
+/* The Obj from nodelist_d1.c; its +0x0A/+0x16/+0x17 fields were measured
+   here. */
 typedef struct Obj {
     u8         pad00[10];
     u8         slot;            /* +0x0A */

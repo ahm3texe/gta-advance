@@ -1,10 +1,10 @@
-/* Kare zinciri — 0x08028E6C-0x08028E85
+/* Frame call chain — 0x08028E6C-0x08028E85
  *
- * 5 fonksiyon zinciri: FUN_08029130, FUN_08027f48, FUN_08019800,
+ * Five-function chain: FUN_08029130, FUN_08027f48, FUN_08019800,
  * FUN_08019a64, ProcessFirstEntry.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/frame_chain.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/frame_chain.c
  */
 
 #include "gba_types.h"

@@ -1,6 +1,7 @@
-/* Bir nesnenin onceki ve yeni boyut siniflarini gecis koduna cevirir.
- * PARK: switch ve if/else bicimleri denendi. En son olcum 168/154 bayt,
- * 149/168 fark; ROM'un karsilastirma agaci dogal C'den farkli siralaniyor. */
+/* Map an object's previous and new size classes to a transition code.
+ * PARKED: tried switch and if/else forms. Latest measurement: 168/154 bytes,
+ * 149/168 differing; the ROM's comparison tree is ordered differently from natural C.
+ */
 
 #include "gba_types.h"
 

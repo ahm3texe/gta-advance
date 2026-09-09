@@ -1,84 +1,91 @@
-/* Giris zamanlayicisini ilerletme -- 0x08028D44-0x08028DC3
+/* Advancing the entry timer -- 0x08028D44-0x08028DC3
  *
- * ESLESTI: 128/128 bayt, fark 0.  make c-match TEMIZ, make c-review TEMIZ.
+ * MATCHED: 128/128 bytes, 0 off.  make c-match CLEAN, make c-review CLEAN.
  *
- * Indisten 148 baytlik giris hesaplayip iki asamali ROM tablosundan
- * hedefi cozuyor; giris uygun durumdaysa ve +0x90 alani 3 ise isaretci
- * kurup FUN_08013CFC'yi cagiriyor, zamanlayiciyi 4 azaltiyor ve pozitif
- * kalirsa 1 donuyor.
+ * Computes the 148-byte entry from the index and resolves the target through a
+ * two-level ROM table; if the entry is in the right state and its +0x90 field
+ * is 3 it sets a pointer, calls FUN_08013CFC, decrements the timer by 4 and
+ * returns 1 if it stays positive.
  *
- * PARAMETRE TIPLERI komut dizisinden okundu: ikinci parametre `lsls #16 /
- * asrs #16` ile ISARETLI 16 bit (s16), ucuncusu `lsls #24 / lsrs #24` ile
- * ISARETSIZ 8 bit (u8). Genis tip yazmak bu kirpma komutlarini goturur.
+ * THE PARAMETER TYPES were read from the instruction sequence: the second
+ * parameter is SIGNED 16-bit (s16) via `lsls #16 / asrs #16`, the third
+ * UNSIGNED 8-bit (u8) via `lsls #24 / lsrs #24`.  Writing a wider type removes
+ * those truncating instructions.
  *
- * Zamanlayici sinamasi `lsls #16` + `cmp <= 0`, yani azaltilmis yarim soz
- * ISARETLI olarak sinaniyor.
+ * The timer test is `lsls #16` + `cmp <= 0`, i.e. the decremented half word is
+ * tested SIGNED.
  *
- * Kural 35: `pop {r1}; bx r1` -> r0 donus degeri tasiyor, imza u32.
+ * Rule 35: `pop {r1}; bx r1` -> r0 carries a return value, so the signature is
+ * u32.
  *
- * TIP BIRLESTIRILDI: gRam020246F0 zaten src/world/table_entries.c'de
- * `Entry[20]` olarak tanimliymis ve o tanimda +0x02 (unk02) ile +0x04
- * (unk04) DOGRU yerdeymis. Elle `base + index*148` hesaplamak yerine
- * `&gRam020246F0[index]` kullanmak dogru olan; ayni sembole iki tur
- * vermek TYPES-001 kapisini kiriyordu. Eksik alanlar (mark +0x2A,
- * state +0x2B, tableIndex +0x64, phase +0x90) dolgudan oyuldu ve
- * table_entries.c 3/3 KORUNDU.
+ * THE TYPE WAS UNIFIED: gRam020246F0 was already defined as `Entry[20]` in
+ * src/world/table_entries.c, and in that definition +0x02 (unk02) and +0x04
+ * (unk04) were in the RIGHT place.  Using `&gRam020246F0[index]` instead of
+ * computing `base + index*148` by hand is the correct thing; giving the same
+ * symbol two types broke the TYPES-001 gate.  The missing fields (mark +0x2A,
+ * state +0x2B, tableIndex +0x64, phase +0x90) were carved out of the padding
+ * and table_entries.c was PRESERVED at 3/3.
  *
  * ------------------------------------------------------------------
- * SON 4 BAYT NASIL KAPANDI (124 -> 128, fark 55 -> 0)
+ * HOW THE LAST 4 BYTES CLOSED (124 -> 128, 55 off -> 0)
  * ------------------------------------------------------------------
- * Komut komut diff, TEK bir bolgenin (mark yazimi ile bl arasi) saptigini
- * gosterdi. ROM ile bizim eski cikti:
+ * An instruction-by-instruction diff showed that a SINGLE region (between the
+ * mark write and the bl) diverged.  The ROM against our old output:
  *
- *   ROM                         eski bizim
- *   adds r0, r4, #0             adds r0, r4, #4     <- arg1 ONCE
- *   adds r0, #140               adds r1, #98        <- r1 = entry+0x2A idi
+ *   the ROM                     ours, before
+ *   adds r0, r4, #0             adds r0, r4, #4     <- arg1 FIRST
+ *   adds r0, #140               adds r1, #98        <- r1 was entry+0x2A
  *   ldr  r0, [r0, #0]           ldr  r1, [r1, #0]
  *   asrs r0, r0, #2             lsrs r1, r1, #2
  *   ldr  r1, [r3, #4]           ldr  r2, [r3, #4]
  *   lsls r0, r0, #2             lsls r1, r1, #2
  *   adds r0, r0, r1             adds r1, r1, r2
  *   ldr  r1, [r0, #0]           ldr  r1, [r1, #0]
- *   adds r0, r4, #4             (yok -- yukarida yapilmisti)
+ *   adds r0, r4, #4             (absent -- it had been done above)
  *
- * MEKANIZMA: arg2 zinciri cagri kurulumu icinde uretilince arg1 (`&entry->
- * unk04`) ONCE r0'a girdi, arg2 zincirine r1 kaldi; r1 o anda zaten
- * `entry+0x2A` (mark isaretcisi) tasidigi icin derleyici `entry+0x8C`yi
- * `adds r1, #98` ile TEK komutta uretti. Iste eksik olan 2 bayt buydu --
- * geri kalan 2 bayt da bunun sonucu: kod 2 bayt kisalinca havuz oncesi
- * hizalama `movs r0,r0` (nop) dolgusu dusuyordu.
+ * THE MECHANISM: with the arg2 chain produced inside the call setup, arg1
+ * (`&entry->unk04`) went into r0 FIRST and r1 was left for the arg2 chain;
+ * since r1 already carried `entry+0x2A` (the mark pointer) at that moment, the
+ * compiler produced `entry+0x8C` in a SINGLE instruction with `adds r1, #98`.
+ * That was the missing 2 bytes -- and the other 2 followed from it: with the
+ * code 2 bytes shorter, the `movs r0,r0` (nop) padding before the pool
+ * disappeared.
  *
- * COZUM: arg2'yi AYRI BIR DEYIME al (`src = ...;`). Boylece RTL sirasi
- * ROM'unki gibi olur: once arg2 zinciri (r0 kazikta, o anda 0xFF olu),
- * sonra cagri kurulumunda `adds r0, r4, #4`. r0 o noktada adres tasimadigi
- * icin `entry+0x8C` r4'ten YENIDEN hesaplaniyor -> aranan fazladan komut.
+ * THE SOLUTION: take arg2 into a SEPARATE STATEMENT (`src = ...;`).  That
+ * makes the RTL order match the ROM's: the arg2 chain first (r0 nailed down,
+ * 0xFF dead at that point), then `adds r0, r4, #4` in the call setup.  Because
+ * r0 does not carry an address at that point, `entry+0x8C` is recomputed from
+ * r4 -> the extra instruction we were looking for.
  *
- * Ikinci parca: unk8C alani s32 (ISARETLI). `>> 2` boylece `asrs` uretiyor.
+ * The second piece: the unk8C field is s32 (SIGNED).  `>> 2` therefore
+ * produces `asrs`.
  *
- * OLCULEN KATKILAR (ayri ayri denendi):
- *   temel (u32 unk8C, arg2 cagri icinde)   -> 124 bayt, fark 55
- *   YALNIZ s32 unk8C                       -> 124 bayt, fark 54  (yetmez)
- *   YALNIZ ayri `src` yereli               -> 128 bayt, fark  1  (asrs eksik)
- *   IKISI BIRDEN                           -> 128 bayt, fark  0  ESLESTI
- * Yani boyutu duzelten deyim ayirmasi, kalan tek bayti duzelten s32.
+ * THE MEASURED CONTRIBUTIONS (tried separately):
+ *   the baseline (u32 unk8C, arg2 inside the call)  -> 124 bytes, 55 off
+ *   ONLY s32 unk8C                                  -> 124 bytes, 54 off (not enough)
+ *   ONLY the separate `src` local                   -> 128 bytes,  1 off (asrs missing)
+ *   BOTH TOGETHER                                   -> 128 bytes,  0 off  MATCHED
+ * So the statement split fixes the size and s32 fixes the last byte.
  *
- * ELENEN YOLLAR (onceki elle-hesaplamali surumden; TEKRAR DENEMEYIN):
- *   kaydirmada (s32) cast                -> 124 bayt
- *   ilk argumani (u8*)entry+4 yapmak     -> 124 bayt
- *   ilk argumani entry->pad04 yapmak     -> 124 bayt
- *   ilk argumani &entry->unk02 + 1       -> 124 bayt
- * Bunlarin hicbiri ise yaramadi cunku sorun ARG1'IN BICIMI DEGIL, arg2'nin
- * NE ZAMAN uretildigiydi. Arg1 ifadesini kurcalamak yanlis eksendi.
- * DERS: "yanlis yazmac" gibi gorunen fark, aslinda YAYILIM SIRASI farkiydi;
- * bir alt ifadeyi ayri deyime almak (kural 40'in tersi yonde kullanimi)
- * cagri argumanlarinin uretim sirasini ROM'unkine cevirir.
+ * PATHS RULED OUT (from the earlier hand-computed version; DO NOT TRY THEM
+ * AGAIN):
+ *   an (s32) cast on the shift          -> 124 bytes
+ *   making the first argument (u8*)entry+4 -> 124 bytes
+ *   making the first argument entry->pad04 -> 124 bytes
+ *   making the first argument &entry->unk02 + 1 -> 124 bytes
+ * None of these helped, because the problem was not THE FORM OF ARG1 but WHEN
+ * arg2 was produced.  Fiddling with the arg1 expression was the wrong axis.
+ * THE LESSON: a difference that looks like "the wrong register" was really a
+ * difference in EMISSION ORDER; taking a subexpression into a separate
+ * statement (using rule 40 in the reverse direction) turns the production
+ * order of the call arguments into the ROM's.
  *
- * Havuz notu (kayit icin): havuz kelimesi hic eksik degildi. Iki havuz da
- * ayni iki sabiti tasiyordu (0x020246F0 ve 0x08BD3448), sadece 4 bayt
- * kaymislardi; eksik olan havuzdan ONCEKI koddu.
+ * A pool note (for the record): no pool word was ever missing.  Both pools
+ * carried the same two constants (0x020246F0 and 0x08BD3448), only shifted by
+ * 4 bytes; what was missing was the code BEFORE the pool.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/step_entry_timer.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/step_entry_timer.c
  */
 
 #include "gba_types.h"
@@ -104,7 +111,7 @@ typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;
     u16 unk02;                  /* +0x02 */
-    u32 unk04;                  /* +0x04 (serbest birakilacak blok) */
+    u32 unk04;                  /* +0x04 (the block to be released) */
     u8  pad08[0x22];
     u8  mark;                   /* +0x2A */
     u8  state;                  /* +0x2B */

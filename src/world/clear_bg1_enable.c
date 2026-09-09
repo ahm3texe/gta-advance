@@ -1,11 +1,11 @@
-/* DISPCNT bit 9 temizleme — 0x08030860-0x08030873
+/* Clear DISPCNT bit 9 — 0x08030860-0x08030873
  *
- * REG_DISPCNT'i okuyup 0xFDFF ile maskeleyerek bit 9'u siliyor.
- * ROM adresi sabit yerine `0x80 << 19` ile kuruyor (movs #128 + lsls #19),
- * bu yuzden kaynakta da kaydirmali bicim yazilmali.
+ * Read REG_DISPCNT and mask with 0xFDFF to clear bit 9. The ROM constructs
+ * the address with `0x80 << 19` (movs #128 + lsls #19), so the source must
+ * use the shifted form too.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/clear_bg1_enable.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/clear_bg1_enable.c
  */
 
 #include "gba_types.h"

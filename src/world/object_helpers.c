@@ -1,10 +1,10 @@
-/* Nesne yardimcilari — 0x08038358-0x080383B7
+/* Object helpers — 0x08038358-0x080383B7
  *
- * Dort kucuk yardimci: alt nesneye devretme, bayrak sorgusu, guncelleme
- * zinciri ve varsayilanli kimlik okumasi.
+ * Four small helpers: delegate to a sub-object, query a flag, run an update
+ * chain, and read an ID with a default.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/object_helpers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/world/object_helpers.c
  */
 
 #include "gba_types.h"
