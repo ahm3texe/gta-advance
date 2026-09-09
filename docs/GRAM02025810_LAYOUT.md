@@ -47,7 +47,7 @@ produced six spurious "indexed accesses"; those have been eliminated.
 
 ---
 
-## 1. Measured minimum size: **0x1390 = 5008 bytes**
+## 1. Measured size: **0x1390 = 5008 bytes**
 
 The recorded value of 5006 is **two bytes short**, but the reasoning in the
 record was correct.
