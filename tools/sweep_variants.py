@@ -29,9 +29,9 @@ lever. The obvious first idea, a DECLARATION ORDER sweep, is also empty: an
 earlier model exhausted 5040 orderings for ClearTextArea and none improved
 anything. A sweep cannot be written for an unknown mechanism.
 
-So this tool is right and fast for rule 44 type (comparison constant) misses;
-for register allocation misses it is NO CURE. If a new mechanism is
-discovered, it should be added to the TRANSFORMS dictionary.
+So this tool is right and fast for rule 44 (comparison constant) misses; for
+register allocation misses it is no cure. If a new mechanism is discovered,
+it should be added to the TRANSFORMS dictionary.
 
 Usage
 -----
@@ -181,11 +181,11 @@ def main():
     ap.add_argument("source")
     ap.add_argument("function")
     ap.add_argument("--only", action="append",
-                    help=f"only this transform ({', '.join(TRANSFORMS)})")
+                    help=f"restrict the sweep to this transform ({', '.join(TRANSFORMS)})")
     ap.add_argument("--max-sites", type=int, default=10,
                     help="max sites per transform (2^n combinations)")
     ap.add_argument("--keep", action="store_true",
-                    help="WRITE the best variant back to the source file")
+                    help="write the best variant back to the source file")
     a = ap.parse_args()
 
     src = Path(a.source)
@@ -194,14 +194,14 @@ def main():
     original = src.read_text()
     span = body_span(original, a.function)
     if not span:
-        sys.exit(f"the body of {a.function} was not found in {src}")
+        sys.exit(f"The body of {a.function} was not found in {src}")
     bstart, bend = span
     head, body, tail = original[:bstart], original[bstart:bend], original[bend:]
     decl_anchor = body.index("\n") + 1   # the line after the opening brace
 
     base_score, base_size = score(src, a.function, addr, size, rom)
     if base_score is None:
-        sys.exit("the base version did not compile")
+        sys.exit("The base version did not compile.")
     print(f"base: {base_size}/{size} bytes, difference {base_score}")
     if base_score == 0:
         print("already matching"); return 0

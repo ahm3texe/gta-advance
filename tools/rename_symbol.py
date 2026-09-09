@@ -55,7 +55,7 @@ def main():
     new_name = args.new_name
 
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", new_name):
-        sys.exit(f"invalid name: {new_name!r}")
+        sys.exit(f"Invalid name: {new_name!r}")
 
     old_name = None
     for table in TABLES:

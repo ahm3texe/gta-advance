@@ -61,7 +61,7 @@ def review(path: Path) -> list[str]:
 
     if REGISTER_PIN.search(code):
         problems.append("explicit register binding (register ... asm(\"rN\")) -- "
-                        "forces the match but hides the reason; docs/WORKFLOW.md 6")
+                        "forces the match but hides the reason; docs/WORKFLOW.md §6")
     elif INLINE_ASM.search(code):
         problems.append("contains inline assembly -- defeats the purpose of moving to C")
 

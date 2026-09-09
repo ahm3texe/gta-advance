@@ -60,7 +60,7 @@ def main() -> None:
     address = int(row["address"], 16)
     size = int(row["size"] or 0)
     if not size:
-        sys.exit(f"the size of {target} is unknown")
+        sys.exit(f"The size of {target} is unknown.")
 
     BUILD.mkdir(parents=True, exist_ok=True)
     start = address - ROM_BASE
@@ -91,7 +91,7 @@ def main() -> None:
         names[addr] = r["name"]
         names[addr | 1] = f"{r['name']}+Thumb"
 
-    print(f"{target}  @ 0x{address:08X}  {size} byte  "
+    print(f"{target}  @ 0x{address:08X}  {size} bytes  "
           f"[{'Thumb' if thumb else 'ARM'}]  - source: baserom.gba")
     if row["notes"]:
         print(f"# {row['notes']}")

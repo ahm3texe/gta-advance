@@ -45,7 +45,7 @@ def main() -> int:
 
     invalid = [row for row in rows if row["status"] not in VALID_STATUSES]
     if invalid:
-        print(f"Error: {len(invalid)} rows have an invalid status.", file=sys.stderr)
+        print(f"ERROR: {len(invalid)} rows have an invalid status.", file=sys.stderr)
         return 1
 
     counts = Counter(row["status"] for row in rows)
@@ -67,14 +67,14 @@ def main() -> int:
         if row["status"] == "matching":
             matching_bytes += size
 
-    print(f"Function map:             {total}")
+    print(f"Function map:           {total}")
     print(f"Reviewed functions:     {documented}/{total} ({percent(documented)})")
-    print(f"With source:          {decompiled}/{total} ({percent(decompiled)})")
-    print(f"Byte-matching:        {counts['matching']}/{total} ({percent(counts['matching'])})")
+    print(f"With source:            {decompiled}/{total} ({percent(decompiled)})")
+    print(f"Byte-matching:          {counts['matching']}/{total} ({percent(counts['matching'])})")
     if known_bytes:
-        print(f"Matching code bytes:  {matching_bytes}/{known_bytes} ({100 * matching_bytes / known_bytes:.2f}%)")
+        print(f"Matching code bytes:    {matching_bytes}/{known_bytes} ({100 * matching_bytes / known_bytes:.2f}%)")
     else:
-        print("Matching code bytes:  n/a (function sizes are not known yet)")
+        print("Matching code bytes:    n/a (function sizes are not known yet)")
 
     c_total, c_matched, c_addresses = c_source_summary(csv_path.parent / "c_sources.csv")
     if c_total:
@@ -83,8 +83,8 @@ def main() -> int:
             for row in rows
             if row["address"].upper() in c_addresses and row["size"].strip()
         )
-        print(f"With C source:        {c_total} functions, {c_matched} byte-matching")
-        print(f"Matching bytes from C: {c_bytes}/{matching_bytes} "
+        print(f"With C source:          {c_total} functions, {c_matched} byte-matching")
+        print(f"Matching bytes from C:  {c_bytes}/{matching_bytes} "
               f"({100 * c_bytes / matching_bytes:.2f}% of matching)")
 
     libc_path = csv_path.parent / "libc_regions.csv"
@@ -93,14 +93,14 @@ def main() -> int:
             libc_bytes = sum(
                 int(r["end"], 16) - int(r["address"], 16) for r in csv.DictReader(handle)
             )
-        print(f"libc regions:         {libc_bytes} bytes "
+        print(f"libc regions:           {libc_bytes} bytes "
               f"(verified against agbcc libc.a)")
 
     region_bytes, regions = matching_region_summary(csv_path.parent / "matching_regions.csv")
     if regions:
-        print(f"Matching ROM region:  {region_bytes} unique bytes")
+        print(f"Matching ROM region:    {region_bytes} unique bytes")
         start, end = max(regions, key=lambda interval: interval[1] - interval[0])
-        print(f"Largest contiguous:   0x{start:08X}-0x{end - 1:08X} ({end - start} bytes)")
+        print(f"Largest contiguous:     0x{start:08X}-0x{end - 1:08X} ({end - start} bytes)")
     return 0
 
 

@@ -56,7 +56,7 @@ def pick_session(lines, index):
     if index is None:
         return blocks[-1], len(blocks), len(blocks)
     if not 1 <= index <= len(blocks):
-        raise SystemExit(f"no session {index}; the log holds {len(blocks)} sessions")
+        raise SystemExit(f"No session {index}; the log holds {len(blocks)} sessions.")
     return blocks[index - 1], index, len(blocks)
 
 

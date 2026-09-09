@@ -106,7 +106,7 @@ def main() -> None:
                 "size": str(points[i + 1] - start), "status": "discovered",
                 "module": row["module"],
                 "notes": f"0x{address:08X} was embedded within the record; "
-                         f"a separate function because it is a call target",
+                         f"recorded separately because it is a call target",
             })
     out.sort(key=lambda r: int(r["address"], 16))
     with FUNCTIONS.open("w", newline="", encoding="utf-8") as handle:

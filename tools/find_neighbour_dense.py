@@ -6,7 +6,7 @@ WHY
 If the functions around one are already matching, that region's type vocabulary
 (struct layouts, RAM symbols, call signatures) is ready; such candidates
 typically close in one or two attempts. This selection used to be made by hand
-(with one-off python snippets) and was NOT RECORDED IN THE REPOSITORY, so the
+(with one-off Python snippets) and was NOT RECORDED IN THE REPOSITORY, so the
 numbers in the plan could not be reproduced. This tool closes that gap.
 
 This is a DIAGNOSTIC tool: a function is not easy merely because its

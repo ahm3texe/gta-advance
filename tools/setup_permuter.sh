@@ -5,7 +5,7 @@
 # permutations by hand (5040 declaration permutations were tried in one file).
 # This tool automates that search.
 #
-# DISCIPLINE NOTE (docs/WORKFLOW.md 6): the permuter is a HYPOTHESIS GENERATOR.
+# DISCIPLINE NOTE (docs/WORKFLOW.md §6): the permuter is a HYPOTHESIS GENERATOR.
 # Once a winning form is found, WHY it works must be understood and written into
 # docs/COMPILER.md as a rule. An unexplained match is not accepted.
 set -euo pipefail
@@ -50,8 +50,8 @@ echo "  1) build the target .o from the ROM bytes -- see build/permuter/target.s
 echo "     THE MAPPING SYMBOLS ARE CRITICAL: code body \$t, literal pool \$d."
 echo "     Leaving the pool inside \$t makes objdump decode it as CODE; the target"
 echo "     then shows 66 instructions (really 61) and the permuter chases the WRONG target."
-echo "     Where the pool starts is in build/cmatch/<name>.s: after the last `bx`"
-echo "     it is the .align + .word block after the last instruction."
+echo "     Where the pool starts is visible in build/cmatch/<name>.s: it is the"
+echo "     .align + .word block that follows the last instruction."
 echo "  2) cd tools/external/permuter && ../venv/bin/python import.py \\"
 echo "       <source.c> <target.o> <FunctionName>"
 echo "  3) AFTER THE IMPORT two manual fixes are needed:"

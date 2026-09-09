@@ -366,7 +366,7 @@ def main() -> None:
 
     print(f"{len(grown)} functions have a short boundary; "
           f"{len(swallowed)} records fall inside another function.")
-    print(f"Left out of the audit (not silently dropped, needs manual review):")
+    print(f"Left out of the audit (not silently dropped; these need manual review):")
     print(f"  {len(skipped_arm):4d} in the ARM range")
     print(f"  {len(skipped_jump):4d} contain an unresolved indirect jump")
     print(f"  {len(skipped_big):4d} implausible extra growth (>{SANE_GROWTH} bytes), "

@@ -49,7 +49,7 @@ def main() -> None:
         if arg.startswith("--out="):
             out = Path(arg.split("=", 1)[1])
     if not ROM.exists():
-        sys.exit("no baserom.gba. First run: make prepare-rom ROM_ZIP=...")
+        sys.exit("baserom.gba is missing. First run: make prepare-rom ROM_ZIP=...")
 
     original = ROM.read_bytes()
     image = bytearray(original)

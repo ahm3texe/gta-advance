@@ -85,19 +85,19 @@ callbacks:add("frame", function()
 
     -- Logic fps = logic frames completed in 60 hardware frames
     out(string.format(
-      "window %-3d  logic %2d/60 frames  (~%2d fps)  gFrameDelay=%d  mode=%d  step distribution[%s]",
+      "window %-3d  logic %2d/60 frames  (~%2d fps)  gFrameDelay=%d  mode=%d  step distribution [%s]",
       windows, logicFrames, logicFrames, delay, mode,
       table.concat(parts, " ")))
 
     if mode == 1 or mode == 2 then
       out("             WARNING: gFrameDelay is FIXED at 5 in this mode; " ..
-          "the real step can only be read from the distribution")
+          "the real step can only be read from the distribution.")
     end
 
     frames, logicFrames, hist = 0, 0, {}
   end
 end)
 
-out("Play the game; one line will drop every second.")
-out("a step distribution of 1:60 means it runs every frame (60 fps).")
+out("Play the game; one line is printed every second.")
+out("A step distribution of 1:60 means it runs every frame (60 fps).")
 out("2:30 means every other frame (30 fps) - that is the 'stutter' feel.")

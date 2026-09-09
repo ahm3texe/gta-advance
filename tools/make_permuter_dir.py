@@ -61,7 +61,7 @@ def main():
                          capture_output=True, text=True, check=True).stdout
     m = re.search(rf"\b{re.escape(name)}\s*\([^)]*\)\s*\{{", pre)
     if not m:
-        sys.exit(f"the body of {name} was not found")
+        sys.exit(f"The body of {name} was not found.")
     open_brace = m.end() - 1
     depth, i = 0, open_brace
     while True:

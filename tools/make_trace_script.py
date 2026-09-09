@@ -102,15 +102,15 @@ local function keyString()
   return " [" .. table.concat(held, "+") .. "]"
 end
 
--- Validation happens ON THE FIRST FRAME, NOT while the script loads: `emu`
--- object is not ready yet at load time, and validating at startup
+-- Validation happens ON THE FIRST FRAME, NOT while the script loads: the
+-- `emu` object is not ready yet at load time, and validating at startup
 -- emptied the whole list and ended the session with zero data.
 local validated = false
 
--- an "all failed" symptom can have two causes: `emu` is not ready
--- ready, OR the method names differ in this version. The two look the same,
--- so we probe the API form first and print the ERROR TEXT; that way
--- a single session tells you exactly which one it is.
+-- An "all failed" symptom has two possible causes: `emu` is not ready yet,
+-- OR the method names differ in this version. The two look the same, so we
+-- probe the API form first and print the ERROR TEXT; that way a single
+-- session tells you exactly which one it is.
 local function probeApi()
   local probe = 0x02000000
   local attempts = {
@@ -132,8 +132,8 @@ local function probeApi()
     end
   end
   if winner == nil then
-    out("[ERROR] no read form worked. Report the error texts above")
-    out("       Send them to Claude; the right API form follows from them.")
+    out("[ERROR] no read form worked. Report the error texts above;")
+    out("        they identify the right API form for this mGBA version.")
   else
     out("selected API form: " .. winner)
   end

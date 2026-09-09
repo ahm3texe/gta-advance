@@ -54,7 +54,7 @@ def corpus_fingerprint(compiler: str) -> tuple[int, str]:
     for relative in lock["compiler"]["corpusSources"]:
         source = ROOT / relative
         if not source.exists():
-            sys.exit(f"toolchain corpus source is missing: {relative}")
+            sys.exit(f"Toolchain corpus source is missing: {relative}")
         blob, layout, _ = compile_and_link(source, compiler)
         for name, (offset, size) in sorted(layout.items()):
             digest.update(name.encode("utf-8"))

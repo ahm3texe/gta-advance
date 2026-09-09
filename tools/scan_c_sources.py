@@ -33,10 +33,10 @@ def main() -> None:
             blob, layout, _ = compile_and_link(source, DEFAULT_CC)
         except SystemExit as error:
             # Silently skipping a source that fails to compile dropped it from
-            # c_sources.csv while still reporting the command as successful,
-            # showing that file's functions as before: with a broken C file
-            # `make check` stayed green. Now they are collected, reported as a
-            # failure, and we DO NOT OVERWRITE the CSV.
+            # c_sources.csv while the command still reported success, so that
+            # file's functions kept their previous state and `make check`
+            # stayed green with a broken C file. Failures are now collected
+            # and reported, and the CSV is NOT OVERWRITTEN.
             failures.append((source, error))
             continue
         relative = source.relative_to(ROOT)

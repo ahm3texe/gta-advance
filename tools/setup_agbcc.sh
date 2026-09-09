@@ -42,12 +42,12 @@ elif [ ! -d "$WORK/.git" ]; then
 elif [ "$(git -C "$WORK" rev-parse HEAD)" != "$AGBCC_COMMIT" ]; then
     echo "ERROR: $WORK is not at the expected agbcc revision." >&2
     echo "  expected: $AGBCC_COMMIT" >&2
-    echo "  found:  $(git -C "$WORK" rev-parse HEAD)" >&2
+    echo "  found:    $(git -C "$WORK" rev-parse HEAD)" >&2
     echo "Use a different, empty AGBCC_WORK directory." >&2
     exit 1
 fi
 
-echo "building agbcc (this may take a few minutes)..."
+echo "Building agbcc (this may take a few minutes)..."
 ( cd "$WORK" && CC="$CCWRAP" CXX=clang++ ./build.sh )
 
 echo "Installing into the project..."

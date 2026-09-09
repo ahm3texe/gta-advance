@@ -5,7 +5,7 @@ from pathlib import Path
 
 def main() -> int:
     if len(sys.argv) != 4:
-        print("usage: compare_slice.py ROM OFFSET BINARY", file=sys.stderr)
+        print("Usage: compare_slice.py ROM OFFSET BINARY", file=sys.stderr)
         return 2
 
     rom_path = Path(sys.argv[1])

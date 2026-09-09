@@ -126,7 +126,7 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
         row = rows.get(key) or ram.get(key)
         if row is None:
             sys.exit(f"'{name}' is in neither data/functions.csv nor "
-                     f"data/ram_map.csv; its address cannot be resolved")
+                     f"data/ram_map.csv; its address cannot be resolved.")
         value = int(row["address"], 16) | (1 if thumb else 0)
         externs.append(f"    .equ {name}, {value:#x}\n")
     source_text = Path(f"{stem}.s").read_text(encoding="utf-8")
@@ -147,7 +147,7 @@ def compile_and_link(source: Path, compiler: str = DEFAULT_CC):
 
     known = [rows[name] for name in defined if name in rows]
     if not known:
-        sys.exit(f"no function in {source} is in data/functions.csv")
+        sys.exit(f"No function in {source} is in data/functions.csv.")
     base = min(int(row["address"], 16) for row in known)
 
     # The section address is set explicitly: agbcc aligns .text to 8, and if the

@@ -60,7 +60,7 @@ def main() -> None:
     calls = []
 
     with tempfile.TemporaryDirectory(prefix="sio-tx-") as work:
-        # Write to no persistent artifact, including the shared build/cmatch files.
+        # Nothing persistent is written here, not even the shared build/cmatch files.
         build.BUILD = diff.BUILD = Path(work) / "build"
         print(f"{TARGET} @ 0x{address:08X}; ROM {rom_size} bytes")
         print(f"{'candidate':26} {'size':>6} {'same/total insns':>19}")

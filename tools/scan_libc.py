@@ -136,7 +136,7 @@ def scan_archive(rom: bytes, work: Path, binary: Path, found: list,
 def main() -> None:
     missing = [str(path) for _, path in LIBS if not path.exists()]
     if missing:
-        sys.exit(f"{', '.join(missing)} missing. First run: make agbcc")
+        sys.exit(f"{', '.join(missing)} not found. First run: make agbcc")
     if not ROM.exists():
         sys.exit("baserom.gba is missing.")
 

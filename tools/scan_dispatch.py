@@ -83,7 +83,7 @@ def main():
         vals = [c[2] for c in ch]
         # THE DISCRIMINATING CRITERION: the DISTINCT NON-ZERO values in the
         # chain. `cmp rX,#0` links are null checks, not dispatch; only
-        # Non-zero and mutually distinct values indicate branching on a state
+        # non-zero, mutually distinct values indicate branching on a state
         # variable.
         distinct = len({v for v in vals if v})
         if len(ch) >= a.min and distinct >= a.distinct:

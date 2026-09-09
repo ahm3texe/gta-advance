@@ -7,7 +7,7 @@ The pattern (a 12-byte core, followed by the pool + a second constant):
     cmp  rD, #constant
     b<cond> FORWARD
     movs r0, #constant1              <- the fall-through path
-    b    SON
+    b    END
     ...pool...
     movs r0, #constant2              <- the branch path
     bx   lr

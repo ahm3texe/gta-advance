@@ -294,7 +294,7 @@ def main() -> None:
         for problem in problems:
             print(f"  {problem}")
         sys.exit(1)
-    print(f"consistency: CLEAN  ({len(functions)} functions, {len(ram)} RAM symbols, "
+    print(f"consistency: CLEAN ({len(functions)} functions, {len(ram)} RAM symbols, "
           f"{len(regions)} regions)")
     # Not an error but VISIBILITY: empty stubs and blind forwarding wrappers
     # are deliberately left unnamed (what they do is unknown, and naming them

@@ -20,11 +20,11 @@ B) FUNCTION POINTER (strong). Jump tables and handler arrays in the ROM data
 C) PROLOGUE PATTERN (probable). Searches the gaps for a Thumb prologue
    (`push {..., lr}`), then extracts the body with the audit_boundaries walker.
    Four strict conditions:
-  1. the body is 8-4096 bytes with no unresolved indirect jump
-  2. the body does not overflow the gap (does not enter a known function)
-  3. it is preceded by a terminator (`bx lr` / `pop {..,pc}` / `bx rN`) or by
-     alignment padding -- i.e. it really is at a function boundary
-  4. of candidates containing one another, only the outer one is taken
+   1. the body is 8-4096 bytes with no unresolved indirect jump
+   2. the body does not overflow the gap (does not enter a known function)
+   3. it is preceded by a terminator (`bx lr` / `pop {..,pc}` / `bx rN`) or by
+      alignment padding -- i.e. it really is at a function boundary
+   4. of candidates containing one another, only the outer one is taken
 
 What is found is added with the `discovered` status: the address and boundary
 are automatic, and the bodies have not been reviewed yet.

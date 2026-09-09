@@ -32,7 +32,7 @@ def baseline_functions():
         capture_output=True,
     )
     if result.returncode:
-        sys.exit(f"could not read the sibling band baseline: {BASE_REVISION}")
+        sys.exit(f"Could not read the sibling band baseline: {BASE_REVISION}")
     return list(csv.DictReader(io.StringIO(result.stdout)))
 
 

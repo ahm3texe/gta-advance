@@ -4,12 +4,12 @@ REGISTER map.
 
 WHY IT EXISTS
 -------------
-This round's real weapon is rule 50 (REGISTER PRIORITY): byte-matching cannot
-be reached without knowing why the ROM gave r4 to one variable and why our
-build gave it to another. The previous version read only the priority table at
+The decisive lever this round is rule 50 (REGISTER PRIORITY): byte-matching
+cannot be reached without knowing why the ROM gave r4 to one variable and why
+our build gave it to another. The previous version read only the priority table at
 the TOP of the dump; the one-line answer to "which C variable took r4" is in
 the `;; Register dispositions` section at the BOTTOM. Three functions were
-tinkered with blindly because that section was never printed. This version
+worked on blindly because that section was never printed. This version
 reads every section.
 
 WHICH SECTIONS IT READS (agbcc `-dg` -> `<input>.greg`)
@@ -17,9 +17,9 @@ WHICH SECTIONS IT READS (agbcc `-dg` -> `<input>.greg`)
   "Registers to be allocated in sorted order:"
       refs / live_length per pseudo; sorted descending by PRIORITY.
   ";; N regs to allocate: ..."
-      the allocno ORDER the GLOBAL allocator actually processes. Pseudos not
-      in this list are handled inside a block by the local allocator; they
-      never enter the global conflict race at all.
+      the order in which the GLOBAL allocator actually processes allocnos.
+      Pseudos not in this list are handled inside a block by the local
+      allocator; they never enter the global conflict race at all.
   ";; N conflicts: ..."
       the conflict graph, including hardware registers (0=r0 ... 13=sp).
   "Register N used X times across Y insns; ...; crosses K calls; pointer"
@@ -429,7 +429,7 @@ def emit(name: str, data: dict, args: dict, origin: dict, pnames: list,
             return f"arg{idx} {nm}" if nm != "?" else f"arg{idx}"
         return "?"
 
-    print(f"\n=== {name}: {len(info)} pseudo-register, {data['spills']} spill")
+    print(f"\n=== {name}: {len(info)} pseudo-registers, {data['spills']} spills")
     hard = " ".join(hard_name(h) for h in data["hard"])
     saved = [h for h in data["hard"] if CALLEE_SAVED_FROM <= h <= 11]
     print(f"    hardware registers: {hard}"
@@ -528,7 +528,7 @@ def main() -> None:
             sys.exit(f"{cc.name} failed:\n{result.stderr[:400]}")
         greg = work / "in.i.greg"
         if not greg.exists():
-            sys.exit("no dump was produced")
+            sys.exit("No dump was produced.")
         text = greg.read_text()
         rtl = work / "in.i.rtl"
         rtl_text = rtl.read_text() if rtl.exists() else ""

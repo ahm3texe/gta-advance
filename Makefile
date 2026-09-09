@@ -11,7 +11,7 @@ C_BUILD_DEPS := $(wildcard include/*.h) tools/build_c.py tools/agbcc_build.py co
 $(MATCHING_C_BINS): $(C_BUILD_DEPS)
 
 prepare-rom:
-	@test -n "$(ROM_ZIP)" || (echo 'Specify the ROM_ZIP path.' >&2; exit 2)
+	@test -n "$(ROM_ZIP)" || (echo 'ERROR: set ROM_ZIP to the path of the ROM archive.' >&2; exit 2)
 	@./tools/prepare_rom.sh "$(ROM_ZIP)"
 
 verify-rom:
@@ -2562,10 +2562,10 @@ misc-id-compatibility-match: verify-rom build/misc/id_compatibility.bin
 matching: misc-id-compatibility-match
 
 # --- permuter hook ----------------------------------------------------
-# decomp-permuter, `make --always-make --dry-run --debug=j PERMUTER=1`
-# output for a build command mentioning the source file. The rule is defined
-# ONLY under PERMUTER=1 so that it cannot affect a normal build, and it does NOT
-# use `@`: the command must be visible in a dry run.
+# decomp-permuter runs `make --always-make --dry-run --debug=j PERMUTER=1` and
+# scans the output for a build command mentioning the source file. The rule
+# is defined ONLY under PERMUTER=1 so that it cannot affect a normal build,
+# and it does NOT use `@`: the command must be visible in a dry run.
 # The permuter runs `make ... PERMUTER=1` with NO TARGET, i.e. it looks at the
 # output of the default target. So under PERMUTER=1 the default target becomes a
 # list that compiles every C source; that way the build command for the file
