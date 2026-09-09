@@ -85,7 +85,7 @@ def main():
 
     if ok:
         print(f"\n{len(ok)} non-matching functions, {sum(r[4] for r in ok)} bytes in total")
-        print(f"fark <= 16 olan: {sum(1 for r in ok if r[5] <= 16)}")
+        print(f"with difference <= 16: {sum(1 for r in ok if r[5] <= 16)}")
 
     if a.csv:
         out = Path(a.csv)

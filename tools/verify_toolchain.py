@@ -35,10 +35,10 @@ def artifact_check(lock: dict) -> bool:
             failures.append((relative, expected, actual))
 
     if not failures:
-        print(f"toolchain kimligi: TEMIZ ({len(lock['referenceArtifacts'])} artifact)")
+        print(f"toolchain identity: CLEAN ({len(lock['referenceArtifacts'])} artifacts)")
         return True
 
-    print("toolchain kimligi DEGISTI:", file=sys.stderr)
+    print("toolchain identity CHANGED:", file=sys.stderr)
     for relative, expected, actual in failures:
         print(f"  {relative}\n    beklenen {expected}\n    bulunan  {actual}", file=sys.stderr)
     return False

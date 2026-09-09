@@ -96,10 +96,10 @@ def main() -> None:
         except ValueError:
             rel = path
         if not problems:
-            print(f"{GREEN}TEMIZ{RESET}  {rel}")
+            print(f"{GREEN}CLEAN{RESET}  {rel}")
             continue
         worst = 1
-        print(f"{YELLOW}UYARI{RESET}  {rel}")
+        print(f"{YELLOW}WARN{RESET}   {rel}")
         for problem in problems[:8]:
             print(f"         - {problem}")
         if len(problems) > 8:
