@@ -22,7 +22,10 @@
 -- 5'e sabitliyor. O kipte bu olcum mantik hizini vermez; asagida ayrica
 -- ham gIwramFrameCounter dagilimi da basiliyor, gercek deger odur.
 
-local LOG_PATH = "/Users/muhammetyildirim/Documents/ChatGPT/advance-decomp/build/fps_watch.log"
+-- Resolved from this script's own location so the path is not machine-specific.
+-- Override with FPS_WATCH_LOG if mGBA is run from elsewhere.
+local SCRIPT_DIR = (debug.getinfo(1, "S").source:match("@(.*/)") or "./")
+local LOG_PATH = os.getenv("FPS_WATCH_LOG") or (SCRIPT_DIR .. "../build/fps_watch.log")
 
 local ADDR_FRAME_DELAY   = 0x03000000
 local ADDR_IWRAM_COUNTER = 0x03000004

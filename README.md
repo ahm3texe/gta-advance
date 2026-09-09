@@ -270,3 +270,14 @@ The existing viewer can still be opened with `make dashboard-dev`. Run
 `make dashboard-watch` in another terminal to refresh its data as the CSV files
 change. Dashboard retirement and decomp.dev integration are planned separately;
 the local verification tools remain part of the project.
+
+## License
+
+The project's own work — reconstructed C and assembly, headers, tools, build
+files, data tables and documentation — is released under the
+[MIT License](LICENSE).
+
+That covers only what this project wrote. It does not grant any right to the
+game itself: the ROM, its code and its extracted assets remain the property of
+their rights holders and are not distributed here. Supply your own ROM as a
+local build input.
