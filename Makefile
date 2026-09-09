@@ -2,9 +2,9 @@
 
 ROM_ZIP ?=
 
-# c_sources.csv, hangi C ceviri birimlerinin matching build hedefi oldugunun
-# tek kaynagidir. Ortak header/build araci/toolchain kilidi degisince bu
-# hedeflerin tamami yeniden uretilir; bayat .bin kullanilamaz.
+# c_sources.csv is the single source of truth for which C translation units are
+# matching build targets. When a shared header, a build tool or the toolchain
+# lock changes, all of these targets are rebuilt; a stale .bin is never used.
 MATCHING_C_SOURCES := $(shell python3 -c 'import csv; print(" ".join(sorted({r["source"] for r in csv.DictReader(open("data/c_sources.csv")) if r["matching"] == "yes"})))')
 MATCHING_C_BINS := $(sort $(patsubst src/%.c,build/%.bin,$(MATCHING_C_SOURCES)))
 C_BUILD_DEPS := $(wildcard include/*.h) tools/build_c.py tools/agbcc_build.py config/toolchain.lock.json
@@ -23,7 +23,7 @@ doctor:
 progress:
 	@python3 tools/progress.py data/functions.csv
 
-# Canli ve tekil durum gorunumu. Sabit sayilar README/PLAN'e yazilmaz.
+# The live, single view of status. Fixed numbers are not written into README/PLAN.
 status:
 	@python3 tools/project_status.py
 
@@ -42,7 +42,7 @@ sibling-check:
 boundary-check:
 	@python3 tools/audit_boundaries.py --check-baseline
 
-# Yalnizca bulgular tek tek incelendikten sonra bilincli olarak calistirilir.
+# Run deliberately, and only after every finding has been reviewed individually.
 boundary-baseline:
 	@python3 tools/audit_boundaries.py --write-baseline
 
@@ -55,31 +55,31 @@ toolchain-corpus:
 agbcc:
 	@tools/setup_agbcc.sh $(if $(FORCE),--force,)
 
-# Bir C dosyasindaki her fonksiyonu agbcc ile derleyip ROM ile karsilastirir.
-# Ornek: make c-match FILE=src/save/save_helpers.c
+# Compile every function in a C file with agbcc and compare it against the ROM.
+# Example: make c-match FILE=src/save/save_helpers.c
 c-match: verify-rom
 	@python3 tools/verify_c_function.py $(FILE)
 
-# src/ altindaki tum C kaynaklarini derleyip ROM ile karsilastirir ve
+# Compile every C source under src/, compare them against the ROM, and
 # data/c_sources.csv'yi uretir. progress ve dashboard bunu okur.
 c-status: verify-rom
 	@python3 tools/scan_c_sources.py
 
-# C kaynaklarini okunabilirlik acisindan denetler (byte eslesmesi yetmez).
+# Check the C sources for readability (a byte match alone is not enough).
 c-review:
 	@python3 tools/review_c_source.py $(FILE)
 
-# Tek fonksiyonun ROM halini derlenmis haliyle yan yana gosterir.
+# Show a single function's ROM form beside its compiled form.
 # Ornek: make diff FILE=src/save/save_helpers.c FUNC=WriteU16LE
 diff: verify-rom
 	@python3 tools/diff_function.py $(FILE) $(FUNC)
 
-# ROM'daki bir fonksiyonun disassembly'sini uretir (kaynak: ROM, depo degil).
+# Produce the disassembly of a function in the ROM (source: the ROM, not the repo).
 # Ornek: make disasm FUNC=EraseSaveSlot
 disasm: verify-rom
 	@python3 tools/disasm_function.py $(FUNC)
 
-# agbcc libc.a fonksiyonlarini ROM icinde arar (--csv override satiri uretir).
+# Search the ROM for agbcc libc.a functions (--csv emits an override row).
 scan-libc: verify-rom
 	@python3 tools/scan_libc.py $(ARGS)
 
@@ -96,19 +96,19 @@ check: toolchain-check rom
 	@python3 tools/check_generated_views.py
 	@python3 tools/project_status.py --check
 
-# Kilometre tasi/merge kapisi: tum matching hedefleri cache'siz uretilir,
-# C corpus parmak izi ve dashboard urun kaynaklari da dogrulanir.
+# Milestone/merge gate: every matching target is rebuilt without the cache, and
+# the C corpus fingerprint and the dashboard production sources are verified too.
 check-full:
 	@$(MAKE) -B check
 	@python3 tools/verify_toolchain.py --corpus
 	@$(MAKE) dashboard-lint dashboard-build
 
-# Hibrit ROM sinamasi: dogrulanmis bolgeler kendi kaynagimizdan, kalani
-# baserom.gba'dan gelir. Hash kaynak bolgelerinin yerlesimini denetler.
+# Hybrid ROM test: verified regions come from our own source, the rest from
+# baserom.gba. The hash checks the placement of the source regions.
 rom: matching
 	@python3 tools/build_rom.py
 
-# ROM'daki standart kutuphane bolgelerini agbcc libc.a'sina karsi dogrular.
+# Verify the standard library regions in the ROM against agbcc's libc.a.
 libc-verify: verify-rom
 	@python3 tools/verify_libc_regions.py
 
@@ -117,12 +117,12 @@ libc-verify: verify-rom
 libc-align: verify-rom
 	@python3 tools/locate_libc_objects.py $(FUNC) $(ADDR)
 
-# Veri dosyalarini izler, degisince dashboard JSON'unu yeniler.
-# dashboard-dev ile birlikte calistir: harita anlik guncellenir.
+# Watch the data files and refresh the dashboard JSON when they change.
+# Run alongside dashboard-dev: the map then updates live.
 dashboard-watch:
 	@python3 tools/watch_dashboard.py
 
-# Veri dosyalarinin kendi icinde, birbiriyle ve kaynakla tutarliligi.
+# Consistency of the data files internally, with each other and with the source.
 consistency:
 	@python3 tools/check_consistency.py
 
@@ -170,7 +170,7 @@ build/bootstrap/intr_main.bin: build/bootstrap/intr_main.elf
 intr-match: verify-rom build/bootstrap/intr_main.bin
 	@python3 tools/compare_slice.py baserom.gba 0x104 build/bootstrap/intr_main.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/bootstrap/init_interrupts.bin: src/bootstrap/init_interrupts.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
 	@python3 tools/build_c.py $< $@
@@ -178,7 +178,7 @@ build/bootstrap/init_interrupts.bin: src/bootstrap/init_interrupts.c data/functi
 init-interrupts-match: verify-rom build/bootstrap/init_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x38c build/bootstrap/init_interrupts.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/bootstrap/game_init.bin: src/bootstrap/game_init.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
 	@python3 tools/build_c.py $< $@
@@ -186,7 +186,7 @@ build/bootstrap/game_init.bin: src/bootstrap/game_init.c data/functions.csv data
 game-init-match: verify-rom build/bootstrap/game_init.bin
 	@python3 tools/compare_slice.py baserom.gba 0x430 build/bootstrap/game_init.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/interrupt/vblank_intr.bin: src/interrupt/vblank_intr.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/interrupt
 	@python3 tools/build_c.py $< $@
@@ -194,7 +194,7 @@ build/interrupt/vblank_intr.bin: src/interrupt/vblank_intr.c data/functions.csv 
 vblank-match: verify-rom build/interrupt/vblank_intr.bin
 	@python3 tools/compare_slice.py baserom.gba 0x220 build/interrupt/vblank_intr.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/interrupt/irq_helpers.bin: src/interrupt/irq_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/interrupt
 	@python3 tools/build_c.py $< $@
@@ -202,7 +202,7 @@ build/interrupt/irq_helpers.bin: src/interrupt/irq_helpers.c data/functions.csv 
 irq-helpers-match: verify-rom build/interrupt/irq_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x730 build/interrupt/irq_helpers.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/bootstrap/reset_display_interrupts.bin: src/bootstrap/reset_display_interrupts.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/bootstrap
 	@python3 tools/build_c.py $< $@
@@ -210,7 +210,7 @@ build/bootstrap/reset_display_interrupts.bin: src/bootstrap/reset_display_interr
 reset-display-match: verify-rom build/bootstrap/reset_display_interrupts.bin
 	@python3 tools/compare_slice.py baserom.gba 0x7b4 build/bootstrap/reset_display_interrupts.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/init_save_system.bin: src/save/init_save_system.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -218,7 +218,7 @@ build/save/init_save_system.bin: src/save/init_save_system.c data/functions.csv 
 init-save-system-match: verify-rom build/save/init_save_system.bin
 	@python3 tools/compare_slice.py baserom.gba 0x82c build/save/init_save_system.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/read_eeprom_bytes.bin: src/save/read_eeprom_bytes.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -226,7 +226,7 @@ build/save/read_eeprom_bytes.bin: src/save/read_eeprom_bytes.c data/functions.cs
 read-eeprom-match: verify-rom build/save/read_eeprom_bytes.bin
 	@python3 tools/compare_slice.py baserom.gba 0x91c build/save/read_eeprom_bytes.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/write_eeprom_bytes.bin: src/save/write_eeprom_bytes.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -234,7 +234,7 @@ build/save/write_eeprom_bytes.bin: src/save/write_eeprom_bytes.c data/functions.
 write-eeprom-match: verify-rom build/save/write_eeprom_bytes.bin
 	@python3 tools/compare_slice.py baserom.gba 0x9ec build/save/write_eeprom_bytes.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/save_slots.bin: src/save/save_slots.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -242,7 +242,7 @@ build/save/save_slots.bin: src/save/save_slots.c data/functions.csv data/ram_map
 save-slots-match: verify-rom build/save/save_slots.bin
 	@python3 tools/compare_slice.py baserom.gba 0xb00 build/save/save_slots.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/save_wrappers.bin: src/save/save_wrappers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -250,7 +250,7 @@ build/save/save_wrappers.bin: src/save/save_wrappers.c data/functions.csv data/r
 save-wrappers-match: verify-rom build/save/save_wrappers.bin
 	@python3 tools/compare_slice.py baserom.gba 0xbe4 build/save/save_wrappers.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/save_manager.bin: src/save/save_manager.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -258,7 +258,7 @@ build/save/save_manager.bin: src/save/save_manager.c data/functions.csv data/ram
 save-manager-match: verify-rom build/save/save_manager.bin
 	@python3 tools/compare_slice.py baserom.gba 0xc28 build/save/save_manager.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/read_eeprom_range.bin: src/save/read_eeprom_range.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -266,7 +266,7 @@ build/save/read_eeprom_range.bin: src/save/read_eeprom_range.c data/functions.cs
 read-eeprom-range-match: verify-rom build/save/read_eeprom_range.bin
 	@python3 tools/compare_slice.py baserom.gba 0xddc build/save/read_eeprom_range.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/write_eeprom_range.bin: src/save/write_eeprom_range.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -274,7 +274,7 @@ build/save/write_eeprom_range.bin: src/save/write_eeprom_range.c data/functions.
 write-eeprom-range-match: verify-rom build/save/write_eeprom_range.bin
 	@python3 tools/compare_slice.py baserom.gba 0xf1c build/save/write_eeprom_range.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/save/save_helpers.bin: src/save/save_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/save
 	@python3 tools/build_c.py $< $@
@@ -282,7 +282,7 @@ build/save/save_helpers.bin: src/save/save_helpers.c data/functions.csv data/ram
 save-helpers-match: verify-rom build/save/save_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1094 build/save/save_helpers.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/ui/build_active_menu_items.bin: src/ui/build_active_menu_items.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
 	@python3 tools/build_c.py $< $@
@@ -290,7 +290,7 @@ build/ui/build_active_menu_items.bin: src/ui/build_active_menu_items.c data/func
 menu-layout-match: verify-rom build/ui/build_active_menu_items.bin
 	@python3 tools/compare_slice.py baserom.gba 0x114c build/ui/build_active_menu_items.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/ui/draw_menu_items.bin: src/ui/draw_menu_items.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
 	@python3 tools/build_c.py $< $@
@@ -298,7 +298,7 @@ build/ui/draw_menu_items.bin: src/ui/draw_menu_items.c data/functions.csv data/r
 draw-menu-match: verify-rom build/ui/draw_menu_items.bin
 	@python3 tools/compare_slice.py baserom.gba 0x11ec build/ui/draw_menu_items.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/ui/init_menu_screen.bin: src/ui/init_menu_screen.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
 	@python3 tools/build_c.py $< $@
@@ -306,7 +306,7 @@ build/ui/init_menu_screen.bin: src/ui/init_menu_screen.c data/functions.csv data
 init-menu-screen-match: verify-rom build/ui/init_menu_screen.bin
 	@python3 tools/compare_slice.py baserom.gba 0x13ac build/ui/init_menu_screen.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/ui/menu_helpers.bin: src/ui/menu_helpers.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
 	@python3 tools/build_c.py $< $@
@@ -314,7 +314,7 @@ build/ui/menu_helpers.bin: src/ui/menu_helpers.c data/functions.csv data/ram_map
 menu-helpers-match: verify-rom build/ui/menu_helpers.bin
 	@python3 tools/compare_slice.py baserom.gba 0x1dc0 build/ui/menu_helpers.bin
 
-# C kaynagindan uretiliyor: assembly karsiligi emekli edildi.
+# Built from the C source: the assembly equivalent was retired.
 build/ui/menu_graphics.bin: src/ui/menu_graphics.c data/functions.csv data/ram_map.csv
 	@mkdir -p build/ui
 	@python3 tools/build_c.py $< $@
@@ -2563,13 +2563,13 @@ matching: misc-id-compatibility-match
 
 # --- permuter kancasi -------------------------------------------------
 # decomp-permuter, `make --always-make --dry-run --debug=j PERMUTER=1`
-# ciktisinda kaynak dosyanin gectigi bir derleme komuti arar. Kural
-# YALNIZCA PERMUTER=1 ile tanimlanir ki normal derlemeyi etkilemesin,
-# ve `@` KULLANMAZ: komut kuru calistirmada gorunmeli.
-# Permuter `make ... PERMUTER=1` komutunu HEDEFSIZ calistirir, yani varsayilan
-# hedefin ciktisina bakar. Bu yuzden PERMUTER=1 altinda varsayilan hedef tum
-# C kaynaklarini derleyen bir listeye cevrilir; boylece aranan dosyanin
-# derleme komutu kuru calistirmada mutlaka gorunur.
+# output for a build command mentioning the source file. The rule is defined
+# ONLY under PERMUTER=1 so that it cannot affect a normal build, and it does NOT
+# use `@`: the command must be visible in a dry run.
+# The permuter runs `make ... PERMUTER=1` with NO TARGET, i.e. it looks at the
+# output of the default target. So under PERMUTER=1 the default target becomes a
+# list that compiles every C source; that way the build command for the file
+# being searched for is guaranteed to appear in the dry run.
 ifdef PERMUTER
 PERMUTER_SRCS := $(shell find src -name '*.c')
 PERMUTER_OBJS := $(patsubst %.c,build/permuter/%.o,$(PERMUTER_SRCS))

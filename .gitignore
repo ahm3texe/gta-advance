@@ -19,20 +19,20 @@ __pycache__/
 .venv/
 analysis/ghidra-project/
 
-# agbcc ikilileri yerelde uretilir (tools/setup_agbcc.sh).
+# The agbcc binaries are built locally (tools/setup_agbcc.sh).
 tools/agbcc/
 
-# Ghidra decompiler ciktisi ROM'dan turetilmis materyaldir; yerelde kalir.
+# Ghidra decompiler output is material derived from the ROM; it stays local.
 analysis/decompiler/
 
-# Dashboard verisi CSV'lerden uretilir ve Ghidra ciktisi gomer.
-# Yeniden uretmek icin: make dashboard-data
+# The dashboard data is generated from the CSVs and embeds Ghidra output.
+# To regenerate: make dashboard-data
 dashboard/app/decomp-data.json
 
-# Bir kerelik yerel inceleme artifakti; kaynak veya kalici dokuman degil.
+# A one-off local review artifact; neither source nor a lasting document.
 /vB.diff
 
-# Permuter: dis kaynak ve izole ortam surumlenmez.
+# Permuter: the external source and the isolated environment are not versioned.
 tools/external/
 build/permuter/
 tools/trace.lua

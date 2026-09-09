@@ -1,7 +1,8 @@
-# decomp-permuter-agbcc ayarlari.
-# agbcc, GCC 2.8 turevidir; rastgelestirme agirliklari icin dogru profil "gcc".
+# decomp-permuter-agbcc settings.
+# agbcc derives from GCC 2.8, so "gcc" is the right profile for the
+# randomization weights.
 compiler_type = "gcc"
 
-# Derleme komutu Makefile'daki PERMUTER=1 kuralindan okunur
-# (bkz. tools/permuter_compile.py -- dis semboller .equ ile cozuluyor).
+# The build command is read from the PERMUTER=1 rule in the Makefile
+# (see tools/permuter_compile.py -- external symbols are resolved with .equ).
 build_system = "make"
