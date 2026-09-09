@@ -343,7 +343,10 @@ start,end,binary,module,notes
 0x0805A4F4,0x0805A500,build/world/wrap_0805a4f4.bin,world,forwarding wrapper
 0x0805A500,0x0805A50C,build/script/cmd_call_08030dd8.bin,script,Handler: calls FUN_08030DD8 and always answers 1
 0x0805A78C,0x0805A7A0,build/script/cmd_call_minus_one.bin,script,Handler: operand into FUN_08041EF8 with a constant -1
+0x0805A928,0x0805A974,build/script/cmd_place_pair.bin,script,"Places a pair, then settles when neither handle is held"
+0x0805A974,0x0805A9A8,build/script/cmd_settle_if_free.bin,script,Settles only when the +0x1358 handle is clear
 0x0805AA1C,0x0805AA30,build/script/cmd_release_slot.bin,script,Handler: FUN_08030D0C's answer straight into ReleaseSlot
+0x0805AAA8,0x0805AADC,build/script/cmd_open_menu.bin,script,Opens the menu; mode 0 needs the +0x54 gate above 15
 0x0805AB04,0x0805AB14,build/script/cmd_call_080351ac.bin,script,Handler: operand into FUN_080351AC
 0x0805AB18,0x0805AB44,build/script/cmd_set_node_flag400.bin,script,"Handler: sets flag 0x400 on the record node, only when it was clear"
 0x0805AB7C,0x0805AB90,build/script/cmd_maybe_reset.bin,script,Handler: FUN_08059818(0) when FUN_08061F54 says so; the only void handler in the block

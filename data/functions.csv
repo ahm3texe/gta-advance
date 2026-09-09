@@ -1451,14 +1451,14 @@ address,name,size,status,module,notes
 0x0805A50C,FUN_0805a50c,82,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805A78C,FUN_0805a78c,20,matching,script,Script handler: the operand into FUN_08041EF8 with a constant -1; decompiled in src/script/cmd_call_minus_one.c
 0x0805A7A0,FUN_0805a7a0,132,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805A824,FUN_0805a824,92,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0805A824,FUN_0805a824,92,decompiled,script,"Script handler: places a record with FUN_0802B394, then calls FUN_08029918 when neither the +0x1358 nor the +0x1360 handle is held. NOT BYTE-MATCHING at 27/42, from one cause: the ROM normalises the first operand in place and copies it, agbcc narrows straight into the callee-saved register. Register-copy class, rule 44; rule 75's lever was tried both ways. src/script/cmd_place_record.c"
 0x0805A880,FUN_0805a880,168,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805A928,FUN_0805a928,76,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805A974,FUN_0805a974,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0805A928,FUN_0805a928,76,matching,script,"Script handler: the same as 0x0805A824 without the record lookup, both operands straight into FUN_0802B394; decompiled in src/script/cmd_place_pair.c"
+0x0805A974,FUN_0805a974,50,matching,script,Script handler: calls FUN_080308EC only when gFrameCounterEwram is running and the +0x1358 handle is clear; decompiled in src/script/cmd_settle_if_free.c
 0x0805A9A8,FUN_0805a9a8,114,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805AA1C,FUN_0805aa1c,20,matching,script,Script handler: FUN_08030D0C's answer straight into ReleaseSlot; decompiled in src/script/cmd_release_slot.c
 0x0805AA30,FUN_0805aa30,120,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0805AAA8,FUN_0805aaa8,52,discovered,unknown,"missed by Ghidra; tools/discover_functions.py function pointer, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0805AAA8,FUN_0805aaa8,52,matching,script,"Script handler: opens the menu; mode 0 only while the word at +0x54 through gRam02000F10 is above 15, every other mode unconditionally; decompiled in src/script/cmd_open_menu.c"
 0x0805AB04,FUN_0805ab04,16,matching,script,Script handler: the operand into FUN_080351AC; decompiled in src/script/cmd_call_080351ac.c
 0x0805AB18,FUN_0805ab18,44,matching,script,"Script handler: sets flag 0x400 on the record node, and only when it was clear; decompiled in src/script/cmd_set_node_flag400.c"
 0x0805AB44,FUN_0805ab44,50,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"

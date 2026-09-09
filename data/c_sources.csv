@@ -601,7 +601,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805A4F4,ForwardToHalvesEqual,src/world/wrap_0805a4f4.c,10,10,yes
 0x0805A500,FUN_0805a500,src/script/cmd_call_08030dd8.c,12,12,yes
 0x0805A78C,FUN_0805a78c,src/script/cmd_call_minus_one.c,20,20,yes
+0x0805A824,FUN_0805a824,src/script/cmd_place_record.c,88,92,no
+0x0805A928,FUN_0805a928,src/script/cmd_place_pair.c,76,76,yes
+0x0805A974,FUN_0805a974,src/script/cmd_settle_if_free.c,50,50,yes
 0x0805AA1C,FUN_0805aa1c,src/script/cmd_release_slot.c,20,20,yes
+0x0805AAA8,FUN_0805aaa8,src/script/cmd_open_menu.c,52,52,yes
 0x0805AB04,FUN_0805ab04,src/script/cmd_call_080351ac.c,16,16,yes
 0x0805AB18,FUN_0805ab18,src/script/cmd_set_node_flag400.c,44,44,yes
 0x0805AB78,NoOp0805AB78,src/misc/empty_stubs.c,2,2,yes
