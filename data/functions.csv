@@ -918,8 +918,8 @@ address,name,size,status,module,notes
 0x08038530,FUN_08038530,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08038584,FUN_08038584,24,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080385C4,FUN_080385c4,68,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x08038608,FUN_08038608,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08038644,FUN_08038644,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08038608,FUN_08038608,60,matching,world,60-byte body and literal pool reproduce ROM bytes 0x38608-0x38643 exactly; the tail lookup must not route the table base through a local (docs/COMPILER.md rule 70)
+0x08038644,FUN_08038644,60,matching,world,"60-byte body and literal pool reproduce ROM bytes 0x38644-0x3867F exactly; twin of 0x08038608, and the field read must use the pointer form (docs/COMPILER.md rule 70)"
 0x08038680,FUN_08038680,38,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080386A8,FUN_080386a8,320,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080387E8,FUN_080387e8,160,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)

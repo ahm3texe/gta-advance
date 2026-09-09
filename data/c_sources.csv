@@ -347,8 +347,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038364,IsObjectActive,src/world/object_helpers.c,28,28,yes
 0x08038380,UpdateObject,src/world/object_helpers.c,32,32,yes
 0x080383A0,GetObjectLinkId,src/world/object_helpers.c,24,24,yes
-0x08038608,FUN_08038608,src/world/p1_38608.c,60,60,no
-0x08038644,FUN_08038644,src/world/p1_38644.c,60,60,no
+0x08038608,FUN_08038608,src/world/p1_38608.c,60,60,yes
+0x08038644,FUN_08038644,src/world/p1_38644.c,60,60,yes
 0x0803AFBC,FUN_0803afbc,src/world/band_0803afbc.c,480,480,yes
 0x0803B19C,NoOp0803B19C,src/misc/empty_stubs.c,2,2,yes
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes

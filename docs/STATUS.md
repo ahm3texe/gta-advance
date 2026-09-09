@@ -9,9 +9,9 @@ summary, run `make status`.
 | Measurement | Value |
 |---|---:|
 | Function map | 1941 functions / 454270 bytes |
-| Human review (`documented+`) | 664 / 1941 |
-| Byte-matching | 615 functions / 58738 bytes (12.93%) |
-| C sources | 645 total / 602 matching |
+| Human review (`documented+`) | 666 / 1941 |
+| Byte-matching | 617 functions / 58858 bytes (12.96%) |
+| C sources | 645 total / 604 matching |
 | ROM verified from source | 40328 bytes |
 | libc verification | 448 bytes |
 | Total verified ROM area | 40776 bytes |

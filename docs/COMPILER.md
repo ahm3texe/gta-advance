@@ -750,6 +750,30 @@ The non-matching set's pseudo average is high (34.4 vs 7.0), but that is
 misleading: those eight functions were deliberately chosen as the hardest
 examples.
 
+## Rule 70 — a base address in a local loads early; used directly it loads late
+
+`FUN_08038608` (0x08038608) reads the same ROM table twice and the cartridge
+places the two literal-pool loads differently:
+
+```
+first lookup : ldr r0,[pc,#48] / lsls r1,r4,#2 / adds r1,r1,r4 / lsls r1,r1,#4
+tail lookup  : lsls r0,r4,#2 / adds r0,r0,r4 / lsls r0,r0,#4 / ldr r1,[pc,#8]
+```
+
+What decides it is whether the base passes through a local. Assigning the symbol
+to one materialises the pool load at the assignment, ahead of the index scaling;
+using the symbol directly in the expression leaves the load at its point of use,
+after the scaling. Measured on that function, against 60 bytes: a local in both
+lookups is 1 instruction off, no local in either is 6 off, and a local in the
+first with a direct tail matches.
+
+Two consequences worth carrying to other functions. First, an asymmetry like
+this is evidence that the original source wrote two otherwise identical
+expressions differently — do not "tidy" them into one shape. Second, in the twin
+`FUN_08038644` the subscript and pointer forms of the same field read are not
+interchangeable: `table[i].field` reintroduces the early load and is 6 off,
+while `(table + i)->field` matches.
+
 ## Rule 67 — address locals look unnecessary but determine register allocation
 
 When the three independent `u16` globals in `ResetRuntimeGlobals` were zeroed

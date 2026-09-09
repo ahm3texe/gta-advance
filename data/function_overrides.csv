@@ -65,6 +65,7 @@ address,name,size,status,module,notes
 0x0802A9F0,FUN_0802a9f0,296,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0802AB18,FUN_0802ab18,296,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08030848,NoOp08030848,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
+0x08031204,FUN_08031204,56,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08031C10,ReplaceNibbleField,136,matching,world,Replaces the selected nibble fields in sixteen words; src/world/nibble_replace.c
 0x08032058,IsEntityFlagSet,50,matching,world,"Small entity accessor; names derived from behaviour, semantics unverified"
 0x08032090,GetEntityFixedFields,20,matching,world,Small entity accessor; body reproduces ROM exactly from src/world/entity_accessors.c
@@ -91,8 +92,11 @@ address,name,size,status,module,notes
 0x08037F4C,GetUnk0202F2D0,12,matching,misc,Reads one global u32; missed by Ghidra auto-analysis
 0x08037F58,GetUnk02028290,12,matching,misc,Reads one global u32
 0x08037F64,GetUnk02028280,12,matching,misc,Reads one global u32
+0x08038608,FUN_08038608,,matching,world,60-byte body and literal pool reproduce ROM bytes 0x38608-0x38643 exactly; the tail lookup must not route the table base through a local (docs/COMPILER.md rule 70)
+0x08038644,FUN_08038644,,matching,world,"60-byte body and literal pool reproduce ROM bytes 0x38644-0x3867F exactly; twin of 0x08038608, and the field read must use the pointer form (docs/COMPILER.md rule 70)"
 0x0803C268,FUN_0803c268,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C2C4,FUN_0803c2c4,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
+0x0803C708,FUN_0803c708,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C77C,GetScaleFactor,16,matching,misc,Returns 1 or 256 depending on a global byte
 0x0803C790,ReturnOne,4,matching,misc,Returns the constant 1; missed by Ghidra auto-analysis
 0x0803C794,NoOpSessionHook,2,matching,misc,Empty function
@@ -105,6 +109,7 @@ address,name,size,status,module,notes
 0x0804FEE4,FUN_0804fee4,28,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x080500DC,FUN_080500dc,28,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08051048,NoOp08051048,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
+0x0805131C,FUN_0805131c,62,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0805135C,RunFrameStageOne,132,matching,core,Runs the first half of the frame processing chain and updates the diagnostic markers; src/core/frame_dispatch.c
 0x080513E0,RunFrameStageTwo,120,matching,core,Runs the second half of the frame processing chain and updates the diagnostic markers; src/core/frame_dispatch.c
 0x080514C8,GetRecordUnk04,20,matching,misc,Reads a field of the selected 60-byte record as 16.16 fixed point
@@ -189,6 +194,3 @@ address,name,size,status,module,notes
 0x08071D8C,abort,32,documented,libc,newlib routine; body byte-identical to agbcc libc.a build
 0x08071DB4,FUN_08071db4,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x08071DE8,FUN_08071de8,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
-0x0805131C,FUN_0805131c,62,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08031204,FUN_08031204,56,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
-0x0803C708,FUN_0803c708,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
