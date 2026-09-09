@@ -1,6 +1,6 @@
 /* Area flags — 0x08030C4C-0x08030CB3
  *
- * At offset 0x4C of the record buffer there is a 192-bit (six word) flag
+ * At offset 0x4C of the record buffer there is a 192-bit (six-word) flag
  * array; the index is ONE-BASED, 0 meaning "none".  src/world/entity_flags.c
  * handles the 128-bit entity flags at 0x3C of the same buffer -- the first 24
  * bytes of the `unk4C[80]` block there are resolved here.

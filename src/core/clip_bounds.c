@@ -1,7 +1,7 @@
 /* Narrow the bounding box — 0x0800A980-0x0800A9E3
  *
- * Two passes: the lower bound is first RAISED to the box's (centre - margin)
- * value, then the upper bound is LOWERED to (centre + margin). That is,
+ * Two passes: the lower bound is first RAISED to the box's (center - margin)
+ * value, then the upper bound is LOWERED to (center + margin). That is,
  * gClipBounds is intersected with the given box.
  *
  * The third component uses the constant 0x80000 instead of an edge margin, and

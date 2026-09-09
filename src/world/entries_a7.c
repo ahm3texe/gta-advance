@@ -47,7 +47,7 @@
  *
  * THE LOOP FORM WAS READ FROM THE ROM, NOT COPIED FROM THE SIBLING:
  *   0x8028BD4  cmp r6,#0 / bgt   -> the loop condition `i < 1` (agbcc
- *                                   canonicalises it to `<= 0`, the inverse
+ *                                   canonicalizes it to `<= 0`, the inverse
  *                                   direction of rule 44)
  *   0x8028BDE  cmp r6,#1 / beq   -> the post-loop check `i == 1`
  * So the bound is 1, which agrees exactly with the "1 x 148 entries" note in
@@ -82,10 +82,10 @@
  *   pushes it into the same canonical form as the loop's own `cmp #0`/`bgt`
  *   test and merges them; the ROM has a SEPARATE `cmp #1`/`beq` at that point.
  *   The same family as rule 44: an equality test written with the bound value
- *   escapes the canonicalisation. The same thing was solved with `i == 15` in
+ *   escapes the canonicalization. The same thing was solved with `i == 15` in
  *   entries_b1.c.
  * - Writing the loop condition as `i <= 0`: IT MATCHES, byte-for-byte the same
- *   code as `i < ENTRY_COUNT`. So the canonicalisation really does happen in
+ *   code as `i < ENTRY_COUNT`. So the canonicalization really does happen in
  *   the loop test; the only place that distinguishes them is the POST-loop
  *   check. `<` was kept for readability.
  * - Making the return type `u8`: 176 bytes, 29 differences. agbcc adds an

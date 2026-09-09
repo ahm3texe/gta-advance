@@ -26,9 +26,8 @@ typedef void (*SlotHandler)(void);
 
 struct Slot {
     /* +0x00 is a POINTER: menu_screen.c loads and dereferences the same word
- * (ldr r1,[r0] + ldrb r2,[r1,#8]). u32 would emit the same bytes but obscure
- * the meaning.
- */
+     * (ldr r1,[r0] + ldrb r2,[r1,#8]). u32 would emit the same bytes but
+     * would obscure the meaning. */
     void       *entry;          /* +0x00 */
     u32         kind;           /* +0x04 */
     u8          pad08[4];

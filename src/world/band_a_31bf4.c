@@ -37,7 +37,7 @@
  * base and its `bl`s are encoded correctly.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/band_a.c
+ * Verification:  make c-match FILE=src/world/band_a_31bf4.c
  */
 
 #include "gba_types.h"

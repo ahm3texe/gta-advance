@@ -59,7 +59,7 @@
  *   - A pre-assignment `probe = 0;` (dead code, DCE removes it).
  *   - Permutations of DECLARATION order (block/probe/flag first, probe last,
  *     block last -> ALL FIVE give 26 differences).  Pseudo numbers DO NOT
- *     change the direction of CSE's canonicalisation.
+ *     change the direction of CSE's canonicalization.
  *
  * THE CFG CLASS -- all give 26 differences (so changing the CFG alone is not
  * enough; the same RTL comes out as with base26):
@@ -86,7 +86,7 @@
  * 9 in the rtl, CSE turns both of its uses into `block` (insn 24 and insn 61),
  * and the `flow` pass deletes the now-dead copy.  That it is also deleted
  * under `-fno-cse-follow-jumps` showed the cause is NOT jump following but
- * canonicalisation within the same block.
+ * canonicalization within the same block.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/core/update_focus.c

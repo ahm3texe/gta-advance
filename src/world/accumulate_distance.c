@@ -50,8 +50,8 @@ void AccumulateDistance(s32 delta)
 
     /* The ROM loads the accumulator base BEFORE the absolute value
        computation (ldr r4 right at the top).  Writing gDistanceAccum
-       directly moves the load
-       to the point of use; a separate local pins the order down. */
+       directly moves the load to the point of use; a separate local pins
+       the order down. */
     accum = &gDistanceAccum;
 
     if (delta < 0)

@@ -4,7 +4,7 @@
  * CALLED with `bl`, so they are real functions -- not boundary errors.
  *
  * To be honest about HOW VALUABLE THIS IS: 54 bytes in total, so it barely
- * moves the percentage. It raises the function COUNT, not the understanding.
+ * moves the percentage. It raises the function COUNT, not our understanding.
  * An empty body produces `bx lr` REGARDLESS of the signature, so the
  * `void f(void)` signatures here are NOT VERIFIED -- they are merely the
  * simplest form. If a caller passes an argument, the consistency checker will

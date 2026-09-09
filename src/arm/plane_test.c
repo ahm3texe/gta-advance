@@ -21,8 +21,8 @@
  *
  * STATUS: PARKED — 171/196 differences, output 188 bytes (ROM 196).
  *
- * This is the project's FIRST attempt in ARM mode.  Every earlier attempt was
- * technically impossible: the build chain was bound to Thumb only.
+ * This is the project's FIRST attempt in ARM mode.  Until now no attempt was
+ * technically possible at all: the build chain was bound to Thumb only.
  *
  * FLAG DISCOVERY (added permanently to agbcc_build.py):
  *   -fomit-frame-pointer                244 -> 240 bytes

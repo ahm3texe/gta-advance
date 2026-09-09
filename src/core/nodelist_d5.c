@@ -62,7 +62,7 @@
  *    the index computation and the call argument. This is the INVERSE
  *    direction of the rule measured in src/core/nodelist_d3.c -- there the ROM
  *    used two registers, so `u16` was required. So the width of an id local is
- *    not memorised; it follows from how many registers the ROM uses.
+ *    not memorized; it follows from how many registers the ROM uses.
  *
  * 4) A SEPARATE POINTER LOCAL FOR THE AREA ENTRY. Written as
  *    `mask = gAreaBank.entries[id].mask;`, agbcc loads the `entries` member

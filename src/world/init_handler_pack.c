@@ -36,11 +36,10 @@ typedef struct Slot {
     u8     ready;               /* +0x81 */
 } Slot;
 
-/* The THUMB BIT (bit 0) must be set in a stored function pointer.
-   a symbol with the `__thumb` suffix; its address resolves as | 1
-   (tools/agbcc_build.py).  Adding the bit at a `bl` target would corrupt the
-   branch offset,
-   would break, a separate symbol is used. */
+/* The THUMB BIT (bit 0) must be set in a stored function pointer.  The
+   address of a symbol with the `__thumb` suffix resolves as | 1
+   (tools/agbcc_build.py).  Setting the bit on a `bl` target would corrupt the
+   branch offset, so a separate symbol is used for the stored pointer. */
 extern u8 FUN_0803d13c__thumb[];
 
 /* 0x0803F67C */

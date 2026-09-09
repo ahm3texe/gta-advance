@@ -4,12 +4,12 @@
  * One of the most called helpers in the project (formerly FUN_08013abc).  If
  * the +0x3C/+0x40 links are 0xFDFDFDFD (not linked) it returns immediately.
  * If the +0x27 "owned" byte is 1, the +0x18 node is freed with UnlinkToFree;
- * on bit0 of the +0x20 flag with +0x34 present, FUN_08013308, and for +0x38,
- * FUN_0801362c.  If there is a +0x44 sub-object, the same work is done for it
- * (its own +0x44's +0x44 goes to FUN_08015110 first) and it is handed back to
- * the gRam020110C0 pool with FUN_0800c804.  Then it is unlinked from the
- * doubly linked list headed at gRam020230A0, the links are set to 0xFDFDFDFD
- * and ownership to 0.
+ * if bit0 of the +0x20 flag is set, +0x34 goes to FUN_08013308 when it is
+ * present and +0x38 to FUN_0801362c.  If there is a +0x44 sub-object, the same
+ * work is done for it (its own +0x44's +0x44 goes to FUN_08015110 first) and
+ * it is handed back to the gRam020110C0 pool with FUN_0800c804.  Then it is
+ * unlinked from the doubly linked list headed at gRam020230A0; the links are
+ * set to 0xFDFDFDFD and ownership to 0.
  *
  * TWO MEASUREMENTS: the sub-object must be tested through the field first and
  * taken into a local AFTERWARDS (`if (obj->child != 0) { child = obj->child;

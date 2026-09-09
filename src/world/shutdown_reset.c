@@ -29,7 +29,7 @@
  * binding the dummy read to a variable (no change), writing all the zeroes as
  * plain constants (168 bytes / 137 off -- the zero is not kept in r5 but
  * regenerated at every write), keeping the zero in a single long-lived local
- * initialised by a separate statement (139 off).
+ * initialized by a separate statement (139 off).
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/shutdown_reset.c

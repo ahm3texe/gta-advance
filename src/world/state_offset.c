@@ -5,8 +5,9 @@
  *
  *   1. An ANGLE is read from the entity, masked with 0x03FFFFFF (26 bits) and
  *      written to the actor's +0x68 field.  The angle turns into a 10-bit
- *      index via >> 16; FUN_08029088 takes it like a conversion helper.
- *   2. A midpoint is computed from the record for the two axes:
+ *      index via >> 16; FUN_08029088 takes it the way a conversion helper
+ *      would.
+ *   2. For each of the two axes a midpoint is computed from the record:
  *      (b6 + b4) - (b18 - 2), then halved with `<< 23 >> 24` and sign
  *      extended from 9 bits.
  *   3. The two returned bytes are scaled by 41/32 and written to +0x26 and +0x27.
@@ -17,38 +18,38 @@
  * at the end.
  *
  * STATUS: PARKED, 1430/1518, 88 bytes SHORT.  The allocation chain is EXACTLY
- * the same as ROM (25, 35, 33, 8, 30, 31, 40, 50, 32, 7, 6, 47 in that order),
- * and the shared epilogue at the end and the default branch fell into place
- * too.  The remaining difference is still block merging: in ROM the 0x03FFFFFF
- * mask sits in SIX separate pool words, so there are six physical blocks; we
- * have five.
+ * the same as the ROM's (25, 35, 33, 8, 30, 31, 40, 50, 32, 7, 6, 47 in that
+ * order), and both the shared epilogue at the end and the default branch fell
+ * into place.  The remaining difference is still block merging: in the ROM the
+ * 0x03FFFFFF mask sits in SIX separate pool words, so there are six physical
+ * blocks; we have five.
  *
  * WIN 1 -- 7 and 6 are SEPARATE branches.  I had merged the two as
- * `state == 7 || state == 6`; in ROM there are two separate copies.  Splitting
- * them: 1172 -> 1312.
+ * `state == 7 || state == 6`; in the ROM there are two separate copies.
+ * Splitting them: 1172 -> 1312.
  *
  * WIN 2 -- EVERY BRANCH HAS ITS OWN LOCALS.  This was the decisive one.  At
  * first I gave all the branches a shared `bias`/`shift`; once the bodies were
  * byte-for-byte identical, agbcc merged case 8's block entirely with 0x1f/0x28
- * (on our side 4 bytes between `cmp #8` and `cmp #30`, in ROM 156).  ROM's
- * stack slots say the branches use separate locals: case 8 sp+8/12/16, case
- * 0x1f sp+32/36/40.  Opening three locals per branch: 1312 -> 1428.
+ * (on our side 4 bytes between `cmp #8` and `cmp #30`, in the ROM 156).  The
+ * ROM's stack slots say the branches use separate locals: case 8 sp+8/12/16,
+ * case 0x1f sp+32/36/40.  Opening three locals per branch: 1312 -> 1428.
  *
- * WIN 3 -- the default branch.  ROM sets up the actor's +4 address with
+ * WIN 3 -- the default branch.  The ROM sets up the actor's +4 address with
  * `adds r0, r7, #4` and tests it against zero, then writes to +34/+35 from
  * there.  Ghidra was showing this as the seemingly meaningless
  * `param_1 == -4`.
  *
  * TWO IDEAS TRIED AND REVERTED (measured, both made it WORSE):
  *
- *   1. Moving the shifts into the call argument.  ROM first computes the RAW
- *      sum of the two axes and only afterwards does the `<<23 >>24` shifts,
- *      three of them back to back; that suggested the source writes the shift
- *      directly into the argument rather than into a local.  Written that way:
- *      1430 -> 1178.  With the locals split per branch it was even worse:
- *      1164.  The idea is wrong.
+ *   1. Moving the shifts into the call argument.  The ROM first computes the
+ *      RAW sum of the two axes and only afterwards does the `<<23 >>24`
+ *      shifts, three of them back to back; that suggested the source writes
+ *      the shift directly into the argument rather than into a local.  Written
+ *      that way: 1430 -> 1178.  With the locals split per branch it was even
+ *      worse: 1164.  The idea is wrong.
  *
- *   2. Keeping the `- (rec->ox - 2)` expression in a separate local.  ROM
+ *   2. Keeping the `- (rec->ox - 2)` expression in a separate local.  The ROM
  *      loads `ox` and does the `-2` separately, while on our side the compiler
  *      recombines it as `+2 - ox`.  Giving it a separate local did not help on
  *      its own; since it was measured together with change 1 above, its
@@ -56,10 +57,10 @@
  *
  * The remaining 88 bytes are spread across the blocks (the 0x28/0x32 block
  * +44, case 8 +24, 0x1e +20, 0x1f +16) and the last block is 40 bytes LONG.
- * ROM's cross-jumping has tied the blocks into a common tail from different
- * depths; case 8 does the call setup inside itself and jumps into the tail
- * FURTHER ALONG, while 0x1f jumps to the start of the setup.  I found no known
- * lever to steer this from the source.
+ * The ROM's cross-jumping has tied the blocks into a common tail from
+ * different depths; case 8 does the call setup inside itself and jumps into
+ * the tail FURTHER ALONG, while 0x1f jumps to the start of the setup.  I found
+ * no known lever to steer this from the source.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/state_offset.c
@@ -78,9 +79,9 @@ typedef struct Owner {
 } Owner;
 
 /* Sub-structure starting at the actor's +0x04; the facing bytes are at +34
- * and +35 inside it.  ROM first sets up this address with `adds r0, r7, #4`
- * and tests it against zero -- what Ghidra shows as `param_1 == -4` is
- * exactly this. */
+ * and +35 inside it.  The ROM first sets up this address with
+ * `adds r0, r7, #4` and tests it against zero -- what Ghidra shows as
+ * `param_1 == -4` is exactly this. */
 typedef struct Slot {
     u8 pad0[34];
     s8 fx;                /* +0x22 (actor's +0x26) */

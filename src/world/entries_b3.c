@@ -9,10 +9,10 @@
  * "bar/wave" drawing.
  *
  * The signature was read from the ROM, not guessed:
- *   r0            -> dest   (a pointer, not normalised)
+ *   r0            -> dest   (a pointer, not normalized)
  *   r1,r2,r3      -> they have an lsls#24/lsrs#24 pair => ALL THREE u8
- *   [sp,#28]      -> the same normalisation => u8 (stride)
- *   [sp,#32]      -> no normalisation, compared against zero => a pointer
+ *   [sp,#28]      -> the same normalization => u8 (stride)
+ *   [sp,#32]      -> no normalization, compared against zero => a pointer
  *   [sp,#36]      -> re-read each round, used with asrs => int
  * The prologue is `push {r4-r7,lr}` + `mov r7,r9`/`mov r6,r8`/`push {r6,r7}`,
  * so r8/r9 are used too; there are seven live values (the register table in

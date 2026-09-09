@@ -10,7 +10,7 @@
  * UNKNOWN, so the symbols are declared as arrays with the first dimension left
  * open.
  *
- * RULE 1 WAS MEASURED HERE: written as casts such as
+ * RULE 1 WAS MEASURED HERE: when the tables are written as casts such as
  * `((u16 (*)[8])0x02026BA0)`, agbcc puts the pool load AFTER the address
  * computation (the ROM puts it BEFORE); the reduced register pressure does not
  * move `n` into a callee-saved register and one register fewer is saved ->

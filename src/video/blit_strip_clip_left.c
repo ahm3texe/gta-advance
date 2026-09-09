@@ -14,7 +14,7 @@
  * `col < 0` -- the opposite edge of the strip. In the source that is a single
  * character: `if (col++ >= 0)` -> `if (col++ < 0)`.
  *
- * The lesson generalises: if a function does not match and a sibling of nearly
+ * The lesson generalizes: if a function does not match and a sibling of nearly
  * THE SAME SIZE in the ROM already does, diff the two bodies against each
  * other first. Check that before chasing register allocation.
  *

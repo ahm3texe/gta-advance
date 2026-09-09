@@ -159,9 +159,9 @@ void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
             if (lnk->holder->kind == 2) return;
         }
         {
-            /* `own` is at block scope: a function-scope local would make the
-             * address
-             * produces an extra copy (see the rejected paths in the header). */
+            /* `own` is at block scope: a function-scope local here would
+             * produce an extra address copy (see the rejected paths in the
+             * header). */
             Owner *own = (*slotp)->owner;
             own->mode = (own->mode & 0x3f) | 0x80;   /* the low 6 bits are preserved */
         }
@@ -179,9 +179,9 @@ void RequestActorAction(Actor *self, u32 id, u32 slot, u32 rank)
             if (lnk->holder->kind == 2) return;
         }
         {
-            /* `own` is at block scope: a function-scope local would make the
-             * address
-             * produces an extra copy (see the rejected paths in the header). */
+            /* `own` is at block scope: a function-scope local here would
+             * produce an extra address copy (see the rejected paths in the
+             * header). */
             Owner *own = (*slotp)->owner;
             own->mode = (own->mode & 0x3f) | 0x40;   /* the low 6 bits are preserved */
         }

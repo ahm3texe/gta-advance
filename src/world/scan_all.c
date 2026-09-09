@@ -35,7 +35,7 @@ void ProcessFirstEntry(void)
     i = 0;
     tbl = gRam02024650;
     do {
-        /* Operand order matters for byte matching. */
+        /* Operand order matters for byte-matching. */
         e = (Entry *)((u32)i * sizeof(Entry) + (u32)tbl);
         if (e->active != 0) {
             if (e->subActive == 0)

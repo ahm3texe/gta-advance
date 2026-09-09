@@ -10,7 +10,7 @@
  * `cmp #0 / bge / adds #3 / asrs #2`, so the source writes
  * `(s32)(height * width) / 4`, not `>> 2`.
  *
- * The final loop adds the palette offset to every half-word; the bound is
+ * The final loop adds the palette offset to every halfword; the bound is
  * recomputed on each iteration, i.e. it is written in place in the `for`
  * condition.
  *

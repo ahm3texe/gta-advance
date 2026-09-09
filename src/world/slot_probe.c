@@ -12,9 +12,9 @@
  * counter; otherwise it sets the `blocked` flag.  If the flag was set, only
  * trigger number 471 is fired.  If it was not, the second loop repeats the
  * same test with rejection INSTEAD OF clamping (an out-of-bounds point is
- * skipped) and produces entries with phase 51; if more than four hold, 0x02 is
- * added to the owner's +0x0A flag, then one more entry for the context's own
- * end and trigger number 470 follow.
+ * skipped) and produces entries with phase 51; if more than four qualify,
+ * 0x02 is added to the owner's +0x0A flag, then one more entry for the
+ * context's own end and trigger number 470 follow.
  *
  * The ROM table gRom08852A1C = { -128, 128, -384, 384 }: 16 bytes copied into
  * a local array in a single block (`ldmia/stmia` + `ldr/str`), so the source
@@ -55,7 +55,7 @@
  *
  * Spellings ruled out: the `tiles[y*w + x]` array index; the `tiles + y*w + x`
  * and `tiles + w*y + x` addition orders (34 bytes); `row = width * y` (171);
- * `cell = tiles + x; cell[y*w]` (the size does not hold); the cell value as
+ * `cell = tiles + x; cell[y*w]` (the sizes do not work out); the cell value as
  * `s32` (11); `w`/`h` locals for the width and height (23); a shared `grid`
  * local pointer (23); 72 permutations of the declaration order (none of them
  * has any effect).

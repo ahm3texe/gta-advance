@@ -63,7 +63,7 @@
  * have swapped places.
  *
  * THE DECISIVE FINDING -- 0x4005/0x4026/0x4027/0x4028 ARE ALSO CASES.
- * Ghidra shows them as pool constants (_DAT_080177d0 and its neighbours), but
+ * Ghidra shows them as pool constants (_DAT_080177d0 and its neighbors), but
  * they are nodes of the comparison tree.  Written without them, the case set
  * stays DENSE between 1 and 0x97 and agbcc produces a JUMP TABLE: 1814 bytes
  * (296 TOO MANY), 45 comparisons, one `mov pc,r0`.  With the four added, the

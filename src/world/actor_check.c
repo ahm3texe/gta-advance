@@ -3,7 +3,8 @@
  * The first function checks the actor flags for availability: bit 8 takes the
  * special validation path (return 1); stop if bit 0 is clear, bit 11 is set,
  * or the sub-object's field at +48 is 2. Otherwise return 1.
- * The second extracts a 3-bit direction index from the FUN_08017D78 difference.
+ * The second extracts a 3-bit direction index from the difference returned
+ * by FUN_08017D78.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/actor_check.c

@@ -27,9 +27,9 @@
  *               (the pool words swap places in the same order too)
  *
  * MEASURED MECHANISM: the hoist order follows the order of USE in the source
- * text; but the source arrangement is what forces ROM's block layout, and the
- * two conflict:
- *   - `if (armed == 0) {B} else {A}` -> ROM's block layout is CORRECT
+ * text; but the source arrangement is what forces the ROM's block layout,
+ * and the two conflict:
+ *   - `if (armed == 0) {B} else {A}` -> the ROM's block layout is CORRECT
  *     (cmp/bne A, B in the middle, A at the end) but the order is 2,1,flags.
  *   - `if (armed != 0) {A} else {B}` -> the order is 2,flags,1 (ROM) but the
  *     compiler moves B above the loop and adds an entry branch: 316 bytes,
@@ -50,7 +50,7 @@
  *     extern declarations: none of them change the order (12).
  *   - Hoisting BY HAND with a pointer/local variable (`bit1 = 2; irq =
  *     &gBiosIrqFlags;`) makes loop 1 match EXACTLY (it drops to 8 bytes):
- *     the initialisation of source-level variables is emitted BEFORE loop.c's
+ *     the initialization of source-level variables is emitted BEFORE loop.c's
  *     hoists. The same trick fails in loop 2: because of the register that
  *     frees up, the constant 2 gets hoisted as well and a spill into r8
  *     appears (336/344). REJECTED because it is a made-up variable — rather
@@ -69,7 +69,7 @@
  *     bytes. Making `gVBlankEnabled` volatile: 12, no change.
  *
  * PERMUTER RUN (1222 iterations): base 80 -> best 20, no zero. The best
- * candidate was REJECTED: it calls VBlankIntrWait twice (a behaviour change),
+ * candidate was REJECTED: it calls VBlankIntrWait twice (a behavior change),
  * reuses the `held` variable for an unrelated value, and adds a
  * `do{...}while(0)` wrapper.
  *

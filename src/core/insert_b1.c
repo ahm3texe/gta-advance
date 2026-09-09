@@ -59,7 +59,7 @@
  *   d) THE FORM THAT WORKS: there is NO pointer variable at all; the three
  *      registers are written as THREE SEPARATE constant cast macros. That way
  *      0x04000008 is loaded from the pool AT ITS FIRST USE (it does not escape
- *      forward), and the two neighbouring addresses are derived from it with
+ *      forward), and the two neighboring addresses are derived from it with
  *      `adds #2` -- the ROM's exact pattern.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

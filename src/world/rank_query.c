@@ -1,8 +1,8 @@
 /* The record field query — 0x08066D54-0x08066ECD
  *
  * The second parameter is a pointer to a record structure, the first a field
- * id between 0 and 35.  According to the id it reads and returns a single
- * field of that record; 0 for an out-of-range id.
+ * id between 0 and 35.  It reads and returns a single field of that record
+ * according to the id, or 0 for an out-of-range id.
  *
  * The 36 branches are turned into a jump table (0x08066D6C, the function's own
  * literal pool): `cmp r0,#35 / bls` + `lsls r0,#2 / ldr a pc-relative base /
@@ -16,16 +16,16 @@
  * bump_rank_counter.c / link_state_step.c; the fields there correspond as
  * follows:
  *   the gSaveBuffer +0x70 word      == RecordData +0x20  (stepA/B/C, 5 bits each)
- *   the gSaveBuffer +0x7E half word == RecordData +0x2E  (rankA/B/C, 5 bits each)
+ *   the gSaveBuffer +0x7E halfword == RecordData +0x2E  (rankA/B/C, 5 bits each)
  *
  * IMPORTANT: the container at +0x2C must be u32, NOT u16.  The `unk2C_11`
  * field is at bits 11-16, i.e. it crosses the 0x2D/0x2E byte boundary; neither
- * the half word at 0x2C nor the one at 0x2E covers it, so agbcc reads a full
+ * the halfword at 0x2C nor the one at 0x2E covers it, so agbcc reads a full
  * word (the ROM: "ldr r0,[r2,#44] / lsls #15 / lsrs #26").  rankA/B/C are bits
  * 17-21, 22-26 and 27-31 of that container; for each, agbcc picks the
  * NARROWEST access that COVERS the field:
  *   17-21 -> the 0x2E byte            (ldrb, lsls #26 / lsrs #27)
- *   22-26 -> the 0x2E half word       (ldrh, it crosses the byte boundary)
+ *   22-26 -> the 0x2E halfword       (ldrh, it crosses the byte boundary)
  *   27-31 -> the top of the 0x2F byte (ldrb, only lsrs #3)
  * bump_rank_counter.c writes the same bits as a u16 container at +0x7E; the
  * two descriptions give the same bit layout, and u16 was enough there because

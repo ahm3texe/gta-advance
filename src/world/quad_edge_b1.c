@@ -13,8 +13,8 @@
  * `__modsi3` IS NEEDED FOR THE ADDRESS 0x0806C18C*** (the existing __modsi3
  * line can be renamed, or an alias added).  Without the record build_c.py says
  * "'__modsi3' is not in data/functions.csv or data/ram_map.csv".
- * I did not add the record; touching anything under data/ was closed to this
- * task.
+ * I did not add the record: modifying anything under data/ was out of scope
+ * for this task.
  * The measurement was made with a helper that adds that line temporarily in
  * memory, and ALL 198 bytes came out identical to the ROM.
  *
@@ -86,7 +86,7 @@
  *     the preload comes back.
  *   - `const s32 (*edge)[3] = &poly[i];` with `edge[0][2]`/`edge[1][2]`:
  *     200 bytes, 146 differences.  A row-array pointer produces no giv.
- *   - There is NO DIFFERENCE between initialising the pointers in their
+ *   - There is NO DIFFERENCE between initializing the pointers in their
  *     declaration and assigning them separately (both give 0); the more
  *     readable form was chosen.
  *

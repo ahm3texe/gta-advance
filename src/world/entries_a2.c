@@ -7,7 +7,7 @@
  * or 52.  It returns 1 if found and 0 if not.
  *
  * The ROM's `subs #51 / cmp #1 / bls` is a single range test; agbcc produces
- * it itself from the `x == 51 || x == 52` spelling (range canonicalisation).
+ * it itself from the `x == 51 || x == 52` spelling (range canonicalization).
  *
  * `pop {r4}; pop {r1}; bx r1` — the return address is taken into r1 because r0
  * stays live, i.e. the function returns a VALUE (the reverse of rule 35).

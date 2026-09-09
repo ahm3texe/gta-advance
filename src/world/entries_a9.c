@@ -1,6 +1,6 @@
 /* SpawnFollowupEntry — 0x080291B8-0x0802922F (120 bytes)
  *
- * Takes a gEntriesA entry as a template, builds a new kind-34 entries from it,
+ * Takes a gEntriesA entry as a template, builds a new kind-34 entry from it,
  * then refreshes two global flags.  The phase choice depends on the entry's
  * kind/phase:
  *

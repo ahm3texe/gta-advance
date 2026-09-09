@@ -3,10 +3,10 @@
 #include "gba_types.h"
 #include "phase1_types.h"
 
-/* An IDENTICAL body to table_entries.c / step_entry_timer.c (the consistency
- * gate requires the same struct body for the same symbol).  The same 148-byte
- * layout as Phase1Entry: timer=unk02, object[136]=+0x04..+0x8B, state=unk8C,
- * key=phase. */
+/* The body is IDENTICAL to the one in table_entries.c / step_entry_timer.c
+ * (the consistency gate requires the same struct body for the same symbol).
+ * It uses the same 148-byte layout as Phase1Entry: timer=unk02,
+ * object[136]=+0x04..+0x8B, state=unk8C, key=phase. */
 typedef struct Entry {
     u8  active;                 /* +0x00 */
     u8  pad01;

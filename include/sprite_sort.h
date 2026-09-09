@@ -8,7 +8,7 @@
  * at 0x08012C74 and inlined into the loop at 0x08012A00. old_agbcc produces
  * byte-matching output in both cases.
  * A label-based traversal with separate `mask &= field` statements left
- * 30 of 98 bytes different. A structured for loop combined with direct masks
+ * 30 of 98 bytes differing. A structured for loop combined with direct masks
  * reproduces the ROM's shared 0x0C00 constant and register allocation;
  * neither change was sufficient on its own.
  */

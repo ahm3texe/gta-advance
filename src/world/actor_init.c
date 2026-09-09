@@ -1,4 +1,4 @@
-/* Entity initialisation — 0x080154D8-0x0801558F
+/* Entity initialization — 0x080154D8-0x0801558F
  *
  * Sets an entity structure to its default values.  The byte fields after 0x88
  * are filled with 0xFF (probably an "unassigned" marker); the low four bits

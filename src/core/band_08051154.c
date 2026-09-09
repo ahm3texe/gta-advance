@@ -7,9 +7,9 @@
  * in the record's +0x20 field for the FIRST entry with flags == 0; if one is
  * found, the start position is converted to 16.16 fixed point from that entry's
  * u16 x/y values, and otherwise the default (0x18800000, 0x09400000) remains.
- * At the very end the frame chain is turned by hand once, BG1 is enabled, the
- * 0x08CAA3E4 asset is loaded and its pointer put into gRam020303C4, and the
- * +4/+8/+0xC fields of gRecordIndex are set to (0, 3600, 0).
+ * At the very end the frame chain is advanced by hand once, BG1 is enabled,
+ * the 0x08CAA3E4 asset is loaded and its pointer put into gRam020303C4, and
+ * the +4/+8/+0xC fields of gRecordIndex are set to (0, 3600, 0).
  *
  * NOTES
  * - The `start` local is DEAD in the ROM: it is written to sp+12/+16/+20 and

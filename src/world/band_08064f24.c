@@ -28,38 +28,40 @@
  *
  * MEASURED SPELLING RULES (all of them were tried in this function, all needed):
  *
- * A. The switch bodies were written in ROM's block order: 0, 2, 1, 3
+ * A. The switch bodies were written in the ROM's block order: 0, 2, 1, 3
  *    (rule 61 addendum). With source order 0,1,2,3 the blocks come out reversed.
  *
- * B. In cases 2 and 1 ROM loads the starting position FIRST.
+ * B. In cases 2 and 1 the ROM loads the starting position FIRST.
  *    The spelling `pos.y - startPos.y` loads `pos.y` first (249/251).
- *    The spelling `-startPos.y + pos.y` gives ROM's order. Ruled out: the unary
- *    `-(startPos.y - pos.y)` (agbcc folds it at the tree level, no difference),
- *    `10 * (...)` (no difference), `(startPos.y - pos.y) * -10` (532 bytes),
- *    `/ (1 << 6)` (548 bytes), an intermediate `diff` local in every case (221/251).
+ *    The spelling `-startPos.y + pos.y` gives the ROM's order. Ruled out:
+ *    the unary `-(startPos.y - pos.y)` (agbcc folds it at the tree level, no
+ *    difference), `10 * (...)` (no difference), `(startPos.y - pos.y) * -10`
+ *    (532 bytes), `/ (1 << 6)` (548 bytes), an intermediate `diff` local in
+ *    every case (221/251).
  *
  * C. The 6th argument of FUN_080627ec must be a VARIABLE. If you write `0`
  *    directly, agbcc emits the constant AFTER the stack write, so the fifth
  *    argument is not waiting in a register, the block asks for one register
  *    less, and the allocation of the WHOLE function shifts (actor drops to r4,
- *    ROM has r6): 115/251. With a variable, all six of r0-r5 are occupied just
- *    like in ROM. For the same reason the third/fourth/fifth arguments are
- *    locals too: written inline, the 2nd argument is computed first (89/251).
+ *    the ROM has r6): 115/251. With a variable, all six of r0-r5 are occupied
+ *    just like in the ROM. For the same reason the third/fourth/fifth
+ *    arguments are locals too: written inline, the 2nd argument is computed
+ *    first (89/251).
  *
  * D. NO INTERMEDIATE POINTER MAY BE USED IN THE COUNTER BLOCK. Writing a
  *    `counter = owner->counter` local in every branch gives 194/251; writing
- *    `owner->counter->` directly gives 225/251 and brings ROM's register
+ *    `owner->counter->` directly gives 225/251 and brings the ROM's register
  *    allocation (counter r1, ceiling r2, drop r3). Ruled out: a single shared
  *    `counter` local (192), a full update in every branch (207).
  *
- * E. THE 0x02035B10 STATUS WORD IS READ AND DISCARDED IN ROM: after `ldr r0,=..` /
- *    `ldr r0,[r0]` r0 is immediately overwritten. The only way to keep the dead
- *    load alive is a volatile view (in line with ram_symbols.h's "each
- *    translation unit declares its own view" rule).
+ * E. THE 0x02035B10 STATUS WORD IS READ AND DISCARDED IN THE ROM: after
+ *    `ldr r0,=..` / `ldr r0,[r0]` r0 is immediately overwritten. The only way
+ *    to keep the dead load alive is a volatile view (in line with
+ *    ram_symbols.h's "each translation unit declares its own view" rule).
  *    Also, because this read holds r0, NoOp08067370's argument is computed in
  *    r1 and copied into r0; passing the SAME value twice to the call (r0 and
- *    r1) is the only spelling that produces ROM's `adds r0,r1,#0` copy. Ruled
- *    out: a single-argument call (250/251, one instruction short),
+ *    r1) is the only spelling that produces the ROM's `adds r0,r1,#0` copy.
+ *    Ruled out: a single-argument call (250/251, one instruction short),
  *    `NoOp08067370(gRam02035B10, dist>>16)` (249), a third argument of `0`
  *    (250), the comma operator, an intermediate `scaled` local.
  *
@@ -156,7 +158,7 @@ extern s32   PlaceProbeEntries(void *actor, s32 mode);
  * volatile view is declared in this TU so the dead load survives. */
 /* The type must be the SAME as in src/core/reset_runtime_globals.c (the
  * consistency check stops contradictory extern types for the same symbol).
- * ROM performs the dead read here; volatile is applied at the expression
+ * The ROM performs the dead read here; volatile is applied at the expression
  * level -- the same pattern as src/world/link_service.c. */
 extern u32 gRam02035B10;
 

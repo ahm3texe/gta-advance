@@ -20,13 +20,13 @@
  * block order shifts.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/big_a4.c
+ * Verification:  make c-match FILE=src/world/level_step.c
  */
 
 #include "gba_types.h"
 
-/* The THUMB BIT must be set in stored function pointers; the `__thumb`
-   the suffixed symbol's address resolves as | 1 (tools/agbcc_build.py). */
+/* The THUMB BIT must be set in stored function pointers; the address of a
+   `__thumb`-suffixed symbol resolves as | 1 (tools/agbcc_build.py). */
 extern u8 FUN_08017628__thumb[];
 extern u8 FUN_080172a0__thumb[];
 extern u8 FUN_08018b74__thumb[];
@@ -34,7 +34,7 @@ extern u8 FinishActorState__thumb[];
 
 /* The definition blocks are read-only ROM data; each is used on its own, so
    there is no base + offset folding (rule 1's rationale does not apply).
-   Since I am not authorised to ADD symbols under data/, they are written as
+   Since I am not authorized to ADD symbols under data/, they are written as
    constant casts. */
 #define DEF(addr) ((const u16 *)(addr))
 

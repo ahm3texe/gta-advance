@@ -4,10 +4,10 @@
  * are identical instruction by instruction, only the pool addresses are
  * shifted -- the same source compiled twice (docs/WORKFLOW.md section 10).
  *
- * It walks the list THREE TIMES.  An eligible actor: 0x40 NOT set at +0x0C,
- * the +0x30 mode of the record at +0x18 equal to 2, and, if +0x2C exists,
- * 0x2000000 not set at its +0x18.  If 0x400000 is set on any eligible actor
- * the function returns immediately.
+ * It walks the list THREE TIMES.  An actor is eligible when 0x40 is NOT set
+ * at +0x0C, the +0x30 mode of the record at +0x18 equals 2 and, if +0x2C
+ * exists, 0x2000000 is not set at its +0x18.  If 0x400000 is set on any
+ * eligible actor the function returns immediately.
  *   pass 1: counts the eligible actors; returns if there are fewer than six.
  *   pass 2: does an INSERTION SORT into a six-slot distance array.
  *   pass 3: sets flag 0x400 at +0x0C on those whose distance is greater than

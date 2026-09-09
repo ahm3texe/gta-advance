@@ -10,7 +10,7 @@
  *     the receive buffers, and if the send has finished, swaps the send
  *     buffers too, clears the counter and, with IME off, adds the serial bit
  *     to the BIOS interrupt flag,
- *   - if the send counter has not passed 9, it puts the next half word into
+ *   - if the send counter has not passed 9, it puts the next halfword into
  *     SIOMLT_SEND and advances the counter,
  *   - if the receive counter is not negative, it writes that frame's word into
  *     each of the four slots (24-byte stride); if the counter is 9 it marks
@@ -46,7 +46,7 @@
  *
  * SPELLINGS RULED OUT (all measured, none made a difference):
  *   making cnt u16/u32/s32, moving its declaration up, nested `if`s,
- *   initialising it at its definition; `gBiosIrqFlags |= ...`,
+ *   initializing it at its definition; `gBiosIrqFlags |= ...`,
  *   `0x80 | gBiosIrqFlags`, taking it into a local first, narrowing with
  *   `(u16)`.  Adding the constant with `+` and writing IME non-volatile BREAK
  *   the match.
@@ -72,7 +72,7 @@
 #define BIOS_IRQ_SERIAL  0x0080
 #define SLOT_COUNT       4
 #define SLOT_STRIDE      24
-#define SEND_LAST        9          /* the index of the last half word in the buffer */
+#define SEND_LAST        9          /* the index of the last halfword in the buffer */
 #define FRAME_DONE       10         /* the counters' upper limit */
 
 /* The four SIOMULTI registers are read as a single block.  The union's u32

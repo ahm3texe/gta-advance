@@ -1,6 +1,6 @@
 /* Area cleanup -- 0x08030CB4-0x08030D0B, 88 bytes.  MATCHES (0 off).
  *
- * If the pending-cleanup flag is set it fills three half words into each of
+ * If the pending-cleanup flag is set it fills three halfwords into each of
  * two VRAM rows, releases a block and clears the flag.
  *
  * THE SOLUTION: the loop form is ARRAY INDEXING, NOT POINTER INCREMENTS.
@@ -20,7 +20,7 @@
  *                                              into a copy
  *     ldr  r2, =0x06009858 right            <- a STRENGTH REDUCTION start
  *     ldr  r1, =0x06009818 left             <- a STRENGTH REDUCTION start
- * The critical point: in loop optimisation agbcc first writes the invariants
+ * The critical point: in loop optimization agbcc first writes the invariants
  * (movables) before loop_start, and then writes the pointer starts produced by
  * strength reduction, also before loop_start.  The second insertion comes
  * AFTER the first.  So the hoisted constant + copy come BEFORE the pointer

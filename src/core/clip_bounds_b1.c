@@ -3,7 +3,7 @@
  * If gSlotSelector is 1, slots 1 and 2 are SWAPPED; the target is then written
  * either into the "held" slot (slot == 2, handing the previously held one over
  * to FUN_0803220c) or into CoordBlock +0x04. If slot <= 1 the block is
- * initialised: +0x00 = 1, +0x3C/+0x40/+0x44 = 0, +0x0C = code << 16, +0x71 =
+ * initialized: +0x00 = 1, +0x3C/+0x40/+0x44 = 0, +0x0C = code << 16, +0x71 =
  * the third parameter.
  *
  * The code comes from one of two sources depending on the target's +0x08 flag

@@ -46,10 +46,9 @@ s32 IsSlotValueInRange(s32 unused, u16 low, u16 high)
     PlayerSlot *slot;
 
     /* Early-exit chain REQUIRED (rule 51). A single && gives low and high the
- * same lifetime (13) and priority, so allocno order swaps r4/r5. This form
- * extends low's lifetime to 14 and lowers its priority: high is allocated
- * first and receives r4, as in the ROM.
- */
+     * same lifetime (13) and priority, so allocno order swaps r4/r5. This
+     * form extends low's lifetime to 14 and lowers its priority: high is
+     * allocated first and receives r4, as in the ROM. */
     slot = (PlayerSlot *)SelectSlotAB(SELECT_A);
     if (slot == 0)
         return 0;

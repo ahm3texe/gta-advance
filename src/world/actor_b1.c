@@ -25,7 +25,7 @@
  *    value, so the signature is u32.
  *  - The threshold 0x100000 is not an immediate: the ROM builds it with
  *    `movs r0,#128 / lsls r0,#13`; writing the plain constant in the source
- *    produces the same pair, and rule 44's canonicalisation trap does not
+ *    produces the same pair, and rule 44's canonicalization trap does not
  *    apply here (the comparison is register-to-register).
  *  - WHAT CLOSED THE LAST 7 BYTES -- THE ACCUMULATION MUST USE COMPOUND
  *    ASSIGNMENT.  The one-line
@@ -42,9 +42,9 @@
  *  - `#include "target_common.h"` + the shared `distance(cur, self)`:
  *    it produces TWO mask blocks, for a and for b, plus a null check at the
  *    top; neither is in the ROM.
- *  - The `special(cur)` form (materialising the `pose->state==2` result in a
+ *  - The `special(cur)` form (materializing the `pose->state==2` result in a
  *    variable, rule 48): the ROM uses `cmp #2 / bne` directly here, and
- *    materialising adds an extra movs/cmp pair.
+ *    materializing adds an extra movs/cmp pair.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/actor_b1.c

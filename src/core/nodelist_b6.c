@@ -9,7 +9,7 @@
  * CAREFUL -- there are TWO SEPARATE lists. The head pointer passed here is
  * gList02035A80 (0x02035A80), NOT the gNodeListHead (0x02035A70) that
  * nodelist_c3.c uses. The ram_map note records that the two are separate
- * objects; because their addresses are neighbours they are easily confused.
+ * objects; because their addresses are neighbors they are easily confused.
  *
  * gAreaBank is seen here as +0x04 (a counter) and +0x1C (an array of 64-byte
  * records); nodelist_c3.c sees the same symbol as the array of 36-byte entries

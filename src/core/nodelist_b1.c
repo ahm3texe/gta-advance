@@ -10,7 +10,7 @@
  * DETAILS MEASURED FROM THE ROM
  *   - The first gate is `ldr r0,=0x7fef / cmp r2,r0 / bne` -- an equality test
  *     with a pool constant. Rule 44 (take the comparison constant into a
- *     local) IS NOT NEEDED HERE: canonicalisation only happens in `<`/`<=`
+ *     local) IS NOT NEEDED HERE: canonicalization only happens in `<`/`<=`
  *     tests; `==` is left alone.
  *   - The +0x18 field is SIGNED (s32): the second gate is `cmp r1,#0 / bge`,
  *     i.e. `bits < 0`. A masked form (`bits & 0x80000000`) does not produce

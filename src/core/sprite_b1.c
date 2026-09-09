@@ -31,7 +31,7 @@
  * floor_log2(refs) * refs / live_length):
  *     src  : refs 11, live_length 122  -> 0.2705   (gets a register)
  *     tail : refs  6, live_length  46  -> 0.2609   (falls to the stack)
- * The order favours src by 3.7%. To flip it, src needs live_length >= 127, or
+ * The order favors src by 3.7%. To flip it, src needs live_length >= 127, or
  * refs <= 10, or tail needs live_length <= 45.
  *
  * TRIED / ELIMINATED -- DO NOT RETRY; ADD anything new you try here:

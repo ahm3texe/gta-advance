@@ -16,11 +16,11 @@
 
 extern volatile u8 gVBlankState;
 extern u32 gDisplayState;
-/* BIOS interrupt check flags (IntrWait). NOT volatile: marked volatile,
- * agbcc changes the load order and diverges from the ROM. */
+/* BIOS interrupt check flags (IntrWait). NOT volatile: if it is marked
+ * volatile, agbcc changes the load order and diverges from the ROM. */
 
 /* The three functions below are not named yet. In the assembly source they
- * were labelled WaitForDma3 / InitSubsystem / WaitForVBlank, but the
+ * were labeled WaitForDma3 / InitSubsystem / WaitForVBlank, but the
  * disassembly does not support those names: FUN_08063b74 is not a DMA loop, it
  * writes constants to four hardware registers; FUN_0800cae4 does not wait for
  * VBlank, it calls two functions. The Ghidra names are used until this is

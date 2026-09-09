@@ -4,7 +4,7 @@
  * SIGNED (blt/ble/bgt/bge), the second UNSIGNED (bcc/bls/bhi).
  *
  * THE FIELD MUST BE u16, NOT s16.  The ROM loads it UNSIGNED with `ldrh` yet
- * the comparisons are signed: that is C's natural behaviour -- a u16 field is
+ * the comparisons are signed: that is C's natural behavior -- a u16 field is
  * promoted to `int` in a comparison.  Writing s16 produced `ldrsh` (2 bytes
  * too many).  The second field is u32, so its comparisons stay unsigned.
  *

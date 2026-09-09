@@ -163,7 +163,7 @@
 #define GLYPH_FIRST      32
 #define GLYPH_SUBSTITUTE 146
 #define GLYPH_APOSTROPHE 39
-#define COLOUR_ESCAPE    64
+#define COLOR_ESCAPE    64
 #define SCREEN_RIGHT     239
 #define SCREEN_BOTTOM    159
 #define LINE_HEIGHT      16
@@ -182,7 +182,7 @@ extern void PlaceGlyph(u8 ch, s32 x, s32 y);
 s32 GetGlyphWidth(u32 ch);
 s32 GetTextWidth(const u8 *text);
 
-#define IS_COLOUR_DIGIT(c) ((u8)((c) - 56) <= 1 || (c) == 48)
+#define IS_COLOR_DIGIT(c) ((u8)((c) - 56) <= 1 || (c) == 48)
 
 static __inline__ s32 GlyphAdvance(u32 ch)
 {
@@ -215,7 +215,7 @@ static __inline__ s32 DrawTextAt(const u8 *text, s32 x, s32 y)
     left = x;
 
     while ((ch = *text++) != 0) {
-        if (ch == COLOUR_ESCAPE && IS_COLOUR_DIGIT(*text)) {
+        if (ch == COLOR_ESCAPE && IS_COLOR_DIGIT(*text)) {
             text++;
             continue;
         }

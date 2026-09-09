@@ -109,7 +109,7 @@
  *     addition is the PRODUCT, and the result shares its register.
  *     Written as `records + id*28`, GCC canonically moves the pointer to the
  *     front; swapping the operands by hand (`id*28 + records`) CHANGES
- *     NOTHING. To break the canonicalisation both sides must be made
+ *     NOTHING. To break the canonicalization both sides must be made
  *     INTEGERS:  (void *)(id * RECORD_SZ + (s32)bank->records)
  *     -- that fixes the registers but pushes the symbol load AFTER the
  *     product. To restore the load order, the symbol's address is held in a

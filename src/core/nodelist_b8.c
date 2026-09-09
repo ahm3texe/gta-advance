@@ -59,7 +59,7 @@
  *    `case 0: return 1;` took 488 -> 492 (154 differences).
  *
  * 2) THE +0x70 CONTAINER'S COMPARISONS MUST BE UNSIGNED: 154 -> 0.
- *    The measured agbcc behaviour (confirmed with a probe):
+ *    The measured agbcc behavior (confirmed with a probe):
  *        a u16 field : 5   ->  `cmp #19 / bhi`   (UNSIGNED)
  *        a u32 field : 5   ->  `cmp #19 / bgt`   (SIGNED)
  *    So the bitfield's DECLARED TYPE decides the signedness of the comparison.

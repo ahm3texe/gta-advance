@@ -3,7 +3,7 @@
  * If the slot's mode byte is 4 it only runs one test and holds a counter at
  * its upper limit.  Otherwise it runs a binding query, waits for bit 0x10,
  * then makes a trigger call and produces entry number 51.  The target buffer
- * and the id field come from two different places according to the slot's
+ * and the id field come from two different places, selected by the slot's
  * +0x08 flag bits.
  *
  * The mode flag is taken into a VARIABLE (rule 48): the ROM emits

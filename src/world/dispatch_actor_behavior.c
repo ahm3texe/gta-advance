@@ -1,4 +1,4 @@
-/* The actor behaviour dispatcher — 0x08017C28-0x08017D77 (336 bytes)
+/* The actor behavior dispatcher — 0x08017C28-0x08017D77 (336 bytes)
  *
  * STATUS: 140/149 instructions, A NEAR MISS (does not match).  The size is
  * right.

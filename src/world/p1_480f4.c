@@ -57,7 +57,7 @@ u32 FUN_080480f4(TargetActor *self)
         ((Phase1Heading *)self->pose)->yaw = heading << 16;
         ((Phase1Heading *)self->pose)->targetYaw = heading << 16;
     }
-    /* ROM evaluates the distance here; its result is not consumed. */
+    /* The ROM evaluates the distance here; the result is not consumed. */
     distance(self,target);
     NotifyContext(self,candidate);
     if (GetOwnerSlot(target) && CanNotify(self)) {

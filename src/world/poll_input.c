@@ -1,7 +1,7 @@
 /* Reading the keys and the input history — 0x080656F4-0x080657D7
  *
  * Inverts KEYINPUT and extracts the 10-bit pressed-key mask.  If all four
- * directions are pressed while the shoulder buttons are NOT, it goes to a
+ * directions are pressed while the shoulder buttons are NOT, it drops into a
  * hardware shutdown (the soft-reset shortcut).
  *
  * While the link state is 2, the input is written into a 32-element ring
@@ -30,10 +30,10 @@
  * instruction + 2 bytes of pool alignment):
  *   a) In the shoulder mask test the ROM COPIES both operands into separate
  *      pseudos (`adds r1,r0,#0 / adds r0,r4,#0 / ands r0,r1`) while we do it
- *      in one instruction (`ands r0,r4`).  (the ROM has +2 instructions)
+ *      in one instruction (`ands r0,r4`).  (The ROM has +2 instructions.)
  *   b) At the `strb` right after the counter bump the ROM still keeps the
  *      address register (r1) live and uses it directly, while we reload it
- *      from ip with `mov r1,ip`.  (we have +1 instruction)
+ *      from ip with `mov r1,ip`.  (We have +1 instruction.)
  * (b) is pure allocation: the ROM keeps the array base in r1 and the index
  * temporary in r0; we do the reverse.
  *

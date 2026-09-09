@@ -1,5 +1,5 @@
-/* Try the position shifted towards the target; if that fails, scan the
- * neighbouring tiles
+/* Try the position shifted toward the target; if that fails, scan the
+ * neighboring tiles
  * 0x08055054-0x0805518B  (312 bytes; the last 4 are a literal pool)
  *
  * The call receives a position pointer (in/out) and a (dx, dy) shift. The
@@ -7,7 +7,7 @@
  * free, the position is moved there and 1 is returned. Otherwise a box of
  * +-128.0 (0x800000) is built around the requested point and passed to
  * FUN_08040700, which writes the (tx, ty) indices of at most 8 tiles falling
- * inside the box. For each tile the tile centre (tx<<22 + dx<<16 + 32.0) is
+ * inside the box. For each tile the tile center (tx<<22 + dx<<16 + 32.0) is
  * tested again; at the first free tile the position's x/y are pulled there and
  * 1 is returned. If none works, 0.
  *
@@ -87,7 +87,7 @@
  *     best.
  *   - Everything tried for the last 2-byte difference (`adds r3,r4,#0`), NONE
  *     of which worked (all >= 9 differences): nested `if`s, `if/else`, a
- *     ternary, an inverted condition (`sel = tileMask` + `||`), a labelled
+ *     ternary, an inverted condition (`sel = tileMask` + `||`), a labeled
  *     `goto have_sel` form, making `sel` int/s32/u32, a second local
  *     `arg = sel;` (rule 17), making `count` u32, taking the `MAX_CELLS`/`box`/
  *     `cells` arguments into separate locals (rule 18), the `&box[0]` form,

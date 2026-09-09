@@ -59,7 +59,7 @@
  *     BEFORE the inner loops. This is agbcc's own motion, not the shape of
  *     the source; the increment is at the END of the body (measured, below).
  *
- * WRITINGS TRIED AND REJECTED (all measured against the 148-byte target):
+ * SPELLINGS TRIED AND REJECTED (all measured against the 148-byte target):
  *
  *  - `u16 remain` (leaving the clipping to the type): 156 bytes, 50 off. An
  *    lsls#16/lsrs#16 is added after every `remain--`, which is not in the

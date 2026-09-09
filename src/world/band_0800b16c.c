@@ -93,7 +93,7 @@ s32 FUN_0800b16c(const s32 quad[4][3], const s32 *point, s32 radius)
             index = 3;
         }
 
-        /* Kenar 1->2 */
+        /* Edge 1->2 */
         side = ((((point[1] - quad[1][1]) >> 12) * ((quad[2][0] - quad[1][0]) >> 12) - ((point[0] - quad[1][0]) >> 12) * ((quad[2][1] - quad[1][1]) >> 12)) << 8);
         side += radiusSq;
         if (side >= 0) {
@@ -102,7 +102,7 @@ s32 FUN_0800b16c(const s32 quad[4][3], const s32 *point, s32 radius)
                 index = 1;
             }
 
-            /* Kenar 0->1 */
+            /* Edge 0->1 */
             side = ((((point[1] - quad[0][1]) >> 12) * ((quad[1][0] - quad[0][0]) >> 12) - ((point[0] - quad[0][0]) >> 12) * ((quad[1][1] - quad[0][1]) >> 12)) << 8);
             side += radiusSq;
             if (side >= 0) {
@@ -111,7 +111,7 @@ s32 FUN_0800b16c(const s32 quad[4][3], const s32 *point, s32 radius)
                     index = 0;
                 }
 
-                /* Kenar 2->3 */
+                /* Edge 2->3 */
                 side = ((((point[1] - quad[2][1]) >> 12) * ((quad[3][0] - quad[2][0]) >> 12) - ((point[0] - quad[2][0]) >> 12) * ((quad[3][1] - quad[2][1]) >> 12)) << 8);
                 side += radiusSq;
                 if (side >= 0) {

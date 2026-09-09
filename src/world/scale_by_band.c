@@ -5,8 +5,8 @@
  * roughly from 1.1 to 0.4.
  *
  * The ROM reverses the last two bands: load 102 first, then overwrite with
- * 128 if the bound is not exceeded. This naturally follows from
- * else if (key <= 0x4FFFF) 128 else 102. Comparisons are unsigned (bhi),
+ * 128 if the bound is not exceeded. That follows naturally from
+ * `else if (key <= 0x4FFFF) 128 else 102`. The comparisons are unsigned (bhi),
  * but the product shifts arithmetically (asrs): key is u32, value is s32.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

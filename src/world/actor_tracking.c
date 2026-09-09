@@ -75,8 +75,7 @@ void AccumulateActorMotion(TrackedActor *actor, s32 scale)
     s32 delta;
 
     /* The measurement is the z displacement from the starting position:
- * the ROM reads +0x120, which is startPos.z itself.
- */
+       the ROM reads +0x120, which is startPos.z itself. */
     delta = actor->pos.z - actor->startPos.z;
     if (delta >= actor->maxDelta)
         actor->maxDelta = delta;

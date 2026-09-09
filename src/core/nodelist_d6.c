@@ -73,7 +73,7 @@
  *   order only comes out with `ids++, i++`. In the second outer loop, by
  *   contrast, the ROM increments the counter first, and there `i++, out++,
  *   ids++` is the right order.
- *   So rule 43 cannot be memorised as "counter first": in every loop the ROM's
+ *   So rule 43 cannot be memorized as "counter first": in every loop the ROM's
  *   own increment order must be read and written into the source in that
  *   order.
  */

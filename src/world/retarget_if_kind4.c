@@ -26,11 +26,11 @@ typedef struct Holder {
 } Holder;
 
 extern void FUN_0803cda8(Holder *holder);
-/* The THUMB BIT (bit 0) must be set in a stored function pointer.
-   a symbol with the `__thumb` suffix; its address resolves as | 1
-   (tools/agbcc_build.py).  Adding the bit at a `bl` target would corrupt the
-   branch offset,
-   would break, a separate symbol is used. */
+/* The THUMB BIT (bit 0) must be set in a stored function pointer, so the
+   declaration below uses a symbol with the `__thumb` suffix; its address
+   resolves as | 1 (tools/agbcc_build.py).  Adding the bit at a `bl` target
+   would corrupt the branch offset, so sharing one symbol between the two
+   uses would break the call; a separate symbol is used instead. */
 extern u8 FUN_0803ef18__thumb[];
 
 /* 0x0803F6D8 */

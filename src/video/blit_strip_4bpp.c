@@ -1,6 +1,6 @@
 /* HUD tile writers + the 4bpp strip blitter band — 0x08030B40 .. 0x08031A1C
  *
- * Matching files in the same neighbourhood: src/ui/hud_fields.c (0x08030B60,
+ * Matching files in the same neighborhood: src/ui/hud_fields.c (0x08030B60,
  * 0x08030E78, 0x08030F28), src/world/area_cleanup.c (0x08030CB4),
  * src/world/area_flags.c.  The blank tile constant 0xF0E8 and the row stride
  * of the 32-entry (64-byte) tile map come from there.
@@ -44,7 +44,7 @@
  * row count and parameter layout.)
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/band_c.c
+ * Verification:  make c-match FILE=src/video/blit_strip_4bpp.c
  */
 
 #include "gba_io.h"

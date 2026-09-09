@@ -1,6 +1,6 @@
-/* Equality of two half words — 0x08030BE8-0x08030C0B  (36 bytes, BYTE-MATCHING)
+/* Equality of two halfwords — 0x08030BE8-0x08030C0B  (36 bytes, BYTE-MATCHING)
  *
- * Filters the +0x04 and +0x1C half words of gRam02025810 through 0xFFFF and
+ * Filters the +0x04 and +0x1C halfwords of gRam02025810 through 0xFFFF and
  * compares them.  The ROM loads the base pointer and the mask from the pool,
  * copies the mask with `adds r2,r1,#0` and uses the copy on the left-hand
  * side; on the right-hand side the mask is dead, so it does `ands r1,r0` in

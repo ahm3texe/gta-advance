@@ -1,7 +1,7 @@
 /* StepDecay -- 0x08023974-0x08023A0B (152 bytes) -- MATCHED
  *
- * If it passes three gates it decrements the value and clamps it to the floor,
- * if the peer is flagged it clamps once more with a second threshold, then it
+ * If it passes three gates it decrements the value and clamps it to the floor;
+ * if the peer is flagged it clamps once more with a second threshold; then it
  * does a shifted comparison over a four-entry ROM table and updates the tag.
  *
  * LAYOUT READ OFF THE ROM (the match confirmed it):
@@ -14,7 +14,8 @@
  * (movs+lsls); 0x0063FFFF and 0x0001FFFF come from the pool.
  * Rule 35: `pop {r1}; bx r1` -> r0 carries the return value, signature u32.
  * Arg2 is never read anywhere (r2 is immediately clobbered with the pool
- * address) but since arg3 is node it stays in the signature as a placeholder.
+ * address), but since arg3 is node it stays in the signature as a
+ * placeholder.
  *
  * THE TWO DIFFERENT-WIDTH READS -- both must be SEPARATE expressions in the
  * source:
@@ -32,20 +33,20 @@
  * difference was only in which value landed in which register.
  *
  *  1. RULE 45, on obj->value. The value is loaded in THREE separate places
- *     (0x8023984 gate, 0x80239ac apply, 0x80239e4 scan) and ROM puts all
+ *     (0x8023984 gate, 0x80239ac apply, 0x80239e4 scan) and the ROM puts all
  *     three in SEPARATE registers: r0 / r2 / r5. Writing the three loads into
  *     a SINGLE `old` local produced one single pseudo in agbcc
  *     (p28: 9 refs, priority 0.844) and when that pseudo's turn came it took
  *     r3 and pushed limit into the callee-saved r6; from there peer slid into
  *     r2 and the gRam address into r5 in a chain. Three separate locals
  *     (old / cur / val) brought the difference down from 51 to 38 and the
- *     peer, gRam, apply and scan registers ALL fell into place against ROM at
- *     once.
+ *     peer, gRam, apply and scan registers ALL fell into place against the
+ *     ROM at once.
  *
- *  2. LIVE-RANGE SPLITTING of limit. At the entry to the scan ROM copies limit
- *     from r3 to r6 with `adds r6, r3, #0`, because r3 is needed for the table
- *     pointer. Written with a single local, agbcc put limit in r6 from the
- *     start and never produced this copy -- that is, we were MISSING one
+ *  2. LIVE-RANGE SPLITTING of limit. At the entry to the scan the ROM copies
+ *     limit from r3 to r6 with `adds r6, r3, #0`, because r3 is needed for the
+ *     table pointer. Written with a single local, agbcc put limit in r6 from
+ *     the start and never produced this copy -- that is, we were MISSING one
  *     instruction; the size still coming out as 152 was masked by the
  *     `movs r0, r0` padding added for pool alignment. Writing `base = limit;`
  *     before the scan brings the copy back.
@@ -58,16 +59,16 @@
  *     -- the distinguishing criterion is overlap.
  *     Writing `base = obj->limit;` (a second load) matches EXACTLY as well,
  *     because CSE turns the second `ldr` into the same copy. The copy form was
- *     preferred in the source: ROM has a single `ldr [r4,#4]`, and writing a
- *     second memory read would mislead the reader.
+ *     preferred in the source: the ROM has a single `ldr [r4,#4]`, and
+ *     writing a second memory read would mislead the reader.
  *
- * SCAN LOOP: in ROM the table pointer is an induction variable
+ * SCAN LOOP: in the ROM the table pointer is an induction variable
  * (`adds r3,#4`), not an index -- writing `TABLE[i]` produces an lsls+ldr
- * pair, a walking pointer is mandatory (rule 37). The increment order is
- * ROM's order: pointer first (0x80239f4), then the counter (0x80239f6). The
+ * pair, so a walking pointer is mandatory (rule 37). The increment order is
+ * the ROM's: pointer first (0x80239f4), then the counter (0x80239f6). The
  * counter is signed: `cmp r2,#3` + `ble` (rule 31), i.e. `s32 i` and `i <= 3`;
  * a `u32` spelling would give `bls`. The order of the prologue statements is
- * ROM's order too: i, base, val, entry.
+ * the ROM's too: i, base, val, entry.
  *
  * SPELLINGS TRIED AND RULED OUT (target 152 bytes / 74 instructions):
  *  - First setup (guessed nested conditions): 156 bytes, 145 off.
@@ -146,7 +147,8 @@ u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
 
     obj->stamp = gRam02000224;
 
-    /* Decrement and clamp to the floor. Zero is already at the floor, untouched. */
+    /* Decrement and clamp to the floor. Zero is already at the floor and is
+     * left untouched. */
     cur = obj->value;
     if (cur != 0) {
         next = cur - delta;
@@ -156,14 +158,16 @@ u32 StepDecay(Obj *obj, s32 delta, u32 unused, Node *node)
     }
 
     /* If the peer is flagged, a second threshold: what falls from the upper
-     * region settles on the floor.  `cur` is the value BEFORE the decrement (r2 in ROM). */
+     * region settles on the floor.  `cur` is the value BEFORE the decrement
+     * (r2 in the ROM). */
     if (peer != 0 && (peer->flags & PEER_BIT) != 0
         && cur > SPAN_LIMIT && obj->value <= SPAN_LIMIT)
         obj->value = SPAN_RESET;
 
-    /* Shifted threshold scan over the four-entry table; the last one to pass wins.
-     * `base` is limit's scan-time live range: since r3 is needed for the table
-     * pointer, ROM emits the `adds r6, r3, #0` copy here (see header, 2). */
+    /* Shifted threshold scan over the four-entry table; the last one to pass
+     * wins.  `base` is limit's scan-time live range: since r3 is needed for
+     * the table pointer, the ROM emits the `adds r6, r3, #0` copy here (see
+     * header, 2). */
     i = 0;
     base = limit;
     val = obj->value;

@@ -49,8 +49,7 @@ s32 IsEntityEngaged(Entity *entity)
     slot = (PlayerSlot *)SelectSlotAB(GetOwnerSlot(entity));
 
     /* The ROM places the zero block first (rule 49), so the condition tests
- * not engaged; the return-1 branch must remain at the tail.
- */
+     * for "not engaged"; the return-1 branch must remain at the tail. */
     if ((entity == 0 || entity->block == 0 || entity->block->kind > 3) &&
         (slot == 0 || slot->marked == 0))
         result = 0;

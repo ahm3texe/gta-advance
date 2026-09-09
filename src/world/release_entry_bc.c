@@ -6,8 +6,8 @@
  * returns 1.
  *
  * Because +0x8C exceeds Thumb's `str` immediate range (124 at most), the ROM
- * produces a separate base (adds r1,r4,#0 / adds r1,#140); that falls out of
- * the natural field write in C on its own.
+ * produces a separate base (adds r1,r4,#0 / adds r1,#140); the natural field
+ * write in C produces that on its own.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/release_entry_bc.c

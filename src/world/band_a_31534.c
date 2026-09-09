@@ -36,7 +36,7 @@
  * base and its `bl`s are encoded correctly.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/band_a.c
+ * Verification:  make c-match FILE=src/world/band_a_31534.c
  */
 
 #include "gba_types.h"
@@ -85,7 +85,7 @@ extern u8  *FUN_0806de10(u8 *dest, const u8 *src, u32 size);
  *  - The row guard is TWO separate signed tests (`cmp #0 / blt`,
  *    `cmp #31 / bgt`): two separate `if`s.  Joining them with `&&` on one line
  *    would fold them.
- *  - The result is materialised in a local (`movs r4,#0` even BEFORE the
+ *  - The result is materialized in a local (`movs r4,#0` even BEFORE the
  *    address computation, then `movs r4,#1`): rule 48.
  *  - The `return 0` body is AFTER the pool, at the end of the function: rule
  *    49, i.e. a `goto` to the end rather than an early `return 0`. */

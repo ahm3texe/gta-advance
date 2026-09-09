@@ -48,7 +48,7 @@
  * - The same plus the direct symbol in `neither`: 25 differences.
  * - Writing it with structured if/else: four different forms were tried (fully
  *   structured, outer goto with inner structured, outer structured with inner
- *   goto, mixed) -- ALL gave THE SAME 20 differences. agbcc normalises the
+ *   goto, mixed) -- ALL gave THE SAME 20 differences. agbcc normalizes the
  *   control-flow form; the block order does NOT CHANGE from here.
  * - `slot = &gNodePool.activeHead; *slot = prev2;` in the `neither` branch:
  *   142 bytes, the size breaks.

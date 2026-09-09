@@ -11,7 +11,7 @@
  * The word counts are multiples of 148, i.e. every destination is an entry
  * table:  555=15 entries, 148=4, 37=1, 740=20, 37=1, 148=4, 185=5, 185=5,
  * 37=1.  The first is gEntriesA (0x02023A00, 15 entries x 148 = 2220 bytes) --
- * so this function is the bulk initialiser of the gEntriesA family.
+ * so this function is the bulk initializer of the gEntriesA family.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/world/entries_b2.c
@@ -31,7 +31,7 @@
 #define WORDS_D        740      /* 20 entries */
 #define WORDS_E        185      /*  5 entries */
 
-/* These addresses have NO entry in data/ram_map.csv; since I am not authorised
+/* These addresses have NO entry in data/ram_map.csv; since I am not authorized
  * to add any, they are written as constant casts (each address is used on its
  * own, so there is no base + offset folding -- rule 1's rationale does not
  * apply here).  The ones that do have entries are shown in comments. */

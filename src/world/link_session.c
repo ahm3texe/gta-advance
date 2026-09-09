@@ -74,12 +74,11 @@ void WaitLinkSettle(void)
     s32 frames;
     s32 again;
 
-    /* Loop form was read from the ROM (rule 49). for (;;) with if (!again)
- * break puts the control block first and the wait block last, and hoists
- * gRam02036328 out of the loop. The ROM reverses that order and loads the
- * address inside the block. Setting the flag BEFORE while (again) gives
- * the correct rotation.
- */
+    /* The loop form was read from the ROM (rule 49). for (;;) with
+       if (!again) break puts the control block first and the wait block last,
+       and hoists gRam02036328 out of the loop. The ROM reverses that order
+       and loads the address inside the block. Setting the flag BEFORE
+       while (again) gives the correct rotation. */
     frames = 0;
     again = 1;
     while (again != 0) {

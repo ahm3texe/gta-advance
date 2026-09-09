@@ -5,7 +5,7 @@
 
 /* Serial link (SIO) state block pointed to by gRam02036338.
  *
- * Shared users access different parts of this block:
+ * Different users of this symbol access different parts of this block:
  *   src/world/comm_flag.c      byte0 and ready06
  *   src/world/link_hw_reset.c  ready06
  *   src/world/link_init.c      setup fields at +0x14..+0x2C and buffers

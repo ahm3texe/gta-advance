@@ -1,4 +1,4 @@
-/* Actor behaviour steps — 0x08017E3C-0x08018B73, 12 functions
+/* Actor behavior steps — 0x08017E3C-0x08018B73, 12 functions
  *
  * 12 COPIES OF A SINGLE TEMPLATE.  tools/find_twins.py flagged the band at
  * 98.5% similarity; comparing the ROM bodies instruction by instruction showed

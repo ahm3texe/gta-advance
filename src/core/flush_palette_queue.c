@@ -41,7 +41,7 @@
  *
  * This is the "one live value too many" class left open in docs/COMPILER.md.
  * The same class: step_decay.c, try_engage_target.c, unlink_to_free.c.
- * Parked until a generalisable solution is found.
+ * Parked until a generalizable solution is found.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
  * Verification:  make c-match FILE=src/core/flush_palette_queue.c

@@ -17,10 +17,11 @@
  *   b8 (aa0)   -1                     +stride    right   (p DECREASES)
  *
  * The direct mirror twin is b6. Even so I did not copy the control flow from
- * the sibling, I read it from ROM (docs/COMPILER.md rule 49 warning) -- and
- * just as well: the loop shape came out DIFFERENT from b6's, see item 5 below.
+ * the sibling, I read it from the ROM (docs/COMPILER.md rule 49 warning) --
+ * and just as well: the loop shape came out DIFFERENT from b6's, see item 5
+ * below.
  *
- * THE SIGNATURE WAS READ FROM ROM, NOT GUESSED:
+ * THE SIGNATURE WAS READ FROM THE ROM, NOT GUESSED:
  *   r0            -> dest   (pointer, not normalized)
  *   r1,r2,r3      -> there is an lsls#24/lsrs#24 pair => ALL THREE are u8
  *   [sp,#28]      -> the same normalization (0x8023ABE) => u8 (stride)
@@ -35,7 +36,7 @@
  * the wrong parameters here.
  * The return is `pop {r0}; bx r0` and r0 is dead => void (rule 35).
  *
- * ROM'S ALLOCATION (different from b6's, noted for diagnosis):
+ * THE ROM'S ALLOCATION (different from b6's, noted for diagnosis):
  *   r7 dest   r5 i   r6 src   r4 n   r8 rows   r9 stride   ip length
  * In b6 dest was r4, rows ip, length r9, stride r8. The difference does not
  * come from a choice in the source: in b6 the row advance is at the END of the
@@ -44,7 +45,7 @@
  * is no carrier, and dest stays directly in the target register. Rule 50's
  * formula gives this on its own; no intervention in the allocation was needed.
  *
- * DETAILS MEASURED FROM ROM:
+ * DETAILS MEASURED FROM THE ROM:
  *
  *  1. `p = dest + (length - 1)`: 0x8023AD0-AD4 `mov r0,ip` / `subs r0,#1` /
  *     `adds r2,r7,r0`. There is NO `muls` like in b7, because the in-row step is 1.
@@ -66,7 +67,7 @@
  *     the middle of the body. In b6's header this spelling stands as a path
  *     RULED OUT with "128 bytes (4 short)" -- there it is wrong, here it is the
  *     CORRECT shape. The sibling's rejected list does not apply to this file.
- *  6. In the copy loop ROM decrements q first and p second
+ *  6. In the copy loop the ROM decrements q first and p second
  *     (0x8023AF8 `subs r3,#1` / 0x8023AFA `subs r2,#1`). The decrement order in
  *     the source maps straight through to this; the reversed spelling left a
  *     2-byte difference in the sibling.
@@ -76,7 +77,8 @@
  *
  * ELIMINATIONS INHERITED FROM THE SIBLINGS, NOT RETRIED HERE (measured in the
  * b6/b7 headers, do not walk into the same wall):
- *  - `u16 remain`: adds lsls#16/lsrs#16 after every decrement, absent from ROM.
+ *  - `u16 remain`: adds lsls#16/lsrs#16 after every decrement, absent from
+ *    the ROM.
  *  - dropping the `(u16)` clip entirely: comes out 4 bytes short, the clip is
  *    in the source.
  *  - `int n`: the narrowing pair at 0x8023ADC disappears.
@@ -123,7 +125,7 @@ void ShiftRowsRight(u8 *dest, u8 index, u8 rows, u8 length, u8 stride,
 
         while (remain != 0) {
             *p = *q;
-            q--;      /* ROM decrements q first; the order matters (item 6) */
+            q--;      /* the ROM decrements q first; order matters (item 6) */
             p--;
             remain--;
         }

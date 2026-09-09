@@ -33,7 +33,7 @@
  *     522)
  *     In the nested form the reload moved the prologue's `mov r4,ip` copy
  *     BEYOND the height branch and reused it at the first edge; that left r7
- *     free and assigned the quad[0][0] temporary to r7, giving rise to an
+ *     free, so the quad[0][0] temporary was assigned to r7, giving rise to an
  *     extra `mov r1,r8` and making the function 1 instruction longer.
  *     With `if (quad[0][2] > from[2] + height) return 0;` the reload produces
  *     a FRESH `mov r7,ip` in the edge block; because r7 is occupied the

@@ -75,7 +75,7 @@
  *   bytes.
  *
  * THE SHARED HEADER IS RIGHT -- the evidence: the same inlined nearest() code
- * holds EXACTLY in target_follow.c (0x0804B088) and target_repeat.c
+ * matches EXACTLY in target_follow.c (0x0804B088) and target_repeat.c
  * (0x08047600).  The header was NOT CHANGED.
  *
  * RULED OUT -- header changes (all of them BROKE the other TWO matches):

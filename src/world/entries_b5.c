@@ -311,7 +311,7 @@ u32 StepEntryPhase(Entry *e)
         goto keep;
     if (e->phase == PHASE_38)
         goto keep;
-    ok = 0;                     /* rule 48: the condition is materialised in a
+    ok = 0;                     /* rule 48: the condition is materialized in a
                                    variable */
     if (e->phase == PHASE_39)
         ok = 1;

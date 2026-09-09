@@ -17,7 +17,7 @@
  * the row.)
  *
  * THE MEASUREMENT (the evidence): the file was temporarily compiled with the
- * neighbouring symbol gRam02026E80 (0x02026E80), which IS already in ram_map
+ * neighboring symbol gRam02026E80 (0x02026E80), which IS already in ram_map
  * -- the code generation is the same, only the pool word changes:
  *     make c-match  -> different: 2/104 bytes
  *     diff_function -> 49/50 instructions the same, 1 different

@@ -2,7 +2,7 @@
  *
  * Writes the id byte and the XOR of two fields into the header, clears the
  * checksum field, copies the 16-byte payload with CpuSet, then sums the
- * packet's ten half words, writes the checksum as `~total - 12` and raises the
+ * packet's ten halfwords, writes the checksum as `~total - 12` and raises the
  * "ready" flag.
  *
  * The checksum field is INCLUDED in the sum: since it is cleared beforehand,
@@ -29,7 +29,7 @@
  * WHY THERE IS NO SOURCE-SIDE LEVER (re-measured): the two pseudos are born at
  * a CSE basic-block boundary.  p27 is in L0 (before the loop) and p74 in L2
  * (after it); the loop block L1 sits between them and, because it has a back
- * edge, CSE's extended basic block path is cut there.  The constant pool load
+ * edge, CSE's extended basic block path is cut there.  The literal pool load
  * is re-emitted at every reference, and there is no source expression that
  * would let L2 use L0's value: L2's only predecessor is L1, and L1 has two
  * predecessors.  The one known lever is to hold the address in a local

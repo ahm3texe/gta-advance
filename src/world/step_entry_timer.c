@@ -12,7 +12,7 @@
  * UNSIGNED 8-bit (u8) via `lsls #24 / lsrs #24`.  Writing a wider type removes
  * those truncating instructions.
  *
- * The timer test is `lsls #16` + `cmp <= 0`, i.e. the decremented half word is
+ * The timer test is `lsls #16` + `cmp <= 0`, i.e. the decremented halfword is
  * tested SIGNED.
  *
  * Rule 35: `pop {r1}; bx r1` -> r0 carries a return value, so the signature is
@@ -21,10 +21,10 @@
  * THE TYPE WAS UNIFIED: gRam020246F0 was already defined as `Entry[20]` in
  * src/world/table_entries.c, and in that definition +0x02 (unk02) and +0x04
  * (unk04) were in the RIGHT place.  Using `&gRam020246F0[index]` instead of
- * computing `base + index*148` by hand is the correct thing; giving the same
- * symbol two types broke the TYPES-001 gate.  The missing fields (mark +0x2A,
- * state +0x2B, tableIndex +0x64, phase +0x90) were carved out of the padding
- * and table_entries.c was PRESERVED at 3/3.
+ * computing `base + index*148` by hand is the right thing to do; giving the
+ * same symbol two types broke the TYPES-001 gate.  The missing fields
+ * (mark +0x2A, state +0x2B, tableIndex +0x64, phase +0x90) were carved out of
+ * the padding and table_entries.c was PRESERVED at 3/3.
  *
  * ------------------------------------------------------------------
  * HOW THE LAST 4 BYTES CLOSED (124 -> 128, 55 off -> 0)

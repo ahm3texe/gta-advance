@@ -4,14 +4,14 @@
  * right.
  *
  * The gRam02030330 block: if +0x34 is set the +0x38 counter increments;
- * according to FUN_0805b94c on the player 1 object, gRam02030370 is either set
- * to 60 or counted down; the +0x3C/+0x3E and +0x3D/+0x3F counter pairs (the
- * high byte counts down from 128 and decrements the low one); if +0x1C is
- * positive it decreases by gFrameDelay; if +0x2C is zero and +0x10 == 1, then
- * when the +0x18 countdown finishes +0x10 = 0, FUN_0802a5b4(0,1), +0x18 = 1200,
- * and if +0x10 <= 0, FUN_0805063c; state (+0x08) 1: (GetActiveSlotValue when
- * +0x04 is zero) FUN_080501c8, 2: FUN_0805063c, 3: +0 = 0, +8 = 1, +0xC = 25,
- * +0x28 = 2, +0x30 = 0.
+ * gRam02030370 is either set to 60 or counted down according to what
+ * FUN_0805b94c reports for the player 1 object; the +0x3C/+0x3E and
+ * +0x3D/+0x3F counter pairs (the high byte counts down from 128 and decrements
+ * the low one); if +0x1C is positive it decreases by gFrameDelay; if +0x2C is
+ * zero and +0x10 == 1, then when the +0x18 countdown finishes +0x10 = 0,
+ * FUN_0802a5b4(0,1), +0x18 = 1200, and if +0x10 <= 0, FUN_0805063c; state
+ * (+0x08) 1: (GetActiveSlotValue when +0x04 is zero) FUN_080501c8,
+ * 2: FUN_0805063c, 3: +0 = 0, +8 = 1, +0xC = 25, +0x28 = 2, +0x30 = 0.
  *
  * MEASURED: the block must be written through the global's members directly,
  * NOT through a local pointer (the ROM reloads the address from the pool three

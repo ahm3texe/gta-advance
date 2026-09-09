@@ -84,11 +84,9 @@ typedef struct Entry {
 #define ROM_BASE 0x08000000
 #define ROM_SPAN 0x00FFFFFF
 
-/* 0x020230A0: the outer list's head pointer.  Since I am not authorised to
-   add a symbol
-   Since I am not authorised to ADD one, a constant cast was written; because
-   the offset is 0,
-   rule 1's folding problem does not arise here (the ROM also reads the
+/* 0x020230A0: the outer list's head pointer.  Since I am not authorized to
+   ADD a symbol under data/, a constant cast was written; because the offset
+   is 0, rule 1's folding problem does not arise here (the ROM also reads the
    address from the pool in one piece and does `ldr r6,[r0,#0]`). */
 #define gListHead020230A0 (*(Entry **)0x020230A0)
 

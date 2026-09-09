@@ -15,7 +15,7 @@
  * A shared tail at the end: if the `ready` bit in the node's +0x0B flag byte is
  * set, FUN_08052988 is called. The ROM enters this tail even when the result is
  * 0, so the `node->ready` read can happen through a null pointer; this is the
- * ORIGINAL BEHAVIOUR and the source was written accordingly (otherwise the
+ * ORIGINAL BEHAVIOR and the source was written accordingly (otherwise the
  * block layout does not match).
  *
  * FOUR MEASURED DETAILS:
@@ -24,7 +24,7 @@
  *    `while`/`for`/`do-while` form was tried: agbcc weights in-loop references
  *    by loop depth, which raises the key value's priority score (2*6/4 = 3.00)
  *    above the walking pointer's (3*12/19 = 1.90) and lets the key claim r0.
- *    The ROM wants the opposite. In the labelled form no loop note is created,
+ *    The ROM wants the opposite. In the labeled form no loop note is created,
  *    the weighting disappears and the allocation comes out as the ROM's:
  *    walker r0, key r1.
  *

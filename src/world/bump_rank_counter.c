@@ -7,7 +7,7 @@
  * All three come out of the SAME source pattern; agbcc emits different
  * instructions depending on whether the field crosses the byte boundary:
  *   bits 1-5   -> a single byte  (ldrb/strb +0x7E)
- *   bits 6-10  -> a half word    (ldrh/strh +0x7E, it crosses the boundary)
+ *   bits 6-10  -> a halfword    (ldrh/strh +0x7E, it crosses the boundary)
  *   bits 11-15 -> a single byte  (ldrb/strb +0x7F)
  * So there is no need to write the three separately; the bitfield declaration
  * is enough.

@@ -9,7 +9,7 @@
  * +0x02 as u16 values, and the pointer at +0x04 is indexed by `y * width + x`
  * to read a u16 tile value.
  *
- * Shared users include:
+ * Users of this symbol include:
  *   src/world/slot_probe.c    reads grid fields and tile data
  *   src/world/window_config.c only assigns the pointer
  * This shared definition avoids conflicting extern types for the same symbol,

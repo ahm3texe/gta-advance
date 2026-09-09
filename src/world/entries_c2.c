@@ -31,12 +31,12 @@
  *  1. THE ANGLE GOES INTO A LOCAL.  Written as
  *     `FUN_0802915c(src->angle >> 16, ...)`, agbcc swallows the shift and
  *     produces `movs r5,#14; ldrsh r0,[r3,r5]` -- i.e. it reads the upper half
- *     of the 16.16 words DIRECTLY as a signed half word; src therefore stays
+ *     of the 16.16 word DIRECTLY as a signed halfword; src therefore stays
  *     live until the call, a SECOND high register (r9) is opened up and the
  *     prologue/epilogue swell.  An `angle = src->angle;` local both produces
  *     `asrs r0,r0,#16` and kills src early: the ROM's single high register
  *     (r8 the entity, ip a temporary) comes back.
- *     THE RULE: if you do not want the narrow-read optimisation, take the
+ *     THE RULE: if you do not want the narrow-read optimization, take the
  *     value into a local.
  *
  *  2. THE DIFFERENCES BECOME SEPARATE STATEMENTS.  Written inside the call

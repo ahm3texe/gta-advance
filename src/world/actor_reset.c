@@ -1,4 +1,4 @@
-/* Re-initialises the actor: links the embedded sub-structure and clears the
+/* Re-initializes the actor: links the embedded sub-structure and clears the
  * flags.  0x08016768, 160 bytes.
  *
  * The address of the structure embedded at the actor's OWN +0x40 is written
@@ -67,9 +67,9 @@ void ResetActor(Actor *self)
 
     ent = self->entity;
     self->sub = &self->body;
-    /* The ROM materialises the result IN A VARIABLE and tests it separately
+    /* The ROM materializes the result IN A VARIABLE and tests it separately
      * (`movs r0,#0 / ... / movs r0,#1 / cmp r0,#0`); the short-circuiting
-     * the `&&` spelling produces a direct branch and loses six bytes. */
+     * `&&` spelling produces a direct branch and loses six bytes. */
     if (ent != 0) {
         s32 ok = 0;
         if (ent->kind == 4) ok = 1;

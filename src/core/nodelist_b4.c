@@ -122,7 +122,7 @@ extern void FUN_080521c4(Node *node, Entry *entry);
 /* 0x080546CC */
 Node *FindRecordNodeEnd(int id)
 {
-    const RecordTable *probe;   /* short-lived: the count read only */
+    const RecordTable *probe;   /* short-lived: the count read-only */
     const RecordTable *table;   /* long-lived: for the +0x1C array base */
     Node  *cur;
     Node  *node;

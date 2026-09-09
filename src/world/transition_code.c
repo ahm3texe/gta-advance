@@ -1,6 +1,7 @@
 /* Map an object's previous and new size classes to a transition code.
- * PARKED: tried switch and if/else forms. Latest measurement: 168/154 bytes,
- * 149/168 differing; the ROM's comparison tree is ordered differently from natural C.
+ * PARKED: tried the switch and if/else forms. Latest measurement: 168/154
+ * bytes, 149/168 differing; the ROM orders its comparison tree differently
+ * from what natural C produces.
  */
 
 #include "gba_types.h"

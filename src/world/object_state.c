@@ -1,8 +1,8 @@
 /* Object state queries — 0x08019670-0x0801970F
  *
- * Four helpers. The first multiplies a scale by 16/32/51 according to mode,
- * then shifts by 6 (51 = 3*17; agbcc emits (v<<1)+v and x+(x<<4)). The others
- * inspect bytes +10 and +167 in the sub-object at +28.
+ * Four helpers. The first multiplies a scale by 16, 32 or 51 depending on the
+ * mode, then shifts by 6 (51 = 3*17; agbcc emits (v<<1)+v and x+(x<<4)). The
+ * others inspect bytes +10 and +167 in the sub-object at +28.
  *
  * The last two have identical bodies except for the query they call.
  *

@@ -18,10 +18,10 @@
  * checks -- the first check branches forward on failure, the second branches
  * on SUCCESS and the failure path is entered by FALLING THROUGH.  Writing two
  * separate `return 0`s produced different branch distances (bne +0x32 instead
- * of the ROM's +0x0C).  The labelled form expresses the ROM's control flow
+ * of the ROM's +0x0C).  The labeled form expresses the ROM's control flow
  * directly; the same solution was used in src/world/bump_or_reset.c.
  *
- * The ROM RE-READS +0x28 AFTER the call; that is natural behaviour, since the
+ * The ROM RE-READS +0x28 AFTER the call; that is natural behavior, since the
  * call may have changed it.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

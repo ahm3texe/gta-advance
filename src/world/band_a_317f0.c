@@ -36,7 +36,7 @@
  * base and its `bl`s are encoded correctly.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/band_a.c
+ * Verification:  make c-match FILE=src/world/band_a_317f0.c
  */
 
 #include "gba_types.h"
@@ -75,7 +75,7 @@ extern u8  *FUN_0806de10(u8 *dest, const u8 *src, u32 size);
 /* 0x080317F0 -- 84 bytes -- BYTE-MATCHING
  *
  * Packs an 8-bits-per-pixel source into 4-bits-per-pixel tile rows: on each
- * round it reads eight bytes from the source and writes two half words, then
+ * round it reads eight bytes from the source and writes two halfwords, then
  * advances the source by 40 bytes (row stride 48, 48 rounds, 192 bytes to the
  * destination).
  *

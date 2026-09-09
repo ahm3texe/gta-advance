@@ -13,7 +13,7 @@
  * ring base=r7 (as in the ROM).
  *
  * A controlled measurement (tools/probe_sio_tx.py):
- *   the old direct two expressions        575/1174, 2356 bytes
+ *   the old form, two direct expressions  575/1174, 2356 bytes
  *   a helper, entry = base + index        573/1174, 2356 bytes
  *   a helper, entry = base; entry += i    669/1174, 2352 bytes  <- KEPT
  * The `static inline` helper is expanded at both call sites; there is no new
@@ -27,7 +27,7 @@
  * p1012 (L79, 6 references / 20 lifetime), the kept source has p1005 and p1032
  * (L79, 8 references / 8 lifetime each, r1). k's allocation p44 moved back from
  * r5 to r4. The hypothesis that this would match the whole body was NOT
- * CONFIRMED: the net gain is 94 instructions, and 505 instructions differences
+ * CONFIRMED: the net gain is 94 instructions, and 505 instruction differences
  * remain.
  *
  * WHAT REMAINS:
@@ -134,8 +134,8 @@
 /* The fields of the frame record. Access goes THROUGH THE BLOCK BASE: because
  * the offsets (0x180..0x19F) do not fit Thumb's strh immediate field (0..62),
  * the ROM builds the constant in a register on every access and adds it to the
- * base. Introducing an intermediate `LinkSlot *` variable makes the base
- * address be computed once and produces `strh [r,#2]` -- which is why every
+ * base. Introducing an intermediate `LinkSlot *` variable causes the base
+ * address to be computed once and produces `strh [r,#2]` -- which is why every
  * access is written as `FRAME(b)->tx.field`.
  *
  * Writing the fields as STRUCT MEMBERS is required: in gcc 2.x's alias
@@ -173,7 +173,7 @@ extern u16 gRam02000498;
 
 /* The three words in IWRAM are contiguous; the ROM derives one from another
  * with `adds #8` / `adds #4`, so THE DIFFERENCE BETWEEN THEM IS KNOWN at
- * compile time. Written as symbols that derivation does not happen, hence the
+ * compile time. Written as symbols, they lose that derivation, hence the
  * address constants. */
 #define gRam03000098 (*(u32 *)0x03000098)
 #define gRam0300009C (*(u32 *)0x0300009C)
@@ -339,7 +339,7 @@ void FUN_080657d8(u32 mode)
             gRam02036324 = status;
             if (((1 << gRam020004A4) & status) != 0
                     && RX_SLOT.magic == SLOT_MAGIC) {
-                /* Part 1: the peer's "last" window. */
+                /* Part 1: the other side's "last" window. */
                 if (RX_SLOT.index != RX_SLOT.endIndex) {
                     end = RX_SLOT.endIndex & RING_MASK;
                     if (((end - cur) & RING_MASK) <= WINDOW_HALF) {
@@ -380,7 +380,7 @@ void FUN_080657d8(u32 mode)
                     }
                 }
 
-                /* Section 2: the other side's window for this frame. */
+                /* Part 2: the other side's window for this frame. */
                 end2 = RX_SLOT.index & RING_MASK;
                 if (((end2 - cur) & RING_MASK) <= WINDOW_HALF) {
                     hi2 = (RX_SLOT.tag >> 8) & RING_MASK;

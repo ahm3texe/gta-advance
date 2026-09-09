@@ -28,7 +28,7 @@
  *    (+4..+7, +0x18, +0x19).  Both arrive as raw words, with no entry
  *    narrowing.
  *  - The bound fields are read with `ldrb` and there is no sign extension ->
- *    u8.  The angle is `ldr` + `asrs #16` -> a signed 16.16 words.
+ *    u8.  The angle is `ldr` + `asrs #16` -> a signed 16.16 word.
  *  - The output slots are sp+4 and sp+5, i.e. two ADJACENT bytes -- the same
  *    call pattern as in entries_b4.c and state_offset.c.
  *    `movs r1,#0; ldrsb r1,[r0,r1]` is the only form of an s8 read in Thumb

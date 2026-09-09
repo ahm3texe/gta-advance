@@ -1,6 +1,6 @@
 /* Notify if ready — 0x08030884-0x0803089F
  *
- * If the object is not null and its +0x18 field is non-zero, calls
+ * If the object is not null and its +0x18 field is non-zero, it calls
  * FUN_0802B2B4 with (object, 0, 1).
  *
  * Two rules at once:

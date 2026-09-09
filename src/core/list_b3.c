@@ -91,7 +91,7 @@
  *       matches the ROM exactly), but the pre-block order inverts instead
  *       (cells0 comes BEFORE the copy) -- again 8 differences.  The two
  *       outcomes exclude each other: if cells0 comes AFTER the copy, cse2
- *       canonicalises the operand to `grid` (p23) and kills p24's fourth
+ *       canonicalizes the operand to `grid` (p23) and kills p24's fourth
  *       reference.
  *     - Reading the `.x` field through `gGrid->touched[0].x`: the allocation
  *       becomes EXACTLY the ROM's (40 bytes overlapping), but the address

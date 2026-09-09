@@ -37,7 +37,7 @@
  * base and its `bl`s are encoded correctly.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Verification:  make c-match FILE=src/world/band_a.c
+ * Verification:  make c-match FILE=src/world/band_a_315f8.c
  */
 
 #include "gba_types.h"
@@ -92,7 +92,7 @@ extern u8  *FUN_0806de10(u8 *dest, const u8 *src, u32 size);
  *
  * Looks the object up in the slot array and releases the slot if it is found.
  * FUN_080309a8 (0x080309A8) returns -1 when it cannot find it; because -1
- * cannot be encoded directly in a Thumb `cmp`, the ROM materialises it with
+ * cannot be encoded directly in a Thumb `cmp`, the ROM materializes it with
  * `movs r0,#1 / negs r0,r0` -- that is an instruction set limit, not a quirk
  * of the source. */
 void FUN_080315f8(Held *held)

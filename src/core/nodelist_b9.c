@@ -10,9 +10,9 @@
  *      Both are locals; the ROM writes them at sp+0 and sp+12 and keeps the
  *      address of sp+12 in r9.
  *   2. The pending name is first searched in the SECONDARY id array of the
- *      RECORD GROUPS (gAreaBank.groups[i].idsB). On a hit the group index,
- *      otherwise ID_NONE.  The comparator FUN_0806dd18 is strcmp (the body at
- *      0x0806DD18 is the classic word-aligned strcmp).
+ *      RECORD GROUPS (gAreaBank.groups[i].idsB). A hit yields the group
+ *      index; otherwise the result is ID_NONE.  The comparator FUN_0806dd18
+ *      is strcmp (the body at 0x0806DD18 is the classic word-aligned strcmp).
  *   3. If the stack depth is nonzero and the selected group is the TOP of the
  *      stack, the stack is cleared; if it is still non-empty, the name is
  *      taken again from the stack (from the empty/special table) and the index
@@ -86,7 +86,7 @@
  *    `const AreaName *cand = &gAreaBank.names[...];` gives that order.
  *    In the SECOND loop it is the other way round: there the ROM already
  *    loads the member first, so a separate local is NOT needed -- this is
- *    measured, not memorised from sibling files.
+ *    measured, not memorized from sibling files.
  *
  * 6) THE TWO ZERO ASSIGNMENTS ARE CHAINED: `gRam02026F34 = gRam020272C8 = 0;`.
  *    The ROM loads both addresses BEFORE the stores, then stores them in
@@ -104,7 +104,7 @@
  *    (r1).  `rec = GetRecord(slot); gRam020357E0 = rec->f20;` forces the
  *    right-hand side to be evaluated first and gives the ROM's order.
  *
- * THE MIDDLE BLOCK (0x08053C06-0x08053C5A) MATCHED ON THE FIRST WRITING:
+ * THE MIDDLE BLOCK (0x08053C06-0x08053C5A) MATCHED ON THE FIRST ATTEMPT:
  *   `sel + 1 == depth` -> if we are at the top of the stack, clear it; if the
  *   stack is still non-empty, `slot = depth - 1` and the name comes from the
  *   empty table; then, if the special flag is set, the name comes from the

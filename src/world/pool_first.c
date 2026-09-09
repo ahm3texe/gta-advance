@@ -4,7 +4,7 @@
  * symbols are in src/world/pool_gets.c.
  *
  * SEPARATE FILE: adding this to pool_gets.c moved the translation unit's
- * shared literal pool and broke matching MarkAndClear's ldr [pc,#imm]
+ * shared literal pool and broke MarkAndClear's matching `ldr [pc,#imm]`
  * (34/34 -> 1/34). Keep noncontiguous address clusters in separate files.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)

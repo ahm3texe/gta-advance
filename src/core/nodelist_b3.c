@@ -30,7 +30,7 @@
  *   local is NOT NEEDED).
  * - 0x3FF, 0x1C00FFFF and 0x1C03FFFF are pool constants; 0x3FF is compared
  *   against a u16 (it does not fit an immediate). Rule 44 is NOT NEEDED:
- *   canonicalisation only happens in `<`/`<=` tests, and here it is `==`.
+ *   canonicalization only happens in `<`/`<=` tests, and here it is `==`.
  *
  * WHY THERE IS A SINGLE STRB AT +0x0B (measured)
  * ----------------------------------------------

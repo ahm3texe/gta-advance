@@ -29,7 +29,7 @@
  *     LITERALLY the same, only r5 and r6 swap places (8 bytes): `outer` falls
  *     into r6 and `src` into r5, the reverse of the ROM.  So the rule 50
  *     lever works here not directly through `outer`/`src` but through the
- *     lifetimes of two neighbouring narrow-typed pseudos; the narrow type
+ *     lifetimes of two neighboring narrow-typed pseudos; the narrow type
  *     flips the allocation order and `outer` gets allocated first and takes
  *     r5.  A mixture of u8/u32 (one narrow, the other wide) is again 8 bytes,
  *     and s32 gives 10 bytes off.
@@ -53,8 +53,8 @@
  *     `node = outer;` copy the condition is written through outer via CSE.
  *     Rule 49: there is no cold body at the end of the function.
  *
- * WRITINGS TRIED AND REJECTED
- * -----------------------
+ * SPELLINGS TRIED AND REJECTED
+ * ----------------------------
  * - `u32 w, h` (and the u8/u32 mixture, `s32`): the instruction stream is the
  *   same, r5<->r6 are reversed, 8-10 bytes off.  See (2) above.
  * - The rule 33 shape (`bits = 0x2000; bits |= flags20; flags20 = bits;`):

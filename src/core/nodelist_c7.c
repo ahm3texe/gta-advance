@@ -11,7 +11,7 @@
  * PATHS TRIED / ELIMINATED  (whoever tries something new should NOT REPEAT
  * these and should ADD their own attempts to this list rather than deleting
  * it):
- *   - None; the first writing matched exactly with the form below (196/196).
+ *   - None; the first attempt matched exactly with the form below (196/196).
  *     The choices below were made by READING THE ROM, not by guessing:
  *     * `flag = 2; flag &= node->kind;` -- rule 33. The ROM emits
  *       `movs r0,#2` / `ldrb r1` / `ands r0,r1`: the result is in THE

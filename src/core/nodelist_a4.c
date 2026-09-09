@@ -14,17 +14,17 @@
  *   - The list head is gList02035A80; both the search and the notification are
  *     passed its ADDRESS (`ldr r0,=0x02035A80`), not its value. The same
  *     pattern as b6.
- *     (NOT gNodeListHead at 0x02035A70 -- a neighbour, but a separate object.)
+ *     (NOT gNodeListHead at 0x02035A70 -- a neighbor, but a separate object.)
  *   - The return type is VOID: the exit is `pop {r4-r7}; pop {r0}; bx r0` and
  *     no path writes a value into r0 (rule 35).
  *   - The 0x100 mask is built as `movs #128 / lsls #1` and the 0x400 mask as
  *     `movs #128 / lsls #3`; neither is a pool constant.
  *   - In the else branch `str r3` writes zero twice: r3 = bits & 0x100, and the
  *     branch is only entered while r3 == 0. A plain `= 0` is enough in the
- *     source; agbcc's cse recognises the "register is zero" equality coming
+ *     source; agbcc's cse recognizes the "register is zero" equality coming
  *     from the condition and reuses r3 without emitting an extra `movs`.
  *
- * THE FIRST WRITING GAVE 208 BYTES (45 of 103 instructions differing). Two
+ * THE FIRST ATTEMPT GAVE 208 BYTES (45 of 103 instructions differing). Two
  * separate levers were found; both account for the 8 bytes:
  *
  * 1) THE +0x0B FIELD MUST BE SIGNED (s8) -- the INVERSE direction of rule 47.

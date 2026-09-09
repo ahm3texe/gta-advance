@@ -1,7 +1,7 @@
 /* Collects the incoming packets — 0x08066798-0x0806686B
  *
  * Swaps the receive buffer and tests each of the four slots.  If the sum of a
- * slot's ten half words is -13 the packet is considered sound: the 16-byte
+ * slot's ten halfwords is -13 the packet is considered sound: the 16-byte
  * payload is copied into the caller's buffer and that slot's bit is added to
  * the result mask.  The slot is cleared in every case.
  *
