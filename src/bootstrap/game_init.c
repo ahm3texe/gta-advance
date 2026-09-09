@@ -129,7 +129,7 @@ extern void FUN_08008e68(void);
 extern void FUN_08037e7c(void);
 extern void FUN_08042784(void);
 extern void ResetAnchorSmall(void);
-extern void FUN_08051300(void);
+extern void ResetRecordIndex(void);
 extern void NoOp08051960(void);
 extern void NoOp08019C04(void);
 extern void ResetMenuState(void);
@@ -293,7 +293,7 @@ void GameInit(void)
             FUN_08037e7c();
             FUN_08042784();
             ResetAnchorSmall();
-            FUN_08051300();
+            ResetRecordIndex();
             NoOp08051960();
             NoOp08019C04();
             ResetMenuState();

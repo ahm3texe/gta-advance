@@ -67,6 +67,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800BDB0,BoxesOverlap,src/world/geometry.c,72,72,yes
 0x0800BDF8,IsPointInPolygon,src/world/quad_edge_b1.c,198,198,yes
 0x0800BF18,FindQuadEdgeCrossing,src/world/quad_edge_test.c,522,522,yes
+0x0800CA78,GetShiftedEntryValue,src/core/shifted_entry_value.c,32,32,yes
 0x0800CB08,FUN_0800cb08,src/core/listhead_e2.c,348,348,no
 0x0800D450,GetNodeBoxDistance,src/core/listhead_e3.c,224,224,yes
 0x0800D530,SortListByKey,src/core/listhead_e1.c,304,304,yes
@@ -438,8 +439,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050A0C,CheckCurrentEntity,src/world/check_current_entity.c,38,38,yes
 0x08050A34,IsAnchorSmall,src/world/is_anchor_small.c,20,20,yes
 0x08051048,NoOp08051048,src/world/p1_51048.c,2,2,yes
+0x08051094,FUN_08051094,src/core/mask_bit_or_empty.c,30,30,yes
 0x08051154,FUN_08051154,src/core/band_08051154.c,348,348,yes
 0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
+0x08051300,ResetRecordIndex,src/core/reset_record_index.c,28,28,yes
 0x0805131C,FUN_0805131c,src/world/p1_5131c.c,62,62,yes
 0x0805135C,RunFrameStageOne,src/core/frame_dispatch.c,132,132,yes
 0x080513E0,RunFrameStageTwo,src/core/frame_dispatch.c,120,120,yes

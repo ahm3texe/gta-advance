@@ -32,6 +32,7 @@ start,end,binary,module,notes
 0x0800AAF4,0x0800AB30,build/world/reset_track_heading.bin,world,0x0800AAF4 ResetTrackHeading
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,zeroing the CoordBlock +0x71 byte
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Point-in-quad test; returns the index of the nearest edge.
+0x0800CA78,0x0800CA98,build/core/shifted_entry_value.bin,core,Selected entry value shifted; rule 70 puts the sentinel in a local so its pool load lands first
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front and remove
 0x0800DD50,0x0800DD84,build/world/p1_0dd50.bin,world,Phase 1: natural C matching the ROM exactly
@@ -229,8 +230,10 @@ start,end,binary,module,notes
 0x08050A0C,0x08050A34,build/world/check_current_entity.bin,world,complex function harvest
 0x08050A34,0x08050A48,build/world/is_anchor_small.bin,world,conditional constant return
 0x08051048,0x0805104C,build/world/p1_51048.bin,world,Phase 1: natural C matching the ROM exactly
+0x08051094,0x080510B4,build/core/mask_bit_or_empty.bin,core,Mask bit test; rule 33 keeps the shift on the constant instead of canonicalizing to mask>>bit
 0x08051154,0x080512B0,build/core/band_08051154.bin,core,Area/record loader: selects the record and runs the world setup chain.
 0x080512B0,0x080512BC,build/world/get_record_index.bin,world,leaf accessor
+0x08051300,0x0805131C,build/core/reset_record_index.bin,core,"Record index block reset; 3600 is built with movs/lsls, the marker comes from the pool"
 0x0805131C,0x0805135C,build/world/p1_5131c.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805135C,0x08051458,build/core/frame_dispatch.bin,core,Frame processing chains and diagnostic markers
 0x08051464,0x08051470,build/world/wrap_08051464.bin,world,forwarding wrapper
