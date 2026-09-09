@@ -238,12 +238,20 @@ start,end,binary,module,notes
 0x0803F8DC,0x0803F910,build/world/p1_3f8dc.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F910,0x0803F944,build/world/p1_3f910.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803FACC,0x0803FAE8,build/world/record_flag_test.bin,world,Flag 0x400 test on the record at +0x2C; mask built first (rule 33)
+0x08041E98,0x08041EC8,build/map/get_tile_field_c.bin,map,Bits 0x380 of the tile at a 22-bit fractional position
+0x08041ED4,0x08041EE0,build/map/clear_map_data.bin,map,Drops the map context's data pointer
+0x08041EE4,0x08041EF0,build/map/forward_field24.bin,map,Hands the +0x24 field to FUN_0803F7D4
 0x08042058,0x080420B4,build/world/map_tile_fields.bin,world,"Tile field getters (bits 7-9, kind)"
+0x080420F8,0x0804211C,build/map/map_mode.bin,map,Three map modes from the +0xD4 word
+0x0804211C,0x08042144,build/map/get_tile_field_b.bin,map,"Bits 0x70 of a tile, by whole coordinates"
+0x080423D0,0x080423F8,build/map/call_with_centred_pair.bin,map,Centres two tile coordinates into a stack triple and calls
 0x08042434,0x08042470,build/world/map_tiles.bin,world,"Map tile kind query: tile index (y<<shift)+x, kinds 1..4 with the obstacle bits clear"
 0x080424A8,0x080424EC,build/world/tile_and_map.bin,world,Tile field (2. value) + map dimensions
 0x080424EC,0x08042574,build/world/find_random_tile_of_kind.bin,world,FindRandomTileOfKind
 0x08042784,0x08042790,build/world/wrap_08042784.bin,world,small function harvest
+0x08042790,0x080427BC,build/map/init_node_pool.bin,map,Threads the 128 nodes of gRam0202F4D0 onto gList020302D0
 0x080427BC,0x080427C0,build/world/p1_427bc.bin,world,Phase 1: natural C matching the ROM exactly
+0x0804283C,0x08042864,build/map/release_first_entry.bin,map,Tears the +0x00 entry down through three routines
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,small function harvest
 0x0804AEAC,0x0804B088,build/world/band_0804aeac.bin,world,"Actor target selection; a linked candidate, or one that is near by octagonal distance."
 0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,small function harvest

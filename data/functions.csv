@@ -1058,10 +1058,10 @@ address,name,size,status,module,notes
 0x08041BB0,FUN_08041bb0,178,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08041C64,FUN_08041c64,448,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08041E24,FUN_08041e24,114,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08041E98,FUN_08041e98,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08041ED4,FUN_08041ed4,12,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08041E98,FUN_08041e98,48,matching,map,"Bits 0x380 of the tile at a 22-bit fractional position, shifted down; decompiled in src/map/get_tile_field_c.c"
+0x08041ED4,FUN_08041ed4,12,matching,map,Clears the map context's +0x00 data pointer; decompiled in src/map/clear_map_data.c
 0x08041EE0,NoOp08041EE0,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
-0x08041EE4,FUN_08041ee4,12,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08041EE4,FUN_08041ee4,12,matching,map,Hands the +0x24 field of its argument to FUN_0803F7D4; decompiled in src/map/forward_field24.c
 0x08041EF0,NoOp08041EF0,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08041EF4,NoOp08041EF4,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08041EF8,FUN_08041ef8,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -1070,12 +1070,12 @@ address,name,size,status,module,notes
 0x0804200C,FUN_0804200c,76,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08042058,GetTileFieldA,48,matching,world,Tile field getter; src/world/map_tile_fields.c size measured including the tail pool (byte-matching evidence)
 0x08042088,GetTileType,44,matching,world,Tile field getter; src/world/map_tile_fields.c size measured including the tail pool (byte-matching evidence)
-0x080420F8,FUN_080420f8,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0804211C,FUN_0804211c,40,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x080420F8,FUN_080420f8,36,matching,map,"Three map modes from the +0xD4 word of the map context: 3 when bit 0 is set, 2 when it is otherwise non-zero, 1 when it is zero. The +0xD4 read is what fixes that context's extent; decompiled in src/map/map_mode.c"
+0x0804211C,FUN_0804211c,40,matching,map,"Bits 0x70 of a tile, from two u16 coordinates already in tile units; decompiled in src/map/get_tile_field_b.c"
 0x08042144,FUN_08042144,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08042280,FUN_08042280,236,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0804236C,FUN_0804236c,100,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x080423D0,FUN_080423d0,40,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x080423D0,FUN_080423d0,40,matching,map,"Shifts two u16 tile coordinates up by 22 and adds half a tile, then hands the pair and a zero to FUN_080519BC as a stack triple; decompiled in src/map/call_with_centred_pair.c"
 0x08042434,IsTileTypeInRange,60,matching,world,Tile kind query; Ghidra counted 56 bytes; the pool word is inside the body
 0x08042470,FUN_08042470,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080424A8,GetTileFieldA2,48,matching,world,Tile and map; src/world/tile_and_map.c size measured including the tail pool (byte-matching evidence)
@@ -1085,10 +1085,10 @@ address,name,size,status,module,notes
 0x08042628,FUN_08042628,196,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080426EC,FUN_080426ec,150,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08042784,FUN_08042784,10,matching,world,byte-matching from C (small function harvest)
-0x08042790,FUN_08042790,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08042790,FUN_08042790,44,matching,map,Initialises gList020302D0 and threads the 128 28-byte nodes of gRam0202F4D0 onto it in reverse; decompiled in src/map/init_node_pool.c
 0x080427BC,NoOp080427BC,2,matching,world,ROM BL target from 0805131C; bx lr followed by alignment; independently verified gap
 0x080427C0,FUN_080427c0,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x0804283C,FUN_0804283c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0804283C,FUN_0804283c,40,matching,map,"Tears the +0x00 entry down through FUN_080428AC and FUN_08042900, then hands it to FUN_0800C804 with gRam020110C0; decompiled in src/map/release_first_entry.c"
 0x08042864,FUN_08042864,70,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080428AC,FUN_080428ac,10,matching,world,byte-matching from C (small function harvest)
 0x080428B8,FUN_080428b8,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)

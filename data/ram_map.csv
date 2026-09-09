@@ -179,8 +179,10 @@ address,size,name,source,status,notes
 0x0202F3D0,4,gRam0202F3D0,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3D8,4,gRam0202F3D8,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x0202F3DC,4,gRam0202F3DC,decomp,provisional,Referenced by a block queued for matching; role unknown
-0x0202F3E0,60,gRam0202F3E0,decomp,provisional,"Map context: +0 tile data pointer, +0x38 row stride  TRACE (session 6): the +0x0C field stepped 6 -> 0 -> 7 about 88 frames after death; the mission was cancelled at that point. Candidate mission/game state machine; NOT VERIFIED.  TRACE (session 7): it holds two arrays, +0x10..+0x24 and +0x28..+0x34; the values advance in steps of exactly 65536 (1.000 in 16.16 fixed point). It looks like a position/grid table."
+0x0202F3E0,216,gRam0202F3E0,decomp,provisional,"Map context: +0x00 tile data pointer, +0x38 row shift, +0xD4 a flag word. SIZE EVIDENCE: 0x080420F8 reads the +0xD4 word, so the size is at least 216; the next mapped symbol at 0x0202F4CC caps it at 236. It was recorded as 60 before, from the two fields known then. TRACE (session 6): the +0x0C field changes with the camera."
 0x0202F4CC,4,gRam0202F4CC,decomp,provisional,u32 state field zeroed by FUN_0805643C
+0x0202F4D0,3584,gRam0202F4D0,decomp,provisional,"An array of 128 28-byte nodes. SIZE EVIDENCE: 0x08042790 threads exactly 128 of them onto the list at 0x020302D0, advancing by 28 each time; 0x0202F4D0 + 128 * 28 = 0x020302D0, so the array ends exactly where that list header begins, which fixes both bounds."
+0x020302D0,12,gList020302D0,decomp,provisional,"List2 header (+0 head, +4 tail, +8 count), initialised by 0x08042790 and then filled with the 128 nodes of gRam0202F4D0. The 12 bytes are the List2 layout in src/core/list_ops2.c."
 0x020302E0,4,gRam020302E0,decomp,provisional,"compared at 0x08050190  TRACE: it changed ONLY during a car ride (f3815, twice). It may belong to the vehicle system."
 0x020302E4,4,gRam020302E4,decomp,provisional,u32 state field zeroed by FUN_0805643C
 0x02030304,4,gRam02030304,decomp,provisional,compared at 0x080501AC

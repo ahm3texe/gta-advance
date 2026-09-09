@@ -29,9 +29,11 @@ typedef struct MapData {
 } MapData;
 
 typedef struct MapContext {
-    MapData *data;              /* +0 */
+    MapData *data;              /* +0x00 */
     u8       pad4[0x34];
-    int      tileShift;         /* +0x38 */
+    int      tileShift;         /* +0x38, row-to-tile shift */
+    u8       pad3C[0x98];
+    u32      flags;             /* +0xD4 */
 } MapContext;
 
 extern MapContext gRam0202F3E0;
