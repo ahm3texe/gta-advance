@@ -1,7 +1,7 @@
 # Game flow (observation)
 
 Source: the user's playthrough account dated 2026-09-05 (Europe ROM).
-This information CANNOT BE DERIVED from the ROM bytes; it is used as a basis for
+This information CANNOT BE DERIVED from the ROM bytes; it serves as a basis for
 naming functions and for mapping the mode/state machine.
 
 ## Startup sequence
@@ -86,7 +86,7 @@ Analysis: `python3 tools/analyze_trace.py`
 ## Next step
 
 Once the trace script (tools/trace.lua) is working, the same flow will be played
-again and the RAM symbol changing at each step will be recorded. This document
+again and the RAM symbols that change at each step will be recorded. This document
 will then be updated to "observation + address".
 
 
@@ -151,7 +151,7 @@ close but their values are separate. Most of the time they also change on
 different frames.
 
 This shows why extending the tracer was necessary: the narrow read had
-manufactured our own conclusion.
+manufactured the conclusion for us.
 
 ### PROVEN: 16.16 fixed point
 
@@ -220,7 +220,7 @@ cutscene is also the expected behavior for a mission timer.
 | f1794 | health 4->0 **and on the same frame** `gRam02000F10+0x10` was zeroed |
 | f1795 | `gNodePool` list heads moved -- an entity was released |
 | f1798 | `gRam02011030+0x0C` cleared; an EWRAM pointer written to `gRam02030328` |
-| f1882 | `gRam0202F3E0+0x0C` stepped 6->0->7 -- mission cancelled |
+| f1882 | `gRam0202F3E0+0x0C` stepped 6->0->7 -- mission canceled |
 
 `gRam02011030` is the CoordBlock read by the `UpdateFocusPoint` (0x0800A9E4)
 function; this establishes which data that parked function operates on.

@@ -104,9 +104,9 @@ separate region.
 
 ### The work list produced by Phase 0 (awaiting application)
 
-The following were **measured but not written into the map** — each needs
-individual verification, since bulk insertion has already cost this project data
-twice:
+The following were **measured but not written into the map**. Each needs
+individual verification, because bulk insertion has already cost this project
+data twice:
 
 - 200 gap functions (61 Thumb with an agbcc prologue = low risk; 123 leaves
   without a prologue = medium risk; 16 ARM = negligible risk)
@@ -133,7 +133,8 @@ The pool (unmatched, game code):
 | 1025+ | 67 | 130,014 | 30.7% |
 
 The method is proven: adjacent leaf clusters + a **library of proven idioms**.
-In this session most of about 30 regions matched exactly on the first attempt.
+Most of the roughly 30 regions taken in this session matched exactly on the
+first attempt.
 Reused idioms: the overflow-guarded counter, the doubly linked list, the
 IME-wrapped DMA block, tile pointer arithmetic, the 148/180-byte table entry, and
 `ldmia` struct assignment.

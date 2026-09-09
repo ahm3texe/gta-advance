@@ -2,8 +2,8 @@
 
 The binding process contract is [PROJECT_SYSTEM.md](PROJECT_SYSTEM.md), current
 state is [STATUS.md](STATUS.md), and compiler behavior is [COMPILER.md](COMPILER.md).
-This document describes reverse engineering one function/block. PROJECT_SYSTEM
-prevails if the documents conflict.
+This document describes how to reverse engineer a single function or block.
+PROJECT_SYSTEM prevails if the two documents conflict.
 
 ## 1. Verification commands
 
@@ -29,9 +29,9 @@ ROM has been rebuilt from source.
 python3 tools/find_leaf_candidates.py --limit=20 --max-size=200
 ```
 
-Leaf functions (without `bl`) are the least expensive targets. However, **one C
-file produces a contiguous ROM region**, so the unit of work is a *block of
-adjacent candidates*, not just an isolated function.
+Leaf functions (those without a `bl`) are the least expensive targets. However,
+**one C file produces a contiguous ROM region**, so the unit of work is a *block
+of adjacent candidates*, not just an isolated function.
 
 Priority order:
 

@@ -50,10 +50,10 @@ check technical meaning, Markdown, links/anchors, old-name references, and the
 scope of the diff. Confirm that executable code and measurement values remain
 unchanged. Do not rebuild the game or dashboard solely for documentation changes.
 
-Generated-document text must be changed in its producer. Check that producer's
-syntax and generated output with the existing recorded data. A change to build
-behavior, executable code, data schema, or matching results is outside this
-exception and requires the implementation checks below.
+Text in a generated document must be changed in its producer. Check that
+producer's syntax, and its generated output, against the recorded data. A change
+to build behavior, executable code, data schema, or matching results is outside
+this exception and requires the implementation checks below.
 
 ### `make check` — implementation commits
 
@@ -115,11 +115,11 @@ C; a candidate without source is not assembly.
 ## 6. Evidence standards
 
 - Original C names and comments are not recovered from this ROM; do not invent unsupported names.
-- Do not present partial or behavioral equivalence as byte matching.
+- Do not present partial or behavioral equivalence as byte-matching.
 - A hybrid ROM is not a complete source build: unknown bytes are copied from `baserom.gba`.
 - Support a claim with numbers, hashes, disassembly, or a clean build.
 - Record unsuccessful approaches at the source-file header or in WORKLOG.
-- Correct stale comments and counters in the same relevant change.
+- Correct stale comments and counters as part of the same change.
 - Do not force C matching with `register ... asm(...)` or inline assembly.
 - An unresolved function must not hold up matching neighbors; isolate it in its own translation unit.
 

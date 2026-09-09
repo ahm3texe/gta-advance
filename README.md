@@ -7,7 +7,7 @@ The goal is to reconstruct readable C source that compiles to the same machine
 code as the original game. The project combines reverse engineering, documented
 compiler behavior, and byte-level verification against a locally supplied ROM.
 
-Maintained by **ahm3texe** and open to voluntary contributions.
+Maintained by **ahm3texe** and open to outside contributions.
 
 [Project status](docs/STATUS.md) · [Getting started](#getting-started) ·
 [Contributing](#contributing) · [Documentation](#documentation)
@@ -22,9 +22,10 @@ README does not become a second, outdated source of numbers.
 Public progress reporting on **decomp.dev** is planned. The repository's local
 reports remain the current way to track progress.
 
-The project was written in Turkish and has been translated to English: source
-comments, tool messages and research documents are now English throughout. The
-existing commit history is preserved and its messages are still Turkish.
+This project was originally written in Turkish and has since been translated
+into English: source comments, tool messages, and research documents are now
+English throughout. The commit history is preserved as it stands, so its
+messages remain in Turkish.
 
 ## What this project reconstructs
 
@@ -33,10 +34,10 @@ C from that machine code and uses a compatible compiler to reproduce the same
 bytes. It does not recover the developers' original C files, variable names,
 or comments.
 
-So the deliverable is behavior plus, where achievable, a byte-for-byte match —
-not the developers' original files. Symbol names and comments in this repository
-are interpretations derived from evidence, and they stay deliberately uncertain
-until the ROM justifies something more specific.
+The deliverable is therefore behavior plus, where achievable, a byte-for-byte
+match — not the developers' original files. Symbol names and comments in this
+repository are interpretations derived from evidence, and they stay deliberately
+uncertain until the ROM justifies something more specific.
 
 ## Target version
 
@@ -72,9 +73,10 @@ For the core build and verification workflow:
 - `shasum` for ROM verification, plus `unzip` if importing a ZIP archive.
 - A ROM matching the SHA-1 above.
 
-The core Python tools use the standard library. Ghidra with Java 21 and mGBA are
-additional analysis tools; they are not required to verify an existing C match.
-Node.js and npm are needed for the remaining dashboard checks described below.
+The core Python tools rely only on the standard library. Ghidra with Java 21 and
+mGBA are additional analysis tools; they are not required to verify an existing
+C match. Node.js and npm are needed for the remaining dashboard checks described
+below.
 
 ### 1. Prepare the ROM
 
@@ -102,7 +104,7 @@ This fetches and builds the agbcc revision recorded in
 `tools/agbcc/`, and checks its output against a fixed set of reference functions.
 The matching workflow uses `old_agbcc` for Thumb code and `agbcc_arm` for ARM code.
 
-The fast toolchain check compares installed binaries with the maintainer's
+The fast toolchain check compares the installed binaries against the maintainer's
 reference hashes. A build on another host can have different binary hashes even
 when its generated code matches. If this happens, run `make toolchain-corpus` and
 include both results in a setup report; a passing corpus check does not bypass
@@ -116,8 +118,8 @@ make status
 make check
 ```
 
-`make doctor` reports available build and analysis tools. It also lists optional
-analysis tools, so a missing entry does not always block the core workflow.
+`make doctor` reports the available build and analysis tools. Because it also
+lists optional ones, a missing entry does not always block the core workflow.
 
 `make check` validates the toolchain, registered matching regions, hybrid ROM
 integration, C sources, metadata consistency, function boundaries, work queue,
@@ -214,9 +216,9 @@ compiler research, tooling, documentation, and setup testing.
    comments, and commit messages.
 
 Keep ROMs, extracted assets, save files, Ghidra databases, and raw decompiler
-exports out of contributions. Existing data-update tools should be used when
-changing the function map or registering matching regions. Coordinate updates to
-shared metadata with the maintainer.
+exports out of contributions. Use the existing data-update tools when changing
+the function map or registering matching regions. Coordinate updates to shared
+metadata with the maintainer.
 
 GitHub Issues are the place for reproducible problems and proposed work; pull
 requests are the place for code and documentation changes. The current

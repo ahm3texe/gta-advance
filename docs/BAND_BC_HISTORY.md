@@ -10,9 +10,9 @@
 - The `0x0803173E` boundary error was corrected; its replacements `0x08031684`
   and `0x080316B0` -> `src/video/blit_strip_plain.c`, both BYTE-MATCHING.
 
-What follows are the agent notes from BEFORE the solution; they are kept for the
-methodological lesson: the register priorities had been measured correctly, but
-the WRONG QUESTION was being asked.
+The notes below are the agent's own, written BEFORE the solution; they are kept
+for the methodological lesson: the register priorities had been measured
+correctly, but the WRONG QUESTION was being asked.
 
 ---
 
@@ -177,8 +177,9 @@ void BlitStripClipLeft4bpp(s32 y0, s32 x0, s32 height, s32 stride,
 
 ## 0x0803173E — WRONG BOUNDARY, NOT A FUNCTION
 
-0x0803173E — WRONG BOUNDARY, NOT A FUNCTION (measured, no C written)
----------------------------------------------------------------------
+The entry recorded at 0x0803173E is a boundary error rather than a function.
+This was measured, and no C was written for it.
+
 Evidence:
 1. The first instruction at 0x0803173E is `adds r4,#1`; there is no prologue.
 2. The `b.n 0x80316CE` at 0x080317DC branches BACKWARD, to BEFORE the recorded

@@ -17,8 +17,8 @@ a task may define its own explicit attempt budget.
 A function selected for work that does not yet match.
 
 **Harvest / matching pass**
-A round of selecting and attempting candidates in sequence. A harvest session
-tries several functions.
+A round in which candidates are selected and attempted in sequence. A single
+harvest session covers several functions.
 
 **Band**
 A grouping by function size. The “60–127 band” contains functions of 60 through

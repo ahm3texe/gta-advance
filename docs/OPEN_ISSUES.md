@@ -344,7 +344,7 @@ its alignment.
 form loads the constant before memory (`mov r0,#0x80 / ldrh r3,[r1] / orr`), while
 the volatile form gives the ROM's order (`ldrh r0,[r2] / mov r1,#128 / orrs`) and
 also moves `REG_IME` into r3 as the ROM does. **The previous note said "no change" —
-that judgement looked only at the byte count and was wrong.**
+that judgment looked only at the byte count and was wrong.**
 
 **Eliminated.** Interleaving the two buffer swaps → 19/152; doing `ready = 0` before
 the swaps → 39/152. Both **reach** 152 bytes, but they move the instructions away

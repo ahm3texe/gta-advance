@@ -373,7 +373,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             <div><Badge variant="outline">{activeTask.priority}</Badge><h2>{activeTask.title}</h2></div>
             <p>Acceptance criteria: {activeTask.acceptance}</p>
           </div>
-        ) : <p className="queue-empty">Activate one queue item before starting new work.</p>}
+        ) : <p className="queue-empty">Activate a queue item before starting new work.</p>}
         {nextTasks.length > 0 && (
           <div className="next-tasks">
             <span>Up next</span>
@@ -389,7 +389,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
             aria-label="Search functions"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search functions, addresses or notes…"
+            placeholder="Search functions, addresses, or notes…"
           />
         </div>
         <NativeSelect value={moduleFilter} onChange={(event) => setModuleFilter(event.target.value)} aria-label="Module filter">
@@ -533,7 +533,7 @@ export default function DecompDashboard({ data }: { data: DashboardData }) {
         </aside>
       </section>
 
-      {tooltip && <div className="map-tooltip" style={{ left: Math.min(tooltip.x + 14, window.innerWidth - 270), top: tooltip.y + 14 }}><strong>{tooltip.fn.name}</strong><span>{tooltip.fn.address} · {formatBytes(tooltip.fn.size)} · %{tooltip.fn.matchPercent.toFixed(2)}</span></div>}
+      {tooltip && <div className="map-tooltip" style={{ left: Math.min(tooltip.x + 14, window.innerWidth - 270), top: tooltip.y + 14 }}><strong>{tooltip.fn.name}</strong><span>{tooltip.fn.address} · {formatBytes(tooltip.fn.size)} · {tooltip.fn.matchPercent.toFixed(2)}%</span></div>}
       {inspectorOpen && (
         <div className="inspector-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setInspectorOpen(false); }}>
           <section className="function-inspector" role="dialog" aria-modal="true" aria-labelledby="inspector-title">

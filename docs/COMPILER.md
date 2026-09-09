@@ -265,7 +265,7 @@ gaining nothing.
 `FUN_0800cb08` dropping from 291 to 146 (348 bytes, still not matching) may be
 worth another look on its own; for the others this road is closed.
 
-## Register copies: a class that cannot be produced from source level
+## Register copies: a class that cannot be produced at the source level
 
 `ClearHudFieldA` / `ClearHudFieldB` (both 36/40, four bytes short) are the clean
 example of this class. `old_agbcc` produces the ROM's body instruction for
@@ -375,7 +375,7 @@ like this (including `FUN_08017628`). The fix: set the `TMode` register to 1,
 clear the region, and re-disassemble — `tools/ghidra/ExportDecompileBatch.java`
 does this unconditionally when a size is given. **It must be unconditional:** a
 broken function may be left over from a previous run, and "create if absent" is
-not enough. This repair made five functions totalling 8,586 bytes readable.
+not enough. This repair made five functions totaling 8,586 bytes readable.
 
 Ghidra can also mistake the `bx r0` at the end of the sequence
 `pop {r4,r5,r6}; pop {r0}; bx r0` for an "unrecoverable jump table". That is what
@@ -455,7 +455,7 @@ time:
 | the "found" body from the loop to the end | 128 B | difference 87 |
 | `return 0` to the end | difference 87 | **difference 56** |
 
-The form: a `goto` to the end instead of an early return, with the body labelled
+The form: a `goto` to the end instead of an early return, with the body labeled
 after the `return`. The project already uses this form (`target_follow.c`,
 `menu_screen.c`).
 
@@ -637,6 +637,8 @@ It compiles each function separately and compares it against the ROM at its
 address from `data/functions.csv`. The assembly equivalent of a matching function
 is then unnecessary.
 
+| # | Rule | Why |
+|---|---|---|
 | 39 | If all the registers are **one higher** than expected, there is an **extra parameter being forwarded** untouched in the source | In `SubmitPack` the ROM used `{r4,r5,r6}` + r2/r3 while ours generated `{r3,r4,r5}` + r1/r2; the entire difference was a single register shift. There was no instruction SETTING r1, so the value was an incoming parameter. Adding the second parameter to the signature and forwarding it in the call took an 8-byte difference to zero. Earlier, adding an argument to `FUN_08060db4(void)` had already brought it from 16 to 8 |
 | 40 | If the ROM keeps short-lived intermediates in **scratch registers** (r0-r3), the source must also use **block-scoped separate temporaries**; a single reused local pushes them into callee-saved | In `ClipBounds` the ROM generated `push {r4,r5,lr}` while ours generated `push {r4,r5,r6,lr}`: a single `cand` variable lived across the whole function and held r2, whereas the ROM reuses that register once `pad` dies. Putting each component into a `{ s32 cand = ...; if (...) ...; }` block produced six independent short-lived temporaries. Repeated memory reads must also be done through a narrow volatile view; otherwise the compiler caches them as a common subexpression and extends the lifetime (96 bytes vs the ROM's 100). Together they took a difference of 26 to 0. WARNING: the technique is NOT FUNCTIONAL but LOCAL — the same move worsened CleanupAreaTiles from 7 to 85 and left SetBg1Enable unchanged |
 
@@ -748,7 +750,7 @@ The non-matching set's pseudo average is high (34.4 vs 7.0), but that is
 misleading: those eight functions were deliberately chosen as the hardest
 examples.
 
-## Rule 51 — address locals look unnecessary but determine register allocation
+## Rule 67 — address locals look unnecessary but determine register allocation
 
 When the three independent `u16` globals in `ResetRuntimeGlobals` were zeroed
 directly, agbcc produced a leaf function and drifted 22 instructions from the
@@ -819,7 +821,7 @@ A single zero value is produced and **both addresses are live simultaneously**:
 Measurement — `ResetLinkSession` @ 0x08066144: an 8-byte difference with separate
 expressions, **byte-matching** with the chain.
 
-### This refutes a judgement I recorded earlier
+### This refutes a judgment I recorded earlier
 
 When `dump_alloc` showed the two address constants as separate pseudos, both in
 the local allocator and both in the same register, I parked it saying "they are
@@ -1117,9 +1119,9 @@ counts have not changed. The full-match gate is still
 When the same address is written in two different forms, agbcc generates different
 code, because **whether the address constant becomes a pseudo-register** changes:
 
-* `#define R (*(vu16 *)0x04000008)` → the address stays a MEM address, common
+- `#define R (*(vu16 *)0x04000008)` → the address stays a MEM address, common
   subexpression elimination (CSE) does not see it, and it gets its own pool entry.
-* `vu16 *p = (vu16 *)0x04000008;` → the address enters a pseudo-register; if
+- `vu16 *p = (vu16 *)0x04000008;` → the address enters a pseudo-register; if
   another nearby constant exists, CSE derives it from that one.
 
 Measurement (`0x080127A8`, SetupBg0Bg1): the function first writes `REG_DISPCNT`
@@ -1164,7 +1166,7 @@ So the base must be a **pointer variable**.
 With two channels, two separate variables are needed, and **the second must be
 assigned at its own point of use**:
 
-* if both are assigned at the top, both pool loads are gathered at the top of the
+- if both are assigned at the top, both pool loads are gathered at the top of the
   function (the ROM loads the second at its point of use),
-* if a single variable is assigned twice, agbcc derives the second as the first's
+- if a single variable is assigned twice, agbcc derives the second as the first's
   +12 (`adds r4,#12`) — the same as rule 65.

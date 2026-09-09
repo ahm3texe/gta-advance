@@ -77,7 +77,8 @@ Two points strengthen this evidence:
   That alone gives ≥ 0x138E, which rounds up to 0x1390 at 4-byte alignment. The
   two pieces of evidence confirm each other.
 
-The neighboring symbol also supports the bound not being exceeded: the next named
+The neighboring symbol also supports the claim that the bound is not exceeded:
+the next named
 symbol is `gRam02026CD0` = base + 0x14C0, so there is a 0x130-byte unnamed gap
 after 0x1390 — no overlap.
 

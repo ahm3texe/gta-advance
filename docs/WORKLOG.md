@@ -281,7 +281,7 @@ All rules are tabulated in `docs/COMPILER.md`.
 
 ### Unverified names were not adopted
 
-The assembly source had labelled three external functions `WaitForDma3`,
+The assembly source had labeled three external functions `WaitForDma3`,
 `InitSubsystem`, and `WaitForVBlank`. The disassembly does not support these:
 `FUN_08063b74` is not a DMA loop but writes constants to four hardware registers;
 `FUN_0800cae4` does not wait for VBlank but calls two functions. The Ghidra names
@@ -789,7 +789,7 @@ product factorization. These form Phase 2's test corpus.
   experiments were recorded as `COMPILER.md` rules 42–43.
 - The same natural C body for sorted insertion reproduces the ROM exactly both as
   a standalone function and when inlined into the `SortSpriteList` loop. The
-  shared body lives in `include/sprite_sort.h`. A labelled loop with separately
+  shared body lives in `include/sprite_sort.h`. A labeled loop with separately
   masked locals left a 30/98 difference; a structured `for` with direct masks
   together produced the match.
 - `include/sprite_pool.h` collects the 128 × 16-byte nodes and the three pool

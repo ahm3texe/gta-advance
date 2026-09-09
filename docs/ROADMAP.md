@@ -54,7 +54,7 @@ metric.
 **7.67%** — 428/1934 functions, 34,816/454,072 bytes. The remaining work splits
 into three bands, and their costs differ sharply:
 
-| band | functions | bytes | share of ROM | note |
+| Band | Functions | Bytes | Share of ROM | Note |
 |---|---|---|---|---|
 | < 120 bytes | 756 | 44,858 | 9.9% | mostly stubs/wrappers, cheap but small |
 | 120–560 bytes | 558 | 141,418 | 31.1% | the genuinely productive band |
@@ -96,8 +96,9 @@ documentation quality rather than the percentage, and `check_consistency` prints
 the count on every run.
 
 **5. Systematize the register-allocation class.** `dump_alloc.py --rom` now
-answers "is this an allocation problem or not" at a glance (COMPILER.md rule 50).
-Three files were tinkered with for days before that distinction was available.
+answers "is this an allocation problem or not?" at a glance (COMPILER.md
+rule 50). Three files were worked on blindly for days before that distinction
+was available.
 
 **What we will NOT do:** play the game in mGBA looking for matches. It was
 measured — every blockage is a compiler pattern, not semantics. mGBA's place is

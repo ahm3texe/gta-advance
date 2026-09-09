@@ -1,8 +1,9 @@
 # Text and language data map
 
 Structural findings. The text **itself** does not enter this repository (see
-docs/ROADMAP.md: the ROM and assets extracted from it are not shared). Recorded
-here is only where it lives, how it is organized, and how to read it.
+docs/ROADMAP.md: the ROM and the assets extracted from it are not shared). What
+is recorded here is only where the text lives, how it is organized, and how to
+read it.
 
 ## Summary
 
@@ -16,8 +17,8 @@ here is only where it lives, how it is organized, and how to read it.
 
 3090 entries, all pointing into the text body, and **exactly divisible by five:
 618 x 5**. The game's startup language screen offers FIVE options (trace log:
-`gActiveMenuItemCount` 0->5, see docs/GAME_FLOW.md), so 618 text strings x 5
-languages.
+`gActiveMenuItemCount` 0->5, see docs/GAME_FLOW.md), so the table holds 618 text
+strings x 5 languages.
 
 The slice -> language mapping is CONFIRMED (session 7): **slice k = language k**,
 directly. It was tested by reading the value at the same index across all five
@@ -55,7 +56,7 @@ as ESPAN(0xD1)OL. Menu labels are directly readable (`PRESS START` @ `0x07C6E70`
 The ROM contains 5046 candidate LZ77 blocks, but the text region is not among
 them; compression appears to be used for graphics and map data.
 
-## OPEN QUESTIONS
+## Open questions
 
 - Some strings are SHARED across languages: slice 1's index 0 points at the same
   address as slice 0's. The number of shared strings has not been counted.
@@ -68,5 +69,5 @@ them; compression appears to be used for graphics and map data.
 
 ## Reading
 
-`tools/dump_text.py` runs locally, writes its output under `build/`, and does
-NOT enter the repository.
+`tools/dump_text.py` runs locally and writes its output under `build/`; that
+output does NOT enter the repository.

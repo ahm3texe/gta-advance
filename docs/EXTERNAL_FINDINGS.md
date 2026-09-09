@@ -12,8 +12,8 @@ the legal boundary in `docs/ROADMAP.md`, the documents, page images, and lengthy
 quotations do **not** enter the repository. Every item here is an inference
 written in our own words.
 
-No banking, signature, or personal information from the documents was carried
-anywhere.
+No banking details, signatures, or personal information from the documents has
+been reproduced anywhere.
 
 ## VERIFIED against the ROM
 
@@ -25,11 +25,11 @@ The serial register constants were found in the literal pools: `SIOCNT`
 (0x04000128) in six places, `SIODATA32` (0x04000120) and `RCNT` (0x04000134) in
 one each. The functions carrying them: FUN_080657d8 (2374 B), SerialIrqHandler,
 StepLinkFrame, InitLinkBlock, ServiceLinkFrame, ResetLinkHardware. About 3.4 KB
-in total, none of it written.
+in total, and none of it has been written yet.
 
 **Input polling lives in two functions.** `KEYINPUT` (0x04000130) appears seven
 times in the literal pools; its owners are PollInput (228 B) and WaitForPartner
-(320 B). Both are unwritten.
+(320 B). Neither has been written yet.
 
 ## INFERENCE — the codebase comes from two teams
 

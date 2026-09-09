@@ -16,7 +16,7 @@ There is a library signature block around `0x00BD3450`:
 0x0BD3810  _sbrk: Heap and stack collision
 ```
 
-The last three strings are **present verbatim in `tools/agbcc/lib/libc.a`.** So
+The last three strings are **present verbatim** in `tools/agbcc/lib/libc.a`. So
 the ROM's code tail is standard library code that requires no reverse
 engineering, and we already have its source.
 
@@ -79,8 +79,9 @@ body occurs **exactly twice** in the ROM, 32 bytes apart — the same layout as 
 laid out in that order, so `_exit = 0x08071B9C` and `_kill = 0x08071BBC` are
 certain.
 
-This shows that an ambiguity byte comparison alone cannot settle can be resolved
-by a *layout argument*: a usable method for symbol pairs with identical bodies.
+This shows that an ambiguity that byte comparison alone cannot settle can still
+be resolved by a *layout argument* — a usable method for symbol pairs with
+identical bodies.
 
 ### Masked search
 
@@ -100,7 +101,7 @@ one sits at a given address. These are recorded as `discovered` rather than
 `documented`, with the alternative name written into the note.
 
 `isinf` and `isnan` are absent from Ghidra's function map entirely — so this
-method does not only supply names, it **also discovers missed functions.**
+method does not only supply names; it **also discovers missed functions**.
 
 ### Object-level placement was attempted — it does not work
 
@@ -242,7 +243,8 @@ the retail game was made by Digital Eclipse and its game content is entirely
 different.
 
 Even so, because of the lineage above, the engine code may be shared. Whether the
-prototype carries a symbol table is unknown — it is dumped on Hidden Palace. If
+prototype carries a symbol table is unknown — a dump of it is available on
+Hidden Palace. If
 it is examined, the priority order is: does it have a symbol/debug section, are
 the `CRAWSAVE` signature and vehicle physics menu the same, and are there shared
 function bodies.
