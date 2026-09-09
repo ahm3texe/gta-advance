@@ -30,7 +30,7 @@
 
 #define FRAME_DELAY_MAX 5
 
-/* gVBlankState degerleri */
+/* gVBlankState values */
 #define VBLANK_IDLE  0   /* a transfer will be attempted next VBlank */
 #define VBLANK_BUSY  1   /* the transfer was done this frame         */
 #define VBLANK_READY 2   /* the window was missed; transfer directly next frame */

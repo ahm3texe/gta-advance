@@ -1,18 +1,15 @@
-/* Ikiz sarmalayici — 0x08063E38-0x08063E57
+/* Twin wrappers — 0x08063E38-0x08063E57
  *
- * Iki fonksiyon da ikinci parametresini u16'ya kirpip FUN_080638a0'a
- * ILK arguman olarak geciyor; fark yalnizca ikinci argumanda:
- * 0x08063E38 sifir, 0x08063E48 bir geciyor.
+ * Both truncate parameter two to u16 and pass it as the FIRST argument to
+ * FUN_080638a0. Only the second argument differs: 0 at 0x08063E38, 1 at
+ * 0x08063E48. Parameter one (r0) is UNUSED; the ROM never reads it.
  *
- * Ilk parametre (r0) KULLANILMIYOR; ROM onu hic okumuyor.
+ * RETURN: the ROM uses pop {r1}; bx r1, not pop {r0}; bx r0, preserving r0.
+ * These wrappers forward the callee's result and are not void (the converse
+ * of rule 35: return through another register leaves the value in r0).
  *
- * DONUS: ROM `pop {r1}; bx r1` yapiyor, `pop {r0}; bx r0` DEGIL.  Yani r0
- * korunuyor -> bu sarmalayicilar cagirdiklari fonksiyonun donus degerini
- * GECIRIYOR, void degiller.  (Kural 35'in tersi: r0 disinda bir yazmacla
- * donuluyorsa deger donuyor demektir.)
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/queue_glyph_wrappers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/queue_glyph_wrappers.c
  */
 
 #include "gba_types.h"

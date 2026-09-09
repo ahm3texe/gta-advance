@@ -161,7 +161,7 @@ void UpdateFocusPoint(void)
     return;
 
 midpoint:
-    /* Orta nokta dali: +0x04 KOPYADAN okunuyor (ROM: ldr r0,[r0,#4]).
+    /* The midpoint branch reads +0x04 FROM THE COPY (ROM: ldr r0,[r0,#4]).
        Rule 49 -- the ROM keeps this rare body at the END of the function. */
     mout = &gFocusPoint;
     mfirst = (Target *)probe->unk04;

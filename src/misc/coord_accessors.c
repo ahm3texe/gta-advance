@@ -1,6 +1,6 @@
 /* Coordinate accessors — 0x0800A94C-0x0800A97F
  *
- * Four small leaf functions that read and write the +12/+16 word pair of the
+ * Four small leaf functions that read and write the +12/+16 words pair of the
  * block at 0x02011030. The pair is always processed in reverse order: the
  * first parameter corresponds to +16 and the second to +12.
  *

@@ -1,90 +1,72 @@
-/* Glifi iki komsu tile'a karistirarak yazma — 0x08063ED8-0x0806401D
+/* Blend a glyph across adjacent tiles — 0x08063ED8-0x0806401D
  *
- * 8bpp metin katmanina bir glif basiyor. Glif 8 piksel genis, hedef ise
- * 8x8'lik tile'lara bolunmus; piksel ofseti (subX) sifir degilse glif IKI
- * tile'a tasar. Fonksiyon bu yuzden ayni ic dongunun iki kopyasini
- * calistiriyor: once icinde bulunulan tile'in kalan sutunlari
- * (firstPairs), sonra bir sonraki tile'in bas sutunlari (secondPairs).
- * Ikisinin toplami her zaman 4 piksel CIFTI = 8 piksel.
+ * Draw an eight-pixel-wide glyph into an 8bpp text layer of 8x8 tiles. Nonzero
+ * subX makes it span TWO tiles. Two copies of the inner loop handle remaining
+ * columns of the current tile (firstPairs), then leading columns of the next
+ * (secondPairs). Their sum is always four pixel PAIRS = eight pixels.
  *
- * Cagiran PlaceGlyph: r0 = hedef tile, r1 = subX (x & 7, cift),
- * r2 = glif verisi, r3 = tile sutunu (x >> 3). Sutun araligi [-1, 29];
- * 30 sutun x 8 piksel = 240 piksel ekran genisligi. col == -1, glifin
- * yalnizca SAG yarisinin ekranda oldugu durum: ilk dongu tamamen atlanir,
- * src yine de o kadar ilerletilir. Ikinci tile col+1'de oldugu icin ikinci
- * sinir denetimi nextCol uzerinden yapiliyor.
+ * PlaceGlyph passes r0 = destination tile, r1 = subX (x & 7, even),
+ * r2 = glyph data, r3 = tile column (x >> 3). Columns range from -1 to 29;
+ * 30*8 = 240 screen pixels. At col == -1 only the RIGHT part is visible: skip
+ * the first loop but advance src by the same amount. Test nextCol for the
+ * second tile, since it lies at col+1.
  *
- * Piksel karistirma: hedef yarim-kelime iki 8bpp pikseli tasir (dusuk bayt
- * = sol piksel). Glif baytinin sifir olmasi SAYDAM demek; o pikselde ekranda
- * duran deger korunuyor. Sifir degilse gFontIndex (secili yazi tipinin
- * karo/palet taban indeksi) ekleniyor ve 16 bite kirpiliyor.
+ * Each destination halfword holds two 8bpp pixels, with the left in its low
+ * byte. A zero glyph byte is TRANSPARENT and preserves the existing pixel.
+ * Otherwise add gFontIndex (the selected font's tile/palette base index) and
+ * truncate to 16 bits.
  *
- * ---- OLCULEN BICIM KURALLARI (her biri tek basina fark kapatti) ----
+ * MEASURED SOURCE-FORM RULES (each independently closed differences):
+ * 1. POINTER WALK: advance destination/source by 8 bytes per row (four
+ *    destination halfwords). After eight rows, subtract 62 bytes from both,
+ *    giving net +2 bytes, one pixel pair. Separate d/s locals and dest++
+ *    reload the base; the ROM walks one pointer and subtracts the difference.
+ * 2. SEPARATE nextCol: col++ creates one pseudo spanning the function and
+ *    adds mov ip,r3 at entry. The ROM leaves the parameter in r3 and assigns
+ *    the separate col+1 pseudo to sl (rule 27).
+ * 3. SEPARATE LOOP COUNTERS: sharing n1/n2 extends lifetime across both loops,
+ *    lowers priority and spills the counter.
+ * 4. DECREMENT IN THE TEST (while (--n1 != 0)), not at the body start. A body
+ *    n1-- adds a depth-0 reference: refs 8 -> floor_log2 3 -> priority 0.48,
+ *    above row's 0.412. The counter takes a low register and reload spills
+ *    it. Decrementing in the test puts it in ip and row in r7: 193 -> 93
+ *    differing bytes from this change alone.
+ * 5. SEPARATE SECOND COUNTER (n2 = secondPairs): counting with secondPairs
+ *    adds depth-1 references, raising it above nextCol. It then takes ip and
+ *    nextCol spills, opposite to the ROM. Separate n2 leaves secondPairs with
+ *    three references and on the stack, while nextCol takes sl: 93 -> 48.
+ * 6. SOURCE ORDER: n1 = firstPairs BEFORE nextCol = col + 1 (rule 19).
+ *    Reversed order gives 89 differing bytes; correct order gives 48.
+ * 7. IN-PLACE MASK: cur &= 0xFF, without a separate lo. The ROM's ands r3,r0
+ *    leaves the result in cur's register; a separate local pushes hi into r3
+ *    instead of r6 (rule 33 here).
+ * 8. WRITE BACK TO THE SOURCE-BYTE LOCAL (srcLo = ...), not pixLo/pixHi: the
+ *    ROM shares the result register with srcLo/srcHi. 42 -> 4 differing bytes.
+ * 9. srcLo/srcHi are u16 with IMPLICIT truncation. Explicit
+ *    (u16)(srcLo + gFontIndex) reverses addition operands (adds r0,r0,r2
+ *    instead of ROM adds r0,r2,r0). This accounts for the last four bytes.
+ *    & 0xFFFF disrupts the whole result (243/334).
  *
- * 1. ISARETCI YURUYUSU. Ic dongu hedefi satir basina 8 bayt (4 yarim-
- *    kelime), kaynagi 8 bayt ilerletiyor; sekiz satir sonunda ikisi de 62
- *    bayt geri aliniyor, net +2 bayt (bir piksel cifti). Ayri d/s yerelleri
- *    acip `dest++` yazmak agbcc'ye tabani yeniden yukletiyor; ROM tek
- *    yuruyen isaretci kullanip farki cikariyor.
+ * REJECTED: while (n-- != 0) (two pseudos, counter spills); for (row=0; row<8;
+ * row++) (signed countdown, bge instead of bne); reversing lo/hi calculation
+ * order (single-byte ldrb reads, 322 bytes); defining n1 before if/else
+ * (330/208); caching gFontIndex in a local (338/246); guarding with firstPairs
+ * (no effect, agbcc merges it).
  *
- * 2. AYRI nextCol DEGISKENI. `col++` yazmak col'u fonksiyon basindan
- *    sonuna tek pseudo yapiyor ve girise `mov ip, r3` ekletiyor. ROM'da
- *    parametre r3'te kaliyor, col+1 AYRI bir pseudo olarak sl'ye gidiyor
- *    (kural 27).
- *
- * 3. DONGU SAYACLARI AYRI DEGISKEN. n1/n2 ortak yerel olunca omur iki
- *    dongunun toplami kadar uzuyor, oncelik dusuyor, sayac yigina tasiyor.
- *
- * 4. AZALTMA DONGU TESTINDE (`while (--n1 != 0)`), govdenin basinda degil.
- *    Govde basindaki `n1--` sayaca fazladan bir depth-0 referansi katiyor:
- *    refs 8 -> floor_log2 3 -> oncelik 0.48, row sayacinin 0.412'sinin
- *    ustune cikiyor; sayac dusuk register kapiyor ve reload onu yigina
- *    atiyor. Test icinde azaltinca sayac ip'ye, row r7'ye oturuyor.
- *    TEK BASINA 193 -> 93 bayt fark.
- *
- * 5. IKINCI SAYAC AYRI (n2 = secondPairs). secondPairs'i dogrudan sayac
- *    yapmak ona depth-1 referanslari katip onceligini nextCol'un ustune
- *    cikariyor; o zaman secondPairs ip'yi, nextCol yigini aliyor -- ROM'un
- *    tersi. Ayri n2 ile secondPairs 3 referansa dusup yigina, nextCol
- *    sl'ye gidiyor. 93 -> 48.
- *
- * 6. KAYNAK SIRASI: `n1 = firstPairs;` ONCE, `nextCol = col + 1;` SONRA
- *    (kural 19). Ters sira 89, dogru sira 48 bayt fark.
- *
- * 7. MASKE YERINDE: `cur &= 0xFF`, ayri bir `lo` yereline degil. ROM
- *    `ands r3, r0` ile sonucu cur'un register'inda birakiyor; ayri yerel
- *    hi'yi r6 yerine r3'e itiyor (kural 33'un bu fonksiyondaki hali).
- *
- * 8. SONUC KAYNAK BAYTINA GERI YAZILIYOR (`srcLo = ...`), ayri pixLo/pixHi
- *    yereline degil: ROM'da sonuc srcLo/srcHi ile ayni register'i
- *    paylasiyor. 42 -> 4 bayt.
- *
- * 9. srcLo/srcHi TIPI u16, kirpma ORTULU. Acik `(u16)(srcLo + gFontIndex)`
- *    cast'i toplamanin operand sirasini ceviriyor (`adds r0,r0,r2` yerine
- *    ROM `adds r0,r2,r0`). Son 4 bayt bu satirdaydi. `& 0xFFFF` bicimi ise
- *    tumden bozuyor (243/334).
- *
- * ELENEN YOLLAR: `while (n-- != 0)` (iki pseudo, sayac yigina tasiyor);
- * `for (row = 0; row < 8; row++)` (isaretli geri sayim, `bge` uretiyor,
- * ROM `bne`); lo/hi hesap sirasini cevirmek (agbcc `ldrb` ile tek bayt
- * okumaya doner, 322 bayt); n1'i if/else oncesinde tanimlamak (330/208);
- * gFontIndex'i ayri yerele almak (338/246); guard'i firstPairs uzerinden
- * kurmak (etkisiz, agbcc birlestiriyor).
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/text_f1.c   -> BYTE-MATCHING 326/326
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/text_f1.c   -> BYTE-MATCHING 326/326
  */
 
 #include "gba_types.h"
 
-#define LAST_TILE_COL   29   /* 240 piksel = 30 tile sutunu */
-#define GLYPH_ROWS       8   /* tile yuksekligi */
-#define DEST_ROW_STEP    4   /* 8bpp tile satiri = 8 bayt = 4 yarim-kelime */
-#define SRC_ROW_SKIP     6   /* satir 8 bayt; ikisi zaten okundu */
-#define DEST_ROW_BACK   31   /* 8*4 - 1: sekiz satir sonrasi net +1 yarim-kelime */
-#define SRC_ROW_BACK    62   /* 8*8 - 2: sekiz satir sonrasi net +2 bayt */
-#define NEXT_TILE       32   /* 64 bayt = bir 8bpp tile (yarim-kelime cinsinden) */
-#define TAIL_TO_TILE    28   /* ilk dongu bittiginde sonraki tile'a kalan */
+#define LAST_TILE_COL   29   /* 240 pixels = 30 tile columns */
+#define GLYPH_ROWS       8   /* tile height */
+#define DEST_ROW_STEP    4   /* 8bpp tile row = 8 bytes = 4 halfwords */
+#define SRC_ROW_SKIP     6   /* 8-byte row; two bytes already read */
+#define DEST_ROW_BACK   31   /* 8*4 - 1: net +1 halfword after eight rows */
+#define SRC_ROW_BACK    62   /* 8*8 - 2: net +2 bytes after eight rows */
+#define NEXT_TILE       32   /* 64 bytes = one 8bpp tile, in halfwords */
+#define TAIL_TO_TILE    28   /* distance to the next tile after the first loop */
 
 extern u32 gFontIndex;
 
@@ -109,7 +91,7 @@ void BlendGlyphAcrossTiles(u16 *dest, s32 subX, const u8 *src, s32 col)
     if (col <= -2)
         return;
 
-    /* Sabit 8 iki kez kullaniliyor; ROM da onu tek register'da tutuyor. */
+    /* Constant 8 is used twice; the ROM keeps it in a single register too. */
     rem = 8 - subX;
     if (rem <= 7) {
         firstPairs = rem >> 1;
@@ -120,7 +102,7 @@ void BlendGlyphAcrossTiles(u16 *dest, s32 subX, const u8 *src, s32 col)
     }
 
     if (col < 0) {
-        /* Sol tile ekran disinda: yalnizca isaretcileri ilerlet. */
+        /* Left tile is off-screen: only advance the pointers. */
         dest += NEXT_TILE;
         src += firstPairs * 2;
         nextCol = col + 1;

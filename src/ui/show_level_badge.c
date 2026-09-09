@@ -1,28 +1,26 @@
-/* Bolum rozetini gosterme — 0x080306C8-0x08030847 (384 bayt)
+/* Show a level badge — 0x080306C8-0x08030847 (384 bytes)
  *
- * DURUM: 146/181 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 146/181 instructions, NEAR MISS; size matches.
+ * Exit if gFrameCounterEwram is zero. Draw its two digits with DrawTwoDigits'
+ * tile scheme at 0x0600981A/0x0600985A, replacing a leading zero with empty
+ * tile. Select descriptor gRom08BD3448.slots[34]->slots[49]->slots
+ * [language*6+index] using GetLanguage. Exit if gRam02025810[0x137E] already
+ * equals index+1. If its old tag is nonzero, clear two three-tile rows and
+ * ReleaseObject(gRam02026E80). Write the new tag, initialize attributes
+ * (75-w/2,8-h/2,+0x26=0), call FUN_08013cfc with 0 and 1, then
+ * FUN_08014ee4 and FUN_08015038.
  *
- * gFrameCounterEwram sifirsa cikar. Degerin iki basamagini DrawTwoDigits
- * sozlugu ile 0x0600981A/0x0600985A'ya yazar (onde gelen sifir bos karo).
- * Dil (GetLanguage) ve indisle gRom08BD3448.slots[34]->slots[49]->slots
- * [dil*6+indis] tanimini secer. gRam02025810[0x137E] etiketi (indis+1)
- * zaten ayniysa cikar; sifir degilse iki 3'luk karo satirini temizleyip
- * gRam02026E80'i ReleaseObject ile birakir. Sonra etiketi yazar,
- * oznitelik blogunu (75 - w/2, 8 - h/2, +0x26 = 0) kurup FUN_08013cfc'yi
- * 0 ve 1 ile cagirir, FUN_08014ee4 + FUN_08015038 ile bitirir.
+ * The remaining 35 instructions differ only in register roles, not logic/count:
+ * - top/bot ROM r3/r2 vs ours r2/r3. Tried bot-first assignment, declaration
+ *   order, and pointer instead of digits[i] (146 -> 142).
+ * - Clear-loop k/blank/top/bot are cyclically shifted (ROM k=r2, blank
+ *   r7->r3, bot=r1, top=r0). Tried k first, do-while, for, bot++ first (144-146).
+ * - Tag r9 and size-byte r7 roles.
+ * Rule-44 class. Before another attempt, inspect InitSessionAttr's cast/array
+ * difference and DrawTwoDigits' base local.
  *
- * KALAN 35 KOMUT, HEPSI YAZMAC ROLU (mantik/komut sayisi ayni):
- *   - top/bot r3/r2 (bende r2/r3); bot-once atama, bildirim sirasi,
- *     `digits[i]` yerine isaretci (146 -> 142) denendi.
- *   - temizleme dongusunde k/blank/top/bot rolleri dongusel kaymis
- *     (ROM k=r2, blank r7->r3, bot r1, top r0); k'yi once, do-while,
- *     for, bot++ once yazimlari denendi (144-146).
- *   - etiket (r9) ve boyut baytlari (r7) rolleri.
- * Kural 44 sinifi. Yeni deneyen once InitSessionAttr'daki cast/dizi
- * farkina ve DrawTwoDigits'in `base` yereline baksin.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/show_level_badge.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/show_level_badge.c
  */
 
 #include "gba_types.h"

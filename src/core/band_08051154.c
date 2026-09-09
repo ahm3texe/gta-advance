@@ -43,7 +43,7 @@ typedef struct SpawnPoint {
     u16 flags;                  /* +0x08 */
     u16 unk0A;
     u32 unk0C;
-} SpawnPoint;                   /* 16 byte */
+} SpawnPoint;                   /* 16 bytes */
 
 typedef struct SpawnList {
     u16 count;                  /* +0x00 */
@@ -66,7 +66,7 @@ typedef struct Record {
     u32 unk30;
     u32 unk34;
     u32 unk38;
-} Record;                       /* 60 byte */
+} Record;                       /* 60 bytes */
 
 typedef struct RecordBlock {
     u32 index;                  /* +0x00 */

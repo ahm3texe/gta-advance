@@ -1,10 +1,10 @@
-/* Menu ekrani baslatma — 0x080013AC-0x08001457
+/* Initialize the menu screen — 0x080013AC-0x08001457
  *
- * Blend register'larini ayarlar, palette verisini ve VRAM temizligini DMA3
- * ile yapar, menuyle iliskili alt sistemleri baslatir.
+ * Set blend registers, DMA3-load palette data and clear VRAM, then initialize
+ * the menu's subsystems.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/init_menu_screen.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/init_menu_screen.c
  */
 
 #include "gba_io.h"
@@ -39,8 +39,9 @@ void InitMenuScreen(void)
     volatile u16 fill;
     u16 ime;
     u8 *entry;
-    /* Basta yerel degiskene alinir: ROM bu adresi cagrilar boyunca r5'te
-     * tutuyor. Kullanildigi yerde okunursa derleyici hoist etmiyor. */
+    /* Capture this address in a local at entry: the ROM keeps it in r5
+ * across calls. Reading it at its use site does not make agbcc hoist it.
+ */
     const u8 *palette = gMenuPaletteSource;
 
     FUN_08063cf0();

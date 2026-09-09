@@ -21,11 +21,11 @@
 
 #include "gba_types.h"
 
-#define LANGUAGE_MAX     4       /* bes dil: 0..4 */
+#define LANGUAGE_MAX     4       /* five languages: 0..4 */
 #define STRINGS_PER_LANG (0x9A8 / 4)   /* 618 */
 
 extern u32 gLanguage;
-extern u32 gTextTable[][STRINGS_PER_LANG];   /* 0x08EC46D4, salt okunur */
+extern u32 gTextTable[][STRINGS_PER_LANG];   /* 0x08EC46D4, read-only */
 
 /* 0x0805E6C4 */
 void SetLanguage(u32 index)

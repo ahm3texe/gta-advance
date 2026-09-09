@@ -1,10 +1,10 @@
-/* Menu grafikleri — 0x08001E30-0x08001F03
+/* Menu graphics — 0x08001E30-0x08001F03
  *
- * Menu grafik kaynagini VRAM'e acar, iki palette araligini DMA3 ile yukler,
- * VRAM'i doldurur ve DISPCNT ayarini uygular.
+ * Expand menu graphics into VRAM, DMA3-load two palette ranges, fill VRAM
+ * and apply DISPCNT settings.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/menu_graphics.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/menu_graphics.c
  */
 
 #include "gba_io.h"
@@ -23,8 +23,10 @@
 #define VRAM_FILL_VALUE  0x9090
 #define MENU_DISPCNT     0x0101
 
-/* 0x0806430C — assembly kaynagi LoadGraphicsResource diye etiketlemisti;
- * govde henuz incelenmedi, dogrulanana kadar Ghidra adi kullaniliyor. */
+/* 0x0806430C — the assembly source called this LoadGraphicsResource.
+ * At the time of this note its body was unreviewed, so the Ghidra name
+ * was retained pending verification.
+ */
 extern void SetTextContext(void *dest, u32 tileCount,
                          const void *tilesA, const void *tilesB,
                          u32 width, u32 flags);

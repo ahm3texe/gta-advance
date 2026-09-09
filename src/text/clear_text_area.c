@@ -1,214 +1,160 @@
-/* Metin alani temizleme -- 0x08064590-0x08064613
+/* Clear a text area — 0x08064590-0x08064613
  *
- * Verilen hucreden baslayarak metin katmanini DMA3 ile sifirlar. Ikinci
- * blok yalnizca gHalfLineSpacing sifirken calisir (tam satir yuksekligi).
+ * DMA3 clears the text layer starting at the supplied cell. The second block
+ * runs only when gHalfLineSpacing is zero (full line height).
  *
- * HENUZ ESLESMIYOR: 66 komutun 65'i birebir tutuyor, TEK BAYT fark var
- * (0x080645F2). Fark, DMA kontrol yazmacindan yapilan OLU OKUMANIN hedef
- * register'i:
- *     ROM  : ldr r0, [r4, #8]
- *     bizim: ldr r3, [r4, #8]
- * Deger atiliyor, yani semantik fark yok -- saf register dagitimi.
- * NEDENI OLCULDU (docs/COMPILER.md, register dagitimi): iki okuma da ciplak
- * birakilinca control r4'e, dma r3'e dusuyor -- ROM'un tersi, 13 bayt. Ciplak
- * okuma dogru hedefi (r0) veriyor ama control'un 6. referansini goturuyor ve
- * dagitim siralamasi ters donuyor. Ikisi ayni anda saglanamiyor.
+ * NOT YET MATCHING: 65 of 66 instructions match, with ONE BYTE different at
+ * 0x080645F2: the destination register of an unused DMA-control read.
+ *   ROM: ldr r0,[r4,#8]   ours: ldr r3,[r4,#8]
+ * The value is discarded; the difference is allocation, not semantics.
+ * MEASURED CAUSE (COMPILER.md, register allocation): leaving both reads bare
+ * puts control in r4 and dma in r3, opposite to the ROM (13 bytes). A bare
+ * read gets r0 but removes control's sixth reference and reverses allocation
+ * order. Both requirements could not be met together.
  *
- * Denenenler (hepsi daha kotu): ayri discard degiskeni 13, ciplak deyim 13,
- * ikisini de control'a atamak 24, olu okumayi row'a 13 / col'a 20 /
- * dest'e 13 / fill'e 57 / ime'ye 56, ilk bloktaki okumayi degistirmek 63-103.
- * Yedi yerel degiskenin 5040 bildirim permutasyonu tarandi: hicbiri 1'in
- * altina inmedi. Ek olarak elenenler:
- *   - height'i control olarak yeniden kullanmak (ROM'daki `add r3,r2,#0`
- *     ipucundan): 15
- *   - dma tanimini one almak, dagitici omrunu uzatip onceligini dusursun diye:
- *     tanim noktasina gore 13 / 17 / 56 / 64 -- sabit yuklemesi yazildigi
- *     yerde maddelestigi icin komut sirasi kayiyor, kazanc yok
- *   - DMA kurulumunu iki kez cagrilan inline yardimciya almak: 55-59
- * Bu bicim olculmus yerel optimum.
+ * Rejected attempts, all worse: separate discard 13; bare expression 13;
+ * assign both reads to control 24; assign the dead read to row 13, col 20,
+ * dest 13, fill 57, ime 56; alter the first block's read 63-103. All 5040
+ * declaration permutations of seven locals were tried; none beat 1. Also:
+ * - Reuse height as control, following ROM add r3,r2,#0: 15.
+ * - Define dma earlier to extend its lifetime/lower priority: 13/17/56/64
+ *   depending on position. The constant load materializes there and shifts
+ *   instruction order, with no gain.
+ * - Move DMA setup into an inline helper called twice: 55-59.
+ * This form is the measured local optimum.
  *
- * PERMUTER DE KIRAMADI (decomp-permuter-agbcc, tools/setup_permuter.sh):
- * 13.917 yinelemede taban skor 205'in ALTINA inilemedi; yalnizca esit
- * skorlu farkli bicimler uretildi. Toplam kanit: 5040 bildirim
- * permutasyonu + 18 hedefli elle deneme + 13.917 rastgele deneme.
- * Artik "henuz bulamadik" degil, OLCULMUS bir duvar. Kaynak duzeyinde
- * yeniden duzenlemeyle ulasilabilir gorunmuyor; cozum muhtemelen baska
- * bir yerde (orn. fonksiyonun ait oldugu gercek ceviri biriminin
- * bilinmesi, ya da henuz olcmedigimiz bir agbcc davranisi).
+ * PERMUTER: decomp-permuter-agbcc (tools/setup_permuter.sh) failed to beat
+ * base score 205 in 13,917 iterations, finding only equal-scoring variants.
+ * Evidence then comprised 5040 declaration permutations, 18 targeted manual
+ * attempts and 13,917 random attempts. The recorded conclusion was a measured
+ * barrier, perhaps requiring the true translation unit or an unmeasured
+ * agbcc behavior rather than local source rearrangement.
  *
- * TERS YON DE DENENDI VE ELENDI. SetBg1Enable'i cozen "yerelleri KALDIR"
- * yontemi burada dort varyantla sinandi, dordu de kotulesti:
- *     control yerelini kaldirmak                 13
- *     row/col kaldirip dest'i tek ifade         116
- *     ikinci blokta da ciplak okuma              13
- *     dest yerelini kaldirmak                   111
- * Taban 1; hicbiri yaklasamadi bile. Boylece bu fonksiyon HER IKI YONDEN
- * kapali: yerel ekleme (18 deneme), yerel kaldirma (4 deneme), rastgele
- * arama (13.917 yineleme) ve 5040 bildirim permutasyonu.
+ * THE REVERSE APPROACH also failed. The remove-locals technique that solved
+ * SetBg1Enable gave: remove control 13; remove row/col and inline dest 116;
+ * bare read in block two 13; remove dest 111. None approached base 1. Thus
+ * 18 local-adding, four local-removing, 13,917 random attempts and 5040
+ * declaration permutations had all failed.
  *
- * ENGEL DAHA KESIN TANIMLANDI (kural 35-38 turevleri denendi): sorun "olu
- * okumanin register'i" DEGIL. Ciplak okuma + control'u UC DEYIMDE hesaplamak
- * 0x62'yi TAM OLARAK duzeltiyor (olu okuma r0'a dusuyor) ama farki 0x38/0x3a'ya
- * tasiyor:
- *     ROM  : lsl r0, r3, #6  /  asr r3, r0, #1   <- ara deger r0'dan geciyor
- *     bizim: lsl r3, r3, #6  /  asr r3, r3, #1   <- yerinde
- * Yani gercek engel: agbcc kaydirmayi r0 uzerinden gecirirken control'un
- * dagitimini ayni anda koruyamiyor. Iki bagimsiz yol da bu ayni iki bayta
- * cikiyor (uc deyim = 2, dort deyim yerinde = 2).
+ * REFINED DIAGNOSIS after rule 35-38 variants: a bare read plus computing
+ * control in THREE statements fixes offset 0x62 exactly (read into r0),
+ * but moves the difference to 0x38/0x3a:
+ *   ROM: lsl r0,r3,#6 / asr r3,r0,#1 — intermediate through r0
+ *   ours: lsl r3,r3,#6 / asr r3,r3,#1 — in place
+ * The barrier is preserving control allocation while routing the shift
+ * through r0. Two independent routes yield the same two-byte obstruction
+ * (three statements = 2; four in-place statements = 2).
+ * Also rejected: separate dma2 base for block two (rule 37), 13 because the
+ * copy merges; separate shifted local 13 (changes reference balance); reuse
+ * dead row 58, col 20, height 13; construct constant first then |=, 60.
  *
- * Bu turda ayrica elenenler: ikinci bloga ayri taban kopyasi (kural 37) 13 --
- * `dma2 = dma` saf kopya oldugu icin agbcc birlestiriyor; ayri `shifted` ara
- * yereli 13 (yeni bildirim referans dengesini bozuyor); olu yerelleri (row 58,
- * col 20, height 13) ara deger yapmak; sabiti one alip |= ile birlestirmek 60.
+ * A forced register volatile DmaChannel *dma asm("r4") reached zero bytes
+ * but was REJECTED under WORKFLOW.md §6: it forces matching while hiding
+ * the explanation. It shows r4 is reachable; the problem is triggering it
+ * with natural C.
  *
- * NOT: bir ajan `register volatile DmaChannel *dma asm("r4");` ile 0 bayta
- * ulasti. Bu KABUL EDILMEDI (docs/WORKFLOW.md 6): acik register baglamasi
- * byte'lari tutturur ama nedenini gizler ve her register uyusmazligini
- * "cozebilecek" bir cekictir. Yine de bir bilgi veriyor: ROM'un r4 secimi
- * ulasilabilir, yani sorun dogal C'de o secimi tetikleyecek bicimi bulmak.
- *
- * PERMUTER SONUCU (2026-09-05): decomp-permuter 24368 iterasyon kostu ve
- * taban skorundan (5) BIR KEZ BILE iyilesmedi.  Tek baytlik fark yazmac
- * dagitimi artefakti; permuter'in yerel kaynak mutasyonlari agbcc'nin
- * dagitim kararini bu yonde oynatmiyor.  Arama uzayinin DISINDA -- daha
- * uzun kosturmak duz zemini daha cok taramak demek.  Kurulum hazir:
+ * PERMUTER RESULT (2026-09-05): 24,368 iterations never improved base score 5.
+ * The one-byte difference is an allocation artifact unaffected by those local
+ * mutations. The recorded assessment was that longer runs would revisit the
+ * same plateau. Reproduction setup:
  *   python3 tools/make_permuter_dir.py src/text/clear_text_area.c \
  *       ClearTextArea 0x08064590 132
  *
- * ================================================================
- * KURAL 50 ILE TAM TESHIS (2026-09-06) -- ENGEL SAYIYA INDIRILDI
- * ================================================================
- * Onceki teshis ("olu yukleme yazmaci") YANLISTI. tools/dump_alloc.py ile
- * olculen gercek engel TEK BIR SIRALAMA KARARI:
+ * RULE 50 DIAGNOSIS (2026-09-06): a single ordering decision, measured with
+ * tools/dump_alloc.py, superseded the earlier dead-load-register diagnosis:
+ *   p29 control: refs=5, lifetime=21, priority=0.476 — processed second
+ *   p30 dma:     refs=9, lifetime=52, priority=0.519 — processed first
+ * Both conflict with {r0,r1,r2}; find_reg gives the first r3 and the next r4.
+ * The ROM needs control=r3, dma=r4, so control must be processed FIRST.
  *
- *     p29 control : refs=5  omur=21  oncelik=0.476   <- sonra islenir
- *     p30 dma     : refs=9  omur=52  oncelik=0.519   <- once isleniyor
+ * Two bare reads yield the desired ldr r0 but remove control's sixth reference:
+ * priority drops 0.545 -> 0.476, order reverses, and 13 bytes differ. The
+ * one-byte form buys reference six by assigning the read to control, at the
+ * cost of loading into r3. A sixth reference requires an instruction operand:
+ * the ROM's five-instruction definition (lsl/asr/movs/lsl/orr) gives control
+ * three references plus two stores = five. No free sixth reference exists.
+ * Its lifetime is 21 but must be <=19 to win; definition at asrs and final
+ * use at block 3 instructions 9 are fixed by ROM order.
  *
- * Cakisma cizgesinde ikisi de {r0,r1,r2} ile catisiyor, yani sirada ONCE
- * gelen find_reg'den r3'u, sonraki r4'u aliyor. ROM control=r3, dma=r4
- * istiyor; yani control'un dma'dan ONCE islenmesi gerekiyor.
+ * TWO INDEPENDENT ROUTES reached the target allocation, each leaving one issue:
+ * 1. Define dma after ime = REG_IME: lifetime 52 -> 60, priority 0.450 < 0.476.
+ *    control=r3, dma=r4, both dead reads ldr r0: 65/66 instructions match.
+ *    But ldr r4,[pc] appears four instructions early (10 bytes). Available
+ *    lifetimes are quantized: 52/56/60/68; required 57 is unreachable at a
+ *    C insertion point. Four measured positions: 13/18/10/17.
+ * 2. Reuse height in place: height <<= 6; height >>= 1; height |= 0x81000000.
+ *    refs=9, lifetime=52, priority=0.519 exactly ties dma. Rule 50's lower-
+ *    pseudo tie-break lets p24 take r3, then dma r4, matching the ROM. Only
+ *    the in-place shifts differ (lsls r3,r3,#6 / asrs r3,r3,#1 instead of
+ *    lsls r0,r3,#6 / asrs r3,r0,#1), two bytes. Separating the intermediate
+ *    (col = height << 6; height = (col>>1)|K) fixes the shift but drops refs
+ *    9 -> 7 and floor_log2 3 -> 2, priority 0.269: 22 differences. Even
+ *    eight references give 3*8/52 = 0.4615 < 0.519; exactly nine are needed,
+ *    without free eighth/ninth references.
+ * A third route, separate height with eight references (3*8/28 = 0.857),
+ * would fix order, but the ROM uses height only for its entry copy and lsls:
+ * two references, with no six free additions.
  *
- * Iki olu okuma da CIPLAK birakilinca (ROM'un istedigi bicim, iki `ldr r0`
- * de dogru cikiyor) control'un 6. referansi kayboluyor, oncelik 0.545'ten
- * 0.476'ya dusuyor ve sira TERSINE donuyor -> 13 bayt. Su anki 1 baytlik
- * bicim, olu okumayi control'a atayarak o 6. referansi satin aliyor; bedeli
- * yuklemenin r3'e dusmesi. Ikisi ayni anda saglanamiyor CUNKU:
+ * FURTHER MEASURED REJECTIONS, all above or equal to base 1:
+ * - 168 combinations of control definition, block-2 read, CFG and block-3
+ *   read target: best 12 results plateau at 1, none zero. Dead-read targets
+ *   x/y/height gave 1/2/2; row/col/dest/fill/ime were already eliminated.
+ * - Remove dma and use macros for all eight accesses: 13. CSE recreates
+ *   one pseudo with refs 9/lifetime 52.
+ * - Separate ctl = &dma->control: 13; agbcc folds it into dma+8 with no new allocno.
+ * - Macros in block 3, local in block 2: 13, still one pseudo.
+ * - CFG changes if (==0), if (!), early return, goto, empty else all leave
+ *   refs=5/lifetime=21 and refs=9/lifetime=52 unchanged: 13. do-while(0): 15.
+ * - Extend dma through a tail read: refs rise to 10/11, floor_log2 stays 3,
+ *   priority rises to 0.536/0.569: 23/44.
+ * The recorded conclusion: one byte is the measured optimum for this variable
+ * structure; revisit these three routes' numbers before repeating attempts.
  *
- *   - control'un 6. referansi ANCAK bir komut ureten operand olabilir;
- *     ROM'un 5 komutluk def dizisi (lsl/asr/movs/lsl/orr) control'a en
- *     fazla 3 referans verir, iki store ile toplam 5. Bedava 6. yok.
- *   - control omru 21; kazanmak icin <=19 gerek. Def `asrs`te, son kullanim
- *     blok 3'un 9. komutunda; ikisi de ROM komut sirasina cakili.
+ * INTEGER-PRIORITY DIAGNOSIS (2026-09-06): global.c allocno_compare truncates
+ * pri = (int)(floor_log2(refs)*refs/lifetime * 10000); lower allocno wins ties.
+ *   control p29: 5/21 -> 4761; dma p30: 9/52 -> 5192.
+ * Even a tie suffices because p29 < p30; control is 431 points short.
+ * All identified routes and their obstructions:
+ * (A) control refs 6/lifetime <=23 -> 5217+. Only assigning the dead read
+ *     creates reference six, forcing r3. The ROM has exactly five control
+ *     references: asr 1, orr 2, two stores 2. No free sixth operand exists.
+ * (B) control refs 5/lifetime <=19 -> 5263. Lifetime counts RTL instructions
+ *     from definition (orr/asr) to block-3 store, both fixed in the ROM;
+ *     the 20-instruction span cannot shrink.
+ * (C) dma lifetime >=57 -> 4736. Measured lifetime is twice the RTL span.
+ *     Definition positions give 52/56/60/68/86 (13/18/10/17/43 bytes);
+ *     57..59 cannot be produced, and each step moves ldr r4,[pc].
+ * (D) dma refs 8 -> 4615. Current refs = definition + eight memory accesses;
+ *     all eight must use r4 in the ROM, so none can be removed.
+ * (E) Another allocno takes r3 before dma. Only p24 (height) and p48
+ *     (height<<6 temporary) conflict with dma but not control. p48 must use
+ *     r0 for ROM lsls r0,r3,#6. p24 has 2 refs/lifetime 28 -> 714 and would
+ *     need eight references to outrank dma; the ROM supplies two. No third candidate.
  *
- * HEDEF DAGITIMIN ULASILABILIR OLDUGU IKI BAGIMSIZ YOLLA KANITLANDI
- * (ikisi de tek bir artik engelde takiliyor):
+ * NEW MEASURED REJECTIONS:
+ * - Full 243-variant cross product: three control definitions x nine dead-read
+ *   targets (bare/control/x/y/height/row/col/dest/ime) in each of two blocks.
+ *   Six forms plateau at base 1; none reaches zero.
+ * - Add RTL copies hoping reload deletes them: dest2=dest, fp=&fill, dmb=dma,
+ *   two-stage copies, cross-block ctl2=control. All six tested forms disappear
+ *   BEFORE global allocation; p29/p30 refs/lifetimes stay identical (all 13).
+ * - Separate block scopes for fill: 50. Compute control earlier: 34, with
+ *   dma lifetime falling 52 -> 44, the wrong direction.
+ * - Reverse declarations (dma first): 34, also losing the tie-break advantage.
  *
- *   1) dma tanimini `ime = REG_IME;` sonrasina almak: omur 52->60, oncelik
- *      0.450 < 0.476, sira duzeliyor. Cikti control=r3 / dma=r4 ve HER IKI
- *      olu okuma `ldr r0` -- 66 komutun 65'i birebir. Tek kusur: `ldr r4,
- *      [pc]` 4 komut erken maddelesiyor (10 bayt). Yerlestirme kuantali:
- *      omur 52 / 56 / 60 / 68; kazanmak icin gereken 57 ARADA KALIYOR,
- *      hicbir C konumu uretmiyor. Olculen dort konum: 13 / 18 / 10 / 17.
- *   2) height'i control olarak kullanip YERINDE hesaplamak
- *      (`height <<= 6; height >>= 1; height |= 0x81000000;`): height refs=9
- *      omur=52 -> oncelik 0.519, dma ile TAM ESITLIK; kural 50'nin
- *      "esitlikte kucuk pseudo once" maddesi geregi p24 once islenip r3'u,
- *      dma r4'u aliyor. ROM dagitiminin AYNISI. Tek kusur kaydirmanin
- *      yerinde olmasi: `lsls r3,r3,#6 / asrs r3,r3,#1` yerine ROM
- *      `lsls r0,r3,#6 / asrs r3,r0,#1` istiyor -- 2 bayt.
- *      Ara degeri ayirinca (`col = height << 6; height = (col>>1)|K;`)
- *      kaydirma DUZELIYOR ama height refs 9->7 dusuyor, floor_log2 bir
- *      basamak iniyor (3->2), oncelik 0.269'a cokuyor, sira bozuluyor: 22.
- *      8 refs de yetmiyor (3*8/52 = 0.4615 < 0.519); esitlik icin TAM 9
- *      gerekiyor ve bedava 8./9. referans yok.
+ * SECOND INDEPENDENT TWO-BYTE ROUTE: compute control in place
+ * (control = height << 6; control >>= 1; control |= K). refs=7/lifetime=24
+ * -> 5833, giving ROM allocation control=r3/dma=r4 and both dead reads into r0.
+ * Only the in-place shifts differ. Every separated-intermediate form tested
+ * (f2/f3/f8/f9/f14/f16/f19) drops refs to five and reverses order. Six-plus
+ * references require in-place shifting; the correct shift gives only five.
  *
- * Ucuncu yol da kapali: height'i control'dan ayri tutup 8 referansa
- * cikarmak (3*8/28 = 0.857) sirayi cozerdi, ama height ROM'da yalnizca
- * giris kopyasi ve tek `lsls`te geciyor -- 2 referans, 6 bedava referans yok.
+ * The investigation concluded that its source-level search space was exhausted.
+ * Before a new attempt, reproduce (A)-(E); each is measurable with one command.
  *
- * BU TURDA OLCULEN VE ELENENLER (hepsi taban 1'in ustunde):
- *   - 168 varyantlik kombinasyon taramasi (control def bicimi x blok2 okuma
- *     x CFG bicimi x blok3 okuma hedefi). En iyi 12 sonuc 1'de plato yapti;
- *     hicbiri 0 vermedi. Olu okumanin hedefi olarak x / y / height de
- *     denendi (row/col/dest/fill/ime zaten elenmisti): 1 / 2 / 2.
- *   - dma yerelini TAMAMEN kaldirip 8 erisimi de makroyla yazmak: 13.
- *     CSE tek pseudo uretiyor, refs 9 / omur 52 aynen kaliyor.
- *   - `ctl = &dma->control;` diye AYRI isaretci: 13. agbcc adresi dma+8
- *     olarak katliyor, ayri allocno olusmuyor.
- *   - blok 3'u makroyla, blok 2'yi yerelle yazmak: 13. Yine tek pseudo.
- *   - CFG bicimi TAMAMEN etkisiz: `if (==0)` / `if (!)` / erken return /
- *     goto / bos else -- besi de birebir ayni refs=5,omur=21 ve
- *     refs=9,omur=52 uretiyor (hepsi 13). do-while(0) 15.
- *   - dma omrunu kuyruk okumasiyla uzatmak: refs de 10/11'e cikiyor,
- *     floor_log2 3'te kaliyor, oncelik 0.536/0.569'a YUKSELIYOR: 23 / 44.
- *
- * SONUC: 1 bayt, bu degisken yapisi altinda OLCULMUS optimum. Engel artik
- * "bilinmiyor" degil: control 0.476'ya karsi dma 0.519, ve aradaki farki
- * kapatacak bedava referans/omur kaynagi ROM'un komut dizisinde YOK.
- * Yeni bir fikir denemeden once yukaridaki uc yolun sayilarini kontrol et;
- * onlari tekrarlamak zaman kaybi.
- *
- * ================================================================
- * 2026-09-06 -- ENGEL TAM SAYIYA INDIRILDI, ARAMA UZAYI KAPATILDI
- * ================================================================
- * Onceki tur "0.476 vs 0.519" diyordu; oncelik agbcc'de TAMSAYIYA kirpiliyor
- * (global.c allocno_compare: pri = (int)(floor_log2(refs)*refs/omur * 10000),
- * esitlikte KUCUK allocno kazanir).  Gercek sayilar:
- *
- *     control p29 : 5 ref / 21 omur -> 4761      <- kaybediyor
- *     dma     p30 : 9 ref / 52 omur -> 5192
- *
- * control p29 < dma p30 oldugu icin ESITLIK BILE YETERDI; 431 puan eksik.
- * Kazanmanin TUM yollari ve neden kapali olduklari:
- *
- *   (A) control 6 ref / omur<=23  -> 5217+.  6. referansin TEK kaynagi olu
- *       okumanin control'a atanmasi; o da yuklemeyi r3'e dusuruyor.  ROM'un
- *       kendi komut dizisinde control tam 5 kez geciyor (asr 1, orr 2,
- *       iki store 2) -- bedava 6. referans FIZIKSEL OLARAK YOK.
- *   (B) control 5 ref / omur<=19  -> 5263.  omur = tanim (orr/asr) ile
- *       blok 3'teki store arasindaki RTL komut sayisi; ikisi de ROM'a cakili,
- *       20 komut, kisaltilamaz.
- *   (C) dma omur >= 57 -> 4736.  Olculdu: omur = 2 x (araliktaki RTL komut).
- *       Tanim yerine gore KUANTUM 52/56/60/68/86 (bayt: 13/18/10/17/43) --
- *       57..59 URETILEMIYOR, ve her adim `ldr r4,[pc]` komutunu ROM'daki
- *       yerinden kaydiriyor.
- *   (D) dma 8 ref -> 4615.  refs = tanim + 8 bellek erisimi; sekizinin de
- *       ROM'da r4 tabanli olmasi zorunlu, hicbiri dusurulemez.
- *   (E) dma'dan ONCE r3'u kapatacak bir allocno.  Cakisma cizgesinde dma ile
- *       cakisip control ile CAKISMAYAN yalnizca IKI pseudo var: p24 (height)
- *       ve p48 (height<<6 gecicisi).  p48 zaten ROM'da r0 olmak ZORUNDA
- *       (`lsls r0,r3,#6`).  p24: 2 ref / 28 omur -> 714; dma'yi gecmesi icin
- *       8 referans gerekir, ROM'da 2 tane var.  Ucuncu aday yok.
- *
- * BU TURDA ELENEN YENI MEKANIZMALAR (hepsi olculdu):
- *   - 243 varyantlik TAM capraz tarama: 3 control-tanim bicimi x 9 olu-okuma
- *     hedefi (bare/control/x/y/height/row/col/dest/ime) x iki blok.  TABAN 1;
- *     alti ayri bicim 1'de plato yapiyor, hicbiri 0 vermiyor.
- *   - RTL komutu EKLEYIP dma omrunu uzatma (reload'un sildigi kopya umuduyla):
- *     dest2=dest, fp=&fill, dmb=dma, iki asamali kopya, bloklar arasi
- *     ctl2=control -- ALTISI DA global dagitimdan ONCE yok ediliyor,
- *     29 ve 30'un refs/omur degerleri BIREBIR ayni kaliyor (hepsi 13).
- *   - `fill`i her bloga ayri kapsamda bildirmek: 50.  control'u erken
- *     hesaplamak: 34 (dma omru 52->44'e DUSUYOR, ters yon).
- *   - Bildirim sirasini ters cevirmek (dma once): 34; ayrica esitlik
- *     kazancini da kaybettiriyor.
- *
- * IKINCI BAGIMSIZ 2-BAYT YOLU BULUNDU (kayit icin): control'u YERINDE
- * hesaplamak -- `control = height << 6; control >>= 1; control |= K;` --
- * control'a 7 ref / 24 omur -> 5833 veriyor, DAGITIM ROM'UN AYNISI
- * (control r3, dma r4) ve HER IKI olu okuma da `ldr r0` cikiyor.  Tek kusur
- * kaydirmanin yerinde olmasi (`lsls r3,r3,#6` / `asrs r3,r3,#1`).  Ara
- * degeri ayiran her bicim (f2/f3/f8/f9/f14/f16/f19 denendi) refs'i 5'e
- * dusurup sirayi bozuyor.  Yani: 6+ referans ancak YERINDE kaydirmayla,
- * dogru kaydirma ancak 5 referansla elde ediliyor -- ikisi ayni anda yok.
- *
- * Bu fonksiyon icin kaynak-duzeyi arama uzayi TUKENMISTIR.  Yeni bir sey
- * denenecekse once (A)-(E) sayilarini yeniden uret; hepsi tek komutla
- * olculebiliyor.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/clear_text_area.c
- * Teshis:     python3 tools/dump_alloc.py src/text/clear_text_area.c \
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/clear_text_area.c
+ * Diagnosis:     python3 tools/dump_alloc.py src/text/clear_text_area.c \
  *                 ClearTextArea --rom --conflicts
  */
 

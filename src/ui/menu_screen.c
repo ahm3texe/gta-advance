@@ -1,51 +1,40 @@
-/* Menu ekrani — 0x08001458-0x080019DD
+/* Menu screen — 0x08001458-0x080019DD
  *
- * Duraklatma/menu ekranini kurar ve kapanana kadar surer. RunMenuLoop
- * (src/ui/menu_loop.c) ile ayni cizim dongusunu paylasir; farki, hangi
- * menu agacinin acilacagini secen bir onsoz ve gorev listesi acikken
- * gosterilen uyari mesajlari.
+ * Initialize and run the pause/menu screen until it closes. Shares the drawing
+ * loop with RunMenuLoop (menu_loop.c), adding a menu-tree selection prologue
+ * and warning messages when the mission list is open.
  *
- * Iki atlama tablosu var:
- *   0x080014CC  41 giris (case 17..57), yalnizca iki hedef
- *   0x08001874   5 giris, eylem fonksiyonunun donus degeri
+ * Jump tables: 0x080014CC, 41 entries for cases 17..57 with only two targets;
+ * 0x08001874, five entries selected by the action return value.
  *
- * HENUZ ESLESMIYOR ama BOYUT TUTTU: 1448/1448, bayt farki 502, hizali
- * komut 582/679.  Bastan 0x080015D8'e kadarki onsoz -- gorev kontrolu, 41
- * girisli atlama tablosu, uyari mesajlari -- ROM ile AYNI BAYT.
+ * NOT YET MATCHING, but SIZE MATCHES: 1448/1448, 502 differing bytes,
+ * 582/679 aligned instructions. The prologue through 0x080015D8 (mission
+ * check, 41-entry table, warnings) is byte-identical.
  *
- * KURAL 45 BURAYA DA UYDU (docs/COMPILER.md).  Onceki surumde alti IME
- * sakla/geri-yaz cifti TEK bir `ime` yerelini paylasiyordu; cikti 1456 bayt
- * (8 fazla), fark 949, hizali komut 494.  Birinci, ikinci, dorduncu ve
- * altinci cifte KENDI blok-yerel `savedIme` degiskeni verilince boyut
- * tuttu ve fark 502'ye indi.
+ * RULE 45: six IME save/restore pairs previously shared one ime local,
+ * producing 1456 bytes (+8), 949 differing bytes and 494 aligned instructions.
+ * Giving pairs 1,2,4,6 separate block-local savedIme values matched size and
+ * reduced differences to 502. The SUBSET matters: all six or the first four
+ * give 1444/643. Allocation follows ROM live ranges, not one local per block.
  *
- * ALT KUME ONEMLI, hepsini kapsamak KOTU: alti cifti de blok-yerel yapmak
- * 1444 bayt / fark 643 veriyor, ilk dordu 1444 / 643.  Yalnizca (1,2,4,6)
- * dogru.  Bu, dagitimin blok basina degil, ROM'un canli deger duzenine
- * gore ayarlandigi anlamina geliyor.
+ * SECOND FIX: ((int *)gRam02025810)[5] folds base+0x14 into pool constant
+ * 0x02025824 and ldr r1,[r0,#0]. The ROM loads the base then ldr r1,[r0,#20].
+ * Structure-member access reduced differing bytes 502 -> 499, aligned
+ * instructions 582 -> 584, and divergent blocks 57 -> 55. Local int*,
+ * local struct* and direct-member variants all gave the same result.
  *
- * IKINCI DUZELTME -- KATLANMIS HAVUZ SABITI.  `((int *)gRam02025810)[5]`
- * yazimi taban+0x14'u TEK havuz sabitine (0x02025824) katliyor ve
- * `ldr r1,[r0,#0]` uretiyordu; ROM tabani duz yukleyip `ldr r1,[r0,#20]`
- * yapiyor.  Yapi uyesi bicimine gecirmek fark 502 -> 499, hizali komut
- * 582 -> 584, ayrim blogu 57 -> 55.  Uc yazim denendi (yerel int*, yerel
- * struct*, dogrudan uye), UCU DE ayni sonucu verdi.
+ * Remaining allocation: ROM saved=r2, ime=r1, zero=r3. Later differences
+ * are pool POSITION offsets (ours reads four bytes ahead), suggesting an
+ * entry moved while total size stayed unchanged.
  *
- * Kalan fark hala yazmac dagitiminda: ROM saved->r2, ime->r1, sifir->r3
- * tutuyor.  Sonraki sapmalar havuz KONUMU farki (bizimki 4 bayt ileriyi
- * okuyor), yani havuz sirasi kaymis; toplam boyut ayni oldugu icin bir
- * giris yer degistirmis olmali.
+ * Rejected: local u16 off=0; REG_IME=off lowers byte differences 949 -> 924
+ * but aligned instructions fall 494 -> 473 and size stays 1456: displacement,
+ * not improvement. Structural evidence took precedence. Also tried reversing
+ * case1/KEY_B branches; loading saved before blend registers (448 aligned
+ * instructions); int ime; local DMA3 pointer (501).
  *
- * Denenenler (hicbiri ilerletmedi): sifiri yerele alip yazmacta sabitlemek
- * (`u16 off = 0; REG_IME = off;`) -- bayt farki 949'dan 924'e dusuyor ama
- * KOMUT HIZALAMASI 494'ten 473'e geriliyor ve boyut 1456'da kaliyor, yani
- * kazanc degil kayma; iki olcut celisince yapisal olana bakildi.  Ayrica:
- * case1/KEY_B dallarini ters cevirmek,
- * `saved`i blend register'larindan once yuklemek (448 komuta dusuyor),
- * `ime`yi int yapmak, DMA3 icin yerel isaretci (501).
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/menu_screen.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/menu_screen.c
  */
 
 #include "gba_io.h"
@@ -81,17 +70,17 @@
 #define KEY_UP           0x0040
 #define KEY_DOWN         0x0080
 
-/* Gorev listesi acikken menuye girilmeye calisilinca gosterilen kayitlar. */
+/* Records shown when entering the menu while the mission list is open. */
 #define MSG_MISSION_BUSY 0x209
 #define MSG_NO_SAVE      0x221
 #define MSG_QUIT_MISSION 0x222
 #define MSG_NEED_CASH    0x223
 #define QUIT_MISSION_FEE 1000
 
-/* Oyuncu ilerleme blogu.  ROM tabani DUZ yukleyip +0x14'u ayri ofsetle
- * okuyor (`ldr r0,[pc] / ldr r1,[r0,#20]`).  Dizi indekslemesi
- * (`((int *)gRam02025810)[5]`) taban+20'yi TEK havuz sabitine katliyordu ve
- * `ldr r1,[r0,#0]` uretiyordu; yapi uyesi biciminde katlanma olmuyor. */
+/* Player progress block. ROM loads the BASE then offset +0x14
+ * (ldr r0,[pc] / ldr r1,[r0,#20]). Array indexing ((int *)gRam02025810)[5]
+ * folds base+20 into one literal and ldr r1,[r0,#0]; member access prevents it.
+ */
 typedef struct Progress {
     u8  pad00[0x14];
     s32 cash;                   /* 0x14 */
@@ -103,7 +92,7 @@ typedef struct Progress {
 typedef struct Menu Menu;
 
 typedef struct MenuItem {
-    u32   type;             /* +0  0: cikis, 1: alt menu, 2: eylem */
+    u32   type;             /* +0: 0 exit, 1 submenu, 2 action */
     u32   label;            /* +4 */
     int   value;            /* +8 */
     u32  *conditionFlags;   /* +12 */
@@ -113,8 +102,9 @@ typedef struct MenuItem {
     u32   param;            /* +28 */
 } MenuItem;
 
-/* Ekran menuleri 664 baytlik bir dizide duruyor: 24 baytlik baslik +
- * 20 girdi * 32 bayt. RunMenuScreen tabloya mode ile indeksliyor. */
+/* Screen menus occupy 664-byte entries: 24-byte header +20*32-byte
+ * items. RunMenuScreen indexes this table by mode.
+ */
 struct Menu {
     u32   centered;         /* +0 */
     Menu *parent;           /* +4 */
@@ -127,7 +117,7 @@ struct Menu {
 
 #define SCREEN_MENUS ((Menu *)0x0832C4E8)
 
-/* Etkin gorev girdisi: +8 tur, +9 alt tur. */
+/* Active mission entry: +8 type, +9 subtype. */
 typedef struct MissionEntry {
     u8 pad0[8];
     u8 kind;                /* +8 */

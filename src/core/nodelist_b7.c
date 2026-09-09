@@ -120,7 +120,7 @@
  * of the register operand counts only r3 (22 vs 23), r4 (18 vs 15) and r0
  * (74 vs 76) deviate -- all three stem from the same single difference (the
  * missing `adds r3,r4,#0` and the 2 bytes of alignment padding that replace
- * it). The remaining 8 instruction differences are the branch offsets shifted
+ * it). The remaining 8 instructions differences are the branch offsets shifted
  * by those 2 bytes, not a separate defect.
  */
 

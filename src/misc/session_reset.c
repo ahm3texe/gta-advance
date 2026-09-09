@@ -5,7 +5,7 @@
  * the ROM.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/session_reset.c
+ * Verification:  make c-match FILE=src/misc/session_reset.c
  */
 
 #include "gba_types.h"

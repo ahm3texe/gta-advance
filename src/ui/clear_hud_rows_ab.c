@@ -1,46 +1,40 @@
-/* Band B — 0x08030B34 .. 0x08031D23 arasindan dokuz fonksiyon.
+/* Historical band B: nine functions from 0x08030B34 .. 0x08031D23.
  *
- * ONEMLI OLCUM NOTU — `make c-match FILE=src/world/band_b.c` CIKTISI YANILTICI
- * ----------------------------------------------------------------------------
- * tools/agbcc_build.py bir dosyadaki TUM fonksiyonlari PES PESE, en kucuk ROM
- * adresinden baslayarak linkliyor (`base = min(address)`, `SUBALIGN(1)`).  Bu
- * dokuz fonksiyon ROM'da BITISIK DEGIL; aralarinda baska ceviri birimlerine ait
- * fonksiyonlar var.  Sonuc: ilk fonksiyon (SendTextMode1) disindaki her fonksiyon
- * kendi ROM adresinden SABIT bir delta kadar kaymis olarak linkleniyor ve
- * govdesindeki her `bl` o delta kadar yanlis kodlaniyor.  Govde birebir dogru
- * olsa bile `bl` iceren fonksiyon "farkli: 2/N byte" gorunuyor.
+ * MEASUREMENT NOTE: results from the former src/world/band_b.c were misleading.
+ * agbcc_build.py links all functions consecutively from min(address), using
+ * SUBALIGN(1). These nine are not contiguous in the ROM: other translation
+ * units intervene. All but the first (SendTextMode1) were linked at a fixed
+ * displacement from their ROM addresses, making every bl offset wrong even
+ * for otherwise matching code (reported as 2/N differing bytes).
+ * Each was therefore measured separately at its own ROM address:
+ *   SendTextMode1 12 BYTE-MATCHING
+ *   LoadHudPalettes 124 BYTE-MATCHING
+ *   TriggerEvent39 12 BYTE-MATCHING
+ *   GetRecordNodeById 14 BYTE-MATCHING
+ *   ScaleMagnitude 132 BYTE-MATCHING
+ *   ClearHudRowsAB 72 BYTE-MATCHING
+ *   ReleaseActorAndSlot 64 BYTE-MATCHING
+ *   BlitStripClipLeft4bpp 470 NON-MATCHING
+ *   PushSlotQueueEntry 140 MISSING RAM SYMBOL
+ * These are historical results; detailed notes accompany the split sources.
  *
- * Bu yuzden her fonksiyon AYRICA tek fonksiyonluk bir dosyada (base = kendi ROM
- * adresi, `bl` dogru) olculdu.  Tek fonksiyonluk olcumler — dogru olanlar:
- *     SendTextMode1  12  BYTE-MATCHING
- *     LoadHudPalettes 124  BYTE-MATCHING
- *     TriggerEvent39  12  BYTE-MATCHING
- *     GetRecordNodeById  14  BYTE-MATCHING
- *     ScaleMagnitude 132  BYTE-MATCHING
- *     ClearHudRowsAB  72  BYTE-MATCHING
- *     ReleaseActorAndSlot  64  BYTE-MATCHING
- *     BlitStripClipLeft4bpp 470  eslesmedi (asagida ayrintili)
- *     PushSlotQueueEntry 140  RAM SEMBOLU EKSIK (asagida ayrintili)
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_b.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/ui/clear_hud_rows_ab.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-/* ---- 0x08031578 — 72 bayt, BYTE-MATCHING --------------------------------
+/* 0x08031578 — 72 bytes, BYTE-MATCHING.
  *
- * Dort VRAM karo satirini bos karo (0xF0E8) ile dolduruyor: iki dongu, her
- * biri sekiz yarim soz, isaretciler GERIYE dogru.
- *
- * src/ui/hud_fields.c'deki ClearHudFieldA ile ayni kalip:
- *  - karo sabiti DOGRUDAN store ifadesinde (HImode store -> `ldr` + `adds`
- *    kopyasi; yerele alinirsa kopya kayboluyor, MEKANIZMA 1),
- *  - sayac ARTAN yazilmali; agbcc azalan cevrime kendisi ceviriyor ve sayac
- *    ilklendirmesi tasinan sabitten SONRA yayiliyor (MEKANIZMA 2).
- * ClearHudFieldA'daki omur uzatan `a++; a--;` no-op'una burada GEREK YOK:
- * ROM'un dagilimi (a=r2, karo=r3) zaten duz yazimin urettigi dagilim.
+ * Fill four VRAM tile rows with empty tile 0xF0E8 using two eight-halfword
+ * loops with pointers walking BACKWARDS. Same pattern as ClearHudFieldA:
+ * - Tile constant directly in the store: HImode store emits ldr + adds copy;
+ *   a local removes the copy (mechanism 1).
+ * - Write an INCREASING counter; agbcc reverses the loop and initializes it
+ *   after the hoisted constant (mechanism 2).
+ * The lifetime-extending a++; a--; no-op from ClearHudFieldA is unnecessary:
+ * plain source already gives the ROM allocation a=r2, tile=r3.
  */
 
 #define TILE_BLANK 0xF0E8

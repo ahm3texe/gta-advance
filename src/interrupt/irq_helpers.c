@@ -1,7 +1,7 @@
-/* IRQ yardimcilari — 0x08000730-0x080007B3
+/* IRQ helpers — 0x08000730-0x080007B3
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/interrupt/irq_helpers.c
+ * Verification:  make c-match FILE=src/interrupt/irq_helpers.c
  */
 
 #include "gba_io.h"

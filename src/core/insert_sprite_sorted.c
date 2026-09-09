@@ -1,5 +1,5 @@
 /* Insert a sprite node into the ordered list — 0x08012C74-0x08012CD5.
- * The primary key is attr2 & 0x0C00 and the secondary key the +6 byte.
+ * The primary key is attr2 & 0x0C00 and the secondary key the +6 bytes.
  * Both are ascending; inserting after equal keys preserves the order.
  * An empty list, insertion in the middle and insertion at the end are separate
  * control paths in the ROM.

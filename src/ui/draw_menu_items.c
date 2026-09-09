@@ -1,49 +1,48 @@
-/* Menu satirlarini ve parasal degerleri cizer — 0x080011EC-0x080013AC
+/* Draw menu rows and monetary values — 0x080011EC-0x080013AC
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/draw_menu_items.c
+ * Show at most eight rows. Resolve each row's text ID; if value is nonnegative,
+ * draw a dollar-prefixed seven-digit number to its right, suppressing leading
+ * zeroes. Use the game's BIOS Div wrapper and compute remainder as
+ * value - quotient*divisor. agbcc converts constant products into shift chains,
+ * as in the ROM.
  *
- * Ekranda en fazla sekiz menu satiri gosterilir. Her satirin metni bir metin
- * kimliginden cozulur; satirin `value` alani negatif degilse metnin sagina
- * "$" ile baslayan, bastaki sifirlari atilmis yedi haneli bir sayi yazilir.
- * Bolme icin oyunun kendi BIOS Div sarmalayicisi cagrilir, kalan ise
- * `deger - bolum * bolen` olarak elde edilir; derleyici sabit carpmalari
- * kaydirma zincirlerine ceviriyor (ROM'daki bicim budur).
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/ui/draw_menu_items.c
  */
 
 #include "gba_io.h"
 
-/* BG1 dikey kaydirma yazmaci. Sabit cast olarak yazilir: agbcc bu adresi
- * kaydirmayla uretemez, ROM'daki gibi literal havuzdan okur. */
+/* BG1 vertical scroll register. A constant cast produces a pool load
+ * as in the ROM; agbcc cannot construct this address with shifts. */
 
-#define MENU_VISIBLE_MAX  8    /* ayni anda cizilen en fazla satir */
-#define MENU_ROW_HEIGHT   16   /* satir yuksekligi, piksel */
-#define STYLE_SELECTED    160  /* secili satirin metin stili */
-#define STYLE_NORMAL      192  /* diger satirlarin metin stili */
+#define MENU_VISIBLE_MAX  8    /* maximum simultaneous rows */
+#define MENU_ROW_HEIGHT   16   /* row height in pixels */
+#define STYLE_SELECTED    160  /* selected-row text style */
+#define STYLE_NORMAL      192  /* other-row text style */
 #define TITLE_X           120
-#define TITLE_Y_OFFSET    32   /* baslik ilk satirin 32 piksel uzerinde */
+#define TITLE_Y_OFFSET    32   /* header is 32 pixels above the first row */
 #define LABEL_X           120
 #define VALUE_LABEL_X     4
 #define VALUE_X           236
 #define VALUE_DIGITS      7    /* 0..9999999 */
-#define VALUE_TEXT_SIZE   9    /* '$' + yedi hane + sonlandirici */
+#define VALUE_TEXT_SIZE   9    /* '$' + seven digits + terminator */
 
 typedef struct MenuItem {
     u32 unk00;
-    u32 label;   /* +4: metin kimligi */
-    int value;   /* +8: negatifse satirda sayi gosterilmez */
+    u32 label;   /* +4: text ID */
+    int value;   /* +8: negative suppresses the number */
 } MenuItem;
 
 extern u8 gMenuPositionX;
 extern u8 gActiveMenuItemCount;
 extern MenuItem *gActiveMenuItems[20];
 
-/* Isimleri henuz cozulmedi; data/functions.csv'deki adlar kullanildi. */
-extern void SetFontIndex(int style);            /* 0x0806434C metin stilini ayarlar */
-extern u32  GetTextString(u32 textId);           /* 0x0805E6E0 metin kimligini cozer */
-extern void DrawTextCentred(u32 text, int x, int y); /* 0x080643D8 metni cizer */
-extern void DrawText(u32 text, int x, int y); /* 0x0806435C metni stiliyle cizer */
-extern void DrawTextRightAligned(const char *text, int x, int y); /* 0x08064460 hazir dizi cizer */
+/* Names unresolved; use the names in data/functions.csv. */
+extern void SetFontIndex(int style);            /* 0x0806434C sets text style */
+extern u32  GetTextString(u32 textId);           /* 0x0805E6E0 resolves a text ID */
+extern void DrawTextCentred(u32 text, int x, int y); /* 0x080643D8 draws text */
+extern void DrawText(u32 text, int x, int y); /* 0x0806435C draws styled text */
+extern void DrawTextRightAligned(const char *text, int x, int y); /* 0x08064460 draws a prepared string */
 extern int  Div(int numerator, int denominator); /* 0x0806B858 BIOS Div (svc 6) */
 
 /* 0x080011EC */
@@ -55,7 +54,7 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
     int value, pos, started, i;
     int digit;
 
-    /* Secili satir ekranda hep ayni yerde kalsin diye arka plan kaydirilir. */
+    /* Scroll the background to keep the selected row at a fixed screen position. */
     REG_BG1VOFS = -(gMenuPositionX + (selectedItem - firstItem) * MENU_ROW_HEIGHT);
 
     SetFontIndex(STYLE_SELECTED);
@@ -75,7 +74,7 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
             SetFontIndex(STYLE_NORMAL);
 
         if (gActiveMenuItems[item]->value < 0) {
-            /* Sadece etiket: satirda gosterilecek sayi yok. */
+            /* Label only: no number for this row. */
             DrawTextCentred(GetTextString(gActiveMenuItems[item]->label), LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
         } else {
@@ -83,8 +82,8 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
                          VALUE_LABEL_X,
                          gMenuPositionX + row * MENU_ROW_HEIGHT);
 
-            /* Deger hanelerine ayrilir; ustteki cagrilar araya girdigi
-             * icin ogeyi ve degerini yeniden okuyoruz (ROM da oyle yapiyor). */
+            /* Split the value into digits. Reread the item and value after the
+             * intervening calls, as the ROM does. */
             value = gActiveMenuItems[item]->value;
             digits[6] = Div(value, 1000000);
             value -= digits[6] * 1000000;
@@ -100,22 +99,17 @@ void DrawMenuItems(u32 *titleText, int selectedItem, int firstItem)
             value -= digits[1] * 10;
             digits[0] = value;
 
-            /* text[1..8] temizlenir, text[0] '$' olarak kalir. Geriye sayan
-             * bicim sart: `i > 0` yazilirsa agbcc `bgt` uretiyor, ROM `bne`
-             * kullaniyor — bu yuzden kosul `i != 0`. */
+            /* Clear text[1..8], preserving '$' at text[0]. Count down with i != 0:
+             * i > 0 emits bgt, whereas the ROM uses bne. */
             text[0] = '$';
             for (i = 8; i != 0; i--)
                 text[i] = 0;
 
-            /* Bastaki sifirlar atlanarak haneler yazilir. `started` bir kez
-             * 1 olduktan sonra kalan tum haneler yazilir.
-             *
-             * Kosulun bu uc parcali bicimi ROM'un urettigi dallanma
-             * zinciriyle (cmp #1 / cmp #0 / hane testi) birebir ayni.
-             * Sadelestirilmis `started || digits[digit]` bicimi iki dal
-             * uretiyor ve ustelik biv eleme calismadigi icin dongude
-             * fazladan bir sayac birakiyordu (ROM sadece isaretciyi
-             * yuruyor: `cmp r2, sp` + `bge`). */
+            /* Skip leading zeroes; after started becomes 1, write every digit.
+             * This three-part condition matches the ROM's cmp #1 / cmp #0 /
+             * digit-test chain. Simplifying to started || digits[digit] emits
+             * two branches and prevents biv elimination, retaining an extra
+             * counter. The ROM only walks a pointer: cmp r2,sp + bge. */
             started = 0;
             pos = 1;
             for (digit = VALUE_DIGITS - 1; digit >= 0; digit--) {

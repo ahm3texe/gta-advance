@@ -6,7 +6,7 @@
  * address of the requested record. The meaning of the fields is not known yet.
  *
  * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/misc/record_table.c
+ * Verification:  make c-match FILE=src/misc/record_table.c
  */
 
 #include "gba_types.h"
@@ -16,7 +16,7 @@ typedef struct {
     u32 unk04;
     u32 unk08;
     u8  unk0C[48];
-} Record;                      /* 60 byte */
+} Record;                      /* 60 bytes */
 
 typedef struct RecordBlock {
     u32 index;                  /* +0x00 */

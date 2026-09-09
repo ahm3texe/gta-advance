@@ -19,7 +19,7 @@
 
 #define DMA_ENABLE 0x80000000
 
-#define EEPROM_BLOCK       8    /* EEPROM erisim birimi (byte)           */
+#define EEPROM_BLOCK       8    /* the EEPROM access unit (bytes)        */
 #define EEPROM_BLOCK_MASK  7    /* byte offset inside a block            */
 #define EEPROM_BLOCK_SHIFT 3    /* byte offset -> block index            */
 #define EEPROM_DEVICE_TYPE 4    /* type code passed to the ID routine    */

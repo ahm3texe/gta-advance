@@ -1,20 +1,21 @@
-/* Menu dongusu — 0x08001A00-0x08001DBF
+/* Menu loop — 0x08001A00-0x08001DBF
  *
- * Menu hiyerarsisini kurar, girisi isler ve secili menuyu her karede
- * yeniden cizer. 0x08001C24'teki `mov pc, r0` atlama tablosu, eylem
- * fonksiyonunun donus degerine gore dallanan bes vakali switch'ten gelir.
+ * Build the menu hierarchy, process input and redraw the selected menu each
+ * frame. The mov pc,r0 jump table at 0x08001C24 comes from a five-case
+ * switch on the action function's return value.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/menu_loop.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/menu_loop.c
  */
 
 #include "gba_io.h"
 
-/* Thumb dolayli cagri yardimcisi (libgcc `_call_via_rN`): `bx r4`. */
+/* Thumb indirect-call helper (libgcc _call_via_rN): bx r4. */
 
-/* data/ram_map.csv'de olmayan RAM adresleri. Sabit cast yazilirsa agbcc
- * 0x0300009C'yi 0x03000098+4 diye katliyor (docs/COMPILER.md kural 1);
- * ayri sembol olunca ROM'daki gibi ayri literal cikiyor. */
+/* RAM addresses originally absent from ram_map.csv. Constant casts let
+ * agbcc fold 0x0300009C to 0x03000098+4 (COMPILER.md rule 1); separate
+ * symbols produce separate literals as in the ROM.
+ */
 
 #define BLEND_Y          (*(u16 *)0x04000054)
 #define PALETTE_RAM      ((void *)0x05000000)
@@ -52,7 +53,7 @@
 typedef struct Menu Menu;
 
 typedef struct MenuItem {
-    u32   type;             /* +0  0: cikis, 1: alt menu, 2: eylem */
+    u32   type;             /* +0: 0 exit, 1 submenu, 2 action */
     u32   label;            /* +4 */
     int   value;            /* +8 */
     u32  *conditionFlags;   /* +12 */
@@ -67,7 +68,7 @@ struct Menu {
     Menu *parent;           /* +4 */
     u32   unk8;             /* +8 */
     u32   unk12;            /* +12 */
-    int   kind;             /* +16 baslangic seciminin nasil kuruldugu */
+    int   kind;             /* +16 initial selection policy */
     int   itemCount;        /* +20 */
     MenuItem items[1];      /* +24 */
 };

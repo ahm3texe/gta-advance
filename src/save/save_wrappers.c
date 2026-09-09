@@ -1,10 +1,10 @@
-/* Kayit metadata sarmalayicilari — 0x08000BE4-0x08000C27
+/* Save metadata wrappers — 0x08000BE4-0x08000C27
  *
- * Metadata RAM tamponu 0x02000ED0'da 32 byte; duzeni docs/SAVE_SYSTEM.md
- * icinde. Byte 16 + slot, ilgili slotun gecerli oldugunu gosteren bayraktir.
+ * The metadata RAM buffer at 0x02000ED0 is 32 bytes; its layout is documented
+ * in docs/SAVE_SYSTEM.md. Byte 16 + slot is the validity flag for that slot.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/save_wrappers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/save_wrappers.c
  */
 
 #include "gba_types.h"

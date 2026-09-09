@@ -15,7 +15,7 @@
  * -----------------------------------------------------------------------
  *
  * 1. DMA SOURCE SLOTS: the ROM's stack frame is 16 bytes and the slots are
- *    FOUR bytes apart (sp+0 word, sp+4 halfword, sp+8 halfword, sp+12 word)
+ *    FOUR bytes apart (sp+0 words, sp+4 halfwords, sp+8 halfwords, sp+12 words)
  *    -- yet sp+4 and sp+8 are written as HALFWORDS. Plain `u16` variables lay
  *    out 2 bytes apart and shrink the frame to 12 bytes (673 differences);
  *    `u32` gives the right frame but makes the store a word (264 differences).
@@ -75,11 +75,11 @@
 
 /* DMA CNT (upper 16 bits control, lower 16 bits transfer count) */
 #define DMA_CLEAR_EWRAM  0x85010000   /* 0x10000 word  = 256K EWRAM     */
-#define DMA_CLEAR_IWRAM  0x85001F80   /* 0x1F80 word   = 32256 byte     */
+#define DMA_CLEAR_IWRAM  0x85001F80   /* 0x1F80 word   = 32256 bytes     */
 #define DMA_CLEAR_VRAM   0x8100C000   /* 0xC000 half   = 96K VRAM       */
 #define DMA_FILL_EWRAM   0x85402000
 #define DMA_FILL_IWRAM   0x85002000
-#define DMA_CLEAR_TAIL   0x85000040   /* 0x40 word = 256 byte IWRAM basi */
+#define DMA_CLEAR_TAIL   0x85000040   /* 0x40 words = 256 bytes at the start of IWRAM */
 #define DMA_CLEAR_OAM    0x81000200   /* 0x200 half = 1K OAM            */
 
 #define EWRAM_FILL 0xCDCDCDCD
@@ -97,11 +97,11 @@ extern u32 gFrameReset;
 extern u32 gPostFrameState;
 extern u8  gGameState[16];
 
-extern void RegisterRamReset(s32 flags);     /* BIOS swi 1: RAM/IO sifirlama */
-extern void FUN_08005f5c(void);          /* bellek alt sistemi           */
-extern void FUN_08063b74(void);          /* DMA3'un bitmesini bekler     */
-extern void FUN_0803251c(s32 arg);       /* alt sistem baslatma          */
-extern void FUN_0800cae4(void);          /* VBlank bekler                */
+extern void RegisterRamReset(s32 flags);     /* BIOS swi 1: RAM/IO reset */
+extern void FUN_08005f5c(void);          /* the memory subsystem         */
+extern void FUN_08063b74(void);          /* waits for DMA3 to finish     */
+extern void FUN_0803251c(s32 arg);       /* subsystem start-up           */
+extern void FUN_0800cae4(void);          /* waits for VBlank             */
 extern void InitInterrupts(void);
 extern void RunMenuLoop(void);
 extern void FUN_080087f4(void);
@@ -142,10 +142,10 @@ extern void FUN_0805e168(void);
 extern void FUN_0802fe44(void);
 extern void FUN_08063d3c(void);
 
-/* 0x08000430 — 768/768 byte BYTE-MATCHING */
+/* 0x08000430 — 768/768 bytes BYTE-MATCHING */
 void GameInit(void)
 {
-    vu32 *dma;         /* init blogu           (ROM: r4) */
+    vu32 *dma;         /* the init block       (ROM: r4) */
     vu32 *dmaFrame;    /* inner-loop clear (ROM: r4, reloaded in the loop) */
     vu32 *dmaReset;    /* outer-loop shutdown  (ROM: r8) */
     vu16 *waitcnt;
@@ -161,7 +161,7 @@ void GameInit(void)
     waitcnt = (vu16 *)REG_WAITCNT_ADDR;
     *waitcnt |= WAITCNT_BITS;
 
-    /* EWRAM'i sifirla */
+    /* Clear EWRAM */
     *(u32 *)fillSlot = 0;
     dma = (vu32 *)REG_DMA3_ADDR;
     dma[0] = (u32)fillSlot;
@@ -176,7 +176,7 @@ void GameInit(void)
     dma[2] = DMA_CLEAR_IWRAM;
     dma[2];
 
-    /* VRAM'i sifirla */
+    /* Clear VRAM */
     clearSource[0] = 0;
     dma[0] = (u32)clearSource;
     dma[1] = VRAM;

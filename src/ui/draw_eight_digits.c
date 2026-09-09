@@ -1,28 +1,25 @@
-/* Sekiz basamakli sayaci iki satirlik karolarla yazma
- * — 0x0802A610-0x0802A857
+/* Draw an eight-digit counter with two-row tiles — 0x0802A610-0x0802A857
  *
- * IKI FONKSIYON, AYNI GOVDE.  tools/find_twins.py %99.3 verdi; ROM
- * govdeleri komut komut ayni, yalnizca havuz adresleri kayik -- ayni
- * kaynak iki kez derlenmis (docs/WORKFLOW.md §10).
+ * Two near-identical bodies: find_twins.py reported 99.3% similarity; their
+ * instructions share the same source pattern with shifted pool addresses
+ * (WORKFLOW.md §10), and the loop-count difference noted below.
  *
- * DrawTwoDigits (src/ui/draw_two_digits.c, 0x08031498) ile ayni karo
- * sozlugu: ust satir 0xF8+d, alt satir 0x102+d, ikisi de 0xF000 palet
- * nibble'iyla OR'lu; bos karo 0xF0E8.  Fark: burada sekiz basamak var,
- * taban 0x0600980E ve bastaki sifirlar 10 ile isaretlenip bos karoya
- * cevriliyor.
+ * Same tile scheme as DrawTwoDigits (draw_two_digits.c, 0x08031498): upper
+ * 0xF8+d, lower 0x102+d, both ORed with palette nibble 0xF000; empty 0xF0E8.
+ * Here there are eight digits, base 0x0600980E, and leading zeroes become
+ * marker 10, then empty tiles.
  *
- * UC OLCUM:
- *   - Yazma dongusu ARTAN indisle yazilmali: `for (i = 0; i < 8; i++)`
- *     ve `digits[i]`.  Azalan sayac + `digits[7-i]` ayni komutlari
- *     veriyor ama `movs r5,#7` bir komut erken cikiyor (1 komut fark);
- *     isaretci yurutmek 20 komut fark veriyor.
- *   - Bos karo sabiti bastaki sifir dongusunde AYRI YERELE alinmali;
- *     dogrudan yazilirsa adres hesabi sabitten once uretiliyor.
- *   - Bastaki sifir dongusunun sinir karsilastirmasi ISARETLI olmali
- *     (ROM `ble`); isaretci karsilastirmasi `bls` uretiyor.
+ * THREE MEASUREMENTS:
+ * - Use increasing for (i=0; i<8; i++) with digits[i]. A descending counter
+ *   and digits[7-i] emits the same instructions but moves movs r5,#7 one
+ *   instruction early; walking a pointer gives 20 instructions differences.
+ * - In the leading-zero loop, store the empty constant in a SEPARATE local;
+ *   direct use computes the address before loading the constant.
+ * - The leading-zero bound comparison must be SIGNED (ble); a pointer
+ *   comparison emits bls.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/draw_eight_digits.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/draw_eight_digits.c
  */
 
 #include "gba_types.h"
@@ -95,9 +92,9 @@ void DrawCounterDigits8(s32 value, s32 x, s32 y)
     }
 }
 
-/* 0x0802A734 — AYNI GOVDE; TEK FARK dongu sayisi 8 yerine 3.
- * (ROM'da `movs r5,#7` yerine `movs r5,#2`.)  Sekiz basamak yine
- * hesaplaniyor, yalnizca uc tanesi ciziliyor. */
+/* 0x0802A734 — same body except loop count 3 instead of 8 (movs r5,#2
+ * instead of #7). Eight digits are still computed; only three are drawn.
+ */
 void DrawCounterDigits3(s32 value, s32 x, s32 y)
 {
     s32 digits[8];

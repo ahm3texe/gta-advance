@@ -1,52 +1,47 @@
-/* Band B — 0x08030B34 .. 0x08031D23 arasindan dokuz fonksiyon.
+/* Historical band B: nine functions from 0x08030B34 .. 0x08031D23.
  *
- * ONEMLI OLCUM NOTU — `make c-match FILE=src/world/band_b.c` CIKTISI YANILTICI
- * ----------------------------------------------------------------------------
- * tools/agbcc_build.py bir dosyadaki TUM fonksiyonlari PES PESE, en kucuk ROM
- * adresinden baslayarak linkliyor (`base = min(address)`, `SUBALIGN(1)`).  Bu
- * dokuz fonksiyon ROM'da BITISIK DEGIL; aralarinda baska ceviri birimlerine ait
- * fonksiyonlar var.  Sonuc: ilk fonksiyon (SendTextMode1) disindaki her fonksiyon
- * kendi ROM adresinden SABIT bir delta kadar kaymis olarak linkleniyor ve
- * govdesindeki her `bl` o delta kadar yanlis kodlaniyor.  Govde birebir dogru
- * olsa bile `bl` iceren fonksiyon "farkli: 2/N byte" gorunuyor.
+ * MEASUREMENT NOTE: results from the former src/world/band_b.c were misleading.
+ * agbcc_build.py links all functions consecutively from min(address), using
+ * SUBALIGN(1). These nine are not contiguous in the ROM: other translation
+ * units intervene. All but the first (SendTextMode1) were linked at a fixed
+ * displacement from their ROM addresses, making every bl offset wrong even
+ * for otherwise matching code (reported as 2/N differing bytes).
+ * Each was therefore measured separately at its own ROM address:
+ *   SendTextMode1 12 BYTE-MATCHING
+ *   LoadHudPalettes 124 BYTE-MATCHING
+ *   TriggerEvent39 12 BYTE-MATCHING
+ *   GetRecordNodeById 14 BYTE-MATCHING
+ *   ScaleMagnitude 132 BYTE-MATCHING
+ *   ClearHudRowsAB 72 BYTE-MATCHING
+ *   ReleaseActorAndSlot 64 BYTE-MATCHING
+ *   BlitStripClipLeft4bpp 470 NON-MATCHING
+ *   PushSlotQueueEntry 140 MISSING RAM SYMBOL
+ * These are historical results; detailed notes accompany the split sources.
  *
- * Bu yuzden her fonksiyon AYRICA tek fonksiyonluk bir dosyada (base = kendi ROM
- * adresi, `bl` dogru) olculdu.  Tek fonksiyonluk olcumler — dogru olanlar:
- *     SendTextMode1  12  BYTE-MATCHING
- *     LoadHudPalettes 124  BYTE-MATCHING
- *     TriggerEvent39  12  BYTE-MATCHING
- *     GetRecordNodeById  14  BYTE-MATCHING
- *     ScaleMagnitude 132  BYTE-MATCHING
- *     ClearHudRowsAB  72  BYTE-MATCHING
- *     ReleaseActorAndSlot  64  BYTE-MATCHING
- *     BlitStripClipLeft4bpp 470  eslesmedi (asagida ayrintili)
- *     PushSlotQueueEntry 140  RAM SEMBOLU EKSIK (asagida ayrintili)
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_b.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/ui/load_hud_palettes.c
  */
 
 #include "gba_types.h"
 #include "gba_io.h"
 
-/* ---- 0x08030EAC — 124 bayt, BYTE-MATCHING -------------------------------
+/* 0x08030EAC — 124 bytes, BYTE-MATCHING.
  *
- * Iki palet blogunu kuruyor.  Once 0x02026BE0'daki bayragi sifirliyor, sonra
- * kesmeleri kapatip DMA3 ile yigindaki 0x3333 sabitini 0x0600A780'e 16 yarim
- * soz olarak dolduruyor (kaynak sabit adresli: 0x81000010).  Kesmeler geri
- * acilip CpuSet ile 0x08347C28 -> 0x0600A7A0 kopyalaniyor, ardindan ikinci bir
- * DMA3 aktarimi 0x08348B28 -> 0x0600A7C0 (32 yarim soz) yapiliyor.
+ * Initialize two palette blocks. Clear flag 0x02026BE0, disable interrupts,
+ * DMA3-fill 16 halfwords at 0x0600A780 from stack constant 0x3333 with fixed
+ * source (0x81000010). Restore interrupts, CpuSet-copy 0x08347C28 ->
+ * 0x0600A7A0, then DMA3-copy 32 halfwords 0x08348B28 -> 0x0600A7C0.
  *
- * OLCULEN AYRINTILAR:
- *  - `fill` YIGINDA ve `volatile` olmali (kural 3).  volatile olmadan agbcc
- *    adres alma ile sabit yuklemeyi yeniden siraliyor.
- *  - Sabit DOGRUDAN store ifadesinde: `ldr r3,=0x3333 / adds r0,r3,#0` cifti
- *    (src/ui/hud_fields.c MEKANIZMA 1) ancak HImode store sabitinden cikiyor.
- *  - `REG_DMA3.control;` satirlari olu okuma degil: ROM `ldr r0,[r4,#8]` ile
- *    denetim kelimesini geri okuyor (kural 62, volatile gorunum).
- *  - 0x02026BE0 icin ram_map kaydi YOK; ROM ofsetsiz (`strb r0,[r1,#0]`)
- *    kullandigi icin kural 1 devreye girmiyor ve cast yazimi ayni baytlari
- *    veriyor.  Sembol eklenirse `extern u8 gRam02026BE0;` yazimi tercih edilir.
+ * MEASURED:
+ * - fill must be on the stack and volatile (rule 3); otherwise agbcc reorders
+ *   address formation and constant loading.
+ * - Constant directly in the store: only HImode produces ldr r3,=0x3333 /
+ *   adds r0,r3,#0 (hud_fields.c mechanism 1).
+ * - REG_DMA3.control reads are required readbacks, not dispensable dead reads:
+ *   ROM ldr r0,[r4,#8] (rule 62, volatile view).
+ * - 0x02026BE0 lacked a ram_map record. Its zero-offset strb r0,[r1,#0]
+ *   makes a cast reproduce the bytes; rule 1 does not intervene. Prefer
+ *   extern u8 gRam02026BE0 if the symbol is registered.
  */
 
 #define PAL_FLAG      (*(u8 *)0x02026BE0)
@@ -56,8 +51,8 @@
 #define PAL_DST       ((void *)0x0600A7A0)
 #define PAL_SRC2      ((const void *)0x08348B28)
 #define PAL_DST2      ((void *)0x0600A7C0)
-#define DMA_FILL16    0x81000010        /* enable, kaynak sabit, 16 yarim soz */
-#define DMA_COPY16    0x80000020        /* enable, 32 yarim soz */
+#define DMA_FILL16    0x81000010        /* enable, fixed source, 16 halfwords */
+#define DMA_COPY16    0x80000020        /* enable, 32 halfwords */
 #define CPUSET_COPY   0x30
 
 extern void CpuSet(const void *src, void *dst, u32 control);

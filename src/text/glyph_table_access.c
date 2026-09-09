@@ -1,18 +1,15 @@
-/* Glif tablosu erisimi — 0x08064698-0x080646AB, 0x080646F8-0x08064723
+/* Glyph table access — 0x08064698-0x080646AB, 0x080646F8-0x08064723
  *
- * Iki fonksiyon da 0x08BD3448 + 0x04'teki isaretci tablosunu u16 indeksle
- * okuyor: `lsls #16 / lsrs #14` kalibi hem u16'ya kirpip hem 4 ile
- * carpiyor (isaretci dizisi indeksi).
+ * Both index the pointer table at 0x08BD3448 +0x04 with a u16 index:
+ * lsls #16 / lsrs #14 simultaneously truncates to u16 and scales by 4.
  *
- * 0x08064698: girisin +0x10 alanini donduruyor.
- * 0x080646F8: +0x10 sifirsa 0 donuyor, degilse +0x14'teki u16 tamponunda
- *   (c << 6) + (b << 4) konumunun ADRESINI donduruyor.  Sondaki `lsls #1`
- *   u16 olceklemesi, yani taban u16*.
+ * 0x08064698 returns entry +0x10. 0x080646F8 returns 0 if +0x10 is zero,
+ * otherwise the ADDRESS of (c << 6) + (b << 4) in the u16 buffer at +0x14.
+ * The final lsls #1 scales u16 elements, so the base is u16*.
+ * Both return a value in r0 with bx lr and use no stack.
  *
- * Ikisi de `bx lr` ile donuyor (yigin kullanmiyor) ve r0'da deger tasiyor.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/glyph_table_access.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/glyph_table_access.c
  */
 
 #include "gba_types.h"
@@ -42,11 +39,11 @@ u16 *GetGlyphCell(u16 index, u32 b, u32 c)
     GlyphEntry *entry;
     u16 *base;
 
-    /* SIRA: ROM veri isaretcisini daldan HEMEN SONRA yukluyor
-       (ldr r0,[r1,#20]), ofseti sonra hesapliyor.  `&entry->data[...]`
-       yazmak tersini uretiyordu.  Ayrica ROM push YAPMIYOR: sadece
-       r0-r3 kullanan bir yaprak, o yuzden fazladan yerel tutmamak
-       gerekiyor. */
+    /* ORDER: the ROM loads the data pointer immediately AFTER the branch
+ * (ldr r0,[r1,#20]), then computes the offset. &entry->data[...] reversed
+ * that order. It also performs no push: this is an r0-r3-only leaf, so
+ * avoid extra locals.
+ */
     entry = gRom08BD3448.table[index];
     if (entry->count == 0)
         return 0;

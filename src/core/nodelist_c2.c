@@ -7,7 +7,7 @@
  * pulled down to 1.
  * At the end FUN_08055D90 is called with the list head + id.
  *
- * +0x0B BAYTI BITFIELD: `ldrb` + `lsls #24` / `asrs #28` cifti, bit 4..7'de
+ * BITFIELD AT +0x0B: the `ldrb` + `lsls #24` / `asrs #28` pair for bits 4..7
  * means a SIGNED 4-bit field. The `== 1` comparison on the same field, by
  * contrast, produces `movs #240 / ands / cmp #16` with no shift — agbcc
  * reducing a bitfield equality comparison to a mask. The `level = 1` assignment

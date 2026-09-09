@@ -1,23 +1,21 @@
-/* Duraklatma metinleri — 0x080023F0-0x080024B3 (196 bayt)
+/* Pause text — 0x080023F0-0x080024B3 (196 bytes)
  *
- * DURUM: 46/85 komut, YAKIN ISKA (eslesmiyor). Boyut tutuyor.
+ * STATUS: 46/85 instructions, NEAR MISS. Size matches.
+ * ClearTextArea(0,64,10), then selection-dependent SetTextContext
+ * (0x06008240,30,tiles A/B,widths B,128,flag) and
+ * DrawText(GetTextString(148),0,64). Repeat with flag sel==0 and text 149
+ * at (40,64).
  *
- * ClearTextArea(0,64,10); secime gore SetTextContext (0x06008240, 30,
- * karo A/B, genislik B, 128, bayrak) ve DrawText(GetTextString(148), 0,
- * 64); ayni sey `sel == 0` bayragiyla ve metin 149 (40,64) icin.
+ * REMAINING DIFFERENCE: ROM loads SetTextContext arguments in order r2,r3,
+ * stack, then r0 (VRAM pool constant) LAST. agbcc loads VRAM FIRST and uses
+ * two callee-saved registers for ok/sel, versus ROM sel=r4/ok=r1. Tried
+ * VRAM as void* / u8* / integer macros, cast table macros vs extern arrays,
+ * a local ok vs inline sel==0 vs two macro expansions (42-46). The matching
+ * call in menu_loop.c uses 0x06000000, built with movs/lsls without a pool.
+ * Here the unresolved issue is placement of the pool constant among arguments.
  *
- * KALAN FARK: ROM SetTextContext argumanlarini r2,r3, yigin, EN SON r0
- * (VRAM havuz sabiti) sirasiyla yukluyor; agbcc bende VRAM'i ILK
- * yukluyor ve `ok`/`sel` icin iki callee-saved yazmac ayiriyor (ROM
- * yalnizca sel r4, ok r1). Denenen: VRAM void* / u8* / tamsayi makro, karo
- * tablolari cast makrosu vs extern dizi, `ok` yereli / satir ici
- * `sel == 0` / makro ile iki kez acilim (42-46). menu_loop.c'deki
- * eslesen cagrida VRAM 0x06000000 (movs/lsls ile uretiliyor, havuz
- * yok); buradaki fark havuz sabitinin arguman sirasinda nereye
- * kondugu -- bilinen kaynak kaldiraci yok.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/draw_pause_texts.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/draw_pause_texts.c
  */
 
 #include "gba_types.h"

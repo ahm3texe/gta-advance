@@ -1,7 +1,7 @@
-/* Genel kayit slotu okuma/yazma — 0x08000B00-0x08000BE3
+/* Generic save-slot read/write — 0x08000B00-0x08000BE3
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/save/save_slots.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/save/save_slots.c
  */
 
 #include "gba_types.h"

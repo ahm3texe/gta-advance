@@ -1,42 +1,36 @@
-/* Metin cizim baglamini kurma — 0x0806430C-0x0806434B
+/* Set the text drawing context — 0x0806430C-0x0806434B
  *
- * Alti parametreyi alti genel degiskene yaziyor; dallanma yok.
- * Dordu yazmacta (r0-r3), ikisi yiginda (sp+16, sp+20 -- push {r4,r5,r6,lr}
- * 16 bayt oldugu icin).  Besinci parametre `lsls #24 / lsrs #24` ile
- * u8'e kirpilıyor.
+ * Write six parameters to six globals without branches. Four arrive in
+ * r0-r3, two at sp+16/sp+20 after the 16-byte push {r4,r5,r6,lr}. Parameter
+ * five is truncated to u8 with lsls #24 / lsrs #24.
+ * Rule 35: pop {r0}; bx r0 indicates void.
  *
- * Kural 35: `pop {r0}; bx r0` -> donus tipi void.
+ * NAMING — resolved conflict: callers menu_screen.c/menu_loop.c treated this
+ * as a TILE LOADER (tilesA/tilesB), but disassembly shows a pure context setter.
+ * Usage settled the issue: gGlyphWidths[index] is indexed as an array in two
+ * MATCHING files (clear_text_area.c:115, draw_text.c:58), proving it is a
+ * table pointer. The caller's tilesB name was a mistaken inference.
  *
- * ADLANDIRMA NOTU — cozulmus celiski:
- * Cagiranlar (menu_screen.c, menu_loop.c) bu fonksiyonu KARO YUKLEYICI
- * saniyordu (`tilesA`, `tilesB` parametre adlari).  Disassembly ise saf
- * bir baglam kurucusu gosteriyor.  Karar KULLANIMDAN verildi:
- * `gGlyphWidths[index]` iki ESLESMIS dosyada dizi olarak indeksleniyor
- * (clear_text_area.c:115, draw_text.c:58), yani gercekten tablo
- * isaretcisi.  Cagirandaki `tilesB` adi yanlis tahmindi.
+ * OPEN QUESTION: gFontIndex receives 160 (MENU_TILE_WIDTH) here and
+ * 160/192/128/240/242 in traces, resembling width/position more than a font
+ * index. The name is QUESTIONABLE but retained without evidence for a better
+ * one and to avoid disturbing matching files.
  *
- * ACIK SORU: `gFontIndex` bu cagrida 160 aliyor (MENU_TILE_WIDTH) ve
- * izleme logunda 160/192/128/240/242 degerlerini aliyor -- bunlar font
- * indeksinden cok genislik/konum gibi duruyor.  Ad SUPHELI ama daha iyi
- * bir ad icin kesin kanit yok; eslesmis dosyalara dokunmamak icin
- * korundu.
+ * NEW SYMBOL: 0x02036308 was unmapped. It receives 0x08831880, exactly 0xE000
+ * bytes before gGlyphWidths' 0x0883F880, consistent with glyph bitmaps followed
+ * by a width table. gGlyphTiles is therefore a PROVISIONAL name.
  *
- * YENI SEMBOL: 0x02036308 haritada yoktu.  Cagrida 0x08831880 aliyor;
- * gGlyphWidths'in aldigi 0x0883F880 ile arasi tam 0xE000 bayt, yani
- * once glif bitmapleri sonra genislik tablosu duzenine uyuyor.
- * `gGlyphTiles` adi bu nedenle GECICI.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/set_text_context.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/set_text_context.c
  */
 
 #include "gba_types.h"
 
 extern u8  *gTextVramBase;      /* 0x02036310 */
 extern u32  gTextRowStride;     /* 0x0203630C */
-extern u8  *gGlyphTiles;        /* 0x02036308 -- GECICI ad */
+extern u8  *gGlyphTiles;        /* 0x02036308 — PROVISIONAL name */
 extern u8  *gGlyphWidths;       /* 0x02036314 */
-extern u32  gFontIndex;         /* 0x02036318 -- ad supheli, yukari bak */
+extern u32  gFontIndex;         /* 0x02036318 — questionable name; see above */
 extern u32  gHalfLineSpacing;   /* 0x0203631C */
 
 /* 0x0806430C */

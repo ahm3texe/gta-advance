@@ -1,7 +1,7 @@
-/* Menu durum yardimcilari — 0x08001DC0-0x08001E2F
+/* Menu state helpers — 0x08001DC0-0x08001E2F
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/ui/menu_helpers.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/ui/menu_helpers.c
  */
 
 #include "gba_types.h"
@@ -14,8 +14,9 @@ extern u32 gMenuFlags;
 extern u32 gMenuRuntimeState;
 extern u32 gActiveMenuItems[ACTIVE_MENU_ITEM_MAX];
 
-/* Henuz adlandirilmadi: 0x080512B0 alti byte'lik bir erisimci,
- * 0x08004280 ise 624 byte'lik bir islem. */
+/* Originally unnamed: 0x080512B0 is a six-byte accessor; 0x08004280
+ * is a 624-byte operation.
+ */
 extern u32 GetRecordIndex(void);
 extern void FUN_08004280(u32 target, u32 argument);
 
@@ -27,8 +28,9 @@ void ResetMenuState(void)
     gMenuPositionX = 0;
     gActiveMenuItemCount = 0;
 
-    /* agbcc bu ileri donguyu geriye giden bir isaretci yuruyusune cevirir;
-     * ROM'daki bicim odur. */
+    /* agbcc converts this forward loop to a backward pointer walk,
+ * matching the ROM.
+ */
     for (i = 0; i < ACTIVE_MENU_ITEM_MAX; i++)
         gActiveMenuItems[i] = 0;
 

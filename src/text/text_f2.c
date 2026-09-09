@@ -1,87 +1,74 @@
-/* Tek glifi metin katmanina yerlestirme — 0x08064020-0x0806417F
+/* Place a glyph in the text layer — 0x08064020-0x0806417F
  *
- * draw_text.c'deki DrawTextAt her karakter icin bunu cagiriyor. Gorevi:
- * kirpma testleri, karakter normalizasyonu ve glif karolarinin hedef
- * adreslerini kurup asil piksel karistiricisini (BlendGlyphAcrossTiles, text_f1.c)
- * cagirmak.
+ * DrawTextAt in draw_text.c calls this for each character. It clips,
+ * normalizes characters, constructs destination tile addresses, and calls
+ * the pixel blender BlendGlyphAcrossTiles (text_f1.c).
  *
- * Akis:
- *   1. Ekran disi kirpmalari: x > 239, y > 159, y < 0, x <= -16.
- *   2. 146 -> 39 ikamesi (draw_text.c'deki GlyphAdvance ile ayni kalip),
- *      sonra _toupper. Glif tablosu yalnizca buyuk harf tasiyor.
- *   3. Genislik ONCEDEN aliniyor (GetGlyphWidth), cunku hem cikis testinde
- *      hem de asagida "ikinci karo sutunu gerekiyor mu" kararinda lazim.
- *      ROM bu degeri yigin yuvasinda tutuyor (sub sp,#4) -- derleyicinin
- *      kendi tasmasi, kaynakta karsiligi yok.
- *   4. 95 ('_') tamamen atlaniyor; 32 altindaki kontrol karakterleri de.
- *   5. x TEK ise bir artiriliyor: hedef yarim-kelime iki pikseli birlikte
- *      tasidigi icin glif ciftlere hizali olmak zorunda.
- *   6. x + genislik <= 0 ise glif tumuyle solda kalmis demektir.
+ * Flow:
+ * 1. Clip x > 239, y > 159, y < 0, x <= -16.
+ * 2. Substitute 146 -> 39 (same as GlyphAdvance in draw_text.c), then _toupper;
+ *    the glyph table contains uppercase characters only.
+ * 3. Read width EARLY through GetGlyphWidth, needed both for rejection and
+ *    deciding whether a second tile column is required. The ROM keeps it in
+ *    a stack slot (sub sp,#4), a compiler spill with no source-level equivalent.
+ * 4. Skip 95 ('_') and control characters below 32.
+ * 5. Increment odd x: destination halfwords hold pixel pairs, requiring alignment.
+ * 6. Reject x + width <= 0, where the whole glyph lies left of the screen.
  *
- * Yerlesim: satir = y >> 3, sutun = x >> 3, karo ici piksel = x & 7
- * (ROM bunu `x - (sutun << 3)` olarak yaziyor, maskeyle degil).
- * Hedef bayt adresi = gTextVramBase + sutun*64 + satir*gTextRowStride*64.
+ * Layout: row = y >> 3, column = x >> 3, subpixel = x & 7 (the ROM uses
+ * x - (column << 3), not a mask). Destination byte address = gTextVramBase
+ * + column*64 + row*gTextRowStride*64.
  *
- * IKI GLIF DUZENI -- ayrimi gHalfLineSpacing yapiyor:
- *   gHalfLineSpacing != 0  : 8x8 glif, karo basina 64 bayt, TEK cagri.
- *   gHalfLineSpacing == 0  : 16x16 glif, 256 bayt, DORT karo. Tablodaki
- *     siralama +0x00 sol-ust, +0x40 sag-ust, +0x80 sol-alt, +0xC0 sag-alt.
- *     Alt karo bir satir asagi (dest + stride*64). Sag sutun yalnizca
- *     genislik 8'i asiyorsa ciziliyor; o zaman x 8 artirilip sutun ve
- *     karo ici piksel yeniden hesaplaniyor.
- * clear_text_area.c ayni bayragi ayni yonde okuyor (0 -> tam satir
- * yuksekligi), yani yorum tutarli.
+ * TWO GLYPH LAYOUTS selected by gHalfLineSpacing:
+ * Nonzero: 8x8 glyph, 64 bytes per tile, ONE call.
+ * Zero: 16x16 glyph, 256 bytes, FOUR tiles ordered +0x00 upper-left, +0x40
+ * upper-right, +0x80 lower-left, +0xC0 lower-right. Lower tiles use
+ * dest + stride*64. Draw the right column only if width > 8; increment x
+ * by 8 and recompute column/subpixel. clear_text_area.c interprets the flag
+ * consistently (0 means full line height).
  *
- * gTextRowStride her cagridan SONRA yeniden okunuyor: cagri bellegi
- * bozabildigi icin agbcc onu onbellege alamiyor. Adresi ise sl'de
- * tutuluyor -- bu, kaynakta ayri bir yerel degil, sabit havuzundan tek
- * yukleme yapmasinin dogal sonucu.
+ * gTextRowStride is reread AFTER every call, since calls may modify memory.
+ * Its address stays in sl as a natural consequence of one literal-pool load,
+ * not a separate source local.
  *
- * 0x080640CA-0x080640DB ve 0x08064174-0x0806417F araliklari KOD DEGIL,
- * sabit havuzu (dort RAM adresi). Disassembler oralari komut sanir.
+ * 0x080640CA-0x080640DB and 0x08064174-0x0806417F are literal pools of four
+ * RAM addresses, NOT CODE, despite disassembler output.
  *
- * ESLESMEYI SAGLAYAN IKI SEY (olculdu, 356/352 baytlik ilk surumden geldi):
+ * TWO MEASURED FIXES (starting from 356/352 bytes):
+ * 1. WORD-WIDTH FIRST PARAMETER, not u8 (rule 15). u8 ch inserts lsls #24 /
+ *    lsrs #24 at entry; the ROM instead starts with adds r4,r0,#0. u8 gives
+ *    311/356 differences, word width 141/352. Normalization also shifts all
+ *    register allocation. At the time of this note, clear_text_area.c and
+ *    draw_text.c still declared extern void PlaceGlyph(u8 ch, s32 x, s32 y).
+ *    The call ABI is the same (a u8 value already arrives in r0), and both
+ *    files matched, but the declaration/definition types differed; those
+ *    declarations were identified for conversion to s32 on the next edit.
+ * 2. ONE VARIABLE for raw character and table index (rule 27). A separate
+ *    index produced adds r3,r0,#0 + adds r4,r3,#0 and swapped x/y between
+ *    r5/r6. Updating ch in place (_toupper, then ch -= 32) fixed both:
+ *    141 -> 0.
  *
- * 1) ILK PARAMETRE KELIME GENISLIGINDE, `u8` DEGIL (kural 15).
- *    `u8 ch` yazilinca agbcc prologa giris normalizasyonu (lsls #24 /
- *    lsrs #24) koyuyor; ROM'da o iki komut YOK, dogrudan `adds r4,r0,#0`
- *    var. `u8` -> 311/356 fark, kelime genisligi -> 141/352. Ayrica
- *    normalizasyonun kullandigi register tum dagitimi bir kaydiriyordu.
- *    NOT: clear_text_area.c ve draw_text.c bu fonksiyonu hala
- *    `extern void PlaceGlyph(u8 ch, s32 x, s32 y);` diye bildiriyor.
- *    Cagri ABI'si ayni (deger zaten r0'da u8 olarak geliyor) ve o iki
- *    dosya BYTE-MATCHING durumda, ama bildirim ile tanim tip olarak
- *    ayrisiyor; bir sonraki dokunusta oradaki bildirimler `s32`ye
- *    cekilmeli.
+ * REJECTED: u8 ch (311/356) and a separate index (141/352). Three versions
+ * sufficed, so no volatile, separate base locals or short-lived temporary
+ * blocks were needed to adjust allocation.
  *
- * 2) HAM KARAKTER VE TABLO INDEKSI TEK DEGISKEN (kural 27).
- *    Ayri bir `index` yereli tutmak `adds r3,r0,#0` + `adds r4,r3,#0`
- *    ciftini ve x/y'nin r5<->r6 takasini uretiyordu. `ch`'yi yerinde
- *    donusturmek (once _toupper, sonra `ch -= 32`) her ikisini de
- *    kapatti: 141 -> 0.
- *
- * DENENIP ELENEN: `u8 ch` imzasi (311/356) ve ayri `index` yereli
- * (141/352). Uc surumde eslesme saglandigi icin register dagitimina
- * yonelik baska bir hamleye (volatile, ayri taban yerelleri, kisa omurlu
- * gecici bloklar) gerek kalmadi.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/text_f2.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/text_f2.c
  */
 
 #include "gba_types.h"
 
-#define GLYPH_FIRST      32   /* tablonun ilk karakteri (bosluk) */
-#define GLYPH_SUBSTITUTE 146  /* metinde gecen ozel bayt */
-#define GLYPH_APOSTROPHE 39   /* onun karsiligi */
-#define GLYPH_SKIP       95   /* '_' hic cizilmiyor */
+#define GLYPH_FIRST      32   /* first table character (space) */
+#define GLYPH_SUBSTITUTE 146  /* special byte found in text */
+#define GLYPH_APOSTROPHE 39   /* replacement character */
+#define GLYPH_SKIP       95   /* underscore is never drawn */
 #define SCREEN_RIGHT     239
 #define SCREEN_BOTTOM    159
-#define LEFT_LIMIT       16   /* x <= -16 ise glif tamamen solda */
-#define TILE_SHIFT       3    /* 8 piksel = 1 karo */
-#define TILE_ORDER       6    /* 8bpp karo = 64 bayt */
-#define GLYPH_ORDER      8    /* 16x16 glif = 256 bayt */
-#define GLYPH_HALF       8    /* dar glif genisligi */
+#define LEFT_LIMIT       16   /* x <= -16 places the glyph entirely left of the screen */
+#define TILE_SHIFT       3    /* 8 pixels = 1 tile */
+#define TILE_ORDER       6    /* 8bpp tile = 64 bytes */
+#define GLYPH_ORDER      8    /* 16x16 glyph = 256 bytes */
+#define GLYPH_HALF       8    /* narrow glyph width */
 #define TILE_TOP_RIGHT   0x40
 #define TILE_BOT_LEFT    0x80
 #define TILE_BOT_RIGHT   0xC0

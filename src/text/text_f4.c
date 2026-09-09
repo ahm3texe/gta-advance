@@ -1,84 +1,62 @@
-/* Metin katmani kurulumu ve temizligi -- 0x08064614-0x08064697
+/* Initialize and clear the text layer — 0x08064614-0x08064697
  *
- * Metin cizim baglamini kurar, hedef VRAM bolgesini DMA3 ile sifirlar ve
- * yazi paletini palet RAM'ine kopyalar. Dallanma yok; tek dogrusal akis.
+ * Set the text context, DMA3-clear destination VRAM and copy the font palette
+ * to palette RAM. One linear path without branches.
  *
- * ROM'DAN OLCULEN AYRINTILAR
+ * ROM MEASUREMENTS:
+ * 1. Destination: lsls r5,r5,#5 + (0xC0 << 19) = VRAM_BASE + tile*32.
+ *    32 bytes is one 4bpp tile, so parameter one is a TILE INDEX. The ROM
+ *    constructs 0x06000000 with movs #192 / lsls #19 rather than a pool load.
+ *    VRAM_BASE reproduces this; no extern is needed (rule 1 does not apply
+ *    to this ROM/VRAM constant; see COMPILER.md on shifted address constants).
+ * 2. SetTextContext arguments: r0=dest, r1=28, r2=0x0884DE40, r3=0x088516C0,
+ *    sp+0=(u8)(palette+bias), sp+4=1. Signature copied from set_text_context.c.
+ * 3. Cross-check: stride 28 tiles *64 bytes =1792 bytes =0x380 halfwords,
+ *    exactly the clear DMA count. Second DMA: 0x10 halfwords =16 colors,
+ *    one 4bpp palette. Destination 0x05000000+palette*2 proves parameter two
+ *    is a PALETTE ENTRY INDEX measured in colors.
+ * 4. adds r2,r6,r2 + lsls/lsrs #24: fontIndex is palette+bias truncated to
+ *    u8. The caller truncates because the prototype parameter is u8.
  *
- * 1. HEDEF ADRES. `lsls r5,r5,#5` + (0xC0 << 19) yani VRAM_BASE + tile*32.
- *    32 bayt = bir 4bpp karo, yani birinci parametre KARO INDEKSI.
- *    0x06000000 havuzdan okunmuyor, `movs #192 / lsls #19` ile
- *    hesaplaniyor -- docs/COMPILER.md'nin "agbcc'nin kaydirmayla
- *    uretebildigi adresler sabit cast olarak yazilmis" notu; VRAM_BASE
- *    makrosu bunu aynen veriyor, extern sembol GEREKMIYOR (kural 1 burada
- *    gecerli degil, adres ROM/VRAM sabiti).
+ * This function MATCHED ON THE FIRST ATTEMPT. The following removal tests
+ * were measured AFTER matching to establish which choices matter:
+ * - Change prototype fontIndex u8 to u32: 107 differing bytes. The caller's
+ *   lsls #24 / lsrs #24 disappears and size drops to 128 (caller side of
+ *   rule 15); truncation inside the callee does not substitute for this.
+ * - Remove volatile from stack fill: 61 bytes (rule 3); address formation
+ *   is reordered relative to the constant load.
+ * - Move fill=0 after src assignment: 8 bytes. ROM strh r3,[r0] precedes
+ *   str r0,[r1,#0] (rule 19).
+ * - Assign the bare dead REG_DMA3.control read to ime: 85 bytes, size 136.
+ *   clear_text_area.c requires the opposite form; measure both rather than
+ *   assuming the same family needs the same expression.
+ * - Use separate volatile DmaChannel *dma instead of REG_DMA3: 17 bytes;
+ *   the pool load moves earlier, as in menu_graphics.c.
  *
- * 2. SetTextContext ARGUMANLARI. r0=dest, r1=28, r2=0x0884DE40,
- *    r3=0x088516C0, sp+0=(u8)(palette+bias), sp+4=1. Imza kardes dosyadan
- *    (src/text/set_text_context.c) aynen alindi.
+ * NO DIFFERENCE (all zero): explicit (u8)(palette+bias) since the prototype
+ * already converts; s32 parameters since only shifts/addition are used;
+ * remove dest and duplicate its expression (CSE merges); separate ime2 for
+ * block two (nonoverlapping lifetimes reuse the register); write the palette
+ * destination as (u16 *)PALETTE_BASE + palette.
  *
- * 3. TUTARLILIK KONTROLU -- yorum uydurma degil, sayilar birbirini
- *    dogruluyor: stride 28 karo x 64 bayt = 1792 bayt = 0x380 yarim-kelime,
- *    ve temizleme DMA'sinin sayaci TAM OLARAK 0x380. Ikinci DMA 0x10
- *    yarim-kelime = 16 renk = tek 4bpp palet; hedef 0x05000000 + palette*2
- *    oldugu icin ikinci parametre PALET GIRIS INDEKSI (renk cinsinden).
+ * NAMING: tile index, palette index and font bias follow ROM usage.
+ * GLYPH_TILES/GLYPH_WIDTHS follow SetTextContext parameters three/four in
+ * the sibling file, where gGlyphTiles is marked PROVISIONAL. The function
+ * name remains InitTextTilesAndPalette.
  *
- * 4. IKI ARGUMANIN TOPLAMI. `adds r2,r6,r2` + `lsls/lsrs #24`: fontIndex
- *    parametresi palette+bias'in u8'e kirpilmisi. Kirpma cagiranda
- *    goruluyor cunku prototipteki parametre `u8` (asagiya bak).
- *
- * ---- OLCULEN BICIM KURALLARI (her biri ayri ayri sinandi) ----
- *
- * Bu fonksiyon ILK DENEMEDE eslesti. Asagidaki sayilar eslesmeden SONRA,
- * hangi yazim tercihinin gercekten tasiyici oldugunu belgelemek icin
- * olculdu -- yani "denedim tutmadi" degil, "kaldirinca sunu bozuyor".
- *
- *   fontIndex prototipte `u8` (`u32` yapmak)              -> 107 bayt fark
- *       `u32` olunca cagirandaki `lsls #24 / lsrs #24` cifti tumden
- *       kayboluyor ve fonksiyon 128 bayta iniyor (kural 15'in cagiran
- *       tarafi). Kardes tanimin kendi ic kirpmasi bunu KARSILAMIYOR.
- *   `fill` yigin tamponu `volatile`                       ->  61 bayt fark
- *       Kural 3. Kaldirilinca agbcc adres almayi sabit yuklemesiyle
- *       yeniden siraliyor.
- *   `fill = 0;` src atamasindan ONCE                      ->   8 bayt fark
- *       ROM sirasi: `strh r3,[r0]` sonra `str r0,[r1,#0]`. Kural 19.
- *   Olu `REG_DMA3.control;` okumasi CIPLAK                ->  85 bayt fark
- *       Degeri `ime`ye atamak dagitimi bozuyor ve fonksiyonu 136 bayta
- *       cikariyor. clear_text_area.c'de TERSI gerekiyordu (orada okuma bir
- *       yerele atanmali) -- ayni ailede ayni deyim iki farkli bicim
- *       istiyor, ezberlenmez, iki yonu de olcun.
- *   `REG_DMA3` makrosu, ayri `dma` yereli DEGIL           ->  17 bayt fark
- *       menu_graphics.c ile ayni tercih; `volatile DmaChannel *dma`
- *       yereli acmak havuz yuklemesini one alip sirayi kaydiriyor.
- *
- * FARK YARATMAYAN (hepsi 0 -- bu satirlarda serbestsiniz):
- *   - `(u8)(palette + bias)` acik cast'i: prototip zaten donusturuyor.
- *   - Parametreleri `s32` yapmak: hepsi yalnizca kaydirma/toplama ile
- *     kullanildigi icin isaretlilik komut secmiyor.
- *   - `dest` yerelini kaldirip ifadeyi iki kez yazmak: CSE birlestiriyor.
- *   - Ikinci blok icin ayri `ime2` yereli: omur ortusmedigi icin ayni
- *     yazmaca dusuyor.
- *   - Palet hedefini `(u16 *)PALETTE_BASE + palette` diye yazmak.
- *
- * ADLANDIRMA: uc parametrenin anlami ROM'daki kullanimdan cikarildi
- * (karo indeksi / palet indeksi / font sapmasi). GLYPH_TILES ve
- * GLYPH_WIDTHS adlari SetTextContext'in 3. ve 4. parametrelerinin kardes
- * dosyada aldigi adlardan geliyor; oradaki `gGlyphTiles` adi da GECICI
- * olarak isaretli. Fonksiyon adi InitTextTilesAndPalette olarak birakildi.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/text_f4.c  -> BYTE-MATCHING 132/132
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/text_f4.c  -> BYTE-MATCHING 132/132
  */
 
 #include "gba_io.h"
 
-#define TEXT_TILE_COUNT  28              /* 28 karo x 64 bayt = 0x380 yarim-kelime */
+#define TEXT_TILE_COUNT  28              /* 28 tiles * 64 bytes = 0x380 halfwords */
 #define GLYPH_TILES      ((u8 *)0x0884DE40)
 #define GLYPH_WIDTHS     ((u8 *)0x088516C0)
 #define TEXT_PALETTE     ((const void *)0x0884DC40)
 #define PALETTE_BASE     0x05000000
-#define DMA_CLEAR_TEXT   0x81000380      /* sabit kaynak, 16 bit, 0x380 adet */
-#define DMA_COPY_PALETTE 0x80000010      /* 16 renk */
+#define DMA_CLEAR_TEXT   0x81000380      /* fixed source, 16-bit, count 0x380 */
+#define DMA_COPY_PALETTE 0x80000010      /* 16 colors */
 
 extern void SetTextContext(u8 *vram, u32 stride, u8 *tiles, u8 *widths,
                            u8 fontIndex, u32 halfSpacing);

@@ -1,23 +1,17 @@
-/* Kare bekleme ve iki kanca — 0x08063E58-0x08063ECF
+/* Frame wait and two hooks — 0x08063E58-0x08063ECF
  *
- * ROM'da bitisik uc fonksiyon.
+ * Three adjacent ROM functions:
+ * 0x08063E58 waits for VBlank until a condition holds, clears a flag and returns 1.
+ * 0x08063E7C and 0x08063EAC are near-twins: when gRam02025800 is nonzero, use
+ * it to index a table of 28-BYTE records. If the first field is 6, invoke
+ * the hooks: two calls at 0x08063E7C, one at 0x08063EAC.
  *
- * 0x08063E58: VBlank bekleyip bir kosul saglanana kadar donuyor, sonra
- *   bir bayragi sifirlayip 1 donuyor.
+ * The ROM forms 28 = 7*4 with lsls #3 / subs / lsls #2 (x*8-x, then <<2),
+ * agbcc's constant multiplication pattern. Rule 35: pop {r0}; bx r0 means
+ * void; 0x08063E58 instead uses pop {r1}; bx r1 and returns VALUE 1 in r0.
  *
- * 0x08063E7C ve 0x08063EAC: neredeyse ikiz.  gRam02025800 sifir degilse
- *   onu 28 BAYTLIK kayit tablosuna indeks olarak kullaniyor; kaydin ilk
- *   alani 6 ise kanca fonksiyonlarini cagiriyor.  Fark: 0x08063E7C iki
- *   fonksiyon cagiriyor, 0x08063EAC bir tane.
- *
- * 28 = 7*4 carpimi ROM'da `lsls #3 / subs / lsls #2` ile kuruluyor
- * (x*8 - x = x*7, sonra <<2).  Bu, agbcc'nin sabit carpim kalibi.
- *
- * Kural 35: `pop {r0}; bx r0` -> void.  0x08063E58 ise `pop {r1}; bx r1`
- * kullaniyor ve r0'da 1 tasiyor -> DEGER donduruyor.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/frame_wait_and_hooks.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/frame_wait_and_hooks.c
  */
 
 #include "gba_types.h"
@@ -27,7 +21,7 @@
 typedef struct Record {
     u32 kind;                   /* +0x00 */
     u8  pad04[24];
-} Record;                       /* 28 bayt */
+} Record;                       /* 28 bytes */
 
 extern void VBlankIntrWait(void);
 extern void FUN_08006210(void);

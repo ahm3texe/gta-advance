@@ -1,50 +1,39 @@
-/* HUD karo yazicilari + 4bpp serit ciziciler bandi — 0x08030B40 .. 0x08031A1C
+/* Historical HUD tile-writer / 4bpp strip band — 0x08030B40 .. 0x08031A1C
  *
- * Ayni komsuluktaki eslesen dosyalar: src/ui/hud_fields.c (0x08030B60,
- * 0x08030E78, 0x08030F28), src/world/area_cleanup.c (0x08030CB4),
- * src/world/area_flags.c.  Bos karo sabiti 0xF0E8 ve 32 girisli (64 bayt)
- * karo haritasi satir adimi oradan geliyor.
+ * Matching neighbors: hud_fields.c (0x08030B60, 0x08030E78, 0x08030F28),
+ * area_cleanup.c (0x08030CB4), area_flags.c. They establish empty tile
+ * 0xF0E8 and the 32-entry/64-byte tilemap row stride.
  *
- * ---------------------------------------------------------------------
- * YERLESIM UYARISI (bu dosyanin iki fonksiyonu icin)
- * ---------------------------------------------------------------------
- * tools/agbcc_build.py bir C dosyasinin TUM fonksiyonlarini, dosyadaki
- * EN KUCUK adresten (burada 0x08030B40) baslayarak ARDISIK linkliyor.
- * ROM'da aralarinda baska fonksiyonlar oldugu icin ikinci ve sonraki
- * fonksiyonlar kendi ROM adreslerine DUSMUYOR.  Bu, `bl` iceren
- * fonksiyonlarda dal ofsetini bozuyor -- kaynak dogru olsa bile.
- * Etkilenenler: SendTextMode2 (3/12 bayt) ve DrawTwoDigits (dal ofseti).
- * Ikisi de KENDI adreslerinden derlenince BYTE-MATCHING; olculdu:
- *     tek fonksiyonluk dosya -> `python3 tools/verify_c_function.py <dosya>`
- *     SendTextMode2  12  BYTE-MATCHING  (0x080315C0)
- *     DrawTwoDigits 156  BYTE-MATCHING  (0x08031498)
- * `bl` icermeyen digerleri (0x08030F50, 0x080311DC, 0x08031328,
- * 0x08031A1C) konumdan bagimsiz oldugu icin bu dosyada da eslesiyor.
- * Ayni durum src/ui/hud_fields.c'de de var (752 ve 136 baytlik bosluklar)
- * -- orada hicbir fonksiyon cagri yapmadigi icin sorun cikmiyor.
+ * HISTORICAL PLACEMENT WARNING, before these functions were split:
+ * tools/agbcc_build.py links all functions in one C file consecutively from
+ * its lowest address (then 0x08030B40). Intervening ROM functions mean later
+ * bodies land at the wrong address, corrupting bl offsets even with correct
+ * source. Affected: SendTextMode2 (3/12 bytes) and DrawTwoDigits (branch offset).
+ * Individually compiled at their own addresses with verify_c_function.py:
+ *   SendTextMode2 12 BYTE-MATCHING (0x080315C0)
+ *   DrawTwoDigits 156 BYTE-MATCHING (0x08031498)
+ * Functions without bl (0x08030F50, 0x080311DC, 0x08031328, 0x08031A1C)
+ * remained position-independent. hud_fields.c likewise has 752/136-byte
+ * gaps but no calls, so was unaffected.
  *
- * ---------------------------------------------------------------------
- * 0x0803173E — SINIR YANLIS, FONKSIYON DEGIL (olculdu, C yazilmadi)
- * ---------------------------------------------------------------------
- * Kanit:
- *  1. 0x0803173E'deki ilk komut `adds r4,#1`; prolog yok.
- *  2. 0x080317DC'deki `b.n 0x80316CE` GERIYE, kayitli baslangictan ONCEYE
- *     daliyor -- yani govde 0x0803173E'den once basliyor.
- *  3. 0x080317DE'deki epilog `pop {r3,r4,r5} / mov r8..sl / pop {r4-r7} /
- *     pop {r0} / bx r0`; buna karsilik gelen prolog 0x080316B0'da:
- *     `push {r4,r5,r6,r7,lr} / mov r7,sl / mov r6,r9 / mov r5,r8 /
- *      push {r5,r6,r7} / sub sp,#4`.
- *  4. 0x08031684-0x080316AF arasi AYRI ve tam bir fonksiyon
- *     (`push {r4,lr}` ... `bx r0`, 0x080316AC'de havuz kelimesi
- *     0x02025810) -- data/functions.csv'de hic kayitli degil.
- * Sonuc: 186 baytlik "bosluk" aslinda iki fonksiyon; gercek sinir
- * 0x080316B0-0x080317EE (318 bayt) ve 0x0803173E onun govde ortasi.
- * 0x0803173E icin C yazilmadi.  (Gercek fonksiyon 0x08031A1C'nin
- * kardesi: ayni sekiz-nibble maskeli serit cizici, tek fark satir
- * sayisi ve parametre yerlesimi.)
+ * 0x0803173E: INVALID FUNCTION BOUNDARY; no C was written for this entry.
+ * Evidence:
+ * 1. First instruction adds r4,#1, with no prologue.
+ * 2. b.n 0x80316CE at 0x080317DC branches BEFORE the recorded start.
+ * 3. Epilogue at 0x080317DE: pop {r3,r4,r5} / mov r8..sl / pop {r4-r7} /
+ *    pop {r0} / bx r0. Its prologue is at 0x080316B0:
+ *    push {r4,r5,r6,r7,lr} / mov r7,sl / mov r6,r9 / mov r5,r8 /
+ *    push {r5,r6,r7} / sub sp,#4.
+ * 4. 0x08031684-0x080316AF is a separate complete function (push {r4,lr}
+ *    ... bx r0, pool word 0x02025810 at 0x080316AC), then missing from
+ *    data/functions.csv.
+ * The 186-byte gap contained two functions. The real boundary is
+ * 0x080316B0-0x080317EE (318 bytes); 0x0803173E lies inside its body.
+ * It is a sibling of 0x08031A1C's eight-nibble masked strip renderer,
+ * differing in row count and parameter placement.
  *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/world/band_c.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm (docs/COMPILER.md)
+ * Verification: make c-match FILE=src/ui/draw_two_digits.c
  */
 
 #include "gba_io.h"
@@ -55,30 +44,26 @@
 extern u32  GetTextString(u32 index);
 extern void FUN_0802af40(u32 text, u32 kind);
 
-/* --------------------------------------------------------------------
- * 0x08031498 — BYTE-MATCHING (kendi adresinden derlendiginde; yukaridaki
- * YERLESIM UYARISI'na bakin).  Iki basamakli sayiyi iki satir
- * yuksekliginde rakam karolariyla, sagdan sola yaziyor.  bayrak bit0
- * kuruluysa ondalik basamak sifirken bos karoyla gizleniyor.
+/* 0x08031498 — BYTE-MATCHING when compiled at its own address; see the
+ * historical placement warning. Draw a two-digit number right-to-left with
+ * two-row digit tiles. If flag bit0 is set, hide a zero tens digit with
+ * the empty tile.
  *
- * Karo degerleri: ust satir 0xF8+d, alt satir 0x102+d; ikisi de 0xF000
- * palet nibble'iyla OR'lanıyor.  Store `vu16` oldugu icin 0xF000 HImode
- * sabite daralip havuza -0x1000 (0xFFFFF000) olarak giriyor -- ROM'daki
- * kelime tam olarak bu.  Bos karo 0xF0E8 ise dogrudan, OR'suz.
+ * Tiles: upper 0xF8+d, lower 0x102+d, ORed with 0xF000. vu16 stores narrow
+ * the constant to HImode, placing -0x1000 (0xFFFFF000) in the pool exactly
+ * as in the ROM. Empty tile 0xF0E8 is stored directly without OR.
  *
- * OLCULEN (adres kurulumu, 21 komut farki bunlara bagliydi):
- *  - `base` AYRI BIR YEREL olmali.  `(y*64 + 0x06009802) + col` gibi duz
- *    toplamda agbcc yeniden birlestirip `col + BASE`i ortak alt ifade
- *    yapiyor ve tek `ldr`i once cekiyor (55/75).  Taban yerele alininca
- *    ortak alt ifade yalniz TABAN oluyor, ROM'un `adds r0,r0,r1` +
- *    `adds r4,r2,r0` ikilisi cikiyor.
- *  - Satir ofseti (`rowoff`) de ayri deyim olmali: yoksa `ldr` taban
- *    yuklemesi `lsls r0,r6,#6`den ONCE yayiliyor (74/75, tek komut).
- *  - Son toplama `col + (...)` sirasinda yazilmali; `(...) + col`
- *    `adds r4,r0,r2` veriyor, ROM `adds r4,r2,r0` istiyor.
- * ELENEN: `(vu16*)(y*S+B) + x`, `col + (y*S+B)`, `(y*S+B)+col`,
- *   `&((vu16*)B)[y*32+x]`, iki ayri satir isaretcisi (52-69/75).
- * ------------------------------------------------------------------ */
+ * MEASURED address construction, accounting for 21 instructions differences:
+ * - Separate base local required. A flat (y*64+0x06009802)+col lets agbcc
+ *   reassociate col+BASE as a common subexpression and hoist one ldr (55/75).
+ *   A local makes only BASE common, producing adds r0,r0,r1 + adds r4,r2,r0.
+ * - rowoff must also be a separate statement; otherwise the base ldr appears
+ *   before lsls r0,r6,#6 (74/75, one instruction).
+ * - Final addition must be col+(...), not (...)+col: ROM needs adds r4,r2,r0
+ *   rather than adds r4,r0,r2.
+ * Rejected: (vu16*)(y*S+B)+x, col+(y*S+B), (y*S+B)+col,
+ * &((vu16*)B)[y*32+x], two separate row pointers (52-69/75).
+ */
 extern s32 Div(s32 numerator, s32 denominator);
 
 #define TILE_MAP_BASE   0x06009802

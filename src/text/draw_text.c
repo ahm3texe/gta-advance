@@ -1,17 +1,15 @@
-/* Metin cizme — 0x0806434C-0x0806458F
+/* Text drawing — 0x0806434C-0x0806458F
  *
- * Uc cizim varyanti (sol, ortali, saga hizali) ile glif ve dize genislik
- * hesabi. Metinde '@' + '0'/'8'/'9' bir RENK KACISI olarak atlanir; oyun
- * metnindeki "@8AMMU-NATION@0" kalibi budur.
+ * Three variants (left, centered, right-aligned), plus glyph/string width
+ * calculation. '@' followed by '0'/'8'/'9' is skipped as a COLOR ESCAPE,
+ * as in the game text @8AMMU-NATION@0.
  *
- * Cizimden once her karakter newlib _toupper'dan geciriliyor; ROM'daki tum
- * oyun metninin buyuk harf olmasinin sebebi budur.
+ * Each character passes through newlib _toupper before drawing, explaining
+ * the uppercase game text. GetTextWidth repeats GetGlyphWidth's calculation
+ * instead of calling it; the ROM likewise has separate copies.
  *
- * GetTextWidth, GetGlyphWidth'i cagirmaz; ayni hesabi kendi icinde
- * tekrarlar. ROM'da da iki ayri kod kopyasi var.
- *
- * Derleyici: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
- * Dogrulama:  make c-match FILE=src/text/draw_text.c
+ * Compiler: old_agbcc -mthumb-interwork -O2 -fhex-asm  (docs/COMPILER.md)
+ * Verification:  make c-match FILE=src/text/draw_text.c
  */
 
 #include "gba_io.h"
