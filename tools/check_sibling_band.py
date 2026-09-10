@@ -9,7 +9,11 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BASE_REVISION = "9cbaf27"
+# The band's target set is fixed as of this commit, so this is a pin into the
+# repository's history and anything that rewrites history invalidates it. That
+# has happened once: rewriting every commit's author retired 9cbaf27 and this
+# became 393b82e, the same tree at the same position.
+BASE_REVISION = "393b82e"
 MIN_SIZE = 120
 MAX_SIZE = 560
 MAX_GAP = 200

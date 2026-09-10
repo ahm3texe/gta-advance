@@ -878,7 +878,7 @@ decomp, the module is not guessed — it is the file that was decompiled.
 
 - For the first time, the roadmap's 84 targets were tied to a fixed, reproducible
   data view: `data/sibling_band.csv`. `make sibling-check` re-selects the targets
-  from the `9cbaf27` baseline using the rules 120–560 bytes, at most a 200-byte
+  from the `393b82e` baseline using the rules 120–560 bytes, at most a 200-byte
   gap, and a Thumb game module. The real total is 19,794 bytes; the old "1.6 KB"
   and "18,818 bytes" figures did not produce the same list and were corrected.
 - 9 functions / 1,262 function bytes matched the ROM exactly: buffer setup,

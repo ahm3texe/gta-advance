@@ -63,7 +63,7 @@ into three bands, and their costs differ sharply:
 **The sibling band is closed.** The earlier text's "1.6 KB / 18,818 bytes" figure
 could not be reproduced. The real selection behind that number is 120–560-byte
 Thumb game functions within **200 bytes** of a matching range: **84 functions /
-19,794 bytes** at the `9cbaf27` baseline. That fixed list and each target's
+19,794 bytes** at the `393b82e` baseline. That fixed list and each target's
 outcome live in `data/sibling_band.csv`; `make sibling-check` validates both the
 selection and the results. 9 targets / 1,262 bytes became new byte-matching C;
 the remaining 75 were parked with a measured C difference or with ROM
