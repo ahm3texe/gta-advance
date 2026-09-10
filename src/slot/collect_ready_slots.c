@@ -36,8 +36,21 @@ typedef struct SlotFlags {
     u8 rest  : 7;
 } SlotFlags;
 
-extern u32 gRam02001060;
-extern u32 gRam02000F80;
+/* Both symbols keep the types their other users give them
+ * (src/world/slot_selectors.c and the slot-query files); the consistency check
+ * requires one type per symbol, so each is reached as an address here. */
+typedef struct SubData {
+    u8  pad00[0x12];
+    u16 value;                  /* +0x12 */
+} SubData;
+
+typedef struct SlotHead {
+    u8       pad00[0x20];
+    SubData *sub;               /* +0x20 */
+} SlotHead;
+
+extern u32      gRam02001060;
+extern SlotHead gRam02000F80;
 
 extern u32 FUN_0803aedc(u32 index, u32 which);
 
