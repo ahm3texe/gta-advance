@@ -97,7 +97,11 @@ address,size,name,source,status,notes
 0x0201AAA4,4,gBufferStateB0201AAA4,decomp,provisional,state word zeroed by FUN_080100D0 during buffer setup.
 0x0201AAA8,4,gBufferStateA0201AAA8,decomp,provisional,state word zeroed by FUN_080100D0 during buffer setup.
 0x0201AAB0,2064,gBufferClear0201AAB0,decomp,provisional,FUN_080100D0 zeroes 0x102 words with DMA3; the size follows from that form.
+0x0201AEC0,4,gRam0201AEC0,decomp,provisional,"A word 0x08011D50 clears together with gRam0201AEC8 and gRam0201AEE4, all three from one zero register."
+0x0201AEC8,4,gRam0201AEC8,decomp,provisional,A word 0x08011D50 clears together with gRam0201AEC0 and gRam0201AEE4.
 0x0201AECC,0,gRam0201AECC,decomp,provisional,used in FUN_080126E4; its internal structure is UNKNOWN and the size was not measured (0). Details in the header of src/core/insert_b1.c.
+0x0201AEE0,2,gRam0201AEE0,decomp,provisional,A halfword 0x08011FAC sets to 1. Only that writer is known.
+0x0201AEE4,4,gRam0201AEE4,decomp,provisional,A word 0x08011D50 clears together with gRam0201AEC0 and gRam0201AEC8.
 0x0201AEE8,8,gRam0201AEE8,decomp,provisional,"Pointer to the map grid. The target structure was MEASURED from 0x080651E0: +0x00 u16 width, +0x02 u16 height, +0x04 u16* tile array (indexed by y*width+x). The single definition is include/map_grid.h. Written by 0x0801D7FC."
 0x0201AEF0,0,gRam0201AEF0,decomp,provisional,a working block that includes the BG2 display position; the +0x1F88 and +0x1F8C fields are used
 0x0201CEC0,2060,gNodePool,decomp,verified,"node pool; +0x800 free list head, +0x804 active list head (byte-matching evidence)  TRACE: it becomes active at f1508 -- the moment the game world / NPCs are spawned. This is where the linked list system comes into play.  MEASURED (FlushSpriteList): +0x800 free list head, +0x804 active list head, +0x808 previous-frame sprite count. Size corrected 2056 -> 2060.  C EVIDENCE: InitSpritePool builds the free list of 128 x 16 bytes; InsertSpriteSorted uses the +0/+2/+4 OAM fields and the +6 secondary sort key. The shared type is include/sprite_pool.h.  TRACE (session 6): one frame after death, +0x08 and +0x0C (the free/active list heads) changed -- the player entity is being released."

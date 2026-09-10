@@ -84,6 +84,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800BF18,FindQuadEdgeCrossing,src/world/quad_edge_test.c,522,522,yes
 0x0800C124,FUN_0800c124,src/glue/is_at_or_past.c,16,16,yes
 0x0800CA78,GetShiftedEntryValue,src/core/shifted_entry_value.c,32,32,yes
+0x0800CAE4,FUN_0800cae4,src/vram/copy_to_iwram_then_clear.c,32,32,yes
 0x0800CB08,FUN_0800cb08,src/core/listhead_e2.c,348,348,no
 0x0800D450,GetNodeBoxDistance,src/core/listhead_e3.c,224,224,yes
 0x0800D530,SortListByKey,src/core/listhead_e1.c,304,304,yes
@@ -99,8 +100,14 @@ address,name,source,compiled_size,mapped_size,matching
 0x08010198,NoOp08010198,src/misc/empty_stubs.c,2,2,yes
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
 0x080101E4,NoOp080101E4,src/misc/empty_stubs.c,2,2,yes
+0x08011CF4,FUN_08011cf4,src/vram/clear_far_pair.c,32,32,yes
+0x08011D14,FUN_08011d14,src/vram/release_two_handles.c,36,36,yes
+0x08011D38,FUN_08011d38,src/vram/get_far_word.c,20,20,yes
 0x08011D4C,NoOp08011D4C,src/misc/empty_stubs.c,2,2,yes
+0x08011D50,FUN_08011d50,src/vram/clear_three_words.c,28,28,yes
 0x08011DD4,FUN_08011dd4,src/core/bg2_affine.c,168,176,no
+0x08011FAC,FUN_08011fac,src/vram/set_halfword_one.c,12,12,yes
+0x080125EC,FUN_080125ec,src/vram/setup_bg1_control.c,40,44,no
 0x080126E4,ConfigureBgControlRegs,src/core/insert_b1.c,108,108,yes
 0x08012750,SetupBg0Bg1Menu,src/video/setup_bg0_bg1_menu.c,80,80,yes
 0x080127A0,NoOp080127A0,src/misc/empty_stubs.c,2,2,yes

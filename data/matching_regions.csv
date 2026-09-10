@@ -48,11 +48,17 @@ start,end,binary,module,notes
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Point-in-quad test; returns the index of the nearest edge.
 0x0800C124,0x0800C134,build/glue/is_at_or_past.bin,glue,"1 when +0x38 is at or past the other's +0x08, signed"
 0x0800CA78,0x0800CA98,build/core/shifted_entry_value.bin,core,Selected entry value shifted; rule 70 puts the sentinel in a local so its pool load lands first
+0x0800CAE4,0x0800CB04,build/vram/copy_to_iwram_then_clear.bin,vram,"Copies 30464 bytes into IWRAM, then clears three flags"
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front and remove
 0x0800DD50,0x0800DD84,build/world/p1_0dd50.bin,world,Phase 1: natural C matching the ROM exactly
 0x080100D0,0x0801014C,build/core/memory_init.bin,core,Buffer allocation and DMA3 zeroing; natural byte-matching C.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,small function harvest
+0x08011CF4,0x08011D14,build/vram/clear_far_pair.bin,vram,"Clears the +0x1F50 and +0x1F54 words, offsets not derived"
+0x08011D14,0x08011D38,build/vram/release_two_handles.bin,vram,Releases the +0x04 and +0x08 handles into one sink
+0x08011D38,0x08011D4C,build/vram/get_far_word.bin,vram,Reads the +0x1F7C word
+0x08011D50,0x08011D6C,build/vram/clear_three_words.bin,vram,Clears three separate words through address locals (rule 67)
+0x08011FAC,0x08011FB8,build/vram/set_halfword_one.bin,vram,Sets gRam0201AEE0 to 1
 0x08012750,0x080127A0,build/video/setup_bg0_bg1_menu.bin,video,0x08012750 SetupBg0Bg1Menu
 0x080127A8,0x080127FC,build/video/setup_bg0_bg1.bin,video,0x080127A8 SetupBg0Bg1
 0x080127FC,0x0801282C,build/core/list_ops2.bin,core,List init + push front (variant)
