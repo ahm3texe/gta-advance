@@ -85,6 +85,7 @@ start,end,binary,module,notes
 0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Constant call + DMA flush
 0x08013ABC,0x08013B9C,build/world/release_object.bin,world,ReleaseObject
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,small function harvest
+0x08014FAC,0x08014FB8,build/glue/clear_object_list_alt.bin,glue,"Second copy of the object-list clear, twelve bytes before the first"
 0x08014FB8,0x08014FC4,build/glue/clear_object_list.bin,glue,Drops the object list head
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184-byte body + literal pool
 0x080157B8,0x08015834,build/world/try_launch_actor.bin,world,0x080157B8 TryLaunchActor
@@ -204,6 +205,11 @@ start,end,binary,module,notes
 0x080337A8,0x08033820,build/world/stop_audio_dma.bin,world,0x080337A8 StopAudioDmaOnCartFlag
 0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
 0x0803385C,0x08033890,build/world/alloc_from_counter.bin,world,0x0803385C AllocFromCounter
+0x08033BA0,0x08033BB4,build/audio/set_far_flag.bin,audio,Raises the +0xBA4 flag of gRam02027330
+0x080348B4,0x080348C0,build/audio/call_and_zero.bin,audio,Calls FUN_08034E48 and answers 0 regardless
+0x080348C0,0x080348D8,build/audio/reset_three_and_flag.bin,audio,"Clears +0x10, +0x24 and +0x28, then raises the flag"
+0x08034F9C,0x08034FB0,build/audio/init_channel.bin,audio,Initialises a channel record; the zero is stored before the argument
+0x08034FB4,0x08034FC8,build/audio/stop_if_flagged.bin,audio,Stops the channel when its +0x05 flag is set
 0x080350A8,0x08035100,build/world/p1_350a8.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035168,0x080351AC,build/world/p1_35168.bin,world,Phase 1: natural C matching the ROM exactly
 0x080351AC,0x080351F0,build/world/p1_351ac.bin,world,Phase 1: natural C matching the ROM exactly

@@ -151,6 +151,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08013ABC,ReleaseObject,src/world/release_object.c,224,224,yes
 0x08014E48,FUN_08014e48,src/world/transition_code.c,168,154,no
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
+0x08014FAC,FUN_08014fac,src/glue/clear_object_list_alt.c,12,12,yes
 0x08014FB8,FUN_08014fb8,src/glue/clear_object_list.c,12,12,yes
 0x080150D0,FUN_080150d0,src/entry/set_two_priorities.c,60,64,no
 0x0801515C,LoadEntryTileData,src/world/level_step_b2.c,100,100,yes
@@ -364,7 +365,12 @@ address,name,source,compiled_size,mapped_size,matching
 0x08033824,AddToCounter,src/world/add_to_counter.c,56,56,yes
 0x0803385C,AllocFromCounter,src/world/alloc_from_counter.c,52,52,yes
 0x08033898,NoOp08033898,src/misc/empty_stubs.c,2,2,yes
+0x08033BA0,FUN_08033ba0,src/audio/set_far_flag.c,20,20,yes
+0x080348B4,FUN_080348b4,src/audio/call_and_zero.c,12,12,yes
+0x080348C0,FUN_080348c0,src/audio/reset_three_and_flag.c,24,24,yes
+0x08034F9C,FUN_08034f9c,src/audio/init_channel.c,18,18,yes
 0x08034FB0,NoOp08034FB0,src/misc/empty_stubs.c,2,2,yes
+0x08034FB4,FUN_08034fb4,src/audio/stop_if_flagged.c,20,20,yes
 0x08034FC8,NoOp08034FC8,src/misc/empty_stubs.c,2,2,yes
 0x08034FCC,NoOp08034FCC,src/misc/empty_stubs.c,2,2,yes
 0x080350A8,FUN_080350a8,src/world/p1_350a8.c,88,88,yes

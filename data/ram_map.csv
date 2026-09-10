@@ -6,6 +6,7 @@ address,size,name,source,status,notes
 0x02000134,2,gRam02000134,decomp,provisional,"Diagnostic marker: on entry to 0x080657D8 it writes the mode parameter (the [sp,#0] on the stack) here. strh, so u16. It lets the last running driver mode be read from RAM at the moment of a lockup."
 0x02000140,32,gRam02000140,decomp,provisional,"Size 32 MEASURED (Memset call, 0x08066144)"
 0x02000170,4,gIrqHandlerTable,decomp,provisional,Interrupt handler table base used by InitInterrupts and IntrMain
+0x020001B0,44,gRam020001B0,decomp,provisional,"A block whose +0x10, +0x24 and +0x28 words 0x080348C0 clears together. The +0x28 read makes the size at least 44; nothing else about it is known."
 0x02000224,4,gRam02000224,decomp,provisional,Referenced by a block queued for matching; role unknown
 0x02000230,64,gRam02000230,decomp,provisional,"Size 64 MEASURED (Memset call, 0x08066144)"
 0x02000284,4,gActiveIrqSlot,decomp,provisional,Currently dispatched IRQ slot
