@@ -965,7 +965,7 @@ address,name,size,status,module,notes
 0x0803BAF0,FUN_0803baf0,480,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0803BCD0,FUN_0803bcd0,248,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803BDC8,FUN_0803bdc8,540,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0803BFE4,FUN_0803bfe4,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
+0x0803BFE4,FUN_0803bfe4,96,matching,slot,"Answers 1 when the object is the first slot's own or the owner behind gRam020272C8, 2 when it is the second slot's or the owner behind gRam02026F34 while gGameState[12] is set, 0 otherwise; decompiled in src/slot/which_slot_owns.c"
 0x0803C044,FUN_0803c044,10,matching,glue,"Forwarding wrapper over FUN_08055700, passing the answer on; decompiled in src/glue/wrap_08055700.c"
 0x0803C050,ConfigureSlot,64,matching,world,Slot configuration; src/world/slot_config.c size measured including the tail pool (byte-matching evidence)
 0x0803C090,GetActiveSlotValue,36,matching,world,Slot configuration; src/world/slot_config.c size measured including the tail pool (byte-matching evidence)
@@ -977,7 +977,7 @@ address,name,size,status,module,notes
 0x0803C20C,FUN_0803c20c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C268,FUN_0803c268,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C2C4,FUN_0803c2c4,92,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
-0x0803C320,FUN_0803c320,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x0803C320,FUN_0803c320,92,decompiled,slot,"Collects the ready slots the mask names, oring the two answers. NOT BYTE-MATCHING at 25/44, same length and structure with two register pairs exchanged; four spellings measured. The file settles the two bit-0 tests that look alike and are not: the entry flag is (u32)byte << 31 and the mask is a rule 33 and. src/slot/collect_ready_slots.c"
 0x0803C37C,FUN_0803c37c,86,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803C3D4,FUN_0803c3d4,44,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed"
 0x0803C400,GetOwnerSlot,92,candidate,world,"Returns which player the entity belongs to: 1 for the 0x02000F10/0x020272C8+0x28 chain, 2 for 0x02001140/0x02026F34+0x28 while gGameState[12] is set, otherwise 0. Its result feeds straight into SelectSlotAB."

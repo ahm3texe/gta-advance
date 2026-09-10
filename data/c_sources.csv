@@ -414,6 +414,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038680,FUN_08038680,src/entity/find_model_by_id.c,38,38,yes
 0x0803AFBC,FUN_0803afbc,src/world/band_0803afbc.c,480,480,yes
 0x0803B19C,NoOp0803B19C,src/misc/empty_stubs.c,2,2,yes
+0x0803BFE4,FUN_0803bfe4,src/slot/which_slot_owns.c,96,96,yes
 0x0803C044,FUN_0803c044,src/glue/wrap_08055700.c,10,10,yes
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,36,36,yes
@@ -423,6 +424,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C1AC,GetDefaultRange,src/world/slot_range.c,6,6,yes
 0x0803C268,FUN_0803c268,src/world/p1_3c268.c,92,92,yes
 0x0803C2C4,FUN_0803c2c4,src/world/p1_3c2c4.c,92,92,yes
+0x0803C320,FUN_0803c320,src/slot/collect_ready_slots.c,92,92,no
 0x0803C45C,SelectWordSource,src/world/select_word_source.c,32,32,yes
 0x0803C49C,SelectSlotAB,src/world/slot_selectors.c,28,28,yes
 0x0803C4B8,SelectSlotCD,src/world/slot_selectors.c,28,28,yes

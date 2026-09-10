@@ -236,6 +236,7 @@ start,end,binary,module,notes
 0x08038584,0x0803859C,build/entity/step_all_entities.bin,entity,Runs FUN_08037B50 over gUnk0202F2C0; Thumb function pointer
 0x08038680,0x080386A8,build/entity/find_model_by_id.bin,entity,"Index of the model whose +0x04 id matches, over 120 x 80-byte entries"
 0x0803AFBC,0x0803B19C,build/world/band_0803afbc.bin,world,"Scene/state transition step; five-way gate, threshold selection, state dispatch."
+0x0803BFE4,0x0803C044,build/slot/which_slot_owns.bin,slot,"Which slot owns an object: 1, 2 or 0"
 0x0803C044,0x0803C050,build/glue/wrap_08055700.bin,glue,Forwarding wrapper over FUN_08055700
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Slot configuration and two readers
 0x0803C0E4,0x0803C178,build/world/apply_two_levels.bin,world,clamping and applying two levels
