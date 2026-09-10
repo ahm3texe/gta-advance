@@ -169,10 +169,13 @@ address,size,name,source,status,notes
 0x02027300,4,gRam02027300,decomp,provisional,0x08032548/3258C: 32-bit counter access; allocation size undetermined
 0x02027310,4,gRam02027310,decomp,provisional,ZeroThreeFlags zeroes it (byte-matching evidence)
 0x02027314,1,gRam02027314,decomp,provisional,0x080337A8 writes a copy of the gCartFlag value here.
+0x0202731C,4,gRam0202731C,decomp,provisional,A word 0x08033BB4 reads and passes to FUN_08033F18 when gRam02001200 is clear. 2 places in the ROM load its address.
 0x02027320,4,gRam02027320,decomp,provisional,ZeroThreeFlags zeroes it (byte-matching evidence)
 0x02027330,0,gRam02027330,decomp,provisional,0x02027344-0x14; +0xB2C is a second view onto the same eight-entry table (0x08033674).
 0x02027344,264,gAddrTable,decomp,provisional,"6-entry, 44-byte table; a +0 u32 ROM address in every entry"
 0x02027EE0,1,gRam02027EE0,decomp,provisional,u8 state field zeroed by FUN_0805643C
+0x02027EF0,12,gList02027EF0,decomp,provisional,"List header (+0 head, +4 tail, +8 count) that 0x080358B4 removes from and 0x08035848 walks with ListForEach; the 12 bytes are the List layout in src/core/linked_list.c. 13 places in the ROM load its address."
+0x02027EFC,4,gRam02027EFC,decomp,provisional,A word 0x08035848 clears before walking gList02027EF0. 2 places in the ROM load its address.
 0x02027F00,576,gRam02027F00,decomp,provisional,MEASURED: DMA32 fill 144 words in 080357CC
 0x02028270,4,gUnk02028270,decomp,provisional,Read by a small getter at 0x08037F34; role unknown
 0x02028280,4,gUnk02028280,decomp,provisional,Read by a small getter at 0x08037F64; role unknown

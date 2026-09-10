@@ -208,6 +208,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801D7DC,SetWindow,src/world/window_config.c,32,32,yes
 0x0801D7FC,StoreRam0201AEE8,src/world/window_config.c,12,12,yes
 0x0801D848,InitAndMirror,src/world/init_and_mirror.c,34,34,yes
+0x0801D86C,FUN_0801d86c,src/entry/set_masked_pair_and_call.c,24,24,yes
 0x0801D8B0,GetField100,src/world/get_field_100.c,10,10,yes
 0x0801D920,FUN_0801d920,src/world/kind_six_or_empty.c,26,26,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
@@ -366,8 +367,11 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803385C,AllocFromCounter,src/world/alloc_from_counter.c,52,52,yes
 0x08033898,NoOp08033898,src/misc/empty_stubs.c,2,2,yes
 0x08033BA0,FUN_08033ba0,src/audio/set_far_flag.c,20,20,yes
+0x08033BB4,FUN_08033bb4,src/audio/dispatch_on_mode_byte.c,36,36,yes
 0x080348B4,FUN_080348b4,src/audio/call_and_zero.c,12,12,yes
 0x080348C0,FUN_080348c0,src/audio/reset_three_and_flag.c,24,24,yes
+0x08034980,FUN_08034980,src/audio/reset_three_on_cart.c,36,36,yes
+0x080349A4,FUN_080349a4,src/audio/step_every_sixteenth.c,40,40,yes
 0x08034F9C,FUN_08034f9c,src/audio/init_channel.c,18,18,yes
 0x08034FB0,NoOp08034FB0,src/misc/empty_stubs.c,2,2,yes
 0x08034FB4,FUN_08034fb4,src/audio/stop_if_flagged.c,20,20,yes
@@ -379,7 +383,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x08035230,FUN_08035230,src/world/p1_35230.c,88,88,yes
 0x080357CC,FUN_080357cc,src/world/p1_357cc.c,52,52,yes
 0x08035844,NoOp08035844,src/world/p1_35844.c,2,2,yes
+0x08035848,FUN_08035848,src/entry/reset_then_walk_list.c,32,32,yes
+0x080358B4,FUN_080358b4,src/entry/unlink_and_clear_bit1.c,32,32,yes
 0x08035CD4,NoOp08035CD4,src/misc/empty_stubs.c,2,2,yes
+0x08035D28,FUN_08035d28,src/entry/call_handler_if_set.c,24,24,yes
 0x08035D60,FUN_08035d60,src/world/p1_35d60.c,58,58,yes
 0x08035D9C,FUN_08035d9c,src/world/p1_35d9c.c,58,58,yes
 0x08035DD8,FUN_08035dd8,src/world/wrap_08035dd8.c,10,10,yes

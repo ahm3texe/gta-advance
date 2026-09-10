@@ -105,6 +105,7 @@ start,end,binary,module,notes
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Actor state + heading difference
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Window settings
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,complex harvest
+0x0801D86C,0x0801D884,build/entry/set_masked_pair_and_call.bin,entry,"Stores the masked value at +0x10 then +0x0C, then calls"
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,small function harvest
 0x0801D920,0x0801D93C,build/world/kind_six_or_empty.bin,world,"Null object, null record or kind 6 -> 1; single shared answer body (rule 49)"
 0x08023648,0x08023660,build/glue/call_with_flag.bin,glue,"Two wrappers over FUN_080223CC, flag 0 and 1"
@@ -206,8 +207,11 @@ start,end,binary,module,notes
 0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
 0x0803385C,0x08033890,build/world/alloc_from_counter.bin,world,0x0803385C AllocFromCounter
 0x08033BA0,0x08033BB4,build/audio/set_far_flag.bin,audio,Raises the +0xBA4 flag of gRam02027330
+0x08033BB4,0x08033BD8,build/audio/dispatch_on_mode_byte.bin,audio,Dispatches on gRam02001200; zero passes gRam0202731C on
 0x080348B4,0x080348C0,build/audio/call_and_zero.bin,audio,Calls FUN_08034E48 and answers 0 regardless
 0x080348C0,0x080348D8,build/audio/reset_three_and_flag.bin,audio,"Clears +0x10, +0x24 and +0x28, then raises the flag"
+0x08034980,0x080349A4,build/audio/reset_three_on_cart.bin,audio,Clears the three words when gCartFlag is 1
+0x080349A4,0x080349CC,build/audio/step_every_sixteenth.bin,audio,"Steps on one tick in sixteen, offset by five"
 0x08034F9C,0x08034FB0,build/audio/init_channel.bin,audio,Initialises a channel record; the zero is stored before the argument
 0x08034FB4,0x08034FC8,build/audio/stop_if_flagged.bin,audio,Stops the channel when its +0x05 flag is set
 0x080350A8,0x08035100,build/world/p1_350a8.bin,world,Phase 1: natural C matching the ROM exactly
@@ -216,6 +220,9 @@ start,end,binary,module,notes
 0x08035230,0x08035288,build/world/p1_35230.bin,world,Phase 1: natural C matching the ROM exactly
 0x080357CC,0x08035800,build/world/p1_357cc.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035844,0x08035848,build/world/p1_35844.bin,world,Phase 1: natural C matching the ROM exactly
+0x08035848,0x08035868,build/entry/reset_then_walk_list.bin,entry,"Clears the counter, then walks the list; Thumb function pointer"
+0x080358B4,0x080358D4,build/entry/unlink_and_clear_bit1.bin,entry,Unlinks the node and clears bit 0 with a wide -2
+0x08035D28,0x08035D40,build/entry/call_handler_if_set.bin,entry,Calls the +0xAC table's +0x04 handler when installed
 0x08035D60,0x08035D9C,build/world/p1_35d60.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035D9C,0x08035DD8,build/world/p1_35d9c.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,small function harvest
