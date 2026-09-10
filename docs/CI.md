@@ -16,15 +16,26 @@ request.
 
 ## What the report contains, and why it cannot overstate progress
 
-`tools/gen_report.py` reads `data/functions.csv` and `data/c_sources.csv` and
-writes `report.json` in the [objdiff report
+`tools/gen_report.py` reads `data/functions.csv`, `data/c_sources.csv` and
+`data/unmapped_regions.csv`, and writes `report.json` in the [objdiff report
 schema](https://github.com/encounter/objdiff/blob/main/objdiff-core/protos/report.proto)
 (version 2). It compiles nothing and reads no ROM.
 
-That is safe because those two files are not hand-maintained claims. `make check`
+That is safe because those files are not hand-maintained claims. `make check`
 regenerates them by rebuilding each function and comparing it against the ROM,
 and the `verify` job runs `make check` on every push. A report can therefore only
 ever restate the last verified state.
+
+`data/unmapped_regions.csv` is the third one and the reason the figure is not
+optimistic. It holds the stretches of code no entry in the function map covers,
+measured from the ROM by `tools/find_map_gaps.py --write`, and the report carries
+them as a `rom/unmapped` unit with nothing in them matched -- so they are in the
+DENOMINATOR. Without it the same progress reads about 0.25 points higher.
+
+The file is cached rather than measured at report time for one reason: this job
+must not need the ROM. `make check` runs `tools/find_map_gaps.py --check`, which
+re-measures from the ROM and fails if the cached file has drifted, so it cannot
+go stale. Regenerate it with `make unmapped-update` after the map changes.
 
 Two arithmetic guards stand behind the published number. `gen_report.py` refuses
 to write unless the unit sizes sum to the full ROM code size recorded in

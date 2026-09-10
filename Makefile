@@ -95,12 +95,19 @@ check: toolchain-check rom
 	@python3 tools/generate_dashboard_data.py
 	@python3 tools/check_generated_views.py
 	@python3 tools/project_status.py --check
+	@python3 tools/find_map_gaps.py --check
 	@python3 tools/gen_report.py --check
 
 # Progress report for decomp.dev, in the objdiff report schema. Needs no ROM:
-# it is derived from data/functions.csv, which `check` has just verified.
+# it is derived from data/functions.csv and data/unmapped_regions.csv, which
+# `check` has just verified against the ROM.
 report:
 	@python3 tools/gen_report.py -o report.json
+
+# Re-measure the code the function map does not cover. Needs the ROM. The file
+# it writes is what keeps `report` ROM-free; `check` fails if the two disagree.
+unmapped-update:
+	@python3 tools/find_map_gaps.py --write
 
 # objdiff's "target" objects, synthesised from the ROM. Needs the ROM and the
 # base objects: the code/pool split of a matching function is read out of

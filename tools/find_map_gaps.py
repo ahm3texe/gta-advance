@@ -22,10 +22,18 @@ Each gap is classified:
 `stubs` is the useful case: those bodies are short, their extents are certain,
 and they can go straight into the map.
 
+The measurement is also WRITTEN OUT, to data/unmapped_regions.csv, because
+tools/gen_report.py needs it and must not need the ROM: the report workflow
+runs without one on purpose, so progress stays public even with no ROM secret
+configured. `make check` regenerates the file from the ROM and fails if it has
+drifted, so the cached copy cannot go stale.
+
 Usage:
     python3 tools/find_map_gaps.py                # summary and the stub gaps
     python3 tools/find_map_gaps.py --all          # every gap that holds code
     python3 tools/find_map_gaps.py --csv          # rows ready for functions.csv
+    python3 tools/find_map_gaps.py --write        # write data/unmapped_regions.csv
+    python3 tools/find_map_gaps.py --check        # verify that file against the ROM
 """
 
 import argparse
@@ -36,6 +44,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.gba"
 FUNCTIONS = ROOT / "data" / "functions.csv"
+UNMAPPED = ROOT / "data" / "unmapped_regions.csv"
 ROM_BASE = 0x08000000
 
 BX_LR = b"\x70\x47"             # bx lr
@@ -157,13 +166,68 @@ def classify(body: bytes, start: int):
     return "code", None
 
 
+def measure(rom: bytes) -> list[tuple[int, int]]:
+    """The stretches that hold code, as (address, size). The single source."""
+    out = []
+    for start, length, _, _ in gaps(entries()):
+        if length > MAX_GAP:
+            continue
+        body = rom[start - ROM_BASE:start - ROM_BASE + length]
+        kind, _ = classify(body, start)
+        if kind == "padding":
+            continue
+        out.append((start, length))
+    return out
+
+
+def read_cached() -> list[tuple[int, int]]:
+    """The measurement as data/unmapped_regions.csv holds it. Needs no ROM."""
+    if not UNMAPPED.exists():
+        sys.exit(f"{UNMAPPED.relative_to(ROOT)} is missing. "
+                 "Run: python3 tools/find_map_gaps.py --write")
+    with UNMAPPED.open(newline="", encoding="utf-8") as handle:
+        return [(int(r["address"], 16), int(r["size"]))
+                for r in csv.DictReader(handle)]
+
+
+def write_cached(rows: list[tuple[int, int]]) -> None:
+    lines = ["address,size\n"]
+    lines += [f"0x{a:08X},{s}\n" for a, s in rows]
+    UNMAPPED.write_text("".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--all", action="store_true",
                         help="list every gap that holds code, not just the stub ones")
     parser.add_argument("--csv", action="store_true",
                         help="print rows for the stub gaps, ready for functions.csv")
+    parser.add_argument("--write", action="store_true",
+                        help="write the measurement to data/unmapped_regions.csv")
+    parser.add_argument("--check", action="store_true",
+                        help="verify data/unmapped_regions.csv against the ROM")
     args = parser.parse_args()
+
+    if args.write or args.check:
+        measured = measure(rom_bytes())
+        if args.write:
+            write_cached(measured)
+            total = sum(s for _, s in measured)
+            print(f"wrote {UNMAPPED.relative_to(ROOT)} "
+                  f"({len(measured)} regions, {total} bytes)")
+            return
+        cached = read_cached()
+        if cached != measured:
+            print(f"ERROR: {UNMAPPED.relative_to(ROOT)} has drifted from the ROM: "
+                  f"{len(cached)} regions / {sum(s for _, s in cached)} bytes cached, "
+                  f"{len(measured)} / {sum(s for _, s in measured)} measured.",
+                  file=sys.stderr)
+            print("  Regenerate it: python3 tools/find_map_gaps.py --write",
+                  file=sys.stderr)
+            sys.exit(1)
+        total = sum(s for _, s in measured)
+        print(f"unmapped regions: CLEAN ({len(measured)} regions, {total} bytes)")
+        return
 
     rom = rom_bytes()
     rows = entries()

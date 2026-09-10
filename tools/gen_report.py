@@ -135,32 +135,23 @@ def make_unit(name: str, functions: list[dict], source_path: str | None) -> dict
 def load_unmapped() -> list[dict]:
     """Return the code stretches no map entry covers, as pseudo-functions.
 
-    Measured by tools/find_map_gaps.py, which is the authority on what counts:
-    it drops the alignment padding and the over-large stretches that are data
-    rather than one function's worth of missing code.
+    Read from data/unmapped_regions.csv, NOT measured here: this file must not
+    need the ROM. tools/find_map_gaps.py writes that file from the ROM and
+    `make check` fails if it has drifted, so the cached copy cannot go stale
+    while the report workflow keeps running without a ROM.
 
     These are REGIONS. Each one may hold several functions, so the count they
     contribute is a count of regions; the names begin with `unmapped_` so that
     is visible wherever they are listed.
     """
-    rom = find_map_gaps.rom_bytes()
-    out = []
-    for start, length, _, _ in find_map_gaps.gaps(find_map_gaps.entries()):
-        if length > find_map_gaps.MAX_GAP:
-            continue
-        body = rom[start - ROM_BASE:start - ROM_BASE + length]
-        kind, _ = find_map_gaps.classify(body, start)
-        if kind == "padding":
-            continue
-        out.append({
-            "address": start,
-            "name": f"unmapped_{start:08X}",
-            "size": length,
-            "module": "unmapped",
-            "matching": False,
-            "source": None,
-        })
-    return out
+    return [{
+        "address": address,
+        "name": f"unmapped_{address:08X}",
+        "size": size,
+        "module": "unmapped",
+        "matching": False,
+        "source": None,
+    } for address, size in find_map_gaps.read_cached()]
 
 
 def load_functions() -> list[dict]:
