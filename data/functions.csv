@@ -78,7 +78,7 @@ address,name,size,status,module,notes
 0x08006090,FUN_08006090,18,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x080060A4,FUN_080060a4,128,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08006124,FUN_08006124,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08006180,FUN_08006180,14,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed"
+0x08006180,FUN_08006180,14,matching,glue,Forwards its first argument to FUN_08002194 with a constant -1; returns void; decompiled in src/glue/call_with_minus_one.c
 0x08006190,FUN_08006190,128,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08006210,FUN_08006210,102,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08006278,FUN_08006278,34,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -485,8 +485,8 @@ address,name,size,status,module,notes
 0x08023130,FUN_08023130,602,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0802338C,FUN_0802338c,574,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080235CC,FUN_080235cc,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08023648,FUN_08023648,12,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08023654,FUN_08023654,12,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08023648,FUN_08023648,12,matching,glue,Forwards to FUN_080223CC with a constant 0 third argument and passes the answer on; decompiled in src/glue/call_with_flag.c
+0x08023654,FUN_08023654,12,matching,glue,Forwards to FUN_080223CC with a constant 1 third argument and passes the answer on; decompiled in src/glue/call_with_flag.c
 0x08023660,FUN_08023660,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0802368C,FUN_0802368c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080236F0,FUN_080236f0,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -693,7 +693,7 @@ address,name,size,status,module,notes
 0x08030F84,TriggerEvent39,12,matching,world,verified from a byte-matching C source; TriggerEvent39; FUN_0802eb50(39)
 0x08030F90,ResetMapView,116,matching,world,verified from a byte-matching C source; ResetMapView; zeroes the map window and the gRam02025810 view fields
 0x08031004,FUN_08031004,24,matching,progress,"Hands the +0x0A byte to FUN_080504B4 sign-extended; the ldrb plus lsls/asrs pair marks it a u8 field cast to s8, not a signed field; decompiled in src/progress/call_signed_byte0a.c"
-0x0803101C,FUN_0803101c,24,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed"
+0x0803101C,FUN_0803101c,24,matching,glue,"The +0x28 owner of the actor ResolveRecordNodeChain resolves the id to, 0 when nothing resolves; decompiled in src/glue/resolve_owner.c"
 0x08031034,FUN_08031034,32,matching,progress,"Calls FUN_0802EB50 with the one-based +0x1128 index minus one, when it is set; decompiled in src/progress/notify_index_1128.c"
 0x08031054,FUN_08031054,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080310C0,FUN_080310c0,116,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -704,7 +704,7 @@ address,name,size,status,module,notes
 0x08031318,GetRecordNodeById,14,matching,world,verified from a byte-matching C source; GetRecordNodeById; record node from a u16 id
 0x08031328,ClearMapWindowDma,96,matching,ui,verified from a byte-matching C source; ClearMapWindowDma; two DMA3 fills
 0x08031388,InitSessionAttr,88,matching,world,verified from a byte-matching C source; InitSessionAttr; gRam02026DA0 attribute setup
-0x080313E0,FUN_080313e0,16,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x080313E0,FUN_080313e0,16,matching,glue,Hands the block at 0x02026DA0 to ReleaseObject; decompiled in src/glue/release_block_da0.c
 0x080313F0,FUN_080313f0,36,matching,progress,"Top six bits of a map cell; the +0x30 word points at a header with the row width at +0x00 and the cells at +0x04, indexed by two coordinates shifted right by 22 (signed); decompiled in src/progress/read_map_cell.c"
 0x08031414,ScaleMagnitude,132,matching,world,verified from a byte-matching C source; ScaleMagnitude; 5-band piecewise linear curve
 0x08031498,DrawTwoDigits,156,matching,ui,verified from a byte-matching C source; DrawTwoDigits; writes a two-digit number with two-row tiles
@@ -966,7 +966,7 @@ address,name,size,status,module,notes
 0x0803BCD0,FUN_0803bcd0,248,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803BDC8,FUN_0803bdc8,540,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0803BFE4,FUN_0803bfe4,96,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
-0x0803C044,FUN_0803c044,10,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed"
+0x0803C044,FUN_0803c044,10,matching,glue,"Forwarding wrapper over FUN_08055700, passing the answer on; decompiled in src/glue/wrap_08055700.c"
 0x0803C050,ConfigureSlot,64,matching,world,Slot configuration; src/world/slot_config.c size measured including the tail pool (byte-matching evidence)
 0x0803C090,GetActiveSlotValue,36,matching,world,Slot configuration; src/world/slot_config.c size measured including the tail pool (byte-matching evidence)
 0x0803C0B4,GetSlotField,48,matching,world,Slot configuration; src/world/slot_config.c
@@ -1258,7 +1258,7 @@ address,name,size,status,module,notes
 0x08051094,FUN_08051094,30,matching,core,30-byte body plus 2 bytes of alignment reproduce ROM bytes 0x51094-0x510B3 exactly; rule 33 bit test
 0x080510B8,FUN_080510b8,32,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x080510D8,FUN_080510d8,112,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08051148,FUN_08051148,12,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08051148,FUN_08051148,12,matching,glue,"Calls IsRamModeWanted and answers 0 regardless; the ROM sets r0 after the call, so the discard is deliberate; decompiled in src/glue/probe_ram_mode.c"
 0x08051154,FUN_08051154,348,matching,core,Area/record loader; selects the 60-byte ROM record and runs the world setup; src/core/band_08051154.c
 0x080512B0,GetRecordIndex,12,matching,world,"leaf accessor; found with tools/find_accessors.py, byte-matching from C"
 0x080512BC,FUN_080512bc,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -1338,7 +1338,7 @@ address,name,size,status,module,notes
 0x080556C0,FUN_080556c0,64,matching,table,"Scans the owner's 20-byte entry table for one whose +0x00 handler is 0x0805AB14 and whose +0x06 halfword matches the operand, and answers that entry's +0x08 halfword; 0 when nothing matches or the owner has no table. Decompiled in src/table/lookup_default_value.c"
 0x08055700,FUN_08055700,32,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08055720,FUN_08055720,72,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08055768,FUN_08055768,12,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08055768,FUN_08055768,12,matching,glue,Writes its argument into the words at +0x08 and +0x0C of gUnk02010C60; decompiled in src/glue/set_pair_words.c
 0x08055774,FUN_08055774,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080557AC,FUN_080557ac,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080557E8,FUN_080557e8,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -1581,7 +1581,7 @@ address,name,size,status,module,notes
 0x0805E040,FUN_0805e040,112,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0805E0B0,FUN_0805e0b0,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0805E118,FUN_0805e118,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0805E14C,FUN_0805e14c,24,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0805E14C,FUN_0805e14c,24,matching,glue,Calls SetLanguage(0) and clears gRam02035C8C; decompiled in src/glue/reset_language.c
 0x0805E168,FUN_0805e168,288,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0805E28C,FUN_0805e28c,912,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0805E61C,FUN_0805e61c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)

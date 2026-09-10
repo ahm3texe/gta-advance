@@ -26,6 +26,7 @@ start,end,binary,module,notes
 0x08005FA8,0x08005FC4,build/bootstrap/set_pending_code.bin,bootstrap,"Sets gUnk02001428 to 8 between FUN_0803379C and FUN_0803378C(8, 1)"
 0x08005FC4,0x08005FD0,build/world/wrap_08005fc4.bin,world,small function harvest
 0x08005FE0,0x08006028,build/bootstrap/set_outer_state_bit.bin,bootstrap,"Codes 8, 9 and 12 each set their own bit in gOuterState; agbcc binary-search switch"
+0x08006180,0x08006190,build/glue/call_with_minus_one.bin,glue,Forwards with a constant -1
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; shifts the 31-entry history queue
 0x08008094,0x080080A4,build/world/set_index.bin,world,wrapper around SetTableIndex
 0x08008108,0x0800811C,build/core/zero_history.bin,core,zeroing the history buffer with Memset
@@ -88,6 +89,7 @@ start,end,binary,module,notes
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,complex harvest
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,small function harvest
 0x0801D920,0x0801D93C,build/world/kind_six_or_empty.bin,world,"Null object, null record or kind 6 -> 1; single shared answer body (rule 49)"
+0x08023648,0x08023660,build/glue/call_with_flag.bin,glue,"Two wrappers over FUN_080223CC, flag 0 and 1"
 0x08023778,0x08023794,build/world/p1_23778.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023794,0x080237B0,build/world/p1_23794.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023868,0x0802392C,build/world/project_actor_offset.bin,world,0x08023868 ProjectActorOffset
@@ -136,6 +138,7 @@ start,end,binary,module,notes
 0x08030F84,0x08030F90,build/world/trigger_event39.bin,world,0x08030F84 TriggerEvent39
 0x08030F90,0x08031004,build/world/reset_map_view.bin,world,0x08030F90 ResetMapView
 0x08031004,0x0803101C,build/progress/call_signed_byte0a.bin,progress,Hands the +0x0A byte to FUN_080504B4 as an s8
+0x0803101C,0x08031034,build/glue/resolve_owner.bin,glue,"The +0x28 owner behind a record id, 0 when nothing resolves"
 0x08031034,0x08031054,build/progress/notify_index_1128.bin,progress,"Notifies with the one-based +0x1128 index, minus one"
 0x080311DC,0x08031204,build/ui/clear_map_window.bin,ui,0x080311DC ClearMapWindow
 0x08031204,0x0803123C,build/world/p1_31204.bin,world,Phase 1: natural C matching the ROM exactly
@@ -143,6 +146,7 @@ start,end,binary,module,notes
 0x08031318,0x08031328,build/world/get_record_node_by_id.bin,world,"0x08031318 GetRecordNodeById (+2 bytes of alignment padding, 0000 in the ROM)"
 0x08031328,0x08031388,build/ui/clear_map_window_dma.bin,ui,0x08031328 ClearMapWindowDma
 0x08031388,0x080313E0,build/world/init_session_attr.bin,world,0x08031388 InitSessionAttr
+0x080313E0,0x080313F0,build/glue/release_block_da0.bin,glue,Releases the block at 0x02026DA0
 0x080313F0,0x08031414,build/progress/read_map_cell.bin,progress,"Top six bits of a map cell, indexed by two fixed-point coordinates"
 0x08031414,0x08031498,build/world/scale_magnitude.bin,world,0x08031414 ScaleMagnitude
 0x08031498,0x08031534,build/ui/draw_two_digits.bin,ui,0x08031498 DrawTwoDigits
@@ -215,6 +219,7 @@ start,end,binary,module,notes
 0x08038584,0x0803859C,build/entity/step_all_entities.bin,entity,Runs FUN_08037B50 over gUnk0202F2C0; Thumb function pointer
 0x08038680,0x080386A8,build/entity/find_model_by_id.bin,entity,"Index of the model whose +0x04 id matches, over 120 x 80-byte entries"
 0x0803AFBC,0x0803B19C,build/world/band_0803afbc.bin,world,"Scene/state transition step; five-way gate, threshold selection, state dispatch."
+0x0803C044,0x0803C050,build/glue/wrap_08055700.bin,glue,Forwarding wrapper over FUN_08055700
 0x0803C050,0x0803C0E4,build/world/slot_config.bin,world,Slot configuration and two readers
 0x0803C0E4,0x0803C178,build/world/apply_two_levels.bin,world,clamping and applying two levels
 0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Slot range + default constant
@@ -279,6 +284,7 @@ start,end,binary,module,notes
 0x08050A34,0x08050A48,build/world/is_anchor_small.bin,world,conditional constant return
 0x08051048,0x0805104C,build/world/p1_51048.bin,world,Phase 1: natural C matching the ROM exactly
 0x08051094,0x080510B4,build/core/mask_bit_or_empty.bin,core,Mask bit test; rule 33 keeps the shift on the constant instead of canonicalizing to mask>>bit
+0x08051148,0x08051154,build/glue/probe_ram_mode.bin,glue,Calls IsRamModeWanted and answers 0 regardless
 0x08051154,0x080512B0,build/core/band_08051154.bin,core,Area/record loader: selects the record and runs the world setup chain.
 0x080512B0,0x080512BC,build/world/get_record_index.bin,world,leaf accessor
 0x08051300,0x0805131C,build/core/reset_record_index.bin,core,"Record index block reset; 3600 is built with movs/lsls, the marker comes from the pool"
@@ -295,6 +301,7 @@ start,end,binary,module,notes
 0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
 0x08054F1C,0x08055054,build/world/is_near_any_actor.bin,world,0x08054F1C IsNearAnyActor (+2 padding)
 0x080556C0,0x08055700,build/table/lookup_default_value.bin,table,"The value carried by the default handler's entry, by kind"
+0x08055768,0x08055774,build/glue/set_pair_words.bin,glue,Writes the same word to +0x08 and +0x0C of gUnk02010C60
 0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
 0x08055970,0x08055A00,build/core/probe_nearby_position.bin,core,Tests the position at four neighbouring offsets
 0x08055A68,0x08055AF8,build/world/node_search.bin,world,Ordered node lookup and id classification
@@ -383,6 +390,7 @@ start,end,binary,module,notes
 0x0805B9E4,0x0805B9F8,build/script/cmd_clear_slot_word.bin,script,"Handler: clears the +0x4C word of slot 1, with no null check"
 0x0805B9F8,0x0805BA04,build/script/cmd_reset_area_ids.bin,script,"Handler: ResetAreaIds, always answering 1"
 0x0805D878,0x0805DA88,build/misc/id_compatibility.bin,misc,Equal IDs or membership in the shared special group
+0x0805E14C,0x0805E164,build/glue/reset_language.bin,glue,SetLanguage(0) and clears gRam02035C8C
 0x0805E6C4,0x0805E700,build/misc/table_lookup.bin,misc,Record table selector and reader
 0x080611CC,0x0806149C,build/world/mark_distant_actors.bin,world,0x080611CC MarkDistantActors + 0x08061334 MarkDistantActorsB (the 0x0202F2C0 list)
 0x08061D34,0x08061D58,build/session/reset_ram_block.bin,session,Clears the 36-byte RAM block; and the setter for its two ids

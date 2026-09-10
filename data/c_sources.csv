@@ -49,6 +49,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08005FA8,FUN_08005fa8,src/bootstrap/set_pending_code.c,28,28,yes
 0x08005FC4,FUN_08005fc4,src/world/wrap_08005fc4.c,10,10,yes
 0x08005FE0,FUN_08005fe0,src/bootstrap/set_outer_state_bit.c,72,72,yes
+0x08006180,FUN_08006180,src/glue/call_with_minus_one.c,14,14,yes
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
 0x08008108,ZeroHistory,src/core/zero_history.c,20,20,yes
@@ -188,6 +189,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x0801D8B0,GetField100,src/world/get_field_100.c,10,10,yes
 0x0801D920,FUN_0801d920,src/world/kind_six_or_empty.c,26,26,yes
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
+0x08023648,FUN_08023648,src/glue/call_with_flag.c,12,12,yes
+0x08023654,FUN_08023654,src/glue/call_with_flag.c,12,12,yes
 0x08023778,FUN_08023778,src/world/p1_23778.c,26,26,yes
 0x08023794,FUN_08023794,src/world/p1_23794.c,26,26,yes
 0x08023868,ProjectActorOffset,src/world/project_actor_offset.c,196,196,yes
@@ -278,6 +281,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08030F84,TriggerEvent39,src/world/trigger_event39.c,12,12,yes
 0x08030F90,ResetMapView,src/world/reset_map_view.c,116,116,yes
 0x08031004,FUN_08031004,src/progress/call_signed_byte0a.c,24,24,yes
+0x0803101C,FUN_0803101c,src/glue/resolve_owner.c,24,24,yes
 0x08031034,FUN_08031034,src/progress/notify_index_1128.c,32,32,yes
 0x080311DC,ClearMapWindow,src/ui/clear_map_window.c,40,40,yes
 0x08031204,FUN_08031204,src/world/p1_31204.c,56,56,yes
@@ -285,6 +289,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08031318,GetRecordNodeById,src/world/get_record_node_by_id.c,14,14,yes
 0x08031328,ClearMapWindowDma,src/ui/clear_map_window_dma.c,96,96,yes
 0x08031388,InitSessionAttr,src/world/init_session_attr.c,88,88,yes
+0x080313E0,FUN_080313e0,src/glue/release_block_da0.c,16,16,yes
 0x080313F0,FUN_080313f0,src/progress/read_map_cell.c,36,36,yes
 0x08031414,ScaleMagnitude,src/world/scale_magnitude.c,132,132,yes
 0x08031498,DrawTwoDigits,src/ui/draw_two_digits.c,156,156,yes
@@ -390,6 +395,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08038680,FUN_08038680,src/entity/find_model_by_id.c,38,38,yes
 0x0803AFBC,FUN_0803afbc,src/world/band_0803afbc.c,480,480,yes
 0x0803B19C,NoOp0803B19C,src/misc/empty_stubs.c,2,2,yes
+0x0803C044,FUN_0803c044,src/glue/wrap_08055700.c,10,10,yes
 0x0803C050,ConfigureSlot,src/world/slot_config.c,64,64,yes
 0x0803C090,GetActiveSlotValue,src/world/slot_config.c,36,36,yes
 0x0803C0B4,GetSlotField,src/world/slot_config.c,48,48,yes
@@ -490,6 +496,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050A34,IsAnchorSmall,src/world/is_anchor_small.c,20,20,yes
 0x08051048,NoOp08051048,src/world/p1_51048.c,2,2,yes
 0x08051094,FUN_08051094,src/core/mask_bit_or_empty.c,30,30,yes
+0x08051148,FUN_08051148,src/glue/probe_ram_mode.c,12,12,yes
 0x08051154,FUN_08051154,src/core/band_08051154.c,348,348,yes
 0x080512B0,GetRecordIndex,src/world/get_record_index.c,12,12,yes
 0x08051300,ResetRecordIndex,src/core/reset_record_index.c,28,28,yes
@@ -542,6 +549,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805518C,RefreshActiveAreas,src/core/nodelist_d5.c,328,328,yes
 0x080552D4,IsProgressThresholdMet,src/core/nodelist_b8.c,492,492,yes
 0x080556C0,FUN_080556c0,src/table/lookup_default_value.c,64,64,yes
+0x08055768,FUN_08055768,src/glue/set_pair_words.c,12,12,yes
 0x08055954,FindFreeNode,src/core/find_free_node.c,28,28,yes
 0x08055970,ProbeNearbyPosition,src/core/probe_nearby_position.c,144,144,yes
 0x08055A68,RandomizeCoords,src/world/node_search.c,44,44,yes
@@ -650,6 +658,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805B9E4,FUN_0805b9e4,src/script/cmd_clear_slot_word.c,18,18,yes
 0x0805B9F8,FUN_0805b9f8,src/script/cmd_reset_area_ids.c,12,12,yes
 0x0805D878,IdsCompatible,src/misc/id_compatibility.c,528,528,yes
+0x0805E14C,FUN_0805e14c,src/glue/reset_language.c,24,24,yes
 0x0805E6C4,SetLanguage,src/misc/table_lookup.c,16,16,yes
 0x0805E6D4,GetLanguage,src/misc/table_lookup.c,12,12,yes
 0x0805E6E0,GetTextString,src/misc/table_lookup.c,32,32,yes
