@@ -45,6 +45,7 @@ start,end,binary,module,notes
 0x0800AB40,0x0800AB4C,build/glue/get_coord_byte71.bin,glue,Reads the coord block's +0x71 byte
 0x0800AB4C,0x0800AB60,build/glue/is_coord_second_equal.bin,glue,1 when the coord block's +0x04 equals the argument
 0x0800AB60,0x0800AB78,build/glue/enter_mode_pair.bin,glue,"Two wrappers over FUN_080657D8, code 0 and code 1"
+0x0800B0A4,0x0800B0D4,build/entry/copy_triple_and_dot.bin,entry,Copies three words and stores their negated dot product at +0x0C
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Point-in-quad test; returns the index of the nearest edge.
 0x0800C124,0x0800C134,build/glue/is_at_or_past.bin,glue,"1 when +0x38 is at or past the other's +0x08, signed"
 0x0800CA78,0x0800CA98,build/core/shifted_entry_value.bin,core,Selected entry value shifted; rule 70 puts the sentinel in a local so its pool load lands first
@@ -54,6 +55,7 @@ start,end,binary,module,notes
 0x0800DD50,0x0800DD84,build/world/p1_0dd50.bin,world,Phase 1: natural C matching the ROM exactly
 0x080100D0,0x0801014C,build/core/memory_init.bin,core,Buffer allocation and DMA3 zeroing; natural byte-matching C.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,small function harvest
+0x08010224,0x08010254,build/entry/release_two_buffers.bin,entry,Releases the EWRAM and IWRAM handles into one sink and clears both
 0x08011CF4,0x08011D14,build/vram/clear_far_pair.bin,vram,"Clears the +0x1F50 and +0x1F54 words, offsets not derived"
 0x08011D14,0x08011D38,build/vram/release_two_handles.bin,vram,Releases the +0x04 and +0x08 handles into one sink
 0x08011D38,0x08011D4C,build/vram/get_far_word.bin,vram,Reads the +0x1F7C word
@@ -77,8 +79,10 @@ start,end,binary,module,notes
 0x08012F88,0x08013098,build/world/queue_draw_request.bin,world,0x08012F88 QueueDrawRequest + its twin 0x08013010
 0x080130D4,0x080130F0,build/world/reset_draw_queue.bin,world,"Draw queue reset; 0x02022ABC is a separate symbol, not an offset"
 0x080130F0,0x080130F4,build/world/p1_130f0.bin,world,Phase 1: natural C matching the ROM exactly
+0x08013434,0x08013450,build/entry/clear_node_pool.bin,entry,"Clears the 904-byte node pool, then rebuilds it"
 0x08013450,0x080134A4,build/world/p1_13450.bin,world,Phase 1: natural C matching the ROM exactly
 0x080134A4,0x080134F8,build/world/p1_134a4.bin,world,Phase 1: natural C matching the ROM exactly
+0x080134FC,0x08013520,build/entry/chain_length_capped.bin,entry,"Length of the +0x380 chain, capped at 32"
 0x080138E8,0x080138F4,build/world/wrap_080138e8.bin,world,small function harvest
 0x080138F4,0x08013900,build/world/wrap_080138f4.bin,world,small function harvest
 0x08013974,0x080139D0,build/world/list_head.bin,world,"Entry lookup, chain count, chain mark"
@@ -87,6 +91,8 @@ start,end,binary,module,notes
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,small function harvest
 0x08014FAC,0x08014FB8,build/glue/clear_object_list_alt.bin,glue,"Second copy of the object-list clear, twelve bytes before the first"
 0x08014FB8,0x08014FC4,build/glue/clear_object_list.bin,glue,Drops the object list head
+0x0801508C,0x080150B4,build/entry/queue_all_draw_requests.bin,entry,Queues a draw request for every node on the +0x44 chain
+0x080150B4,0x080150D0,build/entry/step_all_on_chain.bin,entry,Runs FUN_080148B0 down the +0x44 chain
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184-byte body + literal pool
 0x080157B8,0x08015834,build/world/try_launch_actor.bin,world,0x080157B8 TryLaunchActor
 0x080159A0,0x08015A84,build/world/update_actor_lane.bin,world,0x080159A0 UpdateActorLane

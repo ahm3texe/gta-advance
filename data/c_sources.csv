@@ -77,6 +77,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AB60,FUN_0800ab60,src/glue/enter_mode_pair.c,12,12,yes
 0x0800AB6C,FUN_0800ab6c,src/glue/enter_mode_pair.c,12,12,yes
 0x0800AF48,FUN_0800af48,src/world/plane_classify.c,166,174,no
+0x0800B0A4,FUN_0800b0a4,src/entry/copy_triple_and_dot.c,46,46,yes
 0x0800B140,DotProduct,src/world/geometry.c,44,44,yes
 0x0800B16C,FUN_0800b16c,src/world/band_0800b16c.c,280,280,yes
 0x0800BDB0,BoxesOverlap,src/world/geometry.c,72,72,yes
@@ -100,6 +101,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08010198,NoOp08010198,src/misc/empty_stubs.c,2,2,yes
 0x080101D8,FUN_080101d8,src/world/wrap_080101d8.c,10,10,yes
 0x080101E4,NoOp080101E4,src/misc/empty_stubs.c,2,2,yes
+0x08010224,FUN_08010224,src/entry/release_two_buffers.c,48,48,yes
 0x08011CF4,FUN_08011cf4,src/vram/clear_far_pair.c,32,32,yes
 0x08011D14,FUN_08011d14,src/vram/release_two_handles.c,36,36,yes
 0x08011D38,FUN_08011d38,src/vram/get_far_word.c,20,20,yes
@@ -137,8 +139,10 @@ address,name,source,compiled_size,mapped_size,matching
 0x08013010,QueueDrawRequestDup,src/world/queue_draw_request.c,136,136,yes
 0x080130D4,ResetDrawQueue,src/world/reset_draw_queue.c,28,28,yes
 0x080130F0,NoOp080130F0,src/world/p1_130f0.c,2,2,yes
+0x08013434,FUN_08013434,src/entry/clear_node_pool.c,28,28,yes
 0x08013450,FUN_08013450,src/world/p1_13450.c,84,84,yes
 0x080134A4,FUN_080134a4,src/world/p1_134a4.c,84,84,yes
+0x080134FC,FUN_080134fc,src/entry/chain_length_capped.c,36,36,yes
 0x080138E8,FUN_080138e8,src/world/wrap_080138e8.c,10,10,yes
 0x080138F4,FUN_080138f4,src/world/wrap_080138f4.c,10,10,yes
 0x08013900,FlushPaletteQueue,src/core/flush_palette_queue.c,120,116,no
@@ -153,6 +157,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x08014FAC,FUN_08014fac,src/glue/clear_object_list_alt.c,12,12,yes
 0x08014FB8,FUN_08014fb8,src/glue/clear_object_list.c,12,12,yes
+0x0801508C,FUN_0801508c,src/entry/queue_all_draw_requests.c,40,40,yes
+0x080150B4,FUN_080150b4,src/entry/step_all_on_chain.c,26,26,yes
 0x080150D0,FUN_080150d0,src/entry/set_two_priorities.c,60,64,no
 0x0801515C,LoadEntryTileData,src/world/level_step_b2.c,100,100,yes
 0x080151C0,ReleaseEntryResources,src/world/level_step_b1.c,124,124,yes

@@ -161,7 +161,7 @@ address,name,size,status,module,notes
 0x0800AB88,BuildVolumePlanes,960,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0800AF48,FUN_0800af48,174,decompiled,world,Converts four plane distances into a bit mask; 166/174 bytes parked; src/world/plane_classify.c
 0x0800AFF8,FUN_0800aff8,172,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0800B0A4,FUN_0800b0a4,46,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0800B0A4,FUN_0800b0a4,46,matching,entry,"Copies three words from its first argument to its second and stores -a*x - b*y - c*z at the destination's +0x0C, with x, y and z the SIGNED halfwords at +0x02, +0x06 and +0x0A of the third; decompiled in src/entry/copy_triple_and_dot.c"
 0x0800B0D4,FUN_0800b0d4,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0800B140,DotProduct,44,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0800B16C,FUN_0800b16c,280,matching,world,"Point-in-quad test; 0 when outside, otherwise (nearest edge<<8)|1; src/world/band_0800b16c.c"
@@ -224,7 +224,7 @@ address,name,size,status,module,notes
 0x080101D8,FUN_080101d8,10,matching,world,byte-matching from C (small function harvest)
 0x080101E4,NoOp080101E4,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x080101E8,FUN_080101e8,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x08010224,FUN_08010224,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08010224,FUN_08010224,48,matching,entry,"Releases gBufferA0201AAA0 and the IWRAM handle at 0x03000028 into gBufferBase02014ED0, then clears both from one zero; decompiled in src/entry/release_two_buffers.c"
 0x08010254,FUN_08010254,620,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080104C0,FUN_080104c0,1074,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080108F4,FUN_080108f4,3394,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary verified by the 2026-09-04 ROM flow review
@@ -298,10 +298,10 @@ address,name,size,status,module,notes
 0x08013298,FUN_08013298,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x08013308,FUN_08013308,160,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x080133A8,FUN_080133a8,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08013434,FUN_08013434,28,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08013434,FUN_08013434,28,matching,entry,Clears the 904 bytes of gRam02022AC0 and calls FUN_08013450; decompiled in src/entry/clear_node_pool.c
 0x08013450,FUN_08013450,84,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x080134A4,FUN_080134a4,84,matching,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x080134FC,FUN_080134fc,36,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x080134FC,FUN_080134fc,36,matching,entry,"Length of the chain at +0x380 of gRam02022AC0, followed through each link's +0x14 and capped at 32 so a cycle cannot hang it; decompiled in src/entry/chain_length_capped.c"
 0x08013520,FUN_08013520,126,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080135A0,FUN_080135a0,140,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0801362C,FUN_0801362c,216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
@@ -338,8 +338,8 @@ address,name,size,status,module,notes
 0x08014FC4,FUN_08014fc4,56,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08014FFC,FUN_08014ffc,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08015038,FUN_08015038,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0801508C,FUN_0801508c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080150B4,FUN_080150b4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801508C,FUN_0801508c,40,matching,entry,"Walks the +0x44 chain and queues a draw request for every node with a +0x1C record, passing bit 5 of its +0x20 halfword; decompiled in src/entry/queue_all_draw_requests.c"
+0x080150B4,FUN_080150b4,26,matching,entry,Runs FUN_080148B0 for every node on the +0x44 chain; decompiled in src/entry/step_all_on_chain.c
 0x080150D0,FUN_080150d0,64,decompiled,entry,"Replaces bits 0x0C00 of the +0x18 record's +0x00 and +0x04 halfwords with 0x800 and 0xC00, but only when the +0x27 byte is 1. NOT BYTE-MATCHING at 14/30: the ROM copies each or-constant out of its build register and agbcc does not. Register-copy class, rule 44. src/entry/set_two_priorities.c"
 0x08015110,FUN_08015110,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801515C,LoadEntryTileData,100,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
