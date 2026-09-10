@@ -26,11 +26,16 @@ start,end,binary,module,notes
 0x08005FA8,0x08005FC4,build/bootstrap/set_pending_code.bin,bootstrap,"Sets gUnk02001428 to 8 between FUN_0803379C and FUN_0803378C(8, 1)"
 0x08005FC4,0x08005FD0,build/world/wrap_08005fc4.bin,world,small function harvest
 0x08005FE0,0x08006028,build/bootstrap/set_outer_state_bit.bin,bootstrap,"Codes 8, 9 and 12 each set their own bit in gOuterState; agbcc binary-search switch"
+0x0800607C,0x08006090,build/glue/swap_two_args_flag1.bin,glue,Forwards with the arguments swapped and a constant 1
 0x08006090,0x080060A4,build/glue/swap_two_args.bin,glue,Forwards with the first two arguments swapped and a constant 0
 0x08006180,0x08006190,build/glue/call_with_minus_one.bin,glue,Forwards with a constant -1
+0x08006278,0x0800629C,build/glue/reset_bg_then_queue.bin,glue,"Resets the background, steps the value back 54, then queues"
+0x0800629C,0x080062B8,build/glue/queue_offset_by_base.bin,glue,Queues the argument offset by gRam02010C50
+0x08007FB8,0x08007FDC,build/glue/set_mode_byte_and_call.bin,glue,Stores the mode byte and dispatches on it
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; shifts the 31-entry history queue
 0x08008094,0x080080A4,build/world/set_index.bin,world,wrapper around SetTableIndex
 0x08008108,0x0800811C,build/core/zero_history.bin,core,zeroing the history buffer with Memset
+0x08008C34,0x08008C5C,build/glue/release_and_unlink.bin,glue,Releases the slot's object and unlinks it
 0x0800A930,0x0800A94C,build/core/read_triple.bin,core,writes gRam02011030 +0x30/+0x34/+0x38 out
 0x0800A94C,0x0800A980,build/misc/coord_accessors.bin,misc,Four coordinate accessors (0x02011030 +12/+16/+72 and 0x020110AC)
 0x0800A980,0x0800A9E4,build/core/clip_bounds.bin,core,bounding box narrowing
@@ -38,7 +43,10 @@ start,end,binary,module,notes
 0x0800AAF4,0x0800AB30,build/world/reset_track_heading.bin,world,0x0800AAF4 ResetTrackHeading
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,zeroing the CoordBlock +0x71 byte
 0x0800AB40,0x0800AB4C,build/glue/get_coord_byte71.bin,glue,Reads the coord block's +0x71 byte
+0x0800AB4C,0x0800AB60,build/glue/is_coord_second_equal.bin,glue,1 when the coord block's +0x04 equals the argument
+0x0800AB60,0x0800AB78,build/glue/enter_mode_pair.bin,glue,"Two wrappers over FUN_080657D8, code 0 and code 1"
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Point-in-quad test; returns the index of the nearest edge.
+0x0800C124,0x0800C134,build/glue/is_at_or_past.bin,glue,"1 when +0x38 is at or past the other's +0x08, signed"
 0x0800CA78,0x0800CA98,build/core/shifted_entry_value.bin,core,Selected entry value shifted; rule 70 puts the sentinel in a local so its pool load lands first
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front and remove

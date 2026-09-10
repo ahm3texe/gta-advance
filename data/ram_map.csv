@@ -63,6 +63,7 @@ address,size,name,source,status,notes
 0x02001140,36,gRam02001140,decomp,verified,"Referenced by a block queued for matching; role unknown; +0x00 is a POINTER (menu_screen.c dereferences it: ldr r1,[r0] + ldrb r2,[r1,#8]); +8 of the pointee is `kind` in menu_screen and `flags` in session_node.c -- the same field  TRACE (session 7): a structure PARALLEL to gRam02000F10. On a new game at f22512 the +0x04 field of both became 2 and the +0x10 field 6553600 -- same frame, same values. The second player/entity slot."
 0x020011A0,1,gActiveMenuItemCount,decomp,verified,"Number of visible menu entries written by BuildActiveMenuItems  TRACE: 0->5 at f4 on boot (5 options on the language screen), 5->0 at f1068 when the game starts."
 0x020011B0,80,gActiveMenuItems,decomp,verified,Twenty pointers to the currently visible menu entries
+0x02001200,1,gRam02001200,decomp,provisional,A byte 0x08007FB8 writes from its third argument and then branches on. Only that writer is known.
 0x02001210,4,gMenuPaletteSource,decomp,verified,"Palette data DMA-ed into palette RAM by InitMenuScreen  TRACE: the values are BGR555 colours (0x7C1F magenta, 0x7FFF white) -- NOT A POINTER, a palette buffer. It must not be read as u32."
 0x02001410,4,gMenuFlags,decomp,verified,Menu flag bitfield tested by IsMenuFlagSet
 0x02001414,1,gMenuPositionX,decomp,verified,Menu horizontal position computed by BuildActiveMenuItems
@@ -71,6 +72,7 @@ address,size,name,source,status,notes
 0x02001450,4,gRam02001450,decomp,provisional,"In FUN_08003454, the buffer used as the LZ77UnCompWram destination and then as the DMA3 source. Size NOT VERIFIED; only the base is known."
 0x020079A0,1,player_armor,libretro_cheat,provisional,Cheat value 100
 0x0200F280,464,gLinkBlock,decomp,provisional,ROM: 0x08066144 sets it up by zeroing 464 bytes with InitLinkBlock; gRam02036338 points at it
+0x02010C50,2,gRam02010C50,decomp,provisional,A halfword 0x0800629C adds to its argument before passing the sum to FUN_080046DC. Only the read is known; nothing writes it in the functions decompiled so far.
 0x02010C60,32,gUnk02010C60,decomp,provisional,Byte 26 selects between the two return values of 0x0803C77C
 0x02010F44,4,gMenuRuntimeState,decomp,provisional,Cleared alongside gMenuFlags in ResetMenuState; role unconfirmed
 0x02010F48,4,gRam02010F48,decomp,provisional,u32 state field zeroed by FUN_0805643C
