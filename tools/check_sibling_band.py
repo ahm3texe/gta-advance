@@ -32,7 +32,12 @@ def baseline_functions():
         capture_output=True,
     )
     if result.returncode:
-        sys.exit(f"Could not read the sibling band baseline: {BASE_REVISION}")
+        sys.exit(
+            f"Could not read the sibling band baseline: {BASE_REVISION}\n"
+            "  The band's target set is fixed as of that commit, so this needs the\n"
+            "  repository's history. In CI a SHALLOW CLONE is the usual cause:\n"
+            "  actions/checkout defaults to fetch-depth 1, which omits it.\n"
+            f"  Locally: git fetch --unshallow, or verify with git cat-file -e {BASE_REVISION}")
     return list(csv.DictReader(io.StringIO(result.stdout)))
 
 

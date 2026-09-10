@@ -35,6 +35,11 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+        with:
+          # tools/check_sibling_band.py reads its fixed target set with
+          # `git show 9cbaf27:data/functions.csv`. The default shallow clone
+          # does not contain that commit, and the job failed on it.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -73,6 +78,9 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
+        with:
+          # `make check` runs check_sibling_band.py, which needs history.
+          fetch-depth: 0
 
       - name: Decide whether the ROM is reachable
         id: rom
