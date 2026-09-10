@@ -56,3 +56,4 @@ address,classification,evidence
 0x0806EEDC,boundary-review,0x0806EEC8
 0x0806FF56,boundary-review,0x0806F26C
 0x08071846,boundary-review,0x0807180C
+0x0808E3CA,not-code,"Added by discover_functions.py method A and removed. The bl that reaches it is at 0x0800E3C8, which is a LITERAL POOL word inside FUN_0800DF14 holding 0xFFFFF07F and read by the ldr [pc] at 0x0800E386. The target disassembles as undefined instructions in graphics data, 0x1C000 past the last mapped function, and nothing else in the ROM refers to it. Method A now skips pool words and bounds its targets by the code limit."

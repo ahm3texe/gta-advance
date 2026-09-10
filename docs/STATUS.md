@@ -8,9 +8,9 @@ summary, run `make status`.
 
 | Measurement | Value |
 |---|---:|
-| Function map | 1944 functions / 454280 bytes |
-| Human review (`documented+`) | 814 / 1944 |
-| Byte-matching | 757 functions / 63612 bytes (14.00%) |
+| Function map | 1979 functions / 457008 bytes |
+| Human review (`documented+`) | 814 / 1979 |
+| Byte-matching | 757 functions / 63612 bytes (13.92%) |
 | C sources | 792 total / 744 matching |
 | ROM verified from source | 45156 bytes |
 | libc verification | 448 bytes |

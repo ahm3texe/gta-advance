@@ -8,8 +8,18 @@ handler pointers in the pools (0x0803DEA8, 0x0803E280, 0x0803F0E8,
 
 THREE METHODS:
 
-A) CALL TARGET (certain). The target of every `bl` instruction inside known
-   code is by definition a function entry. There can be no false positive.
+A) CALL TARGET (strong). The target of a `bl` inside known code is a function
+   entry. Two things have to be excluded first, and the second was learned the
+   hard way:
+
+   1. LITERAL POOLS. A pool word can decode as a `bl` pair. 0x0800E3C8 holds
+      the constant 0xFFFFF07F, read by the `ldr rX,[pc,#imm]` at 0x0800E386,
+      and decodes as `bl 0x0808E3CA` -- an address 0x1C000 past the last real
+      function, in graphics data. This tool once added it as "certain". Every
+      pc-relative load target inside a function is now marked and skipped.
+   2. THE CODE LIMIT. A target past the end of the last mapped function is not
+      a call; method B already applied that bound and method A now does too.
+
    No prologue pattern is needed -- leaf functions are found too.
 
 B) FUNCTION POINTER (strong). Jump tables and handler arrays in the ROM data
@@ -76,11 +86,22 @@ def main() -> None:
         covered.update(range(address, address + size))
     known_starts = {address for address, _ in known}
 
-    # A) Call targets: certain function entries.
+    # A) Call targets. Strong, but not free of false positives: see the header.
+    code_limit = max(address + size for address, size in known)
     call_targets = set()
     for address, size in known:
         base = address - ROM_BASE
+        # Every word this function loads pc-relatively is a literal pool entry.
+        # Those four bytes are DATA and must not be decoded as instructions.
+        pool = set()
+        for i in range(0, max(0, size - 1), 2):
+            half_word = int.from_bytes(rom[base + i:base + i + 2], "little")
+            if (half_word & 0xF800) == 0x4800:      # ldr rX,[pc,#imm]
+                word = (((address + i + 4) & ~3) + (half_word & 0xFF) * 4)
+                pool.update(range(word, word + 4))
         for i in range(0, max(0, size - 2), 2):
+            if address + i in pool or address + i + 2 in pool:
+                continue
             hw1 = int.from_bytes(rom[base + i:base + i + 2], "little")
             hw2 = int.from_bytes(rom[base + i + 2:base + i + 4], "little")
             if (hw1 & 0xF800) == 0xF000 and (hw2 & 0xF800) == 0xF800:
@@ -88,7 +109,7 @@ def main() -> None:
                 if offset & 0x400:
                     offset -= 0x800
                 dest = address + i + 4 + (offset << 12) + ((hw2 & 0x7FF) << 1)
-                if ROM_BASE <= dest < ROM_BASE + len(rom):
+                if ROM_BASE <= dest < code_limit:
                     call_targets.add(dest)
 
     from_calls = []
@@ -110,7 +131,7 @@ def main() -> None:
             from_calls.append((target, size))
 
     # B) Function pointers: only when the target has a real prologue.
-    limit = max(address + size for address, size in known)
+    limit = code_limit
     from_pointers = []
     seen_ptr = set()
     for off in range(0, len(rom) - 4, 4):

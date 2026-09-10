@@ -46,6 +46,13 @@ POP_PC = 0xBD00                 # pop {..., pc}
 # long run of them is not evidence of separate functions.
 MAX_STUB = 8
 
+# A gap this large is not one function's worth of missing code. Either the map
+# has an entry outside the code region -- one such outlier at 0x0808E3CA once
+# made this tool report 124,788 unmapped bytes instead of 11,078 -- or the
+# stretch is data. Those are counted apart and left out of the denominator
+# estimate, which is the number this tool exists to produce.
+MAX_GAP = 4096
+
 
 def rom_bytes() -> bytes:
     if not ROM.exists():
@@ -183,10 +190,13 @@ def main() -> None:
                 break
         return bool(prev) and branches_into(rom, prev[0], prev[1], addr) > 0
 
-    buckets = {"padding": [], "stubs": [], "code": []}
+    buckets = {"padding": [], "stubs": [], "code": [], "suspect": []}
     stub_rows = []
     for start, length, before, after in found:
         body = rom[start - ROM_BASE:start - ROM_BASE + length]
+        if length > MAX_GAP:
+            buckets["suspect"].append((start, length, before, after, body, None))
+            continue
         kind, pieces = classify(body, start)
         buckets[kind].append((start, length, before, after, body, pieces))
         if kind == "stubs":
@@ -208,6 +218,12 @@ def main() -> None:
           f"-> {len(stub_rows)} functions")
     print(f"  code    : {len(buckets['code']):4d}  "
           f"{sum(b[1] for b in buckets['code']):6d} bytes")
+    if buckets["suspect"]:
+        print(f"  suspect : {len(buckets['suspect']):4d}  "
+              f"{sum(b[1] for b in buckets['suspect']):6d} bytes  "
+              f"(over {MAX_GAP}; not counted -- see MAX_GAP)")
+        for start, length, before, after, _, _ in buckets["suspect"]:
+            print(f"      {start:#010x} +{length:<7d} [{before} | {after}]")
     print(f"  unmapped code in total: {total} bytes")
 
     referenced = [p for _, _, _, _, _, pieces in buckets["stubs"]

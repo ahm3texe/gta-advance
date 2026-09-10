@@ -15,41 +15,59 @@ bytes)
 `tools/find_map_gaps.py`, 2026-09-10. Read this before quoting a figure.
 
 Every percentage this project reports is matched bytes over the sum of the sizes
-in `data/functions.csv`. That sum is **454,280 bytes**. It is not the ROM's whole
-code region: 618 stretches of the image lie between one map entry's end and the
-next one's start, and after the alignment padding is taken out, **11,078 bytes of
-them hold instructions that no entry covers**.
+in `data/functions.csv`. That sum is not the ROM's whole code region: stretches
+of the image lie between one map entry's end and the next one's start, and after
+the alignment padding is taken out, some of them hold instructions no entry
+covers.
+
+State after this round of map repair:
 
 ```
-gaps: 618  (11988 bytes)
-  padding :  455     910 bytes      every byte zero, or a lone 2-byte slot
-  stubs   :   40     278 bytes      split cleanly into complete bx-lr bodies
-  code    :  123   10800 bytes      instructions, boundaries not yet decided
+gaps: 599  (9260 bytes)
+  padding :  462     924 bytes      every byte zero, or a lone 2-byte slot
+  stubs   :   41     282 bytes      split cleanly into complete bx-lr bodies
+  code    :   96    8054 bytes      instructions, boundaries not yet decided
 ```
 
-Spot checks confirm these are real functions, not data:
+**A figure of X/457,008 is high by a factor of 1.0182 against X/465,344.** At the
+time of writing that is 13.92% reported against **13.67%** honest. The gap moves
+with whatever the map is still missing, so re-run the tool rather than trusting
+this paragraph's numbers.
 
-* `0x0803554C` (+640) opens `push {r4,r5,r6,lr} / ldr r5,=... / bl 0x80358D8`.
-* `0x0805A33C` (+24) is a complete script handler ending in `movs r0,#1 / bx lr`,
-  in the middle of a block whose neighbours on both sides are already decompiled.
+It started at 11,078 bytes. `tools/discover_functions.py` recovered 35 functions
+(2,620 bytes), `tools/audit_boundaries.py` then found 23 of those had short
+extents and grew them by a further 282, and what is left is 8,336 bytes in 96
+stretches. Those need a disassembler pass and a boundary decision each, which is
+why they are still here.
 
-**So a figure of X/454,280 is high by a factor of 1.0244 against X/465,358.** At
-the time of writing that is 14.00% reported against **13.67%** honest. The gap
-does not shrink as work proceeds; it moves with whatever the map is missing.
+`tools/gen_report.py` publishes the optimistic number. The arithmetic guard it
+has only proves the units sum to what `functions.csv` says -- it cannot see code
+`functions.csv` never listed.
 
-Two things follow, and neither is done:
+### Two defects this exposed, both fixed
 
-1. The map needs those 123 stretches split into functions. That needs a
-   disassembler pass and a boundary decision each, not a script.
-2. Until it is, `tools/gen_report.py` publishes the optimistic number. The
-   guard it does have only proves the units sum to what `functions.csv` says --
-   it cannot see code `functions.csv` never listed.
+**`discover_functions.py` method A called itself certain and was not.** It added
+0x0808E3CA as a call target. The `bl` that reaches it is at 0x0800E3C8, which is
+a LITERAL POOL word inside FUN_0800DF14 holding 0xFFFFF07F and read by the
+`ldr [pc]` at 0x0800E386; the target disassembles as undefined instructions in
+graphics data, 0x1C000 past the last real function. Method A now marks every
+pc-relative load target inside a function and skips it, and bounds its targets by
+the code limit the way method B already did. The entry is in
+`data/non_function_entries.csv` with that evidence.
 
-Of the 54 stub bodies the tool can extract exactly, only **3** have any
-reference at all (a `bl` or a pool word holding their address), and **none** is
-branched into from the entry before it. So they are not that entry's second exit
-either; they are unreferenced two-byte functions, a weaker case than the 27 in
-`src/misc/empty_stubs.c`, every one of which is `bl`-called.
+**`find_map_gaps.py` trusted the map's own range.** That one outlier entry made
+it report 124,788 unmapped bytes instead of 11,078, because everything between
+the last real function and 0x0808E3CA counted as a gap. Gaps over 4,096 bytes
+are now reported apart and left out of the denominator estimate.
+
+### The stub bodies are a weaker case than they look
+
+Of the 55 two-byte bodies the tool can extract exactly, only **3** have any
+reference at all -- a `bl`, or a pool word holding their address with or without
+the Thumb bit -- and **none** is branched into from the entry before it, so they
+are not that entry's second exit either. They are unreferenced. That is weaker
+evidence than the 27 in `src/misc/empty_stubs.c`, every one of which is
+`bl`-called, and they are not in the map for that reason.
 
 ## 0. What you need to know
 
