@@ -177,6 +177,12 @@ The function map is still being refined, so its totals can change. A percentage
 of mapped code is not a percentage of the entire ROM. Assets, function bodies,
 and literal pools have different roles in these measurements.
 
+The percentage published to decomp.dev is measured against a denominator that
+INCLUDES the code the function map does not yet cover -- 8,312 bytes at the time
+of writing, carried as a `rom/unmapped` unit with nothing in it matched. Against
+`data/functions.csv` alone the same progress would read 0.25 points higher.
+`tools/find_map_gaps.py` measures the gap and `docs/OPEN_ISSUES.md` explains it.
+
 Function states are `candidate`, `discovered`, `documented`, `decompiled`, and
 `matching`. They distinguish unverified candidates, verified entries and
 boundaries, documented behavior, C implementations awaiting a match, and

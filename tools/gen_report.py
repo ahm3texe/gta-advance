@@ -10,6 +10,17 @@ Every function in the map becomes part of exactly one unit, and the unit sizes
 sum to the full ROM code size. Reporting only the decompiled part would inflate
 the percentage, which is the one mistake this file exists to avoid.
 
+THE MAP IS NOT THE WHOLE CODE REGION. Stretches of the image lie between one
+map entry's end and the next one's start, and some of them hold instructions no
+entry covers -- tools/find_map_gaps.py measures how many. Left out, they are
+missing from the DENOMINATOR and every percentage comes out high; at the time
+this was written, 14.45% instead of 14.20%. They are therefore included, as
+their own unit, with nothing in them matched. Each is a REGION and not a
+function: the names say so, and the unit's name does too, because the function
+count they contribute to is a count of regions and not of the functions inside
+them. That direction is the safe one -- it understates progress rather than
+overstating it -- and it corrects itself as the map is repaired.
+
 Units are formed as follows:
   * one unit per C source file, for the functions that have one;
   * one unit per module for the rest, except the unnamed bulk of the ROM,
@@ -30,12 +41,17 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import find_map_gaps  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 FUNCTIONS_CSV = ROOT / "data" / "functions.csv"
 C_SOURCES_CSV = ROOT / "data" / "c_sources.csv"
 
 # objdiff rejects any report whose version does not migrate to this.
 REPORT_VERSION = 2
+
+ROM_BASE = 0x08000000
 
 # The unnamed bulk of the ROM is one module in functions.csv. Reporting it as a
 # single unit would produce one block covering most of the treemap, so it is cut
@@ -44,6 +60,10 @@ REPORT_VERSION = 2
 BAND_SIZE = 0x10000
 
 MATCHING = "matching"
+
+# The unit that holds the code no map entry covers. Named so that a reader of
+# the treemap can see what it is without opening this file.
+UNMAPPED_UNIT = "rom/unmapped (no entry in the function map)"
 
 
 def read_rows(path: Path) -> list[dict[str, str]]:
@@ -112,6 +132,37 @@ def make_unit(name: str, functions: list[dict], source_path: str | None) -> dict
     return unit
 
 
+def load_unmapped() -> list[dict]:
+    """Return the code stretches no map entry covers, as pseudo-functions.
+
+    Measured by tools/find_map_gaps.py, which is the authority on what counts:
+    it drops the alignment padding and the over-large stretches that are data
+    rather than one function's worth of missing code.
+
+    These are REGIONS. Each one may hold several functions, so the count they
+    contribute is a count of regions; the names begin with `unmapped_` so that
+    is visible wherever they are listed.
+    """
+    rom = find_map_gaps.rom_bytes()
+    out = []
+    for start, length, _, _ in find_map_gaps.gaps(find_map_gaps.entries()):
+        if length > find_map_gaps.MAX_GAP:
+            continue
+        body = rom[start - ROM_BASE:start - ROM_BASE + length]
+        kind, _ = find_map_gaps.classify(body, start)
+        if kind == "padding":
+            continue
+        out.append({
+            "address": start,
+            "name": f"unmapped_{start:08X}",
+            "size": length,
+            "module": "unmapped",
+            "matching": False,
+            "source": None,
+        })
+    return out
+
+
 def load_functions() -> list[dict]:
     """Return every mapped function, annotated with its source file if it has one."""
     source_of = {
@@ -147,6 +198,9 @@ def build_units(functions: list[dict]) -> list[dict]:
     ]
 
     for module, fns in by_module.items():
+        if module == "unmapped":
+            units.append(make_unit(UNMAPPED_UNIT, fns, None))
+            continue
         if module != "unknown":
             units.append(make_unit(f"{module} (no source yet)", fns, None))
             continue
@@ -235,7 +289,7 @@ def main() -> None:
                         help="print the summary and verify, but write nothing")
     args = parser.parse_args()
 
-    functions = load_functions()
+    functions = load_functions() + load_unmapped()
     units = build_units(functions)
     report = {
         "measures": total_measures(units),

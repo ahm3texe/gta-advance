@@ -10,17 +10,16 @@ bytes)
 
 ---
 
-## The reported percentage is measured against an INCOMPLETE denominator
+## The reported percentage counts the code the map does not cover
 
-`tools/find_map_gaps.py`, 2026-09-10. Read this before quoting a figure.
+`tools/find_map_gaps.py` and `tools/gen_report.py`, 2026-09-10.
 
-Every percentage this project reports is matched bytes over the sum of the sizes
-in `data/functions.csv`. That sum is not the ROM's whole code region: stretches
-of the image lie between one map entry's end and the next one's start, and after
-the alignment padding is taken out, some of them hold instructions no entry
-covers.
+Every percentage this project reports is matched bytes over a denominator. That
+denominator is NOT just the sum of the sizes in `data/functions.csv`: stretches
+of the image lie between one map entry's end and the next one's start, and some
+of them hold instructions no entry covers.
 
-State after this round of map repair:
+State at the time of writing:
 
 ```
 gaps: 599  (9260 bytes)
@@ -29,20 +28,25 @@ gaps: 599  (9260 bytes)
   code    :   96    8054 bytes      instructions, boundaries not yet decided
 ```
 
-**A figure of X/457,008 is high by a factor of 1.0182 against X/465,344.** At the
-time of writing that is 13.92% reported against **13.67%** honest. The gap moves
-with whatever the map is still missing, so re-run the tool rather than trusting
-this paragraph's numbers.
+Those 8,312 bytes are in the report, as a unit named
+`rom/unmapped (no entry in the function map)` with nothing in it matched. So the
+published figure is **66,056 / 465,344 = 14.20%** and not the 14.45% that
+`functions.csv` alone would give. Re-run the tool rather than trusting these
+numbers; they move as the map is repaired, and the report moves with them.
 
-It started at 11,078 bytes. `tools/discover_functions.py` recovered 35 functions
-(2,620 bytes), `tools/audit_boundaries.py` then found 23 of those had short
-extents and grew them by a further 282, and what is left is 8,336 bytes in 96
-stretches. Those need a disassembler pass and a boundary decision each, which is
-why they are still here.
+Each stretch is a REGION, not a function. It may hold several, so the count they
+contribute to `total_functions` is a count of regions -- 136 of them -- and the
+names begin with `unmapped_` wherever they are listed. That understates progress
+rather than overstating it, which is the direction to err in.
 
-`tools/gen_report.py` publishes the optimistic number. The arithmetic guard it
-has only proves the units sum to what `functions.csv` says -- it cannot see code
-`functions.csv` never listed.
+**The work that is still open** is splitting those 96 stretches into functions.
+That needs a disassembler pass and a boundary decision each, not a script;
+`tools/discover_functions.py` has already taken everything its conditions can
+reach. Until then the report is honest about the gap instead of hiding it.
+
+It started at 11,078 bytes. `discover_functions.py` recovered 35 functions
+(2,620 bytes) and `tools/audit_boundaries.py` then found 23 of those had short
+extents and grew them by a further 282.
 
 ### Two defects this exposed, both fixed
 
