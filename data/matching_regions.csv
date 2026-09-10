@@ -226,6 +226,8 @@ start,end,binary,module,notes
 0x080337A8,0x08033820,build/world/stop_audio_dma.bin,world,0x080337A8 StopAudioDmaOnCartFlag
 0x08033824,0x0803385C,build/world/add_to_counter.bin,world,0x08033824 AddToCounter
 0x0803385C,0x08033890,build/world/alloc_from_counter.bin,world,0x0803385C AllocFromCounter
+0x08033AD8,0x08033B08,build/audio/is_channel_busy.bin,audio,Index 0 busy on the +0x2C byte; others on their word in the array
+0x08033B74,0x08033BA0,build/audio/drain_request_counter.bin,audio,"Counter of 2 or 1 both call once, then it is cleared"
 0x08033BA0,0x08033BB4,build/audio/set_far_flag.bin,audio,Raises the +0xBA4 flag of gRam02027330
 0x08033BB4,0x08033BD8,build/audio/dispatch_on_mode_byte.bin,audio,Dispatches on gRam02001200; zero passes gRam0202731C on
 0x080348B4,0x080348C0,build/audio/call_and_zero.bin,audio,Calls FUN_08034E48 and answers 0 regardless
@@ -243,6 +245,7 @@ start,end,binary,module,notes
 0x08035848,0x08035868,build/entry/reset_then_walk_list.bin,entry,"Clears the counter, then walks the list; Thumb function pointer"
 0x080358B4,0x080358D4,build/entry/unlink_and_clear_bit1.bin,entry,Unlinks the node and clears bit 0 with a wide -2
 0x08035D28,0x08035D40,build/entry/call_handler_if_set.bin,entry,Calls the +0xAC table's +0x04 handler when installed
+0x08035D40,0x08035D60,build/entry/call_handler_then_step.bin,entry,Calls the +0x08 handler and then steps; neither runs if absent
 0x08035D60,0x08035D9C,build/world/p1_35d60.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035D9C,0x08035DD8,build/world/p1_35d9c.bin,world,Phase 1: natural C matching the ROM exactly
 0x08035DD8,0x08035DE4,build/world/wrap_08035dd8.bin,world,small function harvest
@@ -276,6 +279,7 @@ start,end,binary,module,notes
 0x0803C178,0x0803C1B4,build/world/slot_range.bin,world,Slot range + default constant
 0x0803C268,0x0803C2C4,build/world/p1_3c268.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803C2C4,0x0803C320,build/world/p1_3c2c4.bin,world,Phase 1: natural C matching the ROM exactly
+0x0803C3D4,0x0803C400,build/slot/slot_first_byte_by_index.bin,slot,First byte of the slot record index 1 or 2 selects
 0x0803C45C,0x0803C47C,build/world/select_word_source.bin,world,selecting a source and reading a halfword
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Three slot selectors; SlotCD and GetSubValue merge into a shared tail
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Five slot queries: constant, active slot, scale step, target marking"
@@ -284,6 +288,7 @@ start,end,binary,module,notes
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,Copies the 12-byte packet into gRam0202F360 and forwards it
+0x0803CBB4,0x0803CBC4,build/slot/read_iwram_low_two_bits.bin,slot,Low two bits of the IWRAM word at 0x03000098
 0x0803F630,0x0803F67C,build/world/state_init.bin,world,"State setup, empty, caller, replacer"
 0x0803F67C,0x0803F69C,build/world/init_handler_pack.bin,world,setting up the handler and the 12-byte packet
 0x0803F69C,0x0803F6D8,build/world/rearm_slot.bin,world,rebuilding the slot
@@ -299,6 +304,7 @@ start,end,binary,module,notes
 0x0803F910,0x0803F944,build/world/p1_3f910.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803F9A0,0x0803F9CC,build/actor/attach_actor_step.bin,actor,"Sets bit 23, clears bit 24, installs the step and lowers +0x81"
 0x0803F9CC,0x0803F9DC,build/actor/clear_record_flag23.bin,actor,Clears bits 23 and 24 of the record's flags together
+0x0803F9DC,0x0803F9FC,build/actor/field100_if_flagged.bin,actor,"The record's +0x100 field, when its +0x114 byte is set"
 0x0803FACC,0x0803FAE8,build/world/record_flag_test.bin,world,Flag 0x400 test on the record at +0x2C; mask built first (rule 33)
 0x08041E98,0x08041EC8,build/map/get_tile_field_c.bin,map,Bits 0x380 of the tile at a 22-bit fractional position
 0x08041ED4,0x08041EE0,build/map/clear_map_data.bin,map,Drops the map context's data pointer

@@ -388,6 +388,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08033824,AddToCounter,src/world/add_to_counter.c,56,56,yes
 0x0803385C,AllocFromCounter,src/world/alloc_from_counter.c,52,52,yes
 0x08033898,NoOp08033898,src/misc/empty_stubs.c,2,2,yes
+0x08033AD8,FUN_08033ad8,src/audio/is_channel_busy.c,48,48,yes
+0x08033B74,FUN_08033b74,src/audio/drain_request_counter.c,44,44,yes
 0x08033BA0,FUN_08033ba0,src/audio/set_far_flag.c,20,20,yes
 0x08033BB4,FUN_08033bb4,src/audio/dispatch_on_mode_byte.c,36,36,yes
 0x080348B4,FUN_080348b4,src/audio/call_and_zero.c,12,12,yes
@@ -409,6 +411,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x080358B4,FUN_080358b4,src/entry/unlink_and_clear_bit1.c,32,32,yes
 0x08035CD4,NoOp08035CD4,src/misc/empty_stubs.c,2,2,yes
 0x08035D28,FUN_08035d28,src/entry/call_handler_if_set.c,24,24,yes
+0x08035D40,FUN_08035d40,src/entry/call_handler_then_step.c,32,32,yes
 0x08035D60,FUN_08035d60,src/world/p1_35d60.c,58,58,yes
 0x08035D9C,FUN_08035d9c,src/world/p1_35d9c.c,58,58,yes
 0x08035DD8,FUN_08035dd8,src/world/wrap_08035dd8.c,10,10,yes
@@ -462,6 +465,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C268,FUN_0803c268,src/world/p1_3c268.c,92,92,yes
 0x0803C2C4,FUN_0803c2c4,src/world/p1_3c2c4.c,92,92,yes
 0x0803C320,FUN_0803c320,src/slot/collect_ready_slots.c,92,92,no
+0x0803C3D4,FUN_0803c3d4,src/slot/slot_first_byte_by_index.c,44,44,yes
 0x0803C45C,SelectWordSource,src/world/select_word_source.c,32,32,yes
 0x0803C49C,SelectSlotAB,src/world/slot_selectors.c,28,28,yes
 0x0803C4B8,SelectSlotCD,src/world/slot_selectors.c,28,28,yes
@@ -479,6 +483,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803C794,NoOpSessionHook,src/misc/session_reset.c,2,2,yes
 0x0803C798,ResetSessionNode,src/misc/session_node.c,40,40,yes
 0x0803C7D4,SubmitPack,src/world/submit_pack.c,24,24,yes
+0x0803CBB4,FUN_0803cbb4,src/slot/read_iwram_low_two_bits.c,16,16,yes
 0x0803F4BC,TryEngageTarget,src/world/try_engage_target.c,372,372,no
 0x0803F630,InitState,src/world/state_init.c,26,26,yes
 0x0803F64C,StateNoop,src/world/state_init.c,2,2,yes
@@ -501,6 +506,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0803F910,FUN_0803f910,src/world/p1_3f910.c,50,50,yes
 0x0803F9A0,FUN_0803f9a0,src/actor/attach_actor_step.c,44,44,yes
 0x0803F9CC,FUN_0803f9cc,src/actor/clear_record_flag23.c,16,16,yes
+0x0803F9DC,FUN_0803f9dc,src/actor/field100_if_flagged.c,30,30,yes
 0x0803FACC,FUN_0803facc,src/world/record_flag_test.c,26,26,yes
 0x08041E98,FUN_08041e98,src/map/get_tile_field_c.c,48,48,yes
 0x08041ED4,FUN_08041ed4,src/map/clear_map_data.c,12,12,yes

@@ -15,6 +15,8 @@ typedef struct AudioState {
     u8  pad14[0x10];
     u32 second;                 /* +0x24 */
     u32 third;                  /* +0x28 */
+    u8  busy;                   /* +0x2C */
+    u8  pad2D[3];
 } AudioState;
 
 extern u8         gCartFlag;
