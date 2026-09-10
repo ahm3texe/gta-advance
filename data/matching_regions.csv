@@ -53,6 +53,7 @@ start,end,binary,module,notes
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
 0x0800DBE8,0x0800DC44,build/world/list_ops.bin,world,Push-front and remove
 0x0800DD50,0x0800DD84,build/world/p1_0dd50.bin,world,Phase 1: natural C matching the ROM exactly
+0x0800DE5C,0x0800DE88,build/entry/draw_from_owner_table.bin,entry,"Draws the owner's table entry, chosen by a two-bit field scaled by four"
 0x080100D0,0x0801014C,build/core/memory_init.bin,core,Buffer allocation and DMA3 zeroing; natural byte-matching C.
 0x080101D8,0x080101E4,build/world/wrap_080101d8.bin,world,small function harvest
 0x08010224,0x08010254,build/entry/release_two_buffers.bin,entry,Releases the EWRAM and IWRAM handles into one sink and clears both
@@ -107,13 +108,20 @@ start,end,binary,module,notes
 0x08019670,0x08019710,build/world/object_state.bin,world,Four object state queries: mode-dependent scaling and sub-object lock tests
 0x08019710,0x0801979C,build/world/ping_other_actors.bin,world,0x08019710 PingOtherActors
 0x0801979C,0x080197FC,build/world/finish_actor_state.bin,world,0x0801979C FinishActorState
+0x08019800,0x0801981C,build/entry/reset_five_slots.bin,entry,Resets slots 0..4; u16 counter
+0x0801981C,0x0801983C,build/entry/scale_to_ten.bin,entry,Scales a 26-bit value into 0..9
 0x080199BC,0x08019A44,build/world/palette_lerp.bin,world,16.16-weighted blend of sixteen BGR555 colours; natural C byte-matching plus 2 bytes of alignment.
+0x08019A64,0x08019A80,build/entry/reset_four_slots.bin,entry,Resets slots 0..3; u8 counter
 0x08019B08,0x08019B5C,build/world/actor_check.bin,world,Actor state + heading difference
 0x0801D7DC,0x0801D808,build/world/window_config.bin,world,Window settings
+0x0801D818,0x0801D848,build/entry/init_and_reset_fields.bin,entry,"Stores at +0x1B0, clears five words, records the owner, then steps"
 0x0801D848,0x0801D86C,build/world/init_and_mirror.bin,world,complex harvest
 0x0801D86C,0x0801D884,build/entry/set_masked_pair_and_call.bin,entry,"Stores the masked value at +0x10 then +0x0C, then calls"
 0x0801D8B0,0x0801D8BC,build/world/get_field_100.bin,world,small function harvest
 0x0801D920,0x0801D93C,build/world/kind_six_or_empty.bin,world,"Null object, null record or kind 6 -> 1; single shared answer body (rule 49)"
+0x0801D990,0x0801D9BC,build/entry/scale_by_owner_byte.bin,entry,"Scales the value by (owner byte & 0xFF) + 128, shifted down 8"
+0x0801DB3C,0x0801DB64,build/entry/clear_pair_for_kind35.bin,entry,"Clears +0x38, +0x3C and the slot's +0x44, for kind 35 only"
+0x0801FF40,0x0801FF64,build/entry/read_grid_cell.bin,entry,Reads a grid cell by two fixed-point coordinates
 0x08023648,0x08023660,build/glue/call_with_flag.bin,glue,"Two wrappers over FUN_080223CC, flag 0 and 1"
 0x08023778,0x08023794,build/world/p1_23778.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023794,0x080237B0,build/world/p1_23794.bin,world,Phase 1: natural C matching the ROM exactly

@@ -206,7 +206,7 @@ address,name,size,status,module,notes
 0x0800DCB4,BuildEntryTableRows,154,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x0800DD50,FUN_0800dd50,52,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM; boundary corrected against the ROM (audit_boundaries.py)
 0x0800DD84,FUN_0800dd84,76,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
-0x0800DE5C,FUN_0800de5c,44,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0800DE5C,FUN_0800de5c,44,matching,entry,"Draws the entry the owner's +0x1F byte selects from the +0x38 array of the record at +0x00->+0x04, passing the +0x34 count and the owner advanced by four. The selector is a two-bit field scaled by four, so it is a word index. Decompiled in src/entry/draw_from_owner_table.c"
 0x0800DEA4,FUN_0800dea4,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0800DF14,FUN_0800df14,1216,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0800E3D4,FUN_0800e3d4,546,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -399,13 +399,13 @@ address,name,size,status,module,notes
 0x08019710,PingOtherActors,140,matching,world,verified from a byte-matching C source; PingOtherActors; notifies FUN_08037d98 on two lists
 0x0801979C,FinishActorState,96,matching,world,verified from a byte-matching C source; FinishActorState; ends the state and moves it to 0x7FFF
 0x080197FC,NoOp080197FC,2,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
-0x08019800,FUN_08019800,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801981C,FUN_0801981c,32,discovered,unknown,"missed by Ghidra; tools/discover_functions.py call target (certain), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08019800,FUN_08019800,26,matching,entry,"Calls FUN_08028144 for slots 0 to 4; the counter is narrowed to 16 bits each step, so it is a u16, and the bound is unsigned; decompiled in src/entry/reset_five_slots.c"
+0x0801981C,FUN_0801981c,32,matching,entry,"Adds 0x333333, keeps 26 bits, multiplies by five, takes the top bits and clamps to 9; decompiled in src/entry/scale_to_ten.c"
 0x0801983C,FUN_0801983c,168,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080198E4,FUN_080198e4,104,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801994C,FUN_0801994c,112,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080199BC,BlendPaletteBlock,134,matching,world,Blends sixteen BGR555 colours with a 16.16 coefficient; src/world/palette_lerp.c
-0x08019A64,FUN_08019a64,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08019A64,FUN_08019a64,26,matching,entry,"Calls FUN_08026F68 for slots 0 to 3; the counter is narrowed to EIGHT bits, so it is a u8 -- the width is the only difference from 0x08019800; decompiled in src/entry/reset_four_slots.c"
 0x08019A80,FUN_08019a80,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08019B08,IsActorUsable,52,matching,world,Actor state; src/world/actor_check.c
 0x08019B3C,GetAngleField,30,matching,world,Actor state; src/world/actor_check.c
@@ -432,7 +432,7 @@ address,name,size,status,module,notes
 0x0801D754,FUN_0801d754,136,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801D7DC,SetWindow,32,matching,world,Window setting; src/world/window_config.c size measured including the tail pool (byte-matching evidence)
 0x0801D7FC,StoreRam0201AEE8,12,matching,world,Window setting; src/world/window_config.c size measured including the tail pool (byte-matching evidence)
-0x0801D818,FUN_0801d818,48,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801D818,FUN_0801d818,48,matching,entry,"Stores its second argument at +0x1B0, calls FUN_0801A2C8, clears the five words at +0x00..+0x10, records the third argument at +0x64 and calls FUN_0801D8A0 with 1; decompiled in src/entry/init_and_reset_fields.c"
 0x0801D848,InitAndMirror,34,matching,world,byte-matching from a C source; complex harvest
 0x0801D86C,FUN_0801d86c,24,matching,entry,"Ands its argument with 0x03FFFFFF and stores the result at +0x10 and then +0x0C, then calls FUN_0801A560; decompiled in src/entry/set_masked_pair_and_call.c"
 0x0801D8A0,FUN_0801d8a0,6,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
@@ -440,11 +440,11 @@ address,name,size,status,module,notes
 0x0801D8BC,FUN_0801d8bc,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801D920,FUN_0801d920,26,matching,world,"Answers 1 for a null object, a null record at +0x18 or a record of kind 6; decompiled in src/world/kind_six_or_empty.c"
 0x0801D93C,FUN_0801d93c,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x0801D990,FUN_0801d990,42,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x0801D990,FUN_0801d990,42,matching,entry,"Scales its first argument by (FUN_080325D0's answer & 0xFF) + 128 with an arithmetic shift down of 8, leaving it untouched when there is no owner or no +0x2C record; decompiled in src/entry/scale_by_owner_byte.c"
 0x0801D9BC,FUN_0801d9bc,128,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801DA3C,FUN_0801da3c,78,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801DA8C,FUN_0801da8c,170,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x0801DB3C,FUN_0801db3c,38,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x0801DB3C,FUN_0801db3c,38,matching,entry,"Clears the +0x38 and +0x3C words and the +0x44 word of the owner's slot, but only when the owner at +0x64 has a +0x09 kind of 35; decompiled in src/entry/clear_pair_for_kind35.c"
 0x0801DB64,FUN_0801db64,566,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x0801DDCC,FUN_0801ddcc,62,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801DE0C,FUN_0801de0c,442,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
@@ -457,7 +457,7 @@ address,name,size,status,module,notes
 0x0801F648,FUN_0801f648,1332,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
 0x0801FB7C,FUN_0801fb7c,470,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x0801FD54,FUN_0801fd54,446,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x0801FF40,FUN_0801ff40,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x0801FF40,FUN_0801ff40,36,matching,entry,"Reads the cell at x + width * y of the grid gRam020230E8 points at; both coordinates come down with an arithmetic shift of 22, so both are signed; decompiled in src/entry/read_grid_cell.c"
 0x0801FF64,FUN_0801ff64,76,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x0801FFF0,FUN_0801fff0,64,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08020030,FUN_08020030,78,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"

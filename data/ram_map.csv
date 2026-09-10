@@ -118,6 +118,7 @@ address,size,name,source,status,notes
 0x020230A0,4,gRam020230A0,decomp,provisional,"Head of the doubly linked object list (node +0x3C prev, +0x40 next, 0xFDFDFDFD = not linked); ReleaseObject updates it while unlinking."
 0x020230B4,1,gRam020230B4,decomp,provisional,Shared u8 counter; The 12 behaviours in the 0x08017E3C-0x08018B74 family increment the step and reset it once the threshold is exceeded.
 0x020230D0,20,gRam020230D0,decomp,provisional,+0/+4 (=0x01000000) constant; +12/+16 (arg << 16 | 0xFF000000)
+0x020230E8,4,gRam020230E8,decomp,provisional,A pointer to a grid header: +0x00 is the row width as a u16 and +0x04 the cell array. 0x0801FF40 reads a cell through it. 13 places in the ROM load its address.
 0x02023700,4,gRam02023700,decomp,provisional,Diagnostic marker showing the last completed stage of the frame processing chain
 0x02023704,4,gRam02023704,decomp,provisional,u32 state field zeroed by FUN_0805643C
 0x0202370C,4,gRam0202370C,decomp,provisional,Variable zeroed by 0x0802392C
