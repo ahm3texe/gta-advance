@@ -284,10 +284,12 @@ start,end,binary,module,notes
 0x0803C49C,0x0803C508,build/world/slot_selectors.bin,world,Three slot selectors; SlotCD and GetSubValue merge into a shared tail
 0x0803C53C,0x0803C5B4,build/world/slot_query.bin,world,"Five slot queries: constant, active slot, scale step, target marking"
 0x0803C62C,0x0803C698,build/world/is_player_actor_ready.bin,world,0x0803C62C IsPlayerActorReady (+2 padding)
+0x0803C698,0x0803C6B8,build/slot/notify_if_resolved.bin,slot,"Notifies when FUN_0803B528 resolves; narrows for the call, tests wide"
 0x0803C708,0x0803C73C,build/world/p1_3c708.bin,world,Phase 1: natural C matching the ROM exactly
 0x0803C77C,0x0803C798,build/misc/session_reset.bin,misc,Small session helpers
 0x0803C798,0x0803C7C0,build/misc/session_node.bin,misc,Session node reset
 0x0803C7D4,0x0803C7EC,build/world/submit_pack.bin,world,Copies the 12-byte packet into gRam0202F360 and forwards it
+0x0803CB1C,0x0803CB4C,build/slot/is_link_ready.bin,slot,"Bit 8 or bit 0 of the IWRAM word, by the mode byte"
 0x0803CBB4,0x0803CBC4,build/slot/read_iwram_low_two_bits.bin,slot,Low two bits of the IWRAM word at 0x03000098
 0x0803F630,0x0803F67C,build/world/state_init.bin,world,"State setup, empty, caller, replacer"
 0x0803F67C,0x0803F69C,build/world/init_handler_pack.bin,world,setting up the handler and the 12-byte packet
@@ -322,8 +324,11 @@ start,end,binary,module,notes
 0x0804283C,0x08042864,build/map/release_first_entry.bin,map,Tears the +0x00 entry down through three routines
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,small function harvest
 0x0804AEAC,0x0804B088,build/world/band_0804aeac.bin,world,"Actor target selection; a linked candidate, or one that is near by octagonal distance."
+0x0804FA7C,0x0804FAA0,build/slot/mode_one_or_two.bin,slot,"Passes 1 and 2 through, everything else to 0"
+0x0804FAE8,0x0804FB18,build/slot/is_single_player_ready.bin,slot,0 in two-player; otherwise 1 unless the +0x27 byte is 1
 0x0804FB18,0x0804FB2C,build/glue/is_record_kind_six.bin,glue,1 when the +0x18 record's +0x30 byte is 6
 0x0804FB2C,0x0804FB3C,build/glue/copy_three_words.bin,glue,Twelve-byte struct assignment; ldmia/stmia
+0x0804FB3C,0x0804FB4C,build/slot/narrowed_mode.bin,slot,The callee's answer narrowed to 16 bits
 0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,small function harvest
 0x0804FEE4,0x0804FF00,build/world/p1_4fee4.bin,world,Phase 1: natural C matching the ROM exactly
 0x0804FF98,0x0804FFA4,build/world/wrap_0804ff98.bin,world,forwarding wrapper
@@ -345,8 +350,10 @@ start,end,binary,module,notes
 0x08050A00,0x08050A0C,build/world/get_anchor_unk34.bin,world,Anchor +0x34 getter
 0x08050A0C,0x08050A34,build/world/check_current_entity.bin,world,complex function harvest
 0x08050A34,0x08050A48,build/world/is_anchor_small.bin,world,conditional constant return
+0x0805102C,0x08051048,build/slot/reset_block_380.bin,slot,"Zeroes three words by hand, then Memsets the whole 56-byte block"
 0x08051048,0x0805104C,build/world/p1_51048.bin,world,Phase 1: natural C matching the ROM exactly
 0x08051094,0x080510B4,build/core/mask_bit_or_empty.bin,core,Mask bit test; rule 33 keeps the shift on the constant instead of canonicalizing to mask>>bit
+0x080510B8,0x080510D8,build/slot/mode_and_even_tick.bin,slot,Mode set and tick even (rule 72)
 0x08051148,0x08051154,build/glue/probe_ram_mode.bin,glue,Calls IsRamModeWanted and answers 0 regardless
 0x08051154,0x080512B0,build/core/band_08051154.bin,core,Area/record loader: selects the record and runs the world setup chain.
 0x080512B0,0x080512BC,build/world/get_record_index.bin,world,leaf accessor
@@ -365,6 +372,7 @@ start,end,binary,module,notes
 0x080534A8,0x08053650,build/world/band_080534a8.bin,world,"Frame step of the world object: counter, teardown, slot allocation, record setup."
 0x08054E40,0x08054F1C,build/world/spawn_selected_for_players.bin,world,0x08054E40 SpawnSelectedForPlayers
 0x08054F1C,0x08055054,build/world/is_near_any_actor.bin,world,0x08054F1C IsNearAnyActor (+2 padding)
+0x0805564C,0x08055660,build/slot/set_owner_flag10000.bin,slot,Sets flag 0x10000 on the owner at +0x2C
 0x080556C0,0x08055700,build/table/lookup_default_value.bin,table,"The value carried by the default handler's entry, by kind"
 0x08055768,0x08055774,build/glue/set_pair_words.bin,glue,Writes the same word to +0x08 and +0x0C of gUnk02010C60
 0x08055954,0x08055970,build/core/find_free_node.bin,core,0x08055954 FindFreeNode
