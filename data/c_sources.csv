@@ -228,6 +228,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08020A9C,FUN_08020a9c,src/entity/entity_action.c,210,210,no
 0x08023648,FUN_08023648,src/glue/call_with_flag.c,12,12,yes
 0x08023654,FUN_08023654,src/glue/call_with_flag.c,12,12,yes
+0x08023660,FUN_08023660,src/entry/is_special_kind.c,44,44,yes
+0x08023754,FUN_08023754,src/entry/self_if_free_and_flagged.c,34,36,no
 0x08023778,FUN_08023778,src/world/p1_23778.c,26,26,yes
 0x08023794,FUN_08023794,src/world/p1_23794.c,26,26,yes
 0x08023868,ProjectActorOffset,src/world/project_actor_offset.c,196,196,yes
@@ -268,9 +270,14 @@ address,name,source,compiled_size,mapped_size,matching
 0x08028DF4,HasActiveEntryOfKind,src/world/entries_a1.c,70,70,yes
 0x08028E3C,HasWantedEntry,src/world/kind_scan.c,48,48,yes
 0x08028E6C,FrameChain,src/world/frame_chain.c,26,26,yes
+0x08028E88,FUN_08028e88,src/entry/is_active_byte_unset.c,26,26,yes
+0x08028EA4,FUN_08028ea4,src/entry/clear_low_nibble.c,26,26,yes
 0x08028F4C,FindEntryByOwnerState,src/world/entries_a2.c,76,76,yes
+0x08028F98,FUN_08028f98,src/entry/entry_body_or_none.c,32,32,yes
 0x08028FFC,GetNegatedNested,src/world/scan_active.c,24,24,yes
 0x08029014,ProcessFirstEntry,src/world/scan_all.c,62,62,yes
+0x08029058,FUN_08029058,src/entry/release_entry_body.c,48,48,yes
+0x08029130,FUN_08029130,src/entry/notify_chain_unless_unset.c,44,44,yes
 0x080291B8,SpawnFollowupEntry,src/world/entries_a9.c,120,120,yes
 0x08029244,FindEntryByQuad,src/world/entries_a4.c,86,86,yes
 0x0802929C,RefreshEntryTimerByQuad,src/world/entries_a3.c,80,80,yes
@@ -346,6 +353,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08031C98,PushSlotQueueEntry,src/world/push_slot_queue_entry.c,140,140,yes
 0x08031D24,AnyPairSet,src/world/flag_arrays.c,46,46,yes
 0x08031D54,ClearAllBlocks,src/world/flag_arrays.c,52,52,yes
+0x08031D88,FUN_08031d88,src/entry/midpoints_rounded_up.c,50,46,no
 0x08031DB8,StepThenCheck,src/world/step_then_check.c,36,36,yes
 0x08031E18,FUN_08031e18,src/progress/notify_when_handle_b.c,40,40,yes
 0x08031EEC,FUN_08031eec,src/status/read_counter_pair.c,44,44,yes

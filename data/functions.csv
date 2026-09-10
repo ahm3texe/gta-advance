@@ -487,10 +487,10 @@ address,name,size,status,module,notes
 0x080235CC,FUN_080235cc,124,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08023648,FUN_08023648,12,matching,glue,Forwards to FUN_080223CC with a constant 0 third argument and passes the answer on; decompiled in src/glue/call_with_flag.c
 0x08023654,FUN_08023654,12,matching,glue,Forwards to FUN_080223CC with a constant 1 third argument and passes the answer on; decompiled in src/glue/call_with_flag.c
-0x08023660,FUN_08023660,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08023660,FUN_08023660,44,matching,entry,"1 when the +0x28 word of the record at +0x1C, or that record's +0x06 halfword, is 0x4023, 24 or 108; decompiled in src/entry/is_special_kind.c"
 0x0802368C,FUN_0802368c,100,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080236F0,FUN_080236f0,98,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08023754,FUN_08023754,36,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08023754,FUN_08023754,36,decompiled,entry,"Answers the argument itself when it is non-null, has no owner slot, and its +0x09 flag is set; 0 otherwise. NOT BYTE-MATCHING at 12/17, two bytes: the ROM saves the argument into a callee-saved register and copies it BACK for the call, and agbcc leaves it in place. Four spellings measured including both of rule 75's mixed-type forms. src/entry/self_if_free_and_flagged.c"
 0x08023778,FUN_08023778,26,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x08023794,FUN_08023794,26,matching,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
 0x080237B0,FUN_080237b0,184,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
@@ -566,19 +566,19 @@ address,name,size,status,module,notes
 0x08028DF4,HasActiveEntryOfKind,70,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08028E3C,HasWantedEntry,48,matching,world,scan of the 14-entry active kind table; src/world/kind_scan.c
 0x08028E6C,FrameChain,26,matching,world,Entry scanner + frame chain; src/world/kind_scan.c
-0x08028E88,FUN_08028e88,26,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
-0x08028EA4,FUN_08028ea4,26,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08028E88,FUN_08028e88,26,matching,entry,1 when the +0xB1 byte of the active slot's +0x1C record is 0xFF; decompiled in src/entry/is_active_byte_unset.c
+0x08028EA4,FUN_08028ea4,26,matching,entry,"Clears the low nibble of the +0x8A byte of the active slot's record. The mask is a WIDE -16 (movs #16 / negs), not ~15, which would be one movs #240. Decompiled in src/entry/clear_low_nibble.c"
 0x08028EC0,FUN_08028ec0,52,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08028EF4,FUN_08028ef4,88,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08028F4C,FindEntryByOwnerState,76,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
-0x08028F98,FUN_08028f98,32,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
+0x08028F98,FUN_08028f98,32,matching,entry,"The +4 body of gRam020246F0[index], or 0 when the index is 255; the index is an s16 and the address is computed before the test; decompiled in src/entry/entry_body_or_none.c"
 0x08028FB8,FUN_08028fb8,68,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x08028FFC,GetNegatedNested,24,matching,world,Chain + scan; src/world/scan_active.c
 0x08029014,ProcessFirstEntry,62,matching,world,Processes only table entry number 0; src/world/scan_all.c
-0x08029058,FUN_08029058,48,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed"
+0x08029058,FUN_08029058,48,matching,entry,"Releases the +4 body of gRam02024650[index] and clears its active byte and +0x8C word, answering whether there was anything to release; decompiled in src/entry/release_entry_body.c"
 0x08029088,FUN_08029088,108,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080290F4,FUN_080290f4,60,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
-0x08029130,FUN_08029130,44,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
+0x08029130,FUN_08029130,44,matching,entry,Walks the chain from GetUnk0202F310 and calls FUN_08027AE8 for every actor whose +0x1C record has a +0xB1 byte other than 0xFF; decompiled in src/entry/notify_chain_unless_unset.c
 0x0802915C,FUN_0802915c,92,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x080291B8,SpawnFollowupEntry,120,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x08029244,FindEntryByQuad,86,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
@@ -724,7 +724,7 @@ address,name,size,status,module,notes
 0x08031C98,PushSlotQueueEntry,140,matching,world,verified from a byte-matching C source; PushSlotQueueEntry; writes an entry into six parallel tables of the slot queue
 0x08031D24,AnyPairSet,46,matching,world,Flag array; src/world/flag_arrays.c
 0x08031D54,ClearAllBlocks,52,matching,world,Flag array; src/world/flag_arrays.c size measured including the tail pool (byte-matching evidence)
-0x08031D88,FUN_08031d88,46,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed"
+0x08031D88,FUN_08031d88,46,decompiled,entry,"Writes the two midpoints of the +0x04..+0x07 bounds, each (a+b+1)/2 computed as (s>>1)+(s&1), which rounds away from zero. NOT BYTE-MATCHING at 4/25: the ROM fits the work into five registers and agbcc needs a fourth callee-saved one plus an ip spill, and reads the four bytes in a different order. src/entry/midpoints_rounded_up.c"
 0x08031DB8,StepThenCheck,36,matching,world,byte-matching from a C source (MATCH-014 batch group 3)
 0x08031DDC,FUN_08031ddc,60,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08031E18,FUN_08031e18,40,matching,progress,Notifies the active slot with id 355 when the +0x1360 handle of gRam02025810 is set; decompiled in src/progress/notify_when_handle_b.c

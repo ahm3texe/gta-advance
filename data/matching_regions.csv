@@ -123,6 +123,7 @@ start,end,binary,module,notes
 0x0801DB3C,0x0801DB64,build/entry/clear_pair_for_kind35.bin,entry,"Clears +0x38, +0x3C and the slot's +0x44, for kind 35 only"
 0x0801FF40,0x0801FF64,build/entry/read_grid_cell.bin,entry,Reads a grid cell by two fixed-point coordinates
 0x08023648,0x08023660,build/glue/call_with_flag.bin,glue,"Two wrappers over FUN_080223CC, flag 0 and 1"
+0x08023660,0x0802368C,build/entry/is_special_kind.bin,entry,"Either of two fields matching 0x4023, 24 or 108"
 0x08023778,0x08023794,build/world/p1_23778.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023794,0x080237B0,build/world/p1_23794.bin,world,Phase 1: natural C matching the ROM exactly
 0x08023868,0x0802392C,build/world/project_actor_offset.bin,world,0x08023868 ProjectActorOffset
@@ -137,8 +138,13 @@ start,end,binary,module,notes
 0x08028DC4,0x08028DF4,build/world/release_entry_d.bin,world,0x08028DC4 ReleaseEntryD
 0x08028E3C,0x08028E6C,build/world/kind_scan.bin,world,HasWantedEntry; scan of the 14-entry active kind table
 0x08028E6C,0x08028E88,build/world/frame_chain.bin,world,Frame chain
+0x08028E88,0x08028EA4,build/entry/is_active_byte_unset.bin,entry,1 when the active slot's +0xB1 byte is 0xFF
+0x08028EA4,0x08028EC0,build/entry/clear_low_nibble.bin,entry,Clears the low nibble of the +0x8A byte with a wide -16
+0x08028F98,0x08028FB8,build/entry/entry_body_or_none.bin,entry,"The entry's body at +4, or nothing for index 255"
 0x08028FFC,0x08029014,build/world/scan_active.bin,world,Three-layer chain + negation
 0x08029014,0x08029054,build/world/scan_all.bin,world,ProcessFirstEntry; 62-byte function + 2 bytes of alignment padding
+0x08029058,0x08029088,build/entry/release_entry_body.bin,entry,Releases the entry's body and clears its active byte and +0x8C
+0x08029130,0x0802915C,build/entry/notify_chain_unless_unset.bin,entry,Notifies every actor on the chain whose +0xB1 byte is set
 0x08029374,0x08029390,build/world/entry_state_is_one.bin,world,Entry state test; the element address must be its own statement ahead of the zero
 0x080294B4,0x080294E4,build/world/release_entry_e.bin,world,0x080294B4 ReleaseEntryE
 0x0802A610,0x0802A858,build/ui/draw_eight_digits.bin,ui,0x0802A610 DrawCounterDigits8 + 0x0802A734 DrawCounterDigits3
