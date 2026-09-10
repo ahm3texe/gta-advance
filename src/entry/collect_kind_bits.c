@@ -33,13 +33,26 @@ typedef struct KindEntry {
     struct KindEntry *next;     /* +0x08 */
 } KindEntry;
 
-extern u8 gRam02022E50[];
+/* Copied verbatim from src/world/list_head.c, which shares the root symbol:
+ * the consistency check compares struct BODIES, not just names. */
+typedef struct Entry {
+    u8 pad00[8];
+    struct Entry *next;         /* +0x08 */
+} Entry;
+
+typedef struct ListRoot {
+    u8     pad00[0x100];
+    Entry *listHead;         /* +0x100 */
+    Entry *chainHead;        /* +0x104 */
+} ListRoot;
+
+extern ListRoot gRam02022E50;
 
 /* 0x08013A84 */
 u32 FUN_08013a84(void)
 {
     u16 result = 0;
-    u8 *base = gRam02022E50;
+    u8 *base = (u8 *)&gRam02022E50;
     KindEntry *entry = *(KindEntry **)(base + CHAIN_OFFSET);
     u32 one;
     u32 bit;
