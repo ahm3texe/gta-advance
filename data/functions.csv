@@ -317,7 +317,7 @@ address,name,size,status,module,notes
 0x080139D0,FUN_080139d0,88,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
 0x08013A28,SubmitFixed,30,matching,world,DMA flush; src/world/dma_flush.c
 0x08013A48,FlushBlock,60,matching,world,DMA flush; src/world/dma_flush.c size measured including the tail pool (byte-matching evidence)
-0x08013A84,FUN_08013a84,56,discovered,unknown,"missed by Ghidra; tools/discover_functions.py prologue pattern (probable), body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x08013A84,FUN_08013a84,56,decompiled,entry,"Builds a bitmask of the kinds on the chain at +0x104 of gRam02022E50, skipping any kind above 15. NOT BYTE-MATCHING at 25/28: the ROM loads the kind byte twice per entry and agbcc reuses the first load. Naming the field twice does not help and vu8 is worse. src/entry/collect_kind_bits.c"
 0x08013ABC,ReleaseObject,224,matching,world,"verified from a byte-matching C source; ReleaseObject; removal from the doubly linked object list, releasing the sub-object and the node"
 0x08013B9C,FUN_08013b9c,352,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x08013CFC,FUN_08013cfc,836,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py); boundary corrected against the ROM (audit_boundaries.py)
@@ -340,7 +340,7 @@ address,name,size,status,module,notes
 0x08015038,FUN_08015038,84,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801508C,FUN_0801508c,40,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
 0x080150B4,FUN_080150b4,26,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional
-0x080150D0,FUN_080150d0,64,discovered,unknown,"missed by Ghidra; found with tools/discover_functions.py, body not yet reviewed; boundary corrected against the ROM (audit_boundaries.py)"
+0x080150D0,FUN_080150d0,64,decompiled,entry,"Replaces bits 0x0C00 of the +0x18 record's +0x00 and +0x04 halfwords with 0x800 and 0xC00, but only when the +0x27 byte is 1. NOT BYTE-MATCHING at 14/30: the ROM copies each or-constant out of its build register and agbcc does not. Register-copy class, rule 44. src/entry/set_two_priorities.c"
 0x08015110,FUN_08015110,76,candidate,unknown,Ghidra auto-analysis; boundary and ARM/Thumb mode are provisional; boundary corrected against the ROM (audit_boundaries.py)
 0x0801515C,LoadEntryTileData,100,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM
 0x080151C0,ReleaseEntryResources,124,matching,unknown,verified from a byte-matching C source; boundary and ARM/Thumb mode PROVEN against the ROM

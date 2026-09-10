@@ -147,10 +147,12 @@ address,name,source,compiled_size,mapped_size,matching
 0x080139B0,MarkChain,src/world/list_head.c,32,32,yes
 0x08013A28,SubmitFixed,src/world/dma_flush.c,30,30,yes
 0x08013A48,FlushBlock,src/world/dma_flush.c,60,60,yes
+0x08013A84,FUN_08013a84,src/entry/collect_kind_bits.c,56,56,no
 0x08013ABC,ReleaseObject,src/world/release_object.c,224,224,yes
 0x08014E48,FUN_08014e48,src/world/transition_code.c,168,154,no
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
 0x08014FB8,FUN_08014fb8,src/glue/clear_object_list.c,12,12,yes
+0x080150D0,FUN_080150d0,src/entry/set_two_priorities.c,60,64,no
 0x0801515C,LoadEntryTileData,src/world/level_step_b2.c,100,100,yes
 0x080151C0,ReleaseEntryResources,src/world/level_step_b1.c,124,124,yes
 0x0801528C,SelectEntityHandler,src/world/level_step.c,588,588,yes
