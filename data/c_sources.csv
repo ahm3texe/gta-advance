@@ -49,6 +49,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08005FA8,FUN_08005fa8,src/bootstrap/set_pending_code.c,28,28,yes
 0x08005FC4,FUN_08005fc4,src/world/wrap_08005fc4.c,10,10,yes
 0x08005FE0,FUN_08005fe0,src/bootstrap/set_outer_state_bit.c,72,72,yes
+0x08006090,FUN_08006090,src/glue/swap_two_args.c,18,18,yes
 0x08006180,FUN_08006180,src/glue/call_with_minus_one.c,14,14,yes
 0x08008064,PushHistory,src/world/history_push.c,48,48,yes
 0x08008094,SetIndexReturnOne,src/world/set_index.c,14,14,yes
@@ -66,6 +67,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x0800AADC,SetCoordFlag,src/misc/coord_more.c,12,12,yes
 0x0800AAF4,ResetTrackHeading,src/world/reset_track_heading.c,60,60,yes
 0x0800AB30,ClearCoordByte71,src/core/clear_coord_byte71.c,16,16,yes
+0x0800AB40,FUN_0800ab40,src/glue/get_coord_byte71.c,12,12,yes
 0x0800AF48,FUN_0800af48,src/world/plane_classify.c,166,174,no
 0x0800B140,DotProduct,src/world/geometry.c,44,44,yes
 0x0800B16C,FUN_0800b16c,src/world/band_0800b16c.c,280,280,yes
@@ -132,6 +134,7 @@ address,name,source,compiled_size,mapped_size,matching
 0x08013ABC,ReleaseObject,src/world/release_object.c,224,224,yes
 0x08014E48,FUN_08014e48,src/world/transition_code.c,168,154,no
 0x08014FA0,FUN_08014fa0,src/world/wrap_08014fa0.c,10,10,yes
+0x08014FB8,FUN_08014fb8,src/glue/clear_object_list.c,12,12,yes
 0x0801515C,LoadEntryTileData,src/world/level_step_b2.c,100,100,yes
 0x080151C0,ReleaseEntryResources,src/world/level_step_b1.c,124,124,yes
 0x0801528C,SelectEntityHandler,src/world/level_step.c,588,588,yes
@@ -471,12 +474,17 @@ address,name,source,compiled_size,mapped_size,matching
 0x08048438,FUN_08048438,src/world/p1_48438.c,844,836,no
 0x0804AEAC,FUN_0804aeac,src/world/band_0804aeac.c,476,476,yes
 0x0804B088,AdvanceTargetAction,src/world/target_follow.c,564,564,yes
+0x0804FB18,FUN_0804fb18,src/glue/is_record_kind_six.c,18,18,yes
+0x0804FB2C,FUN_0804fb2c,src/glue/copy_three_words.c,16,16,yes
 0x0804FB4C,FUN_0804fb4c,src/world/wrap_0804fb4c.c,10,10,yes
 0x0804FEE4,FUN_0804fee4,src/world/p1_4fee4.c,28,28,yes
 0x0804FF98,FUN_0804ff98,src/world/wrap_0804ff98.c,10,10,yes
+0x0804FFA4,FUN_0804ffa4,src/glue/detach_and_answer.c,14,14,yes
 0x0804FFB4,FUN_0804ffb4,src/world/wrap_0804ffb4.c,10,10,yes
+0x080500C0,FUN_080500c0,src/glue/arm_and_answer.c,14,14,yes
 0x080500D0,FUN_080500d0,src/world/wrap_080500d0.c,10,10,yes
 0x080500DC,FUN_080500dc,src/world/p1_500dc.c,28,28,yes
+0x080500F8,FUN_080500f8,src/glue/call_with_chain_field.c,16,16,yes
 0x08050108,BumpOrTrigger,src/world/bump_or_trigger.c,40,40,yes
 0x08050190,CompareA,src/world/word_compare.c,28,28,yes
 0x080501AC,CompareB,src/world/word_compare.c,28,28,yes
@@ -484,6 +492,8 @@ address,name,source,compiled_size,mapped_size,matching
 0x08050918,ResetAnchorSmall,src/world/anchor_reset.c,28,28,yes
 0x08050934,ResetAnchorFull,src/world/anchor_reset.c,36,36,yes
 0x08050958,ResetAnchorPartial,src/world/anchor_reset.c,24,24,yes
+0x08050970,FUN_08050970,src/glue/anchor_gets_08_0c.c,12,12,yes
+0x0805097C,FUN_0805097c,src/glue/anchor_gets_08_0c.c,12,12,yes
 0x08050988,GetAnchorUnk04,src/world/get_anchor_unk04.c,12,12,yes
 0x08050994,GetBaseAlt,src/world/get_slot_unk10.c,12,12,yes
 0x080509A0,AdvanceAnchor,src/world/get_slot_unk10.c,36,36,yes
@@ -503,7 +513,9 @@ address,name,source,compiled_size,mapped_size,matching
 0x0805131C,FUN_0805131c,src/world/p1_5131c.c,62,62,yes
 0x0805135C,RunFrameStageOne,src/core/frame_dispatch.c,132,132,yes
 0x080513E0,RunFrameStageTwo,src/core/frame_dispatch.c,120,120,yes
+0x08051458,FUN_08051458,src/glue/wrap_call_with_offset.c,10,10,yes
 0x08051464,FUN_08051464,src/world/wrap_08051464.c,10,10,yes
+0x08051470,FUN_08051470,src/glue/anchor_unk08_as_flag.c,16,16,yes
 0x08051480,ForwardToGetAnchorUnk04,src/world/wrap_08051480.c,10,10,yes
 0x0805148C,IsStateReady,src/world/is_state_two.c,20,20,yes
 0x080514C8,GetRecordUnk04,src/misc/record_table.c,28,28,yes

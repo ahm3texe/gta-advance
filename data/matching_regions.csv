@@ -26,6 +26,7 @@ start,end,binary,module,notes
 0x08005FA8,0x08005FC4,build/bootstrap/set_pending_code.bin,bootstrap,"Sets gUnk02001428 to 8 between FUN_0803379C and FUN_0803378C(8, 1)"
 0x08005FC4,0x08005FD0,build/world/wrap_08005fc4.bin,world,small function harvest
 0x08005FE0,0x08006028,build/bootstrap/set_outer_state_bit.bin,bootstrap,"Codes 8, 9 and 12 each set their own bit in gOuterState; agbcc binary-search switch"
+0x08006090,0x080060A4,build/glue/swap_two_args.bin,glue,Forwards with the first two arguments swapped and a constant 0
 0x08006180,0x08006190,build/glue/call_with_minus_one.bin,glue,Forwards with a constant -1
 0x08008064,0x08008094,build/world/history_push.bin,world,PushHistory; shifts the 31-entry history queue
 0x08008094,0x080080A4,build/world/set_index.bin,world,wrapper around SetTableIndex
@@ -36,6 +37,7 @@ start,end,binary,module,notes
 0x0800AAD0,0x0800AAE8,build/misc/coord_more.bin,misc,Coord unk04 + flag
 0x0800AAF4,0x0800AB30,build/world/reset_track_heading.bin,world,0x0800AAF4 ResetTrackHeading
 0x0800AB30,0x0800AB40,build/core/clear_coord_byte71.bin,core,zeroing the CoordBlock +0x71 byte
+0x0800AB40,0x0800AB4C,build/glue/get_coord_byte71.bin,glue,Reads the coord block's +0x71 byte
 0x0800B16C,0x0800B284,build/world/band_0800b16c.bin,world,Point-in-quad test; returns the index of the nearest edge.
 0x0800CA78,0x0800CA98,build/core/shifted_entry_value.bin,core,Selected entry value shifted; rule 70 puts the sentinel in a local so its pool load lands first
 0x0800DB60,0x0800DB7C,build/world/get_record16.bin,world,0x0800DB60 GetRecord16
@@ -69,6 +71,7 @@ start,end,binary,module,notes
 0x08013A28,0x08013A84,build/world/dma_flush.bin,world,Constant call + DMA flush
 0x08013ABC,0x08013B9C,build/world/release_object.bin,world,ReleaseObject
 0x08014FA0,0x08014FAC,build/world/wrap_08014fa0.bin,world,small function harvest
+0x08014FB8,0x08014FC4,build/glue/clear_object_list.bin,glue,Drops the object list head
 0x080154D8,0x08015598,build/world/actor_init.bin,world,InitActor; 184-byte body + literal pool
 0x080157B8,0x08015834,build/world/try_launch_actor.bin,world,0x080157B8 TryLaunchActor
 0x080159A0,0x08015A84,build/world/update_actor_lane.bin,world,0x080159A0 UpdateActorLane
@@ -265,15 +268,21 @@ start,end,binary,module,notes
 0x0804283C,0x08042864,build/map/release_first_entry.bin,map,Tears the +0x00 entry down through three routines
 0x080428AC,0x080428B8,build/world/wrap_080428ac.bin,world,small function harvest
 0x0804AEAC,0x0804B088,build/world/band_0804aeac.bin,world,"Actor target selection; a linked candidate, or one that is near by octagonal distance."
+0x0804FB18,0x0804FB2C,build/glue/is_record_kind_six.bin,glue,1 when the +0x18 record's +0x30 byte is 6
+0x0804FB2C,0x0804FB3C,build/glue/copy_three_words.bin,glue,Twelve-byte struct assignment; ldmia/stmia
 0x0804FB4C,0x0804FB58,build/world/wrap_0804fb4c.bin,world,small function harvest
 0x0804FEE4,0x0804FF00,build/world/p1_4fee4.bin,world,Phase 1: natural C matching the ROM exactly
 0x0804FF98,0x0804FFA4,build/world/wrap_0804ff98.bin,world,forwarding wrapper
+0x0804FFA4,0x0804FFB4,build/glue/detach_and_answer.bin,glue,Detaches the +0x24 handle and answers 0
 0x0804FFB4,0x0804FFC0,build/world/wrap_0804ffb4.bin,world,forwarding wrapper
+0x080500C0,0x080500D0,build/glue/arm_and_answer.bin,glue,Arms the +0x24 handle and answers 1
 0x080500D0,0x080500DC,build/world/wrap_080500d0.bin,world,forwarding wrapper
 0x080500DC,0x080500F8,build/world/p1_500dc.bin,world,Phase 1: natural C matching the ROM exactly
+0x080500F8,0x08050108,build/glue/call_with_chain_field.bin,glue,Passes the object and a field three links down
 0x08050108,0x08050130,build/world/bump_or_trigger.bin,world,complex harvest
 0x08050190,0x080501C8,build/world/word_compare.bin,world,Two word comparators
 0x08050918,0x08050970,build/world/anchor_reset.bin,world,Anchor reset ; ResetAnchorPartial (0x08050958) added
+0x08050970,0x08050988,build/glue/anchor_gets_08_0c.bin,glue,Two anchor getters no map entry covered
 0x08050988,0x08050994,build/world/get_anchor_unk04.bin,world,wrapper/accessor harvest
 0x08050994,0x080509C4,build/world/get_slot_unk10.bin,world,0x02030330 +0x10 getter
 0x080509C4,0x080509DC,build/world/offset_helpers.bin,world,CallWithOffset; call wrapper with a void offset
@@ -290,7 +299,9 @@ start,end,binary,module,notes
 0x08051300,0x0805131C,build/core/reset_record_index.bin,core,"Record index block reset; 3600 is built with movs/lsls, the marker comes from the pool"
 0x0805131C,0x0805135C,build/world/p1_5131c.bin,world,Phase 1: natural C matching the ROM exactly
 0x0805135C,0x08051458,build/core/frame_dispatch.bin,core,Frame processing chains and diagnostic markers
+0x08051458,0x08051464,build/glue/wrap_call_with_offset.bin,glue,Forwarding wrapper over CallWithOffset
 0x08051464,0x08051470,build/world/wrap_08051464.bin,world,forwarding wrapper
+0x08051470,0x08051480,build/glue/anchor_unk08_as_flag.bin,glue,The anchor's +0x08 word as a flag (rule 48)
 0x08051480,0x0805148C,build/world/wrap_08051480.bin,world,wrapper/accessor harvest
 0x0805148C,0x080514A0,build/world/is_state_two.bin,world,conditional constant return
 0x080514C8,0x08051514,build/misc/record_table.bin,misc,Record table accessors
